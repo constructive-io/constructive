@@ -49,11 +49,17 @@ export function buildCookieOptions(
 ): CookieOptions {
   const isProduction = getNodeEnv() === 'production';
 
-  let maxAge = DEFAULT_SESSION_MAX_AGE;
-  if (rememberMe && settings?.rememberMeDuration) {
-    maxAge = parseIntervalToSeconds(settings.rememberMeDuration) ?? DEFAULT_REMEMBER_ME_MAX_AGE;
-  } else if (settings?.defaultSessionDuration) {
-    maxAge = parseIntervalToSeconds(settings.defaultSessionDuration) ?? DEFAULT_SESSION_MAX_AGE;
+  let maxAge: number;
+  if (rememberMe) {
+    // Use configured rememberMeDuration or default 30 days
+    maxAge = settings?.rememberMeDuration
+      ? (parseIntervalToSeconds(settings.rememberMeDuration) ?? DEFAULT_REMEMBER_ME_MAX_AGE)
+      : DEFAULT_REMEMBER_ME_MAX_AGE;
+  } else {
+    // Use configured defaultSessionDuration or default 1 hour
+    maxAge = settings?.defaultSessionDuration
+      ? (parseIntervalToSeconds(settings.defaultSessionDuration) ?? DEFAULT_SESSION_MAX_AGE)
+      : DEFAULT_SESSION_MAX_AGE;
   }
 
   return {
