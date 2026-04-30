@@ -329,7 +329,8 @@ async function handleWorkspaceInit(
     process.stdout.write('\n');
   }
 
-  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${dirName}\n`);
+  const relPath = path.relative(process.cwd(), targetPath);
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${relPath}\n`);
 
   return { ...argv, ...answers, cwd: targetPath };
 }
@@ -619,7 +620,8 @@ async function handleModuleInit(
     process.stdout.write('\n');
   }
 
-  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${modName}\n`);
+  const relPath = path.relative(process.cwd(), modulePath);
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${relPath}\n`);
 
   return { ...argv, ...answers };
 }
