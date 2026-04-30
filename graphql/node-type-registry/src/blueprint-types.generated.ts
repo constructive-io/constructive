@@ -831,19 +831,6 @@ export interface BlueprintTableUniqueConstraint {
   /** Optional schema name override. */
   schema_name?: string;
 }
-/** A storage-specific RLS policy object for apply_storage_security(). Each entry defines an Authz* policy with explicit privileges, scoped to specific storage tables. */
-export interface BlueprintStoragePolicy {
-  /** Authz* policy generator type (e.g., "AuthzPublishable", "AuthzDirectOwner", "AuthzEntityMembership"). */
-  $type: string;
-  /** Privilege array (e.g., ["select", "insert", "update", "delete"]). Intersected with each storage table's supported operations. */
-  privileges: string[];
-  /** Policy data config. Auto-derived from $type when omitted (e.g., AuthzPublishable defaults to {"is_published_field": "is_public", "require_published_at": false}). */
-  data?: Record<string, unknown>;
-  /** Which storage tables to apply this policy to. Defaults to all three when omitted. Uses logical names (not prefixed). */
-  tables?: ('buckets' | 'files' | 'upload_requests')[];
-  /** Custom RLS policy name suffix. Auto-derived from $type when omitted (pub/own/mem). */
-  policy_name?: string;
-}
 /** A bucket seed entry for storage_config.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped). */
 export interface BlueprintBucketSeed {
   /** Bucket key name (e.g., "avatars", "documents"). Becomes the key column value. */
@@ -859,10 +846,8 @@ export interface BlueprintBucketSeed {
   /** CORS allowed origins for this bucket. */
   allowed_origins?: string[];
 }
-/** Storage configuration for an entity type. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). */
+/** Storage configuration for an entity type. Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions. */
 export interface BlueprintStorageConfig {
-  /** Custom RLS policies for storage tables. When provided, replaces the default policy set (AuthzPublishable + membership + AuthzDirectOwner). Each entry is a policy object with $type, privileges, and optional data/tables/policy_name. */
-  policies?: BlueprintStoragePolicy[];
   /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. Only used for app-level storage (not entity-scoped). */
   buckets?: BlueprintBucketSeed[];
   /** Override for presigned upload URL expiry time in seconds. */
@@ -873,8 +858,8 @@ export interface BlueprintStorageConfig {
   default_max_file_size?: number;
   /** CORS allowed origins for the storage module. */
   allowed_origins?: string[];
-  /** Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. */
-  storage_table_provisions?: {
+  /** Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults. */
+  provisions?: {
     files?: BlueprintEntityTableProvision;
     buckets?: BlueprintEntityTableProvision;
     upload_requests?: BlueprintEntityTableProvision;
@@ -1160,6 +1145,6 @@ export interface BlueprintDefinition {
   unique_constraints?: BlueprintUniqueConstraint[];
   /** Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security. */
   entity_types?: BlueprintEntityType[];
-  /** App-level storage configuration. Creates a storage_module (membership_type = NULL) with the specified policies, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead. */
+  /** App-level storage configuration. Creates a storage_module (membership_type = NULL), seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). Use provisions for per-table policy overrides. For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead. */
   storage?: BlueprintStorageConfig;
 }
