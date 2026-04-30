@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.4.1...@constructive-io/bucket-provisioner@0.5.0) (2026-04-30)
+
+### Bug Fixes
+
+- handle MissingContentMD5 error from MinIO edge-cicd in setLifecycleRules ([d8c66fb](https://github.com/constructive-io/constructive/commit/d8c66fb552ac7fa6b76b2ff7b96a6dc90428bcf9))
+
+### Features
+
+- graceful degradation for setBucketPolicy, enableVersioning, setLifecycleRules + MinIO integration tests ([975e1a1](https://github.com/constructive-io/constructive/commit/975e1a11c403bf73e4da76e68166a50f26d03ed8))
+
 ## [0.4.1](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.4.0...@constructive-io/bucket-provisioner@0.4.1) (2026-04-28)
 
 **Note:** Version bump only for package @constructive-io/bucket-provisioner

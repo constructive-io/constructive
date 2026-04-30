@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.18.1...node-type-registry@0.19.0) (2026-04-30)
+
+### Features
+
+- add has_invites and storage_table_provisions to blueprint types ([a958617](https://github.com/constructive-io/constructive/commit/a958617e990185b8fe5259888519c0a1fcdf9e11)), closes [#958](https://github.com/constructive-io/constructive/issues/958)
+- rename storage_table_provisions -> provisions, remove storage_config.policies ([65719e8](https://github.com/constructive-io/constructive/commit/65719e814e28da464438e9dbfa7c1569e3542500))
+
 ## [0.18.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.18.0...node-type-registry@0.18.1) (2026-04-29)
 
 **Note:** Version bump only for package node-type-registry
