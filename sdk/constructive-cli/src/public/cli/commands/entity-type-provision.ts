@@ -28,6 +28,7 @@ const fieldSchema: FieldSchema = {
   hasProfiles: 'boolean',
   hasLevels: 'boolean',
   hasStorage: 'boolean',
+  hasInvites: 'boolean',
   storageConfig: 'json',
   skipEntityPolicies: 'boolean',
   tableProvision: 'json',
@@ -38,6 +39,7 @@ const fieldSchema: FieldSchema = {
   outStorageModuleId: 'uuid',
   outBucketsTableId: 'uuid',
   outFilesTableId: 'uuid',
+  outInvitesModuleId: 'uuid',
 };
 const usage =
   '\nentity-type-provision <command>\n\nCommands:\n  list                  List entityTypeProvision records\n  find-first            Find first matching entityTypeProvision record\n  get                   Get a entityTypeProvision by ID\n  create                Create a new entityTypeProvision\n  update                Update an existing entityTypeProvision\n  delete                Delete a entityTypeProvision\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
@@ -102,6 +104,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       hasProfiles: true,
       hasLevels: true,
       hasStorage: true,
+      hasInvites: true,
       storageConfig: true,
       skipEntityPolicies: true,
       tableProvision: true,
@@ -112,6 +115,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       outStorageModuleId: true,
       outBucketsTableId: true,
       outFilesTableId: true,
+      outInvitesModuleId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -148,6 +152,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       hasProfiles: true,
       hasLevels: true,
       hasStorage: true,
+      hasInvites: true,
       storageConfig: true,
       skipEntityPolicies: true,
       tableProvision: true,
@@ -158,6 +163,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       outStorageModuleId: true,
       outBucketsTableId: true,
       outFilesTableId: true,
+      outInvitesModuleId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<EntityTypeProvisionSelect, EntityTypeProvisionFilter> & {
@@ -202,6 +208,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           hasProfiles: true,
           hasLevels: true,
           hasStorage: true,
+          hasInvites: true,
           storageConfig: true,
           skipEntityPolicies: true,
           tableProvision: true,
@@ -212,6 +219,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           outStorageModuleId: true,
           outBucketsTableId: true,
           outFilesTableId: true,
+          outInvitesModuleId: true,
         },
       })
       .execute();
@@ -302,6 +310,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'hasInvites',
+        message: 'hasInvites',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'storageConfig',
         message: 'storageConfig',
@@ -371,6 +386,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'outInvitesModuleId',
+        message: 'outInvitesModuleId',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -392,6 +414,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           hasProfiles: cleanedData.hasProfiles,
           hasLevels: cleanedData.hasLevels,
           hasStorage: cleanedData.hasStorage,
+          hasInvites: cleanedData.hasInvites,
           storageConfig: cleanedData.storageConfig,
           skipEntityPolicies: cleanedData.skipEntityPolicies,
           tableProvision: cleanedData.tableProvision,
@@ -402,6 +425,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: cleanedData.outStorageModuleId,
           outBucketsTableId: cleanedData.outBucketsTableId,
           outFilesTableId: cleanedData.outFilesTableId,
+          outInvitesModuleId: cleanedData.outInvitesModuleId,
         },
         select: {
           id: true,
@@ -416,6 +440,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           hasProfiles: true,
           hasLevels: true,
           hasStorage: true,
+          hasInvites: true,
           storageConfig: true,
           skipEntityPolicies: true,
           tableProvision: true,
@@ -426,6 +451,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: true,
           outBucketsTableId: true,
           outFilesTableId: true,
+          outInvitesModuleId: true,
         },
       })
       .execute();
@@ -522,6 +548,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'hasInvites',
+        message: 'hasInvites',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'storageConfig',
         message: 'storageConfig',
@@ -591,6 +624,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'outInvitesModuleId',
+        message: 'outInvitesModuleId',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as EntityTypeProvisionPatch;
@@ -612,6 +652,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           hasProfiles: cleanedData.hasProfiles,
           hasLevels: cleanedData.hasLevels,
           hasStorage: cleanedData.hasStorage,
+          hasInvites: cleanedData.hasInvites,
           storageConfig: cleanedData.storageConfig,
           skipEntityPolicies: cleanedData.skipEntityPolicies,
           tableProvision: cleanedData.tableProvision,
@@ -622,6 +663,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: cleanedData.outStorageModuleId,
           outBucketsTableId: cleanedData.outBucketsTableId,
           outFilesTableId: cleanedData.outFilesTableId,
+          outInvitesModuleId: cleanedData.outInvitesModuleId,
         },
         select: {
           id: true,
@@ -636,6 +678,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           hasProfiles: true,
           hasLevels: true,
           hasStorage: true,
+          hasInvites: true,
           storageConfig: true,
           skipEntityPolicies: true,
           tableProvision: true,
@@ -646,6 +689,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: true,
           outBucketsTableId: true,
           outFilesTableId: true,
+          outInvitesModuleId: true,
         },
       })
       .execute();

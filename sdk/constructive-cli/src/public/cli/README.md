@@ -2409,7 +2409,8 @@ CRUD operations for StorageModule records.
 | `filesTableName` | String |
 | `uploadRequestsTableName` | String |
 | `membershipType` | Int |
-| `policies` | String |
+| `policies` | JSON |
+| `skipDefaultPolicyTables` | String |
 | `entityTableId` | UUID |
 | `endpoint` | String |
 | `publicUrlPrefix` | String |
@@ -2422,7 +2423,7 @@ CRUD operations for StorageModule records.
 | `cacheTtlSeconds` | Int |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `uploadRequestsTableId`, `bucketsTableName`, `filesTableName`, `uploadRequestsTableName`, `membershipType`, `policies`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `uploadRequestsTableId`, `bucketsTableName`, `filesTableName`, `uploadRequestsTableName`, `membershipType`, `policies`, `skipDefaultPolicyTables`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`
 
 ### `entity-type-provision`
 
@@ -2453,6 +2454,7 @@ CRUD operations for EntityTypeProvision records.
 | `hasProfiles` | Boolean |
 | `hasLevels` | Boolean |
 | `hasStorage` | Boolean |
+| `hasInvites` | Boolean |
 | `storageConfig` | JSON |
 | `skipEntityPolicies` | Boolean |
 | `tableProvision` | JSON |
@@ -2463,9 +2465,10 @@ CRUD operations for EntityTypeProvision records.
 | `outStorageModuleId` | UUID |
 | `outBucketsTableId` | UUID |
 | `outFilesTableId` | UUID |
+| `outInvitesModuleId` | UUID |
 
 **Required create fields:** `databaseId`, `name`, `prefix`
-**Optional create fields (backend defaults):** `description`, `parentEntity`, `tableName`, `isVisible`, `hasLimits`, `hasProfiles`, `hasLevels`, `hasStorage`, `storageConfig`, `skipEntityPolicies`, `tableProvision`, `outMembershipType`, `outEntityTableId`, `outEntityTableName`, `outInstalledModules`, `outStorageModuleId`, `outBucketsTableId`, `outFilesTableId`
+**Optional create fields (backend defaults):** `description`, `parentEntity`, `tableName`, `isVisible`, `hasLimits`, `hasProfiles`, `hasLevels`, `hasStorage`, `hasInvites`, `storageConfig`, `skipEntityPolicies`, `tableProvision`, `outMembershipType`, `outEntityTableId`, `outEntityTableName`, `outInstalledModules`, `outStorageModuleId`, `outBucketsTableId`, `outFilesTableId`, `outInvitesModuleId`
 
 ### `webauthn-credentials-module`
 
@@ -4950,6 +4953,7 @@ Composable table provisioning: creates or finds a table, then creates fields (so
   | `--input.indexes` | JSON |
   | `--input.fullTextSearches` | JSON |
   | `--input.uniqueConstraints` | JSON |
+  | `--input.description` | String |
 
 ### `send-verification-email`
 

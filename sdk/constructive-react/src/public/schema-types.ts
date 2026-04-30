@@ -1835,6 +1835,8 @@ export type StorageModuleOrderBy =
   | 'MEMBERSHIP_TYPE_DESC'
   | 'POLICIES_ASC'
   | 'POLICIES_DESC'
+  | 'SKIP_DEFAULT_POLICY_TABLES_ASC'
+  | 'SKIP_DEFAULT_POLICY_TABLES_DESC'
   | 'ENTITY_TABLE_ID_ASC'
   | 'ENTITY_TABLE_ID_DESC'
   | 'ENDPOINT_ASC'
@@ -1884,6 +1886,8 @@ export type EntityTypeProvisionOrderBy =
   | 'HAS_LEVELS_DESC'
   | 'HAS_STORAGE_ASC'
   | 'HAS_STORAGE_DESC'
+  | 'HAS_INVITES_ASC'
+  | 'HAS_INVITES_DESC'
   | 'STORAGE_CONFIG_ASC'
   | 'STORAGE_CONFIG_DESC'
   | 'SKIP_ENTITY_POLICIES_ASC'
@@ -1903,7 +1907,9 @@ export type EntityTypeProvisionOrderBy =
   | 'OUT_BUCKETS_TABLE_ID_ASC'
   | 'OUT_BUCKETS_TABLE_ID_DESC'
   | 'OUT_FILES_TABLE_ID_ASC'
-  | 'OUT_FILES_TABLE_ID_DESC';
+  | 'OUT_FILES_TABLE_ID_DESC'
+  | 'OUT_INVITES_MODULE_ID_ASC'
+  | 'OUT_INVITES_MODULE_ID_DESC';
 /** Methods to use when ordering `WebauthnCredentialsModule`. */
 export type WebauthnCredentialsModuleOrderBy =
   | 'NATURAL'
@@ -8952,7 +8958,9 @@ export interface StorageModuleFilter {
   /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
   /** Filter by the object’s `policies` field. */
-  policies?: StringListFilter;
+  policies?: JSONFilter;
+  /** Filter by the object’s `skipDefaultPolicyTables` field. */
+  skipDefaultPolicyTables?: StringListFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -9031,6 +9039,8 @@ export interface EntityTypeProvisionFilter {
   hasLevels?: BooleanFilter;
   /** Filter by the object’s `hasStorage` field. */
   hasStorage?: BooleanFilter;
+  /** Filter by the object’s `hasInvites` field. */
+  hasInvites?: BooleanFilter;
   /** Filter by the object’s `storageConfig` field. */
   storageConfig?: JSONFilter;
   /** Filter by the object’s `skipEntityPolicies` field. */
@@ -9051,6 +9061,8 @@ export interface EntityTypeProvisionFilter {
   outBucketsTableId?: UUIDFilter;
   /** Filter by the object’s `outFilesTableId` field. */
   outFilesTableId?: UUIDFilter;
+  /** Filter by the object’s `outInvitesModuleId` field. */
+  outInvitesModuleId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: EntityTypeProvisionFilter[];
   /** Checks for any expressions in this list. */
@@ -10083,6 +10095,7 @@ export interface ProvisionTableInput {
   indexes?: unknown;
   fullTextSearches?: unknown;
   uniqueConstraints?: unknown;
+  description?: string;
 }
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
@@ -12272,6 +12285,64 @@ export interface ForeignKeyConstraintInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateTableInput {
+  clientMutationId?: string;
+  /** The `Table` to be created by this mutation. */
+  table: TableInput;
+}
+/** An input for mutations affecting `Table` */
+export interface TableInput {
+  id?: string;
+  databaseId?: string;
+  schemaId: string;
+  name: string;
+  label?: string;
+  description?: string;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  module?: string;
+  scope?: number;
+  useRls?: boolean;
+  timestamps?: boolean;
+  peoplestamps?: boolean;
+  pluralName?: string;
+  singularName?: string;
+  tags?: string[];
+  inheritsId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface CreateStorageModuleInput {
+  clientMutationId?: string;
+  /** The `StorageModule` to be created by this mutation. */
+  storageModule: StorageModuleInput;
+}
+/** An input for mutations affecting `StorageModule` */
+export interface StorageModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  uploadRequestsTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  uploadRequestsTableName?: string;
+  membershipType?: number;
+  policies?: unknown;
+  skipDefaultPolicyTables?: string[];
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
+}
 export interface CreateEntityTypeProvisionInput {
   clientMutationId?: string;
   /** The `EntityTypeProvision` to be created by this mutation. */
@@ -12284,8 +12355,8 @@ export interface EntityTypeProvisionInput {
   /** The database to provision this entity type in. Required. */
   databaseId: string;
   /**
-   * Human-readable name for this membership type, e.g. 'Data Room Member', 'Team Channel Member'. Required.
-   *      Stored in the membership_types registry table.
+   * Human-readable name for this entity type, e.g. 'Data Room', 'Team Channel'. Required.
+   *      Stored in the entity_types registry table.
    */
   name: string;
   /**
@@ -12295,7 +12366,7 @@ export interface EntityTypeProvisionInput {
    *      Must be unique per database — the (database_id, prefix) constraint ensures graceful ON CONFLICT DO NOTHING.
    */
   prefix: string;
-  /** Description of this membership type. Stored in the membership_types registry table. Defaults to empty string. */
+  /** Description of this entity type. Stored in the entity_types registry table. Defaults to empty string. */
   description?: string;
   /**
    * Prefix of the parent entity type. The trigger resolves this to a membership_type integer
@@ -12347,6 +12418,16 @@ export interface EntityTypeProvisionInput {
    */
   hasStorage?: boolean;
   /**
+   * Whether to provision invites_module for this type. Defaults to false.
+   *      When true, the trigger inserts a row into invites_module which in turn
+   *      (via insert_invites_module BEFORE INSERT) creates {prefix}_invites and
+   *      {prefix}_claimed_invites tables plus the submit_{prefix}_invite_code() function.
+   *      Symmetric counterpart of has_storage. Re-provisioning is idempotent: the
+   *      UNIQUE (database_id, membership_type) constraint on invites_module combined with
+   *      ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
+   */
+  hasInvites?: boolean;
+  /**
    * Optional jsonb object for storage module configuration and initial bucket seeding.
    *      Only used when has_storage = true; ignored otherwise. NULL = use defaults.
    *      Recognized keys (all optional):
@@ -12362,8 +12443,21 @@ export interface EntityTypeProvisionInput {
    *        - allowed_mime_types  (text[])         whitelist of MIME types (null = any)
    *        - max_file_size       (bigint)         max file size in bytes (null = use scope default)
    *        - allowed_origins     (text[])         per-bucket CORS override
+   *        - provisions (jsonb object) optional: customize storage tables
+   *                                   with additional nodes, fields, grants, and policies.
+   *                                   Keyed by table role: "files", "buckets", "upload_requests".
+   *                                   Each value uses the same shape as table_provision:
+   *                                   { nodes, fields, grants, use_rls, policies }. Fanned out
+   *                                   to secure_table_provision targeting the corresponding table.
+   *                                   When a key includes policies[], those REPLACE the default
+   *                                   storage policies for that table; tables without a key still
+   *                                   get defaults. Missing "data" on policy entries is auto-populated
+   *                                   with storage-specific defaults (same as table_provision).
+   *                                   Example: add SearchBm25 for full-text search on files:
+   *                                   {"provisions": {"files": {"nodes": [{"$type":
+   *                                   "SearchBm25", "data": {"source_fields": ["description"]}}]}}}
    *      Example:
-   *        storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}]}'::jsonb
+   *        storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}], "provisions": {"files": {"nodes": [{"$type": "SearchBm25", "data": {"source_fields": ["description"]}}]}}}'::jsonb
    */
   storageConfig?: unknown;
   /**
@@ -12414,7 +12508,7 @@ export interface EntityTypeProvisionInput {
   tableProvision?: unknown;
   /**
    * Output: the auto-assigned integer membership type ID. Populated by the trigger after successful provisioning.
-   *      This is the ID used in membership_types, memberships_module, and all module tables.
+   *      This is the ID used in entity_types, memberships_module, and all module tables.
    */
   outMembershipType?: number;
   /**
@@ -12435,63 +12529,12 @@ export interface EntityTypeProvisionInput {
   outBucketsTableId?: string;
   /** Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true. */
   outFilesTableId?: string;
-}
-export interface CreateStorageModuleInput {
-  clientMutationId?: string;
-  /** The `StorageModule` to be created by this mutation. */
-  storageModule: StorageModuleInput;
-}
-/** An input for mutations affecting `StorageModule` */
-export interface StorageModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  uploadRequestsTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  uploadRequestsTableName?: string;
-  membershipType?: number;
-  policies?: string[];
-  entityTableId?: string;
-  endpoint?: string;
-  publicUrlPrefix?: string;
-  provider?: string;
-  allowedOrigins?: string[];
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
-}
-export interface CreateTableInput {
-  clientMutationId?: string;
-  /** The `Table` to be created by this mutation. */
-  table: TableInput;
-}
-/** An input for mutations affecting `Table` */
-export interface TableInput {
-  id?: string;
-  databaseId?: string;
-  schemaId: string;
-  name: string;
-  label?: string;
-  description?: string;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  module?: string;
-  scope?: number;
-  useRls?: boolean;
-  timestamps?: boolean;
-  peoplestamps?: boolean;
-  pluralName?: string;
-  singularName?: string;
-  tags?: string[];
-  inheritsId?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  /**
+   * Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
+   *      NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
+   *      (i.e. the invites_module row was created in a previous run).
+   */
+  outInvitesModuleId?: string;
 }
 export interface CreateRelationProvisionInput {
   clientMutationId?: string;
@@ -15005,6 +15048,66 @@ export interface ForeignKeyConstraintPatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateTableInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Table` being updated. */
+  tablePatch: TablePatch;
+}
+/** Represents an update to a `Table`. Fields that are set will be updated. */
+export interface TablePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  name?: string;
+  label?: string;
+  description?: string;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  module?: string;
+  scope?: number;
+  useRls?: boolean;
+  timestamps?: boolean;
+  peoplestamps?: boolean;
+  pluralName?: string;
+  singularName?: string;
+  tags?: string[];
+  inheritsId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UpdateStorageModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `StorageModule` being updated. */
+  storageModulePatch: StorageModulePatch;
+}
+/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
+export interface StorageModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  uploadRequestsTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  uploadRequestsTableName?: string;
+  membershipType?: number;
+  policies?: unknown;
+  skipDefaultPolicyTables?: string[];
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
+}
 export interface UpdateEntityTypeProvisionInput {
   clientMutationId?: string;
   /** Unique identifier for this provision row. */
@@ -15019,8 +15122,8 @@ export interface EntityTypeProvisionPatch {
   /** The database to provision this entity type in. Required. */
   databaseId?: string;
   /**
-   * Human-readable name for this membership type, e.g. 'Data Room Member', 'Team Channel Member'. Required.
-   *      Stored in the membership_types registry table.
+   * Human-readable name for this entity type, e.g. 'Data Room', 'Team Channel'. Required.
+   *      Stored in the entity_types registry table.
    */
   name?: string;
   /**
@@ -15030,7 +15133,7 @@ export interface EntityTypeProvisionPatch {
    *      Must be unique per database — the (database_id, prefix) constraint ensures graceful ON CONFLICT DO NOTHING.
    */
   prefix?: string;
-  /** Description of this membership type. Stored in the membership_types registry table. Defaults to empty string. */
+  /** Description of this entity type. Stored in the entity_types registry table. Defaults to empty string. */
   description?: string;
   /**
    * Prefix of the parent entity type. The trigger resolves this to a membership_type integer
@@ -15082,6 +15185,16 @@ export interface EntityTypeProvisionPatch {
    */
   hasStorage?: boolean;
   /**
+   * Whether to provision invites_module for this type. Defaults to false.
+   *      When true, the trigger inserts a row into invites_module which in turn
+   *      (via insert_invites_module BEFORE INSERT) creates {prefix}_invites and
+   *      {prefix}_claimed_invites tables plus the submit_{prefix}_invite_code() function.
+   *      Symmetric counterpart of has_storage. Re-provisioning is idempotent: the
+   *      UNIQUE (database_id, membership_type) constraint on invites_module combined with
+   *      ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
+   */
+  hasInvites?: boolean;
+  /**
    * Optional jsonb object for storage module configuration and initial bucket seeding.
    *      Only used when has_storage = true; ignored otherwise. NULL = use defaults.
    *      Recognized keys (all optional):
@@ -15097,8 +15210,21 @@ export interface EntityTypeProvisionPatch {
    *        - allowed_mime_types  (text[])         whitelist of MIME types (null = any)
    *        - max_file_size       (bigint)         max file size in bytes (null = use scope default)
    *        - allowed_origins     (text[])         per-bucket CORS override
+   *        - provisions (jsonb object) optional: customize storage tables
+   *                                   with additional nodes, fields, grants, and policies.
+   *                                   Keyed by table role: "files", "buckets", "upload_requests".
+   *                                   Each value uses the same shape as table_provision:
+   *                                   { nodes, fields, grants, use_rls, policies }. Fanned out
+   *                                   to secure_table_provision targeting the corresponding table.
+   *                                   When a key includes policies[], those REPLACE the default
+   *                                   storage policies for that table; tables without a key still
+   *                                   get defaults. Missing "data" on policy entries is auto-populated
+   *                                   with storage-specific defaults (same as table_provision).
+   *                                   Example: add SearchBm25 for full-text search on files:
+   *                                   {"provisions": {"files": {"nodes": [{"$type":
+   *                                   "SearchBm25", "data": {"source_fields": ["description"]}}]}}}
    *      Example:
-   *        storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}]}'::jsonb
+   *        storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}], "provisions": {"files": {"nodes": [{"$type": "SearchBm25", "data": {"source_fields": ["description"]}}]}}}'::jsonb
    */
   storageConfig?: unknown;
   /**
@@ -15149,7 +15275,7 @@ export interface EntityTypeProvisionPatch {
   tableProvision?: unknown;
   /**
    * Output: the auto-assigned integer membership type ID. Populated by the trigger after successful provisioning.
-   *      This is the ID used in membership_types, memberships_module, and all module tables.
+   *      This is the ID used in entity_types, memberships_module, and all module tables.
    */
   outMembershipType?: number;
   /**
@@ -15170,65 +15296,12 @@ export interface EntityTypeProvisionPatch {
   outBucketsTableId?: string;
   /** Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true. */
   outFilesTableId?: string;
-}
-export interface UpdateStorageModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `StorageModule` being updated. */
-  storageModulePatch: StorageModulePatch;
-}
-/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
-export interface StorageModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  uploadRequestsTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  uploadRequestsTableName?: string;
-  membershipType?: number;
-  policies?: string[];
-  entityTableId?: string;
-  endpoint?: string;
-  publicUrlPrefix?: string;
-  provider?: string;
-  allowedOrigins?: string[];
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
-}
-export interface UpdateTableInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Table` being updated. */
-  tablePatch: TablePatch;
-}
-/** Represents an update to a `Table`. Fields that are set will be updated. */
-export interface TablePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  name?: string;
-  label?: string;
-  description?: string;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  module?: string;
-  scope?: number;
-  useRls?: boolean;
-  timestamps?: boolean;
-  peoplestamps?: boolean;
-  pluralName?: string;
-  singularName?: string;
-  tags?: string[];
-  inheritsId?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  /**
+   * Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
+   *      NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
+   *      (i.e. the invites_module row was created in a previous run).
+   */
+  outInvitesModuleId?: string;
 }
 export interface UpdateRelationProvisionInput {
   clientMutationId?: string;
@@ -15944,17 +16017,17 @@ export interface DeleteForeignKeyConstraintInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteEntityTypeProvisionInput {
+export interface DeleteTableInput {
   clientMutationId?: string;
-  /** Unique identifier for this provision row. */
   id: string;
 }
 export interface DeleteStorageModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteTableInput {
+export interface DeleteEntityTypeProvisionInput {
   clientMutationId?: string;
+  /** Unique identifier for this provision row. */
   id: string;
 }
 export interface DeleteRelationProvisionInput {
@@ -16794,10 +16867,10 @@ export interface ForeignKeyConstraintConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `EntityTypeProvision` values. */
-export interface EntityTypeProvisionConnection {
-  nodes: EntityTypeProvision[];
-  edges: EntityTypeProvisionEdge[];
+/** A connection to a list of `Table` values. */
+export interface TableConnection {
+  nodes: Table[];
+  edges: TableEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16808,10 +16881,10 @@ export interface StorageModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Table` values. */
-export interface TableConnection {
-  nodes: Table[];
-  edges: TableEdge[];
+/** A connection to a list of `EntityTypeProvision` values. */
+export interface EntityTypeProvisionConnection {
+  nodes: EntityTypeProvision[];
+  edges: EntityTypeProvisionEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17683,11 +17756,11 @@ export interface CreateForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface CreateEntityTypeProvisionPayload {
+export interface CreateTablePayload {
   clientMutationId?: string | null;
-  /** The `EntityTypeProvision` that was created by this mutation. */
-  entityTypeProvision?: EntityTypeProvision | null;
-  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
+  /** The `Table` that was created by this mutation. */
+  table?: Table | null;
+  tableEdge?: TableEdge | null;
 }
 export interface CreateStorageModulePayload {
   clientMutationId?: string | null;
@@ -17695,11 +17768,11 @@ export interface CreateStorageModulePayload {
   storageModule?: StorageModule | null;
   storageModuleEdge?: StorageModuleEdge | null;
 }
-export interface CreateTablePayload {
+export interface CreateEntityTypeProvisionPayload {
   clientMutationId?: string | null;
-  /** The `Table` that was created by this mutation. */
-  table?: Table | null;
-  tableEdge?: TableEdge | null;
+  /** The `EntityTypeProvision` that was created by this mutation. */
+  entityTypeProvision?: EntityTypeProvision | null;
+  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
 }
 export interface CreateRelationProvisionPayload {
   clientMutationId?: string | null;
@@ -18355,11 +18428,11 @@ export interface UpdateForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface UpdateEntityTypeProvisionPayload {
+export interface UpdateTablePayload {
   clientMutationId?: string | null;
-  /** The `EntityTypeProvision` that was updated by this mutation. */
-  entityTypeProvision?: EntityTypeProvision | null;
-  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
+  /** The `Table` that was updated by this mutation. */
+  table?: Table | null;
+  tableEdge?: TableEdge | null;
 }
 export interface UpdateStorageModulePayload {
   clientMutationId?: string | null;
@@ -18367,11 +18440,11 @@ export interface UpdateStorageModulePayload {
   storageModule?: StorageModule | null;
   storageModuleEdge?: StorageModuleEdge | null;
 }
-export interface UpdateTablePayload {
+export interface UpdateEntityTypeProvisionPayload {
   clientMutationId?: string | null;
-  /** The `Table` that was updated by this mutation. */
-  table?: Table | null;
-  tableEdge?: TableEdge | null;
+  /** The `EntityTypeProvision` that was updated by this mutation. */
+  entityTypeProvision?: EntityTypeProvision | null;
+  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
 }
 export interface UpdateRelationProvisionPayload {
   clientMutationId?: string | null;
@@ -19027,11 +19100,11 @@ export interface DeleteForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface DeleteEntityTypeProvisionPayload {
+export interface DeleteTablePayload {
   clientMutationId?: string | null;
-  /** The `EntityTypeProvision` that was deleted by this mutation. */
-  entityTypeProvision?: EntityTypeProvision | null;
-  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
+  /** The `Table` that was deleted by this mutation. */
+  table?: Table | null;
+  tableEdge?: TableEdge | null;
 }
 export interface DeleteStorageModulePayload {
   clientMutationId?: string | null;
@@ -19039,11 +19112,11 @@ export interface DeleteStorageModulePayload {
   storageModule?: StorageModule | null;
   storageModuleEdge?: StorageModuleEdge | null;
 }
-export interface DeleteTablePayload {
+export interface DeleteEntityTypeProvisionPayload {
   clientMutationId?: string | null;
-  /** The `Table` that was deleted by this mutation. */
-  table?: Table | null;
-  tableEdge?: TableEdge | null;
+  /** The `EntityTypeProvision` that was deleted by this mutation. */
+  entityTypeProvision?: EntityTypeProvision | null;
+  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
 }
 export interface DeleteRelationProvisionPayload {
   clientMutationId?: string | null;
@@ -19086,6 +19159,8 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
+  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable. */
+  status: string;
 }
 export interface ConfirmUploadPayload {
   /** The confirmed file ID */
@@ -19792,11 +19867,11 @@ export interface ForeignKeyConstraintEdge {
   /** The `ForeignKeyConstraint` at the end of the edge. */
   node?: ForeignKeyConstraint | null;
 }
-/** A `EntityTypeProvision` edge in the connection. */
-export interface EntityTypeProvisionEdge {
+/** A `Table` edge in the connection. */
+export interface TableEdge {
   cursor?: string | null;
-  /** The `EntityTypeProvision` at the end of the edge. */
-  node?: EntityTypeProvision | null;
+  /** The `Table` at the end of the edge. */
+  node?: Table | null;
 }
 /** A `StorageModule` edge in the connection. */
 export interface StorageModuleEdge {
@@ -19804,11 +19879,11 @@ export interface StorageModuleEdge {
   /** The `StorageModule` at the end of the edge. */
   node?: StorageModule | null;
 }
-/** A `Table` edge in the connection. */
-export interface TableEdge {
+/** A `EntityTypeProvision` edge in the connection. */
+export interface EntityTypeProvisionEdge {
   cursor?: string | null;
-  /** The `Table` at the end of the edge. */
-  node?: Table | null;
+  /** The `EntityTypeProvision` at the end of the edge. */
+  node?: EntityTypeProvision | null;
 }
 /** A `RelationProvision` edge in the connection. */
 export interface RelationProvisionEdge {
