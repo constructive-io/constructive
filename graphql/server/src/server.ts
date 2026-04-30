@@ -4,7 +4,9 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
-import express, { Express, RequestHandler } from 'express';
+import { createCsrfMiddleware } from '@constructive-io/csrf';
+import cookieParser from 'cookie-parser';
+import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Server as HttpServer } from 'http';
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
@@ -32,9 +34,9 @@ import { createDebugDatabaseMiddleware } from './middleware/observability/debug-
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
-import { createCaptchaMiddleware } from './middleware/captcha';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { startDebugSampler } from './diagnostics/debug-sampler';
+import { createAuthCookieMiddleware } from './middleware/auth-cookie';
 
 const log = new Logger('server');
 
@@ -146,6 +148,38 @@ class Server {
 
     app.use(poweredBy('constructive'));
     app.use(cors(fallbackOrigin));
+    app.use(cookieParser());
+
+    // CSRF middleware setup
+    const csrf = createCsrfMiddleware({
+      cookieOptions: {
+        httpOnly: false, // Must be readable by JS for double-submit pattern
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 86400,
+        path: '/',
+      },
+    });
+
+    // Set CSRF token cookie on all requests
+    app.use(csrf.setToken as RequestHandler);
+
+    // Selective CSRF protection: only enforce on cookie-authenticated mutations
+    const selectiveCsrfProtect = (req: Request, res: Response, next: NextFunction): void => {
+      const authHeader = req.headers.authorization || '';
+      if (authHeader.toLowerCase().startsWith('bearer ')) {
+        return next();
+      }
+      if (['GET', 'HEAD', 'OPTIONS'].includes(req.method.toUpperCase())) {
+        return next();
+      }
+      const hasCookieAuth = !!req.cookies?.constructive_session;
+      if (!hasCookieAuth) {
+        return next();
+      }
+      csrf.protect(req as any, res as any, next);
+    };
+
     app.use('/graphql', graphqlUpload.graphqlUploadExpress({
       maxFileSize: 10 * 1024 * 1024, // 10 MB
       maxFiles: 10,
@@ -158,8 +192,14 @@ class Server {
     app.use(requestLogger);
     app.use(api);
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
+
+    // CSRF protection before auth mutations (only for cookie-authenticated requests)
+    app.use('/graphql', selectiveCsrfProtect);
+
+    // Auth cookie middleware: intercepts auth mutation responses to set/clear cookies
+    app.use(createAuthCookieMiddleware());
+
     app.use(authenticate);
-    app.use(createCaptchaMiddleware());
     app.use(graphile(effectiveOpts));
     app.use(flush);
 
