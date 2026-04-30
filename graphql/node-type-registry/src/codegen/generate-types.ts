@@ -1042,7 +1042,6 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintTableIndex());
   statements.push(buildBlueprintUniqueConstraint());
   statements.push(buildBlueprintTableUniqueConstraint());
-  // BlueprintStoragePolicy removed — policies are now per-table via provisions
   statements.push(buildBlueprintBucketSeed());
   statements.push(buildBlueprintStorageConfig());
   statements.push(buildBlueprintEntityTableProvision());
