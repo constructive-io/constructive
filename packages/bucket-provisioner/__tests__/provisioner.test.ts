@@ -485,6 +485,134 @@ describe('BucketProvisioner — S3 provider', () => {
   });
 });
 
+describe('BucketProvisioner — graceful degradation (error-code matching)', () => {
+  it('setBucketPolicy tolerates XmlParseException', async () => {
+    const err = new Error('not well-formed');
+    (err as any).Code = 'XmlParseException';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    // Should not throw — graceful degradation
+    await provisioner.setBucketPolicy('test-bucket', {
+      Version: '2012-10-17',
+      Statement: [],
+    });
+  });
+
+  it('setBucketPolicy tolerates NotImplemented', async () => {
+    const err = new Error('not implemented');
+    (err as any).name = 'NotImplemented';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.setBucketPolicy('test-bucket', {
+      Version: '2012-10-17',
+      Statement: [],
+    });
+  });
+
+  it('setBucketPolicy throws on genuine errors', async () => {
+    mockSend.mockRejectedValueOnce(new Error('Access denied'));
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(
+      provisioner.setBucketPolicy('test-bucket', {
+        Version: '2012-10-17',
+        Statement: [],
+      }),
+    ).rejects.toThrow(ProvisionerError);
+  });
+
+  it('enableVersioning tolerates XmlParseException', async () => {
+    const err = new Error('not well-formed');
+    (err as any).Code = 'XmlParseException';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.enableVersioning('test-bucket');
+  });
+
+  it('enableVersioning tolerates NotImplemented', async () => {
+    const err = new Error('not implemented');
+    (err as any).name = 'NotImplemented';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.enableVersioning('test-bucket');
+  });
+
+  it('enableVersioning tolerates VersioningConfiguration message', async () => {
+    const err = new Error('VersioningConfiguration is not supported');
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.enableVersioning('test-bucket');
+  });
+
+  it('enableVersioning throws on genuine errors', async () => {
+    mockSend.mockRejectedValueOnce(new Error('Network failure'));
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(
+      provisioner.enableVersioning('test-bucket'),
+    ).rejects.toThrow(ProvisionerError);
+  });
+
+  it('setLifecycleRules tolerates XmlParseException', async () => {
+    const err = new Error('not well-formed');
+    (err as any).Code = 'XmlParseException';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.setLifecycleRules('test-bucket', [
+      { id: 'test', prefix: '', expirationDays: 1, enabled: true },
+    ]);
+  });
+
+  it('setLifecycleRules tolerates NotImplemented', async () => {
+    const err = new Error('not implemented');
+    (err as any).name = 'NotImplemented';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.setLifecycleRules('test-bucket', [
+      { id: 'test', prefix: '', expirationDays: 1, enabled: true },
+    ]);
+  });
+
+  it('setLifecycleRules tolerates LifecycleConfiguration message', async () => {
+    const err = new Error('LifecycleConfiguration is not supported');
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.setLifecycleRules('test-bucket', [
+      { id: 'test', prefix: '', expirationDays: 1, enabled: true },
+    ]);
+  });
+
+  it('setLifecycleRules tolerates MissingContentMD5 (MinIO edge-cicd)', async () => {
+    const err = new Error('Missing required header for this request: Content-Md5.');
+    (err as any).name = 'MissingContentMD5';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.setLifecycleRules('test-bucket', [
+      { id: 'test', prefix: '', expirationDays: 1, enabled: true },
+    ]);
+  });
+
+  it('setLifecycleRules throws on genuine errors', async () => {
+    mockSend.mockRejectedValueOnce(new Error('Network failure'));
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(
+      provisioner.setLifecycleRules('test-bucket', [
+        { id: 'test', prefix: '', expirationDays: 1, enabled: true },
+      ]),
+    ).rejects.toThrow(ProvisionerError);
+  });
+});
+
 describe('BucketProvisioner — error propagation', () => {
   it('wraps PutPublicAccessBlock failure as POLICY_FAILED', async () => {
     // CreateBucket succeeds

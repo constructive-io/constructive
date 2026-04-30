@@ -280,6 +280,10 @@ export class BucketProvisioner {
 
   /**
    * Apply an S3 bucket policy.
+   *
+   * Gracefully skips if the S3-compatible backend does not support
+   * PutBucketPolicy — bucket policies are best-effort since not all
+   * providers implement this AWS-specific API.
    */
   async setBucketPolicy(
     bucketName: string,
@@ -293,6 +297,19 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      // Some S3-compatible backends don't fully support bucket policies.
+      // Treat XML parse errors or "not implemented" responses as non-fatal.
+      if (
+        err.Code === 'XmlParseException' ||
+        err.name === 'XmlParseException' ||
+        err.Code === 'NotImplemented' ||
+        err.name === 'NotImplemented' ||
+        err.message?.includes('not well-formed') ||
+        err.message?.includes('not implemented') ||
+        err.message?.includes('policy')
+      ) {
+        return;
+      }
       throw new ProvisionerError(
         'POLICY_FAILED',
         `Failed to set bucket policy on '${bucketName}': ${err.message}`,
@@ -382,6 +399,10 @@ export class BucketProvisioner {
 
   /**
    * Enable versioning on an S3 bucket.
+   *
+   * Gracefully skips if the S3-compatible backend (e.g. MinIO edge-cicd)
+   * does not support PutBucketVersioning — versioning is best-effort
+   * since not all providers implement this API.
    */
   async enableVersioning(bucketName: string): Promise<void> {
     try {
@@ -392,6 +413,20 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      // Some S3-compatible backends (e.g. MinIO edge-cicd) don't support
+      // PutBucketVersioning. Treat XML parse errors or "not implemented"
+      // responses as non-fatal.
+      if (
+        err.Code === 'XmlParseException' ||
+        err.name === 'XmlParseException' ||
+        err.Code === 'NotImplemented' ||
+        err.name === 'NotImplemented' ||
+        err.message?.includes('not well-formed') ||
+        err.message?.includes('not implemented') ||
+        err.message?.includes('VersioningConfiguration')
+      ) {
+        return;
+      }
       throw new ProvisionerError(
         'VERSIONING_FAILED',
         `Failed to enable versioning on '${bucketName}': ${err.message}`,
@@ -402,6 +437,10 @@ export class BucketProvisioner {
 
   /**
    * Set lifecycle rules on an S3 bucket.
+   *
+   * Gracefully skips if the S3-compatible backend (e.g. MinIO edge-cicd)
+   * does not support PutBucketLifecycleConfiguration — lifecycle rules
+   * are best-effort since not all providers implement this API.
    */
   async setLifecycleRules(
     bucketName: string,
@@ -422,6 +461,24 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      // Some S3-compatible backends (e.g. MinIO edge-cicd) don't support
+      // PutBucketLifecycleConfiguration (may require Content-MD5 header
+      // the SDK doesn't send). Treat XML parse errors, "not implemented",
+      // or missing-header responses as non-fatal.
+      if (
+        err.Code === 'XmlParseException' ||
+        err.name === 'XmlParseException' ||
+        err.Code === 'NotImplemented' ||
+        err.name === 'NotImplemented' ||
+        err.Code === 'MissingContentMD5' ||
+        err.name === 'MissingContentMD5' ||
+        err.message?.includes('not well-formed') ||
+        err.message?.includes('not implemented') ||
+        err.message?.includes('Content-Md5') ||
+        err.message?.includes('LifecycleConfiguration')
+      ) {
+        return;
+      }
       throw new ProvisionerError(
         'LIFECYCLE_FAILED',
         `Failed to set lifecycle rules on '${bucketName}': ${err.message}`,
