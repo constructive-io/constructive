@@ -86,33 +86,10 @@ const RLS_MODULE_SQL = `
   LIMIT 1
 `;
 
-/**
- * Discover auth settings table location via public metaschema tables.
- * Joins sessions_module with metaschema_public.schema to resolve
- * the schema name + table name without touching private schemas.
- */
-const AUTH_SETTINGS_DISCOVERY_SQL = `
-  SELECT s.schema_name, sm.auth_settings_table AS table_name
-  FROM metaschema_modules_public.sessions_module sm
-  JOIN metaschema_public.schema s ON s.id = sm.schema_id
-  LIMIT 1
-`;
-
-/**
- * Query auth settings from the discovered table.
- * Schema and table name are resolved dynamically from metaschema modules.
- */
-const AUTH_SETTINGS_SQL = (schemaName: string, tableName: string) => `
-  SELECT
-    cookie_secure,
-    cookie_samesite,
-    cookie_domain,
-    cookie_httponly,
-    cookie_max_age,
-    cookie_path,
-    enable_captcha,
-    captcha_site_key
-  FROM "${schemaName}"."${tableName}"
+const SESSIONS_MODULE_SQL = `
+  SELECT data
+  FROM services_public.api_modules
+  WHERE api_id = $1 AND name = 'sessions_module'
   LIMIT 1
 `;
 
@@ -141,19 +118,28 @@ interface RlsModuleData {
   current_user_agent: string;
 }
 
-interface AuthSettingsRow {
-  cookie_secure: boolean;
-  cookie_samesite: string;
-  cookie_domain: string | null;
-  cookie_httponly: boolean;
-  cookie_max_age: string | null;
-  cookie_path: string;
-  enable_captcha: boolean;
-  captcha_site_key: string | null;
-}
-
 interface RlsModuleRow {
   data: RlsModuleData | null;
+}
+
+interface SessionsModuleData {
+  auth_settings_table: string;
+  auth_settings_schema: string;
+}
+
+interface SessionsModuleRow {
+  data: SessionsModuleData | null;
+}
+
+interface AuthSettingsRow {
+  enable_cookie_auth?: boolean;
+  require_csrf_for_auth?: boolean;
+  default_session_duration?: string;
+  remember_me_duration?: string;
+  cookie_secure?: boolean;
+  cookie_samesite?: string;
+  cookie_domain?: string;
+  cookie_path?: string;
 }
 
 interface ApiListRow {
@@ -249,21 +235,12 @@ const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
   };
 };
 
-const toAuthSettings = (row: AuthSettingsRow | null): AuthSettings | undefined => {
-  if (!row) return undefined;
-  return {
-    cookieSecure: row.cookie_secure,
-    cookieSamesite: row.cookie_samesite,
-    cookieDomain: row.cookie_domain,
-    cookieHttponly: row.cookie_httponly,
-    cookieMaxAge: row.cookie_max_age,
-    cookiePath: row.cookie_path,
-    enableCaptcha: row.enable_captcha,
-    captchaSiteKey: row.captcha_site_key,
-  };
-};
-
-const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleRow | null, authSettingsRow?: AuthSettingsRow | null): ApiStructure => ({
+const toApiStructure = (
+  row: ApiRow,
+  opts: ApiOptions,
+  rlsModuleRow?: RlsModuleRow | null,
+  authSettings?: AuthSettings
+): ApiStructure => ({
   apiId: row.api_id,
   dbname: row.dbname || opts.pg?.database || '',
   anonRole: row.anon_role || 'anon',
@@ -271,10 +248,10 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleR
   schema: row.schemas || [],
   apiModules: [],
   rlsModule: toRlsModule(rlsModuleRow ?? null),
+  authSettings,
   domains: [],
   databaseId: row.database_id,
   isPublic: row.is_public,
-  authSettings: toAuthSettings(authSettingsRow ?? null),
 });
 
 const createAdminStructure = (
@@ -334,34 +311,43 @@ const queryRlsModule = async (pool: Pool, apiId: string): Promise<RlsModuleRow |
   return result.rows[0] ?? null;
 };
 
-/**
- * Load server-relevant auth settings from the tenant DB.
- * Discovers the auth settings table dynamically by joining
- * metaschema_modules_public.sessions_module with metaschema_public.schema
- * (both public schemas). Fails gracefully if modules or table don't exist yet.
- */
+const querySessionsModule = async (pool: Pool, apiId: string): Promise<SessionsModuleRow | null> => {
+  const result = await pool.query<SessionsModuleRow>(SESSIONS_MODULE_SQL, [apiId]);
+  return result.rows[0] ?? null;
+};
+
 const queryAuthSettings = async (
   opts: ApiOptions,
-  dbname: string
-): Promise<AuthSettingsRow | null> => {
+  dbname: string,
+  sessionsModule: SessionsModuleData | null
+): Promise<AuthSettings | undefined> => {
+  if (!sessionsModule?.auth_settings_table || !sessionsModule?.auth_settings_schema) {
+    return undefined;
+  }
+
   try {
     const tenantPool = getPgPool({ ...opts.pg, database: dbname });
+    const schema = sessionsModule.auth_settings_schema;
+    const table = sessionsModule.auth_settings_table;
+    const query = `SELECT * FROM "${schema}"."${table}" LIMIT 1`;
+    const result = await tenantPool.query<AuthSettingsRow>(query);
+    const row = result.rows[0];
 
-    // Discover the auth settings schema + table name from public metaschema tables
-    const discovery = await tenantPool.query<{ schema_name: string; table_name: string }>(AUTH_SETTINGS_DISCOVERY_SQL);
-    const resolved = discovery.rows[0];
-    if (!resolved) {
-      log.debug('[auth-settings] No sessions_module row found in tenant DB');
-      return null;
-    }
+    if (!row) return undefined;
 
-    // Query the discovered auth settings table
-    const result = await tenantPool.query<AuthSettingsRow>(AUTH_SETTINGS_SQL(resolved.schema_name, resolved.table_name));
-    return result.rows[0] ?? null;
-  } catch (e: any) {
-    // Table/module may not exist yet if the 2FA migration hasn't been applied
-    log.debug(`[auth-settings] Failed to load auth settings: ${e.message}`);
-    return null;
+    return {
+      enableCookieAuth: row.enable_cookie_auth,
+      requireCsrfForAuth: row.require_csrf_for_auth,
+      defaultSessionDuration: row.default_session_duration,
+      rememberMeDuration: row.remember_me_duration,
+      cookieSecure: row.cookie_secure,
+      cookieSameSite: row.cookie_samesite as AuthSettings['cookieSameSite'],
+      cookieDomain: row.cookie_domain,
+      cookiePath: row.cookie_path,
+    };
+  } catch (err) {
+    log.warn('[api] Failed to load auth settings:', err);
+    return undefined;
   }
 };
 
@@ -417,14 +403,19 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
 
   const isPublic = opts.api?.isPublic ?? false;
   const row = await queryByApiName(pool, headers.databaseId, headers.apiName!, isPublic);
-  
+
   if (!row) {
     log.debug(`[api-name-lookup] No API found for databaseId=${headers.databaseId} name=${headers.apiName}`);
     return null;
   }
 
-  const rlsModule = await queryRlsModule(pool, row.api_id);
-  const authSettings = await queryAuthSettings(opts, row.dbname);
+  const [rlsModule, sessionsModule] = await Promise.all([
+    queryRlsModule(pool, row.api_id),
+    querySessionsModule(pool, row.api_id),
+  ]);
+
+  const authSettings = await queryAuthSettings(opts, row.dbname, sessionsModule?.data ?? null);
+
   log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}, authSettings: ${authSettings ? 'found' : 'none'}`);
   return toApiStructure(row, opts, rlsModule, authSettings);
 };
@@ -441,16 +432,21 @@ const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | 
   const isPublic = opts.api?.isPublic ?? false;
 
   log.debug(`[domain-lookup] domain=${domain} subdomain=${subdomain} isPublic=${isPublic}`);
-  
+
   const row = await queryByDomain(pool, domain, subdomain, isPublic);
-  
+
   if (!row) {
     log.debug(`[domain-lookup] No API found for domain=${domain} subdomain=${subdomain}`);
     return null;
   }
 
-  const rlsModule = await queryRlsModule(pool, row.api_id);
-  const authSettings = await queryAuthSettings(opts, row.dbname);
+  const [rlsModule, sessionsModule] = await Promise.all([
+    queryRlsModule(pool, row.api_id),
+    querySessionsModule(pool, row.api_id),
+  ]);
+
+  const authSettings = await queryAuthSettings(opts, row.dbname, sessionsModule?.data ?? null);
+
   log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}, authSettings: ${authSettings ? 'found' : 'none'}`);
   return toApiStructure(row, opts, rlsModule, authSettings);
 };
