@@ -24,81 +24,18 @@ const SAFE_ERROR_CODES = new Set([
   'PERSISTED_QUERY_NOT_SUPPORTED',
   // Auth
   'UNAUTHENTICATED',
-  'NOT_AUTHENTICATED',
-  'USER_NOT_AUTHENTICATED',
   'FORBIDDEN',
   'BAD_USER_INPUT',
   'INCORRECT_PASSWORD',
   'PASSWORD_INSECURE',
-  'ACCOUNT_LOCKED',
   'ACCOUNT_LOCKED_EXCEED_ATTEMPTS',
   'ACCOUNT_DISABLED',
   'ACCOUNT_EXISTS',
-  'ACCOUNT_NOT_FOUND',
-  'USER_NOT_FOUND',
-  'INVALID_USER',
-  'INVALID_TOKEN',
-  'INVALID_CODE',
-  'NO_PRIMARY_EMAIL',
-  'NO_CREDENTIALS',
   'PASSWORD_LEN',
   'INVITE_NOT_FOUND',
   'INVITE_LIMIT',
   'INVITE_EMAIL_NOT_FOUND',
   'INVALID_CREDENTIALS',
-  // Auth method toggles (app-level allow_* settings)
-  'SIGN_UP_DISABLED',
-  'PASSWORD_SIGN_IN_DISABLED',
-  'PASSWORD_SIGN_UP_DISABLED',
-  'SSO_SIGN_IN_DISABLED',
-  'SSO_SIGN_UP_DISABLED',
-  'SSO_ACCOUNT_NOT_FOUND',
-  'CONNECTED_ACCOUNT_NOT_FOUND',
-  'MAGIC_LINK_SIGN_IN_DISABLED',
-  'MAGIC_LINK_SIGN_UP_DISABLED',
-  'EMAIL_OTP_SIGN_IN_DISABLED',
-  'SMS_SIGN_IN_DISABLED',
-  'SMS_SIGN_UP_DISABLED',
-  // CSRF
-  'CSRF_TOKEN_REQUIRED',
-  'INVALID_CSRF_TOKEN',
-  // Rate limiting / throttling
-  'TOO_MANY_REQUESTS',
-  'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS',
-  // TOTP / MFA / step-up
-  'TOTP_NOT_ENABLED',
-  'TOTP_ALREADY_ENABLED',
-  'TOTP_SETUP_NOT_INITIATED',
-  'MFA_REQUIRED',
-  'MFA_CHALLENGE_EXPIRED',
-  'INVALID_MFA_CHALLENGE',
-  'STEP_UP_REQUIRED',
-  'STEP_UP_REQUIRED_PASSWORD',
-  'STEP_UP_REQUIRED_PASSWORD_OR_MFA',
-  // Sessions / API keys
-  'SESSION_NOT_FOUND',
-  'API_KEY_NOT_FOUND',
-  'CANNOT_DISCONNECT_LAST_AUTH_METHOD',
-  'CANNOT_REVOKE_CURRENT_SESSION',
-  // Account / resource operations
-  'NOT_FOUND',
-  'NULL_VALUES_DISALLOWED',
-  'OBJECT_NOT_FOUND',
-  'OBJECT_NO_UPDATE',
-  'LIMIT_REACHED',
-  'REQUIRES_ONE_OWNER',
-  'DELETE_FIRST',
-  'REF_NOT_FOUND',
-  'CROSS_DATABASE_REF',
-  'GROUPS_REQ_ENTITIES',
-  'ALREADY_SCHEDULED',
-  'SINGLETON_TABLE',
-  // Entity/field immutability
-  'IMMUTABLE_FIELD',
-  'IMMUTABLE_PROPS',
-  'IMMUTABLE_PEOPLESTAMPS',
-  'IMMUTABLE_TIMESTAMPS',
-  'CONST_TYPE_FIELDS_IMMUTABLE',
   // PublicKeySignature
   'FEATURE_DISABLED',
   'INVALID_PUBLIC_KEY',
@@ -108,6 +45,9 @@ const SAFE_ERROR_CODES = new Set([
   'BAD_SIGNIN',
   // Upload
   'UPLOAD_MIMETYPE',
+  // CSRF
+  'CSRF_TOKEN_MISSING',
+  'CSRF_TOKEN_INVALID',
   // PostgreSQL constraint violations (surfaced by PostGraphile)
   '23505', // unique_violation
   '23503', // foreign_key_violation
@@ -232,32 +172,14 @@ const buildPreset = (
         }
 
         if (req.token?.user_id) {
-          const pgSettings: Record<string, string> = {
-            role: roleName,
-            'jwt.claims.token_id': req.token.id,
-            'jwt.claims.user_id': req.token.user_id,
-            ...context,
+          return {
+            pgSettings: {
+              role: roleName,
+              'jwt.claims.token_id': req.token.id,
+              'jwt.claims.user_id': req.token.user_id,
+              ...context,
+            },
           };
-
-          if (req.token.session_id) {
-            pgSettings['jwt.claims.session_id'] = req.token.session_id;
-          }
-
-          // Propagate credential metadata as JWT claims so PG functions
-          // can read them via current_setting('jwt.claims.access_level') etc.
-          if (req.token.access_level) {
-            pgSettings['jwt.claims.access_level'] = req.token.access_level;
-          }
-          if (req.token.kind) {
-            pgSettings['jwt.claims.kind'] = req.token.kind;
-          }
-
-          // Enforce read-only transactions for read_only credentials (API keys, etc.)
-          if (req.token.access_level === 'read_only') {
-            pgSettings['default_transaction_read_only'] = 'on';
-          }
-
-          return { pgSettings };
         }
       }
 
