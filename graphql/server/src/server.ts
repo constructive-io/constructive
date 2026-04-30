@@ -36,7 +36,7 @@ import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { startDebugSampler } from './diagnostics/debug-sampler';
-import { createAuthCookieMiddleware } from './middleware/auth-cookie';
+// Auth cookie handling is done via grafserv plugin in auth-cookie-plugin.ts
 
 const log = new Logger('server');
 
@@ -149,6 +149,7 @@ class Server {
     app.use(poweredBy('constructive'));
     app.use(cors(fallbackOrigin));
     app.use(cookieParser());
+    app.use(express.json());
 
     // CSRF middleware setup
     const csrf = createCsrfMiddleware({
@@ -196,8 +197,7 @@ class Server {
     // CSRF protection before auth mutations (only for cookie-authenticated requests)
     app.use('/graphql', selectiveCsrfProtect);
 
-    // Auth cookie middleware: intercepts auth mutation responses to set/clear cookies
-    app.use(createAuthCookieMiddleware());
+    // Auth cookie handling is done via grafserv plugin (AuthCookiePlugin in graphile preset)
 
     app.use(authenticate);
     app.use(graphile(effectiveOpts));
