@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.19.0...node-type-registry@0.20.0) (2026-05-01)
+
+### Features
+
+- move node-type-registry to packages/ and add column-ref annotations ([32fb2f6](https://github.com/constructive-io/constructive/commit/32fb2f6fea9b5f0222b4caef81b09662bd59f60e)), closes [#767](https://github.com/constructive-io/constructive/issues/767)
+
 # [0.19.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.18.1...node-type-registry@0.19.0) (2026-04-30)
 
 ### Features
