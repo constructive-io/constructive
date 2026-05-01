@@ -72,13 +72,11 @@ export class SessionSecretsModuleModel {
     });
   }
   findFirst<S extends SessionSecretsModuleSelect>(
-    args: FindFirstArgs<S, SessionSecretsModuleFilter> & {
+    args: FindFirstArgs<S, SessionSecretsModuleFilter, SessionSecretsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, SessionSecretsModuleSelect>
   ): QueryBuilder<{
-    sessionSecretsModules: {
-      nodes: InferSelectResult<SessionSecretsModuleWithRelations, S>[];
-    };
+    sessionSecretsModule: InferSelectResult<SessionSecretsModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SessionSecretsModule',
@@ -86,17 +84,26 @@ export class SessionSecretsModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SessionSecretsModuleFilter',
+      'SessionSecretsModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SessionSecretsModule',
-      fieldName: 'sessionSecretsModules',
+      fieldName: 'sessionSecretsModule',
       document,
       variables,
+      transform: (data: {
+        sessionSecretsModules?: {
+          nodes?: InferSelectResult<SessionSecretsModuleWithRelations, S>[];
+        };
+      }) => ({
+        sessionSecretsModule: data.sessionSecretsModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SessionSecretsModuleSelect>(

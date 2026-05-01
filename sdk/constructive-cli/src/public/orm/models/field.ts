@@ -70,13 +70,11 @@ export class FieldModel {
     });
   }
   findFirst<S extends FieldSelect>(
-    args: FindFirstArgs<S, FieldFilter> & {
+    args: FindFirstArgs<S, FieldFilter, FieldOrderBy> & {
       select: S;
     } & StrictSelect<S, FieldSelect>
   ): QueryBuilder<{
-    fields: {
-      nodes: InferSelectResult<FieldWithRelations, S>[];
-    };
+    field: InferSelectResult<FieldWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Field',
@@ -84,17 +82,26 @@ export class FieldModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'FieldFilter',
+      'FieldOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Field',
-      fieldName: 'fields',
+      fieldName: 'field',
       document,
       variables,
+      transform: (data: {
+        fields?: {
+          nodes?: InferSelectResult<FieldWithRelations, S>[];
+        };
+      }) => ({
+        field: data.fields?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends FieldSelect>(

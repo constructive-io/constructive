@@ -70,13 +70,11 @@ export class RlsModuleModel {
     });
   }
   findFirst<S extends RlsModuleSelect>(
-    args: FindFirstArgs<S, RlsModuleFilter> & {
+    args: FindFirstArgs<S, RlsModuleFilter, RlsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, RlsModuleSelect>
   ): QueryBuilder<{
-    rlsModules: {
-      nodes: InferSelectResult<RlsModuleWithRelations, S>[];
-    };
+    rlsModule: InferSelectResult<RlsModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'RlsModule',
@@ -84,17 +82,26 @@ export class RlsModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'RlsModuleFilter',
+      'RlsModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'RlsModule',
-      fieldName: 'rlsModules',
+      fieldName: 'rlsModule',
       document,
       variables,
+      transform: (data: {
+        rlsModules?: {
+          nodes?: InferSelectResult<RlsModuleWithRelations, S>[];
+        };
+      }) => ({
+        rlsModule: data.rlsModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends RlsModuleSelect>(

@@ -70,13 +70,11 @@ export class PolicyModel {
     });
   }
   findFirst<S extends PolicySelect>(
-    args: FindFirstArgs<S, PolicyFilter> & {
+    args: FindFirstArgs<S, PolicyFilter, PolicyOrderBy> & {
       select: S;
     } & StrictSelect<S, PolicySelect>
   ): QueryBuilder<{
-    policies: {
-      nodes: InferSelectResult<PolicyWithRelations, S>[];
-    };
+    policy: InferSelectResult<PolicyWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Policy',
@@ -84,17 +82,26 @@ export class PolicyModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'PolicyFilter',
+      'PolicyOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Policy',
-      fieldName: 'policies',
+      fieldName: 'policy',
       document,
       variables,
+      transform: (data: {
+        policies?: {
+          nodes?: InferSelectResult<PolicyWithRelations, S>[];
+        };
+      }) => ({
+        policy: data.policies?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends PolicySelect>(

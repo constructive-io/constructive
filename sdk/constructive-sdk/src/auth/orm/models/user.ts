@@ -70,13 +70,11 @@ export class UserModel {
     });
   }
   findFirst<S extends UserSelect>(
-    args: FindFirstArgs<S, UserFilter> & {
+    args: FindFirstArgs<S, UserFilter, UserOrderBy> & {
       select: S;
     } & StrictSelect<S, UserSelect>
   ): QueryBuilder<{
-    users: {
-      nodes: InferSelectResult<UserWithRelations, S>[];
-    };
+    user: InferSelectResult<UserWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'User',
@@ -84,17 +82,26 @@ export class UserModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'UserFilter',
+      'UserOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'User',
-      fieldName: 'users',
+      fieldName: 'user',
       document,
       variables,
+      transform: (data: {
+        users?: {
+          nodes?: InferSelectResult<UserWithRelations, S>[];
+        };
+      }) => ({
+        user: data.users?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends UserSelect>(

@@ -70,13 +70,11 @@ export class SiteThemeModel {
     });
   }
   findFirst<S extends SiteThemeSelect>(
-    args: FindFirstArgs<S, SiteThemeFilter> & {
+    args: FindFirstArgs<S, SiteThemeFilter, SiteThemeOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteThemeSelect>
   ): QueryBuilder<{
-    siteThemes: {
-      nodes: InferSelectResult<SiteThemeWithRelations, S>[];
-    };
+    siteTheme: InferSelectResult<SiteThemeWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SiteTheme',
@@ -84,17 +82,26 @@ export class SiteThemeModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SiteThemeFilter',
+      'SiteThemeOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SiteTheme',
-      fieldName: 'siteThemes',
+      fieldName: 'siteTheme',
       document,
       variables,
+      transform: (data: {
+        siteThemes?: {
+          nodes?: InferSelectResult<SiteThemeWithRelations, S>[];
+        };
+      }) => ({
+        siteTheme: data.siteThemes?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SiteThemeSelect>(

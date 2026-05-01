@@ -70,13 +70,11 @@ export class SiteModel {
     });
   }
   findFirst<S extends SiteSelect>(
-    args: FindFirstArgs<S, SiteFilter> & {
+    args: FindFirstArgs<S, SiteFilter, SiteOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteSelect>
   ): QueryBuilder<{
-    sites: {
-      nodes: InferSelectResult<SiteWithRelations, S>[];
-    };
+    site: InferSelectResult<SiteWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Site',
@@ -84,17 +82,26 @@ export class SiteModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SiteFilter',
+      'SiteOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Site',
-      fieldName: 'sites',
+      fieldName: 'site',
       document,
       variables,
+      transform: (data: {
+        sites?: {
+          nodes?: InferSelectResult<SiteWithRelations, S>[];
+        };
+      }) => ({
+        site: data.sites?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SiteSelect>(

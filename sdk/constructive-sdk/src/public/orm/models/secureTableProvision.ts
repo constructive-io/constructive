@@ -72,13 +72,11 @@ export class SecureTableProvisionModel {
     });
   }
   findFirst<S extends SecureTableProvisionSelect>(
-    args: FindFirstArgs<S, SecureTableProvisionFilter> & {
+    args: FindFirstArgs<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy> & {
       select: S;
     } & StrictSelect<S, SecureTableProvisionSelect>
   ): QueryBuilder<{
-    secureTableProvisions: {
-      nodes: InferSelectResult<SecureTableProvisionWithRelations, S>[];
-    };
+    secureTableProvision: InferSelectResult<SecureTableProvisionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SecureTableProvision',
@@ -86,17 +84,26 @@ export class SecureTableProvisionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SecureTableProvisionFilter',
+      'SecureTableProvisionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SecureTableProvision',
-      fieldName: 'secureTableProvisions',
+      fieldName: 'secureTableProvision',
       document,
       variables,
+      transform: (data: {
+        secureTableProvisions?: {
+          nodes?: InferSelectResult<SecureTableProvisionWithRelations, S>[];
+        };
+      }) => ({
+        secureTableProvision: data.secureTableProvisions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SecureTableProvisionSelect>(

@@ -70,13 +70,11 @@ export class MigrateFileModel {
     });
   }
   findFirst<S extends MigrateFileSelect>(
-    args: FindFirstArgs<S, MigrateFileFilter> & {
+    args: FindFirstArgs<S, MigrateFileFilter, MigrateFileOrderBy> & {
       select: S;
     } & StrictSelect<S, MigrateFileSelect>
   ): QueryBuilder<{
-    migrateFiles: {
-      nodes: InferSelectResult<MigrateFileWithRelations, S>[];
-    };
+    migrateFile: InferSelectResult<MigrateFileWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'MigrateFile',
@@ -84,17 +82,26 @@ export class MigrateFileModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'MigrateFileFilter',
+      'MigrateFileOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'MigrateFile',
-      fieldName: 'migrateFiles',
+      fieldName: 'migrateFile',
       document,
       variables,
+      transform: (data: {
+        migrateFiles?: {
+          nodes?: InferSelectResult<MigrateFileWithRelations, S>[];
+        };
+      }) => ({
+        migrateFile: data.migrateFiles?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends MigrateFileSelect>(

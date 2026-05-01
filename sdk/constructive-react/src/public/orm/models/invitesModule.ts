@@ -70,13 +70,11 @@ export class InvitesModuleModel {
     });
   }
   findFirst<S extends InvitesModuleSelect>(
-    args: FindFirstArgs<S, InvitesModuleFilter> & {
+    args: FindFirstArgs<S, InvitesModuleFilter, InvitesModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, InvitesModuleSelect>
   ): QueryBuilder<{
-    invitesModules: {
-      nodes: InferSelectResult<InvitesModuleWithRelations, S>[];
-    };
+    invitesModule: InferSelectResult<InvitesModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'InvitesModule',
@@ -84,17 +82,26 @@ export class InvitesModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'InvitesModuleFilter',
+      'InvitesModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'InvitesModule',
-      fieldName: 'invitesModules',
+      fieldName: 'invitesModule',
       document,
       variables,
+      transform: (data: {
+        invitesModules?: {
+          nodes?: InferSelectResult<InvitesModuleWithRelations, S>[];
+        };
+      }) => ({
+        invitesModule: data.invitesModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends InvitesModuleSelect>(

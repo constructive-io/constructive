@@ -72,13 +72,11 @@ export class UserConnectedAccountModel {
     });
   }
   findFirst<S extends UserConnectedAccountSelect>(
-    args: FindFirstArgs<S, UserConnectedAccountFilter> & {
+    args: FindFirstArgs<S, UserConnectedAccountFilter, UserConnectedAccountOrderBy> & {
       select: S;
     } & StrictSelect<S, UserConnectedAccountSelect>
   ): QueryBuilder<{
-    userConnectedAccounts: {
-      nodes: InferSelectResult<UserConnectedAccountWithRelations, S>[];
-    };
+    userConnectedAccount: InferSelectResult<UserConnectedAccountWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'UserConnectedAccount',
@@ -86,17 +84,26 @@ export class UserConnectedAccountModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'UserConnectedAccountFilter',
+      'UserConnectedAccountOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'UserConnectedAccount',
-      fieldName: 'userConnectedAccounts',
+      fieldName: 'userConnectedAccount',
       document,
       variables,
+      transform: (data: {
+        userConnectedAccounts?: {
+          nodes?: InferSelectResult<UserConnectedAccountWithRelations, S>[];
+        };
+      }) => ({
+        userConnectedAccount: data.userConnectedAccounts?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends UserConnectedAccountSelect>(

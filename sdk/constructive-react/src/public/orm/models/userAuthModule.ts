@@ -70,13 +70,11 @@ export class UserAuthModuleModel {
     });
   }
   findFirst<S extends UserAuthModuleSelect>(
-    args: FindFirstArgs<S, UserAuthModuleFilter> & {
+    args: FindFirstArgs<S, UserAuthModuleFilter, UserAuthModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, UserAuthModuleSelect>
   ): QueryBuilder<{
-    userAuthModules: {
-      nodes: InferSelectResult<UserAuthModuleWithRelations, S>[];
-    };
+    userAuthModule: InferSelectResult<UserAuthModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'UserAuthModule',
@@ -84,17 +82,26 @@ export class UserAuthModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'UserAuthModuleFilter',
+      'UserAuthModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'UserAuthModule',
-      fieldName: 'userAuthModules',
+      fieldName: 'userAuthModule',
       document,
       variables,
+      transform: (data: {
+        userAuthModules?: {
+          nodes?: InferSelectResult<UserAuthModuleWithRelations, S>[];
+        };
+      }) => ({
+        userAuthModule: data.userAuthModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends UserAuthModuleSelect>(

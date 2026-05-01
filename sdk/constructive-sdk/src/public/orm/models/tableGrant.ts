@@ -70,13 +70,11 @@ export class TableGrantModel {
     });
   }
   findFirst<S extends TableGrantSelect>(
-    args: FindFirstArgs<S, TableGrantFilter> & {
+    args: FindFirstArgs<S, TableGrantFilter, TableGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, TableGrantSelect>
   ): QueryBuilder<{
-    tableGrants: {
-      nodes: InferSelectResult<TableGrantWithRelations, S>[];
-    };
+    tableGrant: InferSelectResult<TableGrantWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'TableGrant',
@@ -84,17 +82,26 @@ export class TableGrantModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'TableGrantFilter',
+      'TableGrantOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'TableGrant',
-      fieldName: 'tableGrants',
+      fieldName: 'tableGrant',
       document,
       variables,
+      transform: (data: {
+        tableGrants?: {
+          nodes?: InferSelectResult<TableGrantWithRelations, S>[];
+        };
+      }) => ({
+        tableGrant: data.tableGrants?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends TableGrantSelect>(

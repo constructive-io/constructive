@@ -70,13 +70,11 @@ export class DefaultPrivilegeModel {
     });
   }
   findFirst<S extends DefaultPrivilegeSelect>(
-    args: FindFirstArgs<S, DefaultPrivilegeFilter> & {
+    args: FindFirstArgs<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy> & {
       select: S;
     } & StrictSelect<S, DefaultPrivilegeSelect>
   ): QueryBuilder<{
-    defaultPrivileges: {
-      nodes: InferSelectResult<DefaultPrivilegeWithRelations, S>[];
-    };
+    defaultPrivilege: InferSelectResult<DefaultPrivilegeWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'DefaultPrivilege',
@@ -84,17 +82,26 @@ export class DefaultPrivilegeModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DefaultPrivilegeFilter',
+      'DefaultPrivilegeOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'DefaultPrivilege',
-      fieldName: 'defaultPrivileges',
+      fieldName: 'defaultPrivilege',
       document,
       variables,
+      transform: (data: {
+        defaultPrivileges?: {
+          nodes?: InferSelectResult<DefaultPrivilegeWithRelations, S>[];
+        };
+      }) => ({
+        defaultPrivilege: data.defaultPrivileges?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DefaultPrivilegeSelect>(

@@ -72,13 +72,11 @@ export class OrgMembershipSettingModel {
     });
   }
   findFirst<S extends OrgMembershipSettingSelect>(
-    args: FindFirstArgs<S, OrgMembershipSettingFilter> & {
+    args: FindFirstArgs<S, OrgMembershipSettingFilter, OrgMembershipSettingOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgMembershipSettingSelect>
   ): QueryBuilder<{
-    orgMembershipSettings: {
-      nodes: InferSelectResult<OrgMembershipSettingWithRelations, S>[];
-    };
+    orgMembershipSetting: InferSelectResult<OrgMembershipSettingWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgMembershipSetting',
@@ -86,17 +84,26 @@ export class OrgMembershipSettingModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgMembershipSettingFilter',
+      'OrgMembershipSettingOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgMembershipSetting',
-      fieldName: 'orgMembershipSettings',
+      fieldName: 'orgMembershipSetting',
       document,
       variables,
+      transform: (data: {
+        orgMembershipSettings?: {
+          nodes?: InferSelectResult<OrgMembershipSettingWithRelations, S>[];
+        };
+      }) => ({
+        orgMembershipSetting: data.orgMembershipSettings?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgMembershipSettingSelect>(

@@ -70,13 +70,11 @@ export class WebauthnCredentialModel {
     });
   }
   findFirst<S extends WebauthnCredentialSelect>(
-    args: FindFirstArgs<S, WebauthnCredentialFilter> & {
+    args: FindFirstArgs<S, WebauthnCredentialFilter, WebauthnCredentialOrderBy> & {
       select: S;
     } & StrictSelect<S, WebauthnCredentialSelect>
   ): QueryBuilder<{
-    webauthnCredentials: {
-      nodes: InferSelectResult<WebauthnCredentialWithRelations, S>[];
-    };
+    webauthnCredential: InferSelectResult<WebauthnCredentialWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'WebauthnCredential',
@@ -84,17 +82,26 @@ export class WebauthnCredentialModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'WebauthnCredentialFilter',
+      'WebauthnCredentialOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'WebauthnCredential',
-      fieldName: 'webauthnCredentials',
+      fieldName: 'webauthnCredential',
       document,
       variables,
+      transform: (data: {
+        webauthnCredentials?: {
+          nodes?: InferSelectResult<WebauthnCredentialWithRelations, S>[];
+        };
+      }) => ({
+        webauthnCredential: data.webauthnCredentials?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends WebauthnCredentialSelect>(

@@ -72,13 +72,11 @@ export class DenormalizedTableFieldModel {
     });
   }
   findFirst<S extends DenormalizedTableFieldSelect>(
-    args: FindFirstArgs<S, DenormalizedTableFieldFilter> & {
+    args: FindFirstArgs<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy> & {
       select: S;
     } & StrictSelect<S, DenormalizedTableFieldSelect>
   ): QueryBuilder<{
-    denormalizedTableFields: {
-      nodes: InferSelectResult<DenormalizedTableFieldWithRelations, S>[];
-    };
+    denormalizedTableField: InferSelectResult<DenormalizedTableFieldWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'DenormalizedTableField',
@@ -86,17 +84,26 @@ export class DenormalizedTableFieldModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DenormalizedTableFieldFilter',
+      'DenormalizedTableFieldOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'DenormalizedTableField',
-      fieldName: 'denormalizedTableFields',
+      fieldName: 'denormalizedTableField',
       document,
       variables,
+      transform: (data: {
+        denormalizedTableFields?: {
+          nodes?: InferSelectResult<DenormalizedTableFieldWithRelations, S>[];
+        };
+      }) => ({
+        denormalizedTableField: data.denormalizedTableFields?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DenormalizedTableFieldSelect>(

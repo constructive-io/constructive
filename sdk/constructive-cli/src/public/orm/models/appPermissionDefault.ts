@@ -72,13 +72,11 @@ export class AppPermissionDefaultModel {
     });
   }
   findFirst<S extends AppPermissionDefaultSelect>(
-    args: FindFirstArgs<S, AppPermissionDefaultFilter> & {
+    args: FindFirstArgs<S, AppPermissionDefaultFilter, AppPermissionDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, AppPermissionDefaultSelect>
   ): QueryBuilder<{
-    appPermissionDefaults: {
-      nodes: InferSelectResult<AppPermissionDefaultWithRelations, S>[];
-    };
+    appPermissionDefault: InferSelectResult<AppPermissionDefaultWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppPermissionDefault',
@@ -86,17 +84,26 @@ export class AppPermissionDefaultModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppPermissionDefaultFilter',
+      'AppPermissionDefaultOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppPermissionDefault',
-      fieldName: 'appPermissionDefaults',
+      fieldName: 'appPermissionDefault',
       document,
       variables,
+      transform: (data: {
+        appPermissionDefaults?: {
+          nodes?: InferSelectResult<AppPermissionDefaultWithRelations, S>[];
+        };
+      }) => ({
+        appPermissionDefault: data.appPermissionDefaults?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppPermissionDefaultSelect>(
