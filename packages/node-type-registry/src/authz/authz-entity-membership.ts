@@ -14,6 +14,11 @@ export const AuthzEntityMembership: NodeTypeDefinition = {
         format: 'column-ref',
         description: 'Column name referencing the entity (e.g., entity_id, org_id)'
       },
+      sel_field: {
+        type: 'string',
+        description: 'SPRT column to select for the entity match',
+        default: 'entity_id'
+      },
       membership_type: {
         type: [
           'integer',

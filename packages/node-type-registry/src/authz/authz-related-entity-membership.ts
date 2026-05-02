@@ -14,6 +14,16 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
         format: 'column-ref',
         description: 'Column name on protected table referencing the join table'
       },
+      sel_field: {
+        type: 'string',
+        description: 'SPRT column to select for the entity match',
+        default: 'entity_id'
+      },
+      sprt_join_field: {
+        type: 'string',
+        description: 'SPRT column to join on with the related table',
+        default: 'entity_id'
+      },
       membership_type: {
         type: [
           'integer',
