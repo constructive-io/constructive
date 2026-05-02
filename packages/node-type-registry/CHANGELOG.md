@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.21.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.20.0...node-type-registry@0.21.0) (2026-05-02)
+
+### Features
+
+- **node-type-registry:** add missing defaults to centralize all defaults in registry ([d19fa8a](https://github.com/constructive-io/constructive/commit/d19fa8aa84c9bef87603e183ee0cd44ebc4b91fe))
+
 # [0.20.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.19.0...node-type-registry@0.20.0) (2026-05-01)
 
 ### Features
