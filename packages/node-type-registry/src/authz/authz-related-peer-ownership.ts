@@ -51,7 +51,8 @@ export const AuthzRelatedPeerOwnership: NodeTypeDefinition = {
       obj_ref_field: {
         type: 'string',
         format: 'column-ref',
-        description: 'Field on related table to select for matching entity_field (defaults to id)'
+        description: 'Field on related table to select for matching entity_field',
+        default: 'id'
       },
       permission: {
         type: 'string',
