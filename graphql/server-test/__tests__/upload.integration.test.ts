@@ -2,7 +2,7 @@
  * Upload Integration Tests — end-to-end presigned URL flow
  *
  * Exercises the full upload pipeline for both public and private files:
- *   requestUploadUrl → PUT to presigned URL → confirmUpload → downloadUrl
+ *   requestUploadUrl → PUT to presigned URL → downloadUrl
  *
  * Uses real MinIO (available in CI as minio_cdn service) and lazy bucket
  * provisioning. No RLS — that will be tested in constructive-db.
@@ -49,17 +49,6 @@ const REQUEST_UPLOAD_URL = `
       key
       deduplicated
       expiresAt
-      status
-    }
-  }
-`;
-
-const CONFIRM_UPLOAD = `
-  mutation ConfirmUpload($input: ConfirmUploadInput!) {
-    confirmUpload(input: $input) {
-      fileId
-      status
-      success
     }
   }
 `;
@@ -159,7 +148,6 @@ describe('Upload integration (presigned URL flow)', () => {
       expect(payload.key).toBe(contentHash);
       expect(payload.deduplicated).toBe(false);
       expect(payload.expiresAt).toBeTruthy();
-      expect(payload.status).toBe('pending');
 
       uploadUrl = payload.uploadUrl;
       fileId = payload.fileId;
@@ -168,23 +156,6 @@ describe('Upload integration (presigned URL flow)', () => {
     it('should accept a PUT to the presigned URL', async () => {
       const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType);
       expect(putRes.ok).toBe(true);
-    });
-
-    it('should confirm the upload and transition file to ready', async () => {
-      const res = await postGraphQL({
-        query: CONFIRM_UPLOAD,
-        variables: {
-          input: { fileId },
-        },
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.errors).toBeUndefined();
-
-      const payload = res.body.data.confirmUpload;
-      expect(payload.fileId).toBe(fileId);
-      expect(payload.status).toBe('ready');
-      expect(payload.success).toBe(true);
     });
   });
 
@@ -218,7 +189,6 @@ describe('Upload integration (presigned URL flow)', () => {
       expect(payload.key).toBe(contentHash);
       expect(payload.deduplicated).toBe(false);
       expect(payload.expiresAt).toBeTruthy();
-      expect(payload.status).toBe('pending');
 
       uploadUrl = payload.uploadUrl;
       fileId = payload.fileId;
@@ -227,23 +197,6 @@ describe('Upload integration (presigned URL flow)', () => {
     it('should accept a PUT to the presigned URL', async () => {
       const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType);
       expect(putRes.ok).toBe(true);
-    });
-
-    it('should confirm the upload and transition file to ready', async () => {
-      const res = await postGraphQL({
-        query: CONFIRM_UPLOAD,
-        variables: {
-          input: { fileId },
-        },
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.errors).toBeUndefined();
-
-      const payload = res.body.data.confirmUpload;
-      expect(payload.fileId).toBe(fileId);
-      expect(payload.status).toBe('ready');
-      expect(payload.success).toBe(true);
     });
   });
 
@@ -274,7 +227,6 @@ describe('Upload integration (presigned URL flow)', () => {
       expect(payload.uploadUrl).toBeNull();
       expect(payload.expiresAt).toBeNull();
       expect(payload.fileId).toBeTruthy();
-      expect(payload.status).toBe('ready');
     });
   });
 });
