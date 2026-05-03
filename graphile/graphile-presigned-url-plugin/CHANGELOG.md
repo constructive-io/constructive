@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.7.0...graphile-presigned-url-plugin@0.8.0) (2026-05-03)
+
+### Bug Fixes
+
+- update snapshots, tests, and seeds for storage simplification ([9b1a48a](https://github.com/constructive-io/constructive/commit/9b1a48ae65add780c0d005f8912cf70a4d7af078))
+
+### Features
+
+- remove confirmUpload, upload_requests, files.status — simplify storage ([e3c516d](https://github.com/constructive-io/constructive/commit/e3c516d35fe05a35b5117c2756bd1363872eafe1))
+
 # [0.7.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.5...graphile-presigned-url-plugin@0.7.0) (2026-04-29)
 
 ### Features

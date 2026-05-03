@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.14.0...graphql-server-test@2.14.1) (2026-05-03)
+
+### Bug Fixes
+
+- update snapshots, tests, and seeds for storage simplification ([9b1a48a](https://github.com/constructive-io/constructive/commit/9b1a48ae65add780c0d005f8912cf70a4d7af078))
+
 # [2.14.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.13.0...graphql-server-test@2.14.0) (2026-04-30)
 
 **Note:** Version bump only for package graphql-server-test

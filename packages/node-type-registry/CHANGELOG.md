@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.21.0...node-type-registry@0.22.0) (2026-05-03)
+
+### Bug Fixes
+
+- make conditions type recursive for AND/OR/NOT combinators ([ed7b4af](https://github.com/constructive-io/constructive/commit/ed7b4aff8e0ebe49a13817cd26e17f9034d9aaf6))
+- restore full JSON Schema for conditions alongside x-codegen-type ([de43bc0](https://github.com/constructive-io/constructive/commit/de43bc0eb0e2ed3937a9fec029ebe92ab20b803b))
+
+### Features
+
+- add conditions to DataJobTrigger + DataImageEmbedding node type ([b50fdf9](https://github.com/constructive-io/constructive/commit/b50fdf9cefee48460fec2e5a8853e077275549da))
+- **node-type-registry:** complete column-ref annotations for all column-creating types ([e0ce86a](https://github.com/constructive-io/constructive/commit/e0ce86a1eca8e4408d75d2cd82214c262a53dd7e))
+- remove confirmUpload, upload_requests, files.status — simplify storage ([e3c516d](https://github.com/constructive-io/constructive/commit/e3c516d35fe05a35b5117c2756bd1363872eafe1))
+
 # [0.21.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.20.0...node-type-registry@0.21.0) (2026-05-02)
 
 ### Features
