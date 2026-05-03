@@ -145,6 +145,17 @@ function partialOf(inner: t.TSType): t.TSTypeReference {
 function ensureArrayItems(schema: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...schema };
 
+  // Strip $defs — they exist for JSON Schema validators but schema-typescript
+  // doesn't understand them and the TS types are emitted separately.
+  delete out.$defs;
+
+  // Properties with x-codegen-type get their TS type replaced post-generation,
+  // so collapse them to a simple {type:'object'} to avoid confusing
+  // schema-typescript with $ref or oneOf it can't resolve.
+  if (out['x-codegen-type']) {
+    return { type: 'object', description: out.description, 'x-codegen-type': out['x-codegen-type'] };
+  }
+
   // Ensure arrays have an items spec (schema-typescript throws without one)
   if (out.type === 'array' && !out.items) {
     out.items = { type: 'string' };
