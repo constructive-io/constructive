@@ -183,6 +183,10 @@ export interface DataOwnedFieldsParams {
 }
 /** Combines direct ownership with entity scoping. Adds both owner_id and entity_id columns. Enables AuthzDirectOwner, AuthzEntityMembership, and AuthzOrgHierarchy authorization. Particularly useful for OrgHierarchy where a user owns a row (owner_id) within an entity (entity_id), and managers above can see subordinate-owned records via the hierarchy closure table. */
 export interface DataOwnershipInEntityParams {
+  /* Column name for the owner reference */
+  owner_field_name?: string;
+  /* Column name for the entity reference */
+  entity_field_name?: string;
   /* If true, also adds a UUID primary key column with auto-generation */
   include_id?: boolean;
   /* If true, adds foreign key constraints from owner_id and entity_id to the users table */
@@ -190,6 +194,10 @@ export interface DataOwnershipInEntityParams {
 }
 /** Adds user tracking for creates/updates with created_by and updated_by columns. */
 export interface DataPeoplestampsParams {
+  /* Column name for the creating user reference */
+  created_by_field?: string;
+  /* Column name for the last-updating user reference */
+  updated_by_field?: string;
   /* If true, also adds a UUID primary key column with auto-generation */
   include_id?: boolean;
   /* If true, adds foreign key constraints from created_by and updated_by to the users table */
@@ -197,6 +205,10 @@ export interface DataPeoplestampsParams {
 }
 /** Adds publish state columns (is_published, published_at) for content visibility. Enables AuthzPublishable and AuthzTemporal authorization. */
 export interface DataPublishableParams {
+  /* Column name for the published boolean flag */
+  is_published_field?: string;
+  /* Column name for the publish timestamp */
+  published_at_field?: string;
   /* If true, also adds a UUID primary key column with auto-generation */
   include_id?: boolean;
 }
@@ -209,6 +221,10 @@ export interface DataSlugParams {
 }
 /** Adds soft delete support with deleted_at and is_deleted columns. */
 export interface DataSoftDeleteParams {
+  /* Column name for the soft-delete timestamp */
+  deleted_at_field?: string;
+  /* Column name for the soft-delete boolean flag */
+  is_deleted_field?: string;
   /* If true, also adds a UUID primary key column with auto-generation */
   include_id?: boolean;
 }
@@ -236,6 +252,10 @@ export interface DataTagsParams {
 }
 /** Adds automatic timestamp tracking with created_at and updated_at columns. */
 export interface DataTimestampsParams {
+  /* Column name for the creation timestamp */
+  created_at_field?: string;
+  /* Column name for the last-updated timestamp */
+  updated_at_field?: string;
   /* If true, also adds a UUID primary key column with auto-generation */
   include_id?: boolean;
 }

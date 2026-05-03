@@ -9,6 +9,18 @@ export const DataOwnershipInEntity: NodeTypeDefinition = {
   parameter_schema: {
     type: 'object',
     properties: {
+      owner_field_name: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the owner reference',
+        default: 'owner_id'
+      },
+      entity_field_name: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the entity reference',
+        default: 'entity_id'
+      },
       include_id: {
         type: 'boolean',
         description: 'If true, also adds a UUID primary key column with auto-generation',

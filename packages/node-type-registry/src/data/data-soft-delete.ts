@@ -9,6 +9,18 @@ export const DataSoftDelete: NodeTypeDefinition = {
   parameter_schema: {
     type: 'object',
     properties: {
+      deleted_at_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the soft-delete timestamp',
+        default: 'deleted_at'
+      },
+      is_deleted_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the soft-delete boolean flag',
+        default: 'is_deleted'
+      },
       include_id: {
         type: 'boolean',
         description: 'If true, also adds a UUID primary key column with auto-generation',

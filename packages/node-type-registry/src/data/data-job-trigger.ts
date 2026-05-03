@@ -64,7 +64,8 @@ export const DataJobTrigger: NodeTypeDefinition = {
       payload_custom: {
         type: 'object',
         additionalProperties: {
-          type: 'string'
+          type: 'string',
+          format: 'column-ref'
         },
         description: 'Key-to-column mapping for custom payload (e.g., {"invoice_id": "id", "total": "amount"})'
       },

@@ -71,7 +71,8 @@ export const DataImageEmbedding: NodeTypeDefinition = {
       payload_custom: {
         type: 'object',
         additionalProperties: {
-          type: 'string'
+          type: 'string',
+          format: 'column-ref'
         },
         description: 'Custom payload key-to-column mapping for the job trigger',
         default: {

@@ -9,6 +9,18 @@ export const DataPeoplestamps: NodeTypeDefinition = {
   parameter_schema: {
     type: 'object',
     properties: {
+      created_by_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the creating user reference',
+        default: 'created_by'
+      },
+      updated_by_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the last-updating user reference',
+        default: 'updated_by'
+      },
       include_id: {
         type: 'boolean',
         description: 'If true, also adds a UUID primary key column with auto-generation',
