@@ -103,6 +103,9 @@ import { AppClaimedInviteModel } from './models/appClaimedInvite';
 import { OrgInviteModel } from './models/orgInvite';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { AuditLogModel } from './models/auditLog';
+import { AgentThreadModel } from './models/agentThread';
+import { AgentMessageModel } from './models/agentMessage';
+import { AgentTaskModel } from './models/agentTask';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
 import { IdentityProviderModel } from './models/identityProvider';
 import { RefModel } from './models/ref';
@@ -112,6 +115,7 @@ import { MigrateFileModel } from './models/migrateFile';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { DevicesModuleModel } from './models/devicesModule';
+import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { UserConnectedAccountModel } from './models/userConnectedAccount';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
@@ -258,6 +262,9 @@ export function createClient(config: OrmClientConfig) {
     orgInvite: new OrgInviteModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
     auditLog: new AuditLogModel(client),
+    agentThread: new AgentThreadModel(client),
+    agentMessage: new AgentMessageModel(client),
+    agentTask: new AgentTaskModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
     identityProvider: new IdentityProviderModel(client),
     ref: new RefModel(client),
@@ -267,6 +274,7 @@ export function createClient(config: OrmClientConfig) {
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
     devicesModule: new DevicesModuleModel(client),
+    nodeTypeRegistry: new NodeTypeRegistryModel(client),
     userConnectedAccount: new UserConnectedAccountModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),

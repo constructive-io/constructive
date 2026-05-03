@@ -124,6 +124,9 @@ csdk auth set-token <your-token>
 | `org-invite` | orgInvite CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
 | `audit-log` | auditLog CRUD operations |
+| `agent-thread` | agentThread CRUD operations |
+| `agent-message` | agentMessage CRUD operations |
+| `agent-task` | agentTask CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
 | `identity-provider` | identityProvider CRUD operations |
 | `ref` | ref CRUD operations |
@@ -133,6 +136,7 @@ csdk auth set-token <your-token>
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `devices-module` | devicesModule CRUD operations |
+| `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `user-connected-account` | userConnectedAccount CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
@@ -3362,6 +3366,97 @@ CRUD operations for AuditLog records.
 **Required create fields:** `event`, `success`
 **Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
+### `agent-thread`
+
+CRUD operations for AgentThread records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentThread records |
+| `find-first` | Find first matching agentThread record |
+| `get` | Get a agentThread by id |
+| `create` | Create a new agentThread |
+| `update` | Update an existing agentThread |
+| `delete` | Delete a agentThread |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `title` | String |
+| `mode` | String |
+| `model` | String |
+| `systemPrompt` | String |
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `ownerId` | UUID |
+| `entityId` | UUID |
+| `status` | String |
+
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `title`, `mode`, `model`, `systemPrompt`, `ownerId`, `status`
+
+### `agent-message`
+
+CRUD operations for AgentMessage records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentMessage records |
+| `find-first` | Find first matching agentMessage record |
+| `get` | Get a agentMessage by id |
+| `create` | Create a new agentMessage |
+| `update` | Update an existing agentMessage |
+| `delete` | Delete a agentMessage |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `threadId` | UUID |
+| `entityId` | UUID |
+| `authorRole` | String |
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `ownerId` | UUID |
+| `parts` | JSON |
+
+**Required create fields:** `threadId`, `entityId`, `authorRole`
+**Optional create fields (backend defaults):** `ownerId`, `parts`
+
+### `agent-task`
+
+CRUD operations for AgentTask records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentTask records |
+| `find-first` | Find first matching agentTask record |
+| `get` | Get a agentTask by id |
+| `create` | Create a new agentTask |
+| `update` | Update an existing agentTask |
+| `delete` | Delete a agentTask |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `threadId` | UUID |
+| `entityId` | UUID |
+| `description` | String |
+| `source` | String |
+| `error` | String |
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `ownerId` | UUID |
+| `status` | String |
+
+**Required create fields:** `threadId`, `entityId`, `description`
+**Optional create fields (backend defaults):** `source`, `error`, `ownerId`, `status`
+
 ### `app-permission-default`
 
 CRUD operations for AppPermissionDefault records.
@@ -3581,6 +3676,34 @@ CRUD operations for DevicesModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `userDevicesTableId`, `deviceSettingsTableId`, `userDevicesTable`, `deviceSettingsTable`
+
+### `node-type-registry`
+
+CRUD operations for NodeTypeRegistry records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all nodeTypeRegistry records |
+| `find-first` | Find first matching nodeTypeRegistry record |
+| `get` | Get a nodeTypeRegistry by name |
+| `create` | Create a new nodeTypeRegistry |
+| `update` | Update an existing nodeTypeRegistry |
+| `delete` | Delete a nodeTypeRegistry |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `name` | String |
+| `slug` | String |
+| `category` | String |
+| `displayName` | String |
+| `description` | String |
+| `parameterSchema` | JSON |
+| `tags` | String |
+
+**Required create fields:** `slug`, `category`
+**Optional create fields (backend defaults):** `displayName`, `description`, `parameterSchema`, `tags`
 
 ### `user-connected-account`
 
@@ -3968,7 +4091,6 @@ CRUD operations for AppMembership records.
 | `isDisabled` | Boolean |
 | `isVerified` | Boolean |
 | `isActive` | Boolean |
-| `isExternal` | Boolean |
 | `isOwner` | Boolean |
 | `isAdmin` | Boolean |
 | `permissions` | BitString |
@@ -3977,7 +4099,7 @@ CRUD operations for AppMembership records.
 | `profileId` | UUID |
 
 **Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isExternal`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `hierarchy-module`
 

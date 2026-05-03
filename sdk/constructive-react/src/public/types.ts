@@ -1241,6 +1241,40 @@ export interface AuditLog {
   success: boolean | null;
   createdAt: string | null;
 }
+export interface AgentThread {
+  title: string | null;
+  mode: string | null;
+  model: string | null;
+  systemPrompt: string | null;
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  ownerId: string | null;
+  entityId: string | null;
+  status: string | null;
+}
+export interface AgentMessage {
+  threadId: string | null;
+  entityId: string | null;
+  authorRole: string | null;
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  ownerId: string | null;
+  parts: unknown | null;
+}
+export interface AgentTask {
+  threadId: string | null;
+  entityId: string | null;
+  description: string | null;
+  source: string | null;
+  error: string | null;
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  ownerId: string | null;
+  status: string | null;
+}
 export interface AppPermissionDefault {
   id: string | null;
   permissions: string | null;
@@ -1293,6 +1327,15 @@ export interface DevicesModule {
   deviceSettingsTableId: string | null;
   userDevicesTable: string | null;
   deviceSettingsTable: string | null;
+}
+export interface NodeTypeRegistry {
+  name: string | null;
+  slug: string | null;
+  category: string | null;
+  displayName: string | null;
+  description: string | null;
+  parameterSchema: unknown | null;
+  tags: string[] | null;
 }
 export interface UserConnectedAccount {
   id: string | null;
@@ -1433,7 +1476,6 @@ export interface AppMembership {
   isDisabled: boolean | null;
   isVerified: boolean | null;
   isActive: boolean | null;
-  isExternal: boolean | null;
   isOwner: boolean | null;
   isAdmin: boolean | null;
   permissions: string | null;

@@ -119,6 +119,9 @@ const db = createClient({
 | `orgInvite` | findMany, findOne, create, update, delete |
 | `orgClaimedInvite` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
+| `agentThread` | findMany, findOne, create, update, delete |
+| `agentMessage` | findMany, findOne, create, update, delete |
+| `agentTask` | findMany, findOne, create, update, delete |
 | `appPermissionDefault` | findMany, findOne, create, update, delete |
 | `identityProvider` | findMany, findOne, create, update, delete |
 | `ref` | findMany, findOne, create, update, delete |
@@ -128,6 +131,7 @@ const db = createClient({
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
 | `devicesModule` | findMany, findOne, create, update, delete |
+| `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `userConnectedAccount` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
@@ -3921,6 +3925,118 @@ const updated = await db.auditLog.update({ where: { id: '<UUID>' }, data: { even
 const deleted = await db.auditLog.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.agentThread`
+
+CRUD operations for AgentThread records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `title` | String | Yes |
+| `mode` | String | Yes |
+| `model` | String | Yes |
+| `systemPrompt` | String | Yes |
+| `id` | UUID | No |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `ownerId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `status` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all agentThread records
+const items = await db.agentThread.findMany({ select: { title: true, mode: true, model: true, systemPrompt: true, id: true, createdAt: true, updatedAt: true, ownerId: true, entityId: true, status: true } }).execute();
+
+// Get one by id
+const item = await db.agentThread.findOne({ id: '<UUID>', select: { title: true, mode: true, model: true, systemPrompt: true, id: true, createdAt: true, updatedAt: true, ownerId: true, entityId: true, status: true } }).execute();
+
+// Create
+const created = await db.agentThread.create({ data: { title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', ownerId: '<UUID>', entityId: '<UUID>', status: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.agentThread.update({ where: { id: '<UUID>' }, data: { title: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.agentThread.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.agentMessage`
+
+CRUD operations for AgentMessage records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `threadId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `authorRole` | String | Yes |
+| `id` | UUID | No |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `ownerId` | UUID | Yes |
+| `parts` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all agentMessage records
+const items = await db.agentMessage.findMany({ select: { threadId: true, entityId: true, authorRole: true, id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true } }).execute();
+
+// Get one by id
+const item = await db.agentMessage.findOne({ id: '<UUID>', select: { threadId: true, entityId: true, authorRole: true, id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true } }).execute();
+
+// Create
+const created = await db.agentMessage.create({ data: { threadId: '<UUID>', entityId: '<UUID>', authorRole: '<String>', ownerId: '<UUID>', parts: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.agentMessage.update({ where: { id: '<UUID>' }, data: { threadId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.agentMessage.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.agentTask`
+
+CRUD operations for AgentTask records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `threadId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `description` | String | Yes |
+| `source` | String | Yes |
+| `error` | String | Yes |
+| `id` | UUID | No |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `ownerId` | UUID | Yes |
+| `status` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all agentTask records
+const items = await db.agentTask.findMany({ select: { threadId: true, entityId: true, description: true, source: true, error: true, id: true, createdAt: true, updatedAt: true, ownerId: true, status: true } }).execute();
+
+// Get one by id
+const item = await db.agentTask.findOne({ id: '<UUID>', select: { threadId: true, entityId: true, description: true, source: true, error: true, id: true, createdAt: true, updatedAt: true, ownerId: true, status: true } }).execute();
+
+// Create
+const created = await db.agentTask.create({ data: { threadId: '<UUID>', entityId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', ownerId: '<UUID>', status: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.agentTask.update({ where: { id: '<UUID>' }, data: { threadId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.agentTask.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.appPermissionDefault`
 
 CRUD operations for AppPermissionDefault records.
@@ -4206,6 +4322,41 @@ const updated = await db.devicesModule.update({ where: { id: '<UUID>' }, data: {
 
 // Delete
 const deleted = await db.devicesModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.nodeTypeRegistry`
+
+CRUD operations for NodeTypeRegistry records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `name` | String | No |
+| `slug` | String | Yes |
+| `category` | String | Yes |
+| `displayName` | String | Yes |
+| `description` | String | Yes |
+| `parameterSchema` | JSON | Yes |
+| `tags` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all nodeTypeRegistry records
+const items = await db.nodeTypeRegistry.findMany({ select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true } }).execute();
+
+// Get one by name
+const item = await db.nodeTypeRegistry.findOne({ name: '<String>', select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true } }).execute();
+
+// Create
+const created = await db.nodeTypeRegistry.create({ data: { slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', parameterSchema: '<JSON>', tags: '<String>' }, select: { name: true } }).execute();
+
+// Update
+const updated = await db.nodeTypeRegistry.update({ where: { name: '<String>' }, data: { slug: '<String>' }, select: { name: true } }).execute();
+
+// Delete
+const deleted = await db.nodeTypeRegistry.delete({ where: { name: '<String>' } }).execute();
 ```
 
 ### `db.userConnectedAccount`
@@ -4643,7 +4794,6 @@ CRUD operations for AppMembership records.
 | `isDisabled` | Boolean | Yes |
 | `isVerified` | Boolean | Yes |
 | `isActive` | Boolean | Yes |
-| `isExternal` | Boolean | Yes |
 | `isOwner` | Boolean | Yes |
 | `isAdmin` | Boolean | Yes |
 | `permissions` | BitString | Yes |
@@ -4655,13 +4805,13 @@ CRUD operations for AppMembership records.
 
 ```typescript
 // List all appMembership records
-const items = await db.appMembership.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
+const items = await db.appMembership.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
 
 // Get one by id
-const item = await db.appMembership.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
+const item = await db.appMembership.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
 
 // Create
-const created = await db.appMembership.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.appMembership.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.appMembership.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();

@@ -1,13 +1,13 @@
 ---
 name: orm-public
-description: ORM client for the public API — provides typed CRUD operations for 120 tables and 72 custom operations
+description: ORM client for the public API — provides typed CRUD operations for 124 tables and 72 custom operations
 ---
 
 # orm-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the public API — provides typed CRUD operations for 120 tables and 72 custom operations
+ORM client for the public API — provides typed CRUD operations for 124 tables and 72 custom operations
 
 ## Usage
 
@@ -135,6 +135,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-invite](references/org-invite.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
 - [audit-log](references/audit-log.md)
+- [agent-thread](references/agent-thread.md)
+- [agent-message](references/agent-message.md)
+- [agent-task](references/agent-task.md)
 - [app-permission-default](references/app-permission-default.md)
 - [identity-provider](references/identity-provider.md)
 - [ref](references/ref.md)
@@ -144,6 +147,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
 - [devices-module](references/devices-module.md)
+- [node-type-registry](references/node-type-registry.md)
 - [user-connected-account](references/user-connected-account.md)
 - [app-membership-default](references/app-membership-default.md)
 - [org-membership-default](references/org-membership-default.md)

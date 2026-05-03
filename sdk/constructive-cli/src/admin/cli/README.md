@@ -57,8 +57,8 @@ csdk auth set-token <your-token>
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
 | `app-level` | appLevel CRUD operations |
 | `app-invite` | appInvite CRUD operations |
-| `org-invite` | orgInvite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
+| `org-invite` | orgInvite CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
@@ -962,6 +962,43 @@ CRUD operations for AppInvite records.
 
 **Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
+### `app-membership`
+
+CRUD operations for AppMembership records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appMembership records |
+| `find-first` | Find first matching appMembership record |
+| `get` | Get a appMembership by id |
+| `create` | Create a new appMembership |
+| `update` | Update an existing appMembership |
+| `delete` | Delete a appMembership |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `isBanned` | Boolean |
+| `isDisabled` | Boolean |
+| `isVerified` | Boolean |
+| `isActive` | Boolean |
+| `isOwner` | Boolean |
+| `isAdmin` | Boolean |
+| `permissions` | BitString |
+| `granted` | BitString |
+| `actorId` | UUID |
+| `profileId` | UUID |
+
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+
 ### `org-invite`
 
 CRUD operations for OrgInvite records.
@@ -996,44 +1033,6 @@ CRUD operations for OrgInvite records.
 
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
-
-### `app-membership`
-
-CRUD operations for AppMembership records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appMembership records |
-| `find-first` | Find first matching appMembership record |
-| `get` | Get a appMembership by id |
-| `create` | Create a new appMembership |
-| `update` | Update an existing appMembership |
-| `delete` | Delete a appMembership |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `isBanned` | Boolean |
-| `isDisabled` | Boolean |
-| `isVerified` | Boolean |
-| `isActive` | Boolean |
-| `isExternal` | Boolean |
-| `isOwner` | Boolean |
-| `isAdmin` | Boolean |
-| `permissions` | BitString |
-| `granted` | BitString |
-| `actorId` | UUID |
-| `profileId` | UUID |
-
-**Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isExternal`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `org-membership`
 

@@ -1795,6 +1795,122 @@ type User {
     orderBy: [AuditLogOrderBy!] = [PRIMARY_KEY_ASC]
   ): AuditLogConnection!
 
+  """Reads and enables pagination through a set of `AgentThread`."""
+  agentThreadsByEntityId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentThreadFilter
+
+    """The method to use when ordering `AgentThread`."""
+    orderBy: [AgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentThreadConnection!
+
+  """Reads and enables pagination through a set of `AgentThread`."""
+  ownedAgentThreads(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentThreadFilter
+
+    """The method to use when ordering `AgentThread`."""
+    orderBy: [AgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentThreadConnection!
+
+  """Reads and enables pagination through a set of `AgentMessage`."""
+  ownedAgentMessages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentMessageFilter
+
+    """The method to use when ordering `AgentMessage`."""
+    orderBy: [AgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentMessageConnection!
+
+  """Reads and enables pagination through a set of `AgentTask`."""
+  ownedAgentTasks(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentTaskFilter
+
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentTaskConnection!
+
   """
   TSV rank when searching `searchTsv`. Returns null when no tsv search filter is active.
   """
@@ -6064,6 +6180,30 @@ input UserFilter {
   """`auditLogsByActorId` exist."""
   auditLogsByActorIdExist: Boolean
 
+  """Filter by the object’s `agentThreadsByEntityId` relation."""
+  agentThreadsByEntityId: UserToManyAgentThreadFilter
+
+  """`agentThreadsByEntityId` exist."""
+  agentThreadsByEntityIdExist: Boolean
+
+  """Filter by the object’s `ownedAgentThreads` relation."""
+  ownedAgentThreads: UserToManyAgentThreadFilter
+
+  """`ownedAgentThreads` exist."""
+  ownedAgentThreadsExist: Boolean
+
+  """Filter by the object’s `ownedAgentMessages` relation."""
+  ownedAgentMessages: UserToManyAgentMessageFilter
+
+  """`ownedAgentMessages` exist."""
+  ownedAgentMessagesExist: Boolean
+
+  """Filter by the object’s `ownedAgentTasks` relation."""
+  ownedAgentTasks: UserToManyAgentTaskFilter
+
+  """`ownedAgentTasks` exist."""
+  ownedAgentTasksExist: Boolean
+
   """TSV search on the `search_tsv` column."""
   tsvSearchTsv: String
 
@@ -6391,9 +6531,6 @@ input AppMembershipFilter {
 
   """Filter by the object’s `isActive` field."""
   isActive: BooleanFilter
-
-  """Filter by the object’s `isExternal` field."""
-  isExternal: BooleanFilter
 
   """Filter by the object’s `isOwner` field."""
   isOwner: BooleanFilter
@@ -8556,6 +8693,232 @@ input InternetAddressFilter {
 
   """Contains or contained by the specified internet address."""
   containsOrContainedBy: InternetAddress
+}
+
+"""
+A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyAgentThreadFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AgentThreadFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AgentThreadFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AgentThreadFilter
+}
+
+"""
+A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’
+"""
+input AgentThreadFilter {
+  """Filter by the object’s `title` field."""
+  title: StringFilter
+
+  """Filter by the object’s `mode` field."""
+  mode: StringFilter
+
+  """Filter by the object’s `model` field."""
+  model: StringFilter
+
+  """Filter by the object’s `systemPrompt` field."""
+  systemPrompt: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [AgentThreadFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AgentThreadFilter!]
+
+  """Negates the expression."""
+  not: AgentThreadFilter
+
+  """Filter by the object’s `entity` relation."""
+  entity: UserFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """Filter by the object’s `agentMessagesByThreadId` relation."""
+  agentMessagesByThreadId: AgentThreadToManyAgentMessageFilter
+
+  """`agentMessagesByThreadId` exist."""
+  agentMessagesByThreadIdExist: Boolean
+
+  """Filter by the object’s `agentTasksByThreadId` relation."""
+  agentTasksByThreadId: AgentThreadToManyAgentTaskFilter
+
+  """`agentTasksByThreadId` exist."""
+  agentTasksByThreadIdExist: Boolean
+}
+
+"""
+A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input AgentThreadToManyAgentMessageFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AgentMessageFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AgentMessageFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AgentMessageFilter
+}
+
+"""
+A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input AgentMessageFilter {
+  """Filter by the object’s `threadId` field."""
+  threadId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `authorRole` field."""
+  authorRole: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `parts` field."""
+  parts: JSONFilter
+
+  """Checks for all expressions in this list."""
+  and: [AgentMessageFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AgentMessageFilter!]
+
+  """Negates the expression."""
+  not: AgentMessageFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """Filter by the object’s `thread` relation."""
+  thread: AgentThreadFilter
+}
+
+"""
+A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’
+"""
+input AgentThreadToManyAgentTaskFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AgentTaskFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AgentTaskFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AgentTaskFilter
+}
+
+"""
+A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’
+"""
+input AgentTaskFilter {
+  """Filter by the object’s `threadId` field."""
+  threadId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `source` field."""
+  source: StringFilter
+
+  """Filter by the object’s `error` field."""
+  error: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [AgentTaskFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AgentTaskFilter!]
+
+  """Negates the expression."""
+  not: AgentTaskFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """Filter by the object’s `thread` relation."""
+  thread: AgentThreadFilter
+}
+
+"""
+A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyAgentMessageFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AgentMessageFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AgentMessageFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AgentMessageFilter
+}
+
+"""
+A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyAgentTaskFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AgentTaskFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AgentTaskFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AgentTaskFilter
 }
 
 """
@@ -21862,11 +22225,6 @@ type AppMembership {
   """
   isActive: Boolean!
 
-  """
-  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
-  """
-  isExternal: Boolean!
-
   """Whether the actor is the owner of this entity"""
   isOwner: Boolean!
 
@@ -24045,6 +24403,352 @@ enum AuditLogOrderBy {
   CREATED_AT_DESC
 }
 
+"""A connection to a list of `AgentThread` values."""
+type AgentThreadConnection {
+  """A list of `AgentThread` objects."""
+  nodes: [AgentThread]!
+
+  """
+  A list of edges which contains the `AgentThread` and cursor to aid in pagination.
+  """
+  edges: [AgentThreadEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AgentThread` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension.
+"""
+type AgentThread {
+  """
+  Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed.
+  """
+  title: String
+
+  """
+  Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration.
+  """
+  mode: String!
+
+  """
+  Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time.
+  """
+  model: String
+
+  """
+  Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time.
+  """
+  systemPrompt: String
+  id: UUID!
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime!
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime!
+
+  """User who owns this record within the entity"""
+  ownerId: UUID!
+
+  """Entity this record belongs to"""
+  entityId: UUID!
+
+  """Current status of this record"""
+  status: String!
+
+  """Reads a single `User` that is related to this `AgentThread`."""
+  entity: User
+
+  """Reads a single `User` that is related to this `AgentThread`."""
+  owner: User
+
+  """Reads and enables pagination through a set of `AgentMessage`."""
+  agentMessagesByThreadId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentMessageFilter
+
+    """The method to use when ordering `AgentMessage`."""
+    orderBy: [AgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentMessageConnection!
+
+  """Reads and enables pagination through a set of `AgentTask`."""
+  agentTasksByThreadId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentTaskFilter
+
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentTaskConnection!
+}
+
+"""A connection to a list of `AgentMessage` values."""
+type AgentMessageConnection {
+  """A list of `AgentMessage` objects."""
+  nodes: [AgentMessage]!
+
+  """
+  A list of edges which contains the `AgentMessage` and cursor to aid in pagination.
+  """
+  edges: [AgentMessageEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AgentMessage` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only.
+"""
+type AgentMessage {
+  """
+  Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.
+  """
+  threadId: UUID!
+
+  """
+  Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only.
+  """
+  entityId: UUID!
+
+  """
+  Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array.
+  """
+  authorRole: String!
+  id: UUID!
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime!
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime!
+
+  """User who owns this record"""
+  ownerId: UUID!
+
+  """JSON metadata for extensible key-value storage"""
+  parts: JSON
+
+  """Reads a single `User` that is related to this `AgentMessage`."""
+  owner: User
+
+  """Reads a single `AgentThread` that is related to this `AgentMessage`."""
+  thread: AgentThread
+}
+
+"""A `AgentMessage` edge in the connection."""
+type AgentMessageEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AgentMessage` at the end of the edge."""
+  node: AgentMessage
+}
+
+"""Methods to use when ordering `AgentMessage`."""
+enum AgentMessageOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  THREAD_ID_ASC
+  THREAD_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  AUTHOR_ROLE_ASC
+  AUTHOR_ROLE_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PARTS_ASC
+  PARTS_DESC
+}
+
+"""A connection to a list of `AgentTask` values."""
+type AgentTaskConnection {
+  """A list of `AgentTask` objects."""
+  nodes: [AgentTask]!
+
+  """
+  A list of edges which contains the `AgentTask` and cursor to aid in pagination.
+  """
+  edges: [AgentTaskEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AgentTask` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only.
+"""
+type AgentTask {
+  """
+  Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.
+  """
+  threadId: UUID!
+
+  """
+  Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly.
+  """
+  entityId: UUID!
+
+  """Natural-language description of the work to do. Required."""
+  description: String!
+
+  """
+  Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later.
+  """
+  source: String!
+
+  """
+  Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully.
+  """
+  error: String
+  id: UUID!
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime!
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime!
+
+  """User who owns this record"""
+  ownerId: UUID!
+
+  """Current status of this record"""
+  status: String!
+
+  """Reads a single `User` that is related to this `AgentTask`."""
+  owner: User
+
+  """Reads a single `AgentThread` that is related to this `AgentTask`."""
+  thread: AgentThread
+}
+
+"""A `AgentTask` edge in the connection."""
+type AgentTaskEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AgentTask` at the end of the edge."""
+  node: AgentTask
+}
+
+"""Methods to use when ordering `AgentTask`."""
+enum AgentTaskOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  THREAD_ID_ASC
+  THREAD_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  SOURCE_ASC
+  SOURCE_DESC
+  ERROR_ASC
+  ERROR_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  STATUS_ASC
+  STATUS_DESC
+}
+
+"""A `AgentThread` edge in the connection."""
+type AgentThreadEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AgentThread` at the end of the edge."""
+  node: AgentThread
+}
+
+"""Methods to use when ordering `AgentThread`."""
+enum AgentThreadOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  MODE_ASC
+  MODE_DESC
+  MODEL_ASC
+  MODEL_DESC
+  SYSTEM_PROMPT_ASC
+  SYSTEM_PROMPT_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  STATUS_ASC
+  STATUS_DESC
+}
+
 """A connection to a list of `AppPermissionDefault` values."""
 type AppPermissionDefaultConnection {
   """A list of `AppPermissionDefault` objects."""
@@ -24727,6 +25431,100 @@ enum DevicesModuleOrderBy {
   USER_DEVICES_TABLE_DESC
   DEVICE_SETTINGS_TABLE_ASC
   DEVICE_SETTINGS_TABLE_DESC
+}
+
+"""A connection to a list of `NodeTypeRegistry` values."""
+type NodeTypeRegistryConnection {
+  """A list of `NodeTypeRegistry` objects."""
+  nodes: [NodeTypeRegistry]!
+
+  """
+  A list of edges which contains the `NodeTypeRegistry` and cursor to aid in pagination.
+  """
+  edges: [NodeTypeRegistryEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `NodeTypeRegistry` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type NodeTypeRegistry {
+  name: String!
+  slug: String!
+  category: String!
+  displayName: String
+  description: String
+  parameterSchema: JSON!
+  tags: [String]!
+}
+
+"""A `NodeTypeRegistry` edge in the connection."""
+type NodeTypeRegistryEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NodeTypeRegistry` at the end of the edge."""
+  node: NodeTypeRegistry
+}
+
+"""
+A filter to be used against `NodeTypeRegistry` object types. All fields are combined with a logical ‘and.’
+"""
+input NodeTypeRegistryFilter {
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `slug` field."""
+  slug: StringFilter
+
+  """Filter by the object’s `category` field."""
+  category: StringFilter
+
+  """Filter by the object’s `displayName` field."""
+  displayName: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `parameterSchema` field."""
+  parameterSchema: JSONFilter
+
+  """Filter by the object’s `tags` field."""
+  tags: StringListFilter
+
+  """Checks for all expressions in this list."""
+  and: [NodeTypeRegistryFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [NodeTypeRegistryFilter!]
+
+  """Negates the expression."""
+  not: NodeTypeRegistryFilter
+}
+
+"""Methods to use when ordering `NodeTypeRegistry`."""
+enum NodeTypeRegistryOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NAME_ASC
+  NAME_DESC
+  SLUG_ASC
+  SLUG_DESC
+  CATEGORY_ASC
+  CATEGORY_DESC
+  DISPLAY_NAME_ASC
+  DISPLAY_NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  PARAMETER_SCHEMA_ASC
+  PARAMETER_SCHEMA_DESC
+  TAGS_ASC
+  TAGS_DESC
 }
 
 """A connection to a list of `UserConnectedAccount` values."""
@@ -25934,8 +26732,6 @@ enum AppMembershipOrderBy {
   IS_VERIFIED_DESC
   IS_ACTIVE_ASC
   IS_ACTIVE_DESC
-  IS_EXTERNAL_ASC
-  IS_EXTERNAL_DESC
   IS_OWNER_ASC
   IS_OWNER_DESC
   IS_ADMIN_ASC
@@ -29265,6 +30061,52 @@ input OrgOwnerGrantInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `NodeTypeRegistry` mutation."""
+type CreateNodeTypeRegistryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NodeTypeRegistry` that was created by this mutation."""
+  nodeTypeRegistry: NodeTypeRegistry
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NodeTypeRegistry`. May be used by Relay 1."""
+  nodeTypeRegistryEdge(
+    """The method to use when ordering `NodeTypeRegistry`."""
+    orderBy: [NodeTypeRegistryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NodeTypeRegistryEdge
+}
+
+"""All input for the create `NodeTypeRegistry` mutation."""
+input CreateNodeTypeRegistryInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `NodeTypeRegistry` to be created by this mutation."""
+  nodeTypeRegistry: NodeTypeRegistryInput!
+}
+
+"""An input for mutations affecting `NodeTypeRegistry`"""
+input NodeTypeRegistryInput {
+  name: String!
+  slug: String!
+  category: String!
+  displayName: String
+  description: String
+  parameterSchema: JSON
+  tags: [String]
+}
+
 """The output of our create `UserConnectedAccount` mutation."""
 type CreateUserConnectedAccountPayload {
   """
@@ -29503,6 +30345,72 @@ input CryptoAddressInput {
   name: String
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our create `AgentMessage` mutation."""
+type CreateAgentMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentMessage` that was created by this mutation."""
+  agentMessage: AgentMessage
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentMessage`. May be used by Relay 1."""
+  agentMessageEdge(
+    """The method to use when ordering `AgentMessage`."""
+    orderBy: [AgentMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentMessageEdge
+}
+
+"""All input for the create `AgentMessage` mutation."""
+input CreateAgentMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AgentMessage` to be created by this mutation."""
+  agentMessage: AgentMessageInput!
+}
+
+"""An input for mutations affecting `AgentMessage`"""
+input AgentMessageInput {
+  """
+  Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.
+  """
+  threadId: UUID!
+
+  """
+  Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only.
+  """
+  entityId: UUID!
+
+  """
+  Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array.
+  """
+  authorRole: String!
+  id: UUID
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime
+
+  """User who owns this record"""
+  ownerId: UUID
+
+  """JSON metadata for extensible key-value storage"""
+  parts: JSON
 }
 
 """The output of our create `AppPermission` mutation."""
@@ -30639,6 +31547,154 @@ input OrgChartEdgeInput {
 
   """Numeric seniority level for this position (higher = more senior)"""
   positionLevel: Int
+}
+
+"""The output of our create `AgentTask` mutation."""
+type CreateAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` that was created by this mutation."""
+  agentTask: AgentTask
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentTask`. May be used by Relay 1."""
+  agentTaskEdge(
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentTaskEdge
+}
+
+"""All input for the create `AgentTask` mutation."""
+input CreateAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` to be created by this mutation."""
+  agentTask: AgentTaskInput!
+}
+
+"""An input for mutations affecting `AgentTask`"""
+input AgentTaskInput {
+  """
+  Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.
+  """
+  threadId: UUID!
+
+  """
+  Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly.
+  """
+  entityId: UUID!
+
+  """Natural-language description of the work to do. Required."""
+  description: String!
+
+  """
+  Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later.
+  """
+  source: String
+
+  """
+  Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully.
+  """
+  error: String
+  id: UUID
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime
+
+  """User who owns this record"""
+  ownerId: UUID
+
+  """Current status of this record"""
+  status: String
+}
+
+"""The output of our create `AgentThread` mutation."""
+type CreateAgentThreadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentThread` that was created by this mutation."""
+  agentThread: AgentThread
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentThread`. May be used by Relay 1."""
+  agentThreadEdge(
+    """The method to use when ordering `AgentThread`."""
+    orderBy: [AgentThreadOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentThreadEdge
+}
+
+"""All input for the create `AgentThread` mutation."""
+input CreateAgentThreadInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AgentThread` to be created by this mutation."""
+  agentThread: AgentThreadInput!
+}
+
+"""An input for mutations affecting `AgentThread`"""
+input AgentThreadInput {
+  """
+  Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed.
+  """
+  title: String
+
+  """
+  Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration.
+  """
+  mode: String
+
+  """
+  Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time.
+  """
+  model: String
+
+  """
+  Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time.
+  """
+  systemPrompt: String
+  id: UUID
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime
+
+  """User who owns this record within the entity"""
+  ownerId: UUID
+
+  """Entity this record belongs to"""
+  entityId: UUID!
+
+  """Current status of this record"""
+  status: String
 }
 
 """The output of our create `OrgGrant` mutation."""
@@ -32643,6 +33699,87 @@ input AppInviteInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `AppMembership` mutation."""
+type CreateAppMembershipPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppMembership` that was created by this mutation."""
+  appMembership: AppMembership
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppMembership`. May be used by Relay 1."""
+  appMembershipEdge(
+    """The method to use when ordering `AppMembership`."""
+    orderBy: [AppMembershipOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppMembershipEdge
+}
+
+"""All input for the create `AppMembership` mutation."""
+input CreateAppMembershipInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppMembership` to be created by this mutation."""
+  appMembership: AppMembershipInput!
+}
+
+"""An input for mutations affecting `AppMembership`"""
+input AppMembershipInput {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """Whether this membership has been approved by an admin"""
+  isApproved: Boolean
+
+  """Whether this member has been banned from the entity"""
+  isBanned: Boolean
+
+  """Whether this membership is temporarily disabled"""
+  isDisabled: Boolean
+
+  """Whether this member has been verified (e.g. email confirmation)"""
+  isVerified: Boolean
+
+  """
+  Computed field indicating the membership is approved, verified, not banned, and not disabled
+  """
+  isActive: Boolean
+
+  """Whether the actor is the owner of this entity"""
+  isOwner: Boolean
+
+  """Whether the actor has admin privileges on this entity"""
+  isAdmin: Boolean
+
+  """
+  Aggregated permission bitmask combining profile-based and directly granted permissions
+  """
+  permissions: BitString
+
+  """
+  Bitmask of permissions directly granted to this member (not from profiles)
+  """
+  granted: BitString
+
+  """References the user who holds this membership"""
+  actorId: UUID!
+  profileId: UUID
+}
+
 """The output of our create `EmbeddingChunk` mutation."""
 type CreateEmbeddingChunkPayload {
   """
@@ -32865,92 +34002,6 @@ input ProfilesModuleInput {
   permissionsTableId: UUID
   membershipsTableId: UUID
   prefix: String
-}
-
-"""The output of our create `AppMembership` mutation."""
-type CreateAppMembershipPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppMembership` that was created by this mutation."""
-  appMembership: AppMembership
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppMembership`. May be used by Relay 1."""
-  appMembershipEdge(
-    """The method to use when ordering `AppMembership`."""
-    orderBy: [AppMembershipOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppMembershipEdge
-}
-
-"""All input for the create `AppMembership` mutation."""
-input CreateAppMembershipInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppMembership` to be created by this mutation."""
-  appMembership: AppMembershipInput!
-}
-
-"""An input for mutations affecting `AppMembership`"""
-input AppMembershipInput {
-  id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-  createdBy: UUID
-  updatedBy: UUID
-
-  """Whether this membership has been approved by an admin"""
-  isApproved: Boolean
-
-  """Whether this member has been banned from the entity"""
-  isBanned: Boolean
-
-  """Whether this membership is temporarily disabled"""
-  isDisabled: Boolean
-
-  """Whether this member has been verified (e.g. email confirmation)"""
-  isVerified: Boolean
-
-  """
-  Computed field indicating the membership is approved, verified, not banned, and not disabled
-  """
-  isActive: Boolean
-
-  """
-  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
-  """
-  isExternal: Boolean
-
-  """Whether the actor is the owner of this entity"""
-  isOwner: Boolean
-
-  """Whether the actor has admin privileges on this entity"""
-  isAdmin: Boolean
-
-  """
-  Aggregated permission bitmask combining profile-based and directly granted permissions
-  """
-  permissions: BitString
-
-  """
-  Bitmask of permissions directly granted to this member (not from profiles)
-  """
-  granted: BitString
-
-  """References the user who holds this membership"""
-  actorId: UUID!
-  profileId: UUID
 }
 
 """The output of our create `Index` mutation."""
@@ -36199,6 +37250,57 @@ input OrgOwnerGrantPatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `NodeTypeRegistry` mutation."""
+type UpdateNodeTypeRegistryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NodeTypeRegistry` that was updated by this mutation."""
+  nodeTypeRegistry: NodeTypeRegistry
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NodeTypeRegistry`. May be used by Relay 1."""
+  nodeTypeRegistryEdge(
+    """The method to use when ordering `NodeTypeRegistry`."""
+    orderBy: [NodeTypeRegistryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NodeTypeRegistryEdge
+}
+
+"""All input for the `updateNodeTypeRegistry` mutation."""
+input UpdateNodeTypeRegistryInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+
+  """
+  An object where the defined keys will be set on the `NodeTypeRegistry` being updated.
+  """
+  nodeTypeRegistryPatch: NodeTypeRegistryPatch!
+}
+
+"""
+Represents an update to a `NodeTypeRegistry`. Fields that are set will be updated.
+"""
+input NodeTypeRegistryPatch {
+  name: String
+  slug: String
+  category: String
+  displayName: String
+  description: String
+  parameterSchema: JSON
+  tags: [String]
+}
+
 """The output of our update `Object` mutation."""
 type UpdateObjectPayload {
   """
@@ -36417,6 +37519,77 @@ input CryptoAddressPatch {
   name: String
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our update `AgentMessage` mutation."""
+type UpdateAgentMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentMessage` that was updated by this mutation."""
+  agentMessage: AgentMessage
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentMessage`. May be used by Relay 1."""
+  agentMessageEdge(
+    """The method to use when ordering `AgentMessage`."""
+    orderBy: [AgentMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentMessageEdge
+}
+
+"""All input for the `updateAgentMessage` mutation."""
+input UpdateAgentMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AgentMessage` being updated.
+  """
+  agentMessagePatch: AgentMessagePatch!
+}
+
+"""
+Represents an update to a `AgentMessage`. Fields that are set will be updated.
+"""
+input AgentMessagePatch {
+  """
+  Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.
+  """
+  threadId: UUID
+
+  """
+  Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only.
+  """
+  entityId: UUID
+
+  """
+  Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array.
+  """
+  authorRole: String
+  id: UUID
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime
+
+  """User who owns this record"""
+  ownerId: UUID
+
+  """JSON metadata for extensible key-value storage"""
+  parts: JSON
 }
 
 """The output of our update `AppPermission` mutation."""
@@ -37677,6 +38850,164 @@ input OrgChartEdgePatch {
 
   """Numeric seniority level for this position (higher = more senior)"""
   positionLevel: Int
+}
+
+"""The output of our update `AgentTask` mutation."""
+type UpdateAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` that was updated by this mutation."""
+  agentTask: AgentTask
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentTask`. May be used by Relay 1."""
+  agentTaskEdge(
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentTaskEdge
+}
+
+"""All input for the `updateAgentTask` mutation."""
+input UpdateAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AgentTask` being updated.
+  """
+  agentTaskPatch: AgentTaskPatch!
+}
+
+"""
+Represents an update to a `AgentTask`. Fields that are set will be updated.
+"""
+input AgentTaskPatch {
+  """
+  Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.
+  """
+  threadId: UUID
+
+  """
+  Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly.
+  """
+  entityId: UUID
+
+  """Natural-language description of the work to do. Required."""
+  description: String
+
+  """
+  Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later.
+  """
+  source: String
+
+  """
+  Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully.
+  """
+  error: String
+  id: UUID
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime
+
+  """User who owns this record"""
+  ownerId: UUID
+
+  """Current status of this record"""
+  status: String
+}
+
+"""The output of our update `AgentThread` mutation."""
+type UpdateAgentThreadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentThread` that was updated by this mutation."""
+  agentThread: AgentThread
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentThread`. May be used by Relay 1."""
+  agentThreadEdge(
+    """The method to use when ordering `AgentThread`."""
+    orderBy: [AgentThreadOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentThreadEdge
+}
+
+"""All input for the `updateAgentThread` mutation."""
+input UpdateAgentThreadInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AgentThread` being updated.
+  """
+  agentThreadPatch: AgentThreadPatch!
+}
+
+"""
+Represents an update to a `AgentThread`. Fields that are set will be updated.
+"""
+input AgentThreadPatch {
+  """
+  Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed.
+  """
+  title: String
+
+  """
+  Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration.
+  """
+  mode: String
+
+  """
+  Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time.
+  """
+  model: String
+
+  """
+  Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time.
+  """
+  systemPrompt: String
+  id: UUID
+
+  """Timestamp when this record was created"""
+  createdAt: Datetime
+
+  """Timestamp when this record was last updated"""
+  updatedAt: Datetime
+
+  """User who owns this record within the entity"""
+  ownerId: UUID
+
+  """Entity this record belongs to"""
+  entityId: UUID
+
+  """Current status of this record"""
+  status: String
 }
 
 """The output of our update `OrgGrant` mutation."""
@@ -39773,6 +41104,92 @@ input AppInvitePatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `AppMembership` mutation."""
+type UpdateAppMembershipPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppMembership` that was updated by this mutation."""
+  appMembership: AppMembership
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppMembership`. May be used by Relay 1."""
+  appMembershipEdge(
+    """The method to use when ordering `AppMembership`."""
+    orderBy: [AppMembershipOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppMembershipEdge
+}
+
+"""All input for the `updateAppMembership` mutation."""
+input UpdateAppMembershipInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppMembership` being updated.
+  """
+  appMembershipPatch: AppMembershipPatch!
+}
+
+"""
+Represents an update to a `AppMembership`. Fields that are set will be updated.
+"""
+input AppMembershipPatch {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """Whether this membership has been approved by an admin"""
+  isApproved: Boolean
+
+  """Whether this member has been banned from the entity"""
+  isBanned: Boolean
+
+  """Whether this membership is temporarily disabled"""
+  isDisabled: Boolean
+
+  """Whether this member has been verified (e.g. email confirmation)"""
+  isVerified: Boolean
+
+  """
+  Computed field indicating the membership is approved, verified, not banned, and not disabled
+  """
+  isActive: Boolean
+
+  """Whether the actor is the owner of this entity"""
+  isOwner: Boolean
+
+  """Whether the actor has admin privileges on this entity"""
+  isAdmin: Boolean
+
+  """
+  Aggregated permission bitmask combining profile-based and directly granted permissions
+  """
+  permissions: BitString
+
+  """
+  Bitmask of permissions directly granted to this member (not from profiles)
+  """
+  granted: BitString
+
+  """References the user who holds this membership"""
+  actorId: UUID
+  profileId: UUID
+}
+
 """The output of our update `EmbeddingChunk` mutation."""
 type UpdateEmbeddingChunkPayload {
   """
@@ -40015,97 +41432,6 @@ input ProfilesModulePatch {
   permissionsTableId: UUID
   membershipsTableId: UUID
   prefix: String
-}
-
-"""The output of our update `AppMembership` mutation."""
-type UpdateAppMembershipPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppMembership` that was updated by this mutation."""
-  appMembership: AppMembership
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppMembership`. May be used by Relay 1."""
-  appMembershipEdge(
-    """The method to use when ordering `AppMembership`."""
-    orderBy: [AppMembershipOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppMembershipEdge
-}
-
-"""All input for the `updateAppMembership` mutation."""
-input UpdateAppMembershipInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppMembership` being updated.
-  """
-  appMembershipPatch: AppMembershipPatch!
-}
-
-"""
-Represents an update to a `AppMembership`. Fields that are set will be updated.
-"""
-input AppMembershipPatch {
-  id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-  createdBy: UUID
-  updatedBy: UUID
-
-  """Whether this membership has been approved by an admin"""
-  isApproved: Boolean
-
-  """Whether this member has been banned from the entity"""
-  isBanned: Boolean
-
-  """Whether this membership is temporarily disabled"""
-  isDisabled: Boolean
-
-  """Whether this member has been verified (e.g. email confirmation)"""
-  isVerified: Boolean
-
-  """
-  Computed field indicating the membership is approved, verified, not banned, and not disabled
-  """
-  isActive: Boolean
-
-  """
-  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
-  """
-  isExternal: Boolean
-
-  """Whether the actor is the owner of this entity"""
-  isOwner: Boolean
-
-  """Whether the actor has admin privileges on this entity"""
-  isAdmin: Boolean
-
-  """
-  Aggregated permission bitmask combining profile-based and directly granted permissions
-  """
-  permissions: BitString
-
-  """
-  Bitmask of permissions directly granted to this member (not from profiles)
-  """
-  granted: BitString
-
-  """References the user who holds this membership"""
-  actorId: UUID
-  profileId: UUID
 }
 
 """The output of our update `Index` mutation."""
@@ -42756,6 +44082,39 @@ input DeleteOrgOwnerGrantInput {
   id: UUID!
 }
 
+"""The output of our delete `NodeTypeRegistry` mutation."""
+type DeleteNodeTypeRegistryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NodeTypeRegistry` that was deleted by this mutation."""
+  nodeTypeRegistry: NodeTypeRegistry
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NodeTypeRegistry`. May be used by Relay 1."""
+  nodeTypeRegistryEdge(
+    """The method to use when ordering `NodeTypeRegistry`."""
+    orderBy: [NodeTypeRegistryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NodeTypeRegistryEdge
+}
+
+"""All input for the `deleteNodeTypeRegistry` mutation."""
+input DeleteNodeTypeRegistryInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+}
+
 """The output of our delete `Object` mutation."""
 type DeleteObjectPayload {
   """
@@ -42881,6 +44240,39 @@ type DeleteCryptoAddressPayload {
 
 """All input for the `deleteCryptoAddress` mutation."""
 input DeleteCryptoAddressInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AgentMessage` mutation."""
+type DeleteAgentMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentMessage` that was deleted by this mutation."""
+  agentMessage: AgentMessage
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentMessage`. May be used by Relay 1."""
+  agentMessageEdge(
+    """The method to use when ordering `AgentMessage`."""
+    orderBy: [AgentMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentMessageEdge
+}
+
+"""All input for the `deleteAgentMessage` mutation."""
+input DeleteAgentMessageInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -43587,6 +44979,72 @@ type DeleteOrgChartEdgePayload {
 
 """All input for the `deleteOrgChartEdge` mutation."""
 input DeleteOrgChartEdgeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AgentTask` mutation."""
+type DeleteAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` that was deleted by this mutation."""
+  agentTask: AgentTask
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentTask`. May be used by Relay 1."""
+  agentTaskEdge(
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentTaskEdge
+}
+
+"""All input for the `deleteAgentTask` mutation."""
+input DeleteAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AgentThread` mutation."""
+type DeleteAgentThreadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentThread` that was deleted by this mutation."""
+  agentThread: AgentThread
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentThread`. May be used by Relay 1."""
+  agentThreadEdge(
+    """The method to use when ordering `AgentThread`."""
+    orderBy: [AgentThreadOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentThreadEdge
+}
+
+"""All input for the `deleteAgentThread` mutation."""
+input DeleteAgentThreadInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -44661,6 +46119,39 @@ input DeleteAppInviteInput {
   id: UUID!
 }
 
+"""The output of our delete `AppMembership` mutation."""
+type DeleteAppMembershipPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppMembership` that was deleted by this mutation."""
+  appMembership: AppMembership
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppMembership`. May be used by Relay 1."""
+  appMembershipEdge(
+    """The method to use when ordering `AppMembership`."""
+    orderBy: [AppMembershipOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppMembershipEdge
+}
+
+"""All input for the `deleteAppMembership` mutation."""
+input DeleteAppMembershipInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `EmbeddingChunk` mutation."""
 type DeleteEmbeddingChunkPayload {
   """
@@ -44785,39 +46276,6 @@ type DeleteProfilesModulePayload {
 
 """All input for the `deleteProfilesModule` mutation."""
 input DeleteProfilesModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppMembership` mutation."""
-type DeleteAppMembershipPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppMembership` that was deleted by this mutation."""
-  appMembership: AppMembership
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppMembership`. May be used by Relay 1."""
-  appMembershipEdge(
-    """The method to use when ordering `AppMembership`."""
-    orderBy: [AppMembershipOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppMembershipEdge
-}
-
-"""All input for the `deleteAppMembership` mutation."""
-input DeleteAppMembershipInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -46647,6 +48105,35 @@ type Query {
     orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgOwnerGrantConnection
 
+  """Reads and enables pagination through a set of `NodeTypeRegistry`."""
+  nodeTypeRegistries(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: NodeTypeRegistryFilter
+
+    """The method to use when ordering `NodeTypeRegistry`."""
+    orderBy: [NodeTypeRegistryOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NodeTypeRegistryConnection
+
   """Reads and enables pagination through a set of `UserConnectedAccount`."""
   userConnectedAccounts(
     """Only read the first `n` values of the set."""
@@ -46791,6 +48278,35 @@ type Query {
     """The method to use when ordering `CryptoAddress`."""
     orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
   ): CryptoAddressConnection
+
+  """Reads and enables pagination through a set of `AgentMessage`."""
+  agentMessages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentMessageFilter
+
+    """The method to use when ordering `AgentMessage`."""
+    orderBy: [AgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentMessageConnection
 
   """Reads and enables pagination through a set of `AppPermission`."""
   appPermissions(
@@ -47400,6 +48916,64 @@ type Query {
     """The method to use when ordering `OrgChartEdge`."""
     orderBy: [OrgChartEdgeOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgChartEdgeConnection
+
+  """Reads and enables pagination through a set of `AgentTask`."""
+  agentTasks(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentTaskFilter
+
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentTaskConnection
+
+  """Reads and enables pagination through a set of `AgentThread`."""
+  agentThreads(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentThreadFilter
+
+    """The method to use when ordering `AgentThread`."""
+    orderBy: [AgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentThreadConnection
 
   """Reads and enables pagination through a set of `OrgGrant`."""
   orgGrants(
@@ -48391,6 +49965,35 @@ type Query {
     orderBy: [AppInviteOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppInviteConnection
 
+  """Reads and enables pagination through a set of `AppMembership`."""
+  appMemberships(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppMembershipFilter
+
+    """The method to use when ordering `AppMembership`."""
+    orderBy: [AppMembershipOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppMembershipConnection
+
   """Reads and enables pagination through a set of `EmbeddingChunk`."""
   embeddingChunks(
     """Only read the first `n` values of the set."""
@@ -48506,35 +50109,6 @@ type Query {
     """The method to use when ordering `ProfilesModule`."""
     orderBy: [ProfilesModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): ProfilesModuleConnection
-
-  """Reads and enables pagination through a set of `AppMembership`."""
-  appMemberships(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppMembershipFilter
-
-    """The method to use when ordering `AppMembership`."""
-    orderBy: [AppMembershipOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppMembershipConnection
 
   """Reads and enables pagination through a set of `Index`."""
   indices(
@@ -49594,6 +51168,14 @@ type Mutation {
     input: CreateOrgOwnerGrantInput!
   ): CreateOrgOwnerGrantPayload
 
+  """Creates a single `NodeTypeRegistry`."""
+  createNodeTypeRegistry(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNodeTypeRegistryInput!
+  ): CreateNodeTypeRegistryPayload
+
   """Creates a single `UserConnectedAccount`."""
   createUserConnectedAccount(
     """
@@ -49633,6 +51215,14 @@ type Mutation {
     """
     input: CreateCryptoAddressInput!
   ): CreateCryptoAddressPayload
+
+  """Creates a single `AgentMessage`."""
+  createAgentMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAgentMessageInput!
+  ): CreateAgentMessagePayload
 
   """Creates a single `AppPermission`."""
   createAppPermission(
@@ -49801,6 +51391,22 @@ type Mutation {
     """
     input: CreateOrgChartEdgeInput!
   ): CreateOrgChartEdgePayload
+
+  """Creates a single `AgentTask`."""
+  createAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAgentTaskInput!
+  ): CreateAgentTaskPayload
+
+  """Creates a single `AgentThread`."""
+  createAgentThread(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAgentThreadInput!
+  ): CreateAgentThreadPayload
 
   """Creates a single `OrgGrant`."""
   createOrgGrant(
@@ -50074,6 +51680,14 @@ type Mutation {
     input: CreateAppInviteInput!
   ): CreateAppInvitePayload
 
+  """Creates a single `AppMembership`."""
+  createAppMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppMembershipInput!
+  ): CreateAppMembershipPayload
+
   """Creates a single `EmbeddingChunk`."""
   createEmbeddingChunk(
     """
@@ -50105,14 +51719,6 @@ type Mutation {
     """
     input: CreateProfilesModuleInput!
   ): CreateProfilesModulePayload
-
-  """Creates a single `AppMembership`."""
-  createAppMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppMembershipInput!
-  ): CreateAppMembershipPayload
 
   """Creates a single `Index`."""
   createIndex(
@@ -50530,6 +52136,14 @@ type Mutation {
     input: UpdateOrgOwnerGrantInput!
   ): UpdateOrgOwnerGrantPayload
 
+  """Updates a single `NodeTypeRegistry` using a unique key and a patch."""
+  updateNodeTypeRegistry(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNodeTypeRegistryInput!
+  ): UpdateNodeTypeRegistryPayload
+
   """Updates a single `Object` using a unique key and a patch."""
   updateObject(
     """
@@ -50563,6 +52177,14 @@ type Mutation {
     """
     input: UpdateCryptoAddressInput!
   ): UpdateCryptoAddressPayload
+
+  """Updates a single `AgentMessage` using a unique key and a patch."""
+  updateAgentMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAgentMessageInput!
+  ): UpdateAgentMessagePayload
 
   """Updates a single `AppPermission` using a unique key and a patch."""
   updateAppPermission(
@@ -50735,6 +52357,22 @@ type Mutation {
     """
     input: UpdateOrgChartEdgeInput!
   ): UpdateOrgChartEdgePayload
+
+  """Updates a single `AgentTask` using a unique key and a patch."""
+  updateAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAgentTaskInput!
+  ): UpdateAgentTaskPayload
+
+  """Updates a single `AgentThread` using a unique key and a patch."""
+  updateAgentThread(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAgentThreadInput!
+  ): UpdateAgentThreadPayload
 
   """Updates a single `OrgGrant` using a unique key and a patch."""
   updateOrgGrant(
@@ -51004,6 +52642,14 @@ type Mutation {
     input: UpdateAppInviteInput!
   ): UpdateAppInvitePayload
 
+  """Updates a single `AppMembership` using a unique key and a patch."""
+  updateAppMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppMembershipInput!
+  ): UpdateAppMembershipPayload
+
   """Updates a single `EmbeddingChunk` using a unique key and a patch."""
   updateEmbeddingChunk(
     """
@@ -51035,14 +52681,6 @@ type Mutation {
     """
     input: UpdateProfilesModuleInput!
   ): UpdateProfilesModulePayload
-
-  """Updates a single `AppMembership` using a unique key and a patch."""
-  updateAppMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppMembershipInput!
-  ): UpdateAppMembershipPayload
 
   """Updates a single `Index` using a unique key and a patch."""
   updateIndex(
@@ -51446,6 +53084,14 @@ type Mutation {
     input: DeleteOrgOwnerGrantInput!
   ): DeleteOrgOwnerGrantPayload
 
+  """Deletes a single `NodeTypeRegistry` using a unique key."""
+  deleteNodeTypeRegistry(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNodeTypeRegistryInput!
+  ): DeleteNodeTypeRegistryPayload
+
   """Deletes a single `Object` using a unique key."""
   deleteObject(
     """
@@ -51477,6 +53123,14 @@ type Mutation {
     """
     input: DeleteCryptoAddressInput!
   ): DeleteCryptoAddressPayload
+
+  """Deletes a single `AgentMessage` using a unique key."""
+  deleteAgentMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAgentMessageInput!
+  ): DeleteAgentMessagePayload
 
   """Deletes a single `AppPermission` using a unique key."""
   deleteAppPermission(
@@ -51645,6 +53299,22 @@ type Mutation {
     """
     input: DeleteOrgChartEdgeInput!
   ): DeleteOrgChartEdgePayload
+
+  """Deletes a single `AgentTask` using a unique key."""
+  deleteAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAgentTaskInput!
+  ): DeleteAgentTaskPayload
+
+  """Deletes a single `AgentThread` using a unique key."""
+  deleteAgentThread(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAgentThreadInput!
+  ): DeleteAgentThreadPayload
 
   """Deletes a single `OrgGrant` using a unique key."""
   deleteOrgGrant(
@@ -51902,6 +53572,14 @@ type Mutation {
     input: DeleteAppInviteInput!
   ): DeleteAppInvitePayload
 
+  """Deletes a single `AppMembership` using a unique key."""
+  deleteAppMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppMembershipInput!
+  ): DeleteAppMembershipPayload
+
   """Deletes a single `EmbeddingChunk` using a unique key."""
   deleteEmbeddingChunk(
     """
@@ -51933,14 +53611,6 @@ type Mutation {
     """
     input: DeleteProfilesModuleInput!
   ): DeleteProfilesModulePayload
-
-  """Deletes a single `AppMembership` using a unique key."""
-  deleteAppMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppMembershipInput!
-  ): DeleteAppMembershipPayload
 
   """Deletes a single `Index` using a unique key."""
   deleteIndex(

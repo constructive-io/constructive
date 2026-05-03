@@ -292,14 +292,6 @@ export const appInviteMutationKeys = {
   /** Delete appInvite mutation key */ delete: (id: string | number) =>
     ['mutation', 'appinvite', 'delete', id] as const,
 } as const;
-export const orgInviteMutationKeys = {
-  /** All orgInvite mutation keys */ all: ['mutation', 'orginvite'] as const,
-  /** Create orgInvite mutation key */ create: () => ['mutation', 'orginvite', 'create'] as const,
-  /** Update orgInvite mutation key */ update: (id: string | number) =>
-    ['mutation', 'orginvite', 'update', id] as const,
-  /** Delete orgInvite mutation key */ delete: (id: string | number) =>
-    ['mutation', 'orginvite', 'delete', id] as const,
-} as const;
 export const appMembershipMutationKeys = {
   /** All appMembership mutation keys */ all: ['mutation', 'appmembership'] as const,
   /** Create appMembership mutation key */ create: () =>
@@ -308,6 +300,14 @@ export const appMembershipMutationKeys = {
     ['mutation', 'appmembership', 'update', id] as const,
   /** Delete appMembership mutation key */ delete: (id: string | number) =>
     ['mutation', 'appmembership', 'delete', id] as const,
+} as const;
+export const orgInviteMutationKeys = {
+  /** All orgInvite mutation keys */ all: ['mutation', 'orginvite'] as const,
+  /** Create orgInvite mutation key */ create: () => ['mutation', 'orginvite', 'create'] as const,
+  /** Update orgInvite mutation key */ update: (id: string | number) =>
+    ['mutation', 'orginvite', 'update', id] as const,
+  /** Delete orgInvite mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orginvite', 'delete', id] as const,
 } as const;
 export const orgMembershipMutationKeys = {
   /** All orgMembership mutation keys */ all: ['mutation', 'orgmembership'] as const,
@@ -399,8 +399,8 @@ export const mutationKeys = {
   orgMembershipSetting: orgMembershipSettingMutationKeys,
   appLevel: appLevelMutationKeys,
   appInvite: appInviteMutationKeys,
-  orgInvite: orgInviteMutationKeys,
   appMembership: appMembershipMutationKeys,
+  orgInvite: orgInviteMutationKeys,
   orgMembership: orgMembershipMutationKeys,
   custom: customMutationKeys,
 } as const;
