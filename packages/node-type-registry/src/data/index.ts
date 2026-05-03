@@ -3,6 +3,7 @@ export { DataDirectOwner } from './data-direct-owner';
 export { DataEntityMembership } from './data-entity-membership';
 export { DataForceCurrentUser } from './data-force-current-user';
 export { DataId } from './data-id';
+export { DataImageEmbedding } from './data-image-embedding';
 export { DataImmutableFields } from './data-immutable-fields';
 export { DataInflection } from './data-inflection';
 export { DataInheritFromParent } from './data-inherit-from-parent';
