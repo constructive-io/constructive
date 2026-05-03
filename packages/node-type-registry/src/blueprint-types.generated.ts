@@ -130,13 +130,129 @@ export interface DataJobTriggerParams {
       field?: string;
       row?: 'NEW' | 'OLD';
     };
-    /* Array of conditions combined with AND */AND?: string[];
-    /* Array of conditions combined with OR */OR?: string[];
+    /* Array of conditions combined with AND */AND?: {
+      /* Column name (validated against the table) */field?: string;
+      /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+      /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+      /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+      /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+        field?: string;
+        row?: 'NEW' | 'OLD';
+      };
+      /* Nested AND */AND?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested OR */OR?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested NOT */NOT?: {
+        [key: string]: unknown;
+      };
+    }[];
+    /* Array of conditions combined with OR */OR?: {
+      /* Column name (validated against the table) */field?: string;
+      /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+      /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+      /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+      /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+        field?: string;
+        row?: 'NEW' | 'OLD';
+      };
+      /* Nested AND */AND?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested OR */OR?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested NOT */NOT?: {
+        [key: string]: unknown;
+      };
+    }[];
     /* Negated condition */NOT?: {
-      [key: string]: unknown;
+      /* Column name (validated against the table) */field?: string;
+      /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+      /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+      /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+      /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+        field?: string;
+        row?: 'NEW' | 'OLD';
+      };
+      /* Nested AND */AND?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested OR */OR?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested NOT */NOT?: {
+        [key: string]: unknown;
+      };
     };
   } | {
-    [key: string]: unknown;
+    /* Column name (validated against the table) */field?: string;
+    /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+    /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+    /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+    /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+      field?: string;
+      row?: 'NEW' | 'OLD';
+    };
+    /* Array of conditions combined with AND */AND?: {
+      /* Column name (validated against the table) */field?: string;
+      /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+      /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+      /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+      /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+        field?: string;
+        row?: 'NEW' | 'OLD';
+      };
+      /* Nested AND */AND?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested OR */OR?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested NOT */NOT?: {
+        [key: string]: unknown;
+      };
+    }[];
+    /* Array of conditions combined with OR */OR?: {
+      /* Column name (validated against the table) */field?: string;
+      /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+      /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+      /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+      /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+        field?: string;
+        row?: 'NEW' | 'OLD';
+      };
+      /* Nested AND */AND?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested OR */OR?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested NOT */NOT?: {
+        [key: string]: unknown;
+      };
+    }[];
+    /* Negated condition */NOT?: {
+      /* Column name (validated against the table) */field?: string;
+      /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+      /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+      /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+      /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+        field?: string;
+        row?: 'NEW' | 'OLD';
+      };
+      /* Nested AND */AND?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested OR */OR?: {
+        [key: string]: unknown;
+      }[];
+      /* Nested NOT */NOT?: {
+        [key: string]: unknown;
+      };
+    };
   }[];
   /* For UPDATE triggers, only fire when these fields change (uses DISTINCT FROM) */
   watch_fields?: string[];
