@@ -125,7 +125,6 @@ export function createDownloadUrlPlugin(
                     const $key = $parent.get('key');
                     const $isPublic = $parent.get('is_public');
                     const $filename = $parent.get('filename');
-                    const $status = $parent.get('status');
 
                     // Access GraphQL context for per-database config resolution
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
@@ -135,18 +134,12 @@ export function createDownloadUrlPlugin(
                       key: $key,
                       isPublic: $isPublic,
                       filename: $filename,
-                      status: $status,
                       withPgClient: $withPgClient,
                       pgSettings: $pgSettings,
                     });
 
-                    return lambda($combined, async ({ key, isPublic, filename, status, withPgClient, pgSettings }: any) => {
+                    return lambda($combined, async ({ key, isPublic, filename, withPgClient, pgSettings }: any) => {
                       if (!key) return null;
-
-                      // Only provide download URLs for ready/processed files
-                      if (status !== 'ready' && status !== 'processed') {
-                        return null;
-                      }
 
                       // Resolve per-database config (bucket, publicUrlPrefix, expiry)
                       let s3ForDb = resolveS3(options); // fallback to global

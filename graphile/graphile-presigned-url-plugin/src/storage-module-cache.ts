@@ -19,8 +19,8 @@ const ONE_HOUR_MS = 1000 * 60 * 60;
  * LRU cache for per-database StorageModuleConfig.
  *
  * Each PostGraphile instance serves a single database, but the presigned URL
- * plugin needs to know the generated table names (buckets, files,
- * upload_requests) and their schemas. This cache avoids re-querying metaschema
+ * plugin needs to know the generated table names (buckets, files)
+ * and their schemas. This cache avoids re-querying metaschema
  * on every request.
  *
  * Pattern: same as graphile-cache's LRU with TTL-based eviction.
@@ -48,8 +48,6 @@ const APP_STORAGE_MODULE_QUERY = `
     bt.name AS buckets_table,
     fs.schema_name AS files_schema,
     ft.name AS files_table,
-    urs.schema_name AS upload_requests_schema,
-    urt.name AS upload_requests_table,
     sm.endpoint,
     sm.public_url_prefix,
     sm.provider,
@@ -66,8 +64,6 @@ const APP_STORAGE_MODULE_QUERY = `
   JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
   JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
   JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
-  JOIN metaschema_public.table urt ON urt.id = sm.upload_requests_table_id
-  JOIN metaschema_public.schema urs ON urs.id = urt.schema_id
   WHERE sm.database_id = $1
     AND sm.membership_type IS NULL
   LIMIT 1
@@ -88,8 +84,6 @@ const ALL_STORAGE_MODULES_QUERY = `
     bt.name AS buckets_table,
     fs.schema_name AS files_schema,
     ft.name AS files_table,
-    urs.schema_name AS upload_requests_schema,
-    urt.name AS upload_requests_table,
     sm.endpoint,
     sm.public_url_prefix,
     sm.provider,
@@ -106,8 +100,6 @@ const ALL_STORAGE_MODULES_QUERY = `
   JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
   JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
   JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
-  JOIN metaschema_public.table urt ON urt.id = sm.upload_requests_table_id
-  JOIN metaschema_public.schema urs ON urs.id = urt.schema_id
   LEFT JOIN metaschema_public.table et ON et.id = sm.entity_table_id
   LEFT JOIN metaschema_public.schema es ON es.id = et.schema_id
   WHERE sm.database_id = $1
@@ -121,8 +113,6 @@ interface StorageModuleRow {
   buckets_table: string;
   files_schema: string;
   files_table: string;
-  upload_requests_schema: string;
-  upload_requests_table: string;
   endpoint: string | null;
   public_url_prefix: string | null;
   provider: string | null;
@@ -145,11 +135,9 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
     id: row.id,
     bucketsQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.buckets_schema, row.buckets_table),
     filesQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.files_schema, row.files_table),
-    uploadRequestsQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.upload_requests_schema, row.upload_requests_table),
     schemaName: row.buckets_schema,
     bucketsTableName: row.buckets_table,
     filesTableName: row.files_table,
-    uploadRequestsTableName: row.upload_requests_table,
     membershipType: row.membership_type,
     entityTableId: row.entity_table_id,
     entityQualifiedName: row.entity_schema && row.entity_table
@@ -282,7 +270,6 @@ export async function getStorageModuleConfigForOwner(
 /**
  * Resolve the storage module that owns a specific file by probing all file tables.
  *
- * Used by confirmUpload when only a fileId (UUID) is available.
  * Since UUIDs are globally unique, exactly one table will contain the file.
  *
  * @param pgClient - A pg client from the Graphile context
@@ -294,7 +281,7 @@ export async function resolveStorageModuleByFileId(
   pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
   databaseId: string,
   fileId: string,
-): Promise<{ storageConfig: StorageModuleConfig; file: { id: string; key: string; mime_type: string; status: string; bucket_id: string } } | null> {
+): Promise<{ storageConfig: StorageModuleConfig; file: { id: string; key: string; mime_type: string; bucket_id: string } } | null> {
   // Load all storage modules for this database
   log.debug(`Resolving file ${fileId} across all storage modules for database ${databaseId}`);
 
@@ -305,14 +292,14 @@ export async function resolveStorageModuleByFileId(
   // Probe each module's files table for the fileId
   for (const config of allConfigs) {
     const fileResult = await pgClient.query({
-      text: `SELECT id, key, mime_type, status, bucket_id
+      text: `SELECT id, key, mime_type, bucket_id
        FROM ${config.filesQualifiedName}
        WHERE id = $1
        LIMIT 1`,
       values: [fileId],
     });
     if (fileResult.rows.length > 0) {
-      const file = fileResult.rows[0] as { id: string; key: string; mime_type: string; status: string; bucket_id: string };
+      const file = fileResult.rows[0] as { id: string; key: string; mime_type: string; bucket_id: string };
       return { storageConfig: config, file };
     }
   }

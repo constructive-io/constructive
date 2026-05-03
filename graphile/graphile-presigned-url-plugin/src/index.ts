@@ -2,8 +2,7 @@
  * Presigned URL Plugin for PostGraphile v5
  *
  * Provides presigned URL upload capabilities for PostGraphile v5:
- * - requestUploadUrl mutation (presigned PUT URL generation)
- * - confirmUpload mutation (upload verification + status transition)
+ * - requestUploadUrl mutation (presigned PUT URL generation + dedup)
  * - downloadUrl computed field (presigned GET URL / public URL)
  *
  * @example
@@ -37,8 +36,6 @@ export type {
   StorageModuleConfig,
   RequestUploadUrlInput,
   RequestUploadUrlPayload,
-  ConfirmUploadInput,
-  ConfirmUploadPayload,
   S3Config,
   S3ConfigOrGetter,
   PresignedUrlPluginOptions,

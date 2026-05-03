@@ -78,7 +78,7 @@ export interface DataIdParams {
   /* Column name for the primary key */
   field_name?: string;
 }
-/** Composition wrapper that creates a vector embedding field with HNSW/IVFFlat index (via SearchVector) and a job trigger with compound conditions (via DataJobTrigger) that fires when image files transition to a ready status. Designed for tables with a status lifecycle and mime_type column (e.g., storage file tables). */
+/** Composition wrapper that creates a vector embedding field with HNSW/IVFFlat index (via SearchVector) and a job trigger with compound conditions (via DataJobTrigger) that fires on INSERT for image files matching mime_type patterns. Designed for storage file tables. */
 export interface DataImageEmbeddingParams {
   /* Name of the vector embedding column */
   field_name?: string;
@@ -90,12 +90,6 @@ export interface DataImageEmbeddingParams {
   metric?: 'cosine' | 'l2' | 'ip';
   /* Job task identifier for the embedding worker */
   task_identifier?: string;
-  /* Column that tracks the file upload lifecycle status */
-  status_field?: string;
-  /* Value of status_field indicating the file is ready for processing */
-  status_ready_value?: string;
-  /* Value of status_field indicating the file is still pending (used in OLD row check) */
-  status_pending_value?: string;
   /* MIME type LIKE patterns to match (e.g., image/%, video/%). Multiple patterns are OR'd together. */
   mime_patterns?: string[];
   /* Custom payload key-to-column mapping for the job trigger */
@@ -919,11 +913,10 @@ export interface BlueprintStorageConfig {
   default_max_file_size?: number;
   /** CORS allowed origins for the storage module. */
   allowed_origins?: string[];
-  /** Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults. */
+  /** Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults. */
   provisions?: {
     files?: BlueprintEntityTableProvision;
     buckets?: BlueprintEntityTableProvision;
-    upload_requests?: BlueprintEntityTableProvision;
   };
 }
 /** Override object for the entity table created by a BlueprintEntityType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
@@ -962,7 +955,7 @@ export interface BlueprintEntityType {
   has_profiles?: boolean;
   /** Whether to provision a levels module for this entity type. Defaults to false. */
   has_levels?: boolean;
-  /** Whether to provision a storage module (buckets, files, upload_requests tables) for this entity type. Defaults to false. */
+  /** Whether to provision a storage module (buckets, files tables) for this entity type. Defaults to false. */
   has_storage?: boolean;
   /** Whether to provision entity-scoped invite tables ({prefix}_invites, {prefix}_claimed_invites) and a submit_{prefix}_invite_code() function. Defaults to false. */
   has_invites?: boolean;

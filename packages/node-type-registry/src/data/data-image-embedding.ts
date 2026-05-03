@@ -5,7 +5,7 @@ export const DataImageEmbedding: NodeTypeDefinition = {
   slug: 'data_image_embedding',
   category: 'data',
   display_name: 'Image Embedding',
-  description: 'Composition wrapper that creates a vector embedding field with HNSW/IVFFlat index (via SearchVector) and a job trigger with compound conditions (via DataJobTrigger) that fires when image files transition to a ready status. Designed for tables with a status lifecycle and mime_type column (e.g., storage file tables).',
+  description: 'Composition wrapper that creates a vector embedding field with HNSW/IVFFlat index (via SearchVector) and a job trigger with compound conditions (via DataJobTrigger) that fires on INSERT for image files matching mime_type patterns. Designed for storage file tables.',
   parameter_schema: {
     type: 'object',
     properties: {
@@ -43,22 +43,6 @@ export const DataImageEmbedding: NodeTypeDefinition = {
         type: 'string',
         description: 'Job task identifier for the embedding worker',
         default: 'process_image_embedding'
-      },
-      status_field: {
-        type: 'string',
-        format: 'column-ref',
-        description: 'Column that tracks the file upload lifecycle status',
-        default: 'status'
-      },
-      status_ready_value: {
-        type: 'string',
-        description: 'Value of status_field indicating the file is ready for processing',
-        default: 'ready'
-      },
-      status_pending_value: {
-        type: 'string',
-        description: 'Value of status_field indicating the file is still pending (used in OLD row check)',
-        default: 'pending'
       },
       mime_patterns: {
         type: 'array',
