@@ -145,6 +145,17 @@ function partialOf(inner: t.TSType): t.TSTypeReference {
 function ensureArrayItems(schema: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...schema };
 
+  // Strip $defs — they exist for JSON Schema validators but schema-typescript
+  // doesn't understand them and the TS types are emitted separately.
+  delete out.$defs;
+
+  // Properties with x-codegen-type get their TS type replaced post-generation,
+  // so collapse them to a simple {type:'object'} to avoid confusing
+  // schema-typescript with $ref or oneOf it can't resolve.
+  if (out['x-codegen-type']) {
+    return { type: 'object', description: out.description, 'x-codegen-type': out['x-codegen-type'] };
+  }
+
   // Ensure arrays have an items spec (schema-typescript throws without one)
   if (out.type === 'array' && !out.items) {
     out.items = { type: 'string' };
@@ -174,6 +185,107 @@ function ensureArrayItems(schema: Record<string, unknown>): Record<string, unkno
   }
 
   return out;
+}
+
+// ---------------------------------------------------------------------------
+// TriggerCondition — recursive type for compound WHEN clause conditions.
+// Hand-written because JSON Schema / schema-typescript cannot express
+// self-referencing types.
+// ---------------------------------------------------------------------------
+
+function buildTriggerConditionInterface(): t.ExportNamedDeclaration {
+  const opType = t.tsUnionType(
+    ['=', '!=', '>', '<', '>=', '<=', 'LIKE', 'NOT LIKE', 'IS NULL', 'IS NOT NULL', 'IS DISTINCT FROM']
+      .map((op) => t.tsLiteralType(t.stringLiteral(op)))
+  );
+  const rowType = t.tsUnionType([
+    t.tsLiteralType(t.stringLiteral('NEW')),
+    t.tsLiteralType(t.stringLiteral('OLD'))
+  ]);
+  const condRef = t.tsTypeReference(t.identifier('TriggerCondition'));
+
+  return addJSDoc(
+    exportInterface('TriggerCondition', [
+      addJSDoc(optionalProp('field', t.tsStringKeyword()), 'Column name (validated against the table).'),
+      addJSDoc(optionalProp('op', opType), 'Comparison operator.'),
+      addJSDoc(optionalProp('value', t.tsAnyKeyword()), 'Comparison value. Type is resolved from the column definition.'),
+      addJSDoc(optionalProp('row', rowType), 'Row reference (default: NEW).'),
+      addJSDoc(
+        optionalProp('ref', t.tsTypeLiteral([
+          optionalProp('field', t.tsStringKeyword()),
+          optionalProp('row', rowType)
+        ])),
+        'Column reference for field-to-field comparison (alternative to value).'
+      ),
+      addJSDoc(optionalProp('AND', t.tsArrayType(condRef)), 'Array of conditions combined with AND.'),
+      addJSDoc(optionalProp('OR', t.tsArrayType(condRef)), 'Array of conditions combined with OR.'),
+      addJSDoc(optionalProp('NOT', condRef), 'Negated condition.')
+    ]),
+    'Recursive condition type for compound trigger WHEN clauses. Leaf conditions specify {field, op, value?, row?, ref?}. Combinators nest via AND, OR, NOT.'
+  );
+}
+
+// ---------------------------------------------------------------------------
+// x-codegen-type post-processing — replaces properties that have an
+// 'x-codegen-type' marker in their JSON Schema with a hand-written TS type
+// reference.  This lets node type definitions delegate complex types
+// (like recursive TriggerCondition) to the codegen instead of trying to
+// express them in JSON Schema.
+// ---------------------------------------------------------------------------
+
+function applyCodegenTypeOverrides(
+  statements: t.ExportNamedDeclaration[],
+  nodeTypes: NodeTypeDefinition[]
+): void {
+  // Build a map of typeName -> { propName -> typeString }
+  const overrides = new Map<string, Map<string, string>>();
+  for (const nt of nodeTypes) {
+    const props = nt.parameter_schema?.properties;
+    if (!props) continue;
+    for (const [propName, propSchema] of Object.entries(props)) {
+      const schema = propSchema as Record<string, unknown>;
+      if (schema['x-codegen-type']) {
+        const typeName = `${nt.name}Params`;
+        if (!overrides.has(typeName)) overrides.set(typeName, new Map());
+        overrides.get(typeName)!.set(propName, schema['x-codegen-type'] as string);
+      }
+    }
+  }
+
+  if (overrides.size === 0) return;
+
+  for (const stmt of statements) {
+    const decl = stmt.declaration;
+    if (!t.isTSInterfaceDeclaration(decl)) continue;
+    const ifaceName = decl.id.name;
+    const propOverrides = overrides.get(ifaceName);
+    if (!propOverrides) continue;
+
+    for (const member of decl.body.body) {
+      if (!t.isTSPropertySignature(member)) continue;
+      const key = t.isIdentifier(member.key)
+        ? member.key.name
+        : t.isStringLiteral(member.key)
+          ? member.key.value
+          : null;
+      if (!key || !propOverrides.has(key)) continue;
+
+      const typeStr = propOverrides.get(key)!;
+      // Parse "TypeA | TypeB[]" into a TS union of type references
+      const parts = typeStr.split('|').map((s) => s.trim());
+      const tsTypes = parts.map((part) => {
+        const isArray = part.endsWith('[]');
+        const name = isArray ? part.slice(0, -2) : part;
+        const ref = t.tsTypeReference(t.identifier(name));
+        return isArray ? t.tsArrayType(ref) : ref;
+      });
+      const annotation = tsTypes.length === 1
+        ? tsTypes[0]
+        : t.tsUnionType(tsTypes);
+
+      member.typeAnnotation = t.tsTypeAnnotation(annotation);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -209,6 +321,10 @@ function generateParamsInterfaces(
       results.push(addJSDoc(exportInterface(typeName, []), nt.description));
     }
   }
+
+  // Apply x-codegen-type overrides to replace schema-generated types with
+  // hand-written recursive types (e.g. TriggerCondition)
+  applyCodegenTypeOverrides(results, nodeTypes);
 
   return results;
 }
@@ -1013,6 +1129,10 @@ function buildProgram(meta?: MetaTableInfo[]): string {
     (nt) => nt.category === 'relation'
   );
   const authzNodes = allNodeTypes.filter((nt) => nt.category === 'authz');
+
+  // -- Shared recursive types (emitted before parameter interfaces) --
+  statements.push(sectionComment('Shared recursive types'));
+  statements.push(buildTriggerConditionInterface());
 
   // -- Parameter interfaces grouped by category --
   const categoryOrder = ['data', 'search', 'authz', 'relation', 'view'];
