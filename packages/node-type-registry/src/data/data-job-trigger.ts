@@ -74,6 +74,63 @@ export const DataJobTrigger: NodeTypeDefinition = {
         type: 'string',
         description: 'Value to compare against condition_field in WHEN clause'
       },
+      conditions: {
+        description: 'Compound conditions for the trigger WHEN clause. Accepts a single leaf condition, an array of conditions (implicitly AND), or a nested combinator tree ({AND: [...], OR: [...], NOT: {...}}). Each leaf is {field, op, value?, row?, ref?}. Column types are resolved automatically from the table schema. Cannot be combined with condition_field or watch_fields.',
+        oneOf: [
+          {
+            type: 'object',
+            description: 'A single leaf condition or a combinator (AND/OR/NOT)',
+            properties: {
+              field: {
+                type: 'string',
+                format: 'column-ref',
+                description: 'Column name (validated against the table)'
+              },
+              op: {
+                type: 'string',
+                enum: ['=', '!=', '>', '<', '>=', '<=', 'LIKE', 'NOT LIKE', 'IS NULL', 'IS NOT NULL', 'IS DISTINCT FROM'],
+                description: 'Comparison operator'
+              },
+              value: {
+                description: 'Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM.'
+              },
+              row: {
+                type: 'string',
+                enum: ['NEW', 'OLD'],
+                description: 'Row reference (default: NEW)',
+                default: 'NEW'
+              },
+              ref: {
+                type: 'object',
+                description: 'Column reference for field-to-field comparison (alternative to value)',
+                properties: {
+                  field: { type: 'string', format: 'column-ref' },
+                  row: { type: 'string', enum: ['NEW', 'OLD'], default: 'NEW' }
+                }
+              },
+              AND: {
+                type: 'array',
+                description: 'Array of conditions combined with AND'
+              },
+              OR: {
+                type: 'array',
+                description: 'Array of conditions combined with OR'
+              },
+              NOT: {
+                type: 'object',
+                description: 'Negated condition'
+              }
+            }
+          },
+          {
+            type: 'array',
+            description: 'Array of conditions (implicitly AND)',
+            items: {
+              type: 'object'
+            }
+          }
+        ]
+      },
       watch_fields: {
         type: 'array',
         items: {

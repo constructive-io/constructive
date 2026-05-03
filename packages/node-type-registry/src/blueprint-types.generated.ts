@@ -13,10 +13,14 @@
  * ===========================================================================
  */
 ;
-/** Adds a UUID primary key column with auto-generation default (uuidv7). This is the standard primary key pattern for all tables. */
-export interface DataIdParams {
-  /* Column name for the primary key */
-  field_name?: string;
+/** Creates a derived text field that automatically concatenates multiple source fields via BEFORE INSERT/UPDATE triggers. Used to produce a unified text representation (e.g., embedding_text) from multiple columns on a table. The trigger fires with '_000' prefix to run before Search* triggers alphabetically. */
+export interface DataCompositeFieldParams {
+  /* Name of the derived text field to create (default: 'embedding_text') */
+  target?: string;
+  /* Array of source field names to concatenate into the target field */
+  source_fields: string[];
+  /* Output format: 'labeled' (field_name: value) or 'plain' (values only). Default: 'labeled' */
+  format?: 'labeled' | 'plain';
 }
 /** Adds ownership column for direct user ownership. Enables AuthzDirectOwner authorization. */
 export interface DataDirectOwnerParams {
@@ -36,34 +40,63 @@ export interface DataEntityMembershipParams {
   /* If true, adds a foreign key constraint from entity_id to the users table */
   include_user_fk?: boolean;
 }
-/** Combines direct ownership with entity scoping. Adds both owner_id and entity_id columns. Enables AuthzDirectOwner, AuthzEntityMembership, and AuthzOrgHierarchy authorization. Particularly useful for OrgHierarchy where a user owns a row (owner_id) within an entity (entity_id), and managers above can see subordinate-owned records via the hierarchy closure table. */
-export interface DataOwnershipInEntityParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
-  /* If true, adds foreign key constraints from owner_id and entity_id to the users table */
-  include_user_fk?: boolean;
+/** BEFORE INSERT trigger that forces a field to the value of jwt_public.current_user_id(). Prevents clients from spoofing the actor/uploader identity. The field value is always overwritten regardless of what the client provides. */
+export interface DataForceCurrentUserParams {
+  /* Name of the field to force to current_user_id() */
+  field_name?: string;
 }
-/** Adds automatic timestamp tracking with created_at and updated_at columns. */
-export interface DataTimestampsParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
+/** Adds a UUID primary key column with auto-generation default (uuidv7). This is the standard primary key pattern for all tables. */
+export interface DataIdParams {
+  /* Column name for the primary key */
+  field_name?: string;
 }
-/** Adds user tracking for creates/updates with created_by and updated_by columns. */
-export interface DataPeoplestampsParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
-  /* If true, adds foreign key constraints from created_by and updated_by to the users table */
-  include_user_fk?: boolean;
+/** Composition wrapper that creates a vector embedding field with HNSW/IVFFlat index (via SearchVector) and a job trigger with compound conditions (via DataJobTrigger) that fires when image files transition to a ready status. Designed for tables with a status lifecycle and mime_type column (e.g., storage file tables). */
+export interface DataImageEmbeddingParams {
+  /* Name of the vector embedding column */
+  field_name?: string;
+  /* Vector dimensions */
+  dimensions?: number;
+  /* Index type for similarity search */
+  index_method?: 'hnsw' | 'ivfflat';
+  /* Distance metric */
+  metric?: 'cosine' | 'l2' | 'ip';
+  /* Job task identifier for the embedding worker */
+  task_identifier?: string;
+  /* Column that tracks the file upload lifecycle status */
+  status_field?: string;
+  /* Value of status_field indicating the file is ready for processing */
+  status_ready_value?: string;
+  /* Value of status_field indicating the file is still pending (used in OLD row check) */
+  status_pending_value?: string;
+  /* MIME type LIKE patterns to match (e.g., image/%, video/%). Multiple patterns are OR'd together. */
+  mime_patterns?: string[];
+  /* Custom payload key-to-column mapping for the job trigger */
+  payload_custom?: {
+    [key: string]: unknown;
+  };
 }
-/** Adds publish state columns (is_published, published_at) for content visibility. Enables AuthzPublishable and AuthzTemporal authorization. */
-export interface DataPublishableParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
+/** BEFORE UPDATE trigger that prevents changes to a list of specified fields after INSERT. Raises an exception if any of the listed fields have changed. Unlike FieldImmutable (single-field), this handles multiple fields in a single trigger for efficiency. */
+export interface DataImmutableFieldsParams {
+  /* Field names that cannot be modified after INSERT (e.g. ["key", "bucket_id", "owner_id"]) */
+  fields: string[];
 }
-/** Adds soft delete support with deleted_at and is_deleted columns. */
-export interface DataSoftDeleteParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
+/** Transforms field values using inflection operations (snake_case, camelCase, slugify, plural, singular, etc). Attaches BEFORE INSERT and BEFORE UPDATE triggers. References fields by name in data jsonb. */
+export interface DataInflectionParams {
+  /* Name of the field to transform */
+  field_name: string;
+  /* Inflection operations to apply in order */
+  ops: ('plural' | 'singular' | 'camel' | 'pascal' | 'dashed' | 'slugify' | 'underscore' | 'lower' | 'upper')[];
+}
+/** BEFORE INSERT trigger that copies specified fields from a parent table via a foreign key. The parent row is looked up through RLS (SECURITY INVOKER), so the insert fails if the caller cannot see the parent. Used by the storage module to inherit owner_id and is_public from buckets to files. */
+export interface DataInheritFromParentParams {
+  /* Name of the FK field on this table that references the parent (e.g. bucket_id) */
+  parent_fk_field: string;
+  /* Field names to copy from the parent row (e.g. ["owner_id", "is_public"]) */
+  fields: string[];
+  /* Parent table name (optional fallback if FK not yet registered in metaschema) */
+  parent_table?: string;
+  /* Parent table schema (optional, defaults to same schema as child table) */
+  parent_schema?: string;
 }
 /** Dynamically creates PostgreSQL triggers that enqueue jobs via app_jobs.add_job() when table rows are inserted, updated, or deleted. Supports configurable payload strategies (full row, row ID, selected fields, or custom mapping), conditional firing via WHEN clauses, watched field changes, and extended job options (queue, priority, delay, max attempts). */
 export interface DataJobTriggerParams {
@@ -87,6 +120,24 @@ export interface DataJobTriggerParams {
   condition_field?: string;
   /* Value to compare against condition_field in WHEN clause */
   condition_value?: string;
+  /* Compound conditions for the trigger WHEN clause. Accepts a single leaf condition, an array of conditions (implicitly AND), or a nested combinator tree ({AND: [...], OR: [...], NOT: {...}}). Each leaf is {field, op, value?, row?, ref?}. Column types are resolved automatically from the table schema. Cannot be combined with condition_field or watch_fields. */
+  conditions?: {
+    /* Column name (validated against the table) */field?: string;
+    /* Comparison operator */op?: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'NOT LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IS DISTINCT FROM';
+    /* Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM. */value?: any;
+    /* Row reference (default: NEW) */row?: 'NEW' | 'OLD';
+    /* Column reference for field-to-field comparison (alternative to value) */ref?: {
+      field?: string;
+      row?: 'NEW' | 'OLD';
+    };
+    /* Array of conditions combined with AND */AND?: string[];
+    /* Array of conditions combined with OR */OR?: string[];
+    /* Negated condition */NOT?: {
+      [key: string]: unknown;
+    };
+  } | {
+    [key: string]: unknown;
+  }[];
   /* For UPDATE triggers, only fire when these fields change (uses DISTINCT FROM) */
   watch_fields?: string[];
   /* Static job key for upsert semantics (prevents duplicate jobs) */
@@ -100,14 +151,54 @@ export interface DataJobTriggerParams {
   /* Maximum retry attempts for the job */
   max_attempts?: number;
 }
-/** Adds a citext[] tags column with GIN index for efficient array containment queries (@>, &&). Standard tagging pattern for categorization and filtering. */
-export interface DataTagsParams {
-  /* Column name for the tags array */
+/** Adds a JSONB column with optional GIN index for containment queries (@>, ?, ?|, ?&). Standard pattern for semi-structured metadata. */
+export interface DataJsonbParams {
+  /* Column name for the JSONB field */
   field_name?: string;
-  /* Default value expression for the tags column */
+  /* Default value expression */
   default_value?: string;
   /* Whether the column has a NOT NULL constraint */
   is_required?: boolean;
+  /* Whether to create a GIN index */
+  create_index?: boolean;
+}
+/** Restricts which user can modify specific columns in shared objects. Creates an AFTER UPDATE trigger that throws OWNED_PROPS when a non-owner tries to change protected fields. References fields by name in data jsonb. */
+export interface DataOwnedFieldsParams {
+  /* Name of the field identifying the owner (e.g. sender_id) */
+  role_key_field_name: string;
+  /* Names of fields only this owner can modify */
+  protected_field_names: string[];
+}
+/** Combines direct ownership with entity scoping. Adds both owner_id and entity_id columns. Enables AuthzDirectOwner, AuthzEntityMembership, and AuthzOrgHierarchy authorization. Particularly useful for OrgHierarchy where a user owns a row (owner_id) within an entity (entity_id), and managers above can see subordinate-owned records via the hierarchy closure table. */
+export interface DataOwnershipInEntityParams {
+  /* If true, also adds a UUID primary key column with auto-generation */
+  include_id?: boolean;
+  /* If true, adds foreign key constraints from owner_id and entity_id to the users table */
+  include_user_fk?: boolean;
+}
+/** Adds user tracking for creates/updates with created_by and updated_by columns. */
+export interface DataPeoplestampsParams {
+  /* If true, also adds a UUID primary key column with auto-generation */
+  include_id?: boolean;
+  /* If true, adds foreign key constraints from created_by and updated_by to the users table */
+  include_user_fk?: boolean;
+}
+/** Adds publish state columns (is_published, published_at) for content visibility. Enables AuthzPublishable and AuthzTemporal authorization. */
+export interface DataPublishableParams {
+  /* If true, also adds a UUID primary key column with auto-generation */
+  include_id?: boolean;
+}
+/** Auto-generates URL-friendly slugs from field values on insert/update. Attaches BEFORE INSERT and BEFORE UPDATE triggers that call inflection.slugify() on the target field. References fields by name in data jsonb. */
+export interface DataSlugParams {
+  /* Name of the field to slugify */
+  field_name: string;
+  /* Optional source field name (defaults to field_name) */
+  source_field_name?: string;
+}
+/** Adds soft delete support with deleted_at and is_deleted columns. */
+export interface DataSoftDeleteParams {
+  /* If true, also adds a UUID primary key column with auto-generation */
+  include_id?: boolean;
 }
 /** Adds a status column with B-tree index for efficient equality filtering and sorting. Optionally constrains values via CHECK constraint when allowed_values is provided. */
 export interface DataStatusFieldParams {
@@ -122,72 +213,24 @@ export interface DataStatusFieldParams {
   /* If provided, creates a CHECK constraint restricting the column to these values */
   allowed_values?: string[];
 }
-/** Adds a JSONB column with optional GIN index for containment queries (@>, ?, ?|, ?&). Standard pattern for semi-structured metadata. */
-export interface DataJsonbParams {
-  /* Column name for the JSONB field */
+/** Adds a citext[] tags column with GIN index for efficient array containment queries (@>, &&). Standard tagging pattern for categorization and filtering. */
+export interface DataTagsParams {
+  /* Column name for the tags array */
   field_name?: string;
-  /* Default value expression */
+  /* Default value expression for the tags column */
   default_value?: string;
   /* Whether the column has a NOT NULL constraint */
   is_required?: boolean;
-  /* Whether to create a GIN index */
-  create_index?: boolean;
 }
-/** Auto-generates URL-friendly slugs from field values on insert/update. Attaches BEFORE INSERT and BEFORE UPDATE triggers that call inflection.slugify() on the target field. References fields by name in data jsonb. */
-export interface DataSlugParams {
-  /* Name of the field to slugify */
-  field_name: string;
-  /* Optional source field name (defaults to field_name) */
-  source_field_name?: string;
+/** Adds automatic timestamp tracking with created_at and updated_at columns. */
+export interface DataTimestampsParams {
+  /* If true, also adds a UUID primary key column with auto-generation */
+  include_id?: boolean;
 }
-/** Transforms field values using inflection operations (snake_case, camelCase, slugify, plural, singular, etc). Attaches BEFORE INSERT and BEFORE UPDATE triggers. References fields by name in data jsonb. */
-export interface DataInflectionParams {
-  /* Name of the field to transform */
-  field_name: string;
-  /* Inflection operations to apply in order */
-  ops: ('plural' | 'singular' | 'camel' | 'pascal' | 'dashed' | 'slugify' | 'underscore' | 'lower' | 'upper')[];
-}
-/** Restricts which user can modify specific columns in shared objects. Creates an AFTER UPDATE trigger that throws OWNED_PROPS when a non-owner tries to change protected fields. References fields by name in data jsonb. */
-export interface DataOwnedFieldsParams {
-  /* Name of the field identifying the owner (e.g. sender_id) */
-  role_key_field_name: string;
-  /* Names of fields only this owner can modify */
-  protected_field_names: string[];
-}
-/** BEFORE INSERT trigger that copies specified fields from a parent table via a foreign key. The parent row is looked up through RLS (SECURITY INVOKER), so the insert fails if the caller cannot see the parent. Used by the storage module to inherit owner_id and is_public from buckets to files. */
-export interface DataInheritFromParentParams {
-  /* Name of the FK field on this table that references the parent (e.g. bucket_id) */
-  parent_fk_field: string;
-  /* Field names to copy from the parent row (e.g. ["owner_id", "is_public"]) */
-  fields: string[];
-  /* Parent table name (optional fallback if FK not yet registered in metaschema) */
-  parent_table?: string;
-  /* Parent table schema (optional, defaults to same schema as child table) */
-  parent_schema?: string;
-}
-/** BEFORE INSERT trigger that forces a field to the value of jwt_public.current_user_id(). Prevents clients from spoofing the actor/uploader identity. The field value is always overwritten regardless of what the client provides. */
-export interface DataForceCurrentUserParams {
-  /* Name of the field to force to current_user_id() */
-  field_name?: string;
-}
-/** BEFORE UPDATE trigger that prevents changes to a list of specified fields after INSERT. Raises an exception if any of the listed fields have changed. Unlike FieldImmutable (single-field), this handles multiple fields in a single trigger for efficiency. */
-export interface DataImmutableFieldsParams {
-  /* Field names that cannot be modified after INSERT (e.g. ["key", "bucket_id", "owner_id"]) */
-  fields: string[];
-}
-/** Creates a derived text field that automatically concatenates multiple source fields via BEFORE INSERT/UPDATE triggers. Used to produce a unified text representation (e.g., embedding_text) from multiple columns on a table. The trigger fires with '_000' prefix to run before Search* triggers alphabetically. */
-export interface DataCompositeFieldParams {
-  /* Name of the derived text field to create (default: 'embedding_text') */
-  target?: string;
-  /* Array of source field names to concatenate into the target field */
-  source_fields: string[];
-  /* Output format: 'labeled' (field_name: value) or 'plain' (values only). Default: 'labeled' */
-  format?: 'labeled' | 'plain';
-}
-/** Creates a user profiles table with standard profile fields (profile_picture, bio, first_name, last_name, tags, desired). Uses AuthzDirectOwner for edit access and AuthzAllowAll for select. */
-export type TableUserProfilesParams = {};
 /** Creates an organization settings table with standard business fields (legal_name, address fields). Uses AuthzEntityMembership for access control. */
 export type TableOrganizationSettingsParams = {};
+/** Creates a user profiles table with standard profile fields (profile_picture, bio, first_name, last_name, tags, desired). Uses AuthzDirectOwner for edit access and AuthzAllowAll for select. */
+export type TableUserProfilesParams = {};
 /** Creates a user settings table for user-specific configuration. Uses AuthzDirectOwner for access control. */
 export type TableUserSettingsParams = {};
 /**
@@ -196,42 +239,18 @@ export type TableUserSettingsParams = {};
  * ===========================================================================
  */
 ;
-/** Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), stale tracking strategies (column, null, hash), and automatic job enqueue triggers for embedding generation. */
-export interface SearchVectorParams {
-  /* Name of the vector column */
-  field_name?: string;
-  /* Vector dimensions (e.g. 384, 768, 1536, 3072) */
-  dimensions?: number;
-  /* Index type for similarity search */
-  index_method?: 'hnsw' | 'ivfflat';
-  /* Distance metric (cosine, l2, ip) */
-  metric?: 'cosine' | 'l2' | 'ip';
-  /* Index-specific options. HNSW: {m, ef_construction}. IVFFlat: {lists}. */
-  index_options?: {
-    [key: string]: unknown;
-  };
-  /* When stale_strategy is column, adds an embedding_stale boolean field */
-  include_stale_field?: boolean;
-  /* Column names that feed the embedding. Used by stale trigger to detect content changes. */
-  source_fields?: string[];
-  /* Auto-create trigger that enqueues embedding generation jobs */
-  enqueue_job?: boolean;
-  /* Task identifier for the job queue */
-  job_task_name?: string;
-  /* Strategy for tracking embedding staleness. column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash of source fields. */
-  stale_strategy?: 'column' | 'null' | 'hash';
-  /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */
-  chunks?: {
-    /* Name of the text content column in the chunks table */content_field_name?: string;
-    /* Maximum number of characters per chunk */chunk_size?: number;
-    /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
-    /* Strategy for splitting text into chunks */chunk_strategy?: 'fixed' | 'sentence' | 'paragraph' | 'semantic';
-    /* Metadata fields from parent to copy into chunks */metadata_fields?: {
-      [key: string]: unknown;
-    };
-    /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
-    /* Task identifier for the chunking job queue */chunking_task_name?: string;
-  };
+/** Creates a BM25 index on an existing text column using pg_textsearch. Enables statistical relevance ranking with configurable k1 and b parameters. The BM25 index is auto-detected by graphile-search. */
+export interface SearchBm25Params {
+  /* Name of existing text column to index with BM25 */
+  field_name: string;
+  /* PostgreSQL text search configuration for BM25 */
+  text_config?: string;
+  /* BM25 k1 parameter: term frequency saturation (typical: 1.2-2.0) */
+  k1?: number;
+  /* BM25 b parameter: document length normalization (0=none, 1=full, typical: 0.75) */
+  b?: number;
+  /* Weight for this algorithm in composite searchScore */
+  search_score_weight?: number;
 }
 /** Adds a tsvector column with GIN index and automatic trigger population from source fields. Enables PostgreSQL full-text search with configurable weights and language support. Leverages the existing metaschema full_text_search infrastructure. */
 export interface SearchFullTextParams {
@@ -246,18 +265,48 @@ export interface SearchFullTextParams {
   /* Weight for this algorithm in composite searchScore */
   search_score_weight?: number;
 }
-/** Creates a BM25 index on an existing text column using pg_textsearch. Enables statistical relevance ranking with configurable k1 and b parameters. The BM25 index is auto-detected by graphile-search. */
-export interface SearchBm25Params {
-  /* Name of existing text column to index with BM25 */
-  field_name: string;
-  /* PostgreSQL text search configuration for BM25 */
-  text_config?: string;
-  /* BM25 k1 parameter: term frequency saturation (typical: 1.2-2.0) */
-  k1?: number;
-  /* BM25 b parameter: document length normalization (0=none, 1=full, typical: 0.75) */
-  b?: number;
-  /* Weight for this algorithm in composite searchScore */
-  search_score_weight?: number;
+/** Adds a PostGIS geometry or geography column with a spatial index (GiST or SP-GiST). Supports configurable geometry types (Point, Polygon, etc.), SRID, and dimensionality. The graphile-postgis plugin auto-detects geometry/geography columns by codec type for spatial filtering (ST_Contains, ST_DWithin, bbox operators). */
+export interface SearchSpatialParams {
+  /* Name of the geometry/geography column */
+  field_name?: string;
+  /* PostGIS geometry type constraint */
+  geometry_type?: 'Point' | 'LineString' | 'Polygon' | 'MultiPoint' | 'MultiLineString' | 'MultiPolygon' | 'GeometryCollection' | 'Geometry';
+  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
+  srid?: number;
+  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
+  dimension?: 2 | 3 | 4;
+  /* Use geography type instead of geometry (for geodetic calculations on the sphere) */
+  use_geography?: boolean;
+  /* Spatial index method */
+  index_method?: 'gist' | 'spgist';
+}
+/** Creates a derived/materialized geometry field on the parent table that automatically aggregates geometries from a source (child) table via triggers. When child rows are inserted/updated/deleted, the parent aggregate field is recalculated using the specified PostGIS aggregation function (ST_Union, ST_Collect, ST_ConvexHull, ST_ConcaveHull). Useful for materializing spatial boundaries from collections of points or polygons. */
+export interface SearchSpatialAggregateParams {
+  /* Name of the aggregate geometry column on the parent table */
+  field_name?: string;
+  /* UUID of the source (child) table containing individual geometries */
+  source_table_id: string;
+  /* Name of the geometry column on the source table */
+  source_geom_field?: string;
+  /* Name of the foreign key column on the source table pointing to the parent */
+  source_fk_field: string;
+  /* PostGIS aggregation function: union (ST_Union, merges overlapping), collect (ST_Collect, groups without merging), convex_hull (smallest convex polygon), concave_hull (tighter boundary) */
+  aggregate_function?: 'union' | 'collect' | 'convex_hull' | 'concave_hull';
+  /* Output geometry type constraint for the aggregate field */
+  geometry_type?: 'Point' | 'LineString' | 'Polygon' | 'MultiPoint' | 'MultiLineString' | 'MultiPolygon' | 'GeometryCollection' | 'Geometry';
+  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
+  srid?: number;
+  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
+  dimension?: 2 | 3 | 4;
+  /* Use geography type instead of geometry */
+  use_geography?: boolean;
+  /* Spatial index method for the aggregate field */
+  index_method?: 'gist' | 'spgist';
+}
+/** Creates GIN trigram indexes (gin_trgm_ops) on specified text/citext fields for fuzzy LIKE/ILIKE/similarity search. Adds @trgmSearch smart tag for PostGraphile integration. Fields must already exist on the table. */
+export interface SearchTrgmParams {
+  /* Field names to create trigram indexes on (fields must already exist on the table) */
+  fields: string[];
 }
 /** Composite node type that orchestrates multiple search modalities (full-text search, BM25, embeddings, trigram) on a single table. Configures per-table search score weights, normalization strategy, and recency boost via the @searchConfig smart tag. */
 export interface SearchUnifiedParams {
@@ -312,48 +361,42 @@ export interface SearchUnifiedParams {
     /* Decay rate for recency boost (0-1, lower = faster decay) */boost_recency_decay?: number;
   };
 }
-/** Adds a PostGIS geometry or geography column with a spatial index (GiST or SP-GiST). Supports configurable geometry types (Point, Polygon, etc.), SRID, and dimensionality. The graphile-postgis plugin auto-detects geometry/geography columns by codec type for spatial filtering (ST_Contains, ST_DWithin, bbox operators). */
-export interface SearchSpatialParams {
-  /* Name of the geometry/geography column */
+/** Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), stale tracking strategies (column, null, hash), and automatic job enqueue triggers for embedding generation. */
+export interface SearchVectorParams {
+  /* Name of the vector column */
   field_name?: string;
-  /* PostGIS geometry type constraint */
-  geometry_type?: 'Point' | 'LineString' | 'Polygon' | 'MultiPoint' | 'MultiLineString' | 'MultiPolygon' | 'GeometryCollection' | 'Geometry';
-  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
-  srid?: number;
-  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
-  dimension?: 2 | 3 | 4;
-  /* Use geography type instead of geometry (for geodetic calculations on the sphere) */
-  use_geography?: boolean;
-  /* Spatial index method */
-  index_method?: 'gist' | 'spgist';
-}
-/** Creates a derived/materialized geometry field on the parent table that automatically aggregates geometries from a source (child) table via triggers. When child rows are inserted/updated/deleted, the parent aggregate field is recalculated using the specified PostGIS aggregation function (ST_Union, ST_Collect, ST_ConvexHull, ST_ConcaveHull). Useful for materializing spatial boundaries from collections of points or polygons. */
-export interface SearchSpatialAggregateParams {
-  /* Name of the aggregate geometry column on the parent table */
-  field_name?: string;
-  /* UUID of the source (child) table containing individual geometries */
-  source_table_id: string;
-  /* Name of the geometry column on the source table */
-  source_geom_field?: string;
-  /* Name of the foreign key column on the source table pointing to the parent */
-  source_fk_field: string;
-  /* PostGIS aggregation function: union (ST_Union, merges overlapping), collect (ST_Collect, groups without merging), convex_hull (smallest convex polygon), concave_hull (tighter boundary) */
-  aggregate_function?: 'union' | 'collect' | 'convex_hull' | 'concave_hull';
-  /* Output geometry type constraint for the aggregate field */
-  geometry_type?: 'Point' | 'LineString' | 'Polygon' | 'MultiPoint' | 'MultiLineString' | 'MultiPolygon' | 'GeometryCollection' | 'Geometry';
-  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
-  srid?: number;
-  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
-  dimension?: 2 | 3 | 4;
-  /* Use geography type instead of geometry */
-  use_geography?: boolean;
-  /* Spatial index method for the aggregate field */
-  index_method?: 'gist' | 'spgist';
-}
-/** Creates GIN trigram indexes (gin_trgm_ops) on specified text/citext fields for fuzzy LIKE/ILIKE/similarity search. Adds @trgmSearch smart tag for PostGraphile integration. Fields must already exist on the table. */
-export interface SearchTrgmParams {
-  /* Field names to create trigram indexes on (fields must already exist on the table) */
-  fields: string[];
+  /* Vector dimensions (e.g. 384, 768, 1536, 3072) */
+  dimensions?: number;
+  /* Index type for similarity search */
+  index_method?: 'hnsw' | 'ivfflat';
+  /* Distance metric (cosine, l2, ip) */
+  metric?: 'cosine' | 'l2' | 'ip';
+  /* Index-specific options. HNSW: {m, ef_construction}. IVFFlat: {lists}. */
+  index_options?: {
+    [key: string]: unknown;
+  };
+  /* When stale_strategy is column, adds an embedding_stale boolean field */
+  include_stale_field?: boolean;
+  /* Column names that feed the embedding. Used by stale trigger to detect content changes. */
+  source_fields?: string[];
+  /* Auto-create trigger that enqueues embedding generation jobs */
+  enqueue_job?: boolean;
+  /* Task identifier for the job queue */
+  job_task_name?: string;
+  /* Strategy for tracking embedding staleness. column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash of source fields. */
+  stale_strategy?: 'column' | 'null' | 'hash';
+  /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */
+  chunks?: {
+    /* Name of the text content column in the chunks table */content_field_name?: string;
+    /* Maximum number of characters per chunk */chunk_size?: number;
+    /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
+    /* Strategy for splitting text into chunks */chunk_strategy?: 'fixed' | 'sentence' | 'paragraph' | 'semantic';
+    /* Metadata fields from parent to copy into chunks */metadata_fields?: {
+      [key: string]: unknown;
+    };
+    /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
+    /* Task identifier for the chunking job queue */chunking_task_name?: string;
+  };
 }
 /**
  * ===========================================================================
@@ -361,6 +404,20 @@ export interface SearchTrgmParams {
  * ===========================================================================
  */
 ;
+/** Allows all access. Generates TRUE expression. */
+export type AuthzAllowAllParams = {};
+/** Composite authorization policy that combines multiple authorization nodes using boolean logic (AND/OR). The data field contains a JSONB AST with nested authorization nodes. */
+export interface AuthzCompositeParams {
+  /* Boolean expression combining multiple authorization nodes */
+  BoolExpr?: {
+    /* Boolean operator: AND_EXPR, OR_EXPR, or NOT_EXPR */boolop?: 'AND_EXPR' | 'OR_EXPR' | 'NOT_EXPR';
+    /* Array of authorization nodes to combine */args?: {
+      [key: string]: unknown;
+    }[];
+  };
+}
+/** Denies all access. Generates FALSE expression. */
+export type AuthzDenyAllParams = {};
 /** Direct equality comparison between a table column and the current user ID. Simplest authorization pattern with no subqueries. */
 export interface AuthzDirectOwnerParams {
   /* Column name containing the owner user ID (e.g., owner_id) */
@@ -370,6 +427,30 @@ export interface AuthzDirectOwnerParams {
 export interface AuthzDirectOwnerAnyParams {
   /* Array of column names to check for ownership */
   entity_fields: string[];
+}
+/** Membership check scoped by a field on the row through the SPRT table. Verifies user has membership in the entity referenced by the row. */
+export interface AuthzEntityMembershipParams {
+  /* Column name referencing the entity (e.g., entity_id, org_id) */
+  entity_field: string;
+  /* SPRT column to select for the entity match */
+  sel_field?: string;
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
+  membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
+  /* Single permission name to check (resolved to bitstring mask) */
+  permission?: string;
+  /* Multiple permission names to check (ORed together into mask) */
+  permissions?: string[];
+  /* If true, require is_admin flag */
+  is_admin?: boolean;
+  /* If true, require is_owner flag */
+  is_owner?: boolean;
+}
+/** Check if current user is in an array column on the same row. */
+export interface AuthzMemberListParams {
+  /* Column name containing the array of user IDs */
+  array_field: string;
 }
 /** Membership check that verifies the user has membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. */
 export interface AuthzMembershipParams {
@@ -386,27 +467,58 @@ export interface AuthzMembershipParams {
   /* If true, require is_owner flag */
   is_owner?: boolean;
 }
-/** Membership check scoped by a field on the row through the SPRT table. Verifies user has membership in the entity referenced by the row. */
-export interface AuthzEntityMembershipParams {
+/** Restrictive policy that blocks read-only members from mutations. Checks actor_id + is_read_only IS NOT TRUE on the SPRT. Designed to run as a restrictive counterpart after a permissive AuthzEntityMembership policy has already verified membership. */
+export interface AuthzNotReadOnlyParams {
   /* Column name referencing the entity (e.g., entity_id, org_id) */
   entity_field: string;
+  /* Scope: 2=org, 3+=dynamic entity types. Must be >= 2 (entity-scoped). */
+  membership_type?: number | string;
+}
+/** Organizational hierarchy visibility using closure table. Managers can see subordinate data or subordinates can see manager data. */
+export interface AuthzOrgHierarchyParams {
+  /* down=manager sees subordinates, up=subordinate sees managers */
+  direction: 'up' | 'down';
+  /* Field referencing the org entity */
+  entity_field?: string;
+  /* Field referencing the user (e.g., owner_id) */
+  anchor_field: string;
+  /* Optional max depth to limit visibility */
+  max_depth?: number;
+}
+/** Peer visibility through shared entity membership. Authorizes access to user-owned rows when the owner and current user are both members of the same entity. Self-joins the SPRT table to find peers. */
+export interface AuthzPeerOwnershipParams {
+  /* Column name on protected table referencing the owning user (e.g., owner_id) */
+  owner_field: string;
   /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
   entity_type?: string;
-  /* Single permission name to check (resolved to bitstring mask) */
+  /* Single permission name to check on the current user membership (resolved to bitstring mask) */
   permission?: string;
-  /* Multiple permission names to check (ORed together into mask) */
+  /* Multiple permission names to check on the current user membership (ORed together into mask) */
   permissions?: string[];
-  /* If true, require is_admin flag */
+  /* If true, require is_admin flag on current user membership */
   is_admin?: boolean;
-  /* If true, require is_owner flag */
+  /* If true, require is_owner flag on current user membership */
   is_owner?: boolean;
+}
+/** Published state access control. Restricts access to records that are published. */
+export interface AuthzPublishableParams {
+  /* Boolean field indicating published state */
+  is_published_field?: string;
+  /* Timestamp field for publish time */
+  published_at_field?: string;
+  /* Require published_at to be non-null and <= now() */
+  require_published_at?: boolean;
 }
 /** JOIN-based membership verification through related tables. Joins SPRT table with another table to verify membership. */
 export interface AuthzRelatedEntityMembershipParams {
   /* Column name on protected table referencing the join table */
   entity_field: string;
+  /* SPRT column to select for the entity match */
+  sel_field?: string;
+  /* SPRT column to join on with the related table */
+  sprt_join_field?: string;
   /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
@@ -430,42 +542,6 @@ export interface AuthzRelatedEntityMembershipParams {
   /* If true, require is_owner flag */
   is_owner?: boolean;
 }
-/** Organizational hierarchy visibility using closure table. Managers can see subordinate data or subordinates can see manager data. */
-export interface AuthzOrgHierarchyParams {
-  /* down=manager sees subordinates, up=subordinate sees managers */
-  direction: 'up' | 'down';
-  /* Field referencing the org entity */
-  entity_field?: string;
-  /* Field referencing the user (e.g., owner_id) */
-  anchor_field: string;
-  /* Optional max depth to limit visibility */
-  max_depth?: number;
-}
-/** Time-window based access control. Restricts access based on valid_from and/or valid_until timestamps. At least one of valid_from_field or valid_until_field must be provided. */
-export interface AuthzTemporalParams {
-  /* Column for start time (at least one of valid_from_field or valid_until_field required) */
-  valid_from_field?: string;
-  /* Column for end time (at least one of valid_from_field or valid_until_field required) */
-  valid_until_field?: string;
-  /* Include start boundary */
-  valid_from_inclusive?: boolean;
-  /* Include end boundary */
-  valid_until_inclusive?: boolean;
-}
-/** Published state access control. Restricts access to records that are published. */
-export interface AuthzPublishableParams {
-  /* Boolean field indicating published state */
-  is_published_field?: string;
-  /* Timestamp field for publish time */
-  published_at_field?: string;
-  /* Require published_at to be non-null and <= now() */
-  require_published_at?: boolean;
-}
-/** Check if current user is in an array column on the same row. */
-export interface AuthzMemberListParams {
-  /* Column name containing the array of user IDs */
-  array_field: string;
-}
 /** Array membership check in a related table. */
 export interface AuthzRelatedMemberListParams {
   /* Schema of the related table */
@@ -478,44 +554,6 @@ export interface AuthzRelatedMemberListParams {
   owned_table_ref_key: string;
   /* PK column in protected table */
   this_object_key: string;
-}
-/** Allows all access. Generates TRUE expression. */
-export type AuthzAllowAllParams = {};
-/** Denies all access. Generates FALSE expression. */
-export type AuthzDenyAllParams = {};
-/** Composite authorization policy that combines multiple authorization nodes using boolean logic (AND/OR). The data field contains a JSONB AST with nested authorization nodes. */
-export interface AuthzCompositeParams {
-  /* Boolean expression combining multiple authorization nodes */
-  BoolExpr?: {
-    /* Boolean operator: AND_EXPR, OR_EXPR, or NOT_EXPR */boolop?: 'AND_EXPR' | 'OR_EXPR' | 'NOT_EXPR';
-    /* Array of authorization nodes to combine */args?: {
-      [key: string]: unknown;
-    }[];
-  };
-}
-/** Restrictive policy that blocks read-only members from mutations. Checks actor_id + is_read_only IS NOT TRUE on the SPRT. Designed to run as a restrictive counterpart after a permissive AuthzEntityMembership policy has already verified membership. */
-export interface AuthzNotReadOnlyParams {
-  /* Column name referencing the entity (e.g., entity_id, org_id) */
-  entity_field: string;
-  /* Scope: 2=org, 3+=dynamic entity types. Must be >= 2 (entity-scoped). */
-  membership_type?: number | string;
-}
-/** Peer visibility through shared entity membership. Authorizes access to user-owned rows when the owner and current user are both members of the same entity. Self-joins the SPRT table to find peers. */
-export interface AuthzPeerOwnershipParams {
-  /* Column name on protected table referencing the owning user (e.g., owner_id) */
-  owner_field: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
-  membership_type?: number | string;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
-  entity_type?: string;
-  /* Single permission name to check on the current user membership (resolved to bitstring mask) */
-  permission?: string;
-  /* Multiple permission names to check on the current user membership (ORed together into mask) */
-  permissions?: string[];
-  /* If true, require is_admin flag on current user membership */
-  is_admin?: boolean;
-  /* If true, require is_owner flag on current user membership */
-  is_owner?: boolean;
 }
 /** Peer visibility through shared entity membership via a related table. Like AuthzPeerOwnership but the owning user is resolved through a FK JOIN to a related table. Combines SPRT self-join with object table JOIN. */
 export interface AuthzRelatedPeerOwnershipParams {
@@ -535,7 +573,7 @@ export interface AuthzRelatedPeerOwnershipParams {
   obj_field_id?: string;
   /* Field name on related table containing the owner user ID (e.g., sender_id) */
   obj_field?: string;
-  /* Field on related table to select for matching entity_field (defaults to id) */
+  /* Field on related table to select for matching entity_field */
   obj_ref_field?: string;
   /* Single permission name to check on the current user membership (resolved to bitstring mask) */
   permission?: string;
@@ -545,6 +583,17 @@ export interface AuthzRelatedPeerOwnershipParams {
   is_admin?: boolean;
   /* If true, require is_owner flag on current user membership */
   is_owner?: boolean;
+}
+/** Time-window based access control. Restricts access based on valid_from and/or valid_until timestamps. At least one of valid_from_field or valid_until_field must be provided. */
+export interface AuthzTemporalParams {
+  /* Column for start time (at least one of valid_from_field or valid_until_field required) */
+  valid_from_field?: string;
+  /* Column for end time (at least one of valid_from_field or valid_until_field required) */
+  valid_until_field?: string;
+  /* Include start boundary */
+  valid_from_inclusive?: boolean;
+  /* Include end boundary */
+  valid_until_inclusive?: boolean;
 }
 /**
  * ===========================================================================
@@ -565,19 +614,6 @@ export interface RelationBelongsToParams {
   /* Whether the FK field is NOT NULL */
   is_required?: boolean;
 }
-/** Creates a foreign key field with a unique constraint on the source table referencing the target table. Enforces 1:1 cardinality. Auto-derives the FK field name from the target table name using inflection. delete_action is required and must be explicitly provided by the caller. */
-export interface RelationHasOneParams {
-  /* Table that will have the FK field and unique constraint */
-  source_table_id: string;
-  /* Table being referenced by the FK */
-  target_table_id: string;
-  /* FK field name on the source table. Auto-derived from target table name if omitted (e.g., users → user_id) */
-  field_name?: string;
-  /* FK delete action: c=CASCADE, r=RESTRICT, n=SET NULL, d=SET DEFAULT, a=NO ACTION. Required. */
-  delete_action: 'c' | 'r' | 'n' | 'd' | 'a';
-  /* Whether the FK field is NOT NULL */
-  is_required?: boolean;
-}
 /** Creates a foreign key field on the target table referencing the source table. Inverse of RelationBelongsTo — same FK, different perspective. "projects has many tasks" creates tasks.project_id. Auto-derives the FK field name from the source table name using inflection. delete_action is required and must be explicitly provided by the caller. */
 export interface RelationHasManyParams {
   /* Parent table being referenced by the FK (e.g., projects in projects has many tasks) */
@@ -585,6 +621,19 @@ export interface RelationHasManyParams {
   /* Child table that receives the FK field (e.g., tasks in projects has many tasks) */
   target_table_id: string;
   /* FK field name on the target table. Auto-derived from source table name if omitted (e.g., projects derives project_id) */
+  field_name?: string;
+  /* FK delete action: c=CASCADE, r=RESTRICT, n=SET NULL, d=SET DEFAULT, a=NO ACTION. Required. */
+  delete_action: 'c' | 'r' | 'n' | 'd' | 'a';
+  /* Whether the FK field is NOT NULL */
+  is_required?: boolean;
+}
+/** Creates a foreign key field with a unique constraint on the source table referencing the target table. Enforces 1:1 cardinality. Auto-derives the FK field name from the target table name using inflection. delete_action is required and must be explicitly provided by the caller. */
+export interface RelationHasOneParams {
+  /* Table that will have the FK field and unique constraint */
+  source_table_id: string;
+  /* Table being referenced by the FK */
+  target_table_id: string;
+  /* FK field name on the source table. Auto-derived from target table name if omitted (e.g., users → user_id) */
   field_name?: string;
   /* FK delete action: c=CASCADE, r=RESTRICT, n=SET NULL, d=SET DEFAULT, a=NO ACTION. Required. */
   delete_action: 'c' | 'r' | 'n' | 'd' | 'a';
@@ -651,14 +700,25 @@ export interface RelationSpatialParams {
  * ===========================================================================
  */
 ;
-/** Simple column selection from a single source table. Projects all or specific fields. */
-export interface ViewTableProjectionParams {
-  /* UUID of the source table to project from */
+/** View with GROUP BY and aggregate functions. Useful for summary/reporting views. */
+export interface ViewAggregatedParams {
+  /* UUID of the source table */
   source_table_id: string;
-  /* Optional array of field UUIDs to include (all fields if omitted) */
-  field_ids?: string[];
-  /* Optional array of field names to include (alternative to field_ids) */
-  field_names?: string[];
+  /* Field names to group by */
+  group_by_fields: string[];
+  /* Array of aggregate specifications */
+  aggregates: {
+    function: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
+    /* Field to aggregate (or * for COUNT) */field?: string;
+    /* Output column name */alias: string;
+  }[];
+}
+/** Advanced view using composite AST for the query. Use when other node types are insufficient (CTEs, UNIONs, complex subqueries, etc.). */
+export interface ViewCompositeParams {
+  /* Composite SELECT query AST (JSONB) */
+  query_ast: {
+    [key: string]: unknown;
+  };
 }
 /** Table projection with an Authz* filter baked into the view definition. The view only returns records matching the filter. */
 export interface ViewFilteredTableParams {
@@ -692,25 +752,14 @@ export interface ViewJoinedTablesParams {
   /* Optional array of field UUIDs to include (alternative to per-table columns) */
   field_ids?: string[];
 }
-/** View with GROUP BY and aggregate functions. Useful for summary/reporting views. */
-export interface ViewAggregatedParams {
-  /* UUID of the source table */
+/** Simple column selection from a single source table. Projects all or specific fields. */
+export interface ViewTableProjectionParams {
+  /* UUID of the source table to project from */
   source_table_id: string;
-  /* Field names to group by */
-  group_by_fields: string[];
-  /* Array of aggregate specifications */
-  aggregates: {
-    function: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
-    /* Field to aggregate (or * for COUNT) */field?: string;
-    /* Output column name */alias: string;
-  }[];
-}
-/** Advanced view using composite AST for the query. Use when other node types are insufficient (CTEs, UNIONs, complex subqueries, etc.). */
-export interface ViewCompositeParams {
-  /* Composite SELECT query AST (JSONB) */
-  query_ast: {
-    [key: string]: unknown;
-  };
+  /* Optional array of field UUIDs to include (all fields if omitted) */
+  field_ids?: string[];
+  /* Optional array of field names to include (alternative to field_ids) */
+  field_names?: string[];
 }
 /**
  * ===========================================================================
@@ -734,7 +783,7 @@ export interface BlueprintField {
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzMembership' | 'AuthzEntityMembership' | 'AuthzRelatedEntityMembership' | 'AuthzOrgHierarchy' | 'AuthzTemporal' | 'AuthzPublishable' | 'AuthzMemberList' | 'AuthzRelatedMemberList' | 'AuthzAllowAll' | 'AuthzDenyAll' | 'AuthzComposite' | 'AuthzNotReadOnly' | 'AuthzPeerOwnership' | 'AuthzRelatedPeerOwnership';
+  $type: 'AuthzAllowAll' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzMemberList' | 'AuthzMembership' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedPeerOwnership' | 'AuthzTemporal';
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -919,59 +968,59 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzMembership' | 'AuthzEntityMembership' | 'AuthzRelatedEntityMembership' | 'AuthzOrgHierarchy' | 'AuthzTemporal' | 'AuthzPublishable' | 'AuthzMemberList' | 'AuthzRelatedMemberList' | 'AuthzAllowAll' | 'AuthzDenyAll' | 'AuthzComposite' | 'AuthzNotReadOnly' | 'AuthzPeerOwnership' | 'AuthzRelatedPeerOwnership' | 'DataId' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataOwnershipInEntity' | 'DataTimestamps' | 'DataPeoplestamps' | 'DataPublishable' | 'DataSoftDelete' | 'SearchVector' | 'SearchFullText' | 'SearchBm25' | 'SearchUnified' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'DataJobTrigger' | 'DataTags' | 'DataStatusField' | 'DataJsonb' | 'SearchTrgm' | 'DataSlug' | 'DataInflection' | 'DataOwnedFields' | 'DataInheritFromParent' | 'DataForceCurrentUser' | 'DataImmutableFields' | 'DataCompositeField' | 'TableUserProfiles' | 'TableOrganizationSettings' | 'TableUserSettings';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzComposite' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzMemberList' | 'AuthzMembership' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedPeerOwnership' | 'AuthzTemporal' | 'DataCompositeField' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataId' | 'DataImageEmbedding' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJobTrigger' | 'DataJsonb' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPublishable' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
+  $type: 'AuthzAllowAll';
+  data?: Record<string, never>;
+} | {
+  $type: 'AuthzComposite';
+  data: AuthzCompositeParams;
+} | {
+  $type: 'AuthzDenyAll';
+  data?: Record<string, never>;
+} | {
   $type: 'AuthzDirectOwner';
   data: AuthzDirectOwnerParams;
 } | {
   $type: 'AuthzDirectOwnerAny';
   data: AuthzDirectOwnerAnyParams;
 } | {
-  $type: 'AuthzMembership';
-  data: AuthzMembershipParams;
-} | {
   $type: 'AuthzEntityMembership';
   data: AuthzEntityMembershipParams;
-} | {
-  $type: 'AuthzRelatedEntityMembership';
-  data: AuthzRelatedEntityMembershipParams;
-} | {
-  $type: 'AuthzOrgHierarchy';
-  data: AuthzOrgHierarchyParams;
-} | {
-  $type: 'AuthzTemporal';
-  data: AuthzTemporalParams;
-} | {
-  $type: 'AuthzPublishable';
-  data: AuthzPublishableParams;
 } | {
   $type: 'AuthzMemberList';
   data: AuthzMemberListParams;
 } | {
-  $type: 'AuthzRelatedMemberList';
-  data: AuthzRelatedMemberListParams;
-} | {
-  $type: 'AuthzAllowAll';
-  data?: Record<string, never>;
-} | {
-  $type: 'AuthzDenyAll';
-  data?: Record<string, never>;
-} | {
-  $type: 'AuthzComposite';
-  data: AuthzCompositeParams;
+  $type: 'AuthzMembership';
+  data: AuthzMembershipParams;
 } | {
   $type: 'AuthzNotReadOnly';
   data: AuthzNotReadOnlyParams;
 } | {
+  $type: 'AuthzOrgHierarchy';
+  data: AuthzOrgHierarchyParams;
+} | {
   $type: 'AuthzPeerOwnership';
   data: AuthzPeerOwnershipParams;
+} | {
+  $type: 'AuthzPublishable';
+  data: AuthzPublishableParams;
+} | {
+  $type: 'AuthzRelatedEntityMembership';
+  data: AuthzRelatedEntityMembershipParams;
+} | {
+  $type: 'AuthzRelatedMemberList';
+  data: AuthzRelatedMemberListParams;
 } | {
   $type: 'AuthzRelatedPeerOwnership';
   data: AuthzRelatedPeerOwnershipParams;
 } | {
-  $type: 'DataId';
-  data: DataIdParams;
+  $type: 'AuthzTemporal';
+  data: AuthzTemporalParams;
+} | {
+  $type: 'DataCompositeField';
+  data: DataCompositeFieldParams;
 } | {
   $type: 'DataDirectOwner';
   data: DataDirectOwnerParams;
@@ -979,11 +1028,35 @@ export type BlueprintNodeObject = {
   $type: 'DataEntityMembership';
   data: DataEntityMembershipParams;
 } | {
+  $type: 'DataForceCurrentUser';
+  data: DataForceCurrentUserParams;
+} | {
+  $type: 'DataId';
+  data: DataIdParams;
+} | {
+  $type: 'DataImageEmbedding';
+  data: DataImageEmbeddingParams;
+} | {
+  $type: 'DataImmutableFields';
+  data: DataImmutableFieldsParams;
+} | {
+  $type: 'DataInflection';
+  data: DataInflectionParams;
+} | {
+  $type: 'DataInheritFromParent';
+  data: DataInheritFromParentParams;
+} | {
+  $type: 'DataJobTrigger';
+  data: DataJobTriggerParams;
+} | {
+  $type: 'DataJsonb';
+  data: DataJsonbParams;
+} | {
+  $type: 'DataOwnedFields';
+  data: DataOwnedFieldsParams;
+} | {
   $type: 'DataOwnershipInEntity';
   data: DataOwnershipInEntityParams;
-} | {
-  $type: 'DataTimestamps';
-  data: DataTimestampsParams;
 } | {
   $type: 'DataPeoplestamps';
   data: DataPeoplestampsParams;
@@ -991,20 +1064,26 @@ export type BlueprintNodeObject = {
   $type: 'DataPublishable';
   data: DataPublishableParams;
 } | {
+  $type: 'DataSlug';
+  data: DataSlugParams;
+} | {
   $type: 'DataSoftDelete';
   data: DataSoftDeleteParams;
 } | {
-  $type: 'SearchVector';
-  data: SearchVectorParams;
+  $type: 'DataStatusField';
+  data: DataStatusFieldParams;
 } | {
-  $type: 'SearchFullText';
-  data: SearchFullTextParams;
+  $type: 'DataTags';
+  data: DataTagsParams;
+} | {
+  $type: 'DataTimestamps';
+  data: DataTimestampsParams;
 } | {
   $type: 'SearchBm25';
   data: SearchBm25Params;
 } | {
-  $type: 'SearchUnified';
-  data: SearchUnifiedParams;
+  $type: 'SearchFullText';
+  data: SearchFullTextParams;
 } | {
   $type: 'SearchSpatial';
   data: SearchSpatialParams;
@@ -1012,46 +1091,19 @@ export type BlueprintNodeObject = {
   $type: 'SearchSpatialAggregate';
   data: SearchSpatialAggregateParams;
 } | {
-  $type: 'DataJobTrigger';
-  data: DataJobTriggerParams;
-} | {
-  $type: 'DataTags';
-  data: DataTagsParams;
-} | {
-  $type: 'DataStatusField';
-  data: DataStatusFieldParams;
-} | {
-  $type: 'DataJsonb';
-  data: DataJsonbParams;
-} | {
   $type: 'SearchTrgm';
   data: SearchTrgmParams;
 } | {
-  $type: 'DataSlug';
-  data: DataSlugParams;
+  $type: 'SearchUnified';
+  data: SearchUnifiedParams;
 } | {
-  $type: 'DataInflection';
-  data: DataInflectionParams;
-} | {
-  $type: 'DataOwnedFields';
-  data: DataOwnedFieldsParams;
-} | {
-  $type: 'DataInheritFromParent';
-  data: DataInheritFromParentParams;
-} | {
-  $type: 'DataForceCurrentUser';
-  data: DataForceCurrentUserParams;
-} | {
-  $type: 'DataImmutableFields';
-  data: DataImmutableFieldsParams;
-} | {
-  $type: 'DataCompositeField';
-  data: DataCompositeFieldParams;
-} | {
-  $type: 'TableUserProfiles';
-  data?: Record<string, never>;
+  $type: 'SearchVector';
+  data: SearchVectorParams;
 } | {
   $type: 'TableOrganizationSettings';
+  data?: Record<string, never>;
+} | {
+  $type: 'TableUserProfiles';
   data?: Record<string, never>;
 } | {
   $type: 'TableUserSettings';
@@ -1073,18 +1125,18 @@ export type BlueprintRelation = {
   source_schema_name?: string;
   target_schema_name?: string;
 } & Partial<RelationBelongsToParams> | {
-  $type: 'RelationHasOne';
-  source_table: string;
-  target_table: string;
-  source_schema_name?: string;
-  target_schema_name?: string;
-} & Partial<RelationHasOneParams> | {
   $type: 'RelationHasMany';
   source_table: string;
   target_table: string;
   source_schema_name?: string;
   target_schema_name?: string;
 } & Partial<RelationHasManyParams> | {
+  $type: 'RelationHasOne';
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
+} & Partial<RelationHasOneParams> | {
   $type: 'RelationManyToMany';
   source_table: string;
   target_table: string;
