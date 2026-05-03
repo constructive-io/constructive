@@ -44,6 +44,7 @@ export const ViewAggregated: NodeTypeDefinition = {
             },
             alias: {
               type: 'string',
+              format: 'column-ref',
               description: 'Output column name'
             }
           },

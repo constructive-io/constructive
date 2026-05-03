@@ -9,6 +9,18 @@ export const DataTimestamps: NodeTypeDefinition = {
   parameter_schema: {
     type: 'object',
     properties: {
+      created_at_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the creation timestamp',
+        default: 'created_at'
+      },
+      updated_at_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column name for the last-updated timestamp',
+        default: 'updated_at'
+      },
       include_id: {
         type: 'boolean',
         description: 'If true, also adds a UUID primary key column with auto-generation',
