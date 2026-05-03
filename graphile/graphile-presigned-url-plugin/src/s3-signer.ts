@@ -80,8 +80,7 @@ export async function generatePresignedGetUrl(
 /**
  * Check if an object exists in S3 and optionally verify its content-type.
  *
- * Used by confirmUpload to verify the file was actually uploaded to S3
- * and that the content-type matches what was declared.
+ * Checks whether an object exists in S3 and retrieves its content-type.
  *
  * @param s3Config - S3 client and bucket configuration
  * @param key - S3 object key

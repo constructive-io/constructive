@@ -1,5 +1,5 @@
 -- Schema creation for simple-seed-storage test scenario
--- Creates the app schema with storage tables (buckets, files, upload_requests)
+-- Creates the app schema with storage tables (buckets, files)
 
 -- Create app schemas
 CREATE SCHEMA IF NOT EXISTS "simple-storage-public";
@@ -45,32 +45,13 @@ CREATE TABLE IF NOT EXISTS "simple-storage-public".files (
   filename text,
   owner_id uuid,
   is_public boolean NOT NULL DEFAULT false,
-  status text NOT NULL DEFAULT 'pending',
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE (bucket_id, key)
 );
 
 COMMENT ON TABLE "simple-storage-public".files IS E'@storageFiles\nStorage files table';
 
--- Upload requests table
-CREATE TABLE IF NOT EXISTS "simple-storage-public".upload_requests (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  file_id uuid NOT NULL REFERENCES "simple-storage-public".files(id),
-  actor_id uuid,
-  bucket_id uuid NOT NULL REFERENCES "simple-storage-public".buckets(id),
-  key text NOT NULL,
-  content_type text NOT NULL,
-  content_hash text,
-  status text NOT NULL DEFAULT 'issued',
-  expires_at timestamptz,
-  confirmed_at timestamptz,
-  ip_address inet,
-  user_agent text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 -- Grant table permissions (allow anonymous to do CRUD for tests — no RLS)
 GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-storage-public".buckets TO administrator, authenticated, anonymous;
 GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-storage-public".files TO administrator, authenticated, anonymous;
-GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-storage-public".upload_requests TO administrator, authenticated, anonymous;

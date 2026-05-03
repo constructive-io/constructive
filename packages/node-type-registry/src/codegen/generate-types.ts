@@ -826,14 +826,10 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
             optionalProp(
               'buckets',
               t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
-            ),
-            optionalProp(
-              'upload_requests',
-              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
             )
           ])
         ),
-        'Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults.'
+        'Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults.'
       )
     ]),
     'Storage configuration for an entity type. Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions.'
@@ -926,7 +922,7 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp('has_storage', t.tsBooleanKeyword()),
-        'Whether to provision a storage module (buckets, files, upload_requests tables) for this entity type. Defaults to false.'
+        'Whether to provision a storage module (buckets, files tables) for this entity type. Defaults to false.'
       ),
       addJSDoc(
         optionalProp('has_invites', t.tsBooleanKeyword()),

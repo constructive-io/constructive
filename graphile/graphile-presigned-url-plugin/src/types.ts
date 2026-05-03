@@ -23,16 +23,12 @@ export interface StorageModuleConfig {
   bucketsQualifiedName: string;
   /** Resolved schema.table for files */
   filesQualifiedName: string;
-  /** Resolved schema.table for upload_requests */
-  uploadRequestsQualifiedName: string;
   /** Schema name (e.g., "app_public") */
   schemaName: string;
   /** Buckets table name */
   bucketsTableName: string;
   /** Files table name */
   filesTableName: string;
-  /** Upload requests table name */
-  uploadRequestsTableName: string;
 
   // --- Scope identity ---
 
@@ -105,28 +101,6 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt: string | null;
-  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files */
-  status: string;
-}
-
-/**
- * Input for the confirmUpload mutation.
- */
-export interface ConfirmUploadInput {
-  /** The file ID returned by requestUploadUrl */
-  fileId: string;
-}
-
-/**
- * Result of the confirmUpload mutation.
- */
-export interface ConfirmUploadPayload {
-  /** The confirmed file ID */
-  fileId: string;
-  /** New file status (should be 'ready') */
-  status: string;
-  /** Whether confirmation succeeded */
-  success: boolean;
 }
 
 /**

@@ -2106,27 +2106,6 @@ type RequestUploadUrlPayload {
 
   """Presigned URL expiry time (null if deduplicated)"""
   expiresAt: Datetime
-
-  """
-  File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable.
-  """
-  status: String!
-}
-
-input ConfirmUploadInput {
-  """The file ID returned by requestUploadUrl"""
-  fileId: UUID!
-}
-
-type ConfirmUploadPayload {
-  """The confirmed file ID"""
-  fileId: UUID!
-
-  """New file status"""
-  status: String!
-
-  """Whether confirmation succeeded"""
-  success: Boolean!
 }
 
 """The root query type which gives access points into the data universe."""
@@ -2418,18 +2397,6 @@ type Mutation {
     """
     input: RequestUploadUrlInput!
   ): RequestUploadUrlPayload
-
-  """
-  Confirm that a file has been uploaded to S3.
-  Verifies the object exists in S3, checks content-type,
-  and transitions the file status from 'pending' to 'ready'.
-  """
-  confirmUpload(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ConfirmUploadInput!
-  ): ConfirmUploadPayload
 
   """
   Provision an S3 bucket for a logical bucket in the database.

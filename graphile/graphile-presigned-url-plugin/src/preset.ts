@@ -2,8 +2,8 @@
  * PostGraphile v5 Presigned URL Preset
  *
  * Provides a convenient preset for including presigned URL upload support
- * in PostGraphile. Combines the main mutation plugin (requestUploadUrl,
- * confirmUpload) with the downloadUrl computed field plugin.
+ * in PostGraphile. Combines the main mutation plugin (requestUploadUrl)
+ * with the downloadUrl computed field plugin.
  */
 
 import type { GraphileConfig } from 'graphile-config';

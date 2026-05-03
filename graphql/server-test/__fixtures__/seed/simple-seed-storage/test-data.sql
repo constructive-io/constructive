@@ -43,16 +43,6 @@ VALUES (
   NULL
 ) ON CONFLICT (id) DO NOTHING;
 
--- upload_requests
-INSERT INTO metaschema_public.table (id, database_id, schema_id, name, description)
-VALUES (
-  'b0000001-0000-0000-0000-000000000003',
-  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
-  '6dbae92a-5450-401b-1ed5-d69e7754940d',
-  'upload_requests',
-  NULL
-) ON CONFLICT (id) DO NOTHING;
-
 -- =====================================================
 -- SERVICES DATA
 -- =====================================================
@@ -77,7 +67,6 @@ INSERT INTO metaschema_modules_public.storage_module (
   schema_id,
   buckets_table_id,
   files_table_id,
-  upload_requests_table_id,
   endpoint,
   public_url_prefix,
   provider,
@@ -89,7 +78,6 @@ VALUES (
   '6dbae92a-5450-401b-1ed5-d69e7754940d',
   'b0000001-0000-0000-0000-000000000001',
   'b0000001-0000-0000-0000-000000000002',
-  'b0000001-0000-0000-0000-000000000003',
   NULL,  -- use global CDN_ENDPOINT
   NULL,  -- use global CDN_PUBLIC_URL_PREFIX
   'minio',

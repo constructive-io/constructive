@@ -5,13 +5,9 @@
  *
  * 1. `requestUploadUrl` mutation — generates a presigned PUT URL for direct
  *    client-to-S3 upload. Checks bucket access via RLS, deduplicates by
- *    content hash, tracks the request in upload_requests.
+ *    content hash via UNIQUE(bucket_id, key) constraint.
  *
- * 2. `confirmUpload` mutation — confirms a file was uploaded to S3, verifies
- *    the object exists with correct content-type, transitions file status
- *    from 'pending' to 'ready'.
- *
- * 3. `downloadUrl` computed field on File types — generates presigned GET URLs
+ * 2. `downloadUrl` computed field on File types — generates presigned GET URLs
  *    for private files, returns public URL prefix + key for public files.
  *
  * Uses the extendSchema + grafast plan pattern (same as PublicKeySignature).
@@ -23,8 +19,8 @@ import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
 
 import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig, BucketConfig } from './types';
-import { getStorageModuleConfig, getStorageModuleConfigForOwner, getBucketConfig, resolveStorageModuleByFileId, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
-import { generatePresignedPutUrl, headObject } from './s3-signer';
+import { getStorageModuleConfig, getStorageModuleConfigForOwner, getBucketConfig, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
+import { generatePresignedPutUrl } from './s3-signer';
 
 const log = new Logger('graphile-presigned-url:plugin');
 
@@ -175,22 +171,6 @@ export function createPresignedUrlPlugin(
         deduplicated: Boolean!
         """Presigned URL expiry time (null if deduplicated)"""
         expiresAt: Datetime
-        """File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable."""
-        status: String!
-      }
-
-      input ConfirmUploadInput {
-        """The file ID returned by requestUploadUrl"""
-        fileId: UUID!
-      }
-
-      type ConfirmUploadPayload {
-        """The confirmed file ID"""
-        fileId: UUID!
-        """New file status"""
-        status: String!
-        """Whether confirmation succeeded"""
-        success: Boolean!
       }
 
       extend type Mutation {
@@ -203,15 +183,6 @@ export function createPresignedUrlPlugin(
         requestUploadUrl(
           input: RequestUploadUrlInput!
         ): RequestUploadUrlPayload
-
-        """
-        Confirm that a file has been uploaded to S3.
-        Verifies the object exists in S3, checks content-type,
-        and transitions the file status from 'pending' to 'ready'.
-        """
-        confirmUpload(
-          input: ConfirmUploadInput!
-        ): ConfirmUploadPayload
       }
     `,
     plans: {
@@ -304,11 +275,10 @@ export function createPresignedUrlPlugin(
 
                 // --- Dedup check: look for existing file with same key (content hash) in this bucket ---
                 const dedupResult = await txClient.query({
-                  text: `SELECT id, status
+                  text: `SELECT id
                    FROM ${storageConfig.filesQualifiedName}
                    WHERE key = $1
                      AND bucket_id = $2
-                     AND status IN ('ready', 'processed')
                    LIMIT 1`,
                   values: [s3Key, bucket.id],
                 });
@@ -317,36 +287,27 @@ export function createPresignedUrlPlugin(
                   const existingFile = dedupResult.rows[0];
                   log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
 
-                  // Track the dedup request
-                  await txClient.query({
-                    text: `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
-                     (file_id, bucket_id, key, content_type, content_hash, status, expires_at)
-                     VALUES ($1, $2, $3, $4, $5, 'confirmed', NOW())`,
-                    values: [existingFile.id, bucket.id, s3Key, contentType, contentHash],
-                  });
-
                   return {
                     uploadUrl: null as string | null,
                     fileId: existingFile.id as string,
                     key: s3Key,
                     deduplicated: true,
                     expiresAt: null as string | null,
-                    status: existingFile.status as string,
                   };
                 }
 
-                // --- Create file record (status=pending) ---
+                // --- Create file record ---
                 // For app-level storage (no owner_id column), omit owner_id from the INSERT.
                 const hasOwnerColumn = storageConfig.membershipType !== null;
                 const fileResult = await txClient.query({
                   text: hasOwnerColumn
                     ? `INSERT INTO ${storageConfig.filesQualifiedName}
-                       (bucket_id, key, mime_type, size, filename, owner_id, is_public, status)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+                       (bucket_id, key, mime_type, size, filename, owner_id, is_public)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7)
                        RETURNING id`
                     : `INSERT INTO ${storageConfig.filesQualifiedName}
-                       (bucket_id, key, mime_type, size, filename, is_public, status)
-                       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+                       (bucket_id, key, mime_type, size, filename, is_public)
+                       VALUES ($1, $2, $3, $4, $5, $6)
                        RETURNING id`,
                   values: hasOwnerColumn
                     ? [
@@ -385,111 +346,12 @@ export function createPresignedUrlPlugin(
 
                 const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
 
-                // --- Track the upload request ---
-                await txClient.query({
-                  text: `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
-                   (file_id, bucket_id, key, content_type, content_hash, status, expires_at)
-                   VALUES ($1, $2, $3, $4, $5, 'issued', $6)`,
-                  values: [fileId, bucket.id, s3Key, contentType, contentHash, expiresAt],
-                });
-
                 return {
                   uploadUrl,
                   fileId,
                   key: s3Key,
                   deduplicated: false,
                   expiresAt,
-                  status: 'pending',
-                };
-              });
-            });
-          });
-        },
-
-        confirmUpload(_$mutation: any, fieldArgs: any) {
-          const $input = fieldArgs.getRaw('input');
-          const $withPgClient = (grafastContext() as any).get('withPgClient');
-          const $pgSettings = (grafastContext() as any).get('pgSettings');
-          const $combined = object({
-            input: $input,
-            withPgClient: $withPgClient,
-            pgSettings: $pgSettings,
-          });
-
-          return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
-            const { fileId } = input;
-
-            if (!fileId || typeof fileId !== 'string') {
-              throw new Error('INVALID_FILE_ID');
-            }
-
-            return withPgClient(pgSettings, async (pgClient: any) => {
-              return pgClient.withTransaction(async (txClient: any) => {
-                // --- Resolve storage module by file ID (probes all file tables) ---
-                const databaseId = await resolveDatabaseId(txClient);
-                if (!databaseId) {
-                  throw new Error('DATABASE_NOT_FOUND');
-                }
-
-                const resolved = await resolveStorageModuleByFileId(txClient, databaseId, fileId);
-                if (!resolved) {
-                  throw new Error('FILE_NOT_FOUND');
-                }
-
-                const { storageConfig, file } = resolved;
-
-                if (file.status !== 'pending') {
-                  // File is already confirmed or processed — idempotent success
-                  return {
-                    fileId: file.id,
-                    status: file.status,
-                    success: true,
-                  };
-                }
-
-                // --- Verify file exists in S3 (per-database bucket) ---
-                const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
-                const s3Head = await headObject(s3ForDb, file.key, file.mime_type as string);
-
-                if (!s3Head) {
-                  throw new Error('FILE_NOT_IN_S3: the file has not been uploaded yet');
-                }
-
-                // --- Content-type verification ---
-                if (s3Head.contentType && s3Head.contentType !== file.mime_type) {
-                  // Mark upload_request as rejected
-                  await txClient.query({
-                    text: `UPDATE ${storageConfig.uploadRequestsQualifiedName}
-                     SET status = 'rejected'
-                     WHERE file_id = $1 AND status = 'issued'`,
-                    values: [fileId],
-                  });
-
-                  throw new Error(
-                    `CONTENT_TYPE_MISMATCH: expected ${file.mime_type}, got ${s3Head.contentType}`,
-                  );
-                }
-
-                // --- Transition file to 'ready' ---
-                await txClient.query({
-                  text: `UPDATE ${storageConfig.filesQualifiedName}
-                   SET status = 'ready'
-                   WHERE id = $1`,
-                  values: [fileId],
-                });
-
-                // --- Update upload_request to 'confirmed' ---
-                await txClient.query({
-                  text: `UPDATE ${storageConfig.uploadRequestsQualifiedName}
-                   SET status = 'confirmed', confirmed_at = NOW()
-                   WHERE file_id = $1 AND status = 'issued'`,
-                  values: [fileId],
-                });
-
-                return {
-                  fileId: file.id,
-                  status: 'ready',
-                  success: true,
                 };
               });
             });
