@@ -1,81 +1,5 @@
 import type { NodeTypeDefinition } from '../types';
 
-const CONDITION_OPS: string[] = ['=', '!=', '>', '<', '>=', '<=', 'LIKE', 'NOT LIKE', 'IS NULL', 'IS NOT NULL', 'IS DISTINCT FROM'];
-
-const leafConditionProperties = {
-  field: {
-    type: 'string',
-    format: 'column-ref',
-    description: 'Column name (validated against the table)'
-  },
-  op: {
-    type: 'string',
-    enum: [...CONDITION_OPS],
-    description: 'Comparison operator'
-  },
-  value: {
-    description: 'Comparison value. Type is resolved from the column definition. Omit for IS NULL, IS NOT NULL, IS DISTINCT FROM.'
-  },
-  row: {
-    type: 'string',
-    enum: ['NEW', 'OLD'],
-    description: 'Row reference (default: NEW)',
-    default: 'NEW'
-  },
-  ref: {
-    type: 'object',
-    description: 'Column reference for field-to-field comparison (alternative to value)',
-    properties: {
-      field: { type: 'string', format: 'column-ref' },
-      row: { type: 'string', enum: ['NEW', 'OLD'], default: 'NEW' }
-    }
-  }
-};
-
-const conditionObjectSchema = {
-  type: 'object',
-  description: 'A leaf condition or combinator (AND/OR/NOT)',
-  properties: {
-    ...leafConditionProperties,
-    AND: {
-      type: 'array',
-      description: 'Array of conditions combined with AND',
-      items: {
-        type: 'object',
-        properties: {
-          ...leafConditionProperties,
-          AND: { type: 'array', description: 'Nested AND', items: { type: 'object' } },
-          OR: { type: 'array', description: 'Nested OR', items: { type: 'object' } },
-          NOT: { type: 'object', description: 'Nested NOT' }
-        }
-      }
-    },
-    OR: {
-      type: 'array',
-      description: 'Array of conditions combined with OR',
-      items: {
-        type: 'object',
-        properties: {
-          ...leafConditionProperties,
-          AND: { type: 'array', description: 'Nested AND', items: { type: 'object' } },
-          OR: { type: 'array', description: 'Nested OR', items: { type: 'object' } },
-          NOT: { type: 'object', description: 'Nested NOT' }
-        }
-      }
-    },
-    NOT: {
-      type: 'object',
-      description: 'Negated condition',
-      properties: {
-        ...leafConditionProperties,
-        AND: { type: 'array', description: 'Nested AND', items: { type: 'object' } },
-        OR: { type: 'array', description: 'Nested OR', items: { type: 'object' } },
-        NOT: { type: 'object', description: 'Nested NOT' }
-      }
-    }
-  }
-};
-
 export const DataJobTrigger: NodeTypeDefinition = {
   name: 'DataJobTrigger',
   slug: 'data_job_trigger',
@@ -152,14 +76,8 @@ export const DataJobTrigger: NodeTypeDefinition = {
       },
       conditions: {
         description: 'Compound conditions for the trigger WHEN clause. Accepts a single leaf condition, an array of conditions (implicitly AND), or a nested combinator tree ({AND: [...], OR: [...], NOT: {...}}). Each leaf is {field, op, value?, row?, ref?}. Column types are resolved automatically from the table schema. Cannot be combined with condition_field or watch_fields.',
-        oneOf: [
-          conditionObjectSchema,
-          {
-            type: 'array',
-            description: 'Array of conditions (implicitly AND)',
-            items: conditionObjectSchema
-          }
-        ]
+        type: 'object',
+        'x-codegen-type': 'TriggerCondition | TriggerCondition[]'
       },
       watch_fields: {
         type: 'array',
