@@ -896,6 +896,32 @@ export const auditLogMutationKeys = {
   /** Delete auditLog mutation key */ delete: (id: string | number) =>
     ['mutation', 'auditlog', 'delete', id] as const,
 } as const;
+export const agentThreadMutationKeys = {
+  /** All agentThread mutation keys */ all: ['mutation', 'agentthread'] as const,
+  /** Create agentThread mutation key */ create: () =>
+    ['mutation', 'agentthread', 'create'] as const,
+  /** Update agentThread mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentthread', 'update', id] as const,
+  /** Delete agentThread mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentthread', 'delete', id] as const,
+} as const;
+export const agentMessageMutationKeys = {
+  /** All agentMessage mutation keys */ all: ['mutation', 'agentmessage'] as const,
+  /** Create agentMessage mutation key */ create: () =>
+    ['mutation', 'agentmessage', 'create'] as const,
+  /** Update agentMessage mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentmessage', 'update', id] as const,
+  /** Delete agentMessage mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentmessage', 'delete', id] as const,
+} as const;
+export const agentTaskMutationKeys = {
+  /** All agentTask mutation keys */ all: ['mutation', 'agenttask'] as const,
+  /** Create agentTask mutation key */ create: () => ['mutation', 'agenttask', 'create'] as const,
+  /** Update agentTask mutation key */ update: (id: string | number) =>
+    ['mutation', 'agenttask', 'update', id] as const,
+  /** Delete agentTask mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agenttask', 'delete', id] as const,
+} as const;
 export const appPermissionDefaultMutationKeys = {
   /** All appPermissionDefault mutation keys */ all: ['mutation', 'apppermissiondefault'] as const,
   /** Create appPermissionDefault mutation key */ create: () =>
@@ -973,6 +999,15 @@ export const devicesModuleMutationKeys = {
     ['mutation', 'devicesmodule', 'update', id] as const,
   /** Delete devicesModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'devicesmodule', 'delete', id] as const,
+} as const;
+export const nodeTypeRegistryMutationKeys = {
+  /** All nodeTypeRegistry mutation keys */ all: ['mutation', 'nodetyperegistry'] as const,
+  /** Create nodeTypeRegistry mutation key */ create: () =>
+    ['mutation', 'nodetyperegistry', 'create'] as const,
+  /** Update nodeTypeRegistry mutation key */ update: (id: string | number) =>
+    ['mutation', 'nodetyperegistry', 'update', id] as const,
+  /** Delete nodeTypeRegistry mutation key */ delete: (id: string | number) =>
+    ['mutation', 'nodetyperegistry', 'delete', id] as const,
 } as const;
 export const userConnectedAccountMutationKeys = {
   /** All userConnectedAccount mutation keys */ all: ['mutation', 'userconnectedaccount'] as const,
@@ -1419,6 +1454,9 @@ export const mutationKeys = {
   orgInvite: orgInviteMutationKeys,
   orgClaimedInvite: orgClaimedInviteMutationKeys,
   auditLog: auditLogMutationKeys,
+  agentThread: agentThreadMutationKeys,
+  agentMessage: agentMessageMutationKeys,
+  agentTask: agentTaskMutationKeys,
   appPermissionDefault: appPermissionDefaultMutationKeys,
   identityProvider: identityProviderMutationKeys,
   ref: refMutationKeys,
@@ -1428,6 +1466,7 @@ export const mutationKeys = {
   appLimitDefault: appLimitDefaultMutationKeys,
   orgLimitDefault: orgLimitDefaultMutationKeys,
   devicesModule: devicesModuleMutationKeys,
+  nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   userConnectedAccount: userConnectedAccountMutationKeys,
   appMembershipDefault: appMembershipDefaultMutationKeys,
   orgMembershipDefault: orgMembershipDefaultMutationKeys,

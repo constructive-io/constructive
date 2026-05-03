@@ -260,6 +260,24 @@ export interface AppInvite {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface AppMembership {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  isApproved: boolean | null;
+  isBanned: boolean | null;
+  isDisabled: boolean | null;
+  isVerified: boolean | null;
+  isActive: boolean | null;
+  isOwner: boolean | null;
+  isAdmin: boolean | null;
+  permissions: string | null;
+  granted: string | null;
+  actorId: string | null;
+  profileId: string | null;
+}
 export interface OrgInvite {
   id: string | null;
   email: ConstructiveInternalTypeEmail | null;
@@ -275,25 +293,6 @@ export interface OrgInvite {
   createdAt: string | null;
   updatedAt: string | null;
   entityId: string | null;
-}
-export interface AppMembership {
-  id: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-  isApproved: boolean | null;
-  isBanned: boolean | null;
-  isDisabled: boolean | null;
-  isVerified: boolean | null;
-  isActive: boolean | null;
-  isExternal: boolean | null;
-  isOwner: boolean | null;
-  isAdmin: boolean | null;
-  permissions: string | null;
-  granted: string | null;
-  actorId: string | null;
-  profileId: string | null;
 }
 export interface OrgMembership {
   id: string | null;

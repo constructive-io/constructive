@@ -2059,6 +2059,68 @@ export interface AuditLog {
   /** Timestamp when the audit event was recorded */
   createdAt?: string | null;
 }
+/** Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension. */
+export interface AgentThread {
+  /** Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed. */
+  title?: string | null;
+  /** Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration. */
+  mode?: string | null;
+  /** Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time. */
+  model?: string | null;
+  /** Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time. */
+  systemPrompt?: string | null;
+  id: string;
+  /** Timestamp when this record was created */
+  createdAt?: string | null;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string | null;
+  /** User who owns this record within the entity */
+  ownerId?: string | null;
+  /** Entity this record belongs to */
+  entityId?: string | null;
+  /** Current status of this record */
+  status?: string | null;
+}
+/** A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only. */
+export interface AgentMessage {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId?: string | null;
+  /** Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only. */
+  entityId?: string | null;
+  /** Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array. */
+  authorRole?: string | null;
+  id: string;
+  /** Timestamp when this record was created */
+  createdAt?: string | null;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string | null;
+  /** User who owns this record */
+  ownerId?: string | null;
+  /** JSON metadata for extensible key-value storage */
+  parts?: Record<string, unknown> | null;
+}
+/** An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. */
+export interface AgentTask {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId?: string | null;
+  /** Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly. */
+  entityId?: string | null;
+  /** Natural-language description of the work to do. Required. */
+  description?: string | null;
+  /** Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later. */
+  source?: string | null;
+  /** Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully. */
+  error?: string | null;
+  id: string;
+  /** Timestamp when this record was created */
+  createdAt?: string | null;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string | null;
+  /** User who owns this record */
+  ownerId?: string | null;
+  /** Current status of this record */
+  status?: string | null;
+}
 /** Stores the default permission bitmask assigned to new members upon joining */
 export interface AppPermissionDefault {
   id: string;
@@ -2127,6 +2189,15 @@ export interface DevicesModule {
   deviceSettingsTableId?: string | null;
   userDevicesTable?: string | null;
   deviceSettingsTable?: string | null;
+}
+export interface NodeTypeRegistry {
+  name?: string | null;
+  slug?: string | null;
+  category?: string | null;
+  displayName?: string | null;
+  description?: string | null;
+  parameterSchema?: Record<string, unknown> | null;
+  tags?: string[] | null;
 }
 export interface UserConnectedAccount {
   id: string;
@@ -2305,8 +2376,6 @@ export interface AppMembership {
   isVerified?: boolean | null;
   /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
   isActive?: boolean | null;
-  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
-  isExternal?: boolean | null;
   /** Whether the actor is the owner of this entity */
   isOwner?: boolean | null;
   /** Whether the actor has admin privileges on this entity */
@@ -2947,6 +3016,20 @@ export interface OrgClaimedInviteRelations {
 export interface AuditLogRelations {
   actor?: User | null;
 }
+export interface AgentThreadRelations {
+  entity?: User | null;
+  owner?: User | null;
+  agentMessagesByThreadId?: ConnectionResult<AgentMessage>;
+  agentTasksByThreadId?: ConnectionResult<AgentTask>;
+}
+export interface AgentMessageRelations {
+  owner?: User | null;
+  thread?: AgentThread | null;
+}
+export interface AgentTaskRelations {
+  owner?: User | null;
+  thread?: AgentThread | null;
+}
 export interface AppPermissionDefaultRelations {}
 export interface IdentityProviderRelations {}
 export interface RefRelations {}
@@ -2961,6 +3044,7 @@ export interface DevicesModuleRelations {
   schema?: Schema | null;
   userDevicesTableByUserDevicesTableId?: Table | null;
 }
+export interface NodeTypeRegistryRelations {}
 export interface UserConnectedAccountRelations {}
 export interface AppMembershipDefaultRelations {}
 export interface OrgMembershipDefaultRelations {
@@ -3042,6 +3126,10 @@ export interface UserRelations {
   orgClaimedInvitesByReceiverId?: ConnectionResult<OrgClaimedInvite>;
   orgClaimedInvitesBySenderId?: ConnectionResult<OrgClaimedInvite>;
   auditLogsByActorId?: ConnectionResult<AuditLog>;
+  agentThreadsByEntityId?: ConnectionResult<AgentThread>;
+  ownedAgentThreads?: ConnectionResult<AgentThread>;
+  ownedAgentMessages?: ConnectionResult<AgentMessage>;
+  ownedAgentTasks?: ConnectionResult<AgentTask>;
 }
 export interface AstMigrationRelations {}
 export interface AppMembershipRelations {
@@ -3172,6 +3260,9 @@ export type AppClaimedInviteWithRelations = AppClaimedInvite & AppClaimedInviteR
 export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type OrgClaimedInviteWithRelations = OrgClaimedInvite & OrgClaimedInviteRelations;
 export type AuditLogWithRelations = AuditLog & AuditLogRelations;
+export type AgentThreadWithRelations = AgentThread & AgentThreadRelations;
+export type AgentMessageWithRelations = AgentMessage & AgentMessageRelations;
+export type AgentTaskWithRelations = AgentTask & AgentTaskRelations;
 export type AppPermissionDefaultWithRelations = AppPermissionDefault &
   AppPermissionDefaultRelations;
 export type IdentityProviderWithRelations = IdentityProvider & IdentityProviderRelations;
@@ -3182,6 +3273,7 @@ export type MigrateFileWithRelations = MigrateFile & MigrateFileRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
 export type DevicesModuleWithRelations = DevicesModule & DevicesModuleRelations;
+export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
 export type UserConnectedAccountWithRelations = UserConnectedAccount &
   UserConnectedAccountRelations;
 export type AppMembershipDefaultWithRelations = AppMembershipDefault &
@@ -5965,6 +6057,70 @@ export type AuditLogSelect = {
     select: UserSelect;
   };
 };
+export type AgentThreadSelect = {
+  title?: boolean;
+  mode?: boolean;
+  model?: boolean;
+  systemPrompt?: boolean;
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  ownerId?: boolean;
+  entityId?: boolean;
+  status?: boolean;
+  entity?: {
+    select: UserSelect;
+  };
+  owner?: {
+    select: UserSelect;
+  };
+  agentMessagesByThreadId?: {
+    select: AgentMessageSelect;
+    first?: number;
+    filter?: AgentMessageFilter;
+    orderBy?: AgentMessageOrderBy[];
+  };
+  agentTasksByThreadId?: {
+    select: AgentTaskSelect;
+    first?: number;
+    filter?: AgentTaskFilter;
+    orderBy?: AgentTaskOrderBy[];
+  };
+};
+export type AgentMessageSelect = {
+  threadId?: boolean;
+  entityId?: boolean;
+  authorRole?: boolean;
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  ownerId?: boolean;
+  parts?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+  thread?: {
+    select: AgentThreadSelect;
+  };
+};
+export type AgentTaskSelect = {
+  threadId?: boolean;
+  entityId?: boolean;
+  description?: boolean;
+  source?: boolean;
+  error?: boolean;
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  ownerId?: boolean;
+  status?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+  thread?: {
+    select: AgentThreadSelect;
+  };
+};
 export type AppPermissionDefaultSelect = {
   id?: boolean;
   permissions?: boolean;
@@ -6029,6 +6185,15 @@ export type DevicesModuleSelect = {
   userDevicesTableByUserDevicesTableId?: {
     select: TableSelect;
   };
+};
+export type NodeTypeRegistrySelect = {
+  name?: boolean;
+  slug?: boolean;
+  category?: boolean;
+  displayName?: boolean;
+  description?: boolean;
+  parameterSchema?: boolean;
+  tags?: boolean;
 };
 export type UserConnectedAccountSelect = {
   id?: boolean;
@@ -6493,6 +6658,30 @@ export type UserSelect = {
     filter?: AuditLogFilter;
     orderBy?: AuditLogOrderBy[];
   };
+  agentThreadsByEntityId?: {
+    select: AgentThreadSelect;
+    first?: number;
+    filter?: AgentThreadFilter;
+    orderBy?: AgentThreadOrderBy[];
+  };
+  ownedAgentThreads?: {
+    select: AgentThreadSelect;
+    first?: number;
+    filter?: AgentThreadFilter;
+    orderBy?: AgentThreadOrderBy[];
+  };
+  ownedAgentMessages?: {
+    select: AgentMessageSelect;
+    first?: number;
+    filter?: AgentMessageFilter;
+    orderBy?: AgentMessageOrderBy[];
+  };
+  ownedAgentTasks?: {
+    select: AgentTaskSelect;
+    first?: number;
+    filter?: AgentTaskFilter;
+    orderBy?: AgentTaskOrderBy[];
+  };
 };
 export type AstMigrationSelect = {
   id?: boolean;
@@ -6520,7 +6709,6 @@ export type AppMembershipSelect = {
   isDisabled?: boolean;
   isVerified?: boolean;
   isActive?: boolean;
-  isExternal?: boolean;
   isOwner?: boolean;
   isAdmin?: boolean;
   permissions?: boolean;
@@ -10517,6 +10705,106 @@ export interface AuditLogFilter {
   /** A related `actor` exists. */
   actorExists?: boolean;
 }
+export interface AgentThreadFilter {
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentThreadFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentThreadFilter[];
+  /** Negates the expression. */
+  not?: AgentThreadFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `agentMessagesByThreadId` relation. */
+  agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
+  /** `agentMessagesByThreadId` exist. */
+  agentMessagesByThreadIdExist?: boolean;
+  /** Filter by the object’s `agentTasksByThreadId` relation. */
+  agentTasksByThreadId?: AgentThreadToManyAgentTaskFilter;
+  /** `agentTasksByThreadId` exist. */
+  agentTasksByThreadIdExist?: boolean;
+}
+export interface AgentMessageFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentMessageFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Negates the expression. */
+  not?: AgentMessageFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
+export interface AgentTaskFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentTaskFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentTaskFilter[];
+  /** Negates the expression. */
+  not?: AgentTaskFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
 export interface AppPermissionDefaultFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -10666,6 +10954,28 @@ export interface DevicesModuleFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `userDevicesTableByUserDevicesTableId` relation. */
   userDevicesTableByUserDevicesTableId?: TableFilter;
+}
+export interface NodeTypeRegistryFilter {
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `parameterSchema` field. */
+  parameterSchema?: JSONFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: NodeTypeRegistryFilter[];
+  /** Checks for any expressions in this list. */
+  or?: NodeTypeRegistryFilter[];
+  /** Negates the expression. */
+  not?: NodeTypeRegistryFilter;
 }
 export interface UserConnectedAccountFilter {
   /** Filter by the object’s `id` field. */
@@ -11164,6 +11474,22 @@ export interface UserFilter {
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
   auditLogsByActorIdExist?: boolean;
+  /** Filter by the object’s `agentThreadsByEntityId` relation. */
+  agentThreadsByEntityId?: UserToManyAgentThreadFilter;
+  /** `agentThreadsByEntityId` exist. */
+  agentThreadsByEntityIdExist?: boolean;
+  /** Filter by the object’s `ownedAgentThreads` relation. */
+  ownedAgentThreads?: UserToManyAgentThreadFilter;
+  /** `ownedAgentThreads` exist. */
+  ownedAgentThreadsExist?: boolean;
+  /** Filter by the object’s `ownedAgentMessages` relation. */
+  ownedAgentMessages?: UserToManyAgentMessageFilter;
+  /** `ownedAgentMessages` exist. */
+  ownedAgentMessagesExist?: boolean;
+  /** Filter by the object’s `ownedAgentTasks` relation. */
+  ownedAgentTasks?: UserToManyAgentTaskFilter;
+  /** `ownedAgentTasks` exist. */
+  ownedAgentTasksExist?: boolean;
   /** TSV search on the `search_tsv` column. */
   tsvSearchTsv?: string;
   /** TRGM search on the `display_name` column. */
@@ -11231,8 +11557,6 @@ export interface AppMembershipFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
-  /** Filter by the object’s `isExternal` field. */
-  isExternal?: BooleanFilter;
   /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
   /** Filter by the object’s `isAdmin` field. */
@@ -13775,6 +14099,74 @@ export type AuditLogOrderBy =
   | 'SUCCESS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
+export type AgentThreadOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'MODE_ASC'
+  | 'MODE_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+export type AgentMessageOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'AUTHOR_ROLE_ASC'
+  | 'AUTHOR_ROLE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARTS_ASC'
+  | 'PARTS_DESC';
+export type AgentTaskOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
 export type AppPermissionDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -13877,6 +14269,24 @@ export type DevicesModuleOrderBy =
   | 'USER_DEVICES_TABLE_DESC'
   | 'DEVICE_SETTINGS_TABLE_ASC'
   | 'DEVICE_SETTINGS_TABLE_DESC';
+export type NodeTypeRegistryOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PARAMETER_SCHEMA_ASC'
+  | 'PARAMETER_SCHEMA_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC';
 export type UserConnectedAccountOrderBy =
   | 'NATURAL'
   | 'ID_ASC'
@@ -14151,8 +14561,6 @@ export type AppMembershipOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_ACTIVE_ASC'
   | 'IS_ACTIVE_DESC'
-  | 'IS_EXTERNAL_ASC'
-  | 'IS_EXTERNAL_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
@@ -17482,6 +17890,92 @@ export interface DeleteAuditLogInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateAgentThreadInput {
+  clientMutationId?: string;
+  agentThread: {
+    title?: string;
+    mode?: string;
+    model?: string;
+    systemPrompt?: string;
+    ownerId?: string;
+    entityId: string;
+    status?: string;
+  };
+}
+export interface AgentThreadPatch {
+  title?: string | null;
+  mode?: string | null;
+  model?: string | null;
+  systemPrompt?: string | null;
+  ownerId?: string | null;
+  entityId?: string | null;
+  status?: string | null;
+}
+export interface UpdateAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+  agentThreadPatch: AgentThreadPatch;
+}
+export interface DeleteAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateAgentMessageInput {
+  clientMutationId?: string;
+  agentMessage: {
+    threadId: string;
+    entityId: string;
+    authorRole: string;
+    ownerId?: string;
+    parts?: Record<string, unknown>;
+  };
+}
+export interface AgentMessagePatch {
+  threadId?: string | null;
+  entityId?: string | null;
+  authorRole?: string | null;
+  ownerId?: string | null;
+  parts?: Record<string, unknown> | null;
+}
+export interface UpdateAgentMessageInput {
+  clientMutationId?: string;
+  id: string;
+  agentMessagePatch: AgentMessagePatch;
+}
+export interface DeleteAgentMessageInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateAgentTaskInput {
+  clientMutationId?: string;
+  agentTask: {
+    threadId: string;
+    entityId: string;
+    description: string;
+    source?: string;
+    error?: string;
+    ownerId?: string;
+    status?: string;
+  };
+}
+export interface AgentTaskPatch {
+  threadId?: string | null;
+  entityId?: string | null;
+  description?: string | null;
+  source?: string | null;
+  error?: string | null;
+  ownerId?: string | null;
+  status?: string | null;
+}
+export interface UpdateAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+  agentTaskPatch: AgentTaskPatch;
+}
+export interface DeleteAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateAppPermissionDefaultInput {
   clientMutationId?: string;
   appPermissionDefault: {
@@ -17677,6 +18171,36 @@ export interface UpdateDevicesModuleInput {
 export interface DeleteDevicesModuleInput {
   clientMutationId?: string;
   id: string;
+}
+export interface CreateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  nodeTypeRegistry: {
+    name: string;
+    slug: string;
+    category: string;
+    displayName?: string;
+    description?: string;
+    parameterSchema?: Record<string, unknown>;
+    tags?: string[];
+  };
+}
+export interface NodeTypeRegistryPatch {
+  name?: string | null;
+  slug?: string | null;
+  category?: string | null;
+  displayName?: string | null;
+  description?: string | null;
+  parameterSchema?: Record<string, unknown> | null;
+  tags?: string[] | null;
+}
+export interface UpdateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  name: string;
+  nodeTypeRegistryPatch: NodeTypeRegistryPatch;
+}
+export interface DeleteNodeTypeRegistryInput {
+  clientMutationId?: string;
+  name: string;
 }
 export interface CreateUserConnectedAccountInput {
   clientMutationId?: string;
@@ -18023,7 +18547,6 @@ export interface CreateAppMembershipInput {
     isDisabled?: boolean;
     isVerified?: boolean;
     isActive?: boolean;
-    isExternal?: boolean;
     isOwner?: boolean;
     isAdmin?: boolean;
     permissions?: string;
@@ -18040,7 +18563,6 @@ export interface AppMembershipPatch {
   isDisabled?: boolean | null;
   isVerified?: boolean | null;
   isActive?: boolean | null;
-  isExternal?: boolean | null;
   isOwner?: boolean | null;
   isAdmin?: boolean | null;
   permissions?: string | null;
@@ -18237,6 +18759,10 @@ export const connectionFieldsMap = {
     blueprintTemplatesByForkedFromId: 'BlueprintTemplate',
     blueprintsByTemplateId: 'Blueprint',
   },
+  AgentThread: {
+    agentMessagesByThreadId: 'AgentMessage',
+    agentTasksByThreadId: 'AgentTask',
+  },
   User: {
     ownedDatabases: 'Database',
     appAdminGrantsByActorId: 'AppAdminGrant',
@@ -18288,6 +18814,10 @@ export const connectionFieldsMap = {
     orgClaimedInvitesByReceiverId: 'OrgClaimedInvite',
     orgClaimedInvitesBySenderId: 'OrgClaimedInvite',
     auditLogsByActorId: 'AuditLog',
+    agentThreadsByEntityId: 'AgentThread',
+    ownedAgentThreads: 'AgentThread',
+    ownedAgentMessages: 'AgentMessage',
+    ownedAgentTasks: 'AgentTask',
   },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
@@ -20072,6 +20602,24 @@ export interface ConstructiveInternalTypeOriginFilter {
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
 }
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentMessageFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+}
+/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentTaskFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentTaskFilter;
+}
 /** A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeUploadFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
@@ -20430,6 +20978,33 @@ export interface UserToManyAuditLogFilter {
   every?: AuditLogFilter;
   /** Filters to entities where no related entity matches. */
   none?: AuditLogFilter;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentThreadFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentMessageFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+}
+/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentTaskFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentTaskFilter;
 }
 /** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
 export interface TrgmSearchInput {
@@ -23309,6 +23884,68 @@ export interface BlueprintTemplateFilter {
   /** `blueprintsByTemplateId` exist. */
   blueprintsByTemplateIdExist?: boolean;
 }
+/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentMessageFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentMessageFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Negates the expression. */
+  not?: AgentMessageFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
+/** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentTaskFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentTaskFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentTaskFilter[];
+  /** Negates the expression. */
+  not?: AgentTaskFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
 /** A filter to be used against `Database` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseFilter {
   /** Filter by the object’s `id` field. */
@@ -24384,6 +25021,47 @@ export interface AuditLogFilter {
   /** A related `actor` exists. */
   actorExists?: boolean;
 }
+/** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadFilter {
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentThreadFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentThreadFilter[];
+  /** Negates the expression. */
+  not?: AgentThreadFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `agentMessagesByThreadId` relation. */
+  agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
+  /** `agentMessagesByThreadId` exist. */
+  agentMessagesByThreadIdExist?: boolean;
+  /** Filter by the object’s `agentTasksByThreadId` relation. */
+  agentTasksByThreadId?: AgentThreadToManyAgentTaskFilter;
+  /** `agentTasksByThreadId` exist. */
+  agentTasksByThreadIdExist?: boolean;
+}
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
@@ -24962,6 +25640,22 @@ export interface UserFilter {
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
   auditLogsByActorIdExist?: boolean;
+  /** Filter by the object’s `agentThreadsByEntityId` relation. */
+  agentThreadsByEntityId?: UserToManyAgentThreadFilter;
+  /** `agentThreadsByEntityId` exist. */
+  agentThreadsByEntityIdExist?: boolean;
+  /** Filter by the object’s `ownedAgentThreads` relation. */
+  ownedAgentThreads?: UserToManyAgentThreadFilter;
+  /** `ownedAgentThreads` exist. */
+  ownedAgentThreadsExist?: boolean;
+  /** Filter by the object’s `ownedAgentMessages` relation. */
+  ownedAgentMessages?: UserToManyAgentMessageFilter;
+  /** `ownedAgentMessages` exist. */
+  ownedAgentMessagesExist?: boolean;
+  /** Filter by the object’s `ownedAgentTasks` relation. */
+  ownedAgentTasks?: UserToManyAgentTaskFilter;
+  /** `ownedAgentTasks` exist. */
+  ownedAgentTasksExist?: boolean;
   /** TSV search on the `search_tsv` column. */
   tsvSearchTsv?: string;
   /** TRGM search on the `display_name` column. */
@@ -25264,8 +25958,6 @@ export interface AppMembershipFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
-  /** Filter by the object’s `isExternal` field. */
-  isExternal?: BooleanFilter;
   /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
   /** Filter by the object’s `isAdmin` field. */
@@ -30134,6 +30826,141 @@ export type DeleteAuditLogPayloadSelect = {
     select: AuditLogEdgeSelect;
   };
 };
+export interface CreateAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was created by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+}
+export type CreateAgentThreadPayloadSelect = {
+  clientMutationId?: boolean;
+  agentThread?: {
+    select: AgentThreadSelect;
+  };
+  agentThreadEdge?: {
+    select: AgentThreadEdgeSelect;
+  };
+};
+export interface UpdateAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was updated by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+}
+export type UpdateAgentThreadPayloadSelect = {
+  clientMutationId?: boolean;
+  agentThread?: {
+    select: AgentThreadSelect;
+  };
+  agentThreadEdge?: {
+    select: AgentThreadEdgeSelect;
+  };
+};
+export interface DeleteAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was deleted by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+}
+export type DeleteAgentThreadPayloadSelect = {
+  clientMutationId?: boolean;
+  agentThread?: {
+    select: AgentThreadSelect;
+  };
+  agentThreadEdge?: {
+    select: AgentThreadEdgeSelect;
+  };
+};
+export interface CreateAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was created by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
+}
+export type CreateAgentMessagePayloadSelect = {
+  clientMutationId?: boolean;
+  agentMessage?: {
+    select: AgentMessageSelect;
+  };
+  agentMessageEdge?: {
+    select: AgentMessageEdgeSelect;
+  };
+};
+export interface UpdateAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was updated by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
+}
+export type UpdateAgentMessagePayloadSelect = {
+  clientMutationId?: boolean;
+  agentMessage?: {
+    select: AgentMessageSelect;
+  };
+  agentMessageEdge?: {
+    select: AgentMessageEdgeSelect;
+  };
+};
+export interface DeleteAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was deleted by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
+}
+export type DeleteAgentMessagePayloadSelect = {
+  clientMutationId?: boolean;
+  agentMessage?: {
+    select: AgentMessageSelect;
+  };
+  agentMessageEdge?: {
+    select: AgentMessageEdgeSelect;
+  };
+};
+export interface CreateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was created by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export type CreateAgentTaskPayloadSelect = {
+  clientMutationId?: boolean;
+  agentTask?: {
+    select: AgentTaskSelect;
+  };
+  agentTaskEdge?: {
+    select: AgentTaskEdgeSelect;
+  };
+};
+export interface UpdateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was updated by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export type UpdateAgentTaskPayloadSelect = {
+  clientMutationId?: boolean;
+  agentTask?: {
+    select: AgentTaskSelect;
+  };
+  agentTaskEdge?: {
+    select: AgentTaskEdgeSelect;
+  };
+};
+export interface DeleteAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was deleted by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export type DeleteAgentTaskPayloadSelect = {
+  clientMutationId?: boolean;
+  agentTask?: {
+    select: AgentTaskSelect;
+  };
+  agentTaskEdge?: {
+    select: AgentTaskEdgeSelect;
+  };
+};
 export interface CreateAppPermissionDefaultPayload {
   clientMutationId?: string | null;
   /** The `AppPermissionDefault` that was created by this mutation. */
@@ -30469,6 +31296,51 @@ export type DeleteDevicesModulePayloadSelect = {
   };
   devicesModuleEdge?: {
     select: DevicesModuleEdgeSelect;
+  };
+};
+export interface CreateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was created by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
+export type CreateNodeTypeRegistryPayloadSelect = {
+  clientMutationId?: boolean;
+  nodeTypeRegistry?: {
+    select: NodeTypeRegistrySelect;
+  };
+  nodeTypeRegistryEdge?: {
+    select: NodeTypeRegistryEdgeSelect;
+  };
+};
+export interface UpdateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was updated by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
+export type UpdateNodeTypeRegistryPayloadSelect = {
+  clientMutationId?: boolean;
+  nodeTypeRegistry?: {
+    select: NodeTypeRegistrySelect;
+  };
+  nodeTypeRegistryEdge?: {
+    select: NodeTypeRegistryEdgeSelect;
+  };
+};
+export interface DeleteNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was deleted by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
+export type DeleteNodeTypeRegistryPayloadSelect = {
+  clientMutationId?: boolean;
+  nodeTypeRegistry?: {
+    select: NodeTypeRegistrySelect;
+  };
+  nodeTypeRegistryEdge?: {
+    select: NodeTypeRegistryEdgeSelect;
   };
 };
 export interface CreateUserConnectedAccountPayload {
@@ -32231,6 +33103,42 @@ export type AuditLogEdgeSelect = {
     select: AuditLogSelect;
   };
 };
+/** A `AgentThread` edge in the connection. */
+export interface AgentThreadEdge {
+  cursor?: string | null;
+  /** The `AgentThread` at the end of the edge. */
+  node?: AgentThread | null;
+}
+export type AgentThreadEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AgentThreadSelect;
+  };
+};
+/** A `AgentMessage` edge in the connection. */
+export interface AgentMessageEdge {
+  cursor?: string | null;
+  /** The `AgentMessage` at the end of the edge. */
+  node?: AgentMessage | null;
+}
+export type AgentMessageEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AgentMessageSelect;
+  };
+};
+/** A `AgentTask` edge in the connection. */
+export interface AgentTaskEdge {
+  cursor?: string | null;
+  /** The `AgentTask` at the end of the edge. */
+  node?: AgentTask | null;
+}
+export type AgentTaskEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AgentTaskSelect;
+  };
+};
 /** A `AppPermissionDefault` edge in the connection. */
 export interface AppPermissionDefaultEdge {
   cursor?: string | null;
@@ -32313,6 +33221,18 @@ export type DevicesModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DevicesModuleSelect;
+  };
+};
+/** A `NodeTypeRegistry` edge in the connection. */
+export interface NodeTypeRegistryEdge {
+  cursor?: string | null;
+  /** The `NodeTypeRegistry` at the end of the edge. */
+  node?: NodeTypeRegistry | null;
+}
+export type NodeTypeRegistryEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: NodeTypeRegistrySelect;
   };
 };
 /** A `AppMembershipDefault` edge in the connection. */

@@ -5,6 +5,9 @@
  */
 
 import type {
+  AgentMessage,
+  AgentTask,
+  AgentThread,
   Api,
   ApiModule,
   ApiSchema,
@@ -64,6 +67,7 @@ import type {
   MembershipTypesModule,
   MembershipsModule,
   MigrateFile,
+  NodeTypeRegistry,
   NotificationsModule,
   Object,
   OrgAdminGrant,
@@ -2609,6 +2613,77 @@ export type AuditLogOrderBy =
   | 'SUCCESS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
+/** Methods to use when ordering `AgentMessage`. */
+export type AgentMessageOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'AUTHOR_ROLE_ASC'
+  | 'AUTHOR_ROLE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARTS_ASC'
+  | 'PARTS_DESC';
+/** Methods to use when ordering `AgentTask`. */
+export type AgentTaskOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+/** Methods to use when ordering `AgentThread`. */
+export type AgentThreadOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'MODE_ASC'
+  | 'MODE_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
 /** Methods to use when ordering `AppPermissionDefault`. */
 export type AppPermissionDefaultOrderBy =
   | 'NATURAL'
@@ -2720,6 +2795,25 @@ export type DevicesModuleOrderBy =
   | 'USER_DEVICES_TABLE_DESC'
   | 'DEVICE_SETTINGS_TABLE_ASC'
   | 'DEVICE_SETTINGS_TABLE_DESC';
+/** Methods to use when ordering `NodeTypeRegistry`. */
+export type NodeTypeRegistryOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PARAMETER_SCHEMA_ASC'
+  | 'PARAMETER_SCHEMA_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC';
 /** Methods to use when ordering `UserConnectedAccount`. */
 export type UserConnectedAccountOrderBy =
   | 'NATURAL'
@@ -3076,8 +3170,6 @@ export type AppMembershipOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_ACTIVE_ASC'
   | 'IS_ACTIVE_DESC'
-  | 'IS_EXTERNAL_ASC'
-  | 'IS_EXTERNAL_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
@@ -3732,6 +3824,22 @@ export interface UserFilter {
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
   auditLogsByActorIdExist?: boolean;
+  /** Filter by the object’s `agentThreadsByEntityId` relation. */
+  agentThreadsByEntityId?: UserToManyAgentThreadFilter;
+  /** `agentThreadsByEntityId` exist. */
+  agentThreadsByEntityIdExist?: boolean;
+  /** Filter by the object’s `ownedAgentThreads` relation. */
+  ownedAgentThreads?: UserToManyAgentThreadFilter;
+  /** `ownedAgentThreads` exist. */
+  ownedAgentThreadsExist?: boolean;
+  /** Filter by the object’s `ownedAgentMessages` relation. */
+  ownedAgentMessages?: UserToManyAgentMessageFilter;
+  /** `ownedAgentMessages` exist. */
+  ownedAgentMessagesExist?: boolean;
+  /** Filter by the object’s `ownedAgentTasks` relation. */
+  ownedAgentTasks?: UserToManyAgentTaskFilter;
+  /** `ownedAgentTasks` exist. */
+  ownedAgentTasksExist?: boolean;
   /** TSV search on the `search_tsv` column. */
   tsvSearchTsv?: string;
   /** TRGM search on the `display_name` column. */
@@ -3911,8 +4019,6 @@ export interface AppMembershipFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
-  /** Filter by the object’s `isExternal` field. */
-  isExternal?: BooleanFilter;
   /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
   /** Filter by the object’s `isAdmin` field. */
@@ -5180,6 +5286,154 @@ export interface ConstructiveInternalTypeOriginFilter {
   greaterThanInsensitive?: string;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentThreadFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+}
+/** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadFilter {
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentThreadFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentThreadFilter[];
+  /** Negates the expression. */
+  not?: AgentThreadFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `agentMessagesByThreadId` relation. */
+  agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
+  /** `agentMessagesByThreadId` exist. */
+  agentMessagesByThreadIdExist?: boolean;
+  /** Filter by the object’s `agentTasksByThreadId` relation. */
+  agentTasksByThreadId?: AgentThreadToManyAgentTaskFilter;
+  /** `agentTasksByThreadId` exist. */
+  agentTasksByThreadIdExist?: boolean;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentMessageFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+}
+/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentMessageFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentMessageFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Negates the expression. */
+  not?: AgentMessageFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
+/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentTaskFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentTaskFilter;
+}
+/** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentTaskFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentTaskFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentTaskFilter[];
+  /** Negates the expression. */
+  not?: AgentTaskFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentMessageFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+}
+/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentTaskFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentTaskFilter;
 }
 /** A filter to be used against many `Schema` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManySchemaFilter {
@@ -9550,6 +9804,29 @@ export interface OrgLimitDefaultFilter {
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
+/** A filter to be used against `NodeTypeRegistry` object types. All fields are combined with a logical ‘and.’ */
+export interface NodeTypeRegistryFilter {
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `parameterSchema` field. */
+  parameterSchema?: JSONFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: NodeTypeRegistryFilter[];
+  /** Checks for any expressions in this list. */
+  or?: NodeTypeRegistryFilter[];
+  /** Negates the expression. */
+  not?: NodeTypeRegistryFilter;
+}
 /** A filter to be used against `UserConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
 export interface UserConnectedAccountFilter {
   /** Filter by the object’s `id` field. */
@@ -10650,6 +10927,21 @@ export interface OrgOwnerGrantInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  /** The `NodeTypeRegistry` to be created by this mutation. */
+  nodeTypeRegistry: NodeTypeRegistryInput;
+}
+/** An input for mutations affecting `NodeTypeRegistry` */
+export interface NodeTypeRegistryInput {
+  name: string;
+  slug: string;
+  category: string;
+  displayName?: string;
+  description?: string;
+  parameterSchema?: unknown;
+  tags?: string[];
+}
 export interface CreateUserConnectedAccountInput {
   clientMutationId?: string;
   /** The `UserConnectedAccount` to be created by this mutation. */
@@ -10732,6 +11024,29 @@ export interface CryptoAddressInput {
   name?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateAgentMessageInput {
+  clientMutationId?: string;
+  /** The `AgentMessage` to be created by this mutation. */
+  agentMessage: AgentMessageInput;
+}
+/** An input for mutations affecting `AgentMessage` */
+export interface AgentMessageInput {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId: string;
+  /** Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only. */
+  entityId: string;
+  /** Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array. */
+  authorRole: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** JSON metadata for extensible key-value storage */
+  parts?: unknown;
 }
 export interface CreateAppPermissionInput {
   clientMutationId?: string;
@@ -11123,6 +11438,60 @@ export interface OrgChartEdgeInput {
   positionTitle?: string;
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
+}
+export interface CreateAgentTaskInput {
+  clientMutationId?: string;
+  /** The `AgentTask` to be created by this mutation. */
+  agentTask: AgentTaskInput;
+}
+/** An input for mutations affecting `AgentTask` */
+export interface AgentTaskInput {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId: string;
+  /** Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly. */
+  entityId: string;
+  /** Natural-language description of the work to do. Required. */
+  description: string;
+  /** Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later. */
+  source?: string;
+  /** Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully. */
+  error?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** Current status of this record */
+  status?: string;
+}
+export interface CreateAgentThreadInput {
+  clientMutationId?: string;
+  /** The `AgentThread` to be created by this mutation. */
+  agentThread: AgentThreadInput;
+}
+/** An input for mutations affecting `AgentThread` */
+export interface AgentThreadInput {
+  /** Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed. */
+  title?: string;
+  /** Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration. */
+  mode?: string;
+  /** Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time. */
+  model?: string;
+  /** Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time. */
+  systemPrompt?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record within the entity */
+  ownerId?: string;
+  /** Entity this record belongs to */
+  entityId: string;
+  /** Current status of this record */
+  status?: string;
 }
 export interface CreateOrgGrantInput {
   clientMutationId?: string;
@@ -11918,6 +12287,40 @@ export interface AppInviteInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateAppMembershipInput {
+  clientMutationId?: string;
+  /** The `AppMembership` to be created by this mutation. */
+  appMembership: AppMembershipInput;
+}
+/** An input for mutations affecting `AppMembership` */
+export interface AppMembershipInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Whether this member has been verified (e.g. email confirmation) */
+  isVerified?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId: string;
+  profileId?: string;
+}
 export interface CreateEmbeddingChunkInput {
   clientMutationId?: string;
   /** The `EmbeddingChunk` to be created by this mutation. */
@@ -12017,42 +12420,6 @@ export interface ProfilesModuleInput {
   permissionsTableId?: string;
   membershipsTableId?: string;
   prefix?: string;
-}
-export interface CreateAppMembershipInput {
-  clientMutationId?: string;
-  /** The `AppMembership` to be created by this mutation. */
-  appMembership: AppMembershipInput;
-}
-/** An input for mutations affecting `AppMembership` */
-export interface AppMembershipInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Whether this member has been verified (e.g. email confirmation) */
-  isVerified?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
-  isExternal?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId: string;
-  profileId?: string;
 }
 export interface CreateIndexInput {
   clientMutationId?: string;
@@ -13371,6 +13738,22 @@ export interface OrgOwnerGrantPatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  name: string;
+  /** An object where the defined keys will be set on the `NodeTypeRegistry` being updated. */
+  nodeTypeRegistryPatch: NodeTypeRegistryPatch;
+}
+/** Represents an update to a `NodeTypeRegistry`. Fields that are set will be updated. */
+export interface NodeTypeRegistryPatch {
+  name?: string;
+  slug?: string;
+  category?: string;
+  displayName?: string;
+  description?: string;
+  parameterSchema?: unknown;
+  tags?: string[];
+}
 export interface UpdateObjectInput {
   clientMutationId?: string;
   id: string;
@@ -13442,6 +13825,30 @@ export interface CryptoAddressPatch {
   name?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateAgentMessageInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AgentMessage` being updated. */
+  agentMessagePatch: AgentMessagePatch;
+}
+/** Represents an update to a `AgentMessage`. Fields that are set will be updated. */
+export interface AgentMessagePatch {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId?: string;
+  /** Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only. */
+  entityId?: string;
+  /** Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array. */
+  authorRole?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** JSON metadata for extensible key-value storage */
+  parts?: unknown;
 }
 export interface UpdateAppPermissionInput {
   clientMutationId?: string;
@@ -13862,6 +14269,62 @@ export interface OrgChartEdgePatch {
   positionTitle?: string;
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
+}
+export interface UpdateAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AgentTask` being updated. */
+  agentTaskPatch: AgentTaskPatch;
+}
+/** Represents an update to a `AgentTask`. Fields that are set will be updated. */
+export interface AgentTaskPatch {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId?: string;
+  /** Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly. */
+  entityId?: string;
+  /** Natural-language description of the work to do. Required. */
+  description?: string;
+  /** Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later. */
+  source?: string;
+  /** Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully. */
+  error?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** Current status of this record */
+  status?: string;
+}
+export interface UpdateAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AgentThread` being updated. */
+  agentThreadPatch: AgentThreadPatch;
+}
+/** Represents an update to a `AgentThread`. Fields that are set will be updated. */
+export interface AgentThreadPatch {
+  /** Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed. */
+  title?: string;
+  /** Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration. */
+  mode?: string;
+  /** Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time. */
+  model?: string;
+  /** Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time. */
+  systemPrompt?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record within the entity */
+  ownerId?: string;
+  /** Entity this record belongs to */
+  entityId?: string;
+  /** Current status of this record */
+  status?: string;
 }
 export interface UpdateOrgGrantInput {
   clientMutationId?: string;
@@ -14668,6 +15131,41 @@ export interface AppInvitePatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateAppMembershipInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppMembership` being updated. */
+  appMembershipPatch: AppMembershipPatch;
+}
+/** Represents an update to a `AppMembership`. Fields that are set will be updated. */
+export interface AppMembershipPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Whether this member has been verified (e.g. email confirmation) */
+  isVerified?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId?: string;
+  profileId?: string;
+}
 export interface UpdateEmbeddingChunkInput {
   clientMutationId?: string;
   id: string;
@@ -14771,43 +15269,6 @@ export interface ProfilesModulePatch {
   permissionsTableId?: string;
   membershipsTableId?: string;
   prefix?: string;
-}
-export interface UpdateAppMembershipInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppMembership` being updated. */
-  appMembershipPatch: AppMembershipPatch;
-}
-/** Represents an update to a `AppMembership`. Fields that are set will be updated. */
-export interface AppMembershipPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Whether this member has been verified (e.g. email confirmation) */
-  isVerified?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
-  isExternal?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId?: string;
-  profileId?: string;
 }
 export interface UpdateIndexInput {
   clientMutationId?: string;
@@ -15728,6 +16189,10 @@ export interface DeleteOrgOwnerGrantInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteNodeTypeRegistryInput {
+  clientMutationId?: string;
+  name: string;
+}
 export interface DeleteObjectInput {
   clientMutationId?: string;
   id: string;
@@ -15742,6 +16207,10 @@ export interface DeleteCryptoAddressesModuleInput {
   id: string;
 }
 export interface DeleteCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentMessageInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15832,6 +16301,14 @@ export interface DeleteOrgClaimedInviteInput {
   id: string;
 }
 export interface DeleteOrgChartEdgeInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentThreadInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15968,6 +16445,10 @@ export interface DeleteAppInviteInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteAppMembershipInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteEmbeddingChunkInput {
   clientMutationId?: string;
   id: string;
@@ -15981,10 +16462,6 @@ export interface DeleteLimitsModuleInput {
   id: string;
 }
 export interface DeleteProfilesModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppMembershipInput {
   clientMutationId?: string;
   id: string;
 }
@@ -16391,6 +16868,13 @@ export interface OrgOwnerGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `NodeTypeRegistry` values. */
+export interface NodeTypeRegistryConnection {
+  nodes: NodeTypeRegistry[];
+  edges: NodeTypeRegistryEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `UserConnectedAccount` values. */
 export interface UserConnectedAccountConnection {
   nodes: UserConnectedAccount[];
@@ -16416,6 +16900,13 @@ export interface CryptoAddressesModuleConnection {
 export interface CryptoAddressConnection {
   nodes: CryptoAddress[];
   edges: CryptoAddressEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentMessage` values. */
+export interface AgentMessageConnection {
+  nodes: AgentMessage[];
+  edges: AgentMessageEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16549,6 +17040,20 @@ export interface OrgClaimedInviteConnection {
 export interface OrgChartEdgeConnection {
   nodes: OrgChartEdge[];
   edges: OrgChartEdgeEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentTask` values. */
+export interface AgentTaskConnection {
+  nodes: AgentTask[];
+  edges: AgentTaskEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentThread` values. */
+export interface AgentThreadConnection {
+  nodes: AgentThread[];
+  edges: AgentThreadEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16783,6 +17288,13 @@ export interface AppInviteConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AppMembership` values. */
+export interface AppMembershipConnection {
+  nodes: AppMembership[];
+  edges: AppMembershipEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `EmbeddingChunk` values. */
 export interface EmbeddingChunkConnection {
   nodes: EmbeddingChunk[];
@@ -16808,13 +17320,6 @@ export interface LimitsModuleConnection {
 export interface ProfilesModuleConnection {
   nodes: ProfilesModule[];
   edges: ProfilesModuleEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AppMembership` values. */
-export interface AppMembershipConnection {
-  nodes: AppMembership[];
-  edges: AppMembershipEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17327,6 +17832,12 @@ export interface CreateOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
+export interface CreateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was created by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
 export interface CreateUserConnectedAccountPayload {
   clientMutationId?: string | null;
   /** The `UserConnectedAccount` that was created by this mutation. */
@@ -17355,6 +17866,12 @@ export interface CreateCryptoAddressPayload {
   /** The `CryptoAddress` that was created by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface CreateAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was created by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
 }
 export interface CreateAppPermissionPayload {
   clientMutationId?: string | null;
@@ -17481,6 +17998,18 @@ export interface CreateOrgChartEdgePayload {
   /** The `OrgChartEdge` that was created by this mutation. */
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
+}
+export interface CreateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was created by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export interface CreateAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was created by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
 }
 export interface CreateOrgGrantPayload {
   clientMutationId?: string | null;
@@ -17684,6 +18213,12 @@ export interface CreateAppInvitePayload {
   appInvite?: AppInvite | null;
   appInviteEdge?: AppInviteEdge | null;
 }
+export interface CreateAppMembershipPayload {
+  clientMutationId?: string | null;
+  /** The `AppMembership` that was created by this mutation. */
+  appMembership?: AppMembership | null;
+  appMembershipEdge?: AppMembershipEdge | null;
+}
 export interface CreateEmbeddingChunkPayload {
   clientMutationId?: string | null;
   /** The `EmbeddingChunk` that was created by this mutation. */
@@ -17707,12 +18242,6 @@ export interface CreateProfilesModulePayload {
   /** The `ProfilesModule` that was created by this mutation. */
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
-}
-export interface CreateAppMembershipPayload {
-  clientMutationId?: string | null;
-  /** The `AppMembership` that was created by this mutation. */
-  appMembership?: AppMembership | null;
-  appMembershipEdge?: AppMembershipEdge | null;
 }
 export interface CreateIndexPayload {
   clientMutationId?: string | null;
@@ -18014,6 +18543,12 @@ export interface UpdateOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
+export interface UpdateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was updated by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
 export interface UpdateObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was updated by this mutation. */
@@ -18037,6 +18572,12 @@ export interface UpdateCryptoAddressPayload {
   /** The `CryptoAddress` that was updated by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface UpdateAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was updated by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
 }
 export interface UpdateAppPermissionPayload {
   clientMutationId?: string | null;
@@ -18163,6 +18704,18 @@ export interface UpdateOrgChartEdgePayload {
   /** The `OrgChartEdge` that was updated by this mutation. */
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
+}
+export interface UpdateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was updated by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export interface UpdateAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was updated by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
 }
 export interface UpdateOrgGrantPayload {
   clientMutationId?: string | null;
@@ -18356,6 +18909,12 @@ export interface UpdateAppInvitePayload {
   appInvite?: AppInvite | null;
   appInviteEdge?: AppInviteEdge | null;
 }
+export interface UpdateAppMembershipPayload {
+  clientMutationId?: string | null;
+  /** The `AppMembership` that was updated by this mutation. */
+  appMembership?: AppMembership | null;
+  appMembershipEdge?: AppMembershipEdge | null;
+}
 export interface UpdateEmbeddingChunkPayload {
   clientMutationId?: string | null;
   /** The `EmbeddingChunk` that was updated by this mutation. */
@@ -18379,12 +18938,6 @@ export interface UpdateProfilesModulePayload {
   /** The `ProfilesModule` that was updated by this mutation. */
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
-}
-export interface UpdateAppMembershipPayload {
-  clientMutationId?: string | null;
-  /** The `AppMembership` that was updated by this mutation. */
-  appMembership?: AppMembership | null;
-  appMembershipEdge?: AppMembershipEdge | null;
 }
 export interface UpdateIndexPayload {
   clientMutationId?: string | null;
@@ -18686,6 +19239,12 @@ export interface DeleteOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
+export interface DeleteNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was deleted by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
 export interface DeleteObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was deleted by this mutation. */
@@ -18709,6 +19268,12 @@ export interface DeleteCryptoAddressPayload {
   /** The `CryptoAddress` that was deleted by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface DeleteAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was deleted by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
 }
 export interface DeleteAppPermissionPayload {
   clientMutationId?: string | null;
@@ -18835,6 +19400,18 @@ export interface DeleteOrgChartEdgePayload {
   /** The `OrgChartEdge` that was deleted by this mutation. */
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
+}
+export interface DeleteAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was deleted by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export interface DeleteAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was deleted by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
 }
 export interface DeleteOrgGrantPayload {
   clientMutationId?: string | null;
@@ -19028,6 +19605,12 @@ export interface DeleteAppInvitePayload {
   appInvite?: AppInvite | null;
   appInviteEdge?: AppInviteEdge | null;
 }
+export interface DeleteAppMembershipPayload {
+  clientMutationId?: string | null;
+  /** The `AppMembership` that was deleted by this mutation. */
+  appMembership?: AppMembership | null;
+  appMembershipEdge?: AppMembershipEdge | null;
+}
 export interface DeleteEmbeddingChunkPayload {
   clientMutationId?: string | null;
   /** The `EmbeddingChunk` that was deleted by this mutation. */
@@ -19051,12 +19634,6 @@ export interface DeleteProfilesModulePayload {
   /** The `ProfilesModule` that was deleted by this mutation. */
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
-}
-export interface DeleteAppMembershipPayload {
-  clientMutationId?: string | null;
-  /** The `AppMembership` that was deleted by this mutation. */
-  appMembership?: AppMembership | null;
-  appMembershipEdge?: AppMembershipEdge | null;
 }
 export interface DeleteIndexPayload {
   clientMutationId?: string | null;
@@ -19459,6 +20036,12 @@ export interface OrgOwnerGrantEdge {
   /** The `OrgOwnerGrant` at the end of the edge. */
   node?: OrgOwnerGrant | null;
 }
+/** A `NodeTypeRegistry` edge in the connection. */
+export interface NodeTypeRegistryEdge {
+  cursor?: string | null;
+  /** The `NodeTypeRegistry` at the end of the edge. */
+  node?: NodeTypeRegistry | null;
+}
 /** A `UserConnectedAccount` edge in the connection. */
 export interface UserConnectedAccountEdge {
   cursor?: string | null;
@@ -19482,6 +20065,12 @@ export interface CryptoAddressEdge {
   cursor?: string | null;
   /** The `CryptoAddress` at the end of the edge. */
   node?: CryptoAddress | null;
+}
+/** A `AgentMessage` edge in the connection. */
+export interface AgentMessageEdge {
+  cursor?: string | null;
+  /** The `AgentMessage` at the end of the edge. */
+  node?: AgentMessage | null;
 }
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
@@ -19596,6 +20185,18 @@ export interface OrgChartEdgeEdge {
   cursor?: string | null;
   /** The `OrgChartEdge` at the end of the edge. */
   node?: OrgChartEdge | null;
+}
+/** A `AgentTask` edge in the connection. */
+export interface AgentTaskEdge {
+  cursor?: string | null;
+  /** The `AgentTask` at the end of the edge. */
+  node?: AgentTask | null;
+}
+/** A `AgentThread` edge in the connection. */
+export interface AgentThreadEdge {
+  cursor?: string | null;
+  /** The `AgentThread` at the end of the edge. */
+  node?: AgentThread | null;
 }
 /** A `OrgGrant` edge in the connection. */
 export interface OrgGrantEdge {
@@ -19795,6 +20396,12 @@ export interface AppInviteEdge {
   /** The `AppInvite` at the end of the edge. */
   node?: AppInvite | null;
 }
+/** A `AppMembership` edge in the connection. */
+export interface AppMembershipEdge {
+  cursor?: string | null;
+  /** The `AppMembership` at the end of the edge. */
+  node?: AppMembership | null;
+}
 /** A `EmbeddingChunk` edge in the connection. */
 export interface EmbeddingChunkEdge {
   cursor?: string | null;
@@ -19818,12 +20425,6 @@ export interface ProfilesModuleEdge {
   cursor?: string | null;
   /** The `ProfilesModule` at the end of the edge. */
   node?: ProfilesModule | null;
-}
-/** A `AppMembership` edge in the connection. */
-export interface AppMembershipEdge {
-  cursor?: string | null;
-  /** The `AppMembership` at the end of the edge. */
-  node?: AppMembership | null;
 }
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
