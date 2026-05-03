@@ -66,7 +66,7 @@ The jobs runtime consists of:
 - `@constructive-io/knative-job-worker`
   - Polls `app_jobs.jobs` for work
   - For each job, `POST`s to `${KNATIVE_SERVICE_URL}/${task_identifier}`
-  - Uses `X-Worker-Id`, `X-Job-Id`, `X-Database-Id` headers and JSON payload
+  - Uses `X-Worker-Id`, `X-Job-Id`, `X-Database-Id`, `X-Actor-Id` headers and JSON payload
 
 ### Required env vars (knative-job-service)
 
@@ -198,10 +198,12 @@ echo "Sender ID: $SENDER_ID"
 ### Enqueue invite_email job
 
 ```bash
+# Set JWT claims so add_job can read database_id and actor_id internally
 docker exec -it postgres \
   psql -U postgres -d constructive -c "
+    SELECT set_config('jwt.claims.database_id', '$DBID', true);
+    SELECT set_config('jwt.claims.user_id', '$SENDER_ID', true);
     SELECT app_jobs.add_job(
-      '$DBID'::uuid,
       'send-email-link',
       json_build_object(
         'email_type',   'invite_email',
@@ -218,8 +220,8 @@ docker exec -it postgres \
 ```bash
 docker exec -it postgres \
   psql -U postgres -d constructive -c "
+    SELECT set_config('jwt.claims.database_id', '$DBID', true);
     SELECT app_jobs.add_job(
-      '$DBID'::uuid,
       'send-email-link',
       json_build_object(
         'email_type',   'forgot_password',
@@ -236,8 +238,8 @@ docker exec -it postgres \
 ```bash
 docker exec -it postgres \
   psql -U postgres -d constructive -c "
+    SELECT set_config('jwt.claims.database_id', '$DBID', true);
     SELECT app_jobs.add_job(
-      '$DBID'::uuid,
       'send-email-link',
       json_build_object(
         'email_type',   'email_verification',
@@ -297,11 +299,11 @@ You can also use `app_jobs.scheduled_jobs` and `@constructive-io/job-scheduler` 
 Example (generic, not specific to `simple-email`):
 
 ```sql
+-- database_id and actor_id are read from JWT claims automatically
 SELECT app_jobs.add_scheduled_job(
-  '00000000-0000-0000-0000-000000000001'::uuid,
-  'some-task-name',
-  json_build_object('foo', 'bar'),
-  json_build_object(
+  identifier := 'some-task-name',
+  payload := json_build_object('foo', 'bar'),
+  schedule_info := json_build_object(
     'start', NOW(),
     'end',   NOW() + '1 day'::interval,
     'rule',  '*/5 * * * *'   -- every 5 minutes (cron rule)
