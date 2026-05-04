@@ -583,6 +583,21 @@ function App() {
 | `useCreateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useUpdateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useDeleteAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useAgentThreadsQuery` | Query | Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension. |
+| `useAgentThreadQuery` | Query | Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension. |
+| `useCreateAgentThreadMutation` | Mutation | Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension. |
+| `useUpdateAgentThreadMutation` | Mutation | Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension. |
+| `useDeleteAgentThreadMutation` | Mutation | Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension. |
+| `useAgentMessagesQuery` | Query | A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useAgentMessageQuery` | Query | A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useCreateAgentMessageMutation` | Mutation | A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useUpdateAgentMessageMutation` | Mutation | A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useDeleteAgentMessageMutation` | Mutation | A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useAgentTasksQuery` | Query | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useAgentTaskQuery` | Query | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useCreateAgentTaskMutation` | Mutation | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useUpdateAgentTaskMutation` | Mutation | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
+| `useDeleteAgentTaskMutation` | Mutation | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
 | `useAppPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
 | `useAppPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
 | `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
@@ -625,6 +640,11 @@ function App() {
 | `useCreateDevicesModuleMutation` | Mutation | Create a devicesModule |
 | `useUpdateDevicesModuleMutation` | Mutation | Update a devicesModule |
 | `useDeleteDevicesModuleMutation` | Mutation | Delete a devicesModule |
+| `useNodeTypeRegistriesQuery` | Query | List all nodeTypeRegistries |
+| `useNodeTypeRegistryQuery` | Query | Get one nodeTypeRegistry |
+| `useCreateNodeTypeRegistryMutation` | Mutation | Create a nodeTypeRegistry |
+| `useUpdateNodeTypeRegistryMutation` | Mutation | Update a nodeTypeRegistry |
+| `useDeleteNodeTypeRegistryMutation` | Mutation | Delete a nodeTypeRegistry |
 | `useUserConnectedAccountsQuery` | Query | List all userConnectedAccounts |
 | `useUserConnectedAccountQuery` | Query | Get one userConnectedAccount |
 | `useCreateUserConnectedAccountMutation` | Mutation | Create a userConnectedAccount |
@@ -779,9 +799,6 @@ Example usage:
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
 existing file ID and deduplicated=true with no uploadUrl. |
-| `useConfirmUploadMutation` | Mutation | Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'. |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -2162,20 +2179,20 @@ create({ blueprintId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', status
 ```typescript
 // List all storageModules
 const { data, isLoading } = useStorageModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
 });
 
 // Get one storageModule
 const { data: item } = useStorageModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
 });
 
 // Create a storageModule
 const { mutate: create } = useCreateStorageModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', uploadRequestsTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', uploadRequestsTableName: '<String>', membershipType: '<Int>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', membershipType: '<Int>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' });
 ```
 
 ### EntityTypeProvision
@@ -2729,20 +2746,20 @@ create({ ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64Encoded
 ```typescript
 // List all appInvites
 const { data, isLoading } = useAppInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one appInvite
 const { data: item } = useAppInviteQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a appInvite
 const { mutate: create } = useCreateAppInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' });
+create({ email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', profileId: '<UUID>', expiresAt: '<Datetime>' });
 ```
 
 ### AppClaimedInvite
@@ -2771,20 +2788,20 @@ create({ data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>' });
 ```typescript
 // List all orgInvites
 const { data, isLoading } = useOrgInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
 });
 
 // Get one orgInvite
 const { data: item } = useOrgInviteQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
 });
 
 // Create a orgInvite
 const { mutate: create } = useCreateOrgInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>', entityId: '<UUID>' });
+create({ email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', profileId: '<UUID>', expiresAt: '<Datetime>', entityId: '<UUID>' });
 ```
 
 ### OrgClaimedInvite
@@ -2827,6 +2844,69 @@ const { mutate: create } = useCreateAuditLogMutation({
   selection: { fields: { id: true } },
 });
 create({ event: '<String>', actorId: '<UUID>', origin: '<Origin>', userAgent: '<String>', ipAddress: '<InternetAddress>', success: '<Boolean>' });
+```
+
+### AgentThread
+
+```typescript
+// List all agentThreads
+const { data, isLoading } = useAgentThreadsQuery({
+  selection: { fields: { title: true, mode: true, model: true, systemPrompt: true, id: true, createdAt: true, updatedAt: true, ownerId: true, entityId: true, status: true } },
+});
+
+// Get one agentThread
+const { data: item } = useAgentThreadQuery({
+  id: '<UUID>',
+  selection: { fields: { title: true, mode: true, model: true, systemPrompt: true, id: true, createdAt: true, updatedAt: true, ownerId: true, entityId: true, status: true } },
+});
+
+// Create a agentThread
+const { mutate: create } = useCreateAgentThreadMutation({
+  selection: { fields: { id: true } },
+});
+create({ title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', ownerId: '<UUID>', entityId: '<UUID>', status: '<String>' });
+```
+
+### AgentMessage
+
+```typescript
+// List all agentMessages
+const { data, isLoading } = useAgentMessagesQuery({
+  selection: { fields: { threadId: true, entityId: true, authorRole: true, id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true } },
+});
+
+// Get one agentMessage
+const { data: item } = useAgentMessageQuery({
+  id: '<UUID>',
+  selection: { fields: { threadId: true, entityId: true, authorRole: true, id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true } },
+});
+
+// Create a agentMessage
+const { mutate: create } = useCreateAgentMessageMutation({
+  selection: { fields: { id: true } },
+});
+create({ threadId: '<UUID>', entityId: '<UUID>', authorRole: '<String>', ownerId: '<UUID>', parts: '<JSON>' });
+```
+
+### AgentTask
+
+```typescript
+// List all agentTasks
+const { data, isLoading } = useAgentTasksQuery({
+  selection: { fields: { threadId: true, entityId: true, description: true, source: true, error: true, id: true, createdAt: true, updatedAt: true, ownerId: true, status: true } },
+});
+
+// Get one agentTask
+const { data: item } = useAgentTaskQuery({
+  id: '<UUID>',
+  selection: { fields: { threadId: true, entityId: true, description: true, source: true, error: true, id: true, createdAt: true, updatedAt: true, ownerId: true, status: true } },
+});
+
+// Create a agentTask
+const { mutate: create } = useCreateAgentTaskMutation({
+  selection: { fields: { id: true } },
+});
+create({ threadId: '<UUID>', entityId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', ownerId: '<UUID>', status: '<String>' });
 ```
 
 ### AppPermissionDefault
@@ -3012,6 +3092,27 @@ const { mutate: create } = useCreateDevicesModuleMutation({
 create({ databaseId: '<UUID>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', deviceSettingsTableId: '<UUID>', userDevicesTable: '<String>', deviceSettingsTable: '<String>' });
 ```
 
+### NodeTypeRegistry
+
+```typescript
+// List all nodeTypeRegistries
+const { data, isLoading } = useNodeTypeRegistriesQuery({
+  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true } },
+});
+
+// Get one nodeTypeRegistry
+const { data: item } = useNodeTypeRegistryQuery({
+  name: '<String>',
+  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true } },
+});
+
+// Create a nodeTypeRegistry
+const { mutate: create } = useCreateNodeTypeRegistryMutation({
+  selection: { fields: { name: true } },
+});
+create({ slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', parameterSchema: '<JSON>', tags: '<String>' });
+```
+
 ### UserConnectedAccount
 
 ```typescript
@@ -3185,20 +3286,20 @@ create({ name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<Str
 ```typescript
 // List all orgMembershipSettings
 const { data, isLoading } = useOrgMembershipSettingsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, populateMemberEmail: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, inviteProfileAssignmentMode: true, populateMemberEmail: true } },
 });
 
 // Get one orgMembershipSetting
 const { data: item } = useOrgMembershipSettingQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, populateMemberEmail: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, inviteProfileAssignmentMode: true, populateMemberEmail: true } },
 });
 
 // Create a orgMembershipSetting
 const { mutate: create } = useCreateOrgMembershipSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', entityId: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', createChildCascadeOwners: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', allowExternalMembers: '<Boolean>', populateMemberEmail: '<Boolean>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', entityId: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', createChildCascadeOwners: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', allowExternalMembers: '<Boolean>', inviteProfileAssignmentMode: '<String>', populateMemberEmail: '<Boolean>' });
 ```
 
 ### User
@@ -3248,20 +3349,20 @@ create({ databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: 
 ```typescript
 // List all appMemberships
 const { data, isLoading } = useAppMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
 });
 
 // Get one appMembership
 const { data: item } = useAppMembershipQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
 });
 
 // Create a appMembership
 const { mutate: create } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
 ```
 
 ### HierarchyModule
@@ -4093,19 +4194,6 @@ existing file ID and deduplicated=true with no uploadUrl.
   | Argument | Type |
   |----------|------|
   | `input` | RequestUploadUrlInput (required) |
-
-### `useConfirmUploadMutation`
-
-Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ConfirmUploadInput (required) |
 
 ### `useProvisionBucketMutation`
 

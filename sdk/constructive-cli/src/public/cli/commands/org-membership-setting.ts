@@ -27,6 +27,7 @@ const fieldSchema: FieldSchema = {
   createChildCascadeAdmins: 'boolean',
   createChildCascadeMembers: 'boolean',
   allowExternalMembers: 'boolean',
+  inviteProfileAssignmentMode: 'string',
   populateMemberEmail: 'boolean',
 };
 const usage =
@@ -91,6 +92,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createChildCascadeAdmins: true,
       createChildCascadeMembers: true,
       allowExternalMembers: true,
+      inviteProfileAssignmentMode: true,
       populateMemberEmail: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -127,6 +129,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createChildCascadeAdmins: true,
       createChildCascadeMembers: true,
       allowExternalMembers: true,
+      inviteProfileAssignmentMode: true,
       populateMemberEmail: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -171,6 +174,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           createChildCascadeAdmins: true,
           createChildCascadeMembers: true,
           allowExternalMembers: true,
+          inviteProfileAssignmentMode: true,
           populateMemberEmail: true,
         },
       })
@@ -243,6 +247,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'inviteProfileAssignmentMode',
+        message: 'inviteProfileAssignmentMode',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'boolean',
         name: 'populateMemberEmail',
         message: 'populateMemberEmail',
@@ -267,6 +278,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           createChildCascadeAdmins: cleanedData.createChildCascadeAdmins,
           createChildCascadeMembers: cleanedData.createChildCascadeMembers,
           allowExternalMembers: cleanedData.allowExternalMembers,
+          inviteProfileAssignmentMode: cleanedData.inviteProfileAssignmentMode,
           populateMemberEmail: cleanedData.populateMemberEmail,
         },
         select: {
@@ -281,6 +293,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           createChildCascadeAdmins: true,
           createChildCascadeMembers: true,
           allowExternalMembers: true,
+          inviteProfileAssignmentMode: true,
           populateMemberEmail: true,
         },
       })
@@ -359,6 +372,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'inviteProfileAssignmentMode',
+        message: 'inviteProfileAssignmentMode',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'boolean',
         name: 'populateMemberEmail',
         message: 'populateMemberEmail',
@@ -383,6 +403,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           createChildCascadeAdmins: cleanedData.createChildCascadeAdmins,
           createChildCascadeMembers: cleanedData.createChildCascadeMembers,
           allowExternalMembers: cleanedData.allowExternalMembers,
+          inviteProfileAssignmentMode: cleanedData.inviteProfileAssignmentMode,
           populateMemberEmail: cleanedData.populateMemberEmail,
         },
         select: {
@@ -397,6 +418,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           createChildCascadeAdmins: true,
           createChildCascadeMembers: true,
           allowExternalMembers: true,
+          inviteProfileAssignmentMode: true,
           populateMemberEmail: true,
         },
       })

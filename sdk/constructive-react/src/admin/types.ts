@@ -235,6 +235,7 @@ export interface OrgMembershipSetting {
   createChildCascadeAdmins: boolean | null;
   createChildCascadeMembers: boolean | null;
   allowExternalMembers: boolean | null;
+  inviteProfileAssignmentMode: string | null;
   populateMemberEmail: boolean | null;
 }
 export interface AppLevel {
@@ -256,25 +257,10 @@ export interface AppInvite {
   inviteCount: number | null;
   multiple: boolean | null;
   data: unknown | null;
+  profileId: string | null;
   expiresAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-}
-export interface OrgInvite {
-  id: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  senderId: string | null;
-  receiverId: string | null;
-  inviteToken: string | null;
-  inviteValid: boolean | null;
-  inviteLimit: number | null;
-  inviteCount: number | null;
-  multiple: boolean | null;
-  data: unknown | null;
-  expiresAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  entityId: string | null;
 }
 export interface AppMembership {
   id: string | null;
@@ -287,13 +273,29 @@ export interface AppMembership {
   isDisabled: boolean | null;
   isVerified: boolean | null;
   isActive: boolean | null;
-  isExternal: boolean | null;
   isOwner: boolean | null;
   isAdmin: boolean | null;
   permissions: string | null;
   granted: string | null;
   actorId: string | null;
   profileId: string | null;
+}
+export interface OrgInvite {
+  id: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  senderId: string | null;
+  receiverId: string | null;
+  inviteToken: string | null;
+  inviteValid: boolean | null;
+  inviteLimit: number | null;
+  inviteCount: number | null;
+  multiple: boolean | null;
+  data: unknown | null;
+  profileId: string | null;
+  expiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  entityId: string | null;
 }
 export interface OrgMembership {
   id: string | null;

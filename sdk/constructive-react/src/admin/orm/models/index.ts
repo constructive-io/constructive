@@ -34,6 +34,6 @@ export { OrgMemberProfileModel } from './orgMemberProfile';
 export { OrgMembershipSettingModel } from './orgMembershipSetting';
 export { AppLevelModel } from './appLevel';
 export { AppInviteModel } from './appInvite';
-export { OrgInviteModel } from './orgInvite';
 export { AppMembershipModel } from './appMembership';
+export { OrgInviteModel } from './orgInvite';
 export { OrgMembershipModel } from './orgMembership';

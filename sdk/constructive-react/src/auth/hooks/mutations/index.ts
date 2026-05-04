@@ -48,5 +48,4 @@ export * from './useCreateApiKeyMutation';
 export * from './useForgotPasswordMutation';
 export * from './useSendVerificationEmailMutation';
 export * from './useRequestUploadUrlMutation';
-export * from './useConfirmUploadMutation';
 export * from './useProvisionBucketMutation';

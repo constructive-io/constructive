@@ -113,6 +113,9 @@ import {
   orgInviteKeys,
   orgClaimedInviteKeys,
   auditLogKeys,
+  agentThreadKeys,
+  agentMessageKeys,
+  agentTaskKeys,
   appPermissionDefaultKeys,
   identityProviderKeys,
   refKeys,
@@ -122,6 +125,7 @@ import {
   appLimitDefaultKeys,
   orgLimitDefaultKeys,
   devicesModuleKeys,
+  nodeTypeRegistryKeys,
   userConnectedAccountKeys,
   appMembershipDefaultKeys,
   orgMembershipDefaultKeys,
@@ -1753,6 +1757,57 @@ export const invalidate = {
         queryKey: auditLogKeys.detail(id),
       }),
   },
+  /** Invalidate agentThread queries */ agentThread: {
+    /** Invalidate all agentThread queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentThreadKeys.all,
+      }),
+    /** Invalidate agentThread list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentThreadKeys.lists(),
+      }),
+    /** Invalidate a specific agentThread */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentThreadKeys.detail(id),
+      }),
+  },
+  /** Invalidate agentMessage queries */ agentMessage: {
+    /** Invalidate all agentMessage queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentMessageKeys.all,
+      }),
+    /** Invalidate agentMessage list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentMessageKeys.lists(),
+      }),
+    /** Invalidate a specific agentMessage */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentMessageKeys.detail(id),
+      }),
+  },
+  /** Invalidate agentTask queries */ agentTask: {
+    /** Invalidate all agentTask queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentTaskKeys.all,
+      }),
+    /** Invalidate agentTask list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentTaskKeys.lists(),
+      }),
+    /** Invalidate a specific agentTask */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentTaskKeys.detail(id),
+      }),
+  },
   /** Invalidate appPermissionDefault queries */ appPermissionDefault: {
     /** Invalidate all appPermissionDefault queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1895,6 +1950,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: devicesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate nodeTypeRegistry queries */ nodeTypeRegistry: {
+    /** Invalidate all nodeTypeRegistry queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: nodeTypeRegistryKeys.all,
+      }),
+    /** Invalidate nodeTypeRegistry list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: nodeTypeRegistryKeys.lists(),
+      }),
+    /** Invalidate a specific nodeTypeRegistry */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: nodeTypeRegistryKeys.detail(id),
       }),
   },
   /** Invalidate userConnectedAccount queries */ userConnectedAccount: {
@@ -2813,6 +2885,27 @@ export const remove = {
       queryKey: auditLogKeys.detail(id),
     });
   },
+  /** Remove agentThread from cache */ agentThread: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: agentThreadKeys.detail(id),
+    });
+  },
+  /** Remove agentMessage from cache */ agentMessage: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: agentMessageKeys.detail(id),
+    });
+  },
+  /** Remove agentTask from cache */ agentTask: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: agentTaskKeys.detail(id),
+    });
+  },
   /** Remove appPermissionDefault from cache */ appPermissionDefault: (
     queryClient: QueryClient,
     id: string | number
@@ -2874,6 +2967,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: devicesModuleKeys.detail(id),
+    });
+  },
+  /** Remove nodeTypeRegistry from cache */ nodeTypeRegistry: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: nodeTypeRegistryKeys.detail(id),
     });
   },
   /** Remove userConnectedAccount from cache */ userConnectedAccount: (

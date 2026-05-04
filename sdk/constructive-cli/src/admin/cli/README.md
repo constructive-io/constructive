@@ -57,8 +57,8 @@ csdk auth set-token <your-token>
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
 | `app-level` | appLevel CRUD operations |
 | `app-invite` | appInvite CRUD operations |
-| `org-invite` | orgInvite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
+| `org-invite` | orgInvite CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
@@ -77,9 +77,6 @@ csdk auth set-token <your-token>
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
 existing file ID and deduplicated=true with no uploadUrl. |
-| `confirm-upload` | Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'. |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -897,10 +894,11 @@ CRUD operations for OrgMembershipSetting records.
 | `createChildCascadeAdmins` | Boolean |
 | `createChildCascadeMembers` | Boolean |
 | `allowExternalMembers` | Boolean |
+| `inviteProfileAssignmentMode` | String |
 | `populateMemberEmail` | Boolean |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `deleteMemberCascadeChildren`, `createChildCascadeOwners`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `allowExternalMembers`, `populateMemberEmail`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `deleteMemberCascadeChildren`, `createChildCascadeOwners`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `allowExternalMembers`, `inviteProfileAssignmentMode`, `populateMemberEmail`
 
 ### `app-level`
 
@@ -956,46 +954,12 @@ CRUD operations for AppInvite records.
 | `inviteCount` | Int |
 | `multiple` | Boolean |
 | `data` | JSON |
+| `profileId` | UUID |
 | `expiresAt` | Datetime |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
-
-### `org-invite`
-
-CRUD operations for OrgInvite records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgInvite records |
-| `find-first` | Find first matching orgInvite record |
-| `get` | Get a orgInvite by id |
-| `create` | Create a new orgInvite |
-| `update` | Update an existing orgInvite |
-| `delete` | Delete a orgInvite |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `email` | Email |
-| `senderId` | UUID |
-| `receiverId` | UUID |
-| `inviteToken` | String |
-| `inviteValid` | Boolean |
-| `inviteLimit` | Int |
-| `inviteCount` | Int |
-| `multiple` | Boolean |
-| `data` | JSON |
-| `expiresAt` | Datetime |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `entityId` | UUID |
-
-**Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `expiresAt`
 
 ### `app-membership`
 
@@ -1024,7 +988,6 @@ CRUD operations for AppMembership records.
 | `isDisabled` | Boolean |
 | `isVerified` | Boolean |
 | `isActive` | Boolean |
-| `isExternal` | Boolean |
 | `isOwner` | Boolean |
 | `isAdmin` | Boolean |
 | `permissions` | BitString |
@@ -1033,7 +996,43 @@ CRUD operations for AppMembership records.
 | `profileId` | UUID |
 
 **Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isExternal`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+
+### `org-invite`
+
+CRUD operations for OrgInvite records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgInvite records |
+| `find-first` | Find first matching orgInvite record |
+| `get` | Get a orgInvite by id |
+| `create` | Create a new orgInvite |
+| `update` | Update an existing orgInvite |
+| `delete` | Delete a orgInvite |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `email` | Email |
+| `senderId` | UUID |
+| `receiverId` | UUID |
+| `inviteToken` | String |
+| `inviteValid` | Boolean |
+| `inviteLimit` | Int |
+| `inviteCount` | Int |
+| `multiple` | Boolean |
+| `data` | JSON |
+| `profileId` | UUID |
+| `expiresAt` | Datetime |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `entityId` | UUID |
+
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `expiresAt`
 
 ### `org-membership`
 
@@ -1253,19 +1252,6 @@ existing file ID and deduplicated=true with no uploadUrl.
   | `--input.contentType` | String (required) |
   | `--input.size` | Int (required) |
   | `--input.filename` | String |
-
-### `confirm-upload`
-
-Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.fileId` | UUID (required) |
 
 ### `provision-bucket`
 

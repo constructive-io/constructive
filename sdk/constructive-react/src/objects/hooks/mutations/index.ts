@@ -25,5 +25,4 @@ export * from './useInsertNodeAtPathMutation';
 export * from './useUpdateNodeAtPathMutation';
 export * from './useSetAndCommitMutation';
 export * from './useRequestUploadUrlMutation';
-export * from './useConfirmUploadMutation';
 export * from './useProvisionBucketMutation';

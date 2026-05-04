@@ -119,6 +119,9 @@ const db = createClient({
 | `orgInvite` | findMany, findOne, create, update, delete |
 | `orgClaimedInvite` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
+| `agentThread` | findMany, findOne, create, update, delete |
+| `agentMessage` | findMany, findOne, create, update, delete |
+| `agentTask` | findMany, findOne, create, update, delete |
 | `appPermissionDefault` | findMany, findOne, create, update, delete |
 | `identityProvider` | findMany, findOne, create, update, delete |
 | `ref` | findMany, findOne, create, update, delete |
@@ -128,6 +131,7 @@ const db = createClient({
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
 | `devicesModule` | findMany, findOne, create, update, delete |
+| `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `userConnectedAccount` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
@@ -2728,10 +2732,8 @@ CRUD operations for StorageModule records.
 | `privateSchemaId` | UUID | Yes |
 | `bucketsTableId` | UUID | Yes |
 | `filesTableId` | UUID | Yes |
-| `uploadRequestsTableId` | UUID | Yes |
 | `bucketsTableName` | String | Yes |
 | `filesTableName` | String | Yes |
-| `uploadRequestsTableName` | String | Yes |
 | `membershipType` | Int | Yes |
 | `policies` | JSON | Yes |
 | `skipDefaultPolicyTables` | String | Yes |
@@ -2750,13 +2752,13 @@ CRUD operations for StorageModule records.
 
 ```typescript
 // List all storageModule records
-const items = await db.storageModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } }).execute();
+const items = await db.storageModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } }).execute();
 
 // Get one by id
-const item = await db.storageModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } }).execute();
+const item = await db.storageModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } }).execute();
 
 // Create
-const created = await db.storageModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', uploadRequestsTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', uploadRequestsTableName: '<String>', membershipType: '<Int>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' }, select: { id: true } }).execute();
+const created = await db.storageModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', membershipType: '<Int>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.storageModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -3751,6 +3753,7 @@ CRUD operations for AppInvite records.
 | `inviteCount` | Int | Yes |
 | `multiple` | Boolean | Yes |
 | `data` | JSON | Yes |
+| `profileId` | UUID | Yes |
 | `expiresAt` | Datetime | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -3759,13 +3762,13 @@ CRUD operations for AppInvite records.
 
 ```typescript
 // List all appInvite records
-const items = await db.appInvite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.appInvite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appInvite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appInvite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.appInvite.create({ data: { email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.appInvite.create({ data: { email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', profileId: '<UUID>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.appInvite.update({ where: { id: '<UUID>' }, data: { email: '<Email>' }, select: { id: true } }).execute();
@@ -3826,6 +3829,7 @@ CRUD operations for OrgInvite records.
 | `inviteCount` | Int | Yes |
 | `multiple` | Boolean | Yes |
 | `data` | JSON | Yes |
+| `profileId` | UUID | Yes |
 | `expiresAt` | Datetime | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -3835,13 +3839,13 @@ CRUD operations for OrgInvite records.
 
 ```typescript
 // List all orgInvite records
-const items = await db.orgInvite.findMany({ select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
+const items = await db.orgInvite.findMany({ select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
 
 // Get one by id
-const item = await db.orgInvite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
+const item = await db.orgInvite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
 
 // Create
-const created = await db.orgInvite.create({ data: { email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>', entityId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.orgInvite.create({ data: { email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', profileId: '<UUID>', expiresAt: '<Datetime>', entityId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.orgInvite.update({ where: { id: '<UUID>' }, data: { email: '<Email>' }, select: { id: true } }).execute();
@@ -3919,6 +3923,118 @@ const updated = await db.auditLog.update({ where: { id: '<UUID>' }, data: { even
 
 // Delete
 const deleted = await db.auditLog.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.agentThread`
+
+CRUD operations for AgentThread records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `title` | String | Yes |
+| `mode` | String | Yes |
+| `model` | String | Yes |
+| `systemPrompt` | String | Yes |
+| `id` | UUID | No |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `ownerId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `status` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all agentThread records
+const items = await db.agentThread.findMany({ select: { title: true, mode: true, model: true, systemPrompt: true, id: true, createdAt: true, updatedAt: true, ownerId: true, entityId: true, status: true } }).execute();
+
+// Get one by id
+const item = await db.agentThread.findOne({ id: '<UUID>', select: { title: true, mode: true, model: true, systemPrompt: true, id: true, createdAt: true, updatedAt: true, ownerId: true, entityId: true, status: true } }).execute();
+
+// Create
+const created = await db.agentThread.create({ data: { title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', ownerId: '<UUID>', entityId: '<UUID>', status: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.agentThread.update({ where: { id: '<UUID>' }, data: { title: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.agentThread.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.agentMessage`
+
+CRUD operations for AgentMessage records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `threadId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `authorRole` | String | Yes |
+| `id` | UUID | No |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `ownerId` | UUID | Yes |
+| `parts` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all agentMessage records
+const items = await db.agentMessage.findMany({ select: { threadId: true, entityId: true, authorRole: true, id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true } }).execute();
+
+// Get one by id
+const item = await db.agentMessage.findOne({ id: '<UUID>', select: { threadId: true, entityId: true, authorRole: true, id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true } }).execute();
+
+// Create
+const created = await db.agentMessage.create({ data: { threadId: '<UUID>', entityId: '<UUID>', authorRole: '<String>', ownerId: '<UUID>', parts: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.agentMessage.update({ where: { id: '<UUID>' }, data: { threadId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.agentMessage.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.agentTask`
+
+CRUD operations for AgentTask records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `threadId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `description` | String | Yes |
+| `source` | String | Yes |
+| `error` | String | Yes |
+| `id` | UUID | No |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `ownerId` | UUID | Yes |
+| `status` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all agentTask records
+const items = await db.agentTask.findMany({ select: { threadId: true, entityId: true, description: true, source: true, error: true, id: true, createdAt: true, updatedAt: true, ownerId: true, status: true } }).execute();
+
+// Get one by id
+const item = await db.agentTask.findOne({ id: '<UUID>', select: { threadId: true, entityId: true, description: true, source: true, error: true, id: true, createdAt: true, updatedAt: true, ownerId: true, status: true } }).execute();
+
+// Create
+const created = await db.agentTask.create({ data: { threadId: '<UUID>', entityId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', ownerId: '<UUID>', status: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.agentTask.update({ where: { id: '<UUID>' }, data: { threadId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.agentTask.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.appPermissionDefault`
@@ -4206,6 +4322,41 @@ const updated = await db.devicesModule.update({ where: { id: '<UUID>' }, data: {
 
 // Delete
 const deleted = await db.devicesModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.nodeTypeRegistry`
+
+CRUD operations for NodeTypeRegistry records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `name` | String | No |
+| `slug` | String | Yes |
+| `category` | String | Yes |
+| `displayName` | String | Yes |
+| `description` | String | Yes |
+| `parameterSchema` | JSON | Yes |
+| `tags` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all nodeTypeRegistry records
+const items = await db.nodeTypeRegistry.findMany({ select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true } }).execute();
+
+// Get one by name
+const item = await db.nodeTypeRegistry.findOne({ name: '<String>', select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true } }).execute();
+
+// Create
+const created = await db.nodeTypeRegistry.create({ data: { slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', parameterSchema: '<JSON>', tags: '<String>' }, select: { name: true } }).execute();
+
+// Update
+const updated = await db.nodeTypeRegistry.update({ where: { name: '<String>' }, data: { slug: '<String>' }, select: { name: true } }).execute();
+
+// Delete
+const deleted = await db.nodeTypeRegistry.delete({ where: { name: '<String>' } }).execute();
 ```
 
 ### `db.userConnectedAccount`
@@ -4521,19 +4672,20 @@ CRUD operations for OrgMembershipSetting records.
 | `createChildCascadeAdmins` | Boolean | Yes |
 | `createChildCascadeMembers` | Boolean | Yes |
 | `allowExternalMembers` | Boolean | Yes |
+| `inviteProfileAssignmentMode` | String | Yes |
 | `populateMemberEmail` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all orgMembershipSetting records
-const items = await db.orgMembershipSetting.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, populateMemberEmail: true } }).execute();
+const items = await db.orgMembershipSetting.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, inviteProfileAssignmentMode: true, populateMemberEmail: true } }).execute();
 
 // Get one by id
-const item = await db.orgMembershipSetting.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, populateMemberEmail: true } }).execute();
+const item = await db.orgMembershipSetting.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, inviteProfileAssignmentMode: true, populateMemberEmail: true } }).execute();
 
 // Create
-const created = await db.orgMembershipSetting.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', entityId: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', createChildCascadeOwners: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', allowExternalMembers: '<Boolean>', populateMemberEmail: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.orgMembershipSetting.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', entityId: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', createChildCascadeOwners: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', allowExternalMembers: '<Boolean>', inviteProfileAssignmentMode: '<String>', populateMemberEmail: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.orgMembershipSetting.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
@@ -4643,7 +4795,6 @@ CRUD operations for AppMembership records.
 | `isDisabled` | Boolean | Yes |
 | `isVerified` | Boolean | Yes |
 | `isActive` | Boolean | Yes |
-| `isExternal` | Boolean | Yes |
 | `isOwner` | Boolean | Yes |
 | `isAdmin` | Boolean | Yes |
 | `permissions` | BitString | Yes |
@@ -4655,13 +4806,13 @@ CRUD operations for AppMembership records.
 
 ```typescript
 // List all appMembership records
-const items = await db.appMembership.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
+const items = await db.appMembership.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
 
 // Get one by id
-const item = await db.appMembership.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
+const item = await db.appMembership.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } }).execute();
 
 // Create
-const created = await db.appMembership.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.appMembership.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.appMembership.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
@@ -5805,23 +5956,6 @@ existing file ID and deduplicated=true with no uploadUrl.
 
 ```typescript
 const result = await db.mutation.requestUploadUrl({ input: '<RequestUploadUrlInput>' }).execute();
-```
-
-### `db.mutation.confirmUpload`
-
-Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ConfirmUploadInput (required) |
-
-```typescript
-const result = await db.mutation.confirmUpload({ input: { fileId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.provisionBucket`

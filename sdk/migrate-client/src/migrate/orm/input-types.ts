@@ -472,10 +472,6 @@ export interface RequestUploadUrlInput {
   /** Original filename (optional, for display and Content-Disposition) */
   filename?: string;
 }
-export interface ConfirmUploadInput {
-  /** The file ID returned by requestUploadUrl */
-  fileId: string;
-}
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
@@ -544,8 +540,6 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
-  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable. */
-  status: string;
 }
 export type RequestUploadUrlPayloadSelect = {
   uploadUrl?: boolean;
@@ -553,20 +547,6 @@ export type RequestUploadUrlPayloadSelect = {
   key?: boolean;
   deduplicated?: boolean;
   expiresAt?: boolean;
-  status?: boolean;
-};
-export interface ConfirmUploadPayload {
-  /** The confirmed file ID */
-  fileId: string;
-  /** New file status */
-  status: string;
-  /** Whether confirmation succeeded */
-  success: boolean;
-}
-export type ConfirmUploadPayloadSelect = {
-  fileId?: boolean;
-  status?: boolean;
-  success?: boolean;
 };
 export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */

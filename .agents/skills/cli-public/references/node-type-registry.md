@@ -12,8 +12,8 @@ csdk node-type-registry list --where.<field>.<op> <value> --orderBy <values>
 csdk node-type-registry list --limit 10 --after <cursor>
 csdk node-type-registry find-first --where.<field>.<op> <value>
 csdk node-type-registry get --name <String>
-csdk node-type-registry create --slug <String> --category <String> [--displayName <String>] [--description <String>] [--summary <String>] [--parameterSchema <JSON>] [--guidance <JSON>] [--tags <String>]
-csdk node-type-registry update --name <String> [--slug <String>] [--category <String>] [--displayName <String>] [--description <String>] [--summary <String>] [--parameterSchema <JSON>] [--guidance <JSON>] [--tags <String>]
+csdk node-type-registry create --slug <String> --category <String> [--displayName <String>] [--description <String>] [--parameterSchema <JSON>] [--tags <String>]
+csdk node-type-registry update --name <String> [--slug <String>] [--category <String>] [--displayName <String>] [--description <String>] [--parameterSchema <JSON>] [--tags <String>]
 csdk node-type-registry delete --name <String>
 ```
 
@@ -58,7 +58,7 @@ csdk node-type-registry list --where.name.equalTo <value> --orderBy NAME_ASC
 ### Create a nodeTypeRegistry
 
 ```bash
-csdk node-type-registry create --slug <String> --category <String> [--displayName <String>] [--description <String>] [--summary <String>] [--parameterSchema <JSON>] [--guidance <JSON>] [--tags <String>]
+csdk node-type-registry create --slug <String> --category <String> [--displayName <String>] [--description <String>] [--parameterSchema <JSON>] [--tags <String>]
 ```
 
 ### Get a nodeTypeRegistry by name

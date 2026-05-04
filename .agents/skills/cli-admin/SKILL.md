@@ -1,13 +1,13 @@
 ---
 name: cli-admin
-description: CLI tool (csdk) for the admin API — provides CRUD commands for 34 tables and 16 custom operations
+description: CLI tool (csdk) for the admin API — provides CRUD commands for 34 tables and 15 custom operations
 ---
 
 # cli-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the admin API — provides CRUD commands for 34 tables and 16 custom operations
+CLI tool (csdk) for the admin API — provides CRUD commands for 34 tables and 15 custom operations
 
 ## Usage
 
@@ -87,8 +87,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-membership-setting](references/org-membership-setting.md)
 - [app-level](references/app-level.md)
 - [app-invite](references/app-invite.md)
-- [org-invite](references/org-invite.md)
 - [app-membership](references/app-membership.md)
+- [org-invite](references/org-invite.md)
 - [org-membership](references/org-membership.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)
@@ -104,5 +104,4 @@ See the `references/` directory for detailed per-entity API documentation:
 - [submit-app-invite-code](references/submit-app-invite-code.md)
 - [submit-org-invite-code](references/submit-org-invite-code.md)
 - [request-upload-url](references/request-upload-url.md)
-- [confirm-upload](references/confirm-upload.md)
 - [provision-bucket](references/provision-bucket.md)

@@ -16,7 +16,6 @@ import type {
   UpdateNodeAtPathInput,
   SetAndCommitInput,
   RequestUploadUrlInput,
-  ConfirmUploadInput,
   ProvisionBucketInput,
   FreezeObjectsPayload,
   InitEmptyRepoPayload,
@@ -27,7 +26,6 @@ import type {
   UpdateNodeAtPathPayload,
   SetAndCommitPayload,
   RequestUploadUrlPayload,
-  ConfirmUploadPayload,
   ProvisionBucketPayload,
   FreezeObjectsPayloadSelect,
   InitEmptyRepoPayloadSelect,
@@ -38,7 +36,6 @@ import type {
   UpdateNodeAtPathPayloadSelect,
   SetAndCommitPayloadSelect,
   RequestUploadUrlPayloadSelect,
-  ConfirmUploadPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -75,15 +72,6 @@ existing file ID and deduplicated=true with no uploadUrl.
  */
 export interface RequestUploadUrlVariables {
   input: RequestUploadUrlInput;
-}
-/**
- * Variables for confirmUpload
- * Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'.
- */
-export interface ConfirmUploadVariables {
-  input: ConfirmUploadInput;
 }
 /**
  * Variables for provisionBucket
@@ -356,35 +344,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'RequestUploadUrlPayload'
-        ),
-      }),
-    confirmUpload: <S extends ConfirmUploadPayloadSelect>(
-      args: ConfirmUploadVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ConfirmUploadPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        confirmUpload: InferSelectResult<ConfirmUploadPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ConfirmUpload',
-        fieldName: 'confirmUpload',
-        ...buildCustomDocument(
-          'mutation',
-          'ConfirmUpload',
-          'confirmUpload',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ConfirmUploadInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ConfirmUploadPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

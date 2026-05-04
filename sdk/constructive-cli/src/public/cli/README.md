@@ -124,6 +124,9 @@ csdk auth set-token <your-token>
 | `org-invite` | orgInvite CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
 | `audit-log` | auditLog CRUD operations |
+| `agent-thread` | agentThread CRUD operations |
+| `agent-message` | agentMessage CRUD operations |
+| `agent-task` | agentTask CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
 | `identity-provider` | identityProvider CRUD operations |
 | `ref` | ref CRUD operations |
@@ -133,6 +136,7 @@ csdk auth set-token <your-token>
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `devices-module` | devicesModule CRUD operations |
+| `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `user-connected-account` | userConnectedAccount CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
@@ -235,9 +239,6 @@ Example usage:
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
 existing file ID and deduplicated=true with no uploadUrl. |
-| `confirm-upload` | Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'. |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -2404,10 +2405,8 @@ CRUD operations for StorageModule records.
 | `privateSchemaId` | UUID |
 | `bucketsTableId` | UUID |
 | `filesTableId` | UUID |
-| `uploadRequestsTableId` | UUID |
 | `bucketsTableName` | String |
 | `filesTableName` | String |
-| `uploadRequestsTableName` | String |
 | `membershipType` | Int |
 | `policies` | JSON |
 | `skipDefaultPolicyTables` | String |
@@ -2423,7 +2422,7 @@ CRUD operations for StorageModule records.
 | `cacheTtlSeconds` | Int |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `uploadRequestsTableId`, `bucketsTableName`, `filesTableName`, `uploadRequestsTableName`, `membershipType`, `policies`, `skipDefaultPolicyTables`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `bucketsTableName`, `filesTableName`, `membershipType`, `policies`, `skipDefaultPolicyTables`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`
 
 ### `entity-type-provision`
 
@@ -3238,11 +3237,12 @@ CRUD operations for AppInvite records.
 | `inviteCount` | Int |
 | `multiple` | Boolean |
 | `data` | JSON |
+| `profileId` | UUID |
 | `expiresAt` | Datetime |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `expiresAt`
 
 ### `app-claimed-invite`
 
@@ -3297,13 +3297,14 @@ CRUD operations for OrgInvite records.
 | `inviteCount` | Int |
 | `multiple` | Boolean |
 | `data` | JSON |
+| `profileId` | UUID |
 | `expiresAt` | Datetime |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `expiresAt`
 
 ### `org-claimed-invite`
 
@@ -3361,6 +3362,97 @@ CRUD operations for AuditLog records.
 
 **Required create fields:** `event`, `success`
 **Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
+
+### `agent-thread`
+
+CRUD operations for AgentThread records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentThread records |
+| `find-first` | Find first matching agentThread record |
+| `get` | Get a agentThread by id |
+| `create` | Create a new agentThread |
+| `update` | Update an existing agentThread |
+| `delete` | Delete a agentThread |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `title` | String |
+| `mode` | String |
+| `model` | String |
+| `systemPrompt` | String |
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `ownerId` | UUID |
+| `entityId` | UUID |
+| `status` | String |
+
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `title`, `mode`, `model`, `systemPrompt`, `ownerId`, `status`
+
+### `agent-message`
+
+CRUD operations for AgentMessage records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentMessage records |
+| `find-first` | Find first matching agentMessage record |
+| `get` | Get a agentMessage by id |
+| `create` | Create a new agentMessage |
+| `update` | Update an existing agentMessage |
+| `delete` | Delete a agentMessage |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `threadId` | UUID |
+| `entityId` | UUID |
+| `authorRole` | String |
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `ownerId` | UUID |
+| `parts` | JSON |
+
+**Required create fields:** `threadId`, `entityId`, `authorRole`
+**Optional create fields (backend defaults):** `ownerId`, `parts`
+
+### `agent-task`
+
+CRUD operations for AgentTask records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agentTask records |
+| `find-first` | Find first matching agentTask record |
+| `get` | Get a agentTask by id |
+| `create` | Create a new agentTask |
+| `update` | Update an existing agentTask |
+| `delete` | Delete a agentTask |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `threadId` | UUID |
+| `entityId` | UUID |
+| `description` | String |
+| `source` | String |
+| `error` | String |
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `ownerId` | UUID |
+| `status` | String |
+
+**Required create fields:** `threadId`, `entityId`, `description`
+**Optional create fields (backend defaults):** `source`, `error`, `ownerId`, `status`
 
 ### `app-permission-default`
 
@@ -3581,6 +3673,34 @@ CRUD operations for DevicesModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `userDevicesTableId`, `deviceSettingsTableId`, `userDevicesTable`, `deviceSettingsTable`
+
+### `node-type-registry`
+
+CRUD operations for NodeTypeRegistry records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all nodeTypeRegistry records |
+| `find-first` | Find first matching nodeTypeRegistry record |
+| `get` | Get a nodeTypeRegistry by name |
+| `create` | Create a new nodeTypeRegistry |
+| `update` | Update an existing nodeTypeRegistry |
+| `delete` | Delete a nodeTypeRegistry |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `name` | String |
+| `slug` | String |
+| `category` | String |
+| `displayName` | String |
+| `description` | String |
+| `parameterSchema` | JSON |
+| `tags` | String |
+
+**Required create fields:** `slug`, `category`
+**Optional create fields (backend defaults):** `displayName`, `description`, `parameterSchema`, `tags`
 
 ### `user-connected-account`
 
@@ -3845,10 +3965,11 @@ CRUD operations for OrgMembershipSetting records.
 | `createChildCascadeAdmins` | Boolean |
 | `createChildCascadeMembers` | Boolean |
 | `allowExternalMembers` | Boolean |
+| `inviteProfileAssignmentMode` | String |
 | `populateMemberEmail` | Boolean |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `deleteMemberCascadeChildren`, `createChildCascadeOwners`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `allowExternalMembers`, `populateMemberEmail`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `deleteMemberCascadeChildren`, `createChildCascadeOwners`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `allowExternalMembers`, `inviteProfileAssignmentMode`, `populateMemberEmail`
 
 ### `user`
 
@@ -3968,7 +4089,6 @@ CRUD operations for AppMembership records.
 | `isDisabled` | Boolean |
 | `isVerified` | Boolean |
 | `isActive` | Boolean |
-| `isExternal` | Boolean |
 | `isOwner` | Boolean |
 | `isAdmin` | Boolean |
 | `permissions` | BitString |
@@ -3977,7 +4097,7 @@ CRUD operations for AppMembership records.
 | `profileId` | UUID |
 
 **Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isExternal`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `hierarchy-module`
 
@@ -4997,19 +5117,6 @@ existing file ID and deduplicated=true with no uploadUrl.
   | `--input.contentType` | String (required) |
   | `--input.size` | Int (required) |
   | `--input.filename` | String |
-
-### `confirm-upload`
-
-Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.fileId` | UUID (required) |
 
 ### `provision-bucket`
 

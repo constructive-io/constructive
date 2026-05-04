@@ -5,6 +5,9 @@
  */
 
 import type {
+  AgentMessage,
+  AgentTask,
+  AgentThread,
   Api,
   ApiModule,
   ApiSchema,
@@ -64,6 +67,7 @@ import type {
   MembershipTypesModule,
   MembershipsModule,
   MigrateFile,
+  NodeTypeRegistry,
   NotificationsModule,
   Object,
   OrgAdminGrant,
@@ -1823,14 +1827,10 @@ export type StorageModuleOrderBy =
   | 'BUCKETS_TABLE_ID_DESC'
   | 'FILES_TABLE_ID_ASC'
   | 'FILES_TABLE_ID_DESC'
-  | 'UPLOAD_REQUESTS_TABLE_ID_ASC'
-  | 'UPLOAD_REQUESTS_TABLE_ID_DESC'
   | 'BUCKETS_TABLE_NAME_ASC'
   | 'BUCKETS_TABLE_NAME_DESC'
   | 'FILES_TABLE_NAME_ASC'
   | 'FILES_TABLE_NAME_DESC'
-  | 'UPLOAD_REQUESTS_TABLE_NAME_ASC'
-  | 'UPLOAD_REQUESTS_TABLE_NAME_DESC'
   | 'MEMBERSHIP_TYPE_ASC'
   | 'MEMBERSHIP_TYPE_DESC'
   | 'POLICIES_ASC'
@@ -2513,6 +2513,8 @@ export type AppInviteOrderBy =
   | 'MULTIPLE_DESC'
   | 'DATA_ASC'
   | 'DATA_DESC'
+  | 'PROFILE_ID_ASC'
+  | 'PROFILE_ID_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
@@ -2561,6 +2563,8 @@ export type OrgInviteOrderBy =
   | 'MULTIPLE_DESC'
   | 'DATA_ASC'
   | 'DATA_DESC'
+  | 'PROFILE_ID_ASC'
+  | 'PROFILE_ID_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
@@ -2609,6 +2613,77 @@ export type AuditLogOrderBy =
   | 'SUCCESS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
+/** Methods to use when ordering `AgentMessage`. */
+export type AgentMessageOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'AUTHOR_ROLE_ASC'
+  | 'AUTHOR_ROLE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARTS_ASC'
+  | 'PARTS_DESC';
+/** Methods to use when ordering `AgentTask`. */
+export type AgentTaskOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+/** Methods to use when ordering `AgentThread`. */
+export type AgentThreadOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'MODE_ASC'
+  | 'MODE_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
 /** Methods to use when ordering `AppPermissionDefault`. */
 export type AppPermissionDefaultOrderBy =
   | 'NATURAL'
@@ -2720,6 +2795,25 @@ export type DevicesModuleOrderBy =
   | 'USER_DEVICES_TABLE_DESC'
   | 'DEVICE_SETTINGS_TABLE_ASC'
   | 'DEVICE_SETTINGS_TABLE_DESC';
+/** Methods to use when ordering `NodeTypeRegistry`. */
+export type NodeTypeRegistryOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PARAMETER_SCHEMA_ASC'
+  | 'PARAMETER_SCHEMA_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC';
 /** Methods to use when ordering `UserConnectedAccount`. */
 export type UserConnectedAccountOrderBy =
   | 'NATURAL'
@@ -2993,6 +3087,8 @@ export type OrgMembershipSettingOrderBy =
   | 'CREATE_CHILD_CASCADE_MEMBERS_DESC'
   | 'ALLOW_EXTERNAL_MEMBERS_ASC'
   | 'ALLOW_EXTERNAL_MEMBERS_DESC'
+  | 'INVITE_PROFILE_ASSIGNMENT_MODE_ASC'
+  | 'INVITE_PROFILE_ASSIGNMENT_MODE_DESC'
   | 'POPULATE_MEMBER_EMAIL_ASC'
   | 'POPULATE_MEMBER_EMAIL_DESC';
 /** Methods to use when ordering `User`. */
@@ -3076,8 +3172,6 @@ export type AppMembershipOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_ACTIVE_ASC'
   | 'IS_ACTIVE_DESC'
-  | 'IS_EXTERNAL_ASC'
-  | 'IS_EXTERNAL_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
@@ -3732,6 +3826,22 @@ export interface UserFilter {
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
   auditLogsByActorIdExist?: boolean;
+  /** Filter by the object’s `agentThreadsByEntityId` relation. */
+  agentThreadsByEntityId?: UserToManyAgentThreadFilter;
+  /** `agentThreadsByEntityId` exist. */
+  agentThreadsByEntityIdExist?: boolean;
+  /** Filter by the object’s `ownedAgentThreads` relation. */
+  ownedAgentThreads?: UserToManyAgentThreadFilter;
+  /** `ownedAgentThreads` exist. */
+  ownedAgentThreadsExist?: boolean;
+  /** Filter by the object’s `ownedAgentMessages` relation. */
+  ownedAgentMessages?: UserToManyAgentMessageFilter;
+  /** `ownedAgentMessages` exist. */
+  ownedAgentMessagesExist?: boolean;
+  /** Filter by the object’s `ownedAgentTasks` relation. */
+  ownedAgentTasks?: UserToManyAgentTaskFilter;
+  /** `ownedAgentTasks` exist. */
+  ownedAgentTasksExist?: boolean;
   /** TSV search on the `search_tsv` column. */
   tsvSearchTsv?: string;
   /** TRGM search on the `display_name` column. */
@@ -3911,8 +4021,6 @@ export interface AppMembershipFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
-  /** Filter by the object’s `isExternal` field. */
-  isExternal?: BooleanFilter;
   /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
   /** Filter by the object’s `isAdmin` field. */
@@ -4192,6 +4300,8 @@ export interface OrgMembershipSettingFilter {
   createChildCascadeMembers?: BooleanFilter;
   /** Filter by the object’s `allowExternalMembers` field. */
   allowExternalMembers?: BooleanFilter;
+  /** Filter by the object’s `inviteProfileAssignmentMode` field. */
+  inviteProfileAssignmentMode?: StringFilter;
   /** Filter by the object’s `populateMemberEmail` field. */
   populateMemberEmail?: BooleanFilter;
   /** Checks for all expressions in this list. */
@@ -4923,6 +5033,8 @@ export interface AppInviteFilter {
   inviteCount?: IntFilter;
   /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
   /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -5003,6 +5115,8 @@ export interface OrgInviteFilter {
   inviteCount?: IntFilter;
   /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
   /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -5180,6 +5294,154 @@ export interface ConstructiveInternalTypeOriginFilter {
   greaterThanInsensitive?: string;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentThreadFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+}
+/** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadFilter {
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentThreadFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentThreadFilter[];
+  /** Negates the expression. */
+  not?: AgentThreadFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `agentMessagesByThreadId` relation. */
+  agentMessagesByThreadId?: AgentThreadToManyAgentMessageFilter;
+  /** `agentMessagesByThreadId` exist. */
+  agentMessagesByThreadIdExist?: boolean;
+  /** Filter by the object’s `agentTasksByThreadId` relation. */
+  agentTasksByThreadId?: AgentThreadToManyAgentTaskFilter;
+  /** `agentTasksByThreadId` exist. */
+  agentTasksByThreadIdExist?: boolean;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentMessageFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+}
+/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentMessageFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentMessageFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Negates the expression. */
+  not?: AgentMessageFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
+/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentTaskFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentTaskFilter;
+}
+/** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentTaskFilter {
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentTaskFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentTaskFilter[];
+  /** Negates the expression. */
+  not?: AgentTaskFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentMessageFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+}
+/** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAgentTaskFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentTaskFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentTaskFilter;
 }
 /** A filter to be used against many `Schema` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManySchemaFilter {
@@ -8947,14 +9209,10 @@ export interface StorageModuleFilter {
   bucketsTableId?: UUIDFilter;
   /** Filter by the object’s `filesTableId` field. */
   filesTableId?: UUIDFilter;
-  /** Filter by the object’s `uploadRequestsTableId` field. */
-  uploadRequestsTableId?: UUIDFilter;
   /** Filter by the object’s `bucketsTableName` field. */
   bucketsTableName?: StringFilter;
   /** Filter by the object’s `filesTableName` field. */
   filesTableName?: StringFilter;
-  /** Filter by the object’s `uploadRequestsTableName` field. */
-  uploadRequestsTableName?: StringFilter;
   /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
   /** Filter by the object’s `policies` field. */
@@ -9001,8 +9259,6 @@ export interface StorageModuleFilter {
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
-  /** Filter by the object’s `uploadRequestsTable` relation. */
-  uploadRequestsTable?: TableFilter;
 }
 /** A filter to be used against many `EntityTypeProvision` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyEntityTypeProvisionFilter {
@@ -9549,6 +9805,29 @@ export interface OrgLimitDefaultFilter {
   or?: OrgLimitDefaultFilter[];
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
+}
+/** A filter to be used against `NodeTypeRegistry` object types. All fields are combined with a logical ‘and.’ */
+export interface NodeTypeRegistryFilter {
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `parameterSchema` field. */
+  parameterSchema?: JSONFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: NodeTypeRegistryFilter[];
+  /** Checks for any expressions in this list. */
+  or?: NodeTypeRegistryFilter[];
+  /** Negates the expression. */
+  not?: NodeTypeRegistryFilter;
 }
 /** A filter to be used against `UserConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
 export interface UserConnectedAccountFilter {
@@ -10650,6 +10929,21 @@ export interface OrgOwnerGrantInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  /** The `NodeTypeRegistry` to be created by this mutation. */
+  nodeTypeRegistry: NodeTypeRegistryInput;
+}
+/** An input for mutations affecting `NodeTypeRegistry` */
+export interface NodeTypeRegistryInput {
+  name: string;
+  slug: string;
+  category: string;
+  displayName?: string;
+  description?: string;
+  parameterSchema?: unknown;
+  tags?: string[];
+}
 export interface CreateUserConnectedAccountInput {
   clientMutationId?: string;
   /** The `UserConnectedAccount` to be created by this mutation. */
@@ -10732,6 +11026,29 @@ export interface CryptoAddressInput {
   name?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateAgentMessageInput {
+  clientMutationId?: string;
+  /** The `AgentMessage` to be created by this mutation. */
+  agentMessage: AgentMessageInput;
+}
+/** An input for mutations affecting `AgentMessage` */
+export interface AgentMessageInput {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId: string;
+  /** Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only. */
+  entityId: string;
+  /** Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array. */
+  authorRole: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** JSON metadata for extensible key-value storage */
+  parts?: unknown;
 }
 export interface CreateAppPermissionInput {
   clientMutationId?: string;
@@ -11124,6 +11441,60 @@ export interface OrgChartEdgeInput {
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
 }
+export interface CreateAgentTaskInput {
+  clientMutationId?: string;
+  /** The `AgentTask` to be created by this mutation. */
+  agentTask: AgentTaskInput;
+}
+/** An input for mutations affecting `AgentTask` */
+export interface AgentTaskInput {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId: string;
+  /** Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly. */
+  entityId: string;
+  /** Natural-language description of the work to do. Required. */
+  description: string;
+  /** Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later. */
+  source?: string;
+  /** Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully. */
+  error?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** Current status of this record */
+  status?: string;
+}
+export interface CreateAgentThreadInput {
+  clientMutationId?: string;
+  /** The `AgentThread` to be created by this mutation. */
+  agentThread: AgentThreadInput;
+}
+/** An input for mutations affecting `AgentThread` */
+export interface AgentThreadInput {
+  /** Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed. */
+  title?: string;
+  /** Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration. */
+  mode?: string;
+  /** Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time. */
+  model?: string;
+  /** Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time. */
+  systemPrompt?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record within the entity */
+  ownerId?: string;
+  /** Entity this record belongs to */
+  entityId: string;
+  /** Current status of this record */
+  status?: string;
+}
 export interface CreateOrgGrantInput {
   clientMutationId?: string;
   /** The `OrgGrant` to be created by this mutation. */
@@ -11425,33 +11796,6 @@ export interface SecureTableProvisionInput {
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
   outFields?: string[];
 }
-export interface CreateOrgMembershipSettingInput {
-  clientMutationId?: string;
-  /** The `OrgMembershipSetting` to be created by this mutation. */
-  orgMembershipSetting: OrgMembershipSettingInput;
-}
-/** An input for mutations affecting `OrgMembershipSetting` */
-export interface OrgMembershipSettingInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** References the entity these settings apply to */
-  entityId: string;
-  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
-  deleteMemberCascadeChildren?: boolean;
-  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
-  createChildCascadeOwners?: boolean;
-  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
-  createChildCascadeAdmins?: boolean;
-  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
-  createChildCascadeMembers?: boolean;
-  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
-  allowExternalMembers?: boolean;
-  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
-  populateMemberEmail?: boolean;
-}
 export interface CreateDatabaseTransferInput {
   clientMutationId?: string;
   /** The `DatabaseTransfer` to be created by this mutation. */
@@ -11548,6 +11892,35 @@ export interface InvitesModuleInput {
   prefix?: string;
   membershipType: number;
   entityTableId?: string;
+}
+export interface CreateOrgMembershipSettingInput {
+  clientMutationId?: string;
+  /** The `OrgMembershipSetting` to be created by this mutation. */
+  orgMembershipSetting: OrgMembershipSettingInput;
+}
+/** An input for mutations affecting `OrgMembershipSetting` */
+export interface OrgMembershipSettingInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** References the entity these settings apply to */
+  entityId: string;
+  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
+  deleteMemberCascadeChildren?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
+  createChildCascadeOwners?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
+  createChildCascadeAdmins?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
+  createChildCascadeMembers?: boolean;
+  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
+  allowExternalMembers?: boolean;
+  /** Controls how profile assignment on invites is validated: strict (permission + subset check), permission_only (permission only), or subset_only (subset check only) */
+  inviteProfileAssignmentMode?: string;
+  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
+  populateMemberEmail?: boolean;
 }
 export interface CreateEnumInput {
   clientMutationId?: string;
@@ -11889,34 +12262,39 @@ export interface PermissionsModuleInput {
   getByMask?: string;
   getMaskByName?: string;
 }
-export interface CreateAppInviteInput {
+export interface CreateAppMembershipInput {
   clientMutationId?: string;
-  /** The `AppInvite` to be created by this mutation. */
-  appInvite: AppInviteInput;
+  /** The `AppMembership` to be created by this mutation. */
+  appMembership: AppMembershipInput;
 }
-/** An input for mutations affecting `AppInvite` */
-export interface AppInviteInput {
+/** An input for mutations affecting `AppMembership` */
+export interface AppMembershipInput {
   id?: string;
-  /** Email address of the invited recipient */
-  email?: ConstructiveInternalTypeEmail;
-  /** User ID of the member who sent this invitation */
-  senderId?: string;
-  /** Unique random hex token used to redeem this invitation */
-  inviteToken?: string;
-  /** Whether this invitation is still valid and can be redeemed */
-  inviteValid?: boolean;
-  /** Maximum number of times this invite can be claimed; -1 means unlimited */
-  inviteLimit?: number;
-  /** Running count of how many times this invite has been claimed */
-  inviteCount?: number;
-  /** Whether this invite can be claimed by multiple recipients */
-  multiple?: boolean;
-  /** Optional JSON payload of additional invite metadata */
-  data?: unknown;
-  /** Timestamp after which this invitation can no longer be redeemed */
-  expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Whether this member has been verified (e.g. email confirmation) */
+  isVerified?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId: string;
+  profileId?: string;
 }
 export interface CreateEmbeddingChunkInput {
   clientMutationId?: string;
@@ -12018,41 +12396,36 @@ export interface ProfilesModuleInput {
   membershipsTableId?: string;
   prefix?: string;
 }
-export interface CreateAppMembershipInput {
+export interface CreateAppInviteInput {
   clientMutationId?: string;
-  /** The `AppMembership` to be created by this mutation. */
-  appMembership: AppMembershipInput;
+  /** The `AppInvite` to be created by this mutation. */
+  appInvite: AppInviteInput;
 }
-/** An input for mutations affecting `AppMembership` */
-export interface AppMembershipInput {
+/** An input for mutations affecting `AppInvite` */
+export interface AppInviteInput {
   id?: string;
+  /** Email address of the invited recipient */
+  email?: ConstructiveInternalTypeEmail;
+  /** User ID of the member who sent this invitation */
+  senderId?: string;
+  /** Unique random hex token used to redeem this invitation */
+  inviteToken?: string;
+  /** Whether this invitation is still valid and can be redeemed */
+  inviteValid?: boolean;
+  /** Maximum number of times this invite can be claimed; -1 means unlimited */
+  inviteLimit?: number;
+  /** Running count of how many times this invite has been claimed */
+  inviteCount?: number;
+  /** Whether this invite can be claimed by multiple recipients */
+  multiple?: boolean;
+  /** Optional JSON payload of additional invite metadata */
+  data?: unknown;
+  /** Optional profile (role) to assign to the member when they claim this invite. Only allowed on email invites. */
+  profileId?: string;
+  /** Timestamp after which this invitation can no longer be redeemed */
+  expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Whether this member has been verified (e.g. email confirmation) */
-  isVerified?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
-  isExternal?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId: string;
-  profileId?: string;
 }
 export interface CreateIndexInput {
   clientMutationId?: string;
@@ -12112,38 +12485,6 @@ export interface WebauthnCredentialInput {
   lastUsedAt?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateOrgInviteInput {
-  clientMutationId?: string;
-  /** The `OrgInvite` to be created by this mutation. */
-  orgInvite: OrgInviteInput;
-}
-/** An input for mutations affecting `OrgInvite` */
-export interface OrgInviteInput {
-  id?: string;
-  /** Email address of the invited recipient */
-  email?: ConstructiveInternalTypeEmail;
-  /** User ID of the member who sent this invitation */
-  senderId?: string;
-  /** User ID of the intended recipient, if targeting a specific user */
-  receiverId?: string;
-  /** Unique random hex token used to redeem this invitation */
-  inviteToken?: string;
-  /** Whether this invitation is still valid and can be redeemed */
-  inviteValid?: boolean;
-  /** Maximum number of times this invite can be claimed; -1 means unlimited */
-  inviteLimit?: number;
-  /** Running count of how many times this invite has been claimed */
-  inviteCount?: number;
-  /** Whether this invite can be claimed by multiple recipients */
-  multiple?: boolean;
-  /** Optional JSON payload of additional invite metadata */
-  data?: unknown;
-  /** Timestamp after which this invitation can no longer be redeemed */
-  expiresAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  entityId: string;
 }
 export interface CreateOrgMembershipInput {
   clientMutationId?: string;
@@ -12259,6 +12600,40 @@ export interface HierarchyModuleInput {
   isManagerOfFunction?: string;
   createdAt?: string;
 }
+export interface CreateOrgInviteInput {
+  clientMutationId?: string;
+  /** The `OrgInvite` to be created by this mutation. */
+  orgInvite: OrgInviteInput;
+}
+/** An input for mutations affecting `OrgInvite` */
+export interface OrgInviteInput {
+  id?: string;
+  /** Email address of the invited recipient */
+  email?: ConstructiveInternalTypeEmail;
+  /** User ID of the member who sent this invitation */
+  senderId?: string;
+  /** User ID of the intended recipient, if targeting a specific user */
+  receiverId?: string;
+  /** Unique random hex token used to redeem this invitation */
+  inviteToken?: string;
+  /** Whether this invitation is still valid and can be redeemed */
+  inviteValid?: boolean;
+  /** Maximum number of times this invite can be claimed; -1 means unlimited */
+  inviteLimit?: number;
+  /** Running count of how many times this invite has been claimed */
+  inviteCount?: number;
+  /** Whether this invite can be claimed by multiple recipients */
+  multiple?: boolean;
+  /** Optional JSON payload of additional invite metadata */
+  data?: unknown;
+  /** Optional profile (role) to assign to the member when they claim this invite. Only allowed on email invites. */
+  profileId?: string;
+  /** Timestamp after which this invitation can no longer be redeemed */
+  expiresAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  entityId: string;
+}
 export interface CreateForeignKeyConstraintInput {
   clientMutationId?: string;
   /** The `ForeignKeyConstraint` to be created by this mutation. */
@@ -12284,6 +12659,35 @@ export interface ForeignKeyConstraintInput {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateStorageModuleInput {
+  clientMutationId?: string;
+  /** The `StorageModule` to be created by this mutation. */
+  storageModule: StorageModuleInput;
+}
+/** An input for mutations affecting `StorageModule` */
+export interface StorageModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  membershipType?: number;
+  policies?: unknown;
+  skipDefaultPolicyTables?: string[];
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
 }
 export interface CreateTableInput {
   clientMutationId?: string;
@@ -12311,37 +12715,6 @@ export interface TableInput {
   inheritsId?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateStorageModuleInput {
-  clientMutationId?: string;
-  /** The `StorageModule` to be created by this mutation. */
-  storageModule: StorageModuleInput;
-}
-/** An input for mutations affecting `StorageModule` */
-export interface StorageModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  uploadRequestsTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  uploadRequestsTableName?: string;
-  membershipType?: number;
-  policies?: unknown;
-  skipDefaultPolicyTables?: string[];
-  entityTableId?: string;
-  endpoint?: string;
-  publicUrlPrefix?: string;
-  provider?: string;
-  allowedOrigins?: string[];
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
 }
 export interface CreateEntityTypeProvisionInput {
   clientMutationId?: string;
@@ -12412,7 +12785,7 @@ export interface EntityTypeProvisionInput {
   hasLevels?: boolean;
   /**
    * Whether to provision storage_module for this type. Defaults to false.
-   *      When true, creates {prefix}_buckets, {prefix}_files, and {prefix}_upload_requests tables
+   *      When true, creates {prefix}_buckets and {prefix}_files tables
    *      with entity-scoped RLS (AuthzEntityMembership) using the entity's membership_type.
    *      Storage tables get owner_id FK to the entity table, so files are owned by the entity.
    */
@@ -12445,7 +12818,7 @@ export interface EntityTypeProvisionInput {
    *        - allowed_origins     (text[])         per-bucket CORS override
    *        - provisions (jsonb object) optional: customize storage tables
    *                                   with additional nodes, fields, grants, and policies.
-   *                                   Keyed by table role: "files", "buckets", "upload_requests".
+   *                                   Keyed by table role: "files", "buckets".
    *                                   Each value uses the same shape as table_provision:
    *                                   { nodes, fields, grants, use_rls, policies }. Fanned out
    *                                   to secure_table_provision targeting the corresponding table.
@@ -13371,6 +13744,22 @@ export interface OrgOwnerGrantPatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  name: string;
+  /** An object where the defined keys will be set on the `NodeTypeRegistry` being updated. */
+  nodeTypeRegistryPatch: NodeTypeRegistryPatch;
+}
+/** Represents an update to a `NodeTypeRegistry`. Fields that are set will be updated. */
+export interface NodeTypeRegistryPatch {
+  name?: string;
+  slug?: string;
+  category?: string;
+  displayName?: string;
+  description?: string;
+  parameterSchema?: unknown;
+  tags?: string[];
+}
 export interface UpdateObjectInput {
   clientMutationId?: string;
   id: string;
@@ -13442,6 +13831,30 @@ export interface CryptoAddressPatch {
   name?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateAgentMessageInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AgentMessage` being updated. */
+  agentMessagePatch: AgentMessagePatch;
+}
+/** Represents an update to a `AgentMessage`. Fields that are set will be updated. */
+export interface AgentMessagePatch {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId?: string;
+  /** Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only. */
+  entityId?: string;
+  /** Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array. */
+  authorRole?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** JSON metadata for extensible key-value storage */
+  parts?: unknown;
 }
 export interface UpdateAppPermissionInput {
   clientMutationId?: string;
@@ -13863,6 +14276,62 @@ export interface OrgChartEdgePatch {
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
 }
+export interface UpdateAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AgentTask` being updated. */
+  agentTaskPatch: AgentTaskPatch;
+}
+/** Represents an update to a `AgentTask`. Fields that are set will be updated. */
+export interface AgentTaskPatch {
+  /** Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger. */
+  threadId?: string;
+  /** Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly. */
+  entityId?: string;
+  /** Natural-language description of the work to do. Required. */
+  description?: string;
+  /** Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later. */
+  source?: string;
+  /** Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully. */
+  error?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record */
+  ownerId?: string;
+  /** Current status of this record */
+  status?: string;
+}
+export interface UpdateAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AgentThread` being updated. */
+  agentThreadPatch: AgentThreadPatch;
+}
+/** Represents an update to a `AgentThread`. Fields that are set will be updated. */
+export interface AgentThreadPatch {
+  /** Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed. */
+  title?: string;
+  /** Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration. */
+  mode?: string;
+  /** Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time. */
+  model?: string;
+  /** Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time. */
+  systemPrompt?: string;
+  id?: string;
+  /** Timestamp when this record was created */
+  createdAt?: string;
+  /** Timestamp when this record was last updated */
+  updatedAt?: string;
+  /** User who owns this record within the entity */
+  ownerId?: string;
+  /** Entity this record belongs to */
+  entityId?: string;
+  /** Current status of this record */
+  status?: string;
+}
 export interface UpdateOrgGrantInput {
   clientMutationId?: string;
   id: string;
@@ -14162,34 +14631,6 @@ export interface SecureTableProvisionPatch {
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
   outFields?: string[];
 }
-export interface UpdateOrgMembershipSettingInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgMembershipSetting` being updated. */
-  orgMembershipSettingPatch: OrgMembershipSettingPatch;
-}
-/** Represents an update to a `OrgMembershipSetting`. Fields that are set will be updated. */
-export interface OrgMembershipSettingPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** References the entity these settings apply to */
-  entityId?: string;
-  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
-  deleteMemberCascadeChildren?: boolean;
-  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
-  createChildCascadeOwners?: boolean;
-  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
-  createChildCascadeAdmins?: boolean;
-  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
-  createChildCascadeMembers?: boolean;
-  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
-  allowExternalMembers?: boolean;
-  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
-  populateMemberEmail?: boolean;
-}
 export interface UpdateDatabaseTransferInput {
   clientMutationId?: string;
   id: string;
@@ -14290,6 +14731,36 @@ export interface InvitesModulePatch {
   prefix?: string;
   membershipType?: number;
   entityTableId?: string;
+}
+export interface UpdateOrgMembershipSettingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgMembershipSetting` being updated. */
+  orgMembershipSettingPatch: OrgMembershipSettingPatch;
+}
+/** Represents an update to a `OrgMembershipSetting`. Fields that are set will be updated. */
+export interface OrgMembershipSettingPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** References the entity these settings apply to */
+  entityId?: string;
+  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
+  deleteMemberCascadeChildren?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
+  createChildCascadeOwners?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
+  createChildCascadeAdmins?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
+  createChildCascadeMembers?: boolean;
+  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
+  allowExternalMembers?: boolean;
+  /** Controls how profile assignment on invites is validated: strict (permission + subset check), permission_only (permission only), or subset_only (subset check only) */
+  inviteProfileAssignmentMode?: string;
+  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
+  populateMemberEmail?: boolean;
 }
 export interface UpdateEnumInput {
   clientMutationId?: string;
@@ -14638,35 +15109,40 @@ export interface PermissionsModulePatch {
   getByMask?: string;
   getMaskByName?: string;
 }
-export interface UpdateAppInviteInput {
+export interface UpdateAppMembershipInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `AppInvite` being updated. */
-  appInvitePatch: AppInvitePatch;
+  /** An object where the defined keys will be set on the `AppMembership` being updated. */
+  appMembershipPatch: AppMembershipPatch;
 }
-/** Represents an update to a `AppInvite`. Fields that are set will be updated. */
-export interface AppInvitePatch {
+/** Represents an update to a `AppMembership`. Fields that are set will be updated. */
+export interface AppMembershipPatch {
   id?: string;
-  /** Email address of the invited recipient */
-  email?: ConstructiveInternalTypeEmail;
-  /** User ID of the member who sent this invitation */
-  senderId?: string;
-  /** Unique random hex token used to redeem this invitation */
-  inviteToken?: string;
-  /** Whether this invitation is still valid and can be redeemed */
-  inviteValid?: boolean;
-  /** Maximum number of times this invite can be claimed; -1 means unlimited */
-  inviteLimit?: number;
-  /** Running count of how many times this invite has been claimed */
-  inviteCount?: number;
-  /** Whether this invite can be claimed by multiple recipients */
-  multiple?: boolean;
-  /** Optional JSON payload of additional invite metadata */
-  data?: unknown;
-  /** Timestamp after which this invitation can no longer be redeemed */
-  expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Whether this member has been verified (e.g. email confirmation) */
+  isVerified?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId?: string;
+  profileId?: string;
 }
 export interface UpdateEmbeddingChunkInput {
   clientMutationId?: string;
@@ -14772,42 +15248,37 @@ export interface ProfilesModulePatch {
   membershipsTableId?: string;
   prefix?: string;
 }
-export interface UpdateAppMembershipInput {
+export interface UpdateAppInviteInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `AppMembership` being updated. */
-  appMembershipPatch: AppMembershipPatch;
+  /** An object where the defined keys will be set on the `AppInvite` being updated. */
+  appInvitePatch: AppInvitePatch;
 }
-/** Represents an update to a `AppMembership`. Fields that are set will be updated. */
-export interface AppMembershipPatch {
+/** Represents an update to a `AppInvite`. Fields that are set will be updated. */
+export interface AppInvitePatch {
   id?: string;
+  /** Email address of the invited recipient */
+  email?: ConstructiveInternalTypeEmail;
+  /** User ID of the member who sent this invitation */
+  senderId?: string;
+  /** Unique random hex token used to redeem this invitation */
+  inviteToken?: string;
+  /** Whether this invitation is still valid and can be redeemed */
+  inviteValid?: boolean;
+  /** Maximum number of times this invite can be claimed; -1 means unlimited */
+  inviteLimit?: number;
+  /** Running count of how many times this invite has been claimed */
+  inviteCount?: number;
+  /** Whether this invite can be claimed by multiple recipients */
+  multiple?: boolean;
+  /** Optional JSON payload of additional invite metadata */
+  data?: unknown;
+  /** Optional profile (role) to assign to the member when they claim this invite. Only allowed on email invites. */
+  profileId?: string;
+  /** Timestamp after which this invitation can no longer be redeemed */
+  expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Whether this member has been verified (e.g. email confirmation) */
-  isVerified?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
-  isExternal?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId?: string;
-  profileId?: string;
 }
 export interface UpdateIndexInput {
   clientMutationId?: string;
@@ -14869,39 +15340,6 @@ export interface WebauthnCredentialPatch {
   lastUsedAt?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface UpdateOrgInviteInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgInvite` being updated. */
-  orgInvitePatch: OrgInvitePatch;
-}
-/** Represents an update to a `OrgInvite`. Fields that are set will be updated. */
-export interface OrgInvitePatch {
-  id?: string;
-  /** Email address of the invited recipient */
-  email?: ConstructiveInternalTypeEmail;
-  /** User ID of the member who sent this invitation */
-  senderId?: string;
-  /** User ID of the intended recipient, if targeting a specific user */
-  receiverId?: string;
-  /** Unique random hex token used to redeem this invitation */
-  inviteToken?: string;
-  /** Whether this invitation is still valid and can be redeemed */
-  inviteValid?: boolean;
-  /** Maximum number of times this invite can be claimed; -1 means unlimited */
-  inviteLimit?: number;
-  /** Running count of how many times this invite has been claimed */
-  inviteCount?: number;
-  /** Whether this invite can be claimed by multiple recipients */
-  multiple?: boolean;
-  /** Optional JSON payload of additional invite metadata */
-  data?: unknown;
-  /** Timestamp after which this invitation can no longer be redeemed */
-  expiresAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  entityId?: string;
 }
 export interface UpdateOrgMembershipInput {
   clientMutationId?: string;
@@ -15021,6 +15459,41 @@ export interface HierarchyModulePatch {
   isManagerOfFunction?: string;
   createdAt?: string;
 }
+export interface UpdateOrgInviteInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgInvite` being updated. */
+  orgInvitePatch: OrgInvitePatch;
+}
+/** Represents an update to a `OrgInvite`. Fields that are set will be updated. */
+export interface OrgInvitePatch {
+  id?: string;
+  /** Email address of the invited recipient */
+  email?: ConstructiveInternalTypeEmail;
+  /** User ID of the member who sent this invitation */
+  senderId?: string;
+  /** User ID of the intended recipient, if targeting a specific user */
+  receiverId?: string;
+  /** Unique random hex token used to redeem this invitation */
+  inviteToken?: string;
+  /** Whether this invitation is still valid and can be redeemed */
+  inviteValid?: boolean;
+  /** Maximum number of times this invite can be claimed; -1 means unlimited */
+  inviteLimit?: number;
+  /** Running count of how many times this invite has been claimed */
+  inviteCount?: number;
+  /** Whether this invite can be claimed by multiple recipients */
+  multiple?: boolean;
+  /** Optional JSON payload of additional invite metadata */
+  data?: unknown;
+  /** Optional profile (role) to assign to the member when they claim this invite. Only allowed on email invites. */
+  profileId?: string;
+  /** Timestamp after which this invitation can no longer be redeemed */
+  expiresAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  entityId?: string;
+}
 export interface UpdateForeignKeyConstraintInput {
   clientMutationId?: string;
   id: string;
@@ -15047,6 +15520,36 @@ export interface ForeignKeyConstraintPatch {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateStorageModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `StorageModule` being updated. */
+  storageModulePatch: StorageModulePatch;
+}
+/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
+export interface StorageModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  membershipType?: number;
+  policies?: unknown;
+  skipDefaultPolicyTables?: string[];
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
 }
 export interface UpdateTableInput {
   clientMutationId?: string;
@@ -15075,38 +15578,6 @@ export interface TablePatch {
   inheritsId?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface UpdateStorageModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `StorageModule` being updated. */
-  storageModulePatch: StorageModulePatch;
-}
-/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
-export interface StorageModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  uploadRequestsTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  uploadRequestsTableName?: string;
-  membershipType?: number;
-  policies?: unknown;
-  skipDefaultPolicyTables?: string[];
-  entityTableId?: string;
-  endpoint?: string;
-  publicUrlPrefix?: string;
-  provider?: string;
-  allowedOrigins?: string[];
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
 }
 export interface UpdateEntityTypeProvisionInput {
   clientMutationId?: string;
@@ -15179,7 +15650,7 @@ export interface EntityTypeProvisionPatch {
   hasLevels?: boolean;
   /**
    * Whether to provision storage_module for this type. Defaults to false.
-   *      When true, creates {prefix}_buckets, {prefix}_files, and {prefix}_upload_requests tables
+   *      When true, creates {prefix}_buckets and {prefix}_files tables
    *      with entity-scoped RLS (AuthzEntityMembership) using the entity's membership_type.
    *      Storage tables get owner_id FK to the entity table, so files are owned by the entity.
    */
@@ -15212,7 +15683,7 @@ export interface EntityTypeProvisionPatch {
    *        - allowed_origins     (text[])         per-bucket CORS override
    *        - provisions (jsonb object) optional: customize storage tables
    *                                   with additional nodes, fields, grants, and policies.
-   *                                   Keyed by table role: "files", "buckets", "upload_requests".
+   *                                   Keyed by table role: "files", "buckets".
    *                                   Each value uses the same shape as table_provision:
    *                                   { nodes, fields, grants, use_rls, policies }. Fanned out
    *                                   to secure_table_provision targeting the corresponding table.
@@ -15728,6 +16199,10 @@ export interface DeleteOrgOwnerGrantInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteNodeTypeRegistryInput {
+  clientMutationId?: string;
+  name: string;
+}
 export interface DeleteObjectInput {
   clientMutationId?: string;
   id: string;
@@ -15742,6 +16217,10 @@ export interface DeleteCryptoAddressesModuleInput {
   id: string;
 }
 export interface DeleteCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentMessageInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15835,6 +16314,14 @@ export interface DeleteOrgChartEdgeInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteOrgGrantInput {
   clientMutationId?: string;
   id: string;
@@ -15886,10 +16373,6 @@ export interface DeleteSecureTableProvisionInput {
   /** Unique identifier for this provision row. */
   id: string;
 }
-export interface DeleteOrgMembershipSettingInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteDatabaseTransferInput {
   clientMutationId?: string;
   id: string;
@@ -15903,6 +16386,10 @@ export interface DeleteDatabaseProvisionModuleInput {
   id: string;
 }
 export interface DeleteInvitesModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgMembershipSettingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15964,7 +16451,7 @@ export interface DeletePermissionsModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAppInviteInput {
+export interface DeleteAppMembershipInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15984,7 +16471,7 @@ export interface DeleteProfilesModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAppMembershipInput {
+export interface DeleteAppInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15993,10 +16480,6 @@ export interface DeleteIndexInput {
   id: string;
 }
 export interface DeleteWebauthnCredentialInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -16013,15 +16496,19 @@ export interface DeleteHierarchyModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteOrgInviteInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteForeignKeyConstraintInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteTableInput {
+export interface DeleteStorageModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteStorageModuleInput {
+export interface DeleteTableInput {
   clientMutationId?: string;
   id: string;
 }
@@ -16069,10 +16556,6 @@ export interface RequestUploadUrlInput {
   size: number;
   /** Original filename (optional, for display and Content-Disposition) */
   filename?: string;
-}
-export interface ConfirmUploadInput {
-  /** The file ID returned by requestUploadUrl */
-  fileId: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -16391,6 +16874,13 @@ export interface OrgOwnerGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `NodeTypeRegistry` values. */
+export interface NodeTypeRegistryConnection {
+  nodes: NodeTypeRegistry[];
+  edges: NodeTypeRegistryEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `UserConnectedAccount` values. */
 export interface UserConnectedAccountConnection {
   nodes: UserConnectedAccount[];
@@ -16416,6 +16906,13 @@ export interface CryptoAddressesModuleConnection {
 export interface CryptoAddressConnection {
   nodes: CryptoAddress[];
   edges: CryptoAddressEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentMessage` values. */
+export interface AgentMessageConnection {
+  nodes: AgentMessage[];
+  edges: AgentMessageEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16552,6 +17049,20 @@ export interface OrgChartEdgeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AgentTask` values. */
+export interface AgentTaskConnection {
+  nodes: AgentTask[];
+  edges: AgentTaskEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentThread` values. */
+export interface AgentThreadConnection {
+  nodes: AgentThread[];
+  edges: AgentThreadEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgGrant` values. */
 export interface OrgGrantConnection {
   nodes: OrgGrant[];
@@ -16636,13 +17147,6 @@ export interface SecureTableProvisionConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgMembershipSetting` values. */
-export interface OrgMembershipSettingConnection {
-  nodes: OrgMembershipSetting[];
-  edges: OrgMembershipSettingEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `DatabaseTransfer` values. */
 export interface DatabaseTransferConnection {
   nodes: DatabaseTransfer[];
@@ -16668,6 +17172,13 @@ export interface DatabaseProvisionModuleConnection {
 export interface InvitesModuleConnection {
   nodes: InvitesModule[];
   edges: InvitesModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgMembershipSetting` values. */
+export interface OrgMembershipSettingConnection {
+  nodes: OrgMembershipSetting[];
+  edges: OrgMembershipSettingEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16776,10 +17287,10 @@ export interface PermissionsModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `AppInvite` values. */
-export interface AppInviteConnection {
-  nodes: AppInvite[];
-  edges: AppInviteEdge[];
+/** A connection to a list of `AppMembership` values. */
+export interface AppMembershipConnection {
+  nodes: AppMembership[];
+  edges: AppMembershipEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16811,10 +17322,10 @@ export interface ProfilesModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `AppMembership` values. */
-export interface AppMembershipConnection {
-  nodes: AppMembership[];
-  edges: AppMembershipEdge[];
+/** A connection to a list of `AppInvite` values. */
+export interface AppInviteConnection {
+  nodes: AppInvite[];
+  edges: AppInviteEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16829,13 +17340,6 @@ export interface IndexConnection {
 export interface WebauthnCredentialConnection {
   nodes: WebauthnCredential[];
   edges: WebauthnCredentialEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgInvite` values. */
-export interface OrgInviteConnection {
-  nodes: OrgInvite[];
-  edges: OrgInviteEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -16860,6 +17364,13 @@ export interface HierarchyModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `OrgInvite` values. */
+export interface OrgInviteConnection {
+  nodes: OrgInvite[];
+  edges: OrgInviteEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `ForeignKeyConstraint` values. */
 export interface ForeignKeyConstraintConnection {
   nodes: ForeignKeyConstraint[];
@@ -16867,17 +17378,17 @@ export interface ForeignKeyConstraintConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Table` values. */
-export interface TableConnection {
-  nodes: Table[];
-  edges: TableEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `StorageModule` values. */
 export interface StorageModuleConnection {
   nodes: StorageModule[];
   edges: StorageModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Table` values. */
+export interface TableConnection {
+  nodes: Table[];
+  edges: TableEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17327,6 +17838,12 @@ export interface CreateOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
+export interface CreateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was created by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
 export interface CreateUserConnectedAccountPayload {
   clientMutationId?: string | null;
   /** The `UserConnectedAccount` that was created by this mutation. */
@@ -17355,6 +17872,12 @@ export interface CreateCryptoAddressPayload {
   /** The `CryptoAddress` that was created by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface CreateAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was created by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
 }
 export interface CreateAppPermissionPayload {
   clientMutationId?: string | null;
@@ -17482,6 +18005,18 @@ export interface CreateOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
+export interface CreateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was created by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export interface CreateAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was created by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+}
 export interface CreateOrgGrantPayload {
   clientMutationId?: string | null;
   /** The `OrgGrant` that was created by this mutation. */
@@ -17559,12 +18094,6 @@ export interface CreateSecureTableProvisionPayload {
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
 }
-export interface CreateOrgMembershipSettingPayload {
-  clientMutationId?: string | null;
-  /** The `OrgMembershipSetting` that was created by this mutation. */
-  orgMembershipSetting?: OrgMembershipSetting | null;
-  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
-}
 export interface CreateDatabaseTransferPayload {
   clientMutationId?: string | null;
   /** The `DatabaseTransfer` that was created by this mutation. */
@@ -17588,6 +18117,12 @@ export interface CreateInvitesModulePayload {
   /** The `InvitesModule` that was created by this mutation. */
   invitesModule?: InvitesModule | null;
   invitesModuleEdge?: InvitesModuleEdge | null;
+}
+export interface CreateOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was created by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface CreateEnumPayload {
   clientMutationId?: string | null;
@@ -17678,11 +18213,11 @@ export interface CreatePermissionsModulePayload {
   permissionsModule?: PermissionsModule | null;
   permissionsModuleEdge?: PermissionsModuleEdge | null;
 }
-export interface CreateAppInvitePayload {
+export interface CreateAppMembershipPayload {
   clientMutationId?: string | null;
-  /** The `AppInvite` that was created by this mutation. */
-  appInvite?: AppInvite | null;
-  appInviteEdge?: AppInviteEdge | null;
+  /** The `AppMembership` that was created by this mutation. */
+  appMembership?: AppMembership | null;
+  appMembershipEdge?: AppMembershipEdge | null;
 }
 export interface CreateEmbeddingChunkPayload {
   clientMutationId?: string | null;
@@ -17708,11 +18243,11 @@ export interface CreateProfilesModulePayload {
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
-export interface CreateAppMembershipPayload {
+export interface CreateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `AppMembership` that was created by this mutation. */
-  appMembership?: AppMembership | null;
-  appMembershipEdge?: AppMembershipEdge | null;
+  /** The `AppInvite` that was created by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
 export interface CreateIndexPayload {
   clientMutationId?: string | null;
@@ -17725,12 +18260,6 @@ export interface CreateWebauthnCredentialPayload {
   /** The `WebauthnCredential` that was created by this mutation. */
   webauthnCredential?: WebauthnCredential | null;
   webauthnCredentialEdge?: WebauthnCredentialEdge | null;
-}
-export interface CreateOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was created by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface CreateOrgMembershipPayload {
   clientMutationId?: string | null;
@@ -17750,23 +18279,29 @@ export interface CreateHierarchyModulePayload {
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
+export interface CreateOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was created by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
+}
 export interface CreateForeignKeyConstraintPayload {
   clientMutationId?: string | null;
   /** The `ForeignKeyConstraint` that was created by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface CreateTablePayload {
-  clientMutationId?: string | null;
-  /** The `Table` that was created by this mutation. */
-  table?: Table | null;
-  tableEdge?: TableEdge | null;
-}
 export interface CreateStorageModulePayload {
   clientMutationId?: string | null;
   /** The `StorageModule` that was created by this mutation. */
   storageModule?: StorageModule | null;
   storageModuleEdge?: StorageModuleEdge | null;
+}
+export interface CreateTablePayload {
+  clientMutationId?: string | null;
+  /** The `Table` that was created by this mutation. */
+  table?: Table | null;
+  tableEdge?: TableEdge | null;
 }
 export interface CreateEntityTypeProvisionPayload {
   clientMutationId?: string | null;
@@ -18014,6 +18549,12 @@ export interface UpdateOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
+export interface UpdateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was updated by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
 export interface UpdateObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was updated by this mutation. */
@@ -18037,6 +18578,12 @@ export interface UpdateCryptoAddressPayload {
   /** The `CryptoAddress` that was updated by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface UpdateAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was updated by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
 }
 export interface UpdateAppPermissionPayload {
   clientMutationId?: string | null;
@@ -18164,6 +18711,18 @@ export interface UpdateOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
+export interface UpdateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was updated by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export interface UpdateAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was updated by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+}
 export interface UpdateOrgGrantPayload {
   clientMutationId?: string | null;
   /** The `OrgGrant` that was updated by this mutation. */
@@ -18236,12 +18795,6 @@ export interface UpdateSecureTableProvisionPayload {
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
 }
-export interface UpdateOrgMembershipSettingPayload {
-  clientMutationId?: string | null;
-  /** The `OrgMembershipSetting` that was updated by this mutation. */
-  orgMembershipSetting?: OrgMembershipSetting | null;
-  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
-}
 export interface UpdateDatabaseTransferPayload {
   clientMutationId?: string | null;
   /** The `DatabaseTransfer` that was updated by this mutation. */
@@ -18265,6 +18818,12 @@ export interface UpdateInvitesModulePayload {
   /** The `InvitesModule` that was updated by this mutation. */
   invitesModule?: InvitesModule | null;
   invitesModuleEdge?: InvitesModuleEdge | null;
+}
+export interface UpdateOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was updated by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface UpdateEnumPayload {
   clientMutationId?: string | null;
@@ -18350,11 +18909,11 @@ export interface UpdatePermissionsModulePayload {
   permissionsModule?: PermissionsModule | null;
   permissionsModuleEdge?: PermissionsModuleEdge | null;
 }
-export interface UpdateAppInvitePayload {
+export interface UpdateAppMembershipPayload {
   clientMutationId?: string | null;
-  /** The `AppInvite` that was updated by this mutation. */
-  appInvite?: AppInvite | null;
-  appInviteEdge?: AppInviteEdge | null;
+  /** The `AppMembership` that was updated by this mutation. */
+  appMembership?: AppMembership | null;
+  appMembershipEdge?: AppMembershipEdge | null;
 }
 export interface UpdateEmbeddingChunkPayload {
   clientMutationId?: string | null;
@@ -18380,11 +18939,11 @@ export interface UpdateProfilesModulePayload {
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
-export interface UpdateAppMembershipPayload {
+export interface UpdateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `AppMembership` that was updated by this mutation. */
-  appMembership?: AppMembership | null;
-  appMembershipEdge?: AppMembershipEdge | null;
+  /** The `AppInvite` that was updated by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
 export interface UpdateIndexPayload {
   clientMutationId?: string | null;
@@ -18397,12 +18956,6 @@ export interface UpdateWebauthnCredentialPayload {
   /** The `WebauthnCredential` that was updated by this mutation. */
   webauthnCredential?: WebauthnCredential | null;
   webauthnCredentialEdge?: WebauthnCredentialEdge | null;
-}
-export interface UpdateOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was updated by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface UpdateOrgMembershipPayload {
   clientMutationId?: string | null;
@@ -18422,23 +18975,29 @@ export interface UpdateHierarchyModulePayload {
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
+export interface UpdateOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was updated by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
+}
 export interface UpdateForeignKeyConstraintPayload {
   clientMutationId?: string | null;
   /** The `ForeignKeyConstraint` that was updated by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface UpdateTablePayload {
-  clientMutationId?: string | null;
-  /** The `Table` that was updated by this mutation. */
-  table?: Table | null;
-  tableEdge?: TableEdge | null;
-}
 export interface UpdateStorageModulePayload {
   clientMutationId?: string | null;
   /** The `StorageModule` that was updated by this mutation. */
   storageModule?: StorageModule | null;
   storageModuleEdge?: StorageModuleEdge | null;
+}
+export interface UpdateTablePayload {
+  clientMutationId?: string | null;
+  /** The `Table` that was updated by this mutation. */
+  table?: Table | null;
+  tableEdge?: TableEdge | null;
 }
 export interface UpdateEntityTypeProvisionPayload {
   clientMutationId?: string | null;
@@ -18686,6 +19245,12 @@ export interface DeleteOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
+export interface DeleteNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was deleted by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
+}
 export interface DeleteObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was deleted by this mutation. */
@@ -18709,6 +19274,12 @@ export interface DeleteCryptoAddressPayload {
   /** The `CryptoAddress` that was deleted by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface DeleteAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `AgentMessage` that was deleted by this mutation. */
+  agentMessage?: AgentMessage | null;
+  agentMessageEdge?: AgentMessageEdge | null;
 }
 export interface DeleteAppPermissionPayload {
   clientMutationId?: string | null;
@@ -18836,6 +19407,18 @@ export interface DeleteOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
+export interface DeleteAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was deleted by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
+}
+export interface DeleteAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `AgentThread` that was deleted by this mutation. */
+  agentThread?: AgentThread | null;
+  agentThreadEdge?: AgentThreadEdge | null;
+}
 export interface DeleteOrgGrantPayload {
   clientMutationId?: string | null;
   /** The `OrgGrant` that was deleted by this mutation. */
@@ -18908,12 +19491,6 @@ export interface DeleteSecureTableProvisionPayload {
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
 }
-export interface DeleteOrgMembershipSettingPayload {
-  clientMutationId?: string | null;
-  /** The `OrgMembershipSetting` that was deleted by this mutation. */
-  orgMembershipSetting?: OrgMembershipSetting | null;
-  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
-}
 export interface DeleteDatabaseTransferPayload {
   clientMutationId?: string | null;
   /** The `DatabaseTransfer` that was deleted by this mutation. */
@@ -18937,6 +19514,12 @@ export interface DeleteInvitesModulePayload {
   /** The `InvitesModule` that was deleted by this mutation. */
   invitesModule?: InvitesModule | null;
   invitesModuleEdge?: InvitesModuleEdge | null;
+}
+export interface DeleteOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was deleted by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface DeleteEnumPayload {
   clientMutationId?: string | null;
@@ -19022,11 +19605,11 @@ export interface DeletePermissionsModulePayload {
   permissionsModule?: PermissionsModule | null;
   permissionsModuleEdge?: PermissionsModuleEdge | null;
 }
-export interface DeleteAppInvitePayload {
+export interface DeleteAppMembershipPayload {
   clientMutationId?: string | null;
-  /** The `AppInvite` that was deleted by this mutation. */
-  appInvite?: AppInvite | null;
-  appInviteEdge?: AppInviteEdge | null;
+  /** The `AppMembership` that was deleted by this mutation. */
+  appMembership?: AppMembership | null;
+  appMembershipEdge?: AppMembershipEdge | null;
 }
 export interface DeleteEmbeddingChunkPayload {
   clientMutationId?: string | null;
@@ -19052,11 +19635,11 @@ export interface DeleteProfilesModulePayload {
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
-export interface DeleteAppMembershipPayload {
+export interface DeleteAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `AppMembership` that was deleted by this mutation. */
-  appMembership?: AppMembership | null;
-  appMembershipEdge?: AppMembershipEdge | null;
+  /** The `AppInvite` that was deleted by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
 export interface DeleteIndexPayload {
   clientMutationId?: string | null;
@@ -19069,12 +19652,6 @@ export interface DeleteWebauthnCredentialPayload {
   /** The `WebauthnCredential` that was deleted by this mutation. */
   webauthnCredential?: WebauthnCredential | null;
   webauthnCredentialEdge?: WebauthnCredentialEdge | null;
-}
-export interface DeleteOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was deleted by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface DeleteOrgMembershipPayload {
   clientMutationId?: string | null;
@@ -19094,23 +19671,29 @@ export interface DeleteHierarchyModulePayload {
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
+export interface DeleteOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was deleted by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
+}
 export interface DeleteForeignKeyConstraintPayload {
   clientMutationId?: string | null;
   /** The `ForeignKeyConstraint` that was deleted by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface DeleteTablePayload {
-  clientMutationId?: string | null;
-  /** The `Table` that was deleted by this mutation. */
-  table?: Table | null;
-  tableEdge?: TableEdge | null;
-}
 export interface DeleteStorageModulePayload {
   clientMutationId?: string | null;
   /** The `StorageModule` that was deleted by this mutation. */
   storageModule?: StorageModule | null;
   storageModuleEdge?: StorageModuleEdge | null;
+}
+export interface DeleteTablePayload {
+  clientMutationId?: string | null;
+  /** The `Table` that was deleted by this mutation. */
+  table?: Table | null;
+  tableEdge?: TableEdge | null;
 }
 export interface DeleteEntityTypeProvisionPayload {
   clientMutationId?: string | null;
@@ -19159,16 +19742,6 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
-  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable. */
-  status: string;
-}
-export interface ConfirmUploadPayload {
-  /** The confirmed file ID */
-  fileId: string;
-  /** New file status */
-  status: string;
-  /** Whether confirmation succeeded */
-  success: boolean;
 }
 export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */
@@ -19459,6 +20032,12 @@ export interface OrgOwnerGrantEdge {
   /** The `OrgOwnerGrant` at the end of the edge. */
   node?: OrgOwnerGrant | null;
 }
+/** A `NodeTypeRegistry` edge in the connection. */
+export interface NodeTypeRegistryEdge {
+  cursor?: string | null;
+  /** The `NodeTypeRegistry` at the end of the edge. */
+  node?: NodeTypeRegistry | null;
+}
 /** A `UserConnectedAccount` edge in the connection. */
 export interface UserConnectedAccountEdge {
   cursor?: string | null;
@@ -19482,6 +20061,12 @@ export interface CryptoAddressEdge {
   cursor?: string | null;
   /** The `CryptoAddress` at the end of the edge. */
   node?: CryptoAddress | null;
+}
+/** A `AgentMessage` edge in the connection. */
+export interface AgentMessageEdge {
+  cursor?: string | null;
+  /** The `AgentMessage` at the end of the edge. */
+  node?: AgentMessage | null;
 }
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
@@ -19597,6 +20182,18 @@ export interface OrgChartEdgeEdge {
   /** The `OrgChartEdge` at the end of the edge. */
   node?: OrgChartEdge | null;
 }
+/** A `AgentTask` edge in the connection. */
+export interface AgentTaskEdge {
+  cursor?: string | null;
+  /** The `AgentTask` at the end of the edge. */
+  node?: AgentTask | null;
+}
+/** A `AgentThread` edge in the connection. */
+export interface AgentThreadEdge {
+  cursor?: string | null;
+  /** The `AgentThread` at the end of the edge. */
+  node?: AgentThread | null;
+}
 /** A `OrgGrant` edge in the connection. */
 export interface OrgGrantEdge {
   cursor?: string | null;
@@ -19669,12 +20266,6 @@ export interface SecureTableProvisionEdge {
   /** The `SecureTableProvision` at the end of the edge. */
   node?: SecureTableProvision | null;
 }
-/** A `OrgMembershipSetting` edge in the connection. */
-export interface OrgMembershipSettingEdge {
-  cursor?: string | null;
-  /** The `OrgMembershipSetting` at the end of the edge. */
-  node?: OrgMembershipSetting | null;
-}
 /** A `DatabaseTransfer` edge in the connection. */
 export interface DatabaseTransferEdge {
   cursor?: string | null;
@@ -19698,6 +20289,12 @@ export interface InvitesModuleEdge {
   cursor?: string | null;
   /** The `InvitesModule` at the end of the edge. */
   node?: InvitesModule | null;
+}
+/** A `OrgMembershipSetting` edge in the connection. */
+export interface OrgMembershipSettingEdge {
+  cursor?: string | null;
+  /** The `OrgMembershipSetting` at the end of the edge. */
+  node?: OrgMembershipSetting | null;
 }
 /** A `Enum` edge in the connection. */
 export interface EnumEdge {
@@ -19789,11 +20386,11 @@ export interface PermissionsModuleEdge {
   /** The `PermissionsModule` at the end of the edge. */
   node?: PermissionsModule | null;
 }
-/** A `AppInvite` edge in the connection. */
-export interface AppInviteEdge {
+/** A `AppMembership` edge in the connection. */
+export interface AppMembershipEdge {
   cursor?: string | null;
-  /** The `AppInvite` at the end of the edge. */
-  node?: AppInvite | null;
+  /** The `AppMembership` at the end of the edge. */
+  node?: AppMembership | null;
 }
 /** A `EmbeddingChunk` edge in the connection. */
 export interface EmbeddingChunkEdge {
@@ -19819,11 +20416,11 @@ export interface ProfilesModuleEdge {
   /** The `ProfilesModule` at the end of the edge. */
   node?: ProfilesModule | null;
 }
-/** A `AppMembership` edge in the connection. */
-export interface AppMembershipEdge {
+/** A `AppInvite` edge in the connection. */
+export interface AppInviteEdge {
   cursor?: string | null;
-  /** The `AppMembership` at the end of the edge. */
-  node?: AppMembership | null;
+  /** The `AppInvite` at the end of the edge. */
+  node?: AppInvite | null;
 }
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
@@ -19836,12 +20433,6 @@ export interface WebauthnCredentialEdge {
   cursor?: string | null;
   /** The `WebauthnCredential` at the end of the edge. */
   node?: WebauthnCredential | null;
-}
-/** A `OrgInvite` edge in the connection. */
-export interface OrgInviteEdge {
-  cursor?: string | null;
-  /** The `OrgInvite` at the end of the edge. */
-  node?: OrgInvite | null;
 }
 /** A `OrgMembership` edge in the connection. */
 export interface OrgMembershipEdge {
@@ -19861,23 +20452,29 @@ export interface HierarchyModuleEdge {
   /** The `HierarchyModule` at the end of the edge. */
   node?: HierarchyModule | null;
 }
+/** A `OrgInvite` edge in the connection. */
+export interface OrgInviteEdge {
+  cursor?: string | null;
+  /** The `OrgInvite` at the end of the edge. */
+  node?: OrgInvite | null;
+}
 /** A `ForeignKeyConstraint` edge in the connection. */
 export interface ForeignKeyConstraintEdge {
   cursor?: string | null;
   /** The `ForeignKeyConstraint` at the end of the edge. */
   node?: ForeignKeyConstraint | null;
 }
-/** A `Table` edge in the connection. */
-export interface TableEdge {
-  cursor?: string | null;
-  /** The `Table` at the end of the edge. */
-  node?: Table | null;
-}
 /** A `StorageModule` edge in the connection. */
 export interface StorageModuleEdge {
   cursor?: string | null;
   /** The `StorageModule` at the end of the edge. */
   node?: StorageModule | null;
+}
+/** A `Table` edge in the connection. */
+export interface TableEdge {
+  cursor?: string | null;
+  /** The `Table` at the end of the edge. */
+  node?: Table | null;
 }
 /** A `EntityTypeProvision` edge in the connection. */
 export interface EntityTypeProvisionEdge {

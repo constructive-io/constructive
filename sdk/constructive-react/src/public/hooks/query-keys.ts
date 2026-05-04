@@ -901,6 +901,33 @@ export const auditLogKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...auditLogKeys.details(), id] as const,
 } as const;
+export const agentThreadKeys = {
+  /** All agentThread queries */ all: ['agentthread'] as const,
+  /** List query keys */ lists: () => [...agentThreadKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentThreadKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentThreadKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentThreadKeys.details(), id] as const,
+} as const;
+export const agentMessageKeys = {
+  /** All agentMessage queries */ all: ['agentmessage'] as const,
+  /** List query keys */ lists: () => [...agentMessageKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentMessageKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentMessageKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentMessageKeys.details(), id] as const,
+} as const;
+export const agentTaskKeys = {
+  /** All agentTask queries */ all: ['agenttask'] as const,
+  /** List query keys */ lists: () => [...agentTaskKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...agentTaskKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...agentTaskKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...agentTaskKeys.details(), id] as const,
+} as const;
 export const appPermissionDefaultKeys = {
   /** All appPermissionDefault queries */ all: ['apppermissiondefault'] as const,
   /** List query keys */ lists: () => [...appPermissionDefaultKeys.all, 'list'] as const,
@@ -981,6 +1008,15 @@ export const devicesModuleKeys = {
   /** Detail query keys */ details: () => [...devicesModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...devicesModuleKeys.details(), id] as const,
+} as const;
+export const nodeTypeRegistryKeys = {
+  /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
+  /** List query keys */ lists: () => [...nodeTypeRegistryKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...nodeTypeRegistryKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...nodeTypeRegistryKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...nodeTypeRegistryKeys.details(), id] as const,
 } as const;
 export const userConnectedAccountKeys = {
   /** All userConnectedAccount queries */ all: ['userconnectedaccount'] as const,
@@ -1270,6 +1306,9 @@ export const queryKeys = {
   orgInvite: orgInviteKeys,
   orgClaimedInvite: orgClaimedInviteKeys,
   auditLog: auditLogKeys,
+  agentThread: agentThreadKeys,
+  agentMessage: agentMessageKeys,
+  agentTask: agentTaskKeys,
   appPermissionDefault: appPermissionDefaultKeys,
   identityProvider: identityProviderKeys,
   ref: refKeys,
@@ -1279,6 +1318,7 @@ export const queryKeys = {
   appLimitDefault: appLimitDefaultKeys,
   orgLimitDefault: orgLimitDefaultKeys,
   devicesModule: devicesModuleKeys,
+  nodeTypeRegistry: nodeTypeRegistryKeys,
   userConnectedAccount: userConnectedAccountKeys,
   appMembershipDefault: appMembershipDefaultKeys,
   orgMembershipDefault: orgMembershipDefaultKeys,

@@ -104,9 +104,6 @@ function App() {
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
 existing file ID and deduplicated=true with no uploadUrl. |
-| `useConfirmUploadMutation` | Mutation | Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'. |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -582,19 +579,6 @@ existing file ID and deduplicated=true with no uploadUrl.
   | Argument | Type |
   |----------|------|
   | `input` | RequestUploadUrlInput (required) |
-
-### `useConfirmUploadMutation`
-
-Confirm that a file has been uploaded to S3.
-Verifies the object exists in S3, checks content-type,
-and transitions the file status from 'pending' to 'ready'.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ConfirmUploadInput (required) |
 
 ### `useProvisionBucketMutation`
 

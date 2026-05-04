@@ -7,8 +7,8 @@ Invitation records sent to prospective members via email, with token-based redem
 ## Usage
 
 ```typescript
-useOrgInvitesQuery({ selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } } })
-useOrgInviteQuery({ id: '<UUID>', selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } } })
+useOrgInvitesQuery({ selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } } })
+useOrgInviteQuery({ id: '<UUID>', selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } } })
 useCreateOrgInviteMutation({ selection: { fields: { id: true } } })
 useUpdateOrgInviteMutation({ selection: { fields: { id: true } } })
 useDeleteOrgInviteMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgInviteMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, profileId: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgInvitesQuery({
 const { mutate } = useCreateOrgInviteMutation({
   selection: { fields: { id: true } },
 });
-mutate({ email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>', entityId: '<UUID>' });
+mutate({ email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', profileId: '<UUID>', expiresAt: '<Datetime>', entityId: '<UUID>' });
 ```
