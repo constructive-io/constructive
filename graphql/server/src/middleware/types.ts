@@ -9,6 +9,9 @@ export type ConstructiveAPIToken = {
   [key: string]: unknown;
 };
 
+/** How the current request was authenticated. */
+export type TokenSource = 'bearer' | 'cookie' | 'none';
+
 declare global {
   namespace Express {
     interface Request {
@@ -18,6 +21,8 @@ declare global {
       databaseId?: string;
       requestId?: string;
       token?: ConstructiveAPIToken;
+      /** How the credential was resolved: bearer header, session cookie, or none. */
+      tokenSource?: TokenSource;
     }
   }
 }

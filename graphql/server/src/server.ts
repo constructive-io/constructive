@@ -33,6 +33,7 @@ import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createCaptchaMiddleware } from './middleware/captcha';
+import { createCsrfProtectionMiddleware } from './middleware/csrf';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
@@ -159,11 +160,25 @@ class Server {
     app.use(api);
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
+
+    // CSRF double-submit-cookie protection (no-op when enable_cookie_auth is false)
+    const csrfMiddleware = createCsrfProtectionMiddleware();
+    app.use(csrfMiddleware.setToken);
+    app.use(csrfMiddleware.protect);
+
+    // CAPTCHA verification on protected mutations (no-op when enable_captcha is false)
     app.use(createCaptchaMiddleware());
+
+    // Cookie lifecycle (set/clear session cookies) is handled by the grafserv
+    // CookiePlugin registered in buildPreset() — no Express middleware needed.
+    // The plugin uses the official processRequest hook and is a complete no-op
+    // when enable_cookie_auth is false.
+
     app.use(graphile(effectiveOpts));
     app.use(flush);
 
     // Error handling - MUST be LAST
+    app.use(csrfMiddleware.errorHandler as any); // CSRF validation errors → 403
     app.use(notFoundHandler); // Catches unmatched routes (404)
     app.use(errorHandler); // Catches all thrown errors
 
