@@ -10,18 +10,27 @@ import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord
 import { AppPermissionModel } from './models/appPermission';
 import { OrgPermissionModel } from './models/orgPermission';
 import { AppLevelRequirementModel } from './models/appLevelRequirement';
+import { AppLimitCreditRedemptionModel } from './models/appLimitCreditRedemption';
+import { AppLimitCreditCodeItemModel } from './models/appLimitCreditCodeItem';
 import { OrgMemberModel } from './models/orgMember';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
+import { AppLimitCreditCodeModel } from './models/appLimitCreditCode';
 import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
 import { AppAdminGrantModel } from './models/appAdminGrant';
 import { AppOwnerGrantModel } from './models/appOwnerGrant';
 import { AppAchievementModel } from './models/appAchievement';
 import { AppStepModel } from './models/appStep';
+import { AppLimitCapsDefaultModel } from './models/appLimitCapsDefault';
+import { OrgLimitCapsDefaultModel } from './models/orgLimitCapsDefault';
+import { AppLimitCapModel } from './models/appLimitCap';
+import { OrgLimitCapModel } from './models/orgLimitCap';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
 import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
 import { MembershipTypeModel } from './models/membershipType';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
+import { AppLimitCreditModel } from './models/appLimitCredit';
+import { OrgLimitCreditModel } from './models/orgLimitCredit';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { AppClaimedInviteModel } from './models/appClaimedInvite';
 import { AppGrantModel } from './models/appGrant';
@@ -32,13 +41,13 @@ import { AppLimitEventModel } from './models/appLimitEvent';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
-import { AppLimitModel } from './models/appLimit';
-import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
 import { OrgMemberProfileModel } from './models/orgMemberProfile';
-import { OrgLimitModel } from './models/orgLimit';
 import { AppLevelModel } from './models/appLevel';
+import { AppLimitModel } from './models/appLimit';
 import { AppInviteModel } from './models/appInvite';
 import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
+import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
+import { OrgLimitModel } from './models/orgLimit';
 import { OrgInviteModel } from './models/orgInvite';
 import { AppMembershipModel } from './models/appMembership';
 import { OrgMembershipModel } from './models/orgMembership';
@@ -83,18 +92,27 @@ export function createClient(config: OrmClientConfig) {
     appPermission: new AppPermissionModel(client),
     orgPermission: new OrgPermissionModel(client),
     appLevelRequirement: new AppLevelRequirementModel(client),
+    appLimitCreditRedemption: new AppLimitCreditRedemptionModel(client),
+    appLimitCreditCodeItem: new AppLimitCreditCodeItemModel(client),
     orgMember: new OrgMemberModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
+    appLimitCreditCode: new AppLimitCreditCodeModel(client),
     orgPermissionDefault: new OrgPermissionDefaultModel(client),
     appAdminGrant: new AppAdminGrantModel(client),
     appOwnerGrant: new AppOwnerGrantModel(client),
     appAchievement: new AppAchievementModel(client),
     appStep: new AppStepModel(client),
+    appLimitCapsDefault: new AppLimitCapsDefaultModel(client),
+    orgLimitCapsDefault: new OrgLimitCapsDefaultModel(client),
+    appLimitCap: new AppLimitCapModel(client),
+    orgLimitCap: new OrgLimitCapModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),
     orgOwnerGrant: new OrgOwnerGrantModel(client),
     membershipType: new MembershipTypeModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
+    appLimitCredit: new AppLimitCreditModel(client),
+    orgLimitCredit: new OrgLimitCreditModel(client),
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     appClaimedInvite: new AppClaimedInviteModel(client),
     appGrant: new AppGrantModel(client),
@@ -105,13 +123,13 @@ export function createClient(config: OrmClientConfig) {
     orgLimitEvent: new OrgLimitEventModel(client),
     orgGrant: new OrgGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
-    appLimit: new AppLimitModel(client),
-    orgLimitAggregate: new OrgLimitAggregateModel(client),
     orgMemberProfile: new OrgMemberProfileModel(client),
-    orgLimit: new OrgLimitModel(client),
     appLevel: new AppLevelModel(client),
+    appLimit: new AppLimitModel(client),
     appInvite: new AppInviteModel(client),
     orgMembershipSetting: new OrgMembershipSettingModel(client),
+    orgLimitAggregate: new OrgLimitAggregateModel(client),
+    orgLimit: new OrgLimitModel(client),
     orgInvite: new OrgInviteModel(client),
     appMembership: new AppMembershipModel(client),
     orgMembership: new OrgMembershipModel(client),

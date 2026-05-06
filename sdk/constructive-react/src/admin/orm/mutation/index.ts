@@ -10,14 +10,17 @@ import type {
   SubmitAppInviteCodeInput,
   SubmitOrgInviteCodeInput,
   RequestUploadUrlInput,
+  RequestBulkUploadUrlsInput,
   ProvisionBucketInput,
   SubmitAppInviteCodePayload,
   SubmitOrgInviteCodePayload,
   RequestUploadUrlPayload,
+  RequestBulkUploadUrlsPayload,
   ProvisionBucketPayload,
   SubmitAppInviteCodePayloadSelect,
   SubmitOrgInviteCodePayloadSelect,
   RequestUploadUrlPayloadSelect,
+  RequestBulkUploadUrlsPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -36,6 +39,15 @@ existing file ID and deduplicated=true with no uploadUrl.
  */
 export interface RequestUploadUrlVariables {
   input: RequestUploadUrlInput;
+}
+/**
+ * Variables for requestBulkUploadUrls
+ * Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs.
+ */
+export interface RequestBulkUploadUrlsVariables {
+  input: RequestBulkUploadUrlsInput;
 }
 /**
  * Variables for provisionBucket
@@ -134,6 +146,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'RequestUploadUrlPayload'
+        ),
+      }),
+    requestBulkUploadUrls: <S extends RequestBulkUploadUrlsPayloadSelect>(
+      args: RequestBulkUploadUrlsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RequestBulkUploadUrlsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        requestBulkUploadUrls: InferSelectResult<RequestBulkUploadUrlsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RequestBulkUploadUrls',
+        fieldName: 'requestBulkUploadUrls',
+        ...buildCustomDocument(
+          'mutation',
+          'RequestBulkUploadUrls',
+          'requestBulkUploadUrls',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RequestBulkUploadUrlsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RequestBulkUploadUrlsPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

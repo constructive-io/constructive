@@ -247,6 +247,760 @@ type AppLevelRequirementEdge {
   node: AppLevelRequirement
 }
 
+"""A connection to a list of `AppLimitCreditRedemption` values."""
+type AppLimitCreditRedemptionConnection {
+  """A list of `AppLimitCreditRedemption` objects."""
+  nodes: [AppLimitCreditRedemption]!
+
+  """
+  A list of edges which contains the `AppLimitCreditRedemption` and cursor to aid in pagination.
+  """
+  edges: [AppLimitCreditRedemptionEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppLimitCreditRedemption` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits
+"""
+type AppLimitCreditRedemption {
+  id: UUID!
+
+  """FK to credit_codes — which code is being redeemed"""
+  creditCodeId: UUID!
+
+  """Entity receiving the credits (personal org user_id or org entity_id)"""
+  entityId: UUID!
+
+  """
+  Reads a single `AppLimitCreditCode` that is related to this `AppLimitCreditRedemption`.
+  """
+  creditCode: AppLimitCreditCode
+}
+
+"""
+Redeemable credit codes managed by admins with the add_credits permission
+"""
+type AppLimitCreditCode {
+  id: UUID!
+
+  """Human-readable credit code (case-insensitive, unique)"""
+  code: String!
+
+  """Maximum total redemptions allowed; NULL for unlimited"""
+  maxRedemptions: Int
+
+  """
+  Current number of redemptions (incremented by trigger on credit_redemptions)
+  """
+  currentRedemptions: Int!
+
+  """Expiration timestamp; NULL for no expiry"""
+  expiresAt: Datetime
+
+  """
+  Reads and enables pagination through a set of `AppLimitCreditCodeItem`.
+  """
+  appLimitCreditCodeItemsByCreditCodeId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCreditCodeItemFilter
+
+    """The method to use when ordering `AppLimitCreditCodeItem`."""
+    orderBy: [AppLimitCreditCodeItemOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeItemConnection!
+
+  """
+  Reads and enables pagination through a set of `AppLimitCreditRedemption`.
+  """
+  appLimitCreditRedemptionsByCreditCodeId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCreditRedemptionFilter
+
+    """The method to use when ordering `AppLimitCreditRedemption`."""
+    orderBy: [AppLimitCreditRedemptionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditRedemptionConnection!
+}
+
+"""A connection to a list of `AppLimitCreditCodeItem` values."""
+type AppLimitCreditCodeItemConnection {
+  """A list of `AppLimitCreditCodeItem` objects."""
+  nodes: [AppLimitCreditCodeItem]!
+
+  """
+  A list of edges which contains the `AppLimitCreditCodeItem` and cursor to aid in pagination.
+  """
+  edges: [AppLimitCreditCodeItemEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppLimitCreditCodeItem` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Items within a credit code — each row grants credits for a specific limit definition
+"""
+type AppLimitCreditCodeItem {
+  id: UUID!
+
+  """FK to credit_codes — which code this item belongs to"""
+  creditCodeId: UUID!
+
+  """FK to default_limits — which limit this item grants credits for"""
+  defaultLimitId: UUID!
+
+  """Number of credits this item grants per redemption"""
+  amount: BigInt!
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String!
+
+  """
+  Reads a single `AppLimitCreditCode` that is related to this `AppLimitCreditCodeItem`.
+  """
+  creditCode: AppLimitCreditCode
+
+  """
+  Reads a single `AppLimitDefault` that is related to this `AppLimitCreditCodeItem`.
+  """
+  defaultLimit: AppLimitDefault
+}
+
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+"""
+Default maximum values for each named limit, applied when no per-actor override exists
+"""
+type AppLimitDefault {
+  id: UUID!
+
+  """Name identifier of the limit this default applies to"""
+  name: String!
+
+  """Default maximum usage allowed for this limit"""
+  max: BigInt
+
+  """Default soft limit threshold for warnings; NULL means no soft limit"""
+  softMax: BigInt
+
+  """
+  Reads and enables pagination through a set of `AppLimitCreditCodeItem`.
+  """
+  appLimitCreditCodeItemsByDefaultLimitId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCreditCodeItemFilter
+
+    """The method to use when ordering `AppLimitCreditCodeItem`."""
+    orderBy: [AppLimitCreditCodeItemOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeItemConnection!
+}
+
+"""
+A filter to be used against `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCreditCodeItemFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `creditCodeId` field."""
+  creditCodeId: UUIDFilter
+
+  """Filter by the object’s `defaultLimitId` field."""
+  defaultLimitId: UUIDFilter
+
+  """Filter by the object’s `amount` field."""
+  amount: BigIntFilter
+
+  """Filter by the object’s `creditType` field."""
+  creditType: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitCreditCodeItemFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitCreditCodeItemFilter!]
+
+  """Negates the expression."""
+  not: AppLimitCreditCodeItemFilter
+
+  """Filter by the object’s `creditCode` relation."""
+  creditCode: AppLimitCreditCodeFilter
+
+  """Filter by the object’s `defaultLimit` relation."""
+  defaultLimit: AppLimitDefaultFilter
+}
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+}
+
+"""
+A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’
+"""
+input BigIntFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: BigInt
+
+  """Not equal to the specified value."""
+  notEqualTo: BigInt
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BigInt
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BigInt
+
+  """Included in the specified list."""
+  in: [BigInt!]
+
+  """Not included in the specified list."""
+  notIn: [BigInt!]
+
+  """Less than the specified value."""
+  lessThan: BigInt
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BigInt
+
+  """Greater than the specified value."""
+  greaterThan: BigInt
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BigInt
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+}
+
+"""
+A filter to be used against `AppLimitCreditCode` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCreditCodeFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `code` field."""
+  code: StringFilter
+
+  """Filter by the object’s `maxRedemptions` field."""
+  maxRedemptions: IntFilter
+
+  """Filter by the object’s `currentRedemptions` field."""
+  currentRedemptions: IntFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitCreditCodeFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitCreditCodeFilter!]
+
+  """Negates the expression."""
+  not: AppLimitCreditCodeFilter
+
+  """
+  Filter by the object’s `appLimitCreditCodeItemsByCreditCodeId` relation.
+  """
+  appLimitCreditCodeItemsByCreditCodeId: AppLimitCreditCodeToManyAppLimitCreditCodeItemFilter
+
+  """`appLimitCreditCodeItemsByCreditCodeId` exist."""
+  appLimitCreditCodeItemsByCreditCodeIdExist: Boolean
+
+  """
+  Filter by the object’s `appLimitCreditRedemptionsByCreditCodeId` relation.
+  """
+  appLimitCreditRedemptionsByCreditCodeId: AppLimitCreditCodeToManyAppLimitCreditRedemptionFilter
+
+  """`appLimitCreditRedemptionsByCreditCodeId` exist."""
+  appLimitCreditRedemptionsByCreditCodeIdExist: Boolean
+}
+
+"""
+A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+"""
+input IntFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Int
+
+  """Not equal to the specified value."""
+  notEqualTo: Int
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Int
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Int
+
+  """Included in the specified list."""
+  in: [Int!]
+
+  """Not included in the specified list."""
+  notIn: [Int!]
+
+  """Less than the specified value."""
+  lessThan: Int
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Int
+
+  """Greater than the specified value."""
+  greaterThan: Int
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Int
+}
+
+"""
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+}
+
+"""
+A filter to be used against many `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCreditCodeToManyAppLimitCreditCodeItemFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AppLimitCreditCodeItemFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AppLimitCreditCodeItemFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AppLimitCreditCodeItemFilter
+}
+
+"""
+A filter to be used against many `AppLimitCreditRedemption` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCreditCodeToManyAppLimitCreditRedemptionFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AppLimitCreditRedemptionFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AppLimitCreditRedemptionFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AppLimitCreditRedemptionFilter
+}
+
+"""
+A filter to be used against `AppLimitCreditRedemption` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCreditRedemptionFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `creditCodeId` field."""
+  creditCodeId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitCreditRedemptionFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitCreditRedemptionFilter!]
+
+  """Negates the expression."""
+  not: AppLimitCreditRedemptionFilter
+
+  """Filter by the object’s `creditCode` relation."""
+  creditCode: AppLimitCreditCodeFilter
+}
+
+"""
+A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitDefaultFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Filter by the object’s `softMax` field."""
+  softMax: BigIntFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitDefaultFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitDefaultFilter!]
+
+  """Negates the expression."""
+  not: AppLimitDefaultFilter
+
+  """
+  Filter by the object’s `appLimitCreditCodeItemsByDefaultLimitId` relation.
+  """
+  appLimitCreditCodeItemsByDefaultLimitId: AppLimitDefaultToManyAppLimitCreditCodeItemFilter
+
+  """`appLimitCreditCodeItemsByDefaultLimitId` exist."""
+  appLimitCreditCodeItemsByDefaultLimitIdExist: Boolean
+}
+
+"""
+A filter to be used against many `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitDefaultToManyAppLimitCreditCodeItemFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AppLimitCreditCodeItemFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AppLimitCreditCodeItemFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AppLimitCreditCodeItemFilter
+}
+
+"""Methods to use when ordering `AppLimitCreditCodeItem`."""
+enum AppLimitCreditCodeItemOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREDIT_CODE_ID_ASC
+  CREDIT_CODE_ID_DESC
+  DEFAULT_LIMIT_ID_ASC
+  DEFAULT_LIMIT_ID_DESC
+  AMOUNT_ASC
+  AMOUNT_DESC
+  CREDIT_TYPE_ASC
+  CREDIT_TYPE_DESC
+}
+
+"""A `AppLimitCreditCodeItem` edge in the connection."""
+type AppLimitCreditCodeItemEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitCreditCodeItem` at the end of the edge."""
+  node: AppLimitCreditCodeItem
+}
+
+"""Methods to use when ordering `AppLimitCreditRedemption`."""
+enum AppLimitCreditRedemptionOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREDIT_CODE_ID_ASC
+  CREDIT_CODE_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+}
+
+"""A `AppLimitCreditRedemption` edge in the connection."""
+type AppLimitCreditRedemptionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitCreditRedemption` at the end of the edge."""
+  node: AppLimitCreditRedemption
+}
+
 """A connection to a list of `OrgMember` values."""
 type OrgMemberConnection {
   """A list of `OrgMember` objects."""
@@ -313,48 +1067,6 @@ input OrgMemberFilter {
 
   """Negates the expression."""
   not: OrgMemberFilter
-}
-
-"""
-A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
-"""
-input UUIDFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: UUID
-
-  """Not equal to the specified value."""
-  notEqualTo: UUID
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: UUID
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: UUID
-
-  """Included in the specified list."""
-  in: [UUID!]
-
-  """Not included in the specified list."""
-  notIn: [UUID!]
-
-  """Less than the specified value."""
-  lessThan: UUID
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: UUID
-
-  """Greater than the specified value."""
-  greaterThan: UUID
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: UUID
 }
 
 """
@@ -525,6 +1237,51 @@ enum AppPermissionDefaultOrderBy {
   PERMISSIONS_DESC
 }
 
+"""A connection to a list of `AppLimitCreditCode` values."""
+type AppLimitCreditCodeConnection {
+  """A list of `AppLimitCreditCode` objects."""
+  nodes: [AppLimitCreditCode]!
+
+  """
+  A list of edges which contains the `AppLimitCreditCode` and cursor to aid in pagination.
+  """
+  edges: [AppLimitCreditCodeEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppLimitCreditCode` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `AppLimitCreditCode` edge in the connection."""
+type AppLimitCreditCodeEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitCreditCode` at the end of the edge."""
+  node: AppLimitCreditCode
+}
+
+"""Methods to use when ordering `AppLimitCreditCode`."""
+enum AppLimitCreditCodeOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CODE_ASC
+  CODE_DESC
+  MAX_REDEMPTIONS_ASC
+  MAX_REDEMPTIONS_DESC
+  CURRENT_REDEMPTIONS_ASC
+  CURRENT_REDEMPTIONS_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
+}
+
 """A connection to a list of `OrgPermissionDefault` values."""
 type OrgPermissionDefaultConnection {
   """A list of `OrgPermissionDefault` objects."""
@@ -629,180 +1386,6 @@ input AppPermissionFilter {
 
   """Negates the expression."""
   not: AppPermissionFilter
-}
-
-"""
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
-"""
-input StringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: String
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: String
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: String
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: String
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: String
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: String
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: String
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: String
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: String
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: String
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: String
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [String!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [String!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: String
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: String
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: String
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: String
-}
-
-"""
-A filter to be used against Int fields. All fields are combined with a logical ‘and.’
-"""
-input IntFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Int
-
-  """Not equal to the specified value."""
-  notEqualTo: Int
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Int
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Int
-
-  """Included in the specified list."""
-  in: [Int!]
-
-  """Not included in the specified list."""
-  notIn: [Int!]
-
-  """Less than the specified value."""
-  lessThan: Int
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Int
-
-  """Greater than the specified value."""
-  greaterThan: Int
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Int
 }
 
 """Methods to use when ordering `AppPermission`."""
@@ -938,48 +1521,6 @@ input AppAdminGrantFilter {
 
   """Negates the expression."""
   not: AppAdminGrantFilter
-}
-
-"""
-A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
-"""
-input DatetimeFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Datetime
-
-  """Not equal to the specified value."""
-  notEqualTo: Datetime
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Datetime
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Datetime
-
-  """Included in the specified list."""
-  in: [Datetime!]
-
-  """Not included in the specified list."""
-  notIn: [Datetime!]
-
-  """Less than the specified value."""
-  lessThan: Datetime
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Datetime
-
-  """Greater than the specified value."""
-  greaterThan: Datetime
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Datetime
 }
 
 """Methods to use when ordering `AppAdminGrant`."""
@@ -1276,6 +1817,334 @@ enum AppStepOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+}
+
+"""A connection to a list of `AppLimitCapsDefault` values."""
+type AppLimitCapsDefaultConnection {
+  """A list of `AppLimitCapsDefault` objects."""
+  nodes: [AppLimitCapsDefault]!
+
+  """
+  A list of edges which contains the `AppLimitCapsDefault` and cursor to aid in pagination.
+  """
+  edges: [AppLimitCapsDefaultEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppLimitCapsDefault` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers.
+"""
+type AppLimitCapsDefault {
+  id: UUID!
+
+  """
+  Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics)
+  """
+  name: String!
+
+  """
+  Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units.
+  """
+  max: BigInt!
+}
+
+"""A `AppLimitCapsDefault` edge in the connection."""
+type AppLimitCapsDefaultEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitCapsDefault` at the end of the edge."""
+  node: AppLimitCapsDefault
+}
+
+"""
+A filter to be used against `AppLimitCapsDefault` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCapsDefaultFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitCapsDefaultFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitCapsDefaultFilter!]
+
+  """Negates the expression."""
+  not: AppLimitCapsDefaultFilter
+}
+
+"""Methods to use when ordering `AppLimitCapsDefault`."""
+enum AppLimitCapsDefaultOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  MAX_ASC
+  MAX_DESC
+}
+
+"""A connection to a list of `OrgLimitCapsDefault` values."""
+type OrgLimitCapsDefaultConnection {
+  """A list of `OrgLimitCapsDefault` objects."""
+  nodes: [OrgLimitCapsDefault]!
+
+  """
+  A list of edges which contains the `OrgLimitCapsDefault` and cursor to aid in pagination.
+  """
+  edges: [OrgLimitCapsDefaultEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgLimitCapsDefault` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers.
+"""
+type OrgLimitCapsDefault {
+  id: UUID!
+
+  """
+  Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics)
+  """
+  name: String!
+
+  """
+  Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units.
+  """
+  max: BigInt!
+}
+
+"""A `OrgLimitCapsDefault` edge in the connection."""
+type OrgLimitCapsDefaultEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgLimitCapsDefault` at the end of the edge."""
+  node: OrgLimitCapsDefault
+}
+
+"""
+A filter to be used against `OrgLimitCapsDefault` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgLimitCapsDefaultFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgLimitCapsDefaultFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgLimitCapsDefaultFilter!]
+
+  """Negates the expression."""
+  not: OrgLimitCapsDefaultFilter
+}
+
+"""Methods to use when ordering `OrgLimitCapsDefault`."""
+enum OrgLimitCapsDefaultOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  MAX_ASC
+  MAX_DESC
+}
+
+"""A connection to a list of `AppLimitCap` values."""
+type AppLimitCapConnection {
+  """A list of `AppLimitCap` objects."""
+  nodes: [AppLimitCap]!
+
+  """
+  A list of edges which contains the `AppLimitCap` and cursor to aid in pagination.
+  """
+  edges: [AppLimitCapEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppLimitCap` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default.
+"""
+type AppLimitCap {
+  id: UUID!
+
+  """Name identifier of the cap being overridden"""
+  name: String!
+
+  """Entity this cap override applies to"""
+  entityId: UUID!
+
+  """Override cap value for this entity"""
+  max: BigInt!
+}
+
+"""A `AppLimitCap` edge in the connection."""
+type AppLimitCapEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitCap` at the end of the edge."""
+  node: AppLimitCap
+}
+
+"""
+A filter to be used against `AppLimitCap` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCapFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitCapFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitCapFilter!]
+
+  """Negates the expression."""
+  not: AppLimitCapFilter
+}
+
+"""Methods to use when ordering `AppLimitCap`."""
+enum AppLimitCapOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  MAX_ASC
+  MAX_DESC
+}
+
+"""A connection to a list of `OrgLimitCap` values."""
+type OrgLimitCapConnection {
+  """A list of `OrgLimitCap` objects."""
+  nodes: [OrgLimitCap]!
+
+  """
+  A list of edges which contains the `OrgLimitCap` and cursor to aid in pagination.
+  """
+  edges: [OrgLimitCapEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgLimitCap` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default.
+"""
+type OrgLimitCap {
+  id: UUID!
+
+  """Name identifier of the cap being overridden"""
+  name: String!
+
+  """Entity this cap override applies to"""
+  entityId: UUID!
+
+  """Override cap value for this entity"""
+  max: BigInt!
+}
+
+"""A `OrgLimitCap` edge in the connection."""
+type OrgLimitCapEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgLimitCap` at the end of the edge."""
+  node: OrgLimitCap
+}
+
+"""
+A filter to be used against `OrgLimitCap` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgLimitCapFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgLimitCapFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgLimitCapFilter!]
+
+  """Negates the expression."""
+  not: OrgLimitCapFilter
+}
+
+"""Methods to use when ordering `OrgLimitCap`."""
+enum OrgLimitCapOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  MAX_ASC
+  MAX_DESC
 }
 
 """A connection to a list of `OrgAdminGrant` values."""
@@ -1603,29 +2472,6 @@ type AppLimitDefaultConnection {
   totalCount: Int!
 }
 
-"""
-Default maximum values for each named limit, applied when no per-actor override exists
-"""
-type AppLimitDefault {
-  id: UUID!
-
-  """Name identifier of the limit this default applies to"""
-  name: String!
-
-  """Default maximum usage allowed for this limit"""
-  max: BigInt
-
-  """Default soft limit threshold for warnings; NULL means no soft limit"""
-  softMax: BigInt
-}
-
-"""
-A signed eight-byte integer. The upper big integer values are greater than the
-max value for a JavaScript number. Therefore all big integers will be output as
-strings and not numbers.
-"""
-scalar BigInt
-
 """A `AppLimitDefault` edge in the connection."""
 type AppLimitDefaultEdge {
   """A cursor for use in pagination."""
@@ -1633,74 +2479,6 @@ type AppLimitDefaultEdge {
 
   """The `AppLimitDefault` at the end of the edge."""
   node: AppLimitDefault
-}
-
-"""
-A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’
-"""
-input AppLimitDefaultFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `max` field."""
-  max: BigIntFilter
-
-  """Filter by the object’s `softMax` field."""
-  softMax: BigIntFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppLimitDefaultFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppLimitDefaultFilter!]
-
-  """Negates the expression."""
-  not: AppLimitDefaultFilter
-}
-
-"""
-A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’
-"""
-input BigIntFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: BigInt
-
-  """Not equal to the specified value."""
-  notEqualTo: BigInt
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: BigInt
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: BigInt
-
-  """Included in the specified list."""
-  in: [BigInt!]
-
-  """Not included in the specified list."""
-  notIn: [BigInt!]
-
-  """Less than the specified value."""
-  lessThan: BigInt
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: BigInt
-
-  """Greater than the specified value."""
-  greaterThan: BigInt
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: BigInt
 }
 
 """Methods to use when ordering `AppLimitDefault`."""
@@ -1862,6 +2640,232 @@ enum AppLevelRequirementOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+}
+
+"""A connection to a list of `AppLimitCredit` values."""
+type AppLimitCreditConnection {
+  """A list of `AppLimitCredit` objects."""
+  nodes: [AppLimitCredit]!
+
+  """
+  A list of edges which contains the `AppLimitCredit` and cursor to aid in pagination.
+  """
+  edges: [AppLimitCreditEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppLimitCredit` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Append-only ledger of credit grants that automatically update limit ceilings
+"""
+type AppLimitCredit {
+  id: UUID!
+
+  """FK to default_limits — which limit definition this credit applies to"""
+  defaultLimitId: UUID!
+
+  """User this credit is for; NULL for aggregate entity-level credits"""
+  actorId: UUID
+
+  """Number of credits to grant (positive to add, negative to revoke)"""
+  amount: BigInt!
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String!
+
+  """Optional reason for the credit grant (promo code, admin grant, etc.)"""
+  reason: String
+
+  """
+  Reads a single `AppLimitDefault` that is related to this `AppLimitCredit`.
+  """
+  defaultLimit: AppLimitDefault
+}
+
+"""A `AppLimitCredit` edge in the connection."""
+type AppLimitCreditEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitCredit` at the end of the edge."""
+  node: AppLimitCredit
+}
+
+"""
+A filter to be used against `AppLimitCredit` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitCreditFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `defaultLimitId` field."""
+  defaultLimitId: UUIDFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `amount` field."""
+  amount: BigIntFilter
+
+  """Filter by the object’s `creditType` field."""
+  creditType: StringFilter
+
+  """Filter by the object’s `reason` field."""
+  reason: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitCreditFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitCreditFilter!]
+
+  """Negates the expression."""
+  not: AppLimitCreditFilter
+
+  """Filter by the object’s `defaultLimit` relation."""
+  defaultLimit: AppLimitDefaultFilter
+}
+
+"""Methods to use when ordering `AppLimitCredit`."""
+enum AppLimitCreditOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DEFAULT_LIMIT_ID_ASC
+  DEFAULT_LIMIT_ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  AMOUNT_ASC
+  AMOUNT_DESC
+  CREDIT_TYPE_ASC
+  CREDIT_TYPE_DESC
+  REASON_ASC
+  REASON_DESC
+}
+
+"""A connection to a list of `OrgLimitCredit` values."""
+type OrgLimitCreditConnection {
+  """A list of `OrgLimitCredit` objects."""
+  nodes: [OrgLimitCredit]!
+
+  """
+  A list of edges which contains the `OrgLimitCredit` and cursor to aid in pagination.
+  """
+  edges: [OrgLimitCreditEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgLimitCredit` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Append-only ledger of credit grants that automatically update limit ceilings
+"""
+type OrgLimitCredit {
+  id: UUID!
+
+  """FK to default_limits — which limit definition this credit applies to"""
+  defaultLimitId: UUID!
+
+  """User this credit is for; NULL for aggregate entity-level credits"""
+  actorId: UUID
+
+  """Entity this credit applies to; NULL for actor-only credits"""
+  entityId: UUID
+
+  """Number of credits to grant (positive to add, negative to revoke)"""
+  amount: BigInt!
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String!
+
+  """Optional reason for the credit grant (promo code, admin grant, etc.)"""
+  reason: String
+
+  """
+  Reads a single `OrgLimitDefault` that is related to this `OrgLimitCredit`.
+  """
+  defaultLimit: OrgLimitDefault
+}
+
+"""A `OrgLimitCredit` edge in the connection."""
+type OrgLimitCreditEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgLimitCredit` at the end of the edge."""
+  node: OrgLimitCredit
+}
+
+"""
+A filter to be used against `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgLimitCreditFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `defaultLimitId` field."""
+  defaultLimitId: UUIDFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `amount` field."""
+  amount: BigIntFilter
+
+  """Filter by the object’s `creditType` field."""
+  creditType: StringFilter
+
+  """Filter by the object’s `reason` field."""
+  reason: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgLimitCreditFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgLimitCreditFilter!]
+
+  """Negates the expression."""
+  not: OrgLimitCreditFilter
+
+  """Filter by the object’s `defaultLimit` relation."""
+  defaultLimit: OrgLimitDefaultFilter
+}
+
+"""Methods to use when ordering `OrgLimitCredit`."""
+enum OrgLimitCreditOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DEFAULT_LIMIT_ID_ASC
+  DEFAULT_LIMIT_ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  AMOUNT_ASC
+  AMOUNT_DESC
+  CREDIT_TYPE_ASC
+  CREDIT_TYPE_DESC
+  REASON_ASC
+  REASON_DESC
 }
 
 """A connection to a list of `OrgChartEdgeGrant` values."""
@@ -2959,340 +3963,6 @@ enum OrgChartEdgeOrderBy {
   POSITION_LEVEL_DESC
 }
 
-"""A connection to a list of `AppLimit` values."""
-type AppLimitConnection {
-  """A list of `AppLimit` objects."""
-  nodes: [AppLimit]!
-
-  """
-  A list of edges which contains the `AppLimit` and cursor to aid in pagination.
-  """
-  edges: [AppLimitEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppLimit` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Tracks per-actor usage counts against configurable maximum limits"""
-type AppLimit {
-  id: UUID!
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID!
-
-  """Current usage count for this actor and limit"""
-  num: BigInt
-
-  """
-  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
-  """
-  max: BigInt
-
-  """
-  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
-  """
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: Interval
-}
-
-"""
-An interval of time that has passed where the smallest distinct unit is a second.
-"""
-type Interval {
-  """
-  A quantity of seconds. This is the only non-integer field, as all the other
-  fields will dump their overflow into a smaller unit of time. Intervals don’t
-  have a smaller unit than seconds.
-  """
-  seconds: Float
-
-  """A quantity of minutes."""
-  minutes: Int
-
-  """A quantity of hours."""
-  hours: Int
-
-  """A quantity of days."""
-  days: Int
-
-  """A quantity of months."""
-  months: Int
-
-  """A quantity of years."""
-  years: Int
-}
-
-"""A `AppLimit` edge in the connection."""
-type AppLimitEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppLimit` at the end of the edge."""
-  node: AppLimit
-}
-
-"""
-A filter to be used against `AppLimit` object types. All fields are combined with a logical ‘and.’
-"""
-input AppLimitFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `num` field."""
-  num: BigIntFilter
-
-  """Filter by the object’s `max` field."""
-  max: BigIntFilter
-
-  """Filter by the object’s `softMax` field."""
-  softMax: BigIntFilter
-
-  """Filter by the object’s `windowStart` field."""
-  windowStart: DatetimeFilter
-
-  """Filter by the object’s `windowDuration` field."""
-  windowDuration: IntervalFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppLimitFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppLimitFilter!]
-
-  """Negates the expression."""
-  not: AppLimitFilter
-}
-
-"""
-A filter to be used against Interval fields. All fields are combined with a logical ‘and.’
-"""
-input IntervalFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: IntervalInput
-
-  """Not equal to the specified value."""
-  notEqualTo: IntervalInput
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: IntervalInput
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: IntervalInput
-
-  """Included in the specified list."""
-  in: [IntervalInput!]
-
-  """Not included in the specified list."""
-  notIn: [IntervalInput!]
-
-  """Less than the specified value."""
-  lessThan: IntervalInput
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: IntervalInput
-
-  """Greater than the specified value."""
-  greaterThan: IntervalInput
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: IntervalInput
-}
-
-"""
-An interval of time that has passed where the smallest distinct unit is a second.
-"""
-input IntervalInput {
-  """
-  A quantity of seconds. This is the only non-integer field, as all the other
-  fields will dump their overflow into a smaller unit of time. Intervals don’t
-  have a smaller unit than seconds.
-  """
-  seconds: Float
-
-  """A quantity of minutes."""
-  minutes: Int
-
-  """A quantity of hours."""
-  hours: Int
-
-  """A quantity of days."""
-  days: Int
-
-  """A quantity of months."""
-  months: Int
-
-  """A quantity of years."""
-  years: Int
-}
-
-"""Methods to use when ordering `AppLimit`."""
-enum AppLimitOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  NUM_ASC
-  NUM_DESC
-  MAX_ASC
-  MAX_DESC
-  SOFT_MAX_ASC
-  SOFT_MAX_DESC
-  WINDOW_START_ASC
-  WINDOW_START_DESC
-  WINDOW_DURATION_ASC
-  WINDOW_DURATION_DESC
-}
-
-"""A connection to a list of `OrgLimitAggregate` values."""
-type OrgLimitAggregateConnection {
-  """A list of `OrgLimitAggregate` objects."""
-  nodes: [OrgLimitAggregate]!
-
-  """
-  A list of edges which contains the `OrgLimitAggregate` and cursor to aid in pagination.
-  """
-  edges: [OrgLimitAggregateEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `OrgLimitAggregate` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""
-Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
-"""
-type OrgLimitAggregate {
-  id: UUID!
-
-  """Name identifier of the aggregate limit being tracked"""
-  name: String
-
-  """Entity (org) whose aggregate usage is being tracked"""
-  entityId: UUID!
-
-  """Current aggregate usage count for this entity and limit"""
-  num: BigInt
-
-  """Maximum allowed aggregate usage; negative means unlimited"""
-  max: BigInt
-
-  """Soft limit threshold for warnings; NULL means no soft limit"""
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: Interval
-}
-
-"""A `OrgLimitAggregate` edge in the connection."""
-type OrgLimitAggregateEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgLimitAggregate` at the end of the edge."""
-  node: OrgLimitAggregate
-}
-
-"""
-A filter to be used against `OrgLimitAggregate` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgLimitAggregateFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `num` field."""
-  num: BigIntFilter
-
-  """Filter by the object’s `max` field."""
-  max: BigIntFilter
-
-  """Filter by the object’s `softMax` field."""
-  softMax: BigIntFilter
-
-  """Filter by the object’s `windowStart` field."""
-  windowStart: DatetimeFilter
-
-  """Filter by the object’s `windowDuration` field."""
-  windowDuration: IntervalFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgLimitAggregateFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgLimitAggregateFilter!]
-
-  """Negates the expression."""
-  not: OrgLimitAggregateFilter
-}
-
-"""Methods to use when ordering `OrgLimitAggregate`."""
-enum OrgLimitAggregateOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  NUM_ASC
-  NUM_DESC
-  MAX_ASC
-  MAX_DESC
-  SOFT_MAX_ASC
-  SOFT_MAX_DESC
-  WINDOW_START_ASC
-  WINDOW_START_DESC
-  WINDOW_DURATION_ASC
-  WINDOW_DURATION_DESC
-}
-
 """A connection to a list of `OrgMemberProfile` values."""
 type OrgMemberProfileConnection {
   """A list of `OrgMemberProfile` objects."""
@@ -3634,131 +4304,6 @@ enum OrgMemberProfileOrderBy {
   PROFILE_PICTURE_DESC
 }
 
-"""A connection to a list of `OrgLimit` values."""
-type OrgLimitConnection {
-  """A list of `OrgLimit` objects."""
-  nodes: [OrgLimit]!
-
-  """
-  A list of edges which contains the `OrgLimit` and cursor to aid in pagination.
-  """
-  edges: [OrgLimitEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgLimit` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Tracks per-actor usage counts against configurable maximum limits"""
-type OrgLimit {
-  id: UUID!
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID!
-
-  """Current usage count for this actor and limit"""
-  num: BigInt
-
-  """
-  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
-  """
-  max: BigInt
-
-  """
-  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
-  """
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: Interval
-  entityId: UUID!
-}
-
-"""A `OrgLimit` edge in the connection."""
-type OrgLimitEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgLimit` at the end of the edge."""
-  node: OrgLimit
-}
-
-"""
-A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgLimitFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `num` field."""
-  num: BigIntFilter
-
-  """Filter by the object’s `max` field."""
-  max: BigIntFilter
-
-  """Filter by the object’s `softMax` field."""
-  softMax: BigIntFilter
-
-  """Filter by the object’s `windowStart` field."""
-  windowStart: DatetimeFilter
-
-  """Filter by the object’s `windowDuration` field."""
-  windowDuration: IntervalFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgLimitFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgLimitFilter!]
-
-  """Negates the expression."""
-  not: OrgLimitFilter
-}
-
-"""Methods to use when ordering `OrgLimit`."""
-enum OrgLimitOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  NUM_ASC
-  NUM_DESC
-  MAX_ASC
-  MAX_DESC
-  SOFT_MAX_ASC
-  SOFT_MAX_DESC
-  WINDOW_START_ASC
-  WINDOW_START_DESC
-  WINDOW_DURATION_ASC
-  WINDOW_DURATION_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-}
-
 """A connection to a list of `AppLevel` values."""
 type AppLevelConnection {
   """A list of `AppLevel` objects."""
@@ -3860,6 +4405,251 @@ enum AppLevelOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+}
+
+"""A connection to a list of `AppLimit` values."""
+type AppLimitConnection {
+  """A list of `AppLimit` objects."""
+  nodes: [AppLimit]!
+
+  """
+  A list of edges which contains the `AppLimit` and cursor to aid in pagination.
+  """
+  edges: [AppLimitEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppLimit` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Tracks per-actor usage counts against configurable maximum limits"""
+type AppLimit {
+  id: UUID!
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID!
+
+  """Current usage count for this actor and limit"""
+  num: BigInt
+
+  """
+  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
+  """
+  max: BigInt
+
+  """
+  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
+  """
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: Interval
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+type Interval {
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""A `AppLimit` edge in the connection."""
+type AppLimitEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimit` at the end of the edge."""
+  node: AppLimit
+}
+
+"""
+A filter to be used against `AppLimit` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `num` field."""
+  num: BigIntFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Filter by the object’s `softMax` field."""
+  softMax: BigIntFilter
+
+  """Filter by the object’s `windowStart` field."""
+  windowStart: DatetimeFilter
+
+  """Filter by the object’s `windowDuration` field."""
+  windowDuration: IntervalFilter
+
+  """Filter by the object’s `planMax` field."""
+  planMax: BigIntFilter
+
+  """Filter by the object’s `purchasedCredits` field."""
+  purchasedCredits: BigIntFilter
+
+  """Filter by the object’s `periodCredits` field."""
+  periodCredits: BigIntFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitFilter!]
+
+  """Negates the expression."""
+  not: AppLimitFilter
+}
+
+"""
+A filter to be used against Interval fields. All fields are combined with a logical ‘and.’
+"""
+input IntervalFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: IntervalInput
+
+  """Not equal to the specified value."""
+  notEqualTo: IntervalInput
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: IntervalInput
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: IntervalInput
+
+  """Included in the specified list."""
+  in: [IntervalInput!]
+
+  """Not included in the specified list."""
+  notIn: [IntervalInput!]
+
+  """Less than the specified value."""
+  lessThan: IntervalInput
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: IntervalInput
+
+  """Greater than the specified value."""
+  greaterThan: IntervalInput
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: IntervalInput
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+input IntervalInput {
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""Methods to use when ordering `AppLimit`."""
+enum AppLimitOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  NUM_ASC
+  NUM_DESC
+  MAX_ASC
+  MAX_DESC
+  SOFT_MAX_ASC
+  SOFT_MAX_DESC
+  WINDOW_START_ASC
+  WINDOW_START_DESC
+  WINDOW_DURATION_ASC
+  WINDOW_DURATION_DESC
+  PLAN_MAX_ASC
+  PLAN_MAX_DESC
+  PURCHASED_CREDITS_ASC
+  PURCHASED_CREDITS_DESC
+  PERIOD_CREDITS_ASC
+  PERIOD_CREDITS_DESC
 }
 
 """A connection to a list of `AppInvite` values."""
@@ -4315,6 +5105,320 @@ enum OrgMembershipSettingOrderBy {
   POPULATE_MEMBER_EMAIL_DESC
   LIMIT_ALLOCATION_MODE_ASC
   LIMIT_ALLOCATION_MODE_DESC
+}
+
+"""A connection to a list of `OrgLimitAggregate` values."""
+type OrgLimitAggregateConnection {
+  """A list of `OrgLimitAggregate` objects."""
+  nodes: [OrgLimitAggregate]!
+
+  """
+  A list of edges which contains the `OrgLimitAggregate` and cursor to aid in pagination.
+  """
+  edges: [OrgLimitAggregateEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgLimitAggregate` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown)
+"""
+type OrgLimitAggregate {
+  id: UUID!
+
+  """Name identifier of the aggregate limit being tracked"""
+  name: String
+
+  """Entity (org) whose aggregate usage is being tracked"""
+  entityId: UUID!
+
+  """Current aggregate usage count for this entity and limit"""
+  num: BigInt
+
+  """Maximum allowed aggregate usage; negative means unlimited"""
+  max: BigInt
+
+  """Soft limit threshold for warnings; NULL means no soft limit"""
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: Interval
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
+
+  """
+  Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved.
+  """
+  reserved: BigInt
+}
+
+"""A `OrgLimitAggregate` edge in the connection."""
+type OrgLimitAggregateEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgLimitAggregate` at the end of the edge."""
+  node: OrgLimitAggregate
+}
+
+"""
+A filter to be used against `OrgLimitAggregate` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgLimitAggregateFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `num` field."""
+  num: BigIntFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Filter by the object’s `softMax` field."""
+  softMax: BigIntFilter
+
+  """Filter by the object’s `windowStart` field."""
+  windowStart: DatetimeFilter
+
+  """Filter by the object’s `windowDuration` field."""
+  windowDuration: IntervalFilter
+
+  """Filter by the object’s `planMax` field."""
+  planMax: BigIntFilter
+
+  """Filter by the object’s `purchasedCredits` field."""
+  purchasedCredits: BigIntFilter
+
+  """Filter by the object’s `periodCredits` field."""
+  periodCredits: BigIntFilter
+
+  """Filter by the object’s `reserved` field."""
+  reserved: BigIntFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgLimitAggregateFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgLimitAggregateFilter!]
+
+  """Negates the expression."""
+  not: OrgLimitAggregateFilter
+}
+
+"""Methods to use when ordering `OrgLimitAggregate`."""
+enum OrgLimitAggregateOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  NUM_ASC
+  NUM_DESC
+  MAX_ASC
+  MAX_DESC
+  SOFT_MAX_ASC
+  SOFT_MAX_DESC
+  WINDOW_START_ASC
+  WINDOW_START_DESC
+  WINDOW_DURATION_ASC
+  WINDOW_DURATION_DESC
+  PLAN_MAX_ASC
+  PLAN_MAX_DESC
+  PURCHASED_CREDITS_ASC
+  PURCHASED_CREDITS_DESC
+  PERIOD_CREDITS_ASC
+  PERIOD_CREDITS_DESC
+  RESERVED_ASC
+  RESERVED_DESC
+}
+
+"""A connection to a list of `OrgLimit` values."""
+type OrgLimitConnection {
+  """A list of `OrgLimit` objects."""
+  nodes: [OrgLimit]!
+
+  """
+  A list of edges which contains the `OrgLimit` and cursor to aid in pagination.
+  """
+  edges: [OrgLimitEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgLimit` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Tracks per-actor usage counts against configurable maximum limits"""
+type OrgLimit {
+  id: UUID!
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID!
+
+  """Current usage count for this actor and limit"""
+  num: BigInt
+
+  """
+  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
+  """
+  max: BigInt
+
+  """
+  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
+  """
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: Interval
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
+  entityId: UUID!
+}
+
+"""A `OrgLimit` edge in the connection."""
+type OrgLimitEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgLimit` at the end of the edge."""
+  node: OrgLimit
+}
+
+"""
+A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgLimitFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `num` field."""
+  num: BigIntFilter
+
+  """Filter by the object’s `max` field."""
+  max: BigIntFilter
+
+  """Filter by the object’s `softMax` field."""
+  softMax: BigIntFilter
+
+  """Filter by the object’s `windowStart` field."""
+  windowStart: DatetimeFilter
+
+  """Filter by the object’s `windowDuration` field."""
+  windowDuration: IntervalFilter
+
+  """Filter by the object’s `planMax` field."""
+  planMax: BigIntFilter
+
+  """Filter by the object’s `purchasedCredits` field."""
+  purchasedCredits: BigIntFilter
+
+  """Filter by the object’s `periodCredits` field."""
+  periodCredits: BigIntFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgLimitFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgLimitFilter!]
+
+  """Negates the expression."""
+  not: OrgLimitFilter
+}
+
+"""Methods to use when ordering `OrgLimit`."""
+enum OrgLimitOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  NUM_ASC
+  NUM_DESC
+  MAX_ASC
+  MAX_DESC
+  SOFT_MAX_ASC
+  SOFT_MAX_DESC
+  WINDOW_START_ASC
+  WINDOW_START_DESC
+  WINDOW_DURATION_ASC
+  WINDOW_DURATION_DESC
+  PLAN_MAX_ASC
+  PLAN_MAX_DESC
+  PURCHASED_CREDITS_ASC
+  PURCHASED_CREDITS_DESC
+  PERIOD_CREDITS_ASC
+  PERIOD_CREDITS_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
 }
 
 """A connection to a list of `OrgInvite` values."""
@@ -4925,6 +6029,52 @@ input SubmitOrgInviteCodeInput {
   token: String
 }
 
+"""The output of our create `AppLimitCreditRedemption` mutation."""
+type CreateAppLimitCreditRedemptionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditRedemption` that was created by this mutation."""
+  appLimitCreditRedemption: AppLimitCreditRedemption
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditRedemption`. May be used by Relay 1."""
+  appLimitCreditRedemptionEdge(
+    """The method to use when ordering `AppLimitCreditRedemption`."""
+    orderBy: [AppLimitCreditRedemptionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditRedemptionEdge
+}
+
+"""All input for the create `AppLimitCreditRedemption` mutation."""
+input CreateAppLimitCreditRedemptionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditRedemption` to be created by this mutation."""
+  appLimitCreditRedemption: AppLimitCreditRedemptionInput!
+}
+
+"""An input for mutations affecting `AppLimitCreditRedemption`"""
+input AppLimitCreditRedemptionInput {
+  id: UUID
+
+  """FK to credit_codes — which code is being redeemed"""
+  creditCodeId: UUID!
+
+  """Entity receiving the credits (personal org user_id or org entity_id)"""
+  entityId: UUID!
+}
+
 """The output of our create `OrgMember` mutation."""
 type CreateOrgMemberPayload {
   """
@@ -5015,6 +6165,60 @@ input AppPermissionDefaultInput {
 
   """Default permission bitmask applied to new members"""
   permissions: BitString
+}
+
+"""The output of our create `AppLimitCreditCode` mutation."""
+type CreateAppLimitCreditCodePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCode` that was created by this mutation."""
+  appLimitCreditCode: AppLimitCreditCode
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditCode`. May be used by Relay 1."""
+  appLimitCreditCodeEdge(
+    """The method to use when ordering `AppLimitCreditCode`."""
+    orderBy: [AppLimitCreditCodeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeEdge
+}
+
+"""All input for the create `AppLimitCreditCode` mutation."""
+input CreateAppLimitCreditCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCode` to be created by this mutation."""
+  appLimitCreditCode: AppLimitCreditCodeInput!
+}
+
+"""An input for mutations affecting `AppLimitCreditCode`"""
+input AppLimitCreditCodeInput {
+  id: UUID
+
+  """Human-readable credit code (case-insensitive, unique)"""
+  code: String!
+
+  """Maximum total redemptions allowed; NULL for unlimited"""
+  maxRedemptions: Int
+
+  """
+  Current number of redemptions (incremented by trigger on credit_redemptions)
+  """
+  currentRedemptions: Int
+
+  """Expiration timestamp; NULL for no expiry"""
+  expiresAt: Datetime
 }
 
 """The output of our create `OrgPermissionDefault` mutation."""
@@ -5371,6 +6575,204 @@ input AppStepInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `AppLimitCapsDefault` mutation."""
+type CreateAppLimitCapsDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCapsDefault` that was created by this mutation."""
+  appLimitCapsDefault: AppLimitCapsDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCapsDefault`. May be used by Relay 1."""
+  appLimitCapsDefaultEdge(
+    """The method to use when ordering `AppLimitCapsDefault`."""
+    orderBy: [AppLimitCapsDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCapsDefaultEdge
+}
+
+"""All input for the create `AppLimitCapsDefault` mutation."""
+input CreateAppLimitCapsDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCapsDefault` to be created by this mutation."""
+  appLimitCapsDefault: AppLimitCapsDefaultInput!
+}
+
+"""An input for mutations affecting `AppLimitCapsDefault`"""
+input AppLimitCapsDefaultInput {
+  id: UUID
+
+  """
+  Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics)
+  """
+  name: String!
+
+  """
+  Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units.
+  """
+  max: BigInt
+}
+
+"""The output of our create `OrgLimitCapsDefault` mutation."""
+type CreateOrgLimitCapsDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCapsDefault` that was created by this mutation."""
+  orgLimitCapsDefault: OrgLimitCapsDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCapsDefault`. May be used by Relay 1."""
+  orgLimitCapsDefaultEdge(
+    """The method to use when ordering `OrgLimitCapsDefault`."""
+    orderBy: [OrgLimitCapsDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapsDefaultEdge
+}
+
+"""All input for the create `OrgLimitCapsDefault` mutation."""
+input CreateOrgLimitCapsDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCapsDefault` to be created by this mutation."""
+  orgLimitCapsDefault: OrgLimitCapsDefaultInput!
+}
+
+"""An input for mutations affecting `OrgLimitCapsDefault`"""
+input OrgLimitCapsDefaultInput {
+  id: UUID
+
+  """
+  Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics)
+  """
+  name: String!
+
+  """
+  Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units.
+  """
+  max: BigInt
+}
+
+"""The output of our create `AppLimitCap` mutation."""
+type CreateAppLimitCapPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCap` that was created by this mutation."""
+  appLimitCap: AppLimitCap
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCap`. May be used by Relay 1."""
+  appLimitCapEdge(
+    """The method to use when ordering `AppLimitCap`."""
+    orderBy: [AppLimitCapOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCapEdge
+}
+
+"""All input for the create `AppLimitCap` mutation."""
+input CreateAppLimitCapInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCap` to be created by this mutation."""
+  appLimitCap: AppLimitCapInput!
+}
+
+"""An input for mutations affecting `AppLimitCap`"""
+input AppLimitCapInput {
+  id: UUID
+
+  """Name identifier of the cap being overridden"""
+  name: String!
+
+  """Entity this cap override applies to"""
+  entityId: UUID!
+
+  """Override cap value for this entity"""
+  max: BigInt
+}
+
+"""The output of our create `OrgLimitCap` mutation."""
+type CreateOrgLimitCapPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCap` that was created by this mutation."""
+  orgLimitCap: OrgLimitCap
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCap`. May be used by Relay 1."""
+  orgLimitCapEdge(
+    """The method to use when ordering `OrgLimitCap`."""
+    orderBy: [OrgLimitCapOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapEdge
+}
+
+"""All input for the create `OrgLimitCap` mutation."""
+input CreateOrgLimitCapInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCap` to be created by this mutation."""
+  orgLimitCap: OrgLimitCapInput!
+}
+
+"""An input for mutations affecting `OrgLimitCap`"""
+input OrgLimitCapInput {
+  id: UUID
+
+  """Name identifier of the cap being overridden"""
+  name: String!
+
+  """Entity this cap override applies to"""
+  entityId: UUID!
+
+  """Override cap value for this entity"""
+  max: BigInt
+}
+
 """The output of our create `OrgAdminGrant` mutation."""
 type CreateOrgAdminGrantPayload {
   """
@@ -5637,6 +7039,60 @@ input OrgLimitDefaultInput {
   softMax: BigInt
 }
 
+"""The output of our create `AppLimitCreditCodeItem` mutation."""
+type CreateAppLimitCreditCodeItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCodeItem` that was created by this mutation."""
+  appLimitCreditCodeItem: AppLimitCreditCodeItem
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditCodeItem`. May be used by Relay 1."""
+  appLimitCreditCodeItemEdge(
+    """The method to use when ordering `AppLimitCreditCodeItem`."""
+    orderBy: [AppLimitCreditCodeItemOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeItemEdge
+}
+
+"""All input for the create `AppLimitCreditCodeItem` mutation."""
+input CreateAppLimitCreditCodeItemInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCodeItem` to be created by this mutation."""
+  appLimitCreditCodeItem: AppLimitCreditCodeItemInput!
+}
+
+"""An input for mutations affecting `AppLimitCreditCodeItem`"""
+input AppLimitCreditCodeItemInput {
+  id: UUID
+
+  """FK to credit_codes — which code this item belongs to"""
+  creditCodeId: UUID!
+
+  """FK to default_limits — which limit this item grants credits for"""
+  defaultLimitId: UUID!
+
+  """Number of credits this item grants per redemption"""
+  amount: BigInt!
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String
+}
+
 """The output of our create `AppLevelRequirement` mutation."""
 type CreateAppLevelRequirementPayload {
   """
@@ -5692,6 +7148,123 @@ input AppLevelRequirementInput {
   priority: Int
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our create `AppLimitCredit` mutation."""
+type CreateAppLimitCreditPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCredit` that was created by this mutation."""
+  appLimitCredit: AppLimitCredit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCredit`. May be used by Relay 1."""
+  appLimitCreditEdge(
+    """The method to use when ordering `AppLimitCredit`."""
+    orderBy: [AppLimitCreditOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditEdge
+}
+
+"""All input for the create `AppLimitCredit` mutation."""
+input CreateAppLimitCreditInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCredit` to be created by this mutation."""
+  appLimitCredit: AppLimitCreditInput!
+}
+
+"""An input for mutations affecting `AppLimitCredit`"""
+input AppLimitCreditInput {
+  id: UUID
+
+  """FK to default_limits — which limit definition this credit applies to"""
+  defaultLimitId: UUID!
+
+  """User this credit is for; NULL for aggregate entity-level credits"""
+  actorId: UUID
+
+  """Number of credits to grant (positive to add, negative to revoke)"""
+  amount: BigInt!
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String
+
+  """Optional reason for the credit grant (promo code, admin grant, etc.)"""
+  reason: String
+}
+
+"""The output of our create `OrgLimitCredit` mutation."""
+type CreateOrgLimitCreditPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCredit` that was created by this mutation."""
+  orgLimitCredit: OrgLimitCredit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCredit`. May be used by Relay 1."""
+  orgLimitCreditEdge(
+    """The method to use when ordering `OrgLimitCredit`."""
+    orderBy: [OrgLimitCreditOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCreditEdge
+}
+
+"""All input for the create `OrgLimitCredit` mutation."""
+input CreateOrgLimitCreditInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCredit` to be created by this mutation."""
+  orgLimitCredit: OrgLimitCreditInput!
+}
+
+"""An input for mutations affecting `OrgLimitCredit`"""
+input OrgLimitCreditInput {
+  id: UUID
+
+  """FK to default_limits — which limit definition this credit applies to"""
+  defaultLimitId: UUID!
+
+  """User this credit is for; NULL for aggregate entity-level credits"""
+  actorId: UUID
+
+  """Entity this credit applies to; NULL for actor-only credits"""
+  entityId: UUID
+
+  """Number of credits to grant (positive to add, negative to revoke)"""
+  amount: BigInt!
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String
+
+  """Optional reason for the credit grant (promo code, admin grant, etc.)"""
+  reason: String
 }
 
 """The output of our create `OrgChartEdgeGrant` mutation."""
@@ -6251,136 +7824,6 @@ input OrgChartEdgeInput {
   positionLevel: Int
 }
 
-"""The output of our create `AppLimit` mutation."""
-type CreateAppLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLimit` that was created by this mutation."""
-  appLimit: AppLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLimit`. May be used by Relay 1."""
-  appLimitEdge(
-    """The method to use when ordering `AppLimit`."""
-    orderBy: [AppLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLimitEdge
-}
-
-"""All input for the create `AppLimit` mutation."""
-input CreateAppLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppLimit` to be created by this mutation."""
-  appLimit: AppLimitInput!
-}
-
-"""An input for mutations affecting `AppLimit`"""
-input AppLimitInput {
-  id: UUID
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID!
-
-  """Current usage count for this actor and limit"""
-  num: BigInt
-
-  """
-  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
-  """
-  max: BigInt
-
-  """
-  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
-  """
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: IntervalInput
-}
-
-"""The output of our create `OrgLimitAggregate` mutation."""
-type CreateOrgLimitAggregatePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimitAggregate` that was created by this mutation."""
-  orgLimitAggregate: OrgLimitAggregate
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimitAggregate`. May be used by Relay 1."""
-  orgLimitAggregateEdge(
-    """The method to use when ordering `OrgLimitAggregate`."""
-    orderBy: [OrgLimitAggregateOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitAggregateEdge
-}
-
-"""All input for the create `OrgLimitAggregate` mutation."""
-input CreateOrgLimitAggregateInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgLimitAggregate` to be created by this mutation."""
-  orgLimitAggregate: OrgLimitAggregateInput!
-}
-
-"""An input for mutations affecting `OrgLimitAggregate`"""
-input OrgLimitAggregateInput {
-  id: UUID
-
-  """Name identifier of the aggregate limit being tracked"""
-  name: String
-
-  """Entity (org) whose aggregate usage is being tracked"""
-  entityId: UUID!
-
-  """Current aggregate usage count for this entity and limit"""
-  num: BigInt
-
-  """Maximum allowed aggregate usage; negative means unlimited"""
-  max: BigInt
-
-  """Soft limit threshold for warnings; NULL means no soft limit"""
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: IntervalInput
-}
-
 """The output of our create `OrgMemberProfile` mutation."""
 type CreateOrgMemberProfilePayload {
   """
@@ -6449,74 +7892,6 @@ input OrgMemberProfileInput {
   profilePicture: ConstructiveInternalTypeImage
 }
 
-"""The output of our create `OrgLimit` mutation."""
-type CreateOrgLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` that was created by this mutation."""
-  orgLimit: OrgLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimit`. May be used by Relay 1."""
-  orgLimitEdge(
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitEdge
-}
-
-"""All input for the create `OrgLimit` mutation."""
-input CreateOrgLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` to be created by this mutation."""
-  orgLimit: OrgLimitInput!
-}
-
-"""An input for mutations affecting `OrgLimit`"""
-input OrgLimitInput {
-  id: UUID
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID!
-
-  """Current usage count for this actor and limit"""
-  num: BigInt
-
-  """
-  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
-  """
-  max: BigInt
-
-  """
-  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
-  """
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: IntervalInput
-  entityId: UUID!
-}
-
 """The output of our create `AppLevel` mutation."""
 type CreateAppLevelPayload {
   """
@@ -6569,6 +7944,88 @@ input AppLevelInput {
   ownerId: UUID
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our create `AppLimit` mutation."""
+type CreateAppLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimit` that was created by this mutation."""
+  appLimit: AppLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimit`. May be used by Relay 1."""
+  appLimitEdge(
+    """The method to use when ordering `AppLimit`."""
+    orderBy: [AppLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitEdge
+}
+
+"""All input for the create `AppLimit` mutation."""
+input CreateAppLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimit` to be created by this mutation."""
+  appLimit: AppLimitInput!
+}
+
+"""An input for mutations affecting `AppLimit`"""
+input AppLimitInput {
+  id: UUID
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID!
+
+  """Current usage count for this actor and limit"""
+  num: BigInt
+
+  """
+  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
+  """
+  max: BigInt
+
+  """
+  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
+  """
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: IntervalInput
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
 }
 
 """The output of our create `AppInvite` mutation."""
@@ -6730,6 +8187,172 @@ input OrgMembershipSettingInput {
   Allocation mode for sub-entity limits: pooled (shared parent cap, no per-entity budgets) or budgeted (explicit per-entity allocations, transfer enabled)
   """
   limitAllocationMode: String
+}
+
+"""The output of our create `OrgLimitAggregate` mutation."""
+type CreateOrgLimitAggregatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitAggregate` that was created by this mutation."""
+  orgLimitAggregate: OrgLimitAggregate
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitAggregate`. May be used by Relay 1."""
+  orgLimitAggregateEdge(
+    """The method to use when ordering `OrgLimitAggregate`."""
+    orderBy: [OrgLimitAggregateOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitAggregateEdge
+}
+
+"""All input for the create `OrgLimitAggregate` mutation."""
+input CreateOrgLimitAggregateInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitAggregate` to be created by this mutation."""
+  orgLimitAggregate: OrgLimitAggregateInput!
+}
+
+"""An input for mutations affecting `OrgLimitAggregate`"""
+input OrgLimitAggregateInput {
+  id: UUID
+
+  """Name identifier of the aggregate limit being tracked"""
+  name: String
+
+  """Entity (org) whose aggregate usage is being tracked"""
+  entityId: UUID!
+
+  """Current aggregate usage count for this entity and limit"""
+  num: BigInt
+
+  """Maximum allowed aggregate usage; negative means unlimited"""
+  max: BigInt
+
+  """Soft limit threshold for warnings; NULL means no soft limit"""
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: IntervalInput
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
+
+  """
+  Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved.
+  """
+  reserved: BigInt
+}
+
+"""The output of our create `OrgLimit` mutation."""
+type CreateOrgLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` that was created by this mutation."""
+  orgLimit: OrgLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimit`. May be used by Relay 1."""
+  orgLimitEdge(
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitEdge
+}
+
+"""All input for the create `OrgLimit` mutation."""
+input CreateOrgLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` to be created by this mutation."""
+  orgLimit: OrgLimitInput!
+}
+
+"""An input for mutations affecting `OrgLimit`"""
+input OrgLimitInput {
+  id: UUID
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID!
+
+  """Current usage count for this actor and limit"""
+  num: BigInt
+
+  """
+  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
+  """
+  max: BigInt
+
+  """
+  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
+  """
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: IntervalInput
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
+  entityId: UUID!
 }
 
 """The output of our create `OrgInvite` mutation."""
@@ -6980,6 +8603,57 @@ input OrgMembershipInput {
   profileId: UUID
 }
 
+"""The output of our update `AppLimitCreditRedemption` mutation."""
+type UpdateAppLimitCreditRedemptionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditRedemption` that was updated by this mutation."""
+  appLimitCreditRedemption: AppLimitCreditRedemption
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditRedemption`. May be used by Relay 1."""
+  appLimitCreditRedemptionEdge(
+    """The method to use when ordering `AppLimitCreditRedemption`."""
+    orderBy: [AppLimitCreditRedemptionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditRedemptionEdge
+}
+
+"""All input for the `updateAppLimitCreditRedemption` mutation."""
+input UpdateAppLimitCreditRedemptionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitCreditRedemption` being updated.
+  """
+  appLimitCreditRedemptionPatch: AppLimitCreditRedemptionPatch!
+}
+
+"""
+Represents an update to a `AppLimitCreditRedemption`. Fields that are set will be updated.
+"""
+input AppLimitCreditRedemptionPatch {
+  id: UUID
+
+  """FK to credit_codes — which code is being redeemed"""
+  creditCodeId: UUID
+
+  """Entity receiving the credits (personal org user_id or org entity_id)"""
+  entityId: UUID
+}
+
 """The output of our update `OrgMember` mutation."""
 type UpdateOrgMemberPayload {
   """
@@ -7080,6 +8754,65 @@ input AppPermissionDefaultPatch {
 
   """Default permission bitmask applied to new members"""
   permissions: BitString
+}
+
+"""The output of our update `AppLimitCreditCode` mutation."""
+type UpdateAppLimitCreditCodePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCode` that was updated by this mutation."""
+  appLimitCreditCode: AppLimitCreditCode
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditCode`. May be used by Relay 1."""
+  appLimitCreditCodeEdge(
+    """The method to use when ordering `AppLimitCreditCode`."""
+    orderBy: [AppLimitCreditCodeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeEdge
+}
+
+"""All input for the `updateAppLimitCreditCode` mutation."""
+input UpdateAppLimitCreditCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitCreditCode` being updated.
+  """
+  appLimitCreditCodePatch: AppLimitCreditCodePatch!
+}
+
+"""
+Represents an update to a `AppLimitCreditCode`. Fields that are set will be updated.
+"""
+input AppLimitCreditCodePatch {
+  id: UUID
+
+  """Human-readable credit code (case-insensitive, unique)"""
+  code: String
+
+  """Maximum total redemptions allowed; NULL for unlimited"""
+  maxRedemptions: Int
+
+  """
+  Current number of redemptions (incremented by trigger on credit_redemptions)
+  """
+  currentRedemptions: Int
+
+  """Expiration timestamp; NULL for no expiry"""
+  expiresAt: Datetime
 }
 
 """The output of our update `OrgPermissionDefault` mutation."""
@@ -7471,6 +9204,224 @@ input AppStepPatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `AppLimitCapsDefault` mutation."""
+type UpdateAppLimitCapsDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCapsDefault` that was updated by this mutation."""
+  appLimitCapsDefault: AppLimitCapsDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCapsDefault`. May be used by Relay 1."""
+  appLimitCapsDefaultEdge(
+    """The method to use when ordering `AppLimitCapsDefault`."""
+    orderBy: [AppLimitCapsDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCapsDefaultEdge
+}
+
+"""All input for the `updateAppLimitCapsDefault` mutation."""
+input UpdateAppLimitCapsDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitCapsDefault` being updated.
+  """
+  appLimitCapsDefaultPatch: AppLimitCapsDefaultPatch!
+}
+
+"""
+Represents an update to a `AppLimitCapsDefault`. Fields that are set will be updated.
+"""
+input AppLimitCapsDefaultPatch {
+  id: UUID
+
+  """
+  Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics)
+  """
+  name: String
+
+  """
+  Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units.
+  """
+  max: BigInt
+}
+
+"""The output of our update `OrgLimitCapsDefault` mutation."""
+type UpdateOrgLimitCapsDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCapsDefault` that was updated by this mutation."""
+  orgLimitCapsDefault: OrgLimitCapsDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCapsDefault`. May be used by Relay 1."""
+  orgLimitCapsDefaultEdge(
+    """The method to use when ordering `OrgLimitCapsDefault`."""
+    orderBy: [OrgLimitCapsDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapsDefaultEdge
+}
+
+"""All input for the `updateOrgLimitCapsDefault` mutation."""
+input UpdateOrgLimitCapsDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimitCapsDefault` being updated.
+  """
+  orgLimitCapsDefaultPatch: OrgLimitCapsDefaultPatch!
+}
+
+"""
+Represents an update to a `OrgLimitCapsDefault`. Fields that are set will be updated.
+"""
+input OrgLimitCapsDefaultPatch {
+  id: UUID
+
+  """
+  Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics)
+  """
+  name: String
+
+  """
+  Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units.
+  """
+  max: BigInt
+}
+
+"""The output of our update `AppLimitCap` mutation."""
+type UpdateAppLimitCapPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCap` that was updated by this mutation."""
+  appLimitCap: AppLimitCap
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCap`. May be used by Relay 1."""
+  appLimitCapEdge(
+    """The method to use when ordering `AppLimitCap`."""
+    orderBy: [AppLimitCapOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCapEdge
+}
+
+"""All input for the `updateAppLimitCap` mutation."""
+input UpdateAppLimitCapInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitCap` being updated.
+  """
+  appLimitCapPatch: AppLimitCapPatch!
+}
+
+"""
+Represents an update to a `AppLimitCap`. Fields that are set will be updated.
+"""
+input AppLimitCapPatch {
+  id: UUID
+
+  """Name identifier of the cap being overridden"""
+  name: String
+
+  """Entity this cap override applies to"""
+  entityId: UUID
+
+  """Override cap value for this entity"""
+  max: BigInt
+}
+
+"""The output of our update `OrgLimitCap` mutation."""
+type UpdateOrgLimitCapPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCap` that was updated by this mutation."""
+  orgLimitCap: OrgLimitCap
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCap`. May be used by Relay 1."""
+  orgLimitCapEdge(
+    """The method to use when ordering `OrgLimitCap`."""
+    orderBy: [OrgLimitCapOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapEdge
+}
+
+"""All input for the `updateOrgLimitCap` mutation."""
+input UpdateOrgLimitCapInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimitCap` being updated.
+  """
+  orgLimitCapPatch: OrgLimitCapPatch!
+}
+
+"""
+Represents an update to a `OrgLimitCap`. Fields that are set will be updated.
+"""
+input OrgLimitCapPatch {
+  id: UUID
+
+  """Name identifier of the cap being overridden"""
+  name: String
+
+  """Entity this cap override applies to"""
+  entityId: UUID
+
+  """Override cap value for this entity"""
+  max: BigInt
+}
+
 """The output of our update `OrgAdminGrant` mutation."""
 type UpdateOrgAdminGrantPayload {
   """
@@ -7766,6 +9717,65 @@ input OrgLimitDefaultPatch {
   softMax: BigInt
 }
 
+"""The output of our update `AppLimitCreditCodeItem` mutation."""
+type UpdateAppLimitCreditCodeItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCodeItem` that was updated by this mutation."""
+  appLimitCreditCodeItem: AppLimitCreditCodeItem
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditCodeItem`. May be used by Relay 1."""
+  appLimitCreditCodeItemEdge(
+    """The method to use when ordering `AppLimitCreditCodeItem`."""
+    orderBy: [AppLimitCreditCodeItemOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeItemEdge
+}
+
+"""All input for the `updateAppLimitCreditCodeItem` mutation."""
+input UpdateAppLimitCreditCodeItemInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitCreditCodeItem` being updated.
+  """
+  appLimitCreditCodeItemPatch: AppLimitCreditCodeItemPatch!
+}
+
+"""
+Represents an update to a `AppLimitCreditCodeItem`. Fields that are set will be updated.
+"""
+input AppLimitCreditCodeItemPatch {
+  id: UUID
+
+  """FK to credit_codes — which code this item belongs to"""
+  creditCodeId: UUID
+
+  """FK to default_limits — which limit this item grants credits for"""
+  defaultLimitId: UUID
+
+  """Number of credits this item grants per redemption"""
+  amount: BigInt
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String
+}
+
 """The output of our update `AppLevelRequirement` mutation."""
 type UpdateAppLevelRequirementPayload {
   """
@@ -7826,6 +9836,133 @@ input AppLevelRequirementPatch {
   priority: Int
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our update `AppLimitCredit` mutation."""
+type UpdateAppLimitCreditPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCredit` that was updated by this mutation."""
+  appLimitCredit: AppLimitCredit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCredit`. May be used by Relay 1."""
+  appLimitCreditEdge(
+    """The method to use when ordering `AppLimitCredit`."""
+    orderBy: [AppLimitCreditOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditEdge
+}
+
+"""All input for the `updateAppLimitCredit` mutation."""
+input UpdateAppLimitCreditInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitCredit` being updated.
+  """
+  appLimitCreditPatch: AppLimitCreditPatch!
+}
+
+"""
+Represents an update to a `AppLimitCredit`. Fields that are set will be updated.
+"""
+input AppLimitCreditPatch {
+  id: UUID
+
+  """FK to default_limits — which limit definition this credit applies to"""
+  defaultLimitId: UUID
+
+  """User this credit is for; NULL for aggregate entity-level credits"""
+  actorId: UUID
+
+  """Number of credits to grant (positive to add, negative to revoke)"""
+  amount: BigInt
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String
+
+  """Optional reason for the credit grant (promo code, admin grant, etc.)"""
+  reason: String
+}
+
+"""The output of our update `OrgLimitCredit` mutation."""
+type UpdateOrgLimitCreditPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCredit` that was updated by this mutation."""
+  orgLimitCredit: OrgLimitCredit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCredit`. May be used by Relay 1."""
+  orgLimitCreditEdge(
+    """The method to use when ordering `OrgLimitCredit`."""
+    orderBy: [OrgLimitCreditOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCreditEdge
+}
+
+"""All input for the `updateOrgLimitCredit` mutation."""
+input UpdateOrgLimitCreditInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimitCredit` being updated.
+  """
+  orgLimitCreditPatch: OrgLimitCreditPatch!
+}
+
+"""
+Represents an update to a `OrgLimitCredit`. Fields that are set will be updated.
+"""
+input OrgLimitCreditPatch {
+  id: UUID
+
+  """FK to default_limits — which limit definition this credit applies to"""
+  defaultLimitId: UUID
+
+  """User this credit is for; NULL for aggregate entity-level credits"""
+  actorId: UUID
+
+  """Entity this credit applies to; NULL for actor-only credits"""
+  entityId: UUID
+
+  """Number of credits to grant (positive to add, negative to revoke)"""
+  amount: BigInt
+
+  """
+  Credit durability: permanent (survives window reset) or period (resets on window expiry)
+  """
+  creditType: String
+
+  """Optional reason for the credit grant (promo code, admin grant, etc.)"""
+  reason: String
 }
 
 """The output of our update `OrgChartEdgeGrant` mutation."""
@@ -8303,146 +10440,6 @@ input OrgChartEdgePatch {
   positionLevel: Int
 }
 
-"""The output of our update `AppLimit` mutation."""
-type UpdateAppLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLimit` that was updated by this mutation."""
-  appLimit: AppLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLimit`. May be used by Relay 1."""
-  appLimitEdge(
-    """The method to use when ordering `AppLimit`."""
-    orderBy: [AppLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLimitEdge
-}
-
-"""All input for the `updateAppLimit` mutation."""
-input UpdateAppLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppLimit` being updated.
-  """
-  appLimitPatch: AppLimitPatch!
-}
-
-"""
-Represents an update to a `AppLimit`. Fields that are set will be updated.
-"""
-input AppLimitPatch {
-  id: UUID
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID
-
-  """Current usage count for this actor and limit"""
-  num: BigInt
-
-  """
-  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
-  """
-  max: BigInt
-
-  """
-  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
-  """
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: IntervalInput
-}
-
-"""The output of our update `OrgLimitAggregate` mutation."""
-type UpdateOrgLimitAggregatePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimitAggregate` that was updated by this mutation."""
-  orgLimitAggregate: OrgLimitAggregate
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimitAggregate`. May be used by Relay 1."""
-  orgLimitAggregateEdge(
-    """The method to use when ordering `OrgLimitAggregate`."""
-    orderBy: [OrgLimitAggregateOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitAggregateEdge
-}
-
-"""All input for the `updateOrgLimitAggregate` mutation."""
-input UpdateOrgLimitAggregateInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgLimitAggregate` being updated.
-  """
-  orgLimitAggregatePatch: OrgLimitAggregatePatch!
-}
-
-"""
-Represents an update to a `OrgLimitAggregate`. Fields that are set will be updated.
-"""
-input OrgLimitAggregatePatch {
-  id: UUID
-
-  """Name identifier of the aggregate limit being tracked"""
-  name: String
-
-  """Entity (org) whose aggregate usage is being tracked"""
-  entityId: UUID
-
-  """Current aggregate usage count for this entity and limit"""
-  num: BigInt
-
-  """Maximum allowed aggregate usage; negative means unlimited"""
-  max: BigInt
-
-  """Soft limit threshold for warnings; NULL means no soft limit"""
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: IntervalInput
-}
-
 """The output of our update `OrgMemberProfile` mutation."""
 type UpdateOrgMemberProfilePayload {
   """
@@ -8522,79 +10519,6 @@ input OrgMemberProfilePatch {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-"""The output of our update `OrgLimit` mutation."""
-type UpdateOrgLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` that was updated by this mutation."""
-  orgLimit: OrgLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimit`. May be used by Relay 1."""
-  orgLimitEdge(
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitEdge
-}
-
-"""All input for the `updateOrgLimit` mutation."""
-input UpdateOrgLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgLimit` being updated.
-  """
-  orgLimitPatch: OrgLimitPatch!
-}
-
-"""
-Represents an update to a `OrgLimit`. Fields that are set will be updated.
-"""
-input OrgLimitPatch {
-  id: UUID
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID
-
-  """Current usage count for this actor and limit"""
-  num: BigInt
-
-  """
-  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
-  """
-  max: BigInt
-
-  """
-  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
-  """
-  softMax: BigInt
-
-  """Start of the current metering window; NULL means no time window"""
-  windowStart: Datetime
-
-  """
-  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
-  """
-  windowDuration: IntervalInput
-  entityId: UUID
-}
-
 """The output of our update `AppLevel` mutation."""
 type UpdateAppLevelPayload {
   """
@@ -8655,6 +10579,93 @@ input AppLevelPatch {
 
   """Upload for Badge or icon image associated with this level"""
   imageUpload: Upload
+}
+
+"""The output of our update `AppLimit` mutation."""
+type UpdateAppLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimit` that was updated by this mutation."""
+  appLimit: AppLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimit`. May be used by Relay 1."""
+  appLimitEdge(
+    """The method to use when ordering `AppLimit`."""
+    orderBy: [AppLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitEdge
+}
+
+"""All input for the `updateAppLimit` mutation."""
+input UpdateAppLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimit` being updated.
+  """
+  appLimitPatch: AppLimitPatch!
+}
+
+"""
+Represents an update to a `AppLimit`. Fields that are set will be updated.
+"""
+input AppLimitPatch {
+  id: UUID
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID
+
+  """Current usage count for this actor and limit"""
+  num: BigInt
+
+  """
+  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
+  """
+  max: BigInt
+
+  """
+  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
+  """
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: IntervalInput
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
 }
 
 """The output of our update `AppInvite` mutation."""
@@ -8826,6 +10837,182 @@ input OrgMembershipSettingPatch {
   Allocation mode for sub-entity limits: pooled (shared parent cap, no per-entity budgets) or budgeted (explicit per-entity allocations, transfer enabled)
   """
   limitAllocationMode: String
+}
+
+"""The output of our update `OrgLimitAggregate` mutation."""
+type UpdateOrgLimitAggregatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitAggregate` that was updated by this mutation."""
+  orgLimitAggregate: OrgLimitAggregate
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitAggregate`. May be used by Relay 1."""
+  orgLimitAggregateEdge(
+    """The method to use when ordering `OrgLimitAggregate`."""
+    orderBy: [OrgLimitAggregateOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitAggregateEdge
+}
+
+"""All input for the `updateOrgLimitAggregate` mutation."""
+input UpdateOrgLimitAggregateInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimitAggregate` being updated.
+  """
+  orgLimitAggregatePatch: OrgLimitAggregatePatch!
+}
+
+"""
+Represents an update to a `OrgLimitAggregate`. Fields that are set will be updated.
+"""
+input OrgLimitAggregatePatch {
+  id: UUID
+
+  """Name identifier of the aggregate limit being tracked"""
+  name: String
+
+  """Entity (org) whose aggregate usage is being tracked"""
+  entityId: UUID
+
+  """Current aggregate usage count for this entity and limit"""
+  num: BigInt
+
+  """Maximum allowed aggregate usage; negative means unlimited"""
+  max: BigInt
+
+  """Soft limit threshold for warnings; NULL means no soft limit"""
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: IntervalInput
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
+
+  """
+  Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved.
+  """
+  reserved: BigInt
+}
+
+"""The output of our update `OrgLimit` mutation."""
+type UpdateOrgLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` that was updated by this mutation."""
+  orgLimit: OrgLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimit`. May be used by Relay 1."""
+  orgLimitEdge(
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitEdge
+}
+
+"""All input for the `updateOrgLimit` mutation."""
+input UpdateOrgLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimit` being updated.
+  """
+  orgLimitPatch: OrgLimitPatch!
+}
+
+"""
+Represents an update to a `OrgLimit`. Fields that are set will be updated.
+"""
+input OrgLimitPatch {
+  id: UUID
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID
+
+  """Current usage count for this actor and limit"""
+  num: BigInt
+
+  """
+  Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements.
+  """
+  max: BigInt
+
+  """
+  Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached.
+  """
+  softMax: BigInt
+
+  """Start of the current metering window; NULL means no time window"""
+  windowStart: Datetime
+
+  """
+  Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window
+  """
+  windowDuration: IntervalInput
+
+  """
+  Ceiling set by the active plan via apply_plan(). Window reset does not change this value.
+  """
+  planMax: BigInt
+
+  """
+  Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset.
+  """
+  purchasedCredits: BigInt
+
+  """
+  Temporary credits for the current billing window. Resets to 0 on window expiry.
+  """
+  periodCredits: BigInt
+  entityId: UUID
 }
 
 """The output of our update `OrgInvite` mutation."""
@@ -9091,6 +11278,39 @@ input OrgMembershipPatch {
   profileId: UUID
 }
 
+"""The output of our delete `AppLimitCreditRedemption` mutation."""
+type DeleteAppLimitCreditRedemptionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditRedemption` that was deleted by this mutation."""
+  appLimitCreditRedemption: AppLimitCreditRedemption
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditRedemption`. May be used by Relay 1."""
+  appLimitCreditRedemptionEdge(
+    """The method to use when ordering `AppLimitCreditRedemption`."""
+    orderBy: [AppLimitCreditRedemptionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditRedemptionEdge
+}
+
+"""All input for the `deleteAppLimitCreditRedemption` mutation."""
+input DeleteAppLimitCreditRedemptionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `OrgMember` mutation."""
 type DeleteOrgMemberPayload {
   """
@@ -9149,6 +11369,39 @@ type DeleteAppPermissionDefaultPayload {
 
 """All input for the `deleteAppPermissionDefault` mutation."""
 input DeleteAppPermissionDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AppLimitCreditCode` mutation."""
+type DeleteAppLimitCreditCodePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCode` that was deleted by this mutation."""
+  appLimitCreditCode: AppLimitCreditCode
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditCode`. May be used by Relay 1."""
+  appLimitCreditCodeEdge(
+    """The method to use when ordering `AppLimitCreditCode`."""
+    orderBy: [AppLimitCreditCodeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeEdge
+}
+
+"""All input for the `deleteAppLimitCreditCode` mutation."""
+input DeleteAppLimitCreditCodeInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -9388,6 +11641,138 @@ input DeleteAppStepInput {
   id: UUID!
 }
 
+"""The output of our delete `AppLimitCapsDefault` mutation."""
+type DeleteAppLimitCapsDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCapsDefault` that was deleted by this mutation."""
+  appLimitCapsDefault: AppLimitCapsDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCapsDefault`. May be used by Relay 1."""
+  appLimitCapsDefaultEdge(
+    """The method to use when ordering `AppLimitCapsDefault`."""
+    orderBy: [AppLimitCapsDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCapsDefaultEdge
+}
+
+"""All input for the `deleteAppLimitCapsDefault` mutation."""
+input DeleteAppLimitCapsDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgLimitCapsDefault` mutation."""
+type DeleteOrgLimitCapsDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCapsDefault` that was deleted by this mutation."""
+  orgLimitCapsDefault: OrgLimitCapsDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCapsDefault`. May be used by Relay 1."""
+  orgLimitCapsDefaultEdge(
+    """The method to use when ordering `OrgLimitCapsDefault`."""
+    orderBy: [OrgLimitCapsDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapsDefaultEdge
+}
+
+"""All input for the `deleteOrgLimitCapsDefault` mutation."""
+input DeleteOrgLimitCapsDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AppLimitCap` mutation."""
+type DeleteAppLimitCapPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCap` that was deleted by this mutation."""
+  appLimitCap: AppLimitCap
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCap`. May be used by Relay 1."""
+  appLimitCapEdge(
+    """The method to use when ordering `AppLimitCap`."""
+    orderBy: [AppLimitCapOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCapEdge
+}
+
+"""All input for the `deleteAppLimitCap` mutation."""
+input DeleteAppLimitCapInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgLimitCap` mutation."""
+type DeleteOrgLimitCapPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCap` that was deleted by this mutation."""
+  orgLimitCap: OrgLimitCap
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCap`. May be used by Relay 1."""
+  orgLimitCapEdge(
+    """The method to use when ordering `OrgLimitCap`."""
+    orderBy: [OrgLimitCapOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapEdge
+}
+
+"""All input for the `deleteOrgLimitCap` mutation."""
+input DeleteOrgLimitCapInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `OrgAdminGrant` mutation."""
 type DeleteOrgAdminGrantPayload {
   """
@@ -9557,6 +11942,39 @@ input DeleteOrgLimitDefaultInput {
   id: UUID!
 }
 
+"""The output of our delete `AppLimitCreditCodeItem` mutation."""
+type DeleteAppLimitCreditCodeItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCreditCodeItem` that was deleted by this mutation."""
+  appLimitCreditCodeItem: AppLimitCreditCodeItem
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCreditCodeItem`. May be used by Relay 1."""
+  appLimitCreditCodeItemEdge(
+    """The method to use when ordering `AppLimitCreditCodeItem`."""
+    orderBy: [AppLimitCreditCodeItemOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeItemEdge
+}
+
+"""All input for the `deleteAppLimitCreditCodeItem` mutation."""
+input DeleteAppLimitCreditCodeItemInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `AppLevelRequirement` mutation."""
 type DeleteAppLevelRequirementPayload {
   """
@@ -9582,6 +12000,72 @@ type DeleteAppLevelRequirementPayload {
 
 """All input for the `deleteAppLevelRequirement` mutation."""
 input DeleteAppLevelRequirementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AppLimitCredit` mutation."""
+type DeleteAppLimitCreditPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitCredit` that was deleted by this mutation."""
+  appLimitCredit: AppLimitCredit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitCredit`. May be used by Relay 1."""
+  appLimitCreditEdge(
+    """The method to use when ordering `AppLimitCredit`."""
+    orderBy: [AppLimitCreditOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditEdge
+}
+
+"""All input for the `deleteAppLimitCredit` mutation."""
+input DeleteAppLimitCreditInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgLimitCredit` mutation."""
+type DeleteOrgLimitCreditPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitCredit` that was deleted by this mutation."""
+  orgLimitCredit: OrgLimitCredit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitCredit`. May be used by Relay 1."""
+  orgLimitCreditEdge(
+    """The method to use when ordering `OrgLimitCredit`."""
+    orderBy: [OrgLimitCreditOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitCreditEdge
+}
+
+"""All input for the `deleteOrgLimitCredit` mutation."""
+input DeleteOrgLimitCreditInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -9854,72 +12338,6 @@ input DeleteOrgChartEdgeInput {
   id: UUID!
 }
 
-"""The output of our delete `AppLimit` mutation."""
-type DeleteAppLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLimit` that was deleted by this mutation."""
-  appLimit: AppLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLimit`. May be used by Relay 1."""
-  appLimitEdge(
-    """The method to use when ordering `AppLimit`."""
-    orderBy: [AppLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLimitEdge
-}
-
-"""All input for the `deleteAppLimit` mutation."""
-input DeleteAppLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `OrgLimitAggregate` mutation."""
-type DeleteOrgLimitAggregatePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimitAggregate` that was deleted by this mutation."""
-  orgLimitAggregate: OrgLimitAggregate
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimitAggregate`. May be used by Relay 1."""
-  orgLimitAggregateEdge(
-    """The method to use when ordering `OrgLimitAggregate`."""
-    orderBy: [OrgLimitAggregateOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitAggregateEdge
-}
-
-"""All input for the `deleteOrgLimitAggregate` mutation."""
-input DeleteOrgLimitAggregateInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `OrgMemberProfile` mutation."""
 type DeleteOrgMemberProfilePayload {
   """
@@ -9953,39 +12371,6 @@ input DeleteOrgMemberProfileInput {
   id: UUID!
 }
 
-"""The output of our delete `OrgLimit` mutation."""
-type DeleteOrgLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` that was deleted by this mutation."""
-  orgLimit: OrgLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimit`. May be used by Relay 1."""
-  orgLimitEdge(
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitEdge
-}
-
-"""All input for the `deleteOrgLimit` mutation."""
-input DeleteOrgLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `AppLevel` mutation."""
 type DeleteAppLevelPayload {
   """
@@ -10011,6 +12396,39 @@ type DeleteAppLevelPayload {
 
 """All input for the `deleteAppLevel` mutation."""
 input DeleteAppLevelInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AppLimit` mutation."""
+type DeleteAppLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimit` that was deleted by this mutation."""
+  appLimit: AppLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimit`. May be used by Relay 1."""
+  appLimitEdge(
+    """The method to use when ordering `AppLimit`."""
+    orderBy: [AppLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitEdge
+}
+
+"""All input for the `deleteAppLimit` mutation."""
+input DeleteAppLimitInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -10077,6 +12495,72 @@ type DeleteOrgMembershipSettingPayload {
 
 """All input for the `deleteOrgMembershipSetting` mutation."""
 input DeleteOrgMembershipSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgLimitAggregate` mutation."""
+type DeleteOrgLimitAggregatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitAggregate` that was deleted by this mutation."""
+  orgLimitAggregate: OrgLimitAggregate
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitAggregate`. May be used by Relay 1."""
+  orgLimitAggregateEdge(
+    """The method to use when ordering `OrgLimitAggregate`."""
+    orderBy: [OrgLimitAggregateOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitAggregateEdge
+}
+
+"""All input for the `deleteOrgLimitAggregate` mutation."""
+input DeleteOrgLimitAggregateInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgLimit` mutation."""
+type DeleteOrgLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` that was deleted by this mutation."""
+  orgLimit: OrgLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimit`. May be used by Relay 1."""
+  orgLimitEdge(
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitEdge
+}
+
+"""All input for the `deleteOrgLimit` mutation."""
+input DeleteOrgLimitInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -10207,6 +12691,15 @@ input RequestUploadUrlInput {
 
   """Original filename (optional, for display and Content-Disposition)"""
   filename: String
+
+  """
+  Custom S3 key (e.g., "reports/2024/Q1.pdf").
+  Only allowed when the bucket has allow_custom_keys=true.
+  When omitted, key defaults to contentHash (content-addressed dedup).
+  When provided, the file is stored at this key.
+  Re-uploading to an existing key auto-creates a new version.
+  """
+  key: String
 }
 
 type RequestUploadUrlPayload {
@@ -10224,6 +12717,69 @@ type RequestUploadUrlPayload {
 
   """Presigned URL expiry time (null if deduplicated)"""
   expiresAt: Datetime
+
+  """
+  ID of the previous version (set when re-uploading to an existing custom key)
+  """
+  previousVersionId: UUID
+}
+
+input BulkUploadFileInput {
+  """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
+  contentHash: String!
+
+  """MIME type of the file (e.g., "image/png")"""
+  contentType: String!
+
+  """File size in bytes"""
+  size: Int!
+
+  """Original filename (optional, for display and Content-Disposition)"""
+  filename: String
+
+  """Custom S3 key (only when bucket has allow_custom_keys=true)"""
+  key: String
+}
+
+input RequestBulkUploadUrlsInput {
+  """Bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """Owner entity ID for entity-scoped uploads"""
+  ownerId: UUID
+
+  """Array of files to upload"""
+  files: [BulkUploadFileInput!]!
+}
+
+type BulkUploadFilePayload {
+  """Presigned PUT URL (null if file was deduplicated)"""
+  uploadUrl: String
+
+  """The file ID"""
+  fileId: UUID!
+
+  """The S3 object key"""
+  key: String!
+
+  """Whether this file was deduplicated"""
+  deduplicated: Boolean!
+
+  """Presigned URL expiry time (null if deduplicated)"""
+  expiresAt: Datetime
+
+  """
+  ID of the previous version (set when re-uploading to an existing custom key)
+  """
+  previousVersionId: UUID
+
+  """Index of this file in the input array (for client correlation)"""
+  index: Int!
+}
+
+type RequestBulkUploadUrlsPayload {
+  """Array of results, one per input file"""
+  files: [BulkUploadFilePayload!]!
 }
 
 """The root query type which gives access points into the data universe."""
@@ -10329,6 +12885,37 @@ type Query {
     after: Cursor
   ): AppLevelRequirementConnection
 
+  """
+  Reads and enables pagination through a set of `AppLimitCreditRedemption`.
+  """
+  appLimitCreditRedemptions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCreditRedemptionFilter
+
+    """The method to use when ordering `AppLimitCreditRedemption`."""
+    orderBy: [AppLimitCreditRedemptionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditRedemptionConnection
+
   """Reads and enables pagination through a set of `OrgMember`."""
   orgMembers(
     """Only read the first `n` values of the set."""
@@ -10386,6 +12973,35 @@ type Query {
     """The method to use when ordering `AppPermissionDefault`."""
     orderBy: [AppPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppPermissionDefaultConnection
+
+  """Reads and enables pagination through a set of `AppLimitCreditCode`."""
+  appLimitCreditCodes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCreditCodeFilter
+
+    """The method to use when ordering `AppLimitCreditCode`."""
+    orderBy: [AppLimitCreditCodeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeConnection
 
   """Reads and enables pagination through a set of `OrgPermissionDefault`."""
   orgPermissionDefaults(
@@ -10590,6 +13206,122 @@ type Query {
     orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppStepConnection
 
+  """Reads and enables pagination through a set of `AppLimitCapsDefault`."""
+  appLimitCapsDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCapsDefaultFilter
+
+    """The method to use when ordering `AppLimitCapsDefault`."""
+    orderBy: [AppLimitCapsDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCapsDefaultConnection
+
+  """Reads and enables pagination through a set of `OrgLimitCapsDefault`."""
+  orgLimitCapsDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitCapsDefaultFilter
+
+    """The method to use when ordering `OrgLimitCapsDefault`."""
+    orderBy: [OrgLimitCapsDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapsDefaultConnection
+
+  """Reads and enables pagination through a set of `AppLimitCap`."""
+  appLimitCaps(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCapFilter
+
+    """The method to use when ordering `AppLimitCap`."""
+    orderBy: [AppLimitCapOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCapConnection
+
+  """Reads and enables pagination through a set of `OrgLimitCap`."""
+  orgLimitCaps(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitCapFilter
+
+    """The method to use when ordering `OrgLimitCap`."""
+    orderBy: [OrgLimitCapOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitCapConnection
+
   """Reads and enables pagination through a set of `OrgAdminGrant`."""
   orgAdminGrants(
     """Only read the first `n` values of the set."""
@@ -10735,6 +13467,37 @@ type Query {
     orderBy: [OrgLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgLimitDefaultConnection
 
+  """
+  Reads and enables pagination through a set of `AppLimitCreditCodeItem`.
+  """
+  appLimitCreditCodeItems(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCreditCodeItemFilter
+
+    """The method to use when ordering `AppLimitCreditCodeItem`."""
+    orderBy: [AppLimitCreditCodeItemOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditCodeItemConnection
+
   """Reads and enables pagination through a set of `AppLevelRequirement`."""
   appLevelRequirements(
     """Only read the first `n` values of the set."""
@@ -10763,6 +13526,64 @@ type Query {
     """The method to use when ordering `AppLevelRequirement`."""
     orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLevelRequirementConnection
+
+  """Reads and enables pagination through a set of `AppLimitCredit`."""
+  appLimitCredits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitCreditFilter
+
+    """The method to use when ordering `AppLimitCredit`."""
+    orderBy: [AppLimitCreditOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitCreditConnection
+
+  """Reads and enables pagination through a set of `OrgLimitCredit`."""
+  orgLimitCredits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitCreditFilter
+
+    """The method to use when ordering `OrgLimitCredit`."""
+    orderBy: [OrgLimitCreditOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitCreditConnection
 
   """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
   orgChartEdgeGrants(
@@ -11054,64 +13875,6 @@ type Query {
     orderBy: [OrgChartEdgeOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgChartEdgeConnection
 
-  """Reads and enables pagination through a set of `AppLimit`."""
-  appLimits(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLimitFilter
-
-    """The method to use when ordering `AppLimit`."""
-    orderBy: [AppLimitOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLimitConnection
-
-  """Reads and enables pagination through a set of `OrgLimitAggregate`."""
-  orgLimitAggregates(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgLimitAggregateFilter
-
-    """The method to use when ordering `OrgLimitAggregate`."""
-    orderBy: [OrgLimitAggregateOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgLimitAggregateConnection
-
   """Reads and enables pagination through a set of `OrgMemberProfile`."""
   orgMemberProfiles(
     """Only read the first `n` values of the set."""
@@ -11141,35 +13904,6 @@ type Query {
     orderBy: [OrgMemberProfileOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMemberProfileConnection
 
-  """Reads and enables pagination through a set of `OrgLimit`."""
-  orgLimits(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgLimitFilter
-
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgLimitConnection
-
   """Reads and enables pagination through a set of `AppLevel`."""
   appLevels(
     """Only read the first `n` values of the set."""
@@ -11198,6 +13932,35 @@ type Query {
     """The method to use when ordering `AppLevel`."""
     orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLevelConnection
+
+  """Reads and enables pagination through a set of `AppLimit`."""
+  appLimits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitFilter
+
+    """The method to use when ordering `AppLimit`."""
+    orderBy: [AppLimitOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitConnection
 
   """Reads and enables pagination through a set of `AppInvite`."""
   appInvites(
@@ -11256,6 +14019,64 @@ type Query {
     """The method to use when ordering `OrgMembershipSetting`."""
     orderBy: [OrgMembershipSettingOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMembershipSettingConnection
+
+  """Reads and enables pagination through a set of `OrgLimitAggregate`."""
+  orgLimitAggregates(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitAggregateFilter
+
+    """The method to use when ordering `OrgLimitAggregate`."""
+    orderBy: [OrgLimitAggregateOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitAggregateConnection
+
+  """Reads and enables pagination through a set of `OrgLimit`."""
+  orgLimits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitFilter
+
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitConnection
 
   """Reads and enables pagination through a set of `OrgInvite`."""
   orgInvites(
@@ -11367,6 +14188,14 @@ type Mutation {
     input: SubmitOrgInviteCodeInput!
   ): SubmitOrgInviteCodePayload
 
+  """Creates a single `AppLimitCreditRedemption`."""
+  createAppLimitCreditRedemption(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitCreditRedemptionInput!
+  ): CreateAppLimitCreditRedemptionPayload
+
   """Creates a single `OrgMember`."""
   createOrgMember(
     """
@@ -11382,6 +14211,14 @@ type Mutation {
     """
     input: CreateAppPermissionDefaultInput!
   ): CreateAppPermissionDefaultPayload
+
+  """Creates a single `AppLimitCreditCode`."""
+  createAppLimitCreditCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitCreditCodeInput!
+  ): CreateAppLimitCreditCodePayload
 
   """Creates a single `OrgPermissionDefault`."""
   createOrgPermissionDefault(
@@ -11439,6 +14276,38 @@ type Mutation {
     input: CreateAppStepInput!
   ): CreateAppStepPayload
 
+  """Creates a single `AppLimitCapsDefault`."""
+  createAppLimitCapsDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitCapsDefaultInput!
+  ): CreateAppLimitCapsDefaultPayload
+
+  """Creates a single `OrgLimitCapsDefault`."""
+  createOrgLimitCapsDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitCapsDefaultInput!
+  ): CreateOrgLimitCapsDefaultPayload
+
+  """Creates a single `AppLimitCap`."""
+  createAppLimitCap(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitCapInput!
+  ): CreateAppLimitCapPayload
+
+  """Creates a single `OrgLimitCap`."""
+  createOrgLimitCap(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitCapInput!
+  ): CreateOrgLimitCapPayload
+
   """Creates a single `OrgAdminGrant`."""
   createOrgAdminGrant(
     """
@@ -11479,6 +14348,14 @@ type Mutation {
     input: CreateOrgLimitDefaultInput!
   ): CreateOrgLimitDefaultPayload
 
+  """Creates a single `AppLimitCreditCodeItem`."""
+  createAppLimitCreditCodeItem(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitCreditCodeItemInput!
+  ): CreateAppLimitCreditCodeItemPayload
+
   """Creates a single `AppLevelRequirement`."""
   createAppLevelRequirement(
     """
@@ -11486,6 +14363,22 @@ type Mutation {
     """
     input: CreateAppLevelRequirementInput!
   ): CreateAppLevelRequirementPayload
+
+  """Creates a single `AppLimitCredit`."""
+  createAppLimitCredit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitCreditInput!
+  ): CreateAppLimitCreditPayload
+
+  """Creates a single `OrgLimitCredit`."""
+  createOrgLimitCredit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitCreditInput!
+  ): CreateOrgLimitCreditPayload
 
   """Creates a single `OrgChartEdgeGrant`."""
   createOrgChartEdgeGrant(
@@ -11567,22 +14460,6 @@ type Mutation {
     input: CreateOrgChartEdgeInput!
   ): CreateOrgChartEdgePayload
 
-  """Creates a single `AppLimit`."""
-  createAppLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLimitInput!
-  ): CreateAppLimitPayload
-
-  """Creates a single `OrgLimitAggregate`."""
-  createOrgLimitAggregate(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgLimitAggregateInput!
-  ): CreateOrgLimitAggregatePayload
-
   """Creates a single `OrgMemberProfile`."""
   createOrgMemberProfile(
     """
@@ -11591,14 +14468,6 @@ type Mutation {
     input: CreateOrgMemberProfileInput!
   ): CreateOrgMemberProfilePayload
 
-  """Creates a single `OrgLimit`."""
-  createOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgLimitInput!
-  ): CreateOrgLimitPayload
-
   """Creates a single `AppLevel`."""
   createAppLevel(
     """
@@ -11606,6 +14475,14 @@ type Mutation {
     """
     input: CreateAppLevelInput!
   ): CreateAppLevelPayload
+
+  """Creates a single `AppLimit`."""
+  createAppLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitInput!
+  ): CreateAppLimitPayload
 
   """Creates a single `AppInvite`."""
   createAppInvite(
@@ -11622,6 +14499,22 @@ type Mutation {
     """
     input: CreateOrgMembershipSettingInput!
   ): CreateOrgMembershipSettingPayload
+
+  """Creates a single `OrgLimitAggregate`."""
+  createOrgLimitAggregate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitAggregateInput!
+  ): CreateOrgLimitAggregatePayload
+
+  """Creates a single `OrgLimit`."""
+  createOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitInput!
+  ): CreateOrgLimitPayload
 
   """Creates a single `OrgInvite`."""
   createOrgInvite(
@@ -11647,6 +14540,16 @@ type Mutation {
     input: CreateOrgMembershipInput!
   ): CreateOrgMembershipPayload
 
+  """
+  Updates a single `AppLimitCreditRedemption` using a unique key and a patch.
+  """
+  updateAppLimitCreditRedemption(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitCreditRedemptionInput!
+  ): UpdateAppLimitCreditRedemptionPayload
+
   """Updates a single `OrgMember` using a unique key and a patch."""
   updateOrgMember(
     """
@@ -11664,6 +14567,14 @@ type Mutation {
     """
     input: UpdateAppPermissionDefaultInput!
   ): UpdateAppPermissionDefaultPayload
+
+  """Updates a single `AppLimitCreditCode` using a unique key and a patch."""
+  updateAppLimitCreditCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitCreditCodeInput!
+  ): UpdateAppLimitCreditCodePayload
 
   """
   Updates a single `OrgPermissionDefault` using a unique key and a patch.
@@ -11723,6 +14634,38 @@ type Mutation {
     input: UpdateAppStepInput!
   ): UpdateAppStepPayload
 
+  """Updates a single `AppLimitCapsDefault` using a unique key and a patch."""
+  updateAppLimitCapsDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitCapsDefaultInput!
+  ): UpdateAppLimitCapsDefaultPayload
+
+  """Updates a single `OrgLimitCapsDefault` using a unique key and a patch."""
+  updateOrgLimitCapsDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitCapsDefaultInput!
+  ): UpdateOrgLimitCapsDefaultPayload
+
+  """Updates a single `AppLimitCap` using a unique key and a patch."""
+  updateAppLimitCap(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitCapInput!
+  ): UpdateAppLimitCapPayload
+
+  """Updates a single `OrgLimitCap` using a unique key and a patch."""
+  updateOrgLimitCap(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitCapInput!
+  ): UpdateOrgLimitCapPayload
+
   """Updates a single `OrgAdminGrant` using a unique key and a patch."""
   updateOrgAdminGrant(
     """
@@ -11763,6 +14706,16 @@ type Mutation {
     input: UpdateOrgLimitDefaultInput!
   ): UpdateOrgLimitDefaultPayload
 
+  """
+  Updates a single `AppLimitCreditCodeItem` using a unique key and a patch.
+  """
+  updateAppLimitCreditCodeItem(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitCreditCodeItemInput!
+  ): UpdateAppLimitCreditCodeItemPayload
+
   """Updates a single `AppLevelRequirement` using a unique key and a patch."""
   updateAppLevelRequirement(
     """
@@ -11770,6 +14723,22 @@ type Mutation {
     """
     input: UpdateAppLevelRequirementInput!
   ): UpdateAppLevelRequirementPayload
+
+  """Updates a single `AppLimitCredit` using a unique key and a patch."""
+  updateAppLimitCredit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitCreditInput!
+  ): UpdateAppLimitCreditPayload
+
+  """Updates a single `OrgLimitCredit` using a unique key and a patch."""
+  updateOrgLimitCredit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitCreditInput!
+  ): UpdateOrgLimitCreditPayload
 
   """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
   updateOrgChartEdgeGrant(
@@ -11839,22 +14808,6 @@ type Mutation {
     input: UpdateOrgChartEdgeInput!
   ): UpdateOrgChartEdgePayload
 
-  """Updates a single `AppLimit` using a unique key and a patch."""
-  updateAppLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLimitInput!
-  ): UpdateAppLimitPayload
-
-  """Updates a single `OrgLimitAggregate` using a unique key and a patch."""
-  updateOrgLimitAggregate(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgLimitAggregateInput!
-  ): UpdateOrgLimitAggregatePayload
-
   """Updates a single `OrgMemberProfile` using a unique key and a patch."""
   updateOrgMemberProfile(
     """
@@ -11863,14 +14816,6 @@ type Mutation {
     input: UpdateOrgMemberProfileInput!
   ): UpdateOrgMemberProfilePayload
 
-  """Updates a single `OrgLimit` using a unique key and a patch."""
-  updateOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgLimitInput!
-  ): UpdateOrgLimitPayload
-
   """Updates a single `AppLevel` using a unique key and a patch."""
   updateAppLevel(
     """
@@ -11878,6 +14823,14 @@ type Mutation {
     """
     input: UpdateAppLevelInput!
   ): UpdateAppLevelPayload
+
+  """Updates a single `AppLimit` using a unique key and a patch."""
+  updateAppLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitInput!
+  ): UpdateAppLimitPayload
 
   """Updates a single `AppInvite` using a unique key and a patch."""
   updateAppInvite(
@@ -11896,6 +14849,22 @@ type Mutation {
     """
     input: UpdateOrgMembershipSettingInput!
   ): UpdateOrgMembershipSettingPayload
+
+  """Updates a single `OrgLimitAggregate` using a unique key and a patch."""
+  updateOrgLimitAggregate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitAggregateInput!
+  ): UpdateOrgLimitAggregatePayload
+
+  """Updates a single `OrgLimit` using a unique key and a patch."""
+  updateOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitInput!
+  ): UpdateOrgLimitPayload
 
   """Updates a single `OrgInvite` using a unique key and a patch."""
   updateOrgInvite(
@@ -11921,6 +14890,14 @@ type Mutation {
     input: UpdateOrgMembershipInput!
   ): UpdateOrgMembershipPayload
 
+  """Deletes a single `AppLimitCreditRedemption` using a unique key."""
+  deleteAppLimitCreditRedemption(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitCreditRedemptionInput!
+  ): DeleteAppLimitCreditRedemptionPayload
+
   """Deletes a single `OrgMember` using a unique key."""
   deleteOrgMember(
     """
@@ -11936,6 +14913,14 @@ type Mutation {
     """
     input: DeleteAppPermissionDefaultInput!
   ): DeleteAppPermissionDefaultPayload
+
+  """Deletes a single `AppLimitCreditCode` using a unique key."""
+  deleteAppLimitCreditCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitCreditCodeInput!
+  ): DeleteAppLimitCreditCodePayload
 
   """Deletes a single `OrgPermissionDefault` using a unique key."""
   deleteOrgPermissionDefault(
@@ -11993,6 +14978,38 @@ type Mutation {
     input: DeleteAppStepInput!
   ): DeleteAppStepPayload
 
+  """Deletes a single `AppLimitCapsDefault` using a unique key."""
+  deleteAppLimitCapsDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitCapsDefaultInput!
+  ): DeleteAppLimitCapsDefaultPayload
+
+  """Deletes a single `OrgLimitCapsDefault` using a unique key."""
+  deleteOrgLimitCapsDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitCapsDefaultInput!
+  ): DeleteOrgLimitCapsDefaultPayload
+
+  """Deletes a single `AppLimitCap` using a unique key."""
+  deleteAppLimitCap(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitCapInput!
+  ): DeleteAppLimitCapPayload
+
+  """Deletes a single `OrgLimitCap` using a unique key."""
+  deleteOrgLimitCap(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitCapInput!
+  ): DeleteOrgLimitCapPayload
+
   """Deletes a single `OrgAdminGrant` using a unique key."""
   deleteOrgAdminGrant(
     """
@@ -12033,6 +15050,14 @@ type Mutation {
     input: DeleteOrgLimitDefaultInput!
   ): DeleteOrgLimitDefaultPayload
 
+  """Deletes a single `AppLimitCreditCodeItem` using a unique key."""
+  deleteAppLimitCreditCodeItem(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitCreditCodeItemInput!
+  ): DeleteAppLimitCreditCodeItemPayload
+
   """Deletes a single `AppLevelRequirement` using a unique key."""
   deleteAppLevelRequirement(
     """
@@ -12040,6 +15065,22 @@ type Mutation {
     """
     input: DeleteAppLevelRequirementInput!
   ): DeleteAppLevelRequirementPayload
+
+  """Deletes a single `AppLimitCredit` using a unique key."""
+  deleteAppLimitCredit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitCreditInput!
+  ): DeleteAppLimitCreditPayload
+
+  """Deletes a single `OrgLimitCredit` using a unique key."""
+  deleteOrgLimitCredit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitCreditInput!
+  ): DeleteOrgLimitCreditPayload
 
   """Deletes a single `OrgChartEdgeGrant` using a unique key."""
   deleteOrgChartEdgeGrant(
@@ -12105,22 +15146,6 @@ type Mutation {
     input: DeleteOrgChartEdgeInput!
   ): DeleteOrgChartEdgePayload
 
-  """Deletes a single `AppLimit` using a unique key."""
-  deleteAppLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLimitInput!
-  ): DeleteAppLimitPayload
-
-  """Deletes a single `OrgLimitAggregate` using a unique key."""
-  deleteOrgLimitAggregate(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgLimitAggregateInput!
-  ): DeleteOrgLimitAggregatePayload
-
   """Deletes a single `OrgMemberProfile` using a unique key."""
   deleteOrgMemberProfile(
     """
@@ -12129,14 +15154,6 @@ type Mutation {
     input: DeleteOrgMemberProfileInput!
   ): DeleteOrgMemberProfilePayload
 
-  """Deletes a single `OrgLimit` using a unique key."""
-  deleteOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgLimitInput!
-  ): DeleteOrgLimitPayload
-
   """Deletes a single `AppLevel` using a unique key."""
   deleteAppLevel(
     """
@@ -12144,6 +15161,14 @@ type Mutation {
     """
     input: DeleteAppLevelInput!
   ): DeleteAppLevelPayload
+
+  """Deletes a single `AppLimit` using a unique key."""
+  deleteAppLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitInput!
+  ): DeleteAppLimitPayload
 
   """Deletes a single `AppInvite` using a unique key."""
   deleteAppInvite(
@@ -12160,6 +15185,22 @@ type Mutation {
     """
     input: DeleteOrgMembershipSettingInput!
   ): DeleteOrgMembershipSettingPayload
+
+  """Deletes a single `OrgLimitAggregate` using a unique key."""
+  deleteOrgLimitAggregate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitAggregateInput!
+  ): DeleteOrgLimitAggregatePayload
+
+  """Deletes a single `OrgLimit` using a unique key."""
+  deleteOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitInput!
+  ): DeleteOrgLimitPayload
 
   """Deletes a single `OrgInvite` using a unique key."""
   deleteOrgInvite(
@@ -12197,6 +15238,18 @@ type Mutation {
     """
     input: RequestUploadUrlInput!
   ): RequestUploadUrlPayload
+
+  """
+  Request presigned URLs for uploading multiple files in a single batch.
+  Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+  Each file is processed independently — some may dedup while others get fresh URLs.
+  """
+  requestBulkUploadUrls(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RequestBulkUploadUrlsInput!
+  ): RequestBulkUploadUrlsPayload
 
   """
   Provision an S3 bucket for a logical bucket in the database.

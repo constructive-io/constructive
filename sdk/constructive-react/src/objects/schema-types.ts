@@ -441,6 +441,34 @@ export interface RequestUploadUrlInput {
   size: number;
   /** Original filename (optional, for display and Content-Disposition) */
   filename?: string;
+  /**
+   * Custom S3 key (e.g., "reports/2024/Q1.pdf").
+   * Only allowed when the bucket has allow_custom_keys=true.
+   * When omitted, key defaults to contentHash (content-addressed dedup).
+   * When provided, the file is stored at this key.
+   * Re-uploading to an existing key auto-creates a new version.
+   */
+  key?: string;
+}
+export interface BulkUploadFileInput {
+  /** SHA-256 content hash computed by the client (hex-encoded, 64 chars) */
+  contentHash: string;
+  /** MIME type of the file (e.g., "image/png") */
+  contentType: string;
+  /** File size in bytes */
+  size: number;
+  /** Original filename (optional, for display and Content-Disposition) */
+  filename?: string;
+  /** Custom S3 key (only when bucket has allow_custom_keys=true) */
+  key?: string;
+}
+export interface RequestBulkUploadUrlsInput {
+  /** Bucket key (e.g., "public", "private") */
+  bucketKey: string;
+  /** Owner entity ID for entity-scoped uploads */
+  ownerId?: string;
+  /** Array of files to upload */
+  files: BulkUploadFileInput[];
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -603,6 +631,12 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
+  /** ID of the previous version (set when re-uploading to an existing custom key) */
+  previousVersionId?: string | null;
+}
+export interface RequestBulkUploadUrlsPayload {
+  /** Array of results, one per input file */
+  files: BulkUploadFilePayload[];
 }
 export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */
@@ -672,6 +706,22 @@ export interface MetaTable {
   relations: MetaRelations;
   inflection: MetaInflection;
   query: MetaQuery;
+}
+export interface BulkUploadFilePayload {
+  /** Presigned PUT URL (null if file was deduplicated) */
+  uploadUrl?: string | null;
+  /** The file ID */
+  fileId: string;
+  /** The S3 object key */
+  key: string;
+  /** Whether this file was deduplicated */
+  deduplicated: boolean;
+  /** Presigned URL expiry time (null if deduplicated) */
+  expiresAt?: string | null;
+  /** ID of the previous version (set when re-uploading to an existing custom key) */
+  previousVersionId?: string | null;
+  /** Index of this file in the input array (for client correlation) */
+  index: number;
 }
 /** Information about a table field/column */
 export interface MetaField {

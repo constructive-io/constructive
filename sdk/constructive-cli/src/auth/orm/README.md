@@ -755,6 +755,23 @@ existing file ID and deduplicated=true with no uploadUrl.
 const result = await db.mutation.requestUploadUrl({ input: '<RequestUploadUrlInput>' }).execute();
 ```
 
+### `db.mutation.requestBulkUploadUrls`
+
+Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestBulkUploadUrlsInput (required) |
+
+```typescript
+const result = await db.mutation.requestBulkUploadUrls({ input: { bucketKey: '<String>', ownerId: '<UUID>', files: '<BulkUploadFileInput>' } }).execute();
+```
+
 ### `db.mutation.provisionBucket`
 
 Provision an S3 bucket for a logical bucket in the database.

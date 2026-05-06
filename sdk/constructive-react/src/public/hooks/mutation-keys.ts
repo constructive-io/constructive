@@ -786,6 +786,39 @@ export const appLimitMutationKeys = {
   /** Delete appLimit mutation key */ delete: (id: string | number) =>
     ['mutation', 'applimit', 'delete', id] as const,
 } as const;
+export const appLimitCreditMutationKeys = {
+  /** All appLimitCredit mutation keys */ all: ['mutation', 'applimitcredit'] as const,
+  /** Create appLimitCredit mutation key */ create: () =>
+    ['mutation', 'applimitcredit', 'create'] as const,
+  /** Update appLimitCredit mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitcredit', 'update', id] as const,
+  /** Delete appLimitCredit mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitcredit', 'delete', id] as const,
+} as const;
+export const appLimitCreditCodeItemMutationKeys = {
+  /** All appLimitCreditCodeItem mutation keys */ all: [
+    'mutation',
+    'applimitcreditcodeitem',
+  ] as const,
+  /** Create appLimitCreditCodeItem mutation key */ create: () =>
+    ['mutation', 'applimitcreditcodeitem', 'create'] as const,
+  /** Update appLimitCreditCodeItem mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitcreditcodeitem', 'update', id] as const,
+  /** Delete appLimitCreditCodeItem mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitcreditcodeitem', 'delete', id] as const,
+} as const;
+export const appLimitCreditRedemptionMutationKeys = {
+  /** All appLimitCreditRedemption mutation keys */ all: [
+    'mutation',
+    'applimitcreditredemption',
+  ] as const,
+  /** Create appLimitCreditRedemption mutation key */ create: () =>
+    ['mutation', 'applimitcreditredemption', 'create'] as const,
+  /** Update appLimitCreditRedemption mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitcreditredemption', 'update', id] as const,
+  /** Delete appLimitCreditRedemption mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitcreditredemption', 'delete', id] as const,
+} as const;
 export const orgLimitMutationKeys = {
   /** All orgLimit mutation keys */ all: ['mutation', 'orglimit'] as const,
   /** Create orgLimit mutation key */ create: () => ['mutation', 'orglimit', 'create'] as const,
@@ -793,6 +826,15 @@ export const orgLimitMutationKeys = {
     ['mutation', 'orglimit', 'update', id] as const,
   /** Delete orgLimit mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimit', 'delete', id] as const,
+} as const;
+export const orgLimitCreditMutationKeys = {
+  /** All orgLimitCredit mutation keys */ all: ['mutation', 'orglimitcredit'] as const,
+  /** Create orgLimitCredit mutation key */ create: () =>
+    ['mutation', 'orglimitcredit', 'create'] as const,
+  /** Update orgLimitCredit mutation key */ update: (id: string | number) =>
+    ['mutation', 'orglimitcredit', 'update', id] as const,
+  /** Delete orgLimitCredit mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orglimitcredit', 'delete', id] as const,
 } as const;
 export const orgLimitAggregateMutationKeys = {
   /** All orgLimitAggregate mutation keys */ all: ['mutation', 'orglimitaggregate'] as const,
@@ -973,6 +1015,51 @@ export const appPermissionDefaultMutationKeys = {
   /** Delete appPermissionDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'apppermissiondefault', 'delete', id] as const,
 } as const;
+export const appLimitCreditCodeMutationKeys = {
+  /** All appLimitCreditCode mutation keys */ all: ['mutation', 'applimitcreditcode'] as const,
+  /** Create appLimitCreditCode mutation key */ create: () =>
+    ['mutation', 'applimitcreditcode', 'create'] as const,
+  /** Update appLimitCreditCode mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitcreditcode', 'update', id] as const,
+  /** Delete appLimitCreditCode mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitcreditcode', 'delete', id] as const,
+} as const;
+export const appLimitCapsDefaultMutationKeys = {
+  /** All appLimitCapsDefault mutation keys */ all: ['mutation', 'applimitcapsdefault'] as const,
+  /** Create appLimitCapsDefault mutation key */ create: () =>
+    ['mutation', 'applimitcapsdefault', 'create'] as const,
+  /** Update appLimitCapsDefault mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitcapsdefault', 'update', id] as const,
+  /** Delete appLimitCapsDefault mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitcapsdefault', 'delete', id] as const,
+} as const;
+export const orgLimitCapsDefaultMutationKeys = {
+  /** All orgLimitCapsDefault mutation keys */ all: ['mutation', 'orglimitcapsdefault'] as const,
+  /** Create orgLimitCapsDefault mutation key */ create: () =>
+    ['mutation', 'orglimitcapsdefault', 'create'] as const,
+  /** Update orgLimitCapsDefault mutation key */ update: (id: string | number) =>
+    ['mutation', 'orglimitcapsdefault', 'update', id] as const,
+  /** Delete orgLimitCapsDefault mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orglimitcapsdefault', 'delete', id] as const,
+} as const;
+export const appLimitCapMutationKeys = {
+  /** All appLimitCap mutation keys */ all: ['mutation', 'applimitcap'] as const,
+  /** Create appLimitCap mutation key */ create: () =>
+    ['mutation', 'applimitcap', 'create'] as const,
+  /** Update appLimitCap mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitcap', 'update', id] as const,
+  /** Delete appLimitCap mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitcap', 'delete', id] as const,
+} as const;
+export const orgLimitCapMutationKeys = {
+  /** All orgLimitCap mutation keys */ all: ['mutation', 'orglimitcap'] as const,
+  /** Create orgLimitCap mutation key */ create: () =>
+    ['mutation', 'orglimitcap', 'create'] as const,
+  /** Update orgLimitCap mutation key */ update: (id: string | number) =>
+    ['mutation', 'orglimitcap', 'update', id] as const,
+  /** Delete orgLimitCap mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orglimitcap', 'delete', id] as const,
+} as const;
 export const membershipTypeMutationKeys = {
   /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
   /** Create membershipType mutation key */ create: () =>
@@ -1089,6 +1176,14 @@ export const orgLimitEventMutationKeys = {
   /** Delete orgLimitEvent mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitevent', 'delete', id] as const,
 } as const;
+export const rlsModuleMutationKeys = {
+  /** All rlsModule mutation keys */ all: ['mutation', 'rlsmodule'] as const,
+  /** Create rlsModule mutation key */ create: () => ['mutation', 'rlsmodule', 'create'] as const,
+  /** Update rlsModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'rlsmodule', 'update', id] as const,
+  /** Delete rlsModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'rlsmodule', 'delete', id] as const,
+} as const;
 export const plansModuleMutationKeys = {
   /** All plansModule mutation keys */ all: ['mutation', 'plansmodule'] as const,
   /** Create plansModule mutation key */ create: () =>
@@ -1097,14 +1192,6 @@ export const plansModuleMutationKeys = {
     ['mutation', 'plansmodule', 'update', id] as const,
   /** Delete plansModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'plansmodule', 'delete', id] as const,
-} as const;
-export const rlsModuleMutationKeys = {
-  /** All rlsModule mutation keys */ all: ['mutation', 'rlsmodule'] as const,
-  /** Create rlsModule mutation key */ create: () => ['mutation', 'rlsmodule', 'create'] as const,
-  /** Update rlsModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'rlsmodule', 'update', id] as const,
-  /** Delete rlsModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'rlsmodule', 'delete', id] as const,
 } as const;
 export const sqlActionMutationKeys = {
   /** All sqlAction mutation keys */ all: ['mutation', 'sqlaction'] as const,
@@ -1369,6 +1456,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'requestUploadUrl', identifier] as const)
       : (['mutation', 'requestUploadUrl'] as const),
+  /** Mutation key for requestBulkUploadUrls */ requestBulkUploadUrls: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'requestBulkUploadUrls', identifier] as const)
+      : (['mutation', 'requestBulkUploadUrls'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
@@ -1482,7 +1573,11 @@ export const mutationKeys = {
   orgChartEdgeGrant: orgChartEdgeGrantMutationKeys,
   orgPermissionDefault: orgPermissionDefaultMutationKeys,
   appLimit: appLimitMutationKeys,
+  appLimitCredit: appLimitCreditMutationKeys,
+  appLimitCreditCodeItem: appLimitCreditCodeItemMutationKeys,
+  appLimitCreditRedemption: appLimitCreditRedemptionMutationKeys,
   orgLimit: orgLimitMutationKeys,
+  orgLimitCredit: orgLimitCreditMutationKeys,
   orgLimitAggregate: orgLimitAggregateMutationKeys,
   appStep: appStepMutationKeys,
   appAchievement: appAchievementMutationKeys,
@@ -1504,6 +1599,11 @@ export const mutationKeys = {
   ref: refMutationKeys,
   store: storeMutationKeys,
   appPermissionDefault: appPermissionDefaultMutationKeys,
+  appLimitCreditCode: appLimitCreditCodeMutationKeys,
+  appLimitCapsDefault: appLimitCapsDefaultMutationKeys,
+  orgLimitCapsDefault: orgLimitCapsDefaultMutationKeys,
+  appLimitCap: appLimitCapMutationKeys,
+  orgLimitCap: orgLimitCapMutationKeys,
   membershipType: membershipTypeMutationKeys,
   migrateFile: migrateFileMutationKeys,
   devicesModule: devicesModuleMutationKeys,
@@ -1517,8 +1617,8 @@ export const mutationKeys = {
   orgMembershipDefault: orgMembershipDefaultMutationKeys,
   appLimitEvent: appLimitEventMutationKeys,
   orgLimitEvent: orgLimitEventMutationKeys,
-  plansModule: plansModuleMutationKeys,
   rlsModule: rlsModuleMutationKeys,
+  plansModule: plansModuleMutationKeys,
   sqlAction: sqlActionMutationKeys,
   billingModule: billingModuleMutationKeys,
   astMigration: astMigrationMutationKeys,

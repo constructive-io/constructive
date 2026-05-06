@@ -51,6 +51,16 @@ function App() {
 | `useCreateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
 | `useUpdateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
 | `useDeleteAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
+| `useAppLimitCreditRedemptionsQuery` | Query | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useAppLimitCreditRedemptionQuery` | Query | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useCreateAppLimitCreditRedemptionMutation` | Mutation | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useUpdateAppLimitCreditRedemptionMutation` | Mutation | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useDeleteAppLimitCreditRedemptionMutation` | Mutation | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useAppLimitCreditCodeItemsQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
+| `useAppLimitCreditCodeItemQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
+| `useCreateAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
+| `useUpdateAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
+| `useDeleteAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
 | `useOrgMembersQuery` | Query | Simplified view of active members in an entity, used for listing who belongs to an org or group |
 | `useOrgMemberQuery` | Query | Simplified view of active members in an entity, used for listing who belongs to an org or group |
 | `useCreateOrgMemberMutation` | Mutation | Simplified view of active members in an entity, used for listing who belongs to an org or group |
@@ -61,6 +71,11 @@ function App() {
 | `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
+| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
+| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
 | `useOrgPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
 | `useOrgPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
 | `useCreateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
@@ -86,6 +101,26 @@ function App() {
 | `useCreateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
 | `useUpdateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
 | `useDeleteAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
+| `useAppLimitCapsDefaultsQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useAppLimitCapsDefaultQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useCreateAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useUpdateAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useDeleteAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useOrgLimitCapsDefaultsQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useOrgLimitCapsDefaultQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useCreateOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useUpdateOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useDeleteOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useAppLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useAppLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useCreateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useUpdateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useDeleteAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useOrgLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useOrgLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useCreateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useUpdateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useDeleteOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
 | `useOrgAdminGrantsQuery` | Query | Records of admin role grants and revocations between members |
 | `useOrgAdminGrantQuery` | Query | Records of admin role grants and revocations between members |
 | `useCreateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
@@ -111,6 +146,16 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useAppLimitCreditsQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useAppLimitCreditQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useCreateAppLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useUpdateAppLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useDeleteAppLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useOrgLimitCreditsQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useOrgLimitCreditQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useCreateOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useUpdateOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useDeleteOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
 | `useOrgChartEdgeGrantsQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useOrgChartEdgeGrantQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useCreateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
@@ -155,31 +200,21 @@ function App() {
 | `useCreateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
 | `useUpdateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
 | `useDeleteOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
-| `useAppLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
-| `useAppLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
-| `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
-| `useUpdateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
-| `useDeleteAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
-| `useOrgLimitAggregatesQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
-| `useOrgLimitAggregateQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
-| `useCreateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
-| `useUpdateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
-| `useDeleteOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
 | `useOrgMemberProfilesQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useOrgMemberProfileQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useCreateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useUpdateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useDeleteOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
-| `useOrgLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
-| `useOrgLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
-| `useCreateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
-| `useUpdateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
-| `useDeleteOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
 | `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
 | `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useAppLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useAppLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useUpdateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useDeleteAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useAppInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useAppInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useCreateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
@@ -190,6 +225,16 @@ function App() {
 | `useCreateOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
 | `useUpdateOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
 | `useDeleteOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
+| `useOrgLimitAggregatesQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
+| `useOrgLimitAggregateQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
+| `useCreateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
+| `useUpdateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
+| `useDeleteOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
+| `useOrgLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useOrgLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useCreateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useUpdateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useDeleteOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
@@ -222,6 +267,9 @@ function App() {
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
 existing file ID and deduplicated=true with no uploadUrl. |
+| `useRequestBulkUploadUrlsMutation` | Mutation | Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs. |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -322,6 +370,48 @@ const { mutate: create } = useCreateAppLevelRequirementMutation({
 create({ name: '<String>', level: '<String>', description: '<String>', requiredCount: '<Int>', priority: '<Int>' });
 ```
 
+### AppLimitCreditRedemption
+
+```typescript
+// List all appLimitCreditRedemptions
+const { data, isLoading } = useAppLimitCreditRedemptionsQuery({
+  selection: { fields: { id: true, creditCodeId: true, entityId: true } },
+});
+
+// Get one appLimitCreditRedemption
+const { data: item } = useAppLimitCreditRedemptionQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, creditCodeId: true, entityId: true } },
+});
+
+// Create a appLimitCreditRedemption
+const { mutate: create } = useCreateAppLimitCreditRedemptionMutation({
+  selection: { fields: { id: true } },
+});
+create({ creditCodeId: '<UUID>', entityId: '<UUID>' });
+```
+
+### AppLimitCreditCodeItem
+
+```typescript
+// List all appLimitCreditCodeItems
+const { data, isLoading } = useAppLimitCreditCodeItemsQuery({
+  selection: { fields: { id: true, creditCodeId: true, defaultLimitId: true, amount: true, creditType: true } },
+});
+
+// Get one appLimitCreditCodeItem
+const { data: item } = useAppLimitCreditCodeItemQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, creditCodeId: true, defaultLimitId: true, amount: true, creditType: true } },
+});
+
+// Create a appLimitCreditCodeItem
+const { mutate: create } = useCreateAppLimitCreditCodeItemMutation({
+  selection: { fields: { id: true } },
+});
+create({ creditCodeId: '<UUID>', defaultLimitId: '<UUID>', amount: '<BigInt>', creditType: '<String>' });
+```
+
 ### OrgMember
 
 ```typescript
@@ -362,6 +452,27 @@ const { mutate: create } = useCreateAppPermissionDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ permissions: '<BitString>' });
+```
+
+### AppLimitCreditCode
+
+```typescript
+// List all appLimitCreditCodes
+const { data, isLoading } = useAppLimitCreditCodesQuery({
+  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+});
+
+// Get one appLimitCreditCode
+const { data: item } = useAppLimitCreditCodeQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+});
+
+// Create a appLimitCreditCode
+const { mutate: create } = useCreateAppLimitCreditCodeMutation({
+  selection: { fields: { id: true } },
+});
+create({ code: '<String>', maxRedemptions: '<Int>', currentRedemptions: '<Int>', expiresAt: '<Datetime>' });
 ```
 
 ### OrgPermissionDefault
@@ -469,6 +580,90 @@ const { mutate: create } = useCreateAppStepMutation({
 create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
 ```
 
+### AppLimitCapsDefault
+
+```typescript
+// List all appLimitCapsDefaults
+const { data, isLoading } = useAppLimitCapsDefaultsQuery({
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Get one appLimitCapsDefault
+const { data: item } = useAppLimitCapsDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Create a appLimitCapsDefault
+const { mutate: create } = useCreateAppLimitCapsDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', max: '<BigInt>' });
+```
+
+### OrgLimitCapsDefault
+
+```typescript
+// List all orgLimitCapsDefaults
+const { data, isLoading } = useOrgLimitCapsDefaultsQuery({
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Get one orgLimitCapsDefault
+const { data: item } = useOrgLimitCapsDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Create a orgLimitCapsDefault
+const { mutate: create } = useCreateOrgLimitCapsDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', max: '<BigInt>' });
+```
+
+### AppLimitCap
+
+```typescript
+// List all appLimitCaps
+const { data, isLoading } = useAppLimitCapsQuery({
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Get one appLimitCap
+const { data: item } = useAppLimitCapQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Create a appLimitCap
+const { mutate: create } = useCreateAppLimitCapMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
+```
+
+### OrgLimitCap
+
+```typescript
+// List all orgLimitCaps
+const { data, isLoading } = useOrgLimitCapsQuery({
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Get one orgLimitCap
+const { data: item } = useOrgLimitCapQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Create a orgLimitCap
+const { mutate: create } = useCreateOrgLimitCapMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
+```
+
 ### OrgAdminGrant
 
 ```typescript
@@ -572,6 +767,48 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', max: '<BigInt>', softMax: '<BigInt>' });
+```
+
+### AppLimitCredit
+
+```typescript
+// List all appLimitCredits
+const { data, isLoading } = useAppLimitCreditsQuery({
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Get one appLimitCredit
+const { data: item } = useAppLimitCreditQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Create a appLimitCredit
+const { mutate: create } = useCreateAppLimitCreditMutation({
+  selection: { fields: { id: true } },
+});
+create({ defaultLimitId: '<UUID>', actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' });
+```
+
+### OrgLimitCredit
+
+```typescript
+// List all orgLimitCredits
+const { data, isLoading } = useOrgLimitCreditsQuery({
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, entityId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Get one orgLimitCredit
+const { data: item } = useOrgLimitCreditQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, entityId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Create a orgLimitCredit
+const { mutate: create } = useCreateOrgLimitCreditMutation({
+  selection: { fields: { id: true } },
+});
+create({ defaultLimitId: '<UUID>', actorId: '<UUID>', entityId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' });
 ```
 
 ### OrgChartEdgeGrant
@@ -772,48 +1009,6 @@ const { mutate: create } = useCreateOrgChartEdgeMutation({
 create({ entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', positionTitle: '<String>', positionLevel: '<Int>' });
 ```
 
-### AppLimit
-
-```typescript
-// List all appLimits
-const { data, isLoading } = useAppLimitsQuery({
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
-});
-
-// Get one appLimit
-const { data: item } = useAppLimitQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
-});
-
-// Create a appLimit
-const { mutate: create } = useCreateAppLimitMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>' });
-```
-
-### OrgLimitAggregate
-
-```typescript
-// List all orgLimitAggregates
-const { data, isLoading } = useOrgLimitAggregatesQuery({
-  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
-});
-
-// Get one orgLimitAggregate
-const { data: item } = useOrgLimitAggregateQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
-});
-
-// Create a orgLimitAggregate
-const { mutate: create } = useCreateOrgLimitAggregateMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>' });
-```
-
 ### OrgMemberProfile
 
 ```typescript
@@ -835,27 +1030,6 @@ const { mutate: create } = useCreateOrgMemberProfileMutation({
 create({ membershipId: '<UUID>', entityId: '<UUID>', actorId: '<UUID>', displayName: '<String>', email: '<String>', title: '<String>', bio: '<String>', profilePicture: '<Image>' });
 ```
 
-### OrgLimit
-
-```typescript
-// List all orgLimits
-const { data, isLoading } = useOrgLimitsQuery({
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, entityId: true } },
-});
-
-// Get one orgLimit
-const { data: item } = useOrgLimitQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, entityId: true } },
-});
-
-// Create a orgLimit
-const { mutate: create } = useCreateOrgLimitMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', entityId: '<UUID>' });
-```
-
 ### AppLevel
 
 ```typescript
@@ -875,6 +1049,27 @@ const { mutate: create } = useCreateAppLevelMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', description: '<String>', image: '<Image>', ownerId: '<UUID>' });
+```
+
+### AppLimit
+
+```typescript
+// List all appLimits
+const { data, isLoading } = useAppLimitsQuery({
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true } },
+});
+
+// Get one appLimit
+const { data: item } = useAppLimitQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true } },
+});
+
+// Create a appLimit
+const { mutate: create } = useCreateAppLimitMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>' });
 ```
 
 ### AppInvite
@@ -917,6 +1112,48 @@ const { mutate: create } = useCreateOrgMembershipSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', entityId: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', createChildCascadeOwners: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', allowExternalMembers: '<Boolean>', inviteProfileAssignmentMode: '<String>', populateMemberEmail: '<Boolean>', limitAllocationMode: '<String>' });
+```
+
+### OrgLimitAggregate
+
+```typescript
+// List all orgLimitAggregates
+const { data, isLoading } = useOrgLimitAggregatesQuery({
+  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, reserved: true } },
+});
+
+// Get one orgLimitAggregate
+const { data: item } = useOrgLimitAggregateQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, reserved: true } },
+});
+
+// Create a orgLimitAggregate
+const { mutate: create } = useCreateOrgLimitAggregateMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', reserved: '<BigInt>' });
+```
+
+### OrgLimit
+
+```typescript
+// List all orgLimits
+const { data, isLoading } = useOrgLimitsQuery({
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, entityId: true } },
+});
+
+// Get one orgLimit
+const { data: item } = useOrgLimitQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, entityId: true } },
+});
+
+// Create a orgLimit
+const { mutate: create } = useCreateOrgLimitMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', entityId: '<UUID>' });
 ```
 
 ### OrgInvite
@@ -1154,6 +1391,19 @@ existing file ID and deduplicated=true with no uploadUrl.
   | Argument | Type |
   |----------|------|
   | `input` | RequestUploadUrlInput (required) |
+
+### `useRequestBulkUploadUrlsMutation`
+
+Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestBulkUploadUrlsInput (required) |
 
 ### `useProvisionBucketMutation`
 

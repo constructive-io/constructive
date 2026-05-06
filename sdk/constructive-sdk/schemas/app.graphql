@@ -171,6 +171,15 @@ input RequestUploadUrlInput {
 
   """Original filename (optional, for display and Content-Disposition)"""
   filename: String
+
+  """
+  Custom S3 key (e.g., "reports/2024/Q1.pdf").
+  Only allowed when the bucket has allow_custom_keys=true.
+  When omitted, key defaults to contentHash (content-addressed dedup).
+  When provided, the file is stored at this key.
+  Re-uploading to an existing key auto-creates a new version.
+  """
+  key: String
 }
 
 """
@@ -193,6 +202,11 @@ type RequestUploadUrlPayload {
 
   """Presigned URL expiry time (null if deduplicated)"""
   expiresAt: Datetime
+
+  """
+  ID of the previous version (set when re-uploading to an existing custom key)
+  """
+  previousVersionId: UUID
 }
 
 """
@@ -203,6 +217,64 @@ that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
 to unexpected results.
 """
 scalar Datetime
+
+input BulkUploadFileInput {
+  """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
+  contentHash: String!
+
+  """MIME type of the file (e.g., "image/png")"""
+  contentType: String!
+
+  """File size in bytes"""
+  size: Int!
+
+  """Original filename (optional, for display and Content-Disposition)"""
+  filename: String
+
+  """Custom S3 key (only when bucket has allow_custom_keys=true)"""
+  key: String
+}
+
+input RequestBulkUploadUrlsInput {
+  """Bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """Owner entity ID for entity-scoped uploads"""
+  ownerId: UUID
+
+  """Array of files to upload"""
+  files: [BulkUploadFileInput!]!
+}
+
+type BulkUploadFilePayload {
+  """Presigned PUT URL (null if file was deduplicated)"""
+  uploadUrl: String
+
+  """The file ID"""
+  fileId: UUID!
+
+  """The S3 object key"""
+  key: String!
+
+  """Whether this file was deduplicated"""
+  deduplicated: Boolean!
+
+  """Presigned URL expiry time (null if deduplicated)"""
+  expiresAt: Datetime
+
+  """
+  ID of the previous version (set when re-uploading to an existing custom key)
+  """
+  previousVersionId: UUID
+
+  """Index of this file in the input array (for client correlation)"""
+  index: Int!
+}
+
+type RequestBulkUploadUrlsPayload {
+  """Array of results, one per input file"""
+  files: [BulkUploadFilePayload!]!
+}
 
 """The root query type which gives access points into the data universe."""
 type Query {
@@ -228,6 +300,18 @@ type Mutation {
     """
     input: RequestUploadUrlInput!
   ): RequestUploadUrlPayload
+
+  """
+  Request presigned URLs for uploading multiple files in a single batch.
+  Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+  Each file is processed independently — some may dedup while others get fresh URLs.
+  """
+  requestBulkUploadUrls(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RequestBulkUploadUrlsInput!
+  ): RequestBulkUploadUrlsPayload
 
   """
   Provision an S3 bucket for a logical bucket in the database.

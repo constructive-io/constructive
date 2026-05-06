@@ -90,7 +90,11 @@ import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
 import { AppLimitModel } from './models/appLimit';
+import { AppLimitCreditModel } from './models/appLimitCredit';
+import { AppLimitCreditCodeItemModel } from './models/appLimitCreditCodeItem';
+import { AppLimitCreditRedemptionModel } from './models/appLimitCreditRedemption';
 import { OrgLimitModel } from './models/orgLimit';
+import { OrgLimitCreditModel } from './models/orgLimitCredit';
 import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
 import { AppStepModel } from './models/appStep';
 import { AppAchievementModel } from './models/appAchievement';
@@ -112,6 +116,11 @@ import { IdentityProviderModel } from './models/identityProvider';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
+import { AppLimitCreditCodeModel } from './models/appLimitCreditCode';
+import { AppLimitCapsDefaultModel } from './models/appLimitCapsDefault';
+import { OrgLimitCapsDefaultModel } from './models/orgLimitCapsDefault';
+import { AppLimitCapModel } from './models/appLimitCap';
+import { OrgLimitCapModel } from './models/orgLimitCap';
 import { MembershipTypeModel } from './models/membershipType';
 import { MigrateFileModel } from './models/migrateFile';
 import { DevicesModuleModel } from './models/devicesModule';
@@ -125,8 +134,8 @@ import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { AppLimitEventModel } from './models/appLimitEvent';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
-import { PlansModuleModel } from './models/plansModule';
 import { RlsModuleModel } from './models/rlsModule';
+import { PlansModuleModel } from './models/plansModule';
 import { SqlActionModel } from './models/sqlAction';
 import { BillingModuleModel } from './models/billingModule';
 import { AstMigrationModel } from './models/astMigration';
@@ -254,7 +263,11 @@ export function createClient(config: OrmClientConfig) {
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     orgPermissionDefault: new OrgPermissionDefaultModel(client),
     appLimit: new AppLimitModel(client),
+    appLimitCredit: new AppLimitCreditModel(client),
+    appLimitCreditCodeItem: new AppLimitCreditCodeItemModel(client),
+    appLimitCreditRedemption: new AppLimitCreditRedemptionModel(client),
     orgLimit: new OrgLimitModel(client),
+    orgLimitCredit: new OrgLimitCreditModel(client),
     orgLimitAggregate: new OrgLimitAggregateModel(client),
     appStep: new AppStepModel(client),
     appAchievement: new AppAchievementModel(client),
@@ -276,6 +289,11 @@ export function createClient(config: OrmClientConfig) {
     ref: new RefModel(client),
     store: new StoreModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
+    appLimitCreditCode: new AppLimitCreditCodeModel(client),
+    appLimitCapsDefault: new AppLimitCapsDefaultModel(client),
+    orgLimitCapsDefault: new OrgLimitCapsDefaultModel(client),
+    appLimitCap: new AppLimitCapModel(client),
+    orgLimitCap: new OrgLimitCapModel(client),
     membershipType: new MembershipTypeModel(client),
     migrateFile: new MigrateFileModel(client),
     devicesModule: new DevicesModuleModel(client),
@@ -289,8 +307,8 @@ export function createClient(config: OrmClientConfig) {
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     appLimitEvent: new AppLimitEventModel(client),
     orgLimitEvent: new OrgLimitEventModel(client),
-    plansModule: new PlansModuleModel(client),
     rlsModule: new RlsModuleModel(client),
+    plansModule: new PlansModuleModel(client),
     sqlAction: new SqlActionModel(client),
     billingModule: new BillingModuleModel(client),
     astMigration: new AstMigrationModel(client),

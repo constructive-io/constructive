@@ -65,6 +65,9 @@ csdk auth set-token <your-token>
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
 existing file ID and deduplicated=true with no uploadUrl. |
+| `request-bulk-upload-urls` | Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs. |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -727,6 +730,22 @@ existing file ID and deduplicated=true with no uploadUrl.
   | `--input.contentType` | String (required) |
   | `--input.size` | Int (required) |
   | `--input.filename` | String |
+  | `--input.key` | String |
+
+### `request-bulk-upload-urls`
+
+Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.bucketKey` | String (required) |
+  | `--input.ownerId` | UUID |
+  | `--input.files` | BulkUploadFileInput (required) |
 
 ### `provision-bucket`
 

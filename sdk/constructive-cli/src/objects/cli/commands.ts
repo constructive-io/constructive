@@ -24,6 +24,7 @@ import insertNodeAtPathCmd from './commands/insert-node-at-path';
 import updateNodeAtPathCmd from './commands/update-node-at-path';
 import setAndCommitCmd from './commands/set-and-commit';
 import requestUploadUrlCmd from './commands/request-upload-url';
+import requestBulkUploadUrlsCmd from './commands/request-bulk-upload-urls';
 import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
@@ -53,10 +54,11 @@ const createCommandMap: () => Record<
   'update-node-at-path': updateNodeAtPathCmd,
   'set-and-commit': setAndCommitCmd,
   'request-upload-url': requestUploadUrlCmd,
+  'request-bulk-upload-urls': requestBulkUploadUrlsCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  get-all-record       getAllRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  commit               commit CRUD operations\n  rev-parse            revParse\n  get-all-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-path-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-object-at-path   getObjectAtPath\n  freeze-objects       freezeObjects\n  init-empty-repo      initEmptyRepo\n  remove-node-at-path  removeNodeAtPath\n  set-data-at-path     setDataAtPath\n  set-props-and-commit setPropsAndCommit\n  insert-node-at-path  insertNodeAtPath\n  update-node-at-path  updateNodeAtPath\n  set-and-commit       setAndCommit\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  get-all-record       getAllRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  commit               commit CRUD operations\n  rev-parse            revParse\n  get-all-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-path-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-object-at-path   getObjectAtPath\n  freeze-objects       freezeObjects\n  init-empty-repo      initEmptyRepo\n  remove-node-at-path  removeNodeAtPath\n  set-data-at-path     setDataAtPath\n  set-props-and-commit setPropsAndCommit\n  insert-node-at-path  insertNodeAtPath\n  update-node-at-path  updateNodeAtPath\n  set-and-commit       setAndCommit\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  request-bulk-upload-urls Request presigned URLs for uploading multiple files in a single batch.\nSubject to per-storage-module limits (max_bulk_files, max_bulk_total_size).\nEach file is processed independently \u2014 some may dedup while others get fresh URLs.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

@@ -187,6 +187,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'requestUploadUrl', identifier] as const)
       : (['mutation', 'requestUploadUrl'] as const),
+  /** Mutation key for requestBulkUploadUrls */ requestBulkUploadUrls: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'requestBulkUploadUrls', identifier] as const)
+      : (['mutation', 'requestBulkUploadUrls'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)

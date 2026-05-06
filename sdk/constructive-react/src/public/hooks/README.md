@@ -518,11 +518,31 @@ function App() {
 | `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useUpdateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useDeleteAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useAppLimitCreditsQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useAppLimitCreditQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useCreateAppLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useUpdateAppLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useDeleteAppLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useAppLimitCreditCodeItemsQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
+| `useAppLimitCreditCodeItemQuery` | Query | Items within a credit code — each row grants credits for a specific limit definition |
+| `useCreateAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
+| `useUpdateAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
+| `useDeleteAppLimitCreditCodeItemMutation` | Mutation | Items within a credit code — each row grants credits for a specific limit definition |
+| `useAppLimitCreditRedemptionsQuery` | Query | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useAppLimitCreditRedemptionQuery` | Query | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useCreateAppLimitCreditRedemptionMutation` | Mutation | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useUpdateAppLimitCreditRedemptionMutation` | Mutation | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
+| `useDeleteAppLimitCreditRedemptionMutation` | Mutation | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
 | `useOrgLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useOrgLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useCreateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useUpdateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useDeleteOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useOrgLimitCreditsQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useOrgLimitCreditQuery` | Query | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useCreateOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useUpdateOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useDeleteOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
 | `useOrgLimitAggregatesQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
 | `useOrgLimitAggregateQuery` | Query | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
 | `useCreateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
@@ -625,6 +645,31 @@ function App() {
 | `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
+| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
+| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useAppLimitCapsDefaultsQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useAppLimitCapsDefaultQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useCreateAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useUpdateAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useDeleteAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useOrgLimitCapsDefaultsQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useOrgLimitCapsDefaultQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useCreateOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useUpdateOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useDeleteOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
+| `useAppLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useAppLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useCreateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useUpdateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useDeleteAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useOrgLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useOrgLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useCreateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useUpdateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useDeleteOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
 | `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
@@ -684,16 +729,16 @@ function App() {
 | `useCreateAppLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
 | `useOrgLimitEventsQuery` | Query | Append-only log of limit events for historical reporting and audit |
 | `useCreateOrgLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
-| `usePlansModulesQuery` | Query | List all plansModules |
-| `usePlansModuleQuery` | Query | Get one plansModule |
-| `useCreatePlansModuleMutation` | Mutation | Create a plansModule |
-| `useUpdatePlansModuleMutation` | Mutation | Update a plansModule |
-| `useDeletePlansModuleMutation` | Mutation | Delete a plansModule |
 | `useRlsModulesQuery` | Query | List all rlsModules |
 | `useRlsModuleQuery` | Query | Get one rlsModule |
 | `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
 | `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
 | `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
+| `usePlansModulesQuery` | Query | List all plansModules |
+| `usePlansModuleQuery` | Query | Get one plansModule |
+| `useCreatePlansModuleMutation` | Mutation | Create a plansModule |
+| `useUpdatePlansModuleMutation` | Mutation | Update a plansModule |
+| `useDeletePlansModuleMutation` | Mutation | Delete a plansModule |
 | `useSqlActionsQuery` | Query | List all sqlActions |
 | `useSqlActionQuery` | Query | Get one sqlAction |
 | `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
@@ -818,6 +863,9 @@ Example usage:
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
 existing file ID and deduplicated=true with no uploadUrl. |
+| `useRequestBulkUploadUrlsMutation` | Mutation | Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs. |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -1925,20 +1973,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', st
 ```typescript
 // List all limitsModules
 const { data, isLoading } = useLimitsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, aggregateTableId: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, limitCreditsTableId: true, eventsTableId: true, creditCodesTableId: true, creditCodeItemsTableId: true, creditRedemptionsTableId: true, aggregateTableId: true, limitCapsTableId: true, limitCapsDefaultsTableId: true, capCheckTrigger: true, resolveCapFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
 });
 
 // Get one limitsModule
 const { data: item } = useLimitsModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, aggregateTableId: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, limitCreditsTableId: true, eventsTableId: true, creditCodesTableId: true, creditCodeItemsTableId: true, creditRedemptionsTableId: true, aggregateTableId: true, limitCapsTableId: true, limitCapsDefaultsTableId: true, capCheckTrigger: true, resolveCapFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
 });
 
 // Create a limitsModule
 const { mutate: create } = useCreateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', defaultTableId: '<UUID>', defaultTableName: '<String>', limitIncrementFunction: '<String>', limitDecrementFunction: '<String>', limitIncrementTrigger: '<String>', limitDecrementTrigger: '<String>', limitUpdateTrigger: '<String>', limitCheckFunction: '<String>', aggregateTableId: '<UUID>', prefix: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', actorTableId: '<UUID>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', defaultTableId: '<UUID>', defaultTableName: '<String>', limitIncrementFunction: '<String>', limitDecrementFunction: '<String>', limitIncrementTrigger: '<String>', limitDecrementTrigger: '<String>', limitUpdateTrigger: '<String>', limitCheckFunction: '<String>', limitCreditsTableId: '<UUID>', eventsTableId: '<UUID>', creditCodesTableId: '<UUID>', creditCodeItemsTableId: '<UUID>', creditRedemptionsTableId: '<UUID>', aggregateTableId: '<UUID>', limitCapsTableId: '<UUID>', limitCapsDefaultsTableId: '<UUID>', capCheckTrigger: '<String>', resolveCapFunction: '<String>', prefix: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', actorTableId: '<UUID>' });
 ```
 
 ### MembershipTypesModule
@@ -2198,20 +2246,20 @@ create({ blueprintId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', status
 ```typescript
 // List all storageModules
 const { data, isLoading } = useStorageModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, hasPathShares: true, pathSharesTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true, maxBulkFiles: true, maxBulkTotalSize: true, hasVersioning: true, hasContentHash: true, hasCustomKeys: true, hasAuditLog: true, fileEventsTableId: true } },
 });
 
 // Get one storageModule
 const { data: item } = useStorageModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, hasPathShares: true, pathSharesTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true, maxBulkFiles: true, maxBulkTotalSize: true, hasVersioning: true, hasContentHash: true, hasCustomKeys: true, hasAuditLog: true, fileEventsTableId: true } },
 });
 
 // Create a storageModule
 const { mutate: create } = useCreateStorageModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', membershipType: '<Int>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', restrictReads: '<Boolean>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', membershipType: '<Int>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', restrictReads: '<Boolean>', hasPathShares: '<Boolean>', pathSharesTableId: '<UUID>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>', maxBulkFiles: '<Int>', maxBulkTotalSize: '<BigInt>', hasVersioning: '<Boolean>', hasContentHash: '<Boolean>', hasCustomKeys: '<Boolean>', hasAuditLog: '<Boolean>', fileEventsTableId: '<UUID>' });
 ```
 
 ### EntityTypeProvision
@@ -2219,20 +2267,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bu
 ```typescript
 // List all entityTypeProvisions
 const { data, isLoading } = useEntityTypeProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outInvitesModuleId: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outPathSharesTableId: true, outInvitesModuleId: true } },
 });
 
 // Get one entityTypeProvision
 const { data: item } = useEntityTypeProvisionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outInvitesModuleId: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outPathSharesTableId: true, outInvitesModuleId: true } },
 });
 
 // Create a entityTypeProvision
 const { mutate: create } = useCreateEntityTypeProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', name: '<String>', prefix: '<String>', description: '<String>', parentEntity: '<String>', tableName: '<String>', isVisible: '<Boolean>', hasLimits: '<Boolean>', hasProfiles: '<Boolean>', hasLevels: '<Boolean>', hasStorage: '<Boolean>', hasInvites: '<Boolean>', storageConfig: '<JSON>', skipEntityPolicies: '<Boolean>', tableProvision: '<JSON>', outMembershipType: '<Int>', outEntityTableId: '<UUID>', outEntityTableName: '<String>', outInstalledModules: '<String>', outStorageModuleId: '<UUID>', outBucketsTableId: '<UUID>', outFilesTableId: '<UUID>', outInvitesModuleId: '<UUID>' });
+create({ databaseId: '<UUID>', name: '<String>', prefix: '<String>', description: '<String>', parentEntity: '<String>', tableName: '<String>', isVisible: '<Boolean>', hasLimits: '<Boolean>', hasProfiles: '<Boolean>', hasLevels: '<Boolean>', hasStorage: '<Boolean>', hasInvites: '<Boolean>', storageConfig: '<JSON>', skipEntityPolicies: '<Boolean>', tableProvision: '<JSON>', outMembershipType: '<Int>', outEntityTableId: '<UUID>', outEntityTableName: '<String>', outInstalledModules: '<String>', outStorageModuleId: '<UUID>', outBucketsTableId: '<UUID>', outFilesTableId: '<UUID>', outPathSharesTableId: '<UUID>', outInvitesModuleId: '<UUID>' });
 ```
 
 ### WebauthnCredentialsModule
@@ -2576,20 +2624,83 @@ create({ permissions: '<BitString>', entityId: '<UUID>' });
 ```typescript
 // List all appLimits
 const { data, isLoading } = useAppLimitsQuery({
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true } },
 });
 
 // Get one appLimit
 const { data: item } = useAppLimitQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true } },
 });
 
 // Create a appLimit
 const { mutate: create } = useCreateAppLimitMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>' });
+create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>' });
+```
+
+### AppLimitCredit
+
+```typescript
+// List all appLimitCredits
+const { data, isLoading } = useAppLimitCreditsQuery({
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Get one appLimitCredit
+const { data: item } = useAppLimitCreditQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Create a appLimitCredit
+const { mutate: create } = useCreateAppLimitCreditMutation({
+  selection: { fields: { id: true } },
+});
+create({ defaultLimitId: '<UUID>', actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' });
+```
+
+### AppLimitCreditCodeItem
+
+```typescript
+// List all appLimitCreditCodeItems
+const { data, isLoading } = useAppLimitCreditCodeItemsQuery({
+  selection: { fields: { id: true, creditCodeId: true, defaultLimitId: true, amount: true, creditType: true } },
+});
+
+// Get one appLimitCreditCodeItem
+const { data: item } = useAppLimitCreditCodeItemQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, creditCodeId: true, defaultLimitId: true, amount: true, creditType: true } },
+});
+
+// Create a appLimitCreditCodeItem
+const { mutate: create } = useCreateAppLimitCreditCodeItemMutation({
+  selection: { fields: { id: true } },
+});
+create({ creditCodeId: '<UUID>', defaultLimitId: '<UUID>', amount: '<BigInt>', creditType: '<String>' });
+```
+
+### AppLimitCreditRedemption
+
+```typescript
+// List all appLimitCreditRedemptions
+const { data, isLoading } = useAppLimitCreditRedemptionsQuery({
+  selection: { fields: { id: true, creditCodeId: true, entityId: true } },
+});
+
+// Get one appLimitCreditRedemption
+const { data: item } = useAppLimitCreditRedemptionQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, creditCodeId: true, entityId: true } },
+});
+
+// Create a appLimitCreditRedemption
+const { mutate: create } = useCreateAppLimitCreditRedemptionMutation({
+  selection: { fields: { id: true } },
+});
+create({ creditCodeId: '<UUID>', entityId: '<UUID>' });
 ```
 
 ### OrgLimit
@@ -2597,20 +2708,41 @@ create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', 
 ```typescript
 // List all orgLimits
 const { data, isLoading } = useOrgLimitsQuery({
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, entityId: true } },
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, entityId: true } },
 });
 
 // Get one orgLimit
 const { data: item } = useOrgLimitQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, entityId: true } },
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, entityId: true } },
 });
 
 // Create a orgLimit
 const { mutate: create } = useCreateOrgLimitMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', entityId: '<UUID>' });
+create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', entityId: '<UUID>' });
+```
+
+### OrgLimitCredit
+
+```typescript
+// List all orgLimitCredits
+const { data, isLoading } = useOrgLimitCreditsQuery({
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, entityId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Get one orgLimitCredit
+const { data: item } = useOrgLimitCreditQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, defaultLimitId: true, actorId: true, entityId: true, amount: true, creditType: true, reason: true } },
+});
+
+// Create a orgLimitCredit
+const { mutate: create } = useCreateOrgLimitCreditMutation({
+  selection: { fields: { id: true } },
+});
+create({ defaultLimitId: '<UUID>', actorId: '<UUID>', entityId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' });
 ```
 
 ### OrgLimitAggregate
@@ -2618,20 +2750,20 @@ create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', 
 ```typescript
 // List all orgLimitAggregates
 const { data, isLoading } = useOrgLimitAggregatesQuery({
-  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
+  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, reserved: true } },
 });
 
 // Get one orgLimitAggregate
 const { data: item } = useOrgLimitAggregateQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true } },
+  selection: { fields: { id: true, name: true, entityId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, reserved: true } },
 });
 
 // Create a orgLimitAggregate
 const { mutate: create } = useCreateOrgLimitAggregateMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>' });
+create({ name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', reserved: '<BigInt>' });
 ```
 
 ### AppStep
@@ -3048,6 +3180,111 @@ const { mutate: create } = useCreateAppPermissionDefaultMutation({
 create({ permissions: '<BitString>' });
 ```
 
+### AppLimitCreditCode
+
+```typescript
+// List all appLimitCreditCodes
+const { data, isLoading } = useAppLimitCreditCodesQuery({
+  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+});
+
+// Get one appLimitCreditCode
+const { data: item } = useAppLimitCreditCodeQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+});
+
+// Create a appLimitCreditCode
+const { mutate: create } = useCreateAppLimitCreditCodeMutation({
+  selection: { fields: { id: true } },
+});
+create({ code: '<String>', maxRedemptions: '<Int>', currentRedemptions: '<Int>', expiresAt: '<Datetime>' });
+```
+
+### AppLimitCapsDefault
+
+```typescript
+// List all appLimitCapsDefaults
+const { data, isLoading } = useAppLimitCapsDefaultsQuery({
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Get one appLimitCapsDefault
+const { data: item } = useAppLimitCapsDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Create a appLimitCapsDefault
+const { mutate: create } = useCreateAppLimitCapsDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', max: '<BigInt>' });
+```
+
+### OrgLimitCapsDefault
+
+```typescript
+// List all orgLimitCapsDefaults
+const { data, isLoading } = useOrgLimitCapsDefaultsQuery({
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Get one orgLimitCapsDefault
+const { data: item } = useOrgLimitCapsDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, max: true } },
+});
+
+// Create a orgLimitCapsDefault
+const { mutate: create } = useCreateOrgLimitCapsDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', max: '<BigInt>' });
+```
+
+### AppLimitCap
+
+```typescript
+// List all appLimitCaps
+const { data, isLoading } = useAppLimitCapsQuery({
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Get one appLimitCap
+const { data: item } = useAppLimitCapQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Create a appLimitCap
+const { mutate: create } = useCreateAppLimitCapMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
+```
+
+### OrgLimitCap
+
+```typescript
+// List all orgLimitCaps
+const { data, isLoading } = useOrgLimitCapsQuery({
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Get one orgLimitCap
+const { data: item } = useOrgLimitCapQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Create a orgLimitCap
+const { mutate: create } = useCreateOrgLimitCapMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
+```
+
 ### MembershipType
 
 ```typescript
@@ -3309,27 +3546,6 @@ const { mutate: create } = useCreateOrgLimitEventMutation({
 create({ name: '<String>', actorId: '<UUID>', entityId: '<UUID>', eventType: '<String>', delta: '<BigInt>', numBefore: '<BigInt>', numAfter: '<BigInt>', maxAtEvent: '<BigInt>', reason: '<String>' });
 ```
 
-### PlansModule
-
-```typescript
-// List all plansModules
-const { data, isLoading } = usePlansModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, plansTableId: true, plansTableName: true, planLimitsTableId: true, planLimitsTableName: true, applyPlanFunction: true, applyPlanAggregateFunction: true, prefix: true } },
-});
-
-// Get one plansModule
-const { data: item } = usePlansModuleQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, plansTableId: true, plansTableName: true, planLimitsTableId: true, planLimitsTableName: true, applyPlanFunction: true, applyPlanAggregateFunction: true, prefix: true } },
-});
-
-// Create a plansModule
-const { mutate: create } = useCreatePlansModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', plansTableId: '<UUID>', plansTableName: '<String>', planLimitsTableId: '<UUID>', planLimitsTableName: '<String>', applyPlanFunction: '<String>', applyPlanAggregateFunction: '<String>', prefix: '<String>' });
-```
-
 ### RlsModule
 
 ```typescript
@@ -3349,6 +3565,27 @@ const { mutate: create } = useCreateRlsModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>' });
+```
+
+### PlansModule
+
+```typescript
+// List all plansModules
+const { data, isLoading } = usePlansModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, plansTableId: true, plansTableName: true, planLimitsTableId: true, planLimitsTableName: true, planPricingTableId: true, planOverridesTableId: true, applyPlanFunction: true, applyPlanAggregateFunction: true, prefix: true } },
+});
+
+// Get one plansModule
+const { data: item } = usePlansModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, plansTableId: true, plansTableName: true, planLimitsTableId: true, planLimitsTableName: true, planPricingTableId: true, planOverridesTableId: true, applyPlanFunction: true, applyPlanAggregateFunction: true, prefix: true } },
+});
+
+// Create a plansModule
+const { mutate: create } = useCreatePlansModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', plansTableId: '<UUID>', plansTableName: '<String>', planLimitsTableId: '<UUID>', planLimitsTableName: '<String>', planPricingTableId: '<UUID>', planOverridesTableId: '<UUID>', applyPlanFunction: '<String>', applyPlanAggregateFunction: '<String>', prefix: '<String>' });
 ```
 
 ### SqlAction
@@ -4306,6 +4543,19 @@ existing file ID and deduplicated=true with no uploadUrl.
   | Argument | Type |
   |----------|------|
   | `input` | RequestUploadUrlInput (required) |
+
+### `useRequestBulkUploadUrlsMutation`
+
+Request presigned URLs for uploading multiple files in a single batch.
+Subject to per-storage-module limits (max_bulk_files, max_bulk_total_size).
+Each file is processed independently — some may dedup while others get fresh URLs.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestBulkUploadUrlsInput (required) |
 
 ### `useProvisionBucketMutation`
 

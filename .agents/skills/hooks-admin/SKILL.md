@@ -1,13 +1,13 @@
 ---
 name: hooks-admin
-description: React Query hooks for the admin API — provides typed query and mutation hooks for 37 tables and 15 custom operations
+description: React Query hooks for the admin API — provides typed query and mutation hooks for 46 tables and 16 custom operations
 ---
 
 # hooks-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the admin API — provides typed query and mutation hooks for 37 tables and 15 custom operations
+React Query hooks for the admin API — provides typed query and mutation hooks for 46 tables and 16 custom operations
 
 ## Usage
 
@@ -42,18 +42,27 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-permission](references/app-permission.md)
 - [org-permission](references/org-permission.md)
 - [app-level-requirement](references/app-level-requirement.md)
+- [app-limit-credit-redemption](references/app-limit-credit-redemption.md)
+- [app-limit-credit-code-item](references/app-limit-credit-code-item.md)
 - [org-member](references/org-member.md)
 - [app-permission-default](references/app-permission-default.md)
+- [app-limit-credit-code](references/app-limit-credit-code.md)
 - [org-permission-default](references/org-permission-default.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
 - [app-achievement](references/app-achievement.md)
 - [app-step](references/app-step.md)
+- [app-limit-caps-default](references/app-limit-caps-default.md)
+- [org-limit-caps-default](references/org-limit-caps-default.md)
+- [app-limit-cap](references/app-limit-cap.md)
+- [org-limit-cap](references/org-limit-cap.md)
 - [org-admin-grant](references/org-admin-grant.md)
 - [org-owner-grant](references/org-owner-grant.md)
 - [membership-type](references/membership-type.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
+- [app-limit-credit](references/app-limit-credit.md)
+- [org-limit-credit](references/org-limit-credit.md)
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [app-claimed-invite](references/app-claimed-invite.md)
 - [app-grant](references/app-grant.md)
@@ -64,13 +73,13 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-event](references/org-limit-event.md)
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
-- [app-limit](references/app-limit.md)
-- [org-limit-aggregate](references/org-limit-aggregate.md)
 - [org-member-profile](references/org-member-profile.md)
-- [org-limit](references/org-limit.md)
 - [app-level](references/app-level.md)
+- [app-limit](references/app-limit.md)
 - [app-invite](references/app-invite.md)
 - [org-membership-setting](references/org-membership-setting.md)
+- [org-limit-aggregate](references/org-limit-aggregate.md)
+- [org-limit](references/org-limit.md)
 - [org-invite](references/org-invite.md)
 - [app-membership](references/app-membership.md)
 - [org-membership](references/org-membership.md)
@@ -88,4 +97,5 @@ See the `references/` directory for detailed per-entity API documentation:
 - [submit-app-invite-code](references/submit-app-invite-code.md)
 - [submit-org-invite-code](references/submit-org-invite-code.md)
 - [request-upload-url](references/request-upload-url.md)
+- [request-bulk-upload-urls](references/request-bulk-upload-urls.md)
 - [provision-bucket](references/provision-bucket.md)

@@ -1,13 +1,13 @@
 ---
 name: orm-objects
-description: ORM client for the objects API — provides typed CRUD operations for 5 tables and 14 custom operations
+description: ORM client for the objects API — provides typed CRUD operations for 5 tables and 15 custom operations
 ---
 
 # orm-objects
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the objects API — provides typed CRUD operations for 5 tables and 14 custom operations
+ORM client for the objects API — provides typed CRUD operations for 5 tables and 15 custom operations
 
 ## Usage
 
@@ -55,4 +55,5 @@ See the `references/` directory for detailed per-entity API documentation:
 - [update-node-at-path](references/update-node-at-path.md)
 - [set-and-commit](references/set-and-commit.md)
 - [request-upload-url](references/request-upload-url.md)
+- [request-bulk-upload-urls](references/request-bulk-upload-urls.md)
 - [provision-bucket](references/provision-bucket.md)

@@ -1,13 +1,13 @@
 ---
 name: cli-public
-description: CLI tool (csdk) for the public API — provides CRUD commands for 129 tables and 71 custom operations
+description: CLI tool (csdk) for the public API — provides CRUD commands for 138 tables and 72 custom operations
 ---
 
 # cli-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the public API — provides CRUD commands for 129 tables and 71 custom operations
+CLI tool (csdk) for the public API — provides CRUD commands for 138 tables and 72 custom operations
 
 ## Usage
 
@@ -141,7 +141,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [org-permission-default](references/org-permission-default.md)
 - [app-limit](references/app-limit.md)
+- [app-limit-credit](references/app-limit-credit.md)
+- [app-limit-credit-code-item](references/app-limit-credit-code-item.md)
+- [app-limit-credit-redemption](references/app-limit-credit-redemption.md)
 - [org-limit](references/org-limit.md)
+- [org-limit-credit](references/org-limit-credit.md)
 - [org-limit-aggregate](references/org-limit-aggregate.md)
 - [app-step](references/app-step.md)
 - [app-achievement](references/app-achievement.md)
@@ -163,6 +167,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [ref](references/ref.md)
 - [store](references/store.md)
 - [app-permission-default](references/app-permission-default.md)
+- [app-limit-credit-code](references/app-limit-credit-code.md)
+- [app-limit-caps-default](references/app-limit-caps-default.md)
+- [org-limit-caps-default](references/org-limit-caps-default.md)
+- [app-limit-cap](references/app-limit-cap.md)
+- [org-limit-cap](references/org-limit-cap.md)
 - [membership-type](references/membership-type.md)
 - [migrate-file](references/migrate-file.md)
 - [devices-module](references/devices-module.md)
@@ -176,8 +185,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-membership-default](references/org-membership-default.md)
 - [app-limit-event](references/app-limit-event.md)
 - [org-limit-event](references/org-limit-event.md)
-- [plans-module](references/plans-module.md)
 - [rls-module](references/rls-module.md)
+- [plans-module](references/plans-module.md)
 - [sql-action](references/sql-action.md)
 - [billing-module](references/billing-module.md)
 - [ast-migration](references/ast-migration.md)
@@ -255,4 +264,5 @@ See the `references/` directory for detailed per-entity API documentation:
 - [sign-in](references/sign-in.md)
 - [provision-table](references/provision-table.md)
 - [request-upload-url](references/request-upload-url.md)
+- [request-bulk-upload-urls](references/request-bulk-upload-urls.md)
 - [provision-bucket](references/provision-bucket.md)
