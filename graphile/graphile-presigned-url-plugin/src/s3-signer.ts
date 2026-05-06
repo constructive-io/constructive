@@ -1,5 +1,6 @@
 import {
   S3Client,
+  DeleteObjectCommand,
   PutObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
@@ -116,4 +117,28 @@ export async function headObject(
     }
     throw e;
   }
+}
+
+/**
+ * Delete an object from S3.
+ *
+ * Returns true if the object was deleted (or didn't exist — S3 DeleteObject
+ * is idempotent). Throws on unexpected errors (permissions, network).
+ *
+ * @param s3Config - S3 client and bucket configuration
+ * @param key - S3 object key to delete
+ * @returns true if deletion succeeded
+ */
+export async function deleteS3Object(
+  s3Config: S3Config,
+  key: string,
+): Promise<boolean> {
+  await s3Config.client.send(
+    new DeleteObjectCommand({
+      Bucket: s3Config.bucket,
+      Key: key,
+    }),
+  );
+  log.debug(`Deleted S3 object: key=${key}, bucket=${s3Config.bucket}`);
+  return true;
 }

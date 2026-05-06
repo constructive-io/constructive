@@ -19,8 +19,8 @@ import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
 
 import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig, BucketConfig } from './types';
-import { getStorageModuleConfig, getStorageModuleConfigForOwner, getBucketConfig, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
-import { generatePresignedPutUrl } from './s3-signer';
+import { getStorageModuleConfig, getStorageModuleConfigForOwner, getBucketConfig, resolveStorageModuleByFileId, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
+import { generatePresignedPutUrl, deleteS3Object } from './s3-signer';
 
 const log = new Logger('graphile-presigned-url:plugin');
 
@@ -264,6 +264,20 @@ export function createPresignedUrlPlugin(
         files: [BulkUploadFilePayload!]!
       }
 
+      input DeleteFileInput {
+        """File ID to delete"""
+        fileId: UUID!
+      }
+
+      type DeleteFilePayload {
+        """Whether the file record was deleted from the database"""
+        success: Boolean!
+        """Whether the S3 object was deleted (false if other files reference the same key)"""
+        deletedFromS3: Boolean!
+        """The S3 key that was (or would have been) deleted"""
+        key: String
+      }
+
       extend type Mutation {
         """
         Request a presigned URL for uploading a file directly to S3.
@@ -283,6 +297,17 @@ export function createPresignedUrlPlugin(
         requestBulkUploadUrls(
           input: RequestBulkUploadUrlsInput!
         ): RequestBulkUploadUrlsPayload
+
+        """
+        Delete a file record and its S3 object.
+        The DB record is always deleted (subject to RLS). The S3 object is
+        deleted only if no other file records reference the same key in the
+        same bucket (content-addressed dedup safety). If the inline S3
+        delete fails, cleanup falls back to the async delete_s3_object job.
+        """
+        deleteFile(
+          input: DeleteFileInput!
+        ): DeleteFilePayload
       }
     `,
     plans: {
@@ -299,6 +324,21 @@ export function createPresignedUrlPlugin(
 
           return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
             const result = await processUpload(options, input, withPgClient, pgSettings);
+            return result;
+          });
+        },
+        deleteFile(_$mutation: any, fieldArgs: any) {
+          const $input = fieldArgs.getRaw('input');
+          const $withPgClient = (grafastContext() as any).get('withPgClient');
+          const $pgSettings = (grafastContext() as any).get('pgSettings');
+          const $combined = object({
+            input: $input,
+            withPgClient: $withPgClient,
+            pgSettings: $pgSettings,
+          });
+
+          return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
+            const result = await processDelete(options, input, withPgClient, pgSettings);
             return result;
           });
         },
@@ -633,6 +673,133 @@ async function processSingleFile(
     expiresAt,
     previousVersionId,
   };
+}
+
+// --- Delete logic ---
+
+/**
+ * Process a file deletion: remove the DB record, then attempt S3 cleanup.
+ *
+ * 1. Resolve the file row (key, bucket_id) and storage config
+ * 2. DELETE the file row (RLS enforced — only owner/admin can delete)
+ * 3. Check refcount: any other file with same key in the same bucket?
+ * 4. If orphaned: try S3 DeleteObject inline (sync)
+ *    - On S3 failure: enqueue delete_s3_object job (async fallback)
+ * 5. Return result
+ */
+async function processDelete(
+  options: PresignedUrlPluginOptions,
+  input: any,
+  withPgClient: any,
+  pgSettings: any,
+) {
+  const { fileId } = input;
+
+  if (!fileId || typeof fileId !== 'string') {
+    throw new Error('INVALID_FILE_ID');
+  }
+
+  return withPgClient(pgSettings, async (pgClient: any) => {
+    return pgClient.withTransaction(async (txClient: any) => {
+      const databaseId = await resolveDatabaseId(txClient);
+      if (!databaseId) {
+        throw new Error('DATABASE_NOT_FOUND');
+      }
+
+      // 1. Resolve storage config + file across all storage modules (app-level + entity-scoped)
+      const resolved = await resolveStorageModuleByFileId(txClient, databaseId, fileId);
+      if (!resolved) {
+        throw new Error('FILE_NOT_FOUND: file does not exist or access denied');
+      }
+
+      const { storageConfig, file } = resolved;
+      const { key, bucket_id } = file;
+
+      // 2. DELETE the file row (RLS enforced — will fail if user lacks permission)
+      const deleteResult = await txClient.query({
+        text: `DELETE FROM ${storageConfig.filesQualifiedName}
+         WHERE id = $1
+         RETURNING id`,
+        values: [fileId],
+      });
+
+      if (deleteResult.rows.length === 0) {
+        throw new Error('DELETE_DENIED: insufficient permissions to delete this file');
+      }
+
+      // 3. Check refcount: any other file with same key in this bucket?
+      const refcountResult = await txClient.query({
+        text: `SELECT COUNT(*)::int AS ref_count
+         FROM ${storageConfig.filesQualifiedName}
+         WHERE key = $1
+           AND bucket_id = $2`,
+        values: [key, bucket_id],
+      });
+
+      const refCount = refcountResult.rows[0]?.ref_count ?? 0;
+
+      if (refCount > 0) {
+        // Other files reference this S3 key — do not delete from S3
+        log.info(`File ${fileId} deleted from DB; S3 key ${key} still referenced by ${refCount} file(s)`);
+        return {
+          success: true,
+          deletedFromS3: false,
+          key,
+        };
+      }
+
+      // 4. Attempt sync S3 delete
+      try {
+        const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
+        await deleteS3Object(s3ForDb, key);
+        log.info(`File ${fileId} deleted from DB and S3 (key=${key})`);
+        return {
+          success: true,
+          deletedFromS3: true,
+          key,
+        };
+      } catch (s3Error: any) {
+        // S3 delete failed — enqueue async job as fallback
+        log.warn(`S3 delete failed for key=${key}, falling back to async job: ${s3Error.message}`);
+
+        try {
+          await txClient.query({
+            text: `SELECT app_jobs.add_job(
+              $1::text,
+              $2::json,
+              job_key := $3::text,
+              queue_name := $4::text,
+              priority := $5::int,
+              run_at := NOW() + interval '5 seconds'
+            )`,
+            values: [
+              'delete_s3_object',
+              JSON.stringify({
+                key,
+                bucket_id,
+                database_id: databaseId,
+                schema_name: storageConfig.schemaName,
+                table_name: storageConfig.filesTableName,
+              }),
+              `gc:${bucket_id}:${key}`,
+              'storage_gc',
+              100,
+            ],
+          });
+          log.info(`Enqueued delete_s3_object job for key=${key}`);
+        } catch (jobError: any) {
+          // app_jobs might not be installed — log but don't fail the delete
+          log.warn(`Failed to enqueue delete_s3_object job: ${jobError.message}`);
+        }
+
+        return {
+          success: true,
+          deletedFromS3: false,
+          key,
+        };
+      }
+    });
+  });
 }
 
 export const PresignedUrlPlugin = createPresignedUrlPlugin;

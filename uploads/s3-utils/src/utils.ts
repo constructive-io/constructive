@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand, 
   S3Client} from '@aws-sdk/client-s3';
@@ -26,6 +27,16 @@ export const fileExists = async ({ client, bucket, key }: FileOperationArgs): Pr
     return true;
   } catch (e: any) {
     if (e.name === 'NotFound' || e.$metadata?.httpStatusCode === 404) return false;
+    throw e;
+  }
+};
+
+export const deleteObject = async ({ client, bucket, key }: FileOperationArgs): Promise<boolean> => {
+  try {
+    await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+    return true;
+  } catch (e: any) {
+    if (e.name === 'NoSuchKey' || e.$metadata?.httpStatusCode === 404) return false;
     throw e;
   }
 };
