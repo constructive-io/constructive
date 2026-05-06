@@ -678,13 +678,17 @@ async function processSingleFile(
 // --- Delete logic ---
 
 /**
- * Process a file deletion: remove the DB record, then attempt S3 cleanup.
+ * Process a file deletion: remove the DB record, then attempt sync S3 cleanup.
+ *
+ * The AFTER DELETE trigger on the files table always enqueues an async
+ * delete_s3_object job as a safety net. This function attempts the S3 delete
+ * inline for immediate cleanup — if it fails, the async job handles it.
  *
  * 1. Resolve the file row (key, bucket_id) and storage config
  * 2. DELETE the file row (RLS enforced — only owner/admin can delete)
+ *    → AFTER DELETE trigger enqueues async GC job (SECURITY DEFINER)
  * 3. Check refcount: any other file with same key in the same bucket?
- * 4. If orphaned: try S3 DeleteObject inline (sync)
- *    - On S3 failure: enqueue delete_s3_object job (async fallback)
+ * 4. If orphaned: try S3 DeleteObject inline (sync, best-effort)
  * 5. Return result
  */
 async function processDelete(
@@ -706,7 +710,7 @@ async function processDelete(
         throw new Error('DATABASE_NOT_FOUND');
       }
 
-      // 1. Resolve storage config + file across all storage modules (app-level + entity-scoped)
+      // 1. Resolve storage config + file across all storage modules
       const resolved = await resolveStorageModuleByFileId(txClient, databaseId, fileId);
       if (!resolved) {
         throw new Error('FILE_NOT_FOUND: file does not exist or access denied');
@@ -715,7 +719,7 @@ async function processDelete(
       const { storageConfig, file } = resolved;
       const { key, bucket_id } = file;
 
-      // 2. DELETE the file row (RLS enforced — will fail if user lacks permission)
+      // 2. DELETE the file row (RLS enforced)
       const deleteResult = await txClient.query({
         text: `DELETE FROM ${storageConfig.filesQualifiedName}
          WHERE id = $1
@@ -739,7 +743,6 @@ async function processDelete(
       const refCount = refcountResult.rows[0]?.ref_count ?? 0;
 
       if (refCount > 0) {
-        // Other files reference this S3 key — do not delete from S3
         log.info(`File ${fileId} deleted from DB; S3 key ${key} still referenced by ${refCount} file(s)`);
         return {
           success: true,
@@ -748,7 +751,7 @@ async function processDelete(
         };
       }
 
-      // 4. Attempt sync S3 delete
+      // 4. Attempt sync S3 delete (best-effort; async GC job is the fallback)
       try {
         const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
         await deleteS3Object(s3ForDb, key);
@@ -759,39 +762,7 @@ async function processDelete(
           key,
         };
       } catch (s3Error: any) {
-        // S3 delete failed — enqueue async job as fallback
-        log.warn(`S3 delete failed for key=${key}, falling back to async job: ${s3Error.message}`);
-
-        try {
-          await txClient.query({
-            text: `SELECT app_jobs.add_job(
-              $1::text,
-              $2::json,
-              job_key := $3::text,
-              queue_name := $4::text,
-              priority := $5::int,
-              run_at := NOW() + interval '5 seconds'
-            )`,
-            values: [
-              'delete_s3_object',
-              JSON.stringify({
-                key,
-                bucket_id,
-                database_id: databaseId,
-                schema_name: storageConfig.schemaName,
-                table_name: storageConfig.filesTableName,
-              }),
-              `gc:${bucket_id}:${key}`,
-              'storage_gc',
-              100,
-            ],
-          });
-          log.info(`Enqueued delete_s3_object job for key=${key}`);
-        } catch (jobError: any) {
-          // app_jobs might not be installed — log but don't fail the delete
-          log.warn(`Failed to enqueue delete_s3_object job: ${jobError.message}`);
-        }
-
+        log.warn(`Sync S3 delete failed for key=${key}; async GC job will retry: ${s3Error.message}`);
         return {
           success: true,
           deletedFromS3: false,
