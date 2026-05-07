@@ -24,6 +24,10 @@ const fieldSchema: FieldSchema = {
   softMax: 'int',
   windowStart: 'string',
   windowDuration: 'string',
+  planMax: 'int',
+  purchasedCredits: 'int',
+  periodCredits: 'int',
+  reserved: 'int',
 };
 const usage =
   '\norg-limit-aggregate <command>\n\nCommands:\n  list                  List orgLimitAggregate records\n  find-first            Find first matching orgLimitAggregate record\n  get                   Get a orgLimitAggregate by ID\n  create                Create a new orgLimitAggregate\n  update                Update an existing orgLimitAggregate\n  delete                Delete a orgLimitAggregate\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
@@ -84,6 +88,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       softMax: true,
       windowStart: true,
       windowDuration: true,
+      planMax: true,
+      purchasedCredits: true,
+      periodCredits: true,
+      reserved: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<OrgLimitAggregateSelect, OrgLimitAggregateFilter, OrgLimitAggregateOrderBy> & {
@@ -112,6 +120,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       softMax: true,
       windowStart: true,
       windowDuration: true,
+      planMax: true,
+      purchasedCredits: true,
+      periodCredits: true,
+      reserved: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<OrgLimitAggregateSelect, OrgLimitAggregateFilter> & {
@@ -152,6 +164,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           softMax: true,
           windowStart: true,
           windowDuration: true,
+          planMax: true,
+          purchasedCredits: true,
+          periodCredits: true,
+          reserved: true,
         },
       })
       .execute();
@@ -215,6 +231,34 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'planMax',
+        message: 'planMax',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'purchasedCredits',
+        message: 'purchasedCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'periodCredits',
+        message: 'periodCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'reserved',
+        message: 'reserved',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -232,6 +276,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: cleanedData.softMax,
           windowStart: cleanedData.windowStart,
           windowDuration: cleanedData.windowDuration,
+          planMax: cleanedData.planMax,
+          purchasedCredits: cleanedData.purchasedCredits,
+          periodCredits: cleanedData.periodCredits,
+          reserved: cleanedData.reserved,
         },
         select: {
           id: true,
@@ -242,6 +290,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: true,
           windowStart: true,
           windowDuration: true,
+          planMax: true,
+          purchasedCredits: true,
+          periodCredits: true,
+          reserved: true,
         },
       })
       .execute();
@@ -311,6 +363,34 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'planMax',
+        message: 'planMax',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'purchasedCredits',
+        message: 'purchasedCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'periodCredits',
+        message: 'periodCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'reserved',
+        message: 'reserved',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as OrgLimitAggregatePatch;
@@ -328,6 +408,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: cleanedData.softMax,
           windowStart: cleanedData.windowStart,
           windowDuration: cleanedData.windowDuration,
+          planMax: cleanedData.planMax,
+          purchasedCredits: cleanedData.purchasedCredits,
+          periodCredits: cleanedData.periodCredits,
+          reserved: cleanedData.reserved,
         },
         select: {
           id: true,
@@ -338,6 +422,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: true,
           windowStart: true,
           windowDuration: true,
+          planMax: true,
+          purchasedCredits: true,
+          periodCredits: true,
+          reserved: true,
         },
       })
       .execute();

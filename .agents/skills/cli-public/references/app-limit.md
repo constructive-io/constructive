@@ -12,8 +12,8 @@ csdk app-limit list --where.<field>.<op> <value> --orderBy <values>
 csdk app-limit list --limit 10 --after <cursor>
 csdk app-limit find-first --where.<field>.<op> <value>
 csdk app-limit get --id <UUID>
-csdk app-limit create --actorId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>]
-csdk app-limit update --id <UUID> [--name <String>] [--actorId <UUID>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>]
+csdk app-limit create --actorId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>]
+csdk app-limit update --id <UUID> [--name <String>] [--actorId <UUID>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>]
 csdk app-limit delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-limit list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appLimit
 
 ```bash
-csdk app-limit create --actorId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>]
+csdk app-limit create --actorId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>]
 ```
 
 ### Get a appLimit by id

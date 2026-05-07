@@ -737,24 +737,6 @@ sendVerificationEmail
 const result = await db.mutation.sendVerificationEmail({ input: { email: '<Email>' } }).execute();
 ```
 
-### `db.mutation.requestUploadUrl`
-
-Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RequestUploadUrlInput (required) |
-
-```typescript
-const result = await db.mutation.requestUploadUrl({ input: '<RequestUploadUrlInput>' }).execute();
-```
-
 ### `db.mutation.provisionBucket`
 
 Provision an S3 bucket for a logical bucket in the database.

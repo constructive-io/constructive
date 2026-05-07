@@ -39,6 +39,7 @@ const fieldSchema: FieldSchema = {
   outStorageModuleId: 'uuid',
   outBucketsTableId: 'uuid',
   outFilesTableId: 'uuid',
+  outPathSharesTableId: 'uuid',
   outInvitesModuleId: 'uuid',
 };
 const usage =
@@ -115,6 +116,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       outStorageModuleId: true,
       outBucketsTableId: true,
       outFilesTableId: true,
+      outPathSharesTableId: true,
       outInvitesModuleId: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -163,6 +165,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       outStorageModuleId: true,
       outBucketsTableId: true,
       outFilesTableId: true,
+      outPathSharesTableId: true,
       outInvitesModuleId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -219,6 +222,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           outStorageModuleId: true,
           outBucketsTableId: true,
           outFilesTableId: true,
+          outPathSharesTableId: true,
           outInvitesModuleId: true,
         },
       })
@@ -388,6 +392,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'outPathSharesTableId',
+        message: 'outPathSharesTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'outInvitesModuleId',
         message: 'outInvitesModuleId',
         required: false,
@@ -425,6 +436,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: cleanedData.outStorageModuleId,
           outBucketsTableId: cleanedData.outBucketsTableId,
           outFilesTableId: cleanedData.outFilesTableId,
+          outPathSharesTableId: cleanedData.outPathSharesTableId,
           outInvitesModuleId: cleanedData.outInvitesModuleId,
         },
         select: {
@@ -451,6 +463,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: true,
           outBucketsTableId: true,
           outFilesTableId: true,
+          outPathSharesTableId: true,
           outInvitesModuleId: true,
         },
       })
@@ -626,6 +639,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'outPathSharesTableId',
+        message: 'outPathSharesTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'outInvitesModuleId',
         message: 'outInvitesModuleId',
         required: false,
@@ -663,6 +683,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: cleanedData.outStorageModuleId,
           outBucketsTableId: cleanedData.outBucketsTableId,
           outFilesTableId: cleanedData.outFilesTableId,
+          outPathSharesTableId: cleanedData.outPathSharesTableId,
           outInvitesModuleId: cleanedData.outInvitesModuleId,
         },
         select: {
@@ -689,6 +710,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           outStorageModuleId: true,
           outBucketsTableId: true,
           outFilesTableId: true,
+          outPathSharesTableId: true,
           outInvitesModuleId: true,
         },
       })

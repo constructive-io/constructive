@@ -28,7 +28,6 @@ import type {
   CreateApiKeyInput,
   ForgotPasswordInput,
   SendVerificationEmailInput,
-  RequestUploadUrlInput,
   ProvisionBucketInput,
   SignOutPayload,
   SendAccountDeletionEmailPayload,
@@ -51,7 +50,6 @@ import type {
   CreateApiKeyPayload,
   ForgotPasswordPayload,
   SendVerificationEmailPayload,
-  RequestUploadUrlPayload,
   ProvisionBucketPayload,
   SignOutPayloadSelect,
   SendAccountDeletionEmailPayloadSelect,
@@ -74,7 +72,6 @@ import type {
   CreateApiKeyPayloadSelect,
   ForgotPasswordPayloadSelect,
   SendVerificationEmailPayloadSelect,
-  RequestUploadUrlPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -140,16 +137,6 @@ export interface ForgotPasswordVariables {
 }
 export interface SendVerificationEmailVariables {
   input: SendVerificationEmailInput;
-}
-/**
- * Variables for requestUploadUrl
- * Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl.
- */
-export interface RequestUploadUrlVariables {
-  input: RequestUploadUrlInput;
 }
 /**
  * Variables for provisionBucket
@@ -770,35 +757,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SendVerificationEmailPayload'
-        ),
-      }),
-    requestUploadUrl: <S extends RequestUploadUrlPayloadSelect>(
-      args: RequestUploadUrlVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RequestUploadUrlPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        requestUploadUrl: InferSelectResult<RequestUploadUrlPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RequestUploadUrl',
-        fieldName: 'requestUploadUrl',
-        ...buildCustomDocument(
-          'mutation',
-          'RequestUploadUrl',
-          'requestUploadUrl',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RequestUploadUrlInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RequestUploadUrlPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
