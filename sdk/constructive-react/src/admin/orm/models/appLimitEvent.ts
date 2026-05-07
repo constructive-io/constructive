@@ -70,13 +70,11 @@ export class AppLimitEventModel {
     });
   }
   findFirst<S extends AppLimitEventSelect>(
-    args: FindFirstArgs<S, AppLimitEventFilter> & {
+    args: FindFirstArgs<S, AppLimitEventFilter, AppLimitEventOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLimitEventSelect>
   ): QueryBuilder<{
-    appLimitEvents: {
-      nodes: InferSelectResult<AppLimitEventWithRelations, S>[];
-    };
+    appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppLimitEvent',
@@ -84,17 +82,26 @@ export class AppLimitEventModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppLimitEventFilter',
+      'AppLimitEventOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppLimitEvent',
-      fieldName: 'appLimitEvents',
+      fieldName: 'appLimitEvent',
       document,
       variables,
+      transform: (data: {
+        appLimitEvents?: {
+          nodes?: InferSelectResult<AppLimitEventWithRelations, S>[];
+        };
+      }) => ({
+        appLimitEvent: data.appLimitEvents?.nodes?.[0] ?? null,
+      }),
     });
   }
   create<S extends AppLimitEventSelect>(

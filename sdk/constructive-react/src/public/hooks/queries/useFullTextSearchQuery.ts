@@ -91,7 +91,7 @@ export async function fetchFullTextSearchQuery<S extends FullTextSearchSelect>(p
 export async function fetchFullTextSearchQuery(params: {
   id: string;
   selection: SelectionConfig<FullTextSearchSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<FullTextSearchSelect>(params.selection);
   return getClient()
     .fullTextSearch.findOne({

@@ -91,7 +91,7 @@ export async function fetchMigrateFileQuery<S extends MigrateFileSelect>(params:
 export async function fetchMigrateFileQuery(params: {
   id: string;
   selection: SelectionConfig<MigrateFileSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<MigrateFileSelect>(params.selection);
   return getClient()
     .migrateFile.findOne({

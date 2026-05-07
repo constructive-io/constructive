@@ -97,7 +97,7 @@ export async function fetchPrimaryKeyConstraintQuery<S extends PrimaryKeyConstra
 export async function fetchPrimaryKeyConstraintQuery(params: {
   id: string;
   selection: SelectionConfig<PrimaryKeyConstraintSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<PrimaryKeyConstraintSelect>(params.selection);
   return getClient()
     .primaryKeyConstraint.findOne({

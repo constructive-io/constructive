@@ -91,7 +91,7 @@ export async function fetchBillingModuleQuery<S extends BillingModuleSelect>(par
 export async function fetchBillingModuleQuery(params: {
   id: string;
   selection: SelectionConfig<BillingModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<BillingModuleSelect>(params.selection);
   return getClient()
     .billingModule.findOne({

@@ -97,7 +97,7 @@ export async function fetchAppLevelRequirementQuery<S extends AppLevelRequiremen
 export async function fetchAppLevelRequirementQuery(params: {
   id: string;
   selection: SelectionConfig<AppLevelRequirementSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppLevelRequirementSelect>(params.selection);
   return getClient()
     .appLevelRequirement.findOne({

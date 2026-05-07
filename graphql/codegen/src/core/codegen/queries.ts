@@ -890,6 +890,7 @@ export function generateSingleQueryHook(
         null,
         [createFunctionParam('params', t.tsTypeLiteral(fImplProps))],
         fBody,
+        typeRef('Promise', [t.tsAnyKeyword()]),
       ),
     );
   }

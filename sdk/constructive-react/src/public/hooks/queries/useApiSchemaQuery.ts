@@ -91,7 +91,7 @@ export async function fetchApiSchemaQuery<S extends ApiSchemaSelect>(params: {
 export async function fetchApiSchemaQuery(params: {
   id: string;
   selection: SelectionConfig<ApiSchemaSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ApiSchemaSelect>(params.selection);
   return getClient()
     .apiSchema.findOne({

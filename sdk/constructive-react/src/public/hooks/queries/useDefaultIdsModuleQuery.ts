@@ -91,7 +91,7 @@ export async function fetchDefaultIdsModuleQuery<S extends DefaultIdsModuleSelec
 export async function fetchDefaultIdsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<DefaultIdsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DefaultIdsModuleSelect>(params.selection);
   return getClient()
     .defaultIdsModule.findOne({

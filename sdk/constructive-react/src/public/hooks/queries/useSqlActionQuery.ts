@@ -91,7 +91,7 @@ export async function fetchSqlActionQuery<S extends SqlActionSelect>(params: {
 export async function fetchSqlActionQuery(params: {
   id: number;
   selection: SelectionConfig<SqlActionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SqlActionSelect>(params.selection);
   return getClient()
     .sqlAction.findOne({

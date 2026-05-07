@@ -91,7 +91,7 @@ export async function fetchAppLevelQuery<S extends AppLevelSelect>(params: {
 export async function fetchAppLevelQuery(params: {
   id: string;
   selection: SelectionConfig<AppLevelSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppLevelSelect>(params.selection);
   return getClient()
     .appLevel.findOne({

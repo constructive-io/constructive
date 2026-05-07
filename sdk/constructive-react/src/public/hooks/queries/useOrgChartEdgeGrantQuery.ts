@@ -97,7 +97,7 @@ export async function fetchOrgChartEdgeGrantQuery<S extends OrgChartEdgeGrantSel
 export async function fetchOrgChartEdgeGrantQuery(params: {
   id: string;
   selection: SelectionConfig<OrgChartEdgeGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgChartEdgeGrantSelect>(params.selection);
   return getClient()
     .orgChartEdgeGrant.findOne({

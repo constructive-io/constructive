@@ -91,7 +91,7 @@ export async function fetchRoleTypeQuery<S extends RoleTypeSelect>(params: {
 export async function fetchRoleTypeQuery(params: {
   id: number;
   selection: SelectionConfig<RoleTypeSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<RoleTypeSelect>(params.selection);
   return getClient()
     .roleType.findOne({

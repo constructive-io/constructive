@@ -91,7 +91,7 @@ export async function fetchTableQuery<S extends TableSelect>(params: {
 export async function fetchTableQuery(params: {
   id: string;
   selection: SelectionConfig<TableSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<TableSelect>(params.selection);
   return getClient()
     .table.findOne({

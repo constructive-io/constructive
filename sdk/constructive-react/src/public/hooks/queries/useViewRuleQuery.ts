@@ -91,7 +91,7 @@ export async function fetchViewRuleQuery<S extends ViewRuleSelect>(params: {
 export async function fetchViewRuleQuery(params: {
   id: string;
   selection: SelectionConfig<ViewRuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ViewRuleSelect>(params.selection);
   return getClient()
     .viewRule.findOne({

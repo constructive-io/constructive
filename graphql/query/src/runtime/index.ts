@@ -24,5 +24,5 @@ export { parseType, print } from '@0no-co/graphql.web';
 export type { GraphQLAdapter, GraphQLError, QueryResult } from '@constructive-io/graphql-types';
 
 // Isomorphic fetch with *.localhost DNS + Host header fix for Node.js
-export { createFetch } from './localhost-fetch';
-export type { FetchFunction } from './localhost-fetch';
+export { createFetch } from './localhost-fetch.js';
+export type { FetchFunction } from './localhost-fetch.js';

@@ -91,7 +91,7 @@ export async function fetchDevicesModuleQuery<S extends DevicesModuleSelect>(par
 export async function fetchDevicesModuleQuery(params: {
   id: string;
   selection: SelectionConfig<DevicesModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DevicesModuleSelect>(params.selection);
   return getClient()
     .devicesModule.findOne({

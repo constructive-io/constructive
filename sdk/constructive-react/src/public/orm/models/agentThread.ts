@@ -70,13 +70,11 @@ export class AgentThreadModel {
     });
   }
   findFirst<S extends AgentThreadSelect>(
-    args: FindFirstArgs<S, AgentThreadFilter> & {
+    args: FindFirstArgs<S, AgentThreadFilter, AgentThreadOrderBy> & {
       select: S;
     } & StrictSelect<S, AgentThreadSelect>
   ): QueryBuilder<{
-    agentThreads: {
-      nodes: InferSelectResult<AgentThreadWithRelations, S>[];
-    };
+    agentThread: InferSelectResult<AgentThreadWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AgentThread',
@@ -84,17 +82,26 @@ export class AgentThreadModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AgentThreadFilter',
+      'AgentThreadOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AgentThread',
-      fieldName: 'agentThreads',
+      fieldName: 'agentThread',
       document,
       variables,
+      transform: (data: {
+        agentThreads?: {
+          nodes?: InferSelectResult<AgentThreadWithRelations, S>[];
+        };
+      }) => ({
+        agentThread: data.agentThreads?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AgentThreadSelect>(

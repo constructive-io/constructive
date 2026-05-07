@@ -102,7 +102,7 @@ export async function fetchWebauthnCredentialsModuleQuery<
 export async function fetchWebauthnCredentialsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<WebauthnCredentialsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<WebauthnCredentialsModuleSelect>(params.selection);
   return getClient()
     .webauthnCredentialsModule.findOne({

@@ -97,7 +97,7 @@ export async function fetchBlueprintTemplateQuery<S extends BlueprintTemplateSel
 export async function fetchBlueprintTemplateQuery(params: {
   id: string;
   selection: SelectionConfig<BlueprintTemplateSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<BlueprintTemplateSelect>(params.selection);
   return getClient()
     .blueprintTemplate.findOne({

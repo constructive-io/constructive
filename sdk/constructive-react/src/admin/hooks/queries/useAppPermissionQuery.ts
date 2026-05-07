@@ -91,7 +91,7 @@ export async function fetchAppPermissionQuery<S extends AppPermissionSelect>(par
 export async function fetchAppPermissionQuery(params: {
   id: string;
   selection: SelectionConfig<AppPermissionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppPermissionSelect>(params.selection);
   return getClient()
     .appPermission.findOne({

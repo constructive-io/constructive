@@ -118,7 +118,7 @@ export async function fetchRelationProvisionQuery<S extends RelationProvisionSel
 export async function fetchRelationProvisionQuery(params: {
   id: string;
   selection: SelectionConfig<RelationProvisionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<RelationProvisionSelect>(params.selection);
   return getClient()
     .relationProvision.findOne({

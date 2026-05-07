@@ -97,7 +97,7 @@ export async function fetchOrgPermissionDefaultQuery<S extends OrgPermissionDefa
 export async function fetchOrgPermissionDefaultQuery(params: {
   id: string;
   selection: SelectionConfig<OrgPermissionDefaultSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgPermissionDefaultSelect>(params.selection);
   return getClient()
     .orgPermissionDefault.findOne({

@@ -99,7 +99,7 @@ export async function fetchMembershipTypesModuleQuery<
 export async function fetchMembershipTypesModuleQuery(params: {
   id: string;
   selection: SelectionConfig<MembershipTypesModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<MembershipTypesModuleSelect>(params.selection);
   return getClient()
     .membershipTypesModule.findOne({

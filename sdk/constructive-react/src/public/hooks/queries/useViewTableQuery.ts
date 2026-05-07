@@ -91,7 +91,7 @@ export async function fetchViewTableQuery<S extends ViewTableSelect>(params: {
 export async function fetchViewTableQuery(params: {
   id: string;
   selection: SelectionConfig<ViewTableSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ViewTableSelect>(params.selection);
   return getClient()
     .viewTable.findOne({

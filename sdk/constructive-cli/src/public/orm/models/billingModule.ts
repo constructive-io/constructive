@@ -70,13 +70,11 @@ export class BillingModuleModel {
     });
   }
   findFirst<S extends BillingModuleSelect>(
-    args: FindFirstArgs<S, BillingModuleFilter> & {
+    args: FindFirstArgs<S, BillingModuleFilter, BillingModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, BillingModuleSelect>
   ): QueryBuilder<{
-    billingModules: {
-      nodes: InferSelectResult<BillingModuleWithRelations, S>[];
-    };
+    billingModule: InferSelectResult<BillingModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'BillingModule',
@@ -84,17 +82,26 @@ export class BillingModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'BillingModuleFilter',
+      'BillingModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'BillingModule',
-      fieldName: 'billingModules',
+      fieldName: 'billingModule',
       document,
       variables,
+      transform: (data: {
+        billingModules?: {
+          nodes?: InferSelectResult<BillingModuleWithRelations, S>[];
+        };
+      }) => ({
+        billingModule: data.billingModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends BillingModuleSelect>(

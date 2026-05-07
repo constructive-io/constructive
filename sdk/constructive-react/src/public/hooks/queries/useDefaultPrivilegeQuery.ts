@@ -91,7 +91,7 @@ export async function fetchDefaultPrivilegeQuery<S extends DefaultPrivilegeSelec
 export async function fetchDefaultPrivilegeQuery(params: {
   id: string;
   selection: SelectionConfig<DefaultPrivilegeSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DefaultPrivilegeSelect>(params.selection);
   return getClient()
     .defaultPrivilege.findOne({

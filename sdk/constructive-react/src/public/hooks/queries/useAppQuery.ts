@@ -88,7 +88,10 @@ export async function fetchAppQuery<S extends AppSelect>(params: {
 }): Promise<{
   app: InferSelectResult<AppWithRelations, S> | null;
 }>;
-export async function fetchAppQuery(params: { id: string; selection: SelectionConfig<AppSelect> }) {
+export async function fetchAppQuery(params: {
+  id: string;
+  selection: SelectionConfig<AppSelect>;
+}): Promise<any> {
   const args = buildSelectionArgs<AppSelect>(params.selection);
   return getClient()
     .app.findOne({

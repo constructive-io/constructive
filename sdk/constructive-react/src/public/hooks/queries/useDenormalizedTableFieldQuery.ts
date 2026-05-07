@@ -99,7 +99,7 @@ export async function fetchDenormalizedTableFieldQuery<
 export async function fetchDenormalizedTableFieldQuery(params: {
   id: string;
   selection: SelectionConfig<DenormalizedTableFieldSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DenormalizedTableFieldSelect>(params.selection);
   return getClient()
     .denormalizedTableField.findOne({

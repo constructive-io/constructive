@@ -91,7 +91,7 @@ export async function fetchAgentThreadQuery<S extends AgentThreadSelect>(params:
 export async function fetchAgentThreadQuery(params: {
   id: string;
   selection: SelectionConfig<AgentThreadSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AgentThreadSelect>(params.selection);
   return getClient()
     .agentThread.findOne({

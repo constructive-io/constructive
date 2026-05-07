@@ -13,6 +13,7 @@
  */
 
 export type FetchFunction = typeof globalThis.fetch;
+type NodeModuleLoader = (id: string) => unknown;
 
 export function isLocalhostSubdomain(hostname: string): boolean {
   return hostname.endsWith('.localhost') && hostname !== 'localhost';
@@ -106,6 +107,17 @@ function buildNodeFetch(
 
 let _fetch: FetchFunction | undefined;
 
+function getNodeModuleLoader(): NodeModuleLoader | undefined {
+  try {
+    // Keep node:http / node:https out of browser bundle static analysis.
+    return Function(
+      'return typeof require !== "undefined" ? require : undefined',
+    )() as NodeModuleLoader | undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Create an isomorphic fetch function.
  *
@@ -122,12 +134,13 @@ export function createFetch(): FetchFunction {
 
   if (typeof process !== 'undefined' && process.versions?.node) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const http = require('node:http');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const https = require('node:https');
-      _fetch = buildNodeFetch(http, https);
-      return _fetch;
+      const nodeRequire = getNodeModuleLoader();
+      if (nodeRequire) {
+        const http = nodeRequire('node:' + 'http') as typeof import('node:http');
+        const https = nodeRequire('node:' + 'https') as typeof import('node:https');
+        _fetch = buildNodeFetch(http, https);
+        return _fetch;
+      }
     } catch {
       // node:http unavailable — fall through
     }

@@ -91,7 +91,7 @@ export async function fetchRateLimitsModuleQuery<S extends RateLimitsModuleSelec
 export async function fetchRateLimitsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<RateLimitsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<RateLimitsModuleSelect>(params.selection);
   return getClient()
     .rateLimitsModule.findOne({

@@ -91,7 +91,7 @@ export async function fetchBlueprintQuery<S extends BlueprintSelect>(params: {
 export async function fetchBlueprintQuery(params: {
   id: string;
   selection: SelectionConfig<BlueprintSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<BlueprintSelect>(params.selection);
   return getClient()
     .blueprint.findOne({

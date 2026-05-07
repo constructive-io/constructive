@@ -91,7 +91,7 @@ export async function fetchOrgGrantQuery<S extends OrgGrantSelect>(params: {
 export async function fetchOrgGrantQuery(params: {
   id: string;
   selection: SelectionConfig<OrgGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgGrantSelect>(params.selection);
   return getClient()
     .orgGrant.findOne({

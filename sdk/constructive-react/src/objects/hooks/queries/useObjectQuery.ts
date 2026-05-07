@@ -91,7 +91,7 @@ export async function fetchObjectQuery<S extends ObjectSelect>(params: {
 export async function fetchObjectQuery(params: {
   id: string;
   selection: SelectionConfig<ObjectSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ObjectSelect>(params.selection);
   return getClient()
     .object.findOne({

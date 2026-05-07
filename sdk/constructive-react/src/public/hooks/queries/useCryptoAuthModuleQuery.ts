@@ -91,7 +91,7 @@ export async function fetchCryptoAuthModuleQuery<S extends CryptoAuthModuleSelec
 export async function fetchCryptoAuthModuleQuery(params: {
   id: string;
   selection: SelectionConfig<CryptoAuthModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<CryptoAuthModuleSelect>(params.selection);
   return getClient()
     .cryptoAuthModule.findOne({

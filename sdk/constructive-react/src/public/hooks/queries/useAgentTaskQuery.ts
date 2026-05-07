@@ -91,7 +91,7 @@ export async function fetchAgentTaskQuery<S extends AgentTaskSelect>(params: {
 export async function fetchAgentTaskQuery(params: {
   id: string;
   selection: SelectionConfig<AgentTaskSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AgentTaskSelect>(params.selection);
   return getClient()
     .agentTask.findOne({

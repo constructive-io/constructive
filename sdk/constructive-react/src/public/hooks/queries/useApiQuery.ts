@@ -88,7 +88,10 @@ export async function fetchApiQuery<S extends ApiSelect>(params: {
 }): Promise<{
   api: InferSelectResult<ApiWithRelations, S> | null;
 }>;
-export async function fetchApiQuery(params: { id: string; selection: SelectionConfig<ApiSelect> }) {
+export async function fetchApiQuery(params: {
+  id: string;
+  selection: SelectionConfig<ApiSelect>;
+}): Promise<any> {
   const args = buildSelectionArgs<ApiSelect>(params.selection);
   return getClient()
     .api.findOne({

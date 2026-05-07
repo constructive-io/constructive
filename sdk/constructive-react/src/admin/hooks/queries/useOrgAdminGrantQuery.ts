@@ -91,7 +91,7 @@ export async function fetchOrgAdminGrantQuery<S extends OrgAdminGrantSelect>(par
 export async function fetchOrgAdminGrantQuery(params: {
   id: string;
   selection: SelectionConfig<OrgAdminGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgAdminGrantSelect>(params.selection);
   return getClient()
     .orgAdminGrant.findOne({

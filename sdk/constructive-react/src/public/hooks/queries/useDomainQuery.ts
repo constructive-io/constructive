@@ -91,7 +91,7 @@ export async function fetchDomainQuery<S extends DomainSelect>(params: {
 export async function fetchDomainQuery(params: {
   id: string;
   selection: SelectionConfig<DomainSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DomainSelect>(params.selection);
   return getClient()
     .domain.findOne({

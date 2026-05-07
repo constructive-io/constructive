@@ -91,7 +91,7 @@ export async function fetchCommitQuery<S extends CommitSelect>(params: {
 export async function fetchCommitQuery(params: {
   id: string;
   selection: SelectionConfig<CommitSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<CommitSelect>(params.selection);
   return getClient()
     .commit.findOne({

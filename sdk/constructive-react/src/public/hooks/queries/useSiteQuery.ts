@@ -91,7 +91,7 @@ export async function fetchSiteQuery<S extends SiteSelect>(params: {
 export async function fetchSiteQuery(params: {
   id: string;
   selection: SelectionConfig<SiteSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SiteSelect>(params.selection);
   return getClient()
     .site.findOne({

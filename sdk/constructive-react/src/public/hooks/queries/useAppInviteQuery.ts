@@ -91,7 +91,7 @@ export async function fetchAppInviteQuery<S extends AppInviteSelect>(params: {
 export async function fetchAppInviteQuery(params: {
   id: string;
   selection: SelectionConfig<AppInviteSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppInviteSelect>(params.selection);
   return getClient()
     .appInvite.findOne({

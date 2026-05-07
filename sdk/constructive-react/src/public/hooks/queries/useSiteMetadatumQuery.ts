@@ -91,7 +91,7 @@ export async function fetchSiteMetadatumQuery<S extends SiteMetadatumSelect>(par
 export async function fetchSiteMetadatumQuery(params: {
   id: string;
   selection: SelectionConfig<SiteMetadatumSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SiteMetadatumSelect>(params.selection);
   return getClient()
     .siteMetadatum.findOne({

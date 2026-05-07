@@ -70,13 +70,11 @@ export class NodeTypeRegistryModel {
     });
   }
   findFirst<S extends NodeTypeRegistrySelect>(
-    args: FindFirstArgs<S, NodeTypeRegistryFilter> & {
+    args: FindFirstArgs<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy> & {
       select: S;
     } & StrictSelect<S, NodeTypeRegistrySelect>
   ): QueryBuilder<{
-    nodeTypeRegistries: {
-      nodes: InferSelectResult<NodeTypeRegistryWithRelations, S>[];
-    };
+    nodeTypeRegistry: InferSelectResult<NodeTypeRegistryWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'NodeTypeRegistry',
@@ -84,17 +82,26 @@ export class NodeTypeRegistryModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'NodeTypeRegistryFilter',
+      'NodeTypeRegistryOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'NodeTypeRegistry',
-      fieldName: 'nodeTypeRegistries',
+      fieldName: 'nodeTypeRegistry',
       document,
       variables,
+      transform: (data: {
+        nodeTypeRegistries?: {
+          nodes?: InferSelectResult<NodeTypeRegistryWithRelations, S>[];
+        };
+      }) => ({
+        nodeTypeRegistry: data.nodeTypeRegistries?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends NodeTypeRegistrySelect>(

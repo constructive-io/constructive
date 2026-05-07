@@ -91,7 +91,7 @@ export async function fetchIndexQuery<S extends IndexSelect>(params: {
 export async function fetchIndexQuery(params: {
   id: string;
   selection: SelectionConfig<IndexSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<IndexSelect>(params.selection);
   return getClient()
     .index.findOne({

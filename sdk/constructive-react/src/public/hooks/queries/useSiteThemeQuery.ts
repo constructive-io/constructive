@@ -91,7 +91,7 @@ export async function fetchSiteThemeQuery<S extends SiteThemeSelect>(params: {
 export async function fetchSiteThemeQuery(params: {
   id: string;
   selection: SelectionConfig<SiteThemeSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SiteThemeSelect>(params.selection);
   return getClient()
     .siteTheme.findOne({

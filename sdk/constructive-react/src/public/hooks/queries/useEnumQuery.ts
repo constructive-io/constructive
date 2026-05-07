@@ -91,7 +91,7 @@ export async function fetchEnumQuery<S extends EnumSelect>(params: {
 export async function fetchEnumQuery(params: {
   id: string;
   selection: SelectionConfig<EnumSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<EnumSelect>(params.selection);
   return getClient()
     .enum.findOne({

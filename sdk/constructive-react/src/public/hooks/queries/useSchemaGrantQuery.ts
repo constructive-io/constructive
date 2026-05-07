@@ -91,7 +91,7 @@ export async function fetchSchemaGrantQuery<S extends SchemaGrantSelect>(params:
 export async function fetchSchemaGrantQuery(params: {
   id: string;
   selection: SelectionConfig<SchemaGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SchemaGrantSelect>(params.selection);
   return getClient()
     .schemaGrant.findOne({

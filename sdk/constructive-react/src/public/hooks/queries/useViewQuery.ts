@@ -91,7 +91,7 @@ export async function fetchViewQuery<S extends ViewSelect>(params: {
 export async function fetchViewQuery(params: {
   id: string;
   selection: SelectionConfig<ViewSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ViewSelect>(params.selection);
   return getClient()
     .view.findOne({

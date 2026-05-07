@@ -99,7 +99,7 @@ export async function fetchBlueprintConstructionQuery<
 export async function fetchBlueprintConstructionQuery(params: {
   id: string;
   selection: SelectionConfig<BlueprintConstructionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<BlueprintConstructionSelect>(params.selection);
   return getClient()
     .blueprintConstruction.findOne({

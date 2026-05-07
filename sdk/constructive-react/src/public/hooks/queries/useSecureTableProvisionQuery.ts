@@ -97,7 +97,7 @@ export async function fetchSecureTableProvisionQuery<S extends SecureTableProvis
 export async function fetchSecureTableProvisionQuery(params: {
   id: string;
   selection: SelectionConfig<SecureTableProvisionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SecureTableProvisionSelect>(params.selection);
   return getClient()
     .secureTableProvision.findOne({

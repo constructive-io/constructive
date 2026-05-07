@@ -91,7 +91,7 @@ export async function fetchOrgLimitDefaultQuery<S extends OrgLimitDefaultSelect>
 export async function fetchOrgLimitDefaultQuery(params: {
   id: string;
   selection: SelectionConfig<OrgLimitDefaultSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgLimitDefaultSelect>(params.selection);
   return getClient()
     .orgLimitDefault.findOne({

@@ -91,7 +91,7 @@ export async function fetchTriggerFunctionQuery<S extends TriggerFunctionSelect>
 export async function fetchTriggerFunctionQuery(params: {
   id: string;
   selection: SelectionConfig<TriggerFunctionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<TriggerFunctionSelect>(params.selection);
   return getClient()
     .triggerFunction.findOne({

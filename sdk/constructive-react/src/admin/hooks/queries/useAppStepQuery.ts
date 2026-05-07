@@ -91,7 +91,7 @@ export async function fetchAppStepQuery<S extends AppStepSelect>(params: {
 export async function fetchAppStepQuery(params: {
   id: string;
   selection: SelectionConfig<AppStepSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppStepSelect>(params.selection);
   return getClient()
     .appStep.findOne({

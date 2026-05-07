@@ -97,7 +97,7 @@ export async function fetchMembershipsModuleQuery<S extends MembershipsModuleSel
 export async function fetchMembershipsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<MembershipsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<MembershipsModuleSelect>(params.selection);
   return getClient()
     .membershipsModule.findOne({

@@ -74,7 +74,7 @@ export class ObjectModel {
       select: S;
     } & StrictSelect<S, ObjectSelect>
   ): QueryBuilder<{
-    getNodeAtPath: InferSelectResult<ObjectWithRelations, S> | null;
+    object: InferSelectResult<ObjectWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Object',
@@ -92,7 +92,7 @@ export class ObjectModel {
       client: this.client,
       operation: 'query',
       operationName: 'Object',
-      fieldName: 'getNodeAtPath',
+      fieldName: 'object',
       document,
       variables,
       transform: (data: {
@@ -100,7 +100,7 @@ export class ObjectModel {
           nodes?: InferSelectResult<ObjectWithRelations, S>[];
         };
       }) => ({
-        getNodeAtPath: data.objects?.nodes?.[0] ?? null,
+        object: data.objects?.nodes?.[0] ?? null,
       }),
     });
   }
@@ -110,7 +110,7 @@ export class ObjectModel {
       select: S;
     } & StrictSelect<S, ObjectSelect>
   ): QueryBuilder<{
-    getNodeAtPath: InferSelectResult<ObjectWithRelations, S> | null;
+    object: InferSelectResult<ObjectWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindOneDocument(
       'Object',
@@ -125,7 +125,7 @@ export class ObjectModel {
       client: this.client,
       operation: 'query',
       operationName: 'Object',
-      fieldName: 'getNodeAtPath',
+      fieldName: 'object',
       document,
       variables,
     });

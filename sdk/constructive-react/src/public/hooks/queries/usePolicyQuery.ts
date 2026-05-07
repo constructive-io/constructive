@@ -91,7 +91,7 @@ export async function fetchPolicyQuery<S extends PolicySelect>(params: {
 export async function fetchPolicyQuery(params: {
   id: string;
   selection: SelectionConfig<PolicySelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<PolicySelect>(params.selection);
   return getClient()
     .policy.findOne({

@@ -70,13 +70,11 @@ export class AgentMessageModel {
     });
   }
   findFirst<S extends AgentMessageSelect>(
-    args: FindFirstArgs<S, AgentMessageFilter> & {
+    args: FindFirstArgs<S, AgentMessageFilter, AgentMessageOrderBy> & {
       select: S;
     } & StrictSelect<S, AgentMessageSelect>
   ): QueryBuilder<{
-    agentMessages: {
-      nodes: InferSelectResult<AgentMessageWithRelations, S>[];
-    };
+    agentMessage: InferSelectResult<AgentMessageWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AgentMessage',
@@ -84,17 +82,26 @@ export class AgentMessageModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AgentMessageFilter',
+      'AgentMessageOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AgentMessage',
-      fieldName: 'agentMessages',
+      fieldName: 'agentMessage',
       document,
       variables,
+      transform: (data: {
+        agentMessages?: {
+          nodes?: InferSelectResult<AgentMessageWithRelations, S>[];
+        };
+      }) => ({
+        agentMessage: data.agentMessages?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AgentMessageSelect>(

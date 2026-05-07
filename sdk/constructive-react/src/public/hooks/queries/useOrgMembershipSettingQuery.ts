@@ -97,7 +97,7 @@ export async function fetchOrgMembershipSettingQuery<S extends OrgMembershipSett
 export async function fetchOrgMembershipSettingQuery(params: {
   id: string;
   selection: SelectionConfig<OrgMembershipSettingSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgMembershipSettingSelect>(params.selection);
   return getClient()
     .orgMembershipSetting.findOne({

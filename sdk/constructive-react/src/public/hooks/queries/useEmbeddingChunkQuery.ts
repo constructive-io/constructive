@@ -91,7 +91,7 @@ export async function fetchEmbeddingChunkQuery<S extends EmbeddingChunkSelect>(p
 export async function fetchEmbeddingChunkQuery(params: {
   id: string;
   selection: SelectionConfig<EmbeddingChunkSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<EmbeddingChunkSelect>(params.selection);
   return getClient()
     .embeddingChunk.findOne({

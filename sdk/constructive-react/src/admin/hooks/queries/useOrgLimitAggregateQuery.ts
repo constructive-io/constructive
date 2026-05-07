@@ -97,7 +97,7 @@ export async function fetchOrgLimitAggregateQuery<S extends OrgLimitAggregateSel
 export async function fetchOrgLimitAggregateQuery(params: {
   id: string;
   selection: SelectionConfig<OrgLimitAggregateSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgLimitAggregateSelect>(params.selection);
   return getClient()
     .orgLimitAggregate.findOne({

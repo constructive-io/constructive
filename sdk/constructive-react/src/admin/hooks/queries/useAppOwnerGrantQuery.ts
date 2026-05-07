@@ -91,7 +91,7 @@ export async function fetchAppOwnerGrantQuery<S extends AppOwnerGrantSelect>(par
 export async function fetchAppOwnerGrantQuery(params: {
   id: string;
   selection: SelectionConfig<AppOwnerGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppOwnerGrantSelect>(params.selection);
   return getClient()
     .appOwnerGrant.findOne({
