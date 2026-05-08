@@ -33,6 +33,7 @@ import type {
   ProvisionSpatialRelationInput,
   BootstrapUserInput,
   SetFieldOrderInput,
+  AppendSmartTagsInput,
   ProvisionUniqueConstraintInput,
   ProvisionFullTextSearchInput,
   ProvisionIndexInput,
@@ -54,7 +55,6 @@ import type {
   RequestCrossOriginTokenInput,
   SignInInput,
   ProvisionTableInput,
-  RequestUploadUrlInput,
   ProvisionBucketInput,
   SendAccountDeletionEmailPayload,
   SignOutPayload,
@@ -82,6 +82,7 @@ import type {
   ProvisionSpatialRelationPayload,
   BootstrapUserPayload,
   SetFieldOrderPayload,
+  AppendSmartTagsPayload,
   ProvisionUniqueConstraintPayload,
   ProvisionFullTextSearchPayload,
   ProvisionIndexPayload,
@@ -103,7 +104,6 @@ import type {
   RequestCrossOriginTokenPayload,
   SignInPayload,
   ProvisionTablePayload,
-  RequestUploadUrlPayload,
   ProvisionBucketPayload,
   SendAccountDeletionEmailPayloadSelect,
   SignOutPayloadSelect,
@@ -131,6 +131,7 @@ import type {
   ProvisionSpatialRelationPayloadSelect,
   BootstrapUserPayloadSelect,
   SetFieldOrderPayloadSelect,
+  AppendSmartTagsPayloadSelect,
   ProvisionUniqueConstraintPayloadSelect,
   ProvisionFullTextSearchPayloadSelect,
   ProvisionIndexPayloadSelect,
@@ -152,7 +153,6 @@ import type {
   RequestCrossOriginTokenPayloadSelect,
   SignInPayloadSelect,
   ProvisionTablePayloadSelect,
-  RequestUploadUrlPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -245,6 +245,9 @@ export interface BootstrapUserVariables {
 }
 export interface SetFieldOrderVariables {
   input: SetFieldOrderInput;
+}
+export interface AppendSmartTagsVariables {
+  input: AppendSmartTagsInput;
 }
 /**
  * Variables for provisionUniqueConstraint
@@ -347,16 +350,6 @@ export interface SignInVariables {
  */
 export interface ProvisionTableVariables {
   input: ProvisionTableInput;
-}
-/**
- * Variables for requestUploadUrl
- * Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl.
- */
-export interface RequestUploadUrlVariables {
-  input: RequestUploadUrlInput;
 }
 /**
  * Variables for provisionBucket
@@ -1124,6 +1117,35 @@ export function createMutationOperations(client: OrmClient) {
           'SetFieldOrderPayload'
         ),
       }),
+    appendSmartTags: <S extends AppendSmartTagsPayloadSelect>(
+      args: AppendSmartTagsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, AppendSmartTagsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        appendSmartTags: InferSelectResult<AppendSmartTagsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'AppendSmartTags',
+        fieldName: 'appendSmartTags',
+        ...buildCustomDocument(
+          'mutation',
+          'AppendSmartTags',
+          'appendSmartTags',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'AppendSmartTagsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'AppendSmartTagsPayload'
+        ),
+      }),
     provisionUniqueConstraint: <S extends ProvisionUniqueConstraintPayloadSelect>(
       args: ProvisionUniqueConstraintVariables,
       options: {
@@ -1731,35 +1753,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionTablePayload'
-        ),
-      }),
-    requestUploadUrl: <S extends RequestUploadUrlPayloadSelect>(
-      args: RequestUploadUrlVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RequestUploadUrlPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        requestUploadUrl: InferSelectResult<RequestUploadUrlPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RequestUploadUrl',
-        fieldName: 'requestUploadUrl',
-        ...buildCustomDocument(
-          'mutation',
-          'RequestUploadUrl',
-          'requestUploadUrl',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RequestUploadUrlInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RequestUploadUrlPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

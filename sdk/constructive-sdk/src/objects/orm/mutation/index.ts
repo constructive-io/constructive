@@ -15,7 +15,6 @@ import type {
   InsertNodeAtPathInput,
   UpdateNodeAtPathInput,
   SetAndCommitInput,
-  RequestUploadUrlInput,
   ProvisionBucketInput,
   FreezeObjectsPayload,
   InitEmptyRepoPayload,
@@ -25,7 +24,6 @@ import type {
   InsertNodeAtPathPayload,
   UpdateNodeAtPathPayload,
   SetAndCommitPayload,
-  RequestUploadUrlPayload,
   ProvisionBucketPayload,
   FreezeObjectsPayloadSelect,
   InitEmptyRepoPayloadSelect,
@@ -35,7 +33,6 @@ import type {
   InsertNodeAtPathPayloadSelect,
   UpdateNodeAtPathPayloadSelect,
   SetAndCommitPayloadSelect,
-  RequestUploadUrlPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -62,16 +59,6 @@ export interface UpdateNodeAtPathVariables {
 }
 export interface SetAndCommitVariables {
   input: SetAndCommitInput;
-}
-/**
- * Variables for requestUploadUrl
- * Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl.
- */
-export interface RequestUploadUrlVariables {
-  input: RequestUploadUrlInput;
 }
 /**
  * Variables for provisionBucket
@@ -315,35 +302,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetAndCommitPayload'
-        ),
-      }),
-    requestUploadUrl: <S extends RequestUploadUrlPayloadSelect>(
-      args: RequestUploadUrlVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RequestUploadUrlPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        requestUploadUrl: InferSelectResult<RequestUploadUrlPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RequestUploadUrl',
-        fieldName: 'requestUploadUrl',
-        ...buildCustomDocument(
-          'mutation',
-          'RequestUploadUrl',
-          'requestUploadUrl',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RequestUploadUrlInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RequestUploadUrlPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

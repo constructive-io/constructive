@@ -97,10 +97,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'setAndCommit', identifier] as const)
       : (['mutation', 'setAndCommit'] as const),
-  /** Mutation key for requestUploadUrl */ requestUploadUrl: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'requestUploadUrl', identifier] as const)
-      : (['mutation', 'requestUploadUrl'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
