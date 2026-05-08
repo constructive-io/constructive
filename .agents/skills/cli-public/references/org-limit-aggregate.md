@@ -12,8 +12,8 @@ csdk org-limit-aggregate list --where.<field>.<op> <value> --orderBy <values>
 csdk org-limit-aggregate list --limit 10 --after <cursor>
 csdk org-limit-aggregate find-first --where.<field>.<op> <value>
 csdk org-limit-aggregate get --id <UUID>
-csdk org-limit-aggregate create --entityId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>]
-csdk org-limit-aggregate update --id <UUID> [--name <String>] [--entityId <UUID>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>]
+csdk org-limit-aggregate create --entityId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>] [--reserved <BigInt>]
+csdk org-limit-aggregate update --id <UUID> [--name <String>] [--entityId <UUID>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>] [--reserved <BigInt>]
 csdk org-limit-aggregate delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-limit-aggregate list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgLimitAggregate
 
 ```bash
-csdk org-limit-aggregate create --entityId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>]
+csdk org-limit-aggregate create --entityId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>] [--reserved <BigInt>]
 ```
 
 ### Get a orgLimitAggregate by id

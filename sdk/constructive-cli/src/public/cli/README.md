@@ -111,7 +111,11 @@ csdk auth set-token <your-token>
 | `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
 | `org-permission-default` | orgPermissionDefault CRUD operations |
 | `app-limit` | appLimit CRUD operations |
+| `app-limit-credit` | appLimitCredit CRUD operations |
+| `app-limit-credit-code-item` | appLimitCreditCodeItem CRUD operations |
+| `app-limit-credit-redemption` | appLimitCreditRedemption CRUD operations |
 | `org-limit` | orgLimit CRUD operations |
+| `org-limit-credit` | orgLimitCredit CRUD operations |
 | `org-limit-aggregate` | orgLimitAggregate CRUD operations |
 | `app-step` | appStep CRUD operations |
 | `app-achievement` | appAchievement CRUD operations |
@@ -133,6 +137,11 @@ csdk auth set-token <your-token>
 | `ref` | ref CRUD operations |
 | `store` | store CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
+| `app-limit-credit-code` | appLimitCreditCode CRUD operations |
+| `app-limit-caps-default` | appLimitCapsDefault CRUD operations |
+| `org-limit-caps-default` | orgLimitCapsDefault CRUD operations |
+| `app-limit-cap` | appLimitCap CRUD operations |
+| `org-limit-cap` | orgLimitCap CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `migrate-file` | migrateFile CRUD operations |
 | `devices-module` | devicesModule CRUD operations |
@@ -146,14 +155,15 @@ csdk auth set-token <your-token>
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `app-limit-event` | appLimitEvent CRUD operations |
 | `org-limit-event` | orgLimitEvent CRUD operations |
-| `plans-module` | plansModule CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
+| `plans-module` | plansModule CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
 | `billing-module` | billingModule CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `user` | user CRUD operations |
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
 | `app-membership` | appMembership CRUD operations |
+| `billing-provider-module` | billingProviderModule CRUD operations |
 | `hierarchy-module` | hierarchyModule CRUD operations |
 | `current-user-id` | currentUserId |
 | `current-user-agent` | currentUserAgent |
@@ -203,6 +213,7 @@ csdk auth set-token <your-token>
 | `provision-spatial-relation` | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
 | `bootstrap-user` | bootstrapUser |
 | `set-field-order` | setFieldOrder |
+| `append-smart-tags` | appendSmartTags |
 | `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
 | `provision-full-text-search` | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
 | `provision-index` | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
@@ -240,10 +251,6 @@ Example usage:
 | `request-cross-origin-token` | requestCrossOriginToken |
 | `sign-in` | signIn |
 | `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
-| `request-upload-url` | Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl. |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -1954,14 +1961,23 @@ CRUD operations for LimitsModule records.
 | `limitDecrementTrigger` | String |
 | `limitUpdateTrigger` | String |
 | `limitCheckFunction` | String |
+| `limitCreditsTableId` | UUID |
+| `eventsTableId` | UUID |
+| `creditCodesTableId` | UUID |
+| `creditCodeItemsTableId` | UUID |
+| `creditRedemptionsTableId` | UUID |
 | `aggregateTableId` | UUID |
+| `limitCapsTableId` | UUID |
+| `limitCapsDefaultsTableId` | UUID |
+| `capCheckTrigger` | String |
+| `resolveCapFunction` | String |
 | `prefix` | String |
 | `membershipType` | Int |
 | `entityTableId` | UUID |
 | `actorTableId` | UUID |
 
 **Required create fields:** `databaseId`, `membershipType`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `aggregateTableId`, `prefix`, `entityTableId`, `actorTableId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `limitCreditsTableId`, `eventsTableId`, `creditCodesTableId`, `creditCodeItemsTableId`, `creditRedemptionsTableId`, `aggregateTableId`, `limitCapsTableId`, `limitCapsDefaultsTableId`, `capCheckTrigger`, `resolveCapFunction`, `prefix`, `entityTableId`, `actorTableId`
 
 ### `membership-types-module`
 
@@ -2424,14 +2440,23 @@ CRUD operations for StorageModule records.
 | `provider` | String |
 | `allowedOrigins` | String |
 | `restrictReads` | Boolean |
+| `hasPathShares` | Boolean |
+| `pathSharesTableId` | UUID |
 | `uploadUrlExpirySeconds` | Int |
 | `downloadUrlExpirySeconds` | Int |
 | `defaultMaxFileSize` | BigInt |
 | `maxFilenameLength` | Int |
 | `cacheTtlSeconds` | Int |
+| `maxBulkFiles` | Int |
+| `maxBulkTotalSize` | BigInt |
+| `hasVersioning` | Boolean |
+| `hasContentHash` | Boolean |
+| `hasCustomKeys` | Boolean |
+| `hasAuditLog` | Boolean |
+| `fileEventsTableId` | UUID |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `bucketsTableName`, `filesTableName`, `membershipType`, `policies`, `skipDefaultPolicyTables`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `restrictReads`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `bucketsTableName`, `filesTableName`, `membershipType`, `policies`, `skipDefaultPolicyTables`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `restrictReads`, `hasPathShares`, `pathSharesTableId`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`, `maxBulkFiles`, `maxBulkTotalSize`, `hasVersioning`, `hasContentHash`, `hasCustomKeys`, `hasAuditLog`, `fileEventsTableId`
 
 ### `entity-type-provision`
 
@@ -2473,10 +2498,11 @@ CRUD operations for EntityTypeProvision records.
 | `outStorageModuleId` | UUID |
 | `outBucketsTableId` | UUID |
 | `outFilesTableId` | UUID |
+| `outPathSharesTableId` | UUID |
 | `outInvitesModuleId` | UUID |
 
 **Required create fields:** `databaseId`, `name`, `prefix`
-**Optional create fields (backend defaults):** `description`, `parentEntity`, `tableName`, `isVisible`, `hasLimits`, `hasProfiles`, `hasLevels`, `hasStorage`, `hasInvites`, `storageConfig`, `skipEntityPolicies`, `tableProvision`, `outMembershipType`, `outEntityTableId`, `outEntityTableName`, `outInstalledModules`, `outStorageModuleId`, `outBucketsTableId`, `outFilesTableId`, `outInvitesModuleId`
+**Optional create fields (backend defaults):** `description`, `parentEntity`, `tableName`, `isVisible`, `hasLimits`, `hasProfiles`, `hasLevels`, `hasStorage`, `hasInvites`, `storageConfig`, `skipEntityPolicies`, `tableProvision`, `outMembershipType`, `outEntityTableId`, `outEntityTableName`, `outInstalledModules`, `outStorageModuleId`, `outBucketsTableId`, `outFilesTableId`, `outPathSharesTableId`, `outInvitesModuleId`
 
 ### `webauthn-credentials-module`
 
@@ -2987,9 +3013,88 @@ CRUD operations for AppLimit records.
 | `softMax` | BigInt |
 | `windowStart` | Datetime |
 | `windowDuration` | Interval |
+| `planMax` | BigInt |
+| `purchasedCredits` | BigInt |
+| `periodCredits` | BigInt |
 
 **Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`
+**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`
+
+### `app-limit-credit`
+
+CRUD operations for AppLimitCredit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCredit records |
+| `find-first` | Find first matching appLimitCredit record |
+| `get` | Get a appLimitCredit by id |
+| `create` | Create a new appLimitCredit |
+| `update` | Update an existing appLimitCredit |
+| `delete` | Delete a appLimitCredit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `defaultLimitId` | UUID |
+| `actorId` | UUID |
+| `amount` | BigInt |
+| `creditType` | String |
+| `reason` | String |
+
+**Required create fields:** `defaultLimitId`, `amount`
+**Optional create fields (backend defaults):** `actorId`, `creditType`, `reason`
+
+### `app-limit-credit-code-item`
+
+CRUD operations for AppLimitCreditCodeItem records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCreditCodeItem records |
+| `find-first` | Find first matching appLimitCreditCodeItem record |
+| `get` | Get a appLimitCreditCodeItem by id |
+| `create` | Create a new appLimitCreditCodeItem |
+| `update` | Update an existing appLimitCreditCodeItem |
+| `delete` | Delete a appLimitCreditCodeItem |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `creditCodeId` | UUID |
+| `defaultLimitId` | UUID |
+| `amount` | BigInt |
+| `creditType` | String |
+
+**Required create fields:** `creditCodeId`, `defaultLimitId`, `amount`
+**Optional create fields (backend defaults):** `creditType`
+
+### `app-limit-credit-redemption`
+
+CRUD operations for AppLimitCreditRedemption records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCreditRedemption records |
+| `find-first` | Find first matching appLimitCreditRedemption record |
+| `get` | Get a appLimitCreditRedemption by id |
+| `create` | Create a new appLimitCreditRedemption |
+| `update` | Update an existing appLimitCreditRedemption |
+| `delete` | Delete a appLimitCreditRedemption |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `creditCodeId` | UUID |
+| `entityId` | UUID |
+
+**Required create fields:** `creditCodeId`, `entityId`
 
 ### `org-limit`
 
@@ -3016,10 +3121,41 @@ CRUD operations for OrgLimit records.
 | `softMax` | BigInt |
 | `windowStart` | Datetime |
 | `windowDuration` | Interval |
+| `planMax` | BigInt |
+| `purchasedCredits` | BigInt |
+| `periodCredits` | BigInt |
 | `entityId` | UUID |
 
 **Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`
+**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`
+
+### `org-limit-credit`
+
+CRUD operations for OrgLimitCredit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitCredit records |
+| `find-first` | Find first matching orgLimitCredit record |
+| `get` | Get a orgLimitCredit by id |
+| `create` | Create a new orgLimitCredit |
+| `update` | Update an existing orgLimitCredit |
+| `delete` | Delete a orgLimitCredit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `defaultLimitId` | UUID |
+| `actorId` | UUID |
+| `entityId` | UUID |
+| `amount` | BigInt |
+| `creditType` | String |
+| `reason` | String |
+
+**Required create fields:** `defaultLimitId`, `amount`
+**Optional create fields (backend defaults):** `actorId`, `entityId`, `creditType`, `reason`
 
 ### `org-limit-aggregate`
 
@@ -3046,9 +3182,13 @@ CRUD operations for OrgLimitAggregate records.
 | `softMax` | BigInt |
 | `windowStart` | Datetime |
 | `windowDuration` | Interval |
+| `planMax` | BigInt |
+| `purchasedCredits` | BigInt |
+| `periodCredits` | BigInt |
+| `reserved` | BigInt |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`
+**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`, `reserved`
 
 ### `app-step`
 
@@ -3619,6 +3759,130 @@ CRUD operations for AppPermissionDefault records.
 
 **Optional create fields (backend defaults):** `permissions`
 
+### `app-limit-credit-code`
+
+CRUD operations for AppLimitCreditCode records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCreditCode records |
+| `find-first` | Find first matching appLimitCreditCode record |
+| `get` | Get a appLimitCreditCode by id |
+| `create` | Create a new appLimitCreditCode |
+| `update` | Update an existing appLimitCreditCode |
+| `delete` | Delete a appLimitCreditCode |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `code` | String |
+| `maxRedemptions` | Int |
+| `currentRedemptions` | Int |
+| `expiresAt` | Datetime |
+
+**Required create fields:** `code`
+**Optional create fields (backend defaults):** `maxRedemptions`, `currentRedemptions`, `expiresAt`
+
+### `app-limit-caps-default`
+
+CRUD operations for AppLimitCapsDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCapsDefault records |
+| `find-first` | Find first matching appLimitCapsDefault record |
+| `get` | Get a appLimitCapsDefault by id |
+| `create` | Create a new appLimitCapsDefault |
+| `update` | Update an existing appLimitCapsDefault |
+| `delete` | Delete a appLimitCapsDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `max` | BigInt |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
+### `org-limit-caps-default`
+
+CRUD operations for OrgLimitCapsDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitCapsDefault records |
+| `find-first` | Find first matching orgLimitCapsDefault record |
+| `get` | Get a orgLimitCapsDefault by id |
+| `create` | Create a new orgLimitCapsDefault |
+| `update` | Update an existing orgLimitCapsDefault |
+| `delete` | Delete a orgLimitCapsDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `max` | BigInt |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
+### `app-limit-cap`
+
+CRUD operations for AppLimitCap records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCap records |
+| `find-first` | Find first matching appLimitCap record |
+| `get` | Get a appLimitCap by id |
+| `create` | Create a new appLimitCap |
+| `update` | Update an existing appLimitCap |
+| `delete` | Delete a appLimitCap |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `entityId` | UUID |
+| `max` | BigInt |
+
+**Required create fields:** `name`, `entityId`
+**Optional create fields (backend defaults):** `max`
+
+### `org-limit-cap`
+
+CRUD operations for OrgLimitCap records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitCap records |
+| `find-first` | Find first matching orgLimitCap record |
+| `get` | Get a orgLimitCap by id |
+| `create` | Create a new orgLimitCap |
+| `update` | Update an existing orgLimitCap |
+| `delete` | Delete a orgLimitCap |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `entityId` | UUID |
+| `max` | BigInt |
+
+**Required create fields:** `name`, `entityId`
+**Optional create fields (backend defaults):** `max`
+
 ### `membership-type`
 
 CRUD operations for MembershipType records.
@@ -3976,38 +4240,6 @@ CRUD operations for OrgLimitEvent records.
 
 **Optional create fields (backend defaults):** `name`, `actorId`, `entityId`, `eventType`, `delta`, `numBefore`, `numAfter`, `maxAtEvent`, `reason`
 
-### `plans-module`
-
-CRUD operations for PlansModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all plansModule records |
-| `find-first` | Find first matching plansModule record |
-| `get` | Get a plansModule by id |
-| `create` | Create a new plansModule |
-| `update` | Update an existing plansModule |
-| `delete` | Delete a plansModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `plansTableId` | UUID |
-| `plansTableName` | String |
-| `planLimitsTableId` | UUID |
-| `planLimitsTableName` | String |
-| `applyPlanFunction` | String |
-| `applyPlanAggregateFunction` | String |
-| `prefix` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `plansTableId`, `plansTableName`, `planLimitsTableId`, `planLimitsTableName`, `applyPlanFunction`, `applyPlanAggregateFunction`, `prefix`
-
 ### `rls-module`
 
 CRUD operations for RlsModule records.
@@ -4039,6 +4271,40 @@ CRUD operations for RlsModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
+
+### `plans-module`
+
+CRUD operations for PlansModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all plansModule records |
+| `find-first` | Find first matching plansModule record |
+| `get` | Get a plansModule by id |
+| `create` | Create a new plansModule |
+| `update` | Update an existing plansModule |
+| `delete` | Delete a plansModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `plansTableId` | UUID |
+| `plansTableName` | String |
+| `planLimitsTableId` | UUID |
+| `planLimitsTableName` | String |
+| `planPricingTableId` | UUID |
+| `planOverridesTableId` | UUID |
+| `applyPlanFunction` | String |
+| `applyPlanAggregateFunction` | String |
+| `prefix` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `plansTableId`, `plansTableName`, `planLimitsTableId`, `planLimitsTableName`, `planPricingTableId`, `planOverridesTableId`, `applyPlanFunction`, `applyPlanAggregateFunction`, `prefix`
 
 ### `sql-action`
 
@@ -4270,6 +4536,47 @@ CRUD operations for AppMembership records.
 
 **Required create fields:** `actorId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+
+### `billing-provider-module`
+
+CRUD operations for BillingProviderModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all billingProviderModule records |
+| `find-first` | Find first matching billingProviderModule record |
+| `get` | Get a billingProviderModule by id |
+| `create` | Create a new billingProviderModule |
+| `update` | Update an existing billingProviderModule |
+| `delete` | Delete a billingProviderModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `provider` | String |
+| `productsTableId` | UUID |
+| `pricesTableId` | UUID |
+| `subscriptionsTableId` | UUID |
+| `billingCustomersTableId` | UUID |
+| `billingCustomersTableName` | String |
+| `billingProductsTableId` | UUID |
+| `billingProductsTableName` | String |
+| `billingPricesTableId` | UUID |
+| `billingPricesTableName` | String |
+| `billingSubscriptionsTableId` | UUID |
+| `billingSubscriptionsTableName` | String |
+| `billingWebhookEventsTableId` | UUID |
+| `billingWebhookEventsTableName` | String |
+| `processBillingEventFunction` | String |
+| `prefix` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `provider`, `productsTableId`, `pricesTableId`, `subscriptionsTableId`, `billingCustomersTableId`, `billingCustomersTableName`, `billingProductsTableId`, `billingProductsTableName`, `billingPricesTableId`, `billingPricesTableName`, `billingSubscriptionsTableId`, `billingSubscriptionsTableName`, `billingWebhookEventsTableId`, `billingWebhookEventsTableName`, `processBillingEventFunction`, `prefix`
 
 ### `hierarchy-module`
 
@@ -4912,6 +5219,19 @@ setFieldOrder
   | `--input.clientMutationId` | String |
   | `--input.fieldIds` | UUID |
 
+### `append-smart-tags`
+
+appendSmartTags
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pTableId` | UUID |
+  | `--input.pTags` | JSON |
+
 ### `provision-unique-constraint`
 
 Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
@@ -5270,25 +5590,6 @@ Composable table provisioning: creates or finds a table, then creates fields (so
   | `--input.fullTextSearches` | JSON |
   | `--input.uniqueConstraints` | JSON |
   | `--input.description` | String |
-
-### `request-upload-url`
-
-Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.bucketKey` | String (required) |
-  | `--input.ownerId` | UUID |
-  | `--input.contentHash` | String (required) |
-  | `--input.contentType` | String (required) |
-  | `--input.size` | Int (required) |
-  | `--input.filename` | String |
 
 ### `provision-bucket`
 

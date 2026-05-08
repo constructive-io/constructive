@@ -1,13 +1,13 @@
 ---
 name: hooks-objects
-description: React Query hooks for the objects API — provides typed query and mutation hooks for 5 tables and 14 custom operations
+description: React Query hooks for the objects API — provides typed query and mutation hooks for 5 tables and 13 custom operations
 ---
 
 # hooks-objects
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the objects API — provides typed query and mutation hooks for 5 tables and 14 custom operations
+React Query hooks for the objects API — provides typed query and mutation hooks for 5 tables and 13 custom operations
 
 ## Usage
 
@@ -54,5 +54,4 @@ See the `references/` directory for detailed per-entity API documentation:
 - [insert-node-at-path](references/insert-node-at-path.md)
 - [update-node-at-path](references/update-node-at-path.md)
 - [set-and-commit](references/set-and-commit.md)
-- [request-upload-url](references/request-upload-url.md)
 - [provision-bucket](references/provision-bucket.md)

@@ -1,13 +1,13 @@
 ---
 name: hooks-public
-description: React Query hooks for the public API — provides typed query and mutation hooks for 129 tables and 71 custom operations
+description: React Query hooks for the public API — provides typed query and mutation hooks for 139 tables and 71 custom operations
 ---
 
 # hooks-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the public API — provides typed query and mutation hooks for 129 tables and 71 custom operations
+React Query hooks for the public API — provides typed query and mutation hooks for 139 tables and 71 custom operations
 
 ## Usage
 
@@ -122,7 +122,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [org-permission-default](references/org-permission-default.md)
 - [app-limit](references/app-limit.md)
+- [app-limit-credit](references/app-limit-credit.md)
+- [app-limit-credit-code-item](references/app-limit-credit-code-item.md)
+- [app-limit-credit-redemption](references/app-limit-credit-redemption.md)
 - [org-limit](references/org-limit.md)
+- [org-limit-credit](references/org-limit-credit.md)
 - [org-limit-aggregate](references/org-limit-aggregate.md)
 - [app-step](references/app-step.md)
 - [app-achievement](references/app-achievement.md)
@@ -144,6 +148,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [ref](references/ref.md)
 - [store](references/store.md)
 - [app-permission-default](references/app-permission-default.md)
+- [app-limit-credit-code](references/app-limit-credit-code.md)
+- [app-limit-caps-default](references/app-limit-caps-default.md)
+- [org-limit-caps-default](references/org-limit-caps-default.md)
+- [app-limit-cap](references/app-limit-cap.md)
+- [org-limit-cap](references/org-limit-cap.md)
 - [membership-type](references/membership-type.md)
 - [migrate-file](references/migrate-file.md)
 - [devices-module](references/devices-module.md)
@@ -157,14 +166,15 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-membership-default](references/org-membership-default.md)
 - [app-limit-event](references/app-limit-event.md)
 - [org-limit-event](references/org-limit-event.md)
-- [plans-module](references/plans-module.md)
 - [rls-module](references/rls-module.md)
+- [plans-module](references/plans-module.md)
 - [sql-action](references/sql-action.md)
 - [billing-module](references/billing-module.md)
 - [ast-migration](references/ast-migration.md)
 - [user](references/user.md)
 - [org-membership-setting](references/org-membership-setting.md)
 - [app-membership](references/app-membership.md)
+- [billing-provider-module](references/billing-provider-module.md)
 - [hierarchy-module](references/hierarchy-module.md)
 - [current-user-id](references/current-user-id.md)
 - [current-user-agent](references/current-user-agent.md)
@@ -214,6 +224,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [provision-spatial-relation](references/provision-spatial-relation.md)
 - [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
+- [append-smart-tags](references/append-smart-tags.md)
 - [provision-unique-constraint](references/provision-unique-constraint.md)
 - [provision-full-text-search](references/provision-full-text-search.md)
 - [provision-index](references/provision-index.md)
@@ -235,5 +246,4 @@ See the `references/` directory for detailed per-entity API documentation:
 - [request-cross-origin-token](references/request-cross-origin-token.md)
 - [sign-in](references/sign-in.md)
 - [provision-table](references/provision-table.md)
-- [request-upload-url](references/request-upload-url.md)
 - [provision-bucket](references/provision-bucket.md)

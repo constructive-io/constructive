@@ -9,7 +9,7 @@ ORM operations for PlansModule records
 ```typescript
 db.plansModule.findMany({ select: { id: true } }).execute()
 db.plansModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.plansModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', plansTableId: '<UUID>', plansTableName: '<String>', planLimitsTableId: '<UUID>', planLimitsTableName: '<String>', applyPlanFunction: '<String>', applyPlanAggregateFunction: '<String>', prefix: '<String>' }, select: { id: true } }).execute()
+db.plansModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', plansTableId: '<UUID>', plansTableName: '<String>', planLimitsTableId: '<UUID>', planLimitsTableName: '<String>', planPricingTableId: '<UUID>', planOverridesTableId: '<UUID>', applyPlanFunction: '<String>', applyPlanAggregateFunction: '<String>', prefix: '<String>' }, select: { id: true } }).execute()
 db.plansModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.plansModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.plansModule.findMany({
 
 ```typescript
 const item = await db.plansModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', plansTableId: '<UUID>', plansTableName: '<String>', planLimitsTableId: '<UUID>', planLimitsTableName: '<String>', applyPlanFunction: '<String>', applyPlanAggregateFunction: '<String>', prefix: '<String>' },
+  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', plansTableId: '<UUID>', plansTableName: '<String>', planLimitsTableId: '<UUID>', planLimitsTableName: '<String>', planPricingTableId: '<UUID>', planOverridesTableId: '<UUID>', applyPlanFunction: '<String>', applyPlanAggregateFunction: '<String>', prefix: '<String>' },
   select: { id: true }
 }).execute();
 ```
