@@ -270,8 +270,28 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
     _pgSettings: Record<string, string> | null,
     callback: (client: Client) => T | Promise<T>
   ): Promise<T> => {
-    // Simply use the test client - it's already in a transaction
-    // The pgSettings have already been applied above via setContextOnClient
+    // Augment the client with withTransaction if it doesn't already have it.
+    // In production, @dataplan/pg provides this method. In tests the raw pg
+    // Client lacks it, so we implement it via savepoints (which nest cleanly
+    // inside the test harness's outer transaction).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = pgClient as any;
+    if (typeof client.withTransaction !== 'function') {
+      client.withTransaction = async (
+        cb: (txClient: Client) => unknown | Promise<unknown>
+      ) => {
+        const sp = `wt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        await client.query(`SAVEPOINT ${sp}`);
+        try {
+          const result = await cb(client);
+          await client.query(`RELEASE SAVEPOINT ${sp}`);
+          return result;
+        } catch (err) {
+          await client.query(`ROLLBACK TO SAVEPOINT ${sp}`);
+          throw err;
+        }
+      };
+    }
     return callback(pgClient);
   };
 
