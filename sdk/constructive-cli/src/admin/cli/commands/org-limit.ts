@@ -24,6 +24,9 @@ const fieldSchema: FieldSchema = {
   softMax: 'int',
   windowStart: 'string',
   windowDuration: 'string',
+  planMax: 'int',
+  purchasedCredits: 'int',
+  periodCredits: 'int',
   entityId: 'uuid',
 };
 const usage =
@@ -85,6 +88,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       softMax: true,
       windowStart: true,
       windowDuration: true,
+      planMax: true,
+      purchasedCredits: true,
+      periodCredits: true,
       entityId: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -114,6 +120,9 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       softMax: true,
       windowStart: true,
       windowDuration: true,
+      planMax: true,
+      purchasedCredits: true,
+      periodCredits: true,
       entityId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -155,6 +164,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           softMax: true,
           windowStart: true,
           windowDuration: true,
+          planMax: true,
+          purchasedCredits: true,
+          periodCredits: true,
           entityId: true,
         },
       })
@@ -221,6 +233,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'planMax',
+        message: 'planMax',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'purchasedCredits',
+        message: 'purchasedCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'periodCredits',
+        message: 'periodCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'entityId',
         message: 'entityId',
         required: true,
@@ -239,6 +272,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: cleanedData.softMax,
           windowStart: cleanedData.windowStart,
           windowDuration: cleanedData.windowDuration,
+          planMax: cleanedData.planMax,
+          purchasedCredits: cleanedData.purchasedCredits,
+          periodCredits: cleanedData.periodCredits,
           entityId: cleanedData.entityId,
         },
         select: {
@@ -250,6 +286,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: true,
           windowStart: true,
           windowDuration: true,
+          planMax: true,
+          purchasedCredits: true,
+          periodCredits: true,
           entityId: true,
         },
       })
@@ -322,6 +361,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'planMax',
+        message: 'planMax',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'purchasedCredits',
+        message: 'purchasedCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'periodCredits',
+        message: 'periodCredits',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'entityId',
         message: 'entityId',
         required: false,
@@ -343,6 +403,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: cleanedData.softMax,
           windowStart: cleanedData.windowStart,
           windowDuration: cleanedData.windowDuration,
+          planMax: cleanedData.planMax,
+          purchasedCredits: cleanedData.purchasedCredits,
+          periodCredits: cleanedData.periodCredits,
           entityId: cleanedData.entityId,
         },
         select: {
@@ -354,6 +417,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           softMax: true,
           windowStart: true,
           windowDuration: true,
+          planMax: true,
+          purchasedCredits: true,
+          periodCredits: true,
           entityId: true,
         },
       })

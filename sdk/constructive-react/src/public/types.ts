@@ -164,6 +164,19 @@ export interface SpatialRelation {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface Partition {
+  id: string | null;
+  databaseId: string | null;
+  tableId: string | null;
+  strategy: string | null;
+  partitionKeyId: string | null;
+  interval: string | null;
+  retention: string | null;
+  lookahead: number | null;
+  namingPattern: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface ForeignKeyConstraint {
   id: string | null;
   databaseId: string | null;
@@ -439,6 +452,12 @@ export interface Enum {
   scope: number | null;
   tags: string[] | null;
 }
+export interface Function {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  name: string | null;
+}
 export interface ApiSchema {
   id: string | null;
   databaseId: string | null;
@@ -480,6 +499,12 @@ export interface SiteTheme {
   databaseId: string | null;
   siteId: string | null;
   theme: unknown | null;
+}
+export interface CorsSetting {
+  id: string | null;
+  databaseId: string | null;
+  apiId: string | null;
+  allowedOrigins: string[] | null;
 }
 export interface TriggerFunction {
   id: string | null;
@@ -535,6 +560,21 @@ export interface App {
   appStoreId: string | null;
   appIdPrefix: string | null;
   playStoreLink: ConstructiveInternalTypeUrl | null;
+}
+export interface ApiSetting {
+  id: string | null;
+  databaseId: string | null;
+  apiId: string | null;
+  enableAggregates: boolean | null;
+  enablePostgis: boolean | null;
+  enableSearch: boolean | null;
+  enableDirectUploads: boolean | null;
+  enablePresignedUploads: boolean | null;
+  enableManyToMany: boolean | null;
+  enableConnectionFilter: boolean | null;
+  enableLtree: boolean | null;
+  enableLlm: boolean | null;
+  options: unknown | null;
 }
 export interface ConnectedAccountsModule {
   id: string | null;
@@ -664,7 +704,16 @@ export interface LimitsModule {
   limitDecrementTrigger: string | null;
   limitUpdateTrigger: string | null;
   limitCheckFunction: string | null;
+  limitCreditsTableId: string | null;
+  eventsTableId: string | null;
+  creditCodesTableId: string | null;
+  creditCodeItemsTableId: string | null;
+  creditRedemptionsTableId: string | null;
   aggregateTableId: string | null;
+  limitCapsTableId: string | null;
+  limitCapsDefaultsTableId: string | null;
+  capCheckTrigger: string | null;
+  resolveCapFunction: string | null;
   prefix: string | null;
   membershipType: number | null;
   entityTableId: string | null;
@@ -887,11 +936,20 @@ export interface StorageModule {
   provider: string | null;
   allowedOrigins: string[] | null;
   restrictReads: boolean | null;
+  hasPathShares: boolean | null;
+  pathSharesTableId: string | null;
   uploadUrlExpirySeconds: number | null;
   downloadUrlExpirySeconds: number | null;
   defaultMaxFileSize: string | null;
   maxFilenameLength: number | null;
   cacheTtlSeconds: number | null;
+  maxBulkFiles: number | null;
+  maxBulkTotalSize: string | null;
+  hasVersioning: boolean | null;
+  hasContentHash: boolean | null;
+  hasCustomKeys: boolean | null;
+  hasAuditLog: boolean | null;
+  fileEventsTableId: string | null;
 }
 export interface EntityTypeProvision {
   id: string | null;
@@ -917,6 +975,7 @@ export interface EntityTypeProvision {
   outStorageModuleId: string | null;
   outBucketsTableId: string | null;
   outFilesTableId: string | null;
+  outPathSharesTableId: string | null;
   outInvitesModuleId: string | null;
 }
 export interface WebauthnCredentialsModule {
@@ -1108,6 +1167,29 @@ export interface AppLimit {
   softMax: string | null;
   windowStart: string | null;
   windowDuration: string | null;
+  planMax: string | null;
+  purchasedCredits: string | null;
+  periodCredits: string | null;
+}
+export interface AppLimitCredit {
+  id: string | null;
+  defaultLimitId: string | null;
+  actorId: string | null;
+  amount: string | null;
+  creditType: string | null;
+  reason: string | null;
+}
+export interface AppLimitCreditCodeItem {
+  id: string | null;
+  creditCodeId: string | null;
+  defaultLimitId: string | null;
+  amount: string | null;
+  creditType: string | null;
+}
+export interface AppLimitCreditRedemption {
+  id: string | null;
+  creditCodeId: string | null;
+  entityId: string | null;
 }
 export interface OrgLimit {
   id: string | null;
@@ -1118,7 +1200,19 @@ export interface OrgLimit {
   softMax: string | null;
   windowStart: string | null;
   windowDuration: string | null;
+  planMax: string | null;
+  purchasedCredits: string | null;
+  periodCredits: string | null;
   entityId: string | null;
+}
+export interface OrgLimitCredit {
+  id: string | null;
+  defaultLimitId: string | null;
+  actorId: string | null;
+  entityId: string | null;
+  amount: string | null;
+  creditType: string | null;
+  reason: string | null;
 }
 export interface OrgLimitAggregate {
   id: string | null;
@@ -1129,6 +1223,10 @@ export interface OrgLimitAggregate {
   softMax: string | null;
   windowStart: string | null;
   windowDuration: string | null;
+  planMax: string | null;
+  purchasedCredits: string | null;
+  periodCredits: string | null;
+  reserved: string | null;
 }
 export interface AppStep {
   id: string | null;
@@ -1324,6 +1422,35 @@ export interface AppPermissionDefault {
   id: string | null;
   permissions: string | null;
 }
+export interface AppLimitCreditCode {
+  id: string | null;
+  code: string | null;
+  maxRedemptions: number | null;
+  currentRedemptions: number | null;
+  expiresAt: string | null;
+}
+export interface AppLimitCapsDefault {
+  id: string | null;
+  name: string | null;
+  max: string | null;
+}
+export interface OrgLimitCapsDefault {
+  id: string | null;
+  name: string | null;
+  max: string | null;
+}
+export interface AppLimitCap {
+  id: string | null;
+  name: string | null;
+  entityId: string | null;
+  max: string | null;
+}
+export interface OrgLimitCap {
+  id: string | null;
+  name: string | null;
+  entityId: string | null;
+  max: string | null;
+}
 export interface MembershipType {
   id: number | null;
   name: string | null;
@@ -1388,6 +1515,17 @@ export interface Commit {
   treeId: string | null;
   date: string | null;
 }
+export interface PubkeySetting {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  cryptoNetwork: string | null;
+  userField: string | null;
+  signUpWithKeyFunctionId: string | null;
+  signInRequestChallengeFunctionId: string | null;
+  signInRecordFailureFunctionId: string | null;
+  signInWithChallengeFunctionId: string | null;
+}
 export interface RateLimitsModule {
   id: string | null;
   databaseId: string | null;
@@ -1417,6 +1555,18 @@ export interface OrgMembershipDefault {
   isApproved: boolean | null;
   entityId: string | null;
 }
+export interface RlsSetting {
+  id: string | null;
+  databaseId: string | null;
+  authenticateSchemaId: string | null;
+  roleSchemaId: string | null;
+  authenticateFunctionId: string | null;
+  authenticateStrictFunctionId: string | null;
+  currentRoleFunctionId: string | null;
+  currentRoleIdFunctionId: string | null;
+  currentUserAgentFunctionId: string | null;
+  currentIpAddressFunctionId: string | null;
+}
 export interface AppLimitEvent {
   name: string | null;
   actorId: string | null;
@@ -1439,19 +1589,6 @@ export interface OrgLimitEvent {
   maxAtEvent: string | null;
   reason: string | null;
 }
-export interface PlansModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  plansTableId: string | null;
-  plansTableName: string | null;
-  planLimitsTableId: string | null;
-  planLimitsTableName: string | null;
-  applyPlanFunction: string | null;
-  applyPlanAggregateFunction: string | null;
-  prefix: string | null;
-}
 export interface RlsModule {
   id: string | null;
   databaseId: string | null;
@@ -1464,6 +1601,35 @@ export interface RlsModule {
   authenticateStrict: string | null;
   currentRole: string | null;
   currentRoleId: string | null;
+}
+export interface DatabaseSetting {
+  id: string | null;
+  databaseId: string | null;
+  enableAggregates: boolean | null;
+  enablePostgis: boolean | null;
+  enableSearch: boolean | null;
+  enableDirectUploads: boolean | null;
+  enablePresignedUploads: boolean | null;
+  enableManyToMany: boolean | null;
+  enableConnectionFilter: boolean | null;
+  enableLtree: boolean | null;
+  enableLlm: boolean | null;
+  options: unknown | null;
+}
+export interface PlansModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  plansTableId: string | null;
+  plansTableName: string | null;
+  planLimitsTableId: string | null;
+  planLimitsTableName: string | null;
+  planPricingTableId: string | null;
+  planOverridesTableId: string | null;
+  applyPlanFunction: string | null;
+  applyPlanAggregateFunction: string | null;
+  prefix: string | null;
 }
 export interface SqlAction {
   id: number | null;
@@ -1540,6 +1706,26 @@ export interface OrgMembershipSetting {
   populateMemberEmail: boolean | null;
   limitAllocationMode: string | null;
 }
+export interface WebauthnSetting {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  credentialsSchemaId: string | null;
+  sessionsSchemaId: string | null;
+  sessionSecretsSchemaId: string | null;
+  credentialsTableId: string | null;
+  sessionsTableId: string | null;
+  sessionCredentialsTableId: string | null;
+  sessionSecretsTableId: string | null;
+  userFieldId: string | null;
+  rpId: string | null;
+  rpName: string | null;
+  originAllowlist: string[] | null;
+  attestationType: string | null;
+  requireUserVerification: boolean | null;
+  residentKey: string | null;
+  challengeExpirySeconds: string | null;
+}
 export interface AppMembership {
   id: string | null;
   createdAt: string | null;
@@ -1557,6 +1743,28 @@ export interface AppMembership {
   granted: string | null;
   actorId: string | null;
   profileId: string | null;
+}
+export interface BillingProviderModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  provider: string | null;
+  productsTableId: string | null;
+  pricesTableId: string | null;
+  subscriptionsTableId: string | null;
+  billingCustomersTableId: string | null;
+  billingCustomersTableName: string | null;
+  billingProductsTableId: string | null;
+  billingProductsTableName: string | null;
+  billingPricesTableId: string | null;
+  billingPricesTableName: string | null;
+  billingSubscriptionsTableId: string | null;
+  billingSubscriptionsTableName: string | null;
+  billingWebhookEventsTableId: string | null;
+  billingWebhookEventsTableName: string | null;
+  processBillingEventFunction: string | null;
+  prefix: string | null;
 }
 export interface HierarchyModule {
   id: string | null;

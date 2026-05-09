@@ -7,8 +7,8 @@ Tracks per-actor usage counts against configurable maximum limits
 ## Usage
 
 ```typescript
-useOrgLimitsQuery({ selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, entityId: true } } })
-useOrgLimitQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, entityId: true } } })
+useOrgLimitsQuery({ selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, entityId: true } } })
+useOrgLimitQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, entityId: true } } })
 useCreateOrgLimitMutation({ selection: { fields: { id: true } } })
 useUpdateOrgLimitMutation({ selection: { fields: { id: true } } })
 useDeleteOrgLimitMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgLimitMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgLimitsQuery({
-  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, entityId: true } },
+  selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, softMax: true, windowStart: true, windowDuration: true, planMax: true, purchasedCredits: true, periodCredits: true, entityId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgLimitsQuery({
 const { mutate } = useCreateOrgLimitMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', entityId: '<UUID>' });
+mutate({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', entityId: '<UUID>' });
 ```

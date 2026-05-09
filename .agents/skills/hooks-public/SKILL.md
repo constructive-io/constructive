@@ -1,13 +1,13 @@
 ---
 name: hooks-public
-description: React Query hooks for the public API — provides typed query and mutation hooks for 129 tables and 71 custom operations
+description: React Query hooks for the public API — provides typed query and mutation hooks for 147 tables and 71 custom operations
 ---
 
 # hooks-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the public API — provides typed query and mutation hooks for 129 tables and 71 custom operations
+React Query hooks for the public API — provides typed query and mutation hooks for 147 tables and 71 custom operations
 
 ## Usage
 
@@ -50,6 +50,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [check-constraint](references/check-constraint.md)
 - [field](references/field.md)
 - [spatial-relation](references/spatial-relation.md)
+- [partition](references/partition.md)
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)
 - [index](references/index.md)
@@ -70,17 +71,20 @@ See the `references/` directory for detailed per-entity API documentation:
 - [schema-grant](references/schema-grant.md)
 - [default-privilege](references/default-privilege.md)
 - [enum](references/enum.md)
+- [function](references/function.md)
 - [api-schema](references/api-schema.md)
 - [api-module](references/api-module.md)
 - [domain](references/domain.md)
 - [site-metadatum](references/site-metadatum.md)
 - [site-module](references/site-module.md)
 - [site-theme](references/site-theme.md)
+- [cors-setting](references/cors-setting.md)
 - [trigger-function](references/trigger-function.md)
 - [database-transfer](references/database-transfer.md)
 - [api](references/api.md)
 - [site](references/site.md)
 - [app](references/app.md)
+- [api-setting](references/api-setting.md)
 - [connected-accounts-module](references/connected-accounts-module.md)
 - [crypto-addresses-module](references/crypto-addresses-module.md)
 - [crypto-auth-module](references/crypto-auth-module.md)
@@ -122,7 +126,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [org-permission-default](references/org-permission-default.md)
 - [app-limit](references/app-limit.md)
+- [app-limit-credit](references/app-limit-credit.md)
+- [app-limit-credit-code-item](references/app-limit-credit-code-item.md)
+- [app-limit-credit-redemption](references/app-limit-credit-redemption.md)
 - [org-limit](references/org-limit.md)
+- [org-limit-credit](references/org-limit-credit.md)
 - [org-limit-aggregate](references/org-limit-aggregate.md)
 - [app-step](references/app-step.md)
 - [app-achievement](references/app-achievement.md)
@@ -144,6 +152,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [ref](references/ref.md)
 - [store](references/store.md)
 - [app-permission-default](references/app-permission-default.md)
+- [app-limit-credit-code](references/app-limit-credit-code.md)
+- [app-limit-caps-default](references/app-limit-caps-default.md)
+- [org-limit-caps-default](references/org-limit-caps-default.md)
+- [app-limit-cap](references/app-limit-cap.md)
+- [org-limit-cap](references/org-limit-cap.md)
 - [membership-type](references/membership-type.md)
 - [migrate-file](references/migrate-file.md)
 - [devices-module](references/devices-module.md)
@@ -152,19 +165,24 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-default](references/org-limit-default.md)
 - [user-connected-account](references/user-connected-account.md)
 - [commit](references/commit.md)
+- [pubkey-setting](references/pubkey-setting.md)
 - [rate-limits-module](references/rate-limits-module.md)
 - [app-membership-default](references/app-membership-default.md)
 - [org-membership-default](references/org-membership-default.md)
+- [rls-setting](references/rls-setting.md)
 - [app-limit-event](references/app-limit-event.md)
 - [org-limit-event](references/org-limit-event.md)
-- [plans-module](references/plans-module.md)
 - [rls-module](references/rls-module.md)
+- [database-setting](references/database-setting.md)
+- [plans-module](references/plans-module.md)
 - [sql-action](references/sql-action.md)
 - [billing-module](references/billing-module.md)
 - [ast-migration](references/ast-migration.md)
 - [user](references/user.md)
 - [org-membership-setting](references/org-membership-setting.md)
+- [webauthn-setting](references/webauthn-setting.md)
 - [app-membership](references/app-membership.md)
+- [billing-provider-module](references/billing-provider-module.md)
 - [hierarchy-module](references/hierarchy-module.md)
 - [current-user-id](references/current-user-id.md)
 - [current-user-agent](references/current-user-agent.md)
@@ -214,6 +232,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [provision-spatial-relation](references/provision-spatial-relation.md)
 - [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
+- [append-smart-tags](references/append-smart-tags.md)
 - [provision-unique-constraint](references/provision-unique-constraint.md)
 - [provision-full-text-search](references/provision-full-text-search.md)
 - [provision-index](references/provision-index.md)
@@ -235,5 +254,4 @@ See the `references/` directory for detailed per-entity API documentation:
 - [request-cross-origin-token](references/request-cross-origin-token.md)
 - [sign-in](references/sign-in.md)
 - [provision-table](references/provision-table.md)
-- [request-upload-url](references/request-upload-url.md)
 - [provision-bucket](references/provision-bucket.md)

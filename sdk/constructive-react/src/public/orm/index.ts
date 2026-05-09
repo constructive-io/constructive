@@ -18,6 +18,7 @@ import { TableModel } from './models/table';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { FieldModel } from './models/field';
 import { SpatialRelationModel } from './models/spatialRelation';
+import { PartitionModel } from './models/partition';
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
 import { IndexModel } from './models/index';
@@ -38,17 +39,20 @@ import { IdentityProvidersModuleModel } from './models/identityProvidersModule';
 import { SchemaGrantModel } from './models/schemaGrant';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
 import { EnumModel } from './models/enum';
+import { FunctionModel } from './models/function';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiModuleModel } from './models/apiModule';
 import { DomainModel } from './models/domain';
 import { SiteMetadatumModel } from './models/siteMetadatum';
 import { SiteModuleModel } from './models/siteModule';
 import { SiteThemeModel } from './models/siteTheme';
+import { CorsSettingModel } from './models/corsSetting';
 import { TriggerFunctionModel } from './models/triggerFunction';
 import { DatabaseTransferModel } from './models/databaseTransfer';
 import { ApiModel } from './models/api';
 import { SiteModel } from './models/site';
 import { AppModel } from './models/app';
+import { ApiSettingModel } from './models/apiSetting';
 import { ConnectedAccountsModuleModel } from './models/connectedAccountsModule';
 import { CryptoAddressesModuleModel } from './models/cryptoAddressesModule';
 import { CryptoAuthModuleModel } from './models/cryptoAuthModule';
@@ -90,7 +94,11 @@ import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
 import { AppLimitModel } from './models/appLimit';
+import { AppLimitCreditModel } from './models/appLimitCredit';
+import { AppLimitCreditCodeItemModel } from './models/appLimitCreditCodeItem';
+import { AppLimitCreditRedemptionModel } from './models/appLimitCreditRedemption';
 import { OrgLimitModel } from './models/orgLimit';
+import { OrgLimitCreditModel } from './models/orgLimitCredit';
 import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
 import { AppStepModel } from './models/appStep';
 import { AppAchievementModel } from './models/appAchievement';
@@ -112,6 +120,11 @@ import { IdentityProviderModel } from './models/identityProvider';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
+import { AppLimitCreditCodeModel } from './models/appLimitCreditCode';
+import { AppLimitCapsDefaultModel } from './models/appLimitCapsDefault';
+import { OrgLimitCapsDefaultModel } from './models/orgLimitCapsDefault';
+import { AppLimitCapModel } from './models/appLimitCap';
+import { OrgLimitCapModel } from './models/orgLimitCap';
 import { MembershipTypeModel } from './models/membershipType';
 import { MigrateFileModel } from './models/migrateFile';
 import { DevicesModuleModel } from './models/devicesModule';
@@ -120,19 +133,24 @@ import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { UserConnectedAccountModel } from './models/userConnectedAccount';
 import { CommitModel } from './models/commit';
+import { PubkeySettingModel } from './models/pubkeySetting';
 import { RateLimitsModuleModel } from './models/rateLimitsModule';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
+import { RlsSettingModel } from './models/rlsSetting';
 import { AppLimitEventModel } from './models/appLimitEvent';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
-import { PlansModuleModel } from './models/plansModule';
 import { RlsModuleModel } from './models/rlsModule';
+import { DatabaseSettingModel } from './models/databaseSetting';
+import { PlansModuleModel } from './models/plansModule';
 import { SqlActionModel } from './models/sqlAction';
 import { BillingModuleModel } from './models/billingModule';
 import { AstMigrationModel } from './models/astMigration';
 import { UserModel } from './models/user';
 import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
+import { WebauthnSettingModel } from './models/webauthnSetting';
 import { AppMembershipModel } from './models/appMembership';
+import { BillingProviderModuleModel } from './models/billingProviderModule';
 import { HierarchyModuleModel } from './models/hierarchyModule';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -182,6 +200,7 @@ export function createClient(config: OrmClientConfig) {
     checkConstraint: new CheckConstraintModel(client),
     field: new FieldModel(client),
     spatialRelation: new SpatialRelationModel(client),
+    partition: new PartitionModel(client),
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),
     index: new IndexModel(client),
@@ -202,17 +221,20 @@ export function createClient(config: OrmClientConfig) {
     schemaGrant: new SchemaGrantModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
     enum: new EnumModel(client),
+    function: new FunctionModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiModule: new ApiModuleModel(client),
     domain: new DomainModel(client),
     siteMetadatum: new SiteMetadatumModel(client),
     siteModule: new SiteModuleModel(client),
     siteTheme: new SiteThemeModel(client),
+    corsSetting: new CorsSettingModel(client),
     triggerFunction: new TriggerFunctionModel(client),
     databaseTransfer: new DatabaseTransferModel(client),
     api: new ApiModel(client),
     site: new SiteModel(client),
     app: new AppModel(client),
+    apiSetting: new ApiSettingModel(client),
     connectedAccountsModule: new ConnectedAccountsModuleModel(client),
     cryptoAddressesModule: new CryptoAddressesModuleModel(client),
     cryptoAuthModule: new CryptoAuthModuleModel(client),
@@ -254,7 +276,11 @@ export function createClient(config: OrmClientConfig) {
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     orgPermissionDefault: new OrgPermissionDefaultModel(client),
     appLimit: new AppLimitModel(client),
+    appLimitCredit: new AppLimitCreditModel(client),
+    appLimitCreditCodeItem: new AppLimitCreditCodeItemModel(client),
+    appLimitCreditRedemption: new AppLimitCreditRedemptionModel(client),
     orgLimit: new OrgLimitModel(client),
+    orgLimitCredit: new OrgLimitCreditModel(client),
     orgLimitAggregate: new OrgLimitAggregateModel(client),
     appStep: new AppStepModel(client),
     appAchievement: new AppAchievementModel(client),
@@ -276,6 +302,11 @@ export function createClient(config: OrmClientConfig) {
     ref: new RefModel(client),
     store: new StoreModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
+    appLimitCreditCode: new AppLimitCreditCodeModel(client),
+    appLimitCapsDefault: new AppLimitCapsDefaultModel(client),
+    orgLimitCapsDefault: new OrgLimitCapsDefaultModel(client),
+    appLimitCap: new AppLimitCapModel(client),
+    orgLimitCap: new OrgLimitCapModel(client),
     membershipType: new MembershipTypeModel(client),
     migrateFile: new MigrateFileModel(client),
     devicesModule: new DevicesModuleModel(client),
@@ -284,19 +315,24 @@ export function createClient(config: OrmClientConfig) {
     orgLimitDefault: new OrgLimitDefaultModel(client),
     userConnectedAccount: new UserConnectedAccountModel(client),
     commit: new CommitModel(client),
+    pubkeySetting: new PubkeySettingModel(client),
     rateLimitsModule: new RateLimitsModuleModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
+    rlsSetting: new RlsSettingModel(client),
     appLimitEvent: new AppLimitEventModel(client),
     orgLimitEvent: new OrgLimitEventModel(client),
-    plansModule: new PlansModuleModel(client),
     rlsModule: new RlsModuleModel(client),
+    databaseSetting: new DatabaseSettingModel(client),
+    plansModule: new PlansModuleModel(client),
     sqlAction: new SqlActionModel(client),
     billingModule: new BillingModuleModel(client),
     astMigration: new AstMigrationModel(client),
     user: new UserModel(client),
     orgMembershipSetting: new OrgMembershipSettingModel(client),
+    webauthnSetting: new WebauthnSettingModel(client),
     appMembership: new AppMembershipModel(client),
+    billingProviderModule: new BillingProviderModuleModel(client),
     hierarchyModule: new HierarchyModuleModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

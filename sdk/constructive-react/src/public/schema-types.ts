@@ -11,6 +11,7 @@ import type {
   Api,
   ApiModule,
   ApiSchema,
+  ApiSetting,
   App,
   AppAchievement,
   AppAdminGrant,
@@ -20,6 +21,12 @@ import type {
   AppLevel,
   AppLevelRequirement,
   AppLimit,
+  AppLimitCap,
+  AppLimitCapsDefault,
+  AppLimitCredit,
+  AppLimitCreditCode,
+  AppLimitCreditCodeItem,
+  AppLimitCreditRedemption,
   AppLimitDefault,
   AppLimitEvent,
   AppMembership,
@@ -31,17 +38,20 @@ import type {
   AstMigration,
   AuditLog,
   BillingModule,
+  BillingProviderModule,
   Blueprint,
   BlueprintConstruction,
   BlueprintTemplate,
   CheckConstraint,
   Commit,
   ConnectedAccountsModule,
+  CorsSetting,
   CryptoAddress,
   CryptoAddressesModule,
   CryptoAuthModule,
   Database,
   DatabaseProvisionModule,
+  DatabaseSetting,
   DatabaseTransfer,
   DefaultIdsModule,
   DefaultPrivilege,
@@ -57,6 +67,7 @@ import type {
   Field,
   ForeignKeyConstraint,
   FullTextSearch,
+  Function,
   GetAllRecord,
   HierarchyModule,
   IdentityProvider,
@@ -82,6 +93,9 @@ import type {
   OrgInvite,
   OrgLimit,
   OrgLimitAggregate,
+  OrgLimitCap,
+  OrgLimitCapsDefault,
+  OrgLimitCredit,
   OrgLimitDefault,
   OrgLimitEvent,
   OrgMember,
@@ -92,6 +106,7 @@ import type {
   OrgOwnerGrant,
   OrgPermission,
   OrgPermissionDefault,
+  Partition,
   PermissionsModule,
   PhoneNumber,
   PhoneNumbersModule,
@@ -99,10 +114,12 @@ import type {
   Policy,
   PrimaryKeyConstraint,
   ProfilesModule,
+  PubkeySetting,
   RateLimitsModule,
   Ref,
   RelationProvision,
   RlsModule,
+  RlsSetting,
   RoleType,
   Schema,
   SchemaGrant,
@@ -134,6 +151,7 @@ import type {
   WebauthnAuthModule,
   WebauthnCredential,
   WebauthnCredentialsModule,
+  WebauthnSetting,
   BigFloatFilter,
   BigIntFilter,
   BitStringFilter,
@@ -225,6 +243,33 @@ export type SpatialRelationOrderBy =
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `Partition`. */
+export type PartitionOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC'
+  | 'STRATEGY_ASC'
+  | 'STRATEGY_DESC'
+  | 'PARTITION_KEY_ID_ASC'
+  | 'PARTITION_KEY_ID_DESC'
+  | 'INTERVAL_ASC'
+  | 'INTERVAL_DESC'
+  | 'RETENTION_ASC'
+  | 'RETENTION_DESC'
+  | 'LOOKAHEAD_ASC'
+  | 'LOOKAHEAD_DESC'
+  | 'NAMING_PATTERN_ASC'
+  | 'NAMING_PATTERN_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -895,6 +940,19 @@ export type EnumOrderBy =
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC';
+/** Methods to use when ordering `Function`. */
+export type FunctionOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
 /** Methods to use when ordering `ApiModule`. */
 export type ApiModuleOrderBy =
   | 'NATURAL'
@@ -985,6 +1043,19 @@ export type SiteThemeOrderBy =
   | 'SITE_ID_DESC'
   | 'THEME_ASC'
   | 'THEME_DESC';
+/** Methods to use when ordering `CorsSetting`. */
+export type CorsSettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'API_ID_ASC'
+  | 'API_ID_DESC'
+  | 'ALLOWED_ORIGINS_ASC'
+  | 'ALLOWED_ORIGINS_DESC';
 /** Methods to use when ordering `Schema`. */
 export type SchemaOrderBy =
   | 'NATURAL'
@@ -1133,6 +1204,37 @@ export type AppOrderBy =
   | 'APP_ID_PREFIX_DESC'
   | 'PLAY_STORE_LINK_ASC'
   | 'PLAY_STORE_LINK_DESC';
+/** Methods to use when ordering `ApiSetting`. */
+export type ApiSettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'API_ID_ASC'
+  | 'API_ID_DESC'
+  | 'ENABLE_AGGREGATES_ASC'
+  | 'ENABLE_AGGREGATES_DESC'
+  | 'ENABLE_POSTGIS_ASC'
+  | 'ENABLE_POSTGIS_DESC'
+  | 'ENABLE_SEARCH_ASC'
+  | 'ENABLE_SEARCH_DESC'
+  | 'ENABLE_DIRECT_UPLOADS_ASC'
+  | 'ENABLE_DIRECT_UPLOADS_DESC'
+  | 'ENABLE_PRESIGNED_UPLOADS_ASC'
+  | 'ENABLE_PRESIGNED_UPLOADS_DESC'
+  | 'ENABLE_MANY_TO_MANY_ASC'
+  | 'ENABLE_MANY_TO_MANY_DESC'
+  | 'ENABLE_CONNECTION_FILTER_ASC'
+  | 'ENABLE_CONNECTION_FILTER_DESC'
+  | 'ENABLE_LTREE_ASC'
+  | 'ENABLE_LTREE_DESC'
+  | 'ENABLE_LLM_ASC'
+  | 'ENABLE_LLM_DESC'
+  | 'OPTIONS_ASC'
+  | 'OPTIONS_DESC';
 /** Methods to use when ordering `ConnectedAccountsModule`. */
 export type ConnectedAccountsModuleOrderBy =
   | 'NATURAL'
@@ -1401,8 +1503,26 @@ export type LimitsModuleOrderBy =
   | 'LIMIT_UPDATE_TRIGGER_DESC'
   | 'LIMIT_CHECK_FUNCTION_ASC'
   | 'LIMIT_CHECK_FUNCTION_DESC'
+  | 'LIMIT_CREDITS_TABLE_ID_ASC'
+  | 'LIMIT_CREDITS_TABLE_ID_DESC'
+  | 'EVENTS_TABLE_ID_ASC'
+  | 'EVENTS_TABLE_ID_DESC'
+  | 'CREDIT_CODES_TABLE_ID_ASC'
+  | 'CREDIT_CODES_TABLE_ID_DESC'
+  | 'CREDIT_CODE_ITEMS_TABLE_ID_ASC'
+  | 'CREDIT_CODE_ITEMS_TABLE_ID_DESC'
+  | 'CREDIT_REDEMPTIONS_TABLE_ID_ASC'
+  | 'CREDIT_REDEMPTIONS_TABLE_ID_DESC'
   | 'AGGREGATE_TABLE_ID_ASC'
   | 'AGGREGATE_TABLE_ID_DESC'
+  | 'LIMIT_CAPS_TABLE_ID_ASC'
+  | 'LIMIT_CAPS_TABLE_ID_DESC'
+  | 'LIMIT_CAPS_DEFAULTS_TABLE_ID_ASC'
+  | 'LIMIT_CAPS_DEFAULTS_TABLE_ID_DESC'
+  | 'CAP_CHECK_TRIGGER_ASC'
+  | 'CAP_CHECK_TRIGGER_DESC'
+  | 'RESOLVE_CAP_FUNCTION_ASC'
+  | 'RESOLVE_CAP_FUNCTION_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
   | 'MEMBERSHIP_TYPE_ASC'
@@ -1860,6 +1980,10 @@ export type StorageModuleOrderBy =
   | 'ALLOWED_ORIGINS_DESC'
   | 'RESTRICT_READS_ASC'
   | 'RESTRICT_READS_DESC'
+  | 'HAS_PATH_SHARES_ASC'
+  | 'HAS_PATH_SHARES_DESC'
+  | 'PATH_SHARES_TABLE_ID_ASC'
+  | 'PATH_SHARES_TABLE_ID_DESC'
   | 'UPLOAD_URL_EXPIRY_SECONDS_ASC'
   | 'UPLOAD_URL_EXPIRY_SECONDS_DESC'
   | 'DOWNLOAD_URL_EXPIRY_SECONDS_ASC'
@@ -1869,7 +1993,21 @@ export type StorageModuleOrderBy =
   | 'MAX_FILENAME_LENGTH_ASC'
   | 'MAX_FILENAME_LENGTH_DESC'
   | 'CACHE_TTL_SECONDS_ASC'
-  | 'CACHE_TTL_SECONDS_DESC';
+  | 'CACHE_TTL_SECONDS_DESC'
+  | 'MAX_BULK_FILES_ASC'
+  | 'MAX_BULK_FILES_DESC'
+  | 'MAX_BULK_TOTAL_SIZE_ASC'
+  | 'MAX_BULK_TOTAL_SIZE_DESC'
+  | 'HAS_VERSIONING_ASC'
+  | 'HAS_VERSIONING_DESC'
+  | 'HAS_CONTENT_HASH_ASC'
+  | 'HAS_CONTENT_HASH_DESC'
+  | 'HAS_CUSTOM_KEYS_ASC'
+  | 'HAS_CUSTOM_KEYS_DESC'
+  | 'HAS_AUDIT_LOG_ASC'
+  | 'HAS_AUDIT_LOG_DESC'
+  | 'FILE_EVENTS_TABLE_ID_ASC'
+  | 'FILE_EVENTS_TABLE_ID_DESC';
 /** Methods to use when ordering `EntityTypeProvision`. */
 export type EntityTypeProvisionOrderBy =
   | 'NATURAL'
@@ -1921,6 +2059,8 @@ export type EntityTypeProvisionOrderBy =
   | 'OUT_BUCKETS_TABLE_ID_DESC'
   | 'OUT_FILES_TABLE_ID_ASC'
   | 'OUT_FILES_TABLE_ID_DESC'
+  | 'OUT_PATH_SHARES_TABLE_ID_ASC'
+  | 'OUT_PATH_SHARES_TABLE_ID_DESC'
   | 'OUT_INVITES_MODULE_ID_ASC'
   | 'OUT_INVITES_MODULE_ID_DESC';
 /** Methods to use when ordering `WebauthnCredentialsModule`. */
@@ -2340,7 +2480,56 @@ export type AppLimitOrderBy =
   | 'WINDOW_START_ASC'
   | 'WINDOW_START_DESC'
   | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC';
+  | 'WINDOW_DURATION_DESC'
+  | 'PLAN_MAX_ASC'
+  | 'PLAN_MAX_DESC'
+  | 'PURCHASED_CREDITS_ASC'
+  | 'PURCHASED_CREDITS_DESC'
+  | 'PERIOD_CREDITS_ASC'
+  | 'PERIOD_CREDITS_DESC';
+/** Methods to use when ordering `AppLimitCredit`. */
+export type AppLimitCreditOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DEFAULT_LIMIT_ID_ASC'
+  | 'DEFAULT_LIMIT_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'AMOUNT_ASC'
+  | 'AMOUNT_DESC'
+  | 'CREDIT_TYPE_ASC'
+  | 'CREDIT_TYPE_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC';
+/** Methods to use when ordering `AppLimitCreditCodeItem`. */
+export type AppLimitCreditCodeItemOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREDIT_CODE_ID_ASC'
+  | 'CREDIT_CODE_ID_DESC'
+  | 'DEFAULT_LIMIT_ID_ASC'
+  | 'DEFAULT_LIMIT_ID_DESC'
+  | 'AMOUNT_ASC'
+  | 'AMOUNT_DESC'
+  | 'CREDIT_TYPE_ASC'
+  | 'CREDIT_TYPE_DESC';
+/** Methods to use when ordering `AppLimitCreditRedemption`. */
+export type AppLimitCreditRedemptionOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREDIT_CODE_ID_ASC'
+  | 'CREDIT_CODE_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `OrgLimit`. */
 export type OrgLimitOrderBy =
   | 'NATURAL'
@@ -2362,8 +2551,33 @@ export type OrgLimitOrderBy =
   | 'WINDOW_START_DESC'
   | 'WINDOW_DURATION_ASC'
   | 'WINDOW_DURATION_DESC'
+  | 'PLAN_MAX_ASC'
+  | 'PLAN_MAX_DESC'
+  | 'PURCHASED_CREDITS_ASC'
+  | 'PURCHASED_CREDITS_DESC'
+  | 'PERIOD_CREDITS_ASC'
+  | 'PERIOD_CREDITS_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
+/** Methods to use when ordering `OrgLimitCredit`. */
+export type OrgLimitCreditOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DEFAULT_LIMIT_ID_ASC'
+  | 'DEFAULT_LIMIT_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'AMOUNT_ASC'
+  | 'AMOUNT_DESC'
+  | 'CREDIT_TYPE_ASC'
+  | 'CREDIT_TYPE_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC';
 /** Methods to use when ordering `OrgLimitAggregate`. */
 export type OrgLimitAggregateOrderBy =
   | 'NATURAL'
@@ -2384,7 +2598,15 @@ export type OrgLimitAggregateOrderBy =
   | 'WINDOW_START_ASC'
   | 'WINDOW_START_DESC'
   | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC';
+  | 'WINDOW_DURATION_DESC'
+  | 'PLAN_MAX_ASC'
+  | 'PLAN_MAX_DESC'
+  | 'PURCHASED_CREDITS_ASC'
+  | 'PURCHASED_CREDITS_DESC'
+  | 'PERIOD_CREDITS_ASC'
+  | 'PERIOD_CREDITS_DESC'
+  | 'RESERVED_ASC'
+  | 'RESERVED_DESC';
 /** Methods to use when ordering `AppStep`. */
 export type AppStepOrderBy =
   | 'NATURAL'
@@ -2791,6 +3013,21 @@ export type AppPermissionDefaultOrderBy =
   | 'ID_DESC'
   | 'PERMISSIONS_ASC'
   | 'PERMISSIONS_DESC';
+/** Methods to use when ordering `AppLimitCreditCode`. */
+export type AppLimitCreditCodeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CODE_ASC'
+  | 'CODE_DESC'
+  | 'MAX_REDEMPTIONS_ASC'
+  | 'MAX_REDEMPTIONS_DESC'
+  | 'CURRENT_REDEMPTIONS_ASC'
+  | 'CURRENT_REDEMPTIONS_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC';
 /** Methods to use when ordering `AppPermission`. */
 export type AppPermissionOrderBy =
   | 'NATURAL'
@@ -2821,6 +3058,54 @@ export type OrgPermissionOrderBy =
   | 'BITSTR_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC';
+/** Methods to use when ordering `AppLimitCapsDefault`. */
+export type AppLimitCapsDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC';
+/** Methods to use when ordering `OrgLimitCapsDefault`. */
+export type OrgLimitCapsDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC';
+/** Methods to use when ordering `AppLimitCap`. */
+export type AppLimitCapOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC';
+/** Methods to use when ordering `OrgLimitCap`. */
+export type OrgLimitCapOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC';
 /** Methods to use when ordering `MembershipType`. */
 export type MembershipTypeOrderBy =
   | 'NATURAL'
@@ -2993,6 +3278,29 @@ export type CommitOrderBy =
   | 'TREE_ID_DESC'
   | 'DATE_ASC'
   | 'DATE_DESC';
+/** Methods to use when ordering `PubkeySetting`. */
+export type PubkeySettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'CRYPTO_NETWORK_ASC'
+  | 'CRYPTO_NETWORK_DESC'
+  | 'USER_FIELD_ASC'
+  | 'USER_FIELD_DESC'
+  | 'SIGN_UP_WITH_KEY_FUNCTION_ID_ASC'
+  | 'SIGN_UP_WITH_KEY_FUNCTION_ID_DESC'
+  | 'SIGN_IN_REQUEST_CHALLENGE_FUNCTION_ID_ASC'
+  | 'SIGN_IN_REQUEST_CHALLENGE_FUNCTION_ID_DESC'
+  | 'SIGN_IN_RECORD_FAILURE_FUNCTION_ID_ASC'
+  | 'SIGN_IN_RECORD_FAILURE_FUNCTION_ID_DESC'
+  | 'SIGN_IN_WITH_CHALLENGE_FUNCTION_ID_ASC'
+  | 'SIGN_IN_WITH_CHALLENGE_FUNCTION_ID_DESC';
 /** Methods to use when ordering `RateLimitsModule`. */
 export type RateLimitsModuleOrderBy =
   | 'NATURAL'
@@ -3054,6 +3362,31 @@ export type OrgMembershipDefaultOrderBy =
   | 'IS_APPROVED_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
+/** Methods to use when ordering `RlsSetting`. */
+export type RlsSettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'AUTHENTICATE_SCHEMA_ID_ASC'
+  | 'AUTHENTICATE_SCHEMA_ID_DESC'
+  | 'ROLE_SCHEMA_ID_ASC'
+  | 'ROLE_SCHEMA_ID_DESC'
+  | 'AUTHENTICATE_FUNCTION_ID_ASC'
+  | 'AUTHENTICATE_FUNCTION_ID_DESC'
+  | 'AUTHENTICATE_STRICT_FUNCTION_ID_ASC'
+  | 'AUTHENTICATE_STRICT_FUNCTION_ID_DESC'
+  | 'CURRENT_ROLE_FUNCTION_ID_ASC'
+  | 'CURRENT_ROLE_FUNCTION_ID_DESC'
+  | 'CURRENT_ROLE_ID_FUNCTION_ID_ASC'
+  | 'CURRENT_ROLE_ID_FUNCTION_ID_DESC'
+  | 'CURRENT_USER_AGENT_FUNCTION_ID_ASC'
+  | 'CURRENT_USER_AGENT_FUNCTION_ID_DESC'
+  | 'CURRENT_IP_ADDRESS_FUNCTION_ID_ASC'
+  | 'CURRENT_IP_ADDRESS_FUNCTION_ID_DESC';
 /** Methods to use when ordering `AppLimitEvent`. */
 export type AppLimitEventOrderBy =
   | 'NATURAL'
@@ -3096,33 +3429,6 @@ export type OrgLimitEventOrderBy =
   | 'MAX_AT_EVENT_DESC'
   | 'REASON_ASC'
   | 'REASON_DESC';
-/** Methods to use when ordering `PlansModule`. */
-export type PlansModuleOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PLANS_TABLE_ID_ASC'
-  | 'PLANS_TABLE_ID_DESC'
-  | 'PLANS_TABLE_NAME_ASC'
-  | 'PLANS_TABLE_NAME_DESC'
-  | 'PLAN_LIMITS_TABLE_ID_ASC'
-  | 'PLAN_LIMITS_TABLE_ID_DESC'
-  | 'PLAN_LIMITS_TABLE_NAME_ASC'
-  | 'PLAN_LIMITS_TABLE_NAME_DESC'
-  | 'APPLY_PLAN_FUNCTION_ASC'
-  | 'APPLY_PLAN_FUNCTION_DESC'
-  | 'APPLY_PLAN_AGGREGATE_FUNCTION_ASC'
-  | 'APPLY_PLAN_AGGREGATE_FUNCTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC';
 /** Methods to use when ordering `RlsModule`. */
 export type RlsModuleOrderBy =
   | 'NATURAL'
@@ -3150,6 +3456,66 @@ export type RlsModuleOrderBy =
   | 'CURRENT_ROLE_DESC'
   | 'CURRENT_ROLE_ID_ASC'
   | 'CURRENT_ROLE_ID_DESC';
+/** Methods to use when ordering `DatabaseSetting`. */
+export type DatabaseSettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENABLE_AGGREGATES_ASC'
+  | 'ENABLE_AGGREGATES_DESC'
+  | 'ENABLE_POSTGIS_ASC'
+  | 'ENABLE_POSTGIS_DESC'
+  | 'ENABLE_SEARCH_ASC'
+  | 'ENABLE_SEARCH_DESC'
+  | 'ENABLE_DIRECT_UPLOADS_ASC'
+  | 'ENABLE_DIRECT_UPLOADS_DESC'
+  | 'ENABLE_PRESIGNED_UPLOADS_ASC'
+  | 'ENABLE_PRESIGNED_UPLOADS_DESC'
+  | 'ENABLE_MANY_TO_MANY_ASC'
+  | 'ENABLE_MANY_TO_MANY_DESC'
+  | 'ENABLE_CONNECTION_FILTER_ASC'
+  | 'ENABLE_CONNECTION_FILTER_DESC'
+  | 'ENABLE_LTREE_ASC'
+  | 'ENABLE_LTREE_DESC'
+  | 'ENABLE_LLM_ASC'
+  | 'ENABLE_LLM_DESC'
+  | 'OPTIONS_ASC'
+  | 'OPTIONS_DESC';
+/** Methods to use when ordering `PlansModule`. */
+export type PlansModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PLANS_TABLE_ID_ASC'
+  | 'PLANS_TABLE_ID_DESC'
+  | 'PLANS_TABLE_NAME_ASC'
+  | 'PLANS_TABLE_NAME_DESC'
+  | 'PLAN_LIMITS_TABLE_ID_ASC'
+  | 'PLAN_LIMITS_TABLE_ID_DESC'
+  | 'PLAN_LIMITS_TABLE_NAME_ASC'
+  | 'PLAN_LIMITS_TABLE_NAME_DESC'
+  | 'PLAN_PRICING_TABLE_ID_ASC'
+  | 'PLAN_PRICING_TABLE_ID_DESC'
+  | 'PLAN_OVERRIDES_TABLE_ID_ASC'
+  | 'PLAN_OVERRIDES_TABLE_ID_DESC'
+  | 'APPLY_PLAN_FUNCTION_ASC'
+  | 'APPLY_PLAN_FUNCTION_DESC'
+  | 'APPLY_PLAN_AGGREGATE_FUNCTION_ASC'
+  | 'APPLY_PLAN_AGGREGATE_FUNCTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC';
 /** Methods to use when ordering `SqlAction`. */
 export type SqlActionOrderBy =
   | 'NATURAL'
@@ -3301,6 +3667,47 @@ export type OrgMembershipSettingOrderBy =
   | 'POPULATE_MEMBER_EMAIL_DESC'
   | 'LIMIT_ALLOCATION_MODE_ASC'
   | 'LIMIT_ALLOCATION_MODE_DESC';
+/** Methods to use when ordering `WebauthnSetting`. */
+export type WebauthnSettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'CREDENTIALS_SCHEMA_ID_ASC'
+  | 'CREDENTIALS_SCHEMA_ID_DESC'
+  | 'SESSIONS_SCHEMA_ID_ASC'
+  | 'SESSIONS_SCHEMA_ID_DESC'
+  | 'SESSION_SECRETS_SCHEMA_ID_ASC'
+  | 'SESSION_SECRETS_SCHEMA_ID_DESC'
+  | 'CREDENTIALS_TABLE_ID_ASC'
+  | 'CREDENTIALS_TABLE_ID_DESC'
+  | 'SESSIONS_TABLE_ID_ASC'
+  | 'SESSIONS_TABLE_ID_DESC'
+  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
+  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
+  | 'SESSION_SECRETS_TABLE_ID_ASC'
+  | 'SESSION_SECRETS_TABLE_ID_DESC'
+  | 'USER_FIELD_ID_ASC'
+  | 'USER_FIELD_ID_DESC'
+  | 'RP_ID_ASC'
+  | 'RP_ID_DESC'
+  | 'RP_NAME_ASC'
+  | 'RP_NAME_DESC'
+  | 'ORIGIN_ALLOWLIST_ASC'
+  | 'ORIGIN_ALLOWLIST_DESC'
+  | 'ATTESTATION_TYPE_ASC'
+  | 'ATTESTATION_TYPE_DESC'
+  | 'REQUIRE_USER_VERIFICATION_ASC'
+  | 'REQUIRE_USER_VERIFICATION_DESC'
+  | 'RESIDENT_KEY_ASC'
+  | 'RESIDENT_KEY_DESC'
+  | 'CHALLENGE_EXPIRY_SECONDS_ASC'
+  | 'CHALLENGE_EXPIRY_SECONDS_DESC';
 /** Methods to use when ordering `AppMembership`. */
 export type AppMembershipOrderBy =
   | 'NATURAL'
@@ -3338,6 +3745,51 @@ export type AppMembershipOrderBy =
   | 'ACTOR_ID_DESC'
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
+/** Methods to use when ordering `BillingProviderModule`. */
+export type BillingProviderModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PRODUCTS_TABLE_ID_ASC'
+  | 'PRODUCTS_TABLE_ID_DESC'
+  | 'PRICES_TABLE_ID_ASC'
+  | 'PRICES_TABLE_ID_DESC'
+  | 'SUBSCRIPTIONS_TABLE_ID_ASC'
+  | 'SUBSCRIPTIONS_TABLE_ID_DESC'
+  | 'BILLING_CUSTOMERS_TABLE_ID_ASC'
+  | 'BILLING_CUSTOMERS_TABLE_ID_DESC'
+  | 'BILLING_CUSTOMERS_TABLE_NAME_ASC'
+  | 'BILLING_CUSTOMERS_TABLE_NAME_DESC'
+  | 'BILLING_PRODUCTS_TABLE_ID_ASC'
+  | 'BILLING_PRODUCTS_TABLE_ID_DESC'
+  | 'BILLING_PRODUCTS_TABLE_NAME_ASC'
+  | 'BILLING_PRODUCTS_TABLE_NAME_DESC'
+  | 'BILLING_PRICES_TABLE_ID_ASC'
+  | 'BILLING_PRICES_TABLE_ID_DESC'
+  | 'BILLING_PRICES_TABLE_NAME_ASC'
+  | 'BILLING_PRICES_TABLE_NAME_DESC'
+  | 'BILLING_SUBSCRIPTIONS_TABLE_ID_ASC'
+  | 'BILLING_SUBSCRIPTIONS_TABLE_ID_DESC'
+  | 'BILLING_SUBSCRIPTIONS_TABLE_NAME_ASC'
+  | 'BILLING_SUBSCRIPTIONS_TABLE_NAME_DESC'
+  | 'BILLING_WEBHOOK_EVENTS_TABLE_ID_ASC'
+  | 'BILLING_WEBHOOK_EVENTS_TABLE_ID_DESC'
+  | 'BILLING_WEBHOOK_EVENTS_TABLE_NAME_ASC'
+  | 'BILLING_WEBHOOK_EVENTS_TABLE_NAME_DESC'
+  | 'PROCESS_BILLING_EVENT_FUNCTION_ASC'
+  | 'PROCESS_BILLING_EVENT_FUNCTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC';
 /** Methods to use when ordering `HierarchyModule`. */
 export type HierarchyModuleOrderBy =
   | 'NATURAL'
@@ -3561,10 +4013,18 @@ export interface DatabaseFilter {
   spatialRelations?: DatabaseToManySpatialRelationFilter;
   /** `spatialRelations` exist. */
   spatialRelationsExist?: boolean;
+  /** Filter by the object’s `functions` relation. */
+  functions?: DatabaseToManyFunctionFilter;
+  /** `functions` exist. */
+  functionsExist?: boolean;
   /** Filter by the object’s `databaseTransfers` relation. */
   databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
   /** `databaseTransfers` exist. */
   databaseTransfersExist?: boolean;
+  /** Filter by the object’s `partitions` relation. */
+  partitions?: DatabaseToManyPartitionFilter;
+  /** `partitions` exist. */
+  partitionsExist?: boolean;
   /** Filter by the object’s `apis` relation. */
   apis?: DatabaseToManyApiFilter;
   /** `apis` exist. */
@@ -3601,6 +4061,30 @@ export interface DatabaseFilter {
   siteThemes?: DatabaseToManySiteThemeFilter;
   /** `siteThemes` exist. */
   siteThemesExist?: boolean;
+  /** Filter by the object’s `databaseSetting` relation. */
+  databaseSetting?: DatabaseSettingFilter;
+  /** A related `databaseSetting` exists. */
+  databaseSettingExists?: boolean;
+  /** Filter by the object’s `apiSettings` relation. */
+  apiSettings?: DatabaseToManyApiSettingFilter;
+  /** `apiSettings` exist. */
+  apiSettingsExist?: boolean;
+  /** Filter by the object’s `rlsSetting` relation. */
+  rlsSetting?: RlsSettingFilter;
+  /** A related `rlsSetting` exists. */
+  rlsSettingExists?: boolean;
+  /** Filter by the object’s `corsSettings` relation. */
+  corsSettings?: DatabaseToManyCorsSettingFilter;
+  /** `corsSettings` exist. */
+  corsSettingsExist?: boolean;
+  /** Filter by the object’s `pubkeySetting` relation. */
+  pubkeySetting?: PubkeySettingFilter;
+  /** A related `pubkeySetting` exists. */
+  pubkeySettingExists?: boolean;
+  /** Filter by the object’s `webauthnSetting` relation. */
+  webauthnSetting?: WebauthnSettingFilter;
+  /** A related `webauthnSetting` exists. */
+  webauthnSettingExists?: boolean;
   /** Filter by the object’s `connectedAccountsModules` relation. */
   connectedAccountsModules?: DatabaseToManyConnectedAccountsModuleFilter;
   /** `connectedAccountsModules` exist. */
@@ -3745,6 +4229,10 @@ export interface DatabaseFilter {
   billingModule?: BillingModuleFilter;
   /** A related `billingModule` exists. */
   billingModuleExists?: boolean;
+  /** Filter by the object’s `billingProviderModule` relation. */
+  billingProviderModule?: BillingProviderModuleFilter;
+  /** A related `billingProviderModule` exists. */
+  billingProviderModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -3912,6 +4400,10 @@ export interface UserFilter {
   appLimitsByActorId?: UserToManyAppLimitFilter;
   /** `appLimitsByActorId` exist. */
   appLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `appLimitCreditsByActorId` relation. */
+  appLimitCreditsByActorId?: UserToManyAppLimitCreditFilter;
+  /** `appLimitCreditsByActorId` exist. */
+  appLimitCreditsByActorIdExist?: boolean;
   /** Filter by the object’s `orgLimitsByActorId` relation. */
   orgLimitsByActorId?: UserToManyOrgLimitFilter;
   /** `orgLimitsByActorId` exist. */
@@ -3920,6 +4412,14 @@ export interface UserFilter {
   orgLimitsByEntityId?: UserToManyOrgLimitFilter;
   /** `orgLimitsByEntityId` exist. */
   orgLimitsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgLimitCreditsByActorId` relation. */
+  orgLimitCreditsByActorId?: UserToManyOrgLimitCreditFilter;
+  /** `orgLimitCreditsByActorId` exist. */
+  orgLimitCreditsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitCreditsByEntityId` relation. */
+  orgLimitCreditsByEntityId?: UserToManyOrgLimitCreditFilter;
+  /** `orgLimitCreditsByEntityId` exist. */
+  orgLimitCreditsByEntityIdExist?: boolean;
   /** Filter by the object’s `orgLimitAggregatesByEntityId` relation. */
   orgLimitAggregatesByEntityId?: UserToManyOrgLimitAggregateFilter;
   /** `orgLimitAggregatesByEntityId` exist. */
@@ -4785,6 +5285,12 @@ export interface AppLimitFilter {
   windowStart?: DatetimeFilter;
   /** Filter by the object’s `windowDuration` field. */
   windowDuration?: IntervalFilter;
+  /** Filter by the object’s `planMax` field. */
+  planMax?: BigIntFilter;
+  /** Filter by the object’s `purchasedCredits` field. */
+  purchasedCredits?: BigIntFilter;
+  /** Filter by the object’s `periodCredits` field. */
+  periodCredits?: BigIntFilter;
   /** Checks for all expressions in this list. */
   and?: AppLimitFilter[];
   /** Checks for any expressions in this list. */
@@ -4838,6 +5344,170 @@ export interface IntervalInput {
   /** A quantity of years. */
   years?: number;
 }
+/** A filter to be used against many `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppLimitCreditFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitCreditFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitCreditFilter;
+}
+/** A filter to be used against `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `defaultLimitId` field. */
+  defaultLimitId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `amount` field. */
+  amount?: BigIntFilter;
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCreditFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditFilter[];
+  /** Negates the expression. */
+  not?: AppLimitCreditFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
+  /** Filter by the object’s `defaultLimit` relation. */
+  defaultLimit?: AppLimitDefaultFilter;
+}
+/** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Filter by the object’s `softMax` field. */
+  softMax?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitDefaultFilter[];
+  /** Negates the expression. */
+  not?: AppLimitDefaultFilter;
+  /** Filter by the object’s `appLimitCreditsByDefaultLimitId` relation. */
+  appLimitCreditsByDefaultLimitId?: AppLimitDefaultToManyAppLimitCreditFilter;
+  /** `appLimitCreditsByDefaultLimitId` exist. */
+  appLimitCreditsByDefaultLimitIdExist?: boolean;
+  /** Filter by the object’s `appLimitCreditCodeItemsByDefaultLimitId` relation. */
+  appLimitCreditCodeItemsByDefaultLimitId?: AppLimitDefaultToManyAppLimitCreditCodeItemFilter;
+  /** `appLimitCreditCodeItemsByDefaultLimitId` exist. */
+  appLimitCreditCodeItemsByDefaultLimitIdExist?: boolean;
+}
+/** A filter to be used against many `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitDefaultToManyAppLimitCreditFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitCreditFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitCreditFilter;
+}
+/** A filter to be used against many `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitDefaultToManyAppLimitCreditCodeItemFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditCodeItemFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitCreditCodeItemFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitCreditCodeItemFilter;
+}
+/** A filter to be used against `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditCodeItemFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `creditCodeId` field. */
+  creditCodeId?: UUIDFilter;
+  /** Filter by the object’s `defaultLimitId` field. */
+  defaultLimitId?: UUIDFilter;
+  /** Filter by the object’s `amount` field. */
+  amount?: BigIntFilter;
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCreditCodeItemFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditCodeItemFilter[];
+  /** Negates the expression. */
+  not?: AppLimitCreditCodeItemFilter;
+  /** Filter by the object’s `creditCode` relation. */
+  creditCode?: AppLimitCreditCodeFilter;
+  /** Filter by the object’s `defaultLimit` relation. */
+  defaultLimit?: AppLimitDefaultFilter;
+}
+/** A filter to be used against `AppLimitCreditCode` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditCodeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `code` field. */
+  code?: StringFilter;
+  /** Filter by the object’s `maxRedemptions` field. */
+  maxRedemptions?: IntFilter;
+  /** Filter by the object’s `currentRedemptions` field. */
+  currentRedemptions?: IntFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCreditCodeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditCodeFilter[];
+  /** Negates the expression. */
+  not?: AppLimitCreditCodeFilter;
+  /** Filter by the object’s `appLimitCreditCodeItemsByCreditCodeId` relation. */
+  appLimitCreditCodeItemsByCreditCodeId?: AppLimitCreditCodeToManyAppLimitCreditCodeItemFilter;
+  /** `appLimitCreditCodeItemsByCreditCodeId` exist. */
+  appLimitCreditCodeItemsByCreditCodeIdExist?: boolean;
+  /** Filter by the object’s `appLimitCreditRedemptionsByCreditCodeId` relation. */
+  appLimitCreditRedemptionsByCreditCodeId?: AppLimitCreditCodeToManyAppLimitCreditRedemptionFilter;
+  /** `appLimitCreditRedemptionsByCreditCodeId` exist. */
+  appLimitCreditRedemptionsByCreditCodeIdExist?: boolean;
+}
+/** A filter to be used against many `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditCodeToManyAppLimitCreditCodeItemFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditCodeItemFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitCreditCodeItemFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitCreditCodeItemFilter;
+}
+/** A filter to be used against many `AppLimitCreditRedemption` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditCodeToManyAppLimitCreditRedemptionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditRedemptionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitCreditRedemptionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitCreditRedemptionFilter;
+}
+/** A filter to be used against `AppLimitCreditRedemption` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditRedemptionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `creditCodeId` field. */
+  creditCodeId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCreditRedemptionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditRedemptionFilter[];
+  /** Negates the expression. */
+  not?: AppLimitCreditRedemptionFilter;
+  /** Filter by the object’s `creditCode` relation. */
+  creditCode?: AppLimitCreditCodeFilter;
+}
 /** A filter to be used against many `OrgLimit` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyOrgLimitFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -4865,6 +5535,12 @@ export interface OrgLimitFilter {
   windowStart?: DatetimeFilter;
   /** Filter by the object’s `windowDuration` field. */
   windowDuration?: IntervalFilter;
+  /** Filter by the object’s `planMax` field. */
+  planMax?: BigIntFilter;
+  /** Filter by the object’s `purchasedCredits` field. */
+  purchasedCredits?: BigIntFilter;
+  /** Filter by the object’s `periodCredits` field. */
+  periodCredits?: BigIntFilter;
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
   /** Checks for all expressions in this list. */
@@ -4877,6 +5553,78 @@ export interface OrgLimitFilter {
   actor?: UserFilter;
   /** Filter by the object’s `entity` relation. */
   entity?: UserFilter;
+}
+/** A filter to be used against many `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgLimitCreditFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgLimitCreditFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgLimitCreditFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgLimitCreditFilter;
+}
+/** A filter to be used against `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitCreditFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `defaultLimitId` field. */
+  defaultLimitId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `amount` field. */
+  amount?: BigIntFilter;
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitCreditFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitCreditFilter[];
+  /** Negates the expression. */
+  not?: OrgLimitCreditFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
+  /** Filter by the object’s `defaultLimit` relation. */
+  defaultLimit?: OrgLimitDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** A related `entity` exists. */
+  entityExists?: boolean;
+}
+/** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Filter by the object’s `softMax` field. */
+  softMax?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgLimitDefaultFilter;
+  /** Filter by the object’s `orgLimitCreditsByDefaultLimitId` relation. */
+  orgLimitCreditsByDefaultLimitId?: OrgLimitDefaultToManyOrgLimitCreditFilter;
+  /** `orgLimitCreditsByDefaultLimitId` exist. */
+  orgLimitCreditsByDefaultLimitIdExist?: boolean;
+}
+/** A filter to be used against many `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitDefaultToManyOrgLimitCreditFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgLimitCreditFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgLimitCreditFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgLimitCreditFilter;
 }
 /** A filter to be used against many `OrgLimitAggregate` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyOrgLimitAggregateFilter {
@@ -4905,6 +5653,14 @@ export interface OrgLimitAggregateFilter {
   windowStart?: DatetimeFilter;
   /** Filter by the object’s `windowDuration` field. */
   windowDuration?: IntervalFilter;
+  /** Filter by the object’s `planMax` field. */
+  planMax?: BigIntFilter;
+  /** Filter by the object’s `purchasedCredits` field. */
+  purchasedCredits?: BigIntFilter;
+  /** Filter by the object’s `periodCredits` field. */
+  periodCredits?: BigIntFilter;
+  /** Filter by the object’s `reserved` field. */
+  reserved?: BigIntFilter;
   /** Checks for all expressions in this list. */
   and?: OrgLimitAggregateFilter[];
   /** Checks for any expressions in this list. */
@@ -5770,6 +6526,10 @@ export interface SchemaFilter {
   enums?: SchemaToManyEnumFilter;
   /** `enums` exist. */
   enumsExist?: boolean;
+  /** Filter by the object’s `functions` relation. */
+  functions?: SchemaToManyFunctionFilter;
+  /** `functions` exist. */
+  functionsExist?: boolean;
   /** Filter by the object’s `apiSchemas` relation. */
   apiSchemas?: SchemaToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
@@ -5914,6 +6674,10 @@ export interface TableFilter {
   spatialRelations?: TableToManySpatialRelationFilter;
   /** `spatialRelations` exist. */
   spatialRelationsExist?: boolean;
+  /** Filter by the object’s `partition` relation. */
+  partition?: PartitionFilter;
+  /** A related `partition` exists. */
+  partitionExists?: boolean;
   /** Filter by the object’s `secureTableProvisions` relation. */
   secureTableProvisions?: TableToManySecureTableProvisionFilter;
   /** `secureTableProvisions` exist. */
@@ -6025,6 +6789,10 @@ export interface FieldFilter {
   spatialRelationsByRefFieldId?: FieldToManySpatialRelationFilter;
   /** `spatialRelationsByRefFieldId` exist. */
   spatialRelationsByRefFieldIdExist?: boolean;
+  /** Filter by the object’s `partitionsByPartitionKeyId` relation. */
+  partitionsByPartitionKeyId?: FieldToManyPartitionFilter;
+  /** `partitionsByPartitionKeyId` exist. */
+  partitionsByPartitionKeyIdExist?: boolean;
 }
 /** A filter to be used against many `SpatialRelation` object types. All fields are combined with a logical ‘and.’ */
 export interface FieldToManySpatialRelationFilter {
@@ -6081,6 +6849,52 @@ export interface SpatialRelationFilter {
   refField?: FieldFilter;
   /** Filter by the object’s `refTable` relation. */
   refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against many `Partition` object types. All fields are combined with a logical ‘and.’ */
+export interface FieldToManyPartitionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PartitionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PartitionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PartitionFilter;
+}
+/** A filter to be used against `Partition` object types. All fields are combined with a logical ‘and.’ */
+export interface PartitionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `strategy` field. */
+  strategy?: StringFilter;
+  /** Filter by the object’s `partitionKeyId` field. */
+  partitionKeyId?: UUIDFilter;
+  /** Filter by the object’s `interval` field. */
+  interval?: StringFilter;
+  /** Filter by the object’s `retention` field. */
+  retention?: StringFilter;
+  /** Filter by the object’s `lookahead` field. */
+  lookahead?: IntFilter;
+  /** Filter by the object’s `namingPattern` field. */
+  namingPattern?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PartitionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PartitionFilter[];
+  /** Negates the expression. */
+  not?: PartitionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `partitionKey` relation. */
+  partitionKey?: FieldFilter;
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
 }
@@ -7102,6 +7916,36 @@ export interface EnumFilter {
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
 }
+/** A filter to be used against many `Function` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyFunctionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionFilter;
+}
+/** A filter to be used against `Function` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FunctionFilter[];
+  /** Negates the expression. */
+  not?: FunctionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
 /** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManyApiSchemaFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -7170,6 +8014,14 @@ export interface ApiFilter {
   domains?: ApiToManyDomainFilter;
   /** `domains` exist. */
   domainsExist?: boolean;
+  /** Filter by the object’s `apiSetting` relation. */
+  apiSetting?: ApiSettingFilter;
+  /** A related `apiSetting` exists. */
+  apiSettingExists?: boolean;
+  /** Filter by the object’s `corsSettings` relation. */
+  corsSettings?: ApiToManyCorsSettingFilter;
+  /** `corsSettings` exist. */
+  corsSettingsExist?: boolean;
 }
 /** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
 export interface ApiToManyApiModuleFilter {
@@ -7664,6 +8516,77 @@ export interface SiteThemeFilter {
   /** Filter by the object’s `site` relation. */
   site?: SiteFilter;
 }
+/** A filter to be used against `ApiSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `enableAggregates` field. */
+  enableAggregates?: BooleanFilter;
+  /** Filter by the object’s `enablePostgis` field. */
+  enablePostgis?: BooleanFilter;
+  /** Filter by the object’s `enableSearch` field. */
+  enableSearch?: BooleanFilter;
+  /** Filter by the object’s `enableDirectUploads` field. */
+  enableDirectUploads?: BooleanFilter;
+  /** Filter by the object’s `enablePresignedUploads` field. */
+  enablePresignedUploads?: BooleanFilter;
+  /** Filter by the object’s `enableManyToMany` field. */
+  enableManyToMany?: BooleanFilter;
+  /** Filter by the object’s `enableConnectionFilter` field. */
+  enableConnectionFilter?: BooleanFilter;
+  /** Filter by the object’s `enableLtree` field. */
+  enableLtree?: BooleanFilter;
+  /** Filter by the object’s `enableLlm` field. */
+  enableLlm?: BooleanFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: ApiSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ApiSettingFilter[];
+  /** Negates the expression. */
+  not?: ApiSettingFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against many `CorsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiToManyCorsSettingFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CorsSettingFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CorsSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CorsSettingFilter;
+}
+/** A filter to be used against `CorsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface CorsSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `allowedOrigins` field. */
+  allowedOrigins?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: CorsSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CorsSettingFilter[];
+  /** Negates the expression. */
+  not?: CorsSettingFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** A related `api` exists. */
+  apiExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
 /** A filter to be used against many `SessionSecretsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManySessionSecretsModuleFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -7885,6 +8808,15 @@ export interface DatabaseToManySpatialRelationFilter {
   /** Filters to entities where no related entity matches. */
   none?: SpatialRelationFilter;
 }
+/** A filter to be used against many `Function` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyFunctionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionFilter;
+}
 /** A filter to be used against many `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseTransferFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -7932,6 +8864,15 @@ export interface DatabaseTransferFilter {
   not?: DatabaseTransferFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
+}
+/** A filter to be used against many `Partition` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPartitionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PartitionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PartitionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PartitionFilter;
 }
 /** A filter to be used against many `Api` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyApiFilter {
@@ -8013,6 +8954,254 @@ export interface DatabaseToManySiteThemeFilter {
   every?: SiteThemeFilter;
   /** Filters to entities where no related entity matches. */
   none?: SiteThemeFilter;
+}
+/** A filter to be used against `DatabaseSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `enableAggregates` field. */
+  enableAggregates?: BooleanFilter;
+  /** Filter by the object’s `enablePostgis` field. */
+  enablePostgis?: BooleanFilter;
+  /** Filter by the object’s `enableSearch` field. */
+  enableSearch?: BooleanFilter;
+  /** Filter by the object’s `enableDirectUploads` field. */
+  enableDirectUploads?: BooleanFilter;
+  /** Filter by the object’s `enablePresignedUploads` field. */
+  enablePresignedUploads?: BooleanFilter;
+  /** Filter by the object’s `enableManyToMany` field. */
+  enableManyToMany?: BooleanFilter;
+  /** Filter by the object’s `enableConnectionFilter` field. */
+  enableConnectionFilter?: BooleanFilter;
+  /** Filter by the object’s `enableLtree` field. */
+  enableLtree?: BooleanFilter;
+  /** Filter by the object’s `enableLlm` field. */
+  enableLlm?: BooleanFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseSettingFilter[];
+  /** Negates the expression. */
+  not?: DatabaseSettingFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against many `ApiSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyApiSettingFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSettingFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSettingFilter;
+}
+/** A filter to be used against `RlsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface RlsSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `authenticateSchemaId` field. */
+  authenticateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `roleSchemaId` field. */
+  roleSchemaId?: UUIDFilter;
+  /** Filter by the object’s `authenticateFunctionId` field. */
+  authenticateFunctionId?: UUIDFilter;
+  /** Filter by the object’s `authenticateStrictFunctionId` field. */
+  authenticateStrictFunctionId?: UUIDFilter;
+  /** Filter by the object’s `currentRoleFunctionId` field. */
+  currentRoleFunctionId?: UUIDFilter;
+  /** Filter by the object’s `currentRoleIdFunctionId` field. */
+  currentRoleIdFunctionId?: UUIDFilter;
+  /** Filter by the object’s `currentUserAgentFunctionId` field. */
+  currentUserAgentFunctionId?: UUIDFilter;
+  /** Filter by the object’s `currentIpAddressFunctionId` field. */
+  currentIpAddressFunctionId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: RlsSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RlsSettingFilter[];
+  /** Negates the expression. */
+  not?: RlsSettingFilter;
+  /** Filter by the object’s `authenticateFunction` relation. */
+  authenticateFunction?: FunctionFilter;
+  /** A related `authenticateFunction` exists. */
+  authenticateFunctionExists?: boolean;
+  /** Filter by the object’s `authenticateSchema` relation. */
+  authenticateSchema?: SchemaFilter;
+  /** A related `authenticateSchema` exists. */
+  authenticateSchemaExists?: boolean;
+  /** Filter by the object’s `authenticateStrictFunction` relation. */
+  authenticateStrictFunction?: FunctionFilter;
+  /** A related `authenticateStrictFunction` exists. */
+  authenticateStrictFunctionExists?: boolean;
+  /** Filter by the object’s `currentIpAddressFunction` relation. */
+  currentIpAddressFunction?: FunctionFilter;
+  /** A related `currentIpAddressFunction` exists. */
+  currentIpAddressFunctionExists?: boolean;
+  /** Filter by the object’s `currentRoleFunction` relation. */
+  currentRoleFunction?: FunctionFilter;
+  /** A related `currentRoleFunction` exists. */
+  currentRoleFunctionExists?: boolean;
+  /** Filter by the object’s `currentRoleIdFunction` relation. */
+  currentRoleIdFunction?: FunctionFilter;
+  /** A related `currentRoleIdFunction` exists. */
+  currentRoleIdFunctionExists?: boolean;
+  /** Filter by the object’s `currentUserAgentFunction` relation. */
+  currentUserAgentFunction?: FunctionFilter;
+  /** A related `currentUserAgentFunction` exists. */
+  currentUserAgentFunctionExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `roleSchema` relation. */
+  roleSchema?: SchemaFilter;
+  /** A related `roleSchema` exists. */
+  roleSchemaExists?: boolean;
+}
+/** A filter to be used against many `CorsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCorsSettingFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CorsSettingFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CorsSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CorsSettingFilter;
+}
+/** A filter to be used against `PubkeySetting` object types. All fields are combined with a logical ‘and.’ */
+export interface PubkeySettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
+  cryptoNetwork?: StringFilter;
+  /** Filter by the object’s `userField` field. */
+  userField?: StringFilter;
+  /** Filter by the object’s `signUpWithKeyFunctionId` field. */
+  signUpWithKeyFunctionId?: UUIDFilter;
+  /** Filter by the object’s `signInRequestChallengeFunctionId` field. */
+  signInRequestChallengeFunctionId?: UUIDFilter;
+  /** Filter by the object’s `signInRecordFailureFunctionId` field. */
+  signInRecordFailureFunctionId?: UUIDFilter;
+  /** Filter by the object’s `signInWithChallengeFunctionId` field. */
+  signInWithChallengeFunctionId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PubkeySettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PubkeySettingFilter[];
+  /** Negates the expression. */
+  not?: PubkeySettingFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** A related `schema` exists. */
+  schemaExists?: boolean;
+  /** Filter by the object’s `signInRecordFailureFunction` relation. */
+  signInRecordFailureFunction?: FunctionFilter;
+  /** A related `signInRecordFailureFunction` exists. */
+  signInRecordFailureFunctionExists?: boolean;
+  /** Filter by the object’s `signInRequestChallengeFunction` relation. */
+  signInRequestChallengeFunction?: FunctionFilter;
+  /** A related `signInRequestChallengeFunction` exists. */
+  signInRequestChallengeFunctionExists?: boolean;
+  /** Filter by the object’s `signInWithChallengeFunction` relation. */
+  signInWithChallengeFunction?: FunctionFilter;
+  /** A related `signInWithChallengeFunction` exists. */
+  signInWithChallengeFunctionExists?: boolean;
+  /** Filter by the object’s `signUpWithKeyFunction` relation. */
+  signUpWithKeyFunction?: FunctionFilter;
+  /** A related `signUpWithKeyFunction` exists. */
+  signUpWithKeyFunctionExists?: boolean;
+}
+/** A filter to be used against `WebauthnSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface WebauthnSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `credentialsSchemaId` field. */
+  credentialsSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionsSchemaId` field. */
+  sessionsSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionSecretsSchemaId` field. */
+  sessionSecretsSchemaId?: UUIDFilter;
+  /** Filter by the object’s `credentialsTableId` field. */
+  credentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionSecretsTableId` field. */
+  sessionSecretsTableId?: UUIDFilter;
+  /** Filter by the object’s `userFieldId` field. */
+  userFieldId?: UUIDFilter;
+  /** Filter by the object’s `rpId` field. */
+  rpId?: StringFilter;
+  /** Filter by the object’s `rpName` field. */
+  rpName?: StringFilter;
+  /** Filter by the object’s `originAllowlist` field. */
+  originAllowlist?: StringListFilter;
+  /** Filter by the object’s `attestationType` field. */
+  attestationType?: StringFilter;
+  /** Filter by the object’s `requireUserVerification` field. */
+  requireUserVerification?: BooleanFilter;
+  /** Filter by the object’s `residentKey` field. */
+  residentKey?: StringFilter;
+  /** Filter by the object’s `challengeExpirySeconds` field. */
+  challengeExpirySeconds?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: WebauthnSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: WebauthnSettingFilter[];
+  /** Negates the expression. */
+  not?: WebauthnSettingFilter;
+  /** Filter by the object’s `credentialsSchema` relation. */
+  credentialsSchema?: SchemaFilter;
+  /** A related `credentialsSchema` exists. */
+  credentialsSchemaExists?: boolean;
+  /** Filter by the object’s `credentialsTable` relation. */
+  credentialsTable?: TableFilter;
+  /** A related `credentialsTable` exists. */
+  credentialsTableExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** A related `schema` exists. */
+  schemaExists?: boolean;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** A related `sessionCredentialsTable` exists. */
+  sessionCredentialsTableExists?: boolean;
+  /** Filter by the object’s `sessionSecretsSchema` relation. */
+  sessionSecretsSchema?: SchemaFilter;
+  /** A related `sessionSecretsSchema` exists. */
+  sessionSecretsSchemaExists?: boolean;
+  /** Filter by the object’s `sessionSecretsTable` relation. */
+  sessionSecretsTable?: TableFilter;
+  /** A related `sessionSecretsTable` exists. */
+  sessionSecretsTableExists?: boolean;
+  /** Filter by the object’s `sessionsSchema` relation. */
+  sessionsSchema?: SchemaFilter;
+  /** A related `sessionsSchema` exists. */
+  sessionsSchemaExists?: boolean;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** A related `sessionsTable` exists. */
+  sessionsTableExists?: boolean;
+  /** Filter by the object’s `userField` relation. */
+  userField?: FieldFilter;
+  /** A related `userField` exists. */
+  userFieldExists?: boolean;
 }
 /** A filter to be used against many `ConnectedAccountsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyConnectedAccountsModuleFilter {
@@ -8503,8 +9692,26 @@ export interface LimitsModuleFilter {
   limitUpdateTrigger?: StringFilter;
   /** Filter by the object’s `limitCheckFunction` field. */
   limitCheckFunction?: StringFilter;
+  /** Filter by the object’s `limitCreditsTableId` field. */
+  limitCreditsTableId?: UUIDFilter;
+  /** Filter by the object’s `eventsTableId` field. */
+  eventsTableId?: UUIDFilter;
+  /** Filter by the object’s `creditCodesTableId` field. */
+  creditCodesTableId?: UUIDFilter;
+  /** Filter by the object’s `creditCodeItemsTableId` field. */
+  creditCodeItemsTableId?: UUIDFilter;
+  /** Filter by the object’s `creditRedemptionsTableId` field. */
+  creditRedemptionsTableId?: UUIDFilter;
   /** Filter by the object’s `aggregateTableId` field. */
   aggregateTableId?: UUIDFilter;
+  /** Filter by the object’s `limitCapsTableId` field. */
+  limitCapsTableId?: UUIDFilter;
+  /** Filter by the object’s `limitCapsDefaultsTableId` field. */
+  limitCapsDefaultsTableId?: UUIDFilter;
+  /** Filter by the object’s `capCheckTrigger` field. */
+  capCheckTrigger?: StringFilter;
+  /** Filter by the object’s `resolveCapFunction` field. */
+  resolveCapFunction?: StringFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `membershipType` field. */
@@ -8525,6 +9732,18 @@ export interface LimitsModuleFilter {
   aggregateTable?: TableFilter;
   /** A related `aggregateTable` exists. */
   aggregateTableExists?: boolean;
+  /** Filter by the object’s `creditCodeItemsTable` relation. */
+  creditCodeItemsTable?: TableFilter;
+  /** A related `creditCodeItemsTable` exists. */
+  creditCodeItemsTableExists?: boolean;
+  /** Filter by the object’s `creditCodesTable` relation. */
+  creditCodesTable?: TableFilter;
+  /** A related `creditCodesTable` exists. */
+  creditCodesTableExists?: boolean;
+  /** Filter by the object’s `creditRedemptionsTable` relation. */
+  creditRedemptionsTable?: TableFilter;
+  /** A related `creditRedemptionsTable` exists. */
+  creditRedemptionsTableExists?: boolean;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `defaultTable` relation. */
@@ -8533,6 +9752,22 @@ export interface LimitsModuleFilter {
   entityTable?: TableFilter;
   /** A related `entityTable` exists. */
   entityTableExists?: boolean;
+  /** Filter by the object’s `eventsTable` relation. */
+  eventsTable?: TableFilter;
+  /** A related `eventsTable` exists. */
+  eventsTableExists?: boolean;
+  /** Filter by the object’s `limitCapsDefaultsTable` relation. */
+  limitCapsDefaultsTable?: TableFilter;
+  /** A related `limitCapsDefaultsTable` exists. */
+  limitCapsDefaultsTableExists?: boolean;
+  /** Filter by the object’s `limitCapsTable` relation. */
+  limitCapsTable?: TableFilter;
+  /** A related `limitCapsTable` exists. */
+  limitCapsTableExists?: boolean;
+  /** Filter by the object’s `limitCreditsTable` relation. */
+  limitCreditsTable?: TableFilter;
+  /** A related `limitCreditsTable` exists. */
+  limitCreditsTableExists?: boolean;
   /** Filter by the object’s `privateSchema` relation. */
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
@@ -9459,6 +10694,10 @@ export interface StorageModuleFilter {
   allowedOrigins?: StringListFilter;
   /** Filter by the object’s `restrictReads` field. */
   restrictReads?: BooleanFilter;
+  /** Filter by the object’s `hasPathShares` field. */
+  hasPathShares?: BooleanFilter;
+  /** Filter by the object’s `pathSharesTableId` field. */
+  pathSharesTableId?: UUIDFilter;
   /** Filter by the object’s `uploadUrlExpirySeconds` field. */
   uploadUrlExpirySeconds?: IntFilter;
   /** Filter by the object’s `downloadUrlExpirySeconds` field. */
@@ -9469,6 +10708,20 @@ export interface StorageModuleFilter {
   maxFilenameLength?: IntFilter;
   /** Filter by the object’s `cacheTtlSeconds` field. */
   cacheTtlSeconds?: IntFilter;
+  /** Filter by the object’s `maxBulkFiles` field. */
+  maxBulkFiles?: IntFilter;
+  /** Filter by the object’s `maxBulkTotalSize` field. */
+  maxBulkTotalSize?: BigIntFilter;
+  /** Filter by the object’s `hasVersioning` field. */
+  hasVersioning?: BooleanFilter;
+  /** Filter by the object’s `hasContentHash` field. */
+  hasContentHash?: BooleanFilter;
+  /** Filter by the object’s `hasCustomKeys` field. */
+  hasCustomKeys?: BooleanFilter;
+  /** Filter by the object’s `hasAuditLog` field. */
+  hasAuditLog?: BooleanFilter;
+  /** Filter by the object’s `fileEventsTableId` field. */
+  fileEventsTableId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: StorageModuleFilter[];
   /** Checks for any expressions in this list. */
@@ -9483,8 +10736,16 @@ export interface StorageModuleFilter {
   entityTable?: TableFilter;
   /** A related `entityTable` exists. */
   entityTableExists?: boolean;
+  /** Filter by the object’s `fileEventsTable` relation. */
+  fileEventsTable?: TableFilter;
+  /** A related `fileEventsTable` exists. */
+  fileEventsTableExists?: boolean;
   /** Filter by the object’s `filesTable` relation. */
   filesTable?: TableFilter;
+  /** Filter by the object’s `pathSharesTable` relation. */
+  pathSharesTable?: TableFilter;
+  /** A related `pathSharesTable` exists. */
+  pathSharesTableExists?: boolean;
   /** Filter by the object’s `privateSchema` relation. */
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
@@ -9547,6 +10808,8 @@ export interface EntityTypeProvisionFilter {
   outBucketsTableId?: UUIDFilter;
   /** Filter by the object’s `outFilesTableId` field. */
   outFilesTableId?: UUIDFilter;
+  /** Filter by the object’s `outPathSharesTableId` field. */
+  outPathSharesTableId?: UUIDFilter;
   /** Filter by the object’s `outInvitesModuleId` field. */
   outInvitesModuleId?: UUIDFilter;
   /** Checks for all expressions in this list. */
@@ -9854,6 +11117,10 @@ export interface PlansModuleFilter {
   planLimitsTableId?: UUIDFilter;
   /** Filter by the object’s `planLimitsTableName` field. */
   planLimitsTableName?: StringFilter;
+  /** Filter by the object’s `planPricingTableId` field. */
+  planPricingTableId?: UUIDFilter;
+  /** Filter by the object’s `planOverridesTableId` field. */
+  planOverridesTableId?: UUIDFilter;
   /** Filter by the object’s `applyPlanFunction` field. */
   applyPlanFunction?: StringFilter;
   /** Filter by the object’s `applyPlanAggregateFunction` field. */
@@ -9870,6 +11137,14 @@ export interface PlansModuleFilter {
   database?: DatabaseFilter;
   /** Filter by the object’s `planLimitsTable` relation. */
   planLimitsTable?: TableFilter;
+  /** Filter by the object’s `planOverridesTable` relation. */
+  planOverridesTable?: TableFilter;
+  /** A related `planOverridesTable` exists. */
+  planOverridesTableExists?: boolean;
+  /** Filter by the object’s `planPricingTable` relation. */
+  planPricingTable?: TableFilter;
+  /** A related `planPricingTable` exists. */
+  planPricingTableExists?: boolean;
   /** Filter by the object’s `plansTable` relation. */
   plansTable?: TableFilter;
   /** Filter by the object’s `privateSchema` relation. */
@@ -9927,6 +11202,83 @@ export interface BillingModuleFilter {
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
+}
+/** A filter to be used against `BillingProviderModule` object types. All fields are combined with a logical ‘and.’ */
+export interface BillingProviderModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `productsTableId` field. */
+  productsTableId?: UUIDFilter;
+  /** Filter by the object’s `pricesTableId` field. */
+  pricesTableId?: UUIDFilter;
+  /** Filter by the object’s `subscriptionsTableId` field. */
+  subscriptionsTableId?: UUIDFilter;
+  /** Filter by the object’s `billingCustomersTableId` field. */
+  billingCustomersTableId?: UUIDFilter;
+  /** Filter by the object’s `billingCustomersTableName` field. */
+  billingCustomersTableName?: StringFilter;
+  /** Filter by the object’s `billingProductsTableId` field. */
+  billingProductsTableId?: UUIDFilter;
+  /** Filter by the object’s `billingProductsTableName` field. */
+  billingProductsTableName?: StringFilter;
+  /** Filter by the object’s `billingPricesTableId` field. */
+  billingPricesTableId?: UUIDFilter;
+  /** Filter by the object’s `billingPricesTableName` field. */
+  billingPricesTableName?: StringFilter;
+  /** Filter by the object’s `billingSubscriptionsTableId` field. */
+  billingSubscriptionsTableId?: UUIDFilter;
+  /** Filter by the object’s `billingSubscriptionsTableName` field. */
+  billingSubscriptionsTableName?: StringFilter;
+  /** Filter by the object’s `billingWebhookEventsTableId` field. */
+  billingWebhookEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `billingWebhookEventsTableName` field. */
+  billingWebhookEventsTableName?: StringFilter;
+  /** Filter by the object’s `processBillingEventFunction` field. */
+  processBillingEventFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: BillingProviderModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BillingProviderModuleFilter[];
+  /** Negates the expression. */
+  not?: BillingProviderModuleFilter;
+  /** Filter by the object’s `billingCustomersTable` relation. */
+  billingCustomersTable?: TableFilter;
+  /** Filter by the object’s `billingPricesTable` relation. */
+  billingPricesTable?: TableFilter;
+  /** Filter by the object’s `billingProductsTable` relation. */
+  billingProductsTable?: TableFilter;
+  /** Filter by the object’s `billingSubscriptionsTable` relation. */
+  billingSubscriptionsTable?: TableFilter;
+  /** Filter by the object’s `billingWebhookEventsTable` relation. */
+  billingWebhookEventsTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `pricesTable` relation. */
+  pricesTable?: TableFilter;
+  /** A related `pricesTable` exists. */
+  pricesTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `productsTable` relation. */
+  productsTable?: TableFilter;
+  /** A related `productsTable` exists. */
+  productsTableExists?: boolean;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `subscriptionsTable` relation. */
+  subscriptionsTable?: TableFilter;
+  /** A related `subscriptionsTable` exists. */
+  subscriptionsTableExists?: boolean;
 }
 /** A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseProvisionModuleFilter {
@@ -10086,6 +11438,70 @@ export interface OrgPermissionFilter {
   /** Negates the expression. */
   not?: OrgPermissionFilter;
 }
+/** A filter to be used against `AppLimitCapsDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCapsDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCapsDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCapsDefaultFilter[];
+  /** Negates the expression. */
+  not?: AppLimitCapsDefaultFilter;
+}
+/** A filter to be used against `OrgLimitCapsDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitCapsDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitCapsDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitCapsDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgLimitCapsDefaultFilter;
+}
+/** A filter to be used against `AppLimitCap` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCapFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCapFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCapFilter[];
+  /** Negates the expression. */
+  not?: AppLimitCapFilter;
+}
+/** A filter to be used against `OrgLimitCap` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitCapFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitCapFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitCapFilter[];
+  /** Negates the expression. */
+  not?: OrgLimitCapFilter;
+}
 /** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
 export interface MembershipTypeFilter {
   /** Filter by the object’s `id` field. */
@@ -10179,40 +11595,6 @@ export interface NodeTypeRegistryFilter {
   or?: NodeTypeRegistryFilter[];
   /** Negates the expression. */
   not?: NodeTypeRegistryFilter;
-}
-/** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `max` field. */
-  max?: BigIntFilter;
-  /** Filter by the object’s `softMax` field. */
-  softMax?: BigIntFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitDefaultFilter[];
-  /** Negates the expression. */
-  not?: AppLimitDefaultFilter;
-}
-/** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `max` field. */
-  max?: BigIntFilter;
-  /** Filter by the object’s `softMax` field. */
-  softMax?: BigIntFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitDefaultFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitDefaultFilter;
 }
 /** A filter to be used against `UserConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
 export interface UserConnectedAccountFilter {
@@ -10589,6 +11971,11 @@ export interface SetFieldOrderInput {
   clientMutationId?: string;
   fieldIds?: string[];
 }
+export interface AppendSmartTagsInput {
+  clientMutationId?: string;
+  pTableId?: string;
+  pTags?: unknown;
+}
 export interface ProvisionUniqueConstraintInput {
   clientMutationId?: string;
   databaseId?: string;
@@ -10784,6 +12171,31 @@ export interface RoleTypeInput {
   id: number;
   name: string;
 }
+export interface CreateAppLimitCreditRedemptionInput {
+  clientMutationId?: string;
+  /** The `AppLimitCreditRedemption` to be created by this mutation. */
+  appLimitCreditRedemption: AppLimitCreditRedemptionInput;
+}
+/** An input for mutations affecting `AppLimitCreditRedemption` */
+export interface AppLimitCreditRedemptionInput {
+  id?: string;
+  /** FK to credit_codes — which code is being redeemed */
+  creditCodeId: string;
+  /** Entity receiving the credits (personal org user_id or org entity_id) */
+  entityId: string;
+}
+export interface CreateFunctionInput {
+  clientMutationId?: string;
+  /** The `Function` to be created by this mutation. */
+  function: FunctionInput;
+}
+/** An input for mutations affecting `Function` */
+export interface FunctionInput {
+  id?: string;
+  databaseId: string;
+  schemaId: string;
+  name: string;
+}
 export interface CreateViewTableInput {
   clientMutationId?: string;
   /** The `ViewTable` to be created by this mutation. */
@@ -10811,6 +12223,22 @@ export interface ApiSchemaInput {
   schemaId: string;
   /** API that exposes this schema */
   apiId: string;
+}
+export interface CreateCorsSettingInput {
+  clientMutationId?: string;
+  /** The `CorsSetting` to be created by this mutation. */
+  corsSetting: CorsSettingInput;
+}
+/** An input for mutations affecting `CorsSetting` */
+export interface CorsSettingInput {
+  /** Unique identifier for this CORS settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId: string;
+  /** Optional API for per-API override; NULL means database-wide default */
+  apiId?: string;
+  /** Array of allowed CORS origins (e.g. https://example.com) */
+  allowedOrigins?: string[];
 }
 export interface CreateOrgMemberInput {
   clientMutationId?: string;
@@ -10973,6 +12401,23 @@ export interface SiteModuleInput {
   name: string;
   /** JSON configuration data for this module */
   data: unknown;
+}
+export interface CreateAppLimitCreditCodeInput {
+  clientMutationId?: string;
+  /** The `AppLimitCreditCode` to be created by this mutation. */
+  appLimitCreditCode: AppLimitCreditCodeInput;
+}
+/** An input for mutations affecting `AppLimitCreditCode` */
+export interface AppLimitCreditCodeInput {
+  id?: string;
+  /** Human-readable credit code (case-insensitive, unique) */
+  code: string;
+  /** Maximum total redemptions allowed; NULL for unlimited */
+  maxRedemptions?: number;
+  /** Current number of redemptions (incremented by trigger on credit_redemptions) */
+  currentRedemptions?: number;
+  /** Expiration timestamp; NULL for no expiry */
+  expiresAt?: string;
 }
 export interface CreateSchemaGrantInput {
   clientMutationId?: string;
@@ -11158,6 +12603,62 @@ export interface OrgPermissionInput {
   bitstr?: string;
   /** Human-readable description of what this permission allows */
   description?: string;
+}
+export interface CreateAppLimitCapsDefaultInput {
+  clientMutationId?: string;
+  /** The `AppLimitCapsDefault` to be created by this mutation. */
+  appLimitCapsDefault: AppLimitCapsDefaultInput;
+}
+/** An input for mutations affecting `AppLimitCapsDefault` */
+export interface AppLimitCapsDefaultInput {
+  id?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+}
+export interface CreateOrgLimitCapsDefaultInput {
+  clientMutationId?: string;
+  /** The `OrgLimitCapsDefault` to be created by this mutation. */
+  orgLimitCapsDefault: OrgLimitCapsDefaultInput;
+}
+/** An input for mutations affecting `OrgLimitCapsDefault` */
+export interface OrgLimitCapsDefaultInput {
+  id?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+}
+export interface CreateAppLimitCapInput {
+  clientMutationId?: string;
+  /** The `AppLimitCap` to be created by this mutation. */
+  appLimitCap: AppLimitCapInput;
+}
+/** An input for mutations affecting `AppLimitCap` */
+export interface AppLimitCapInput {
+  id?: string;
+  /** Name identifier of the cap being overridden */
+  name: string;
+  /** Entity this cap override applies to */
+  entityId: string;
+  /** Override cap value for this entity */
+  max?: string;
+}
+export interface CreateOrgLimitCapInput {
+  clientMutationId?: string;
+  /** The `OrgLimitCap` to be created by this mutation. */
+  orgLimitCap: OrgLimitCapInput;
+}
+/** An input for mutations affecting `OrgLimitCap` */
+export interface OrgLimitCapInput {
+  id?: string;
+  /** Name identifier of the cap being overridden */
+  name: string;
+  /** Entity this cap override applies to */
+  entityId: string;
+  /** Override cap value for this entity */
+  max?: string;
 }
 export interface CreateMembershipTypeInput {
   clientMutationId?: string;
@@ -11414,6 +12915,23 @@ export interface OrgLimitDefaultInput {
   /** Default soft limit threshold for warnings; NULL means no soft limit */
   softMax?: string;
 }
+export interface CreateAppLimitCreditCodeItemInput {
+  clientMutationId?: string;
+  /** The `AppLimitCreditCodeItem` to be created by this mutation. */
+  appLimitCreditCodeItem: AppLimitCreditCodeItemInput;
+}
+/** An input for mutations affecting `AppLimitCreditCodeItem` */
+export interface AppLimitCreditCodeItemInput {
+  id?: string;
+  /** FK to credit_codes — which code this item belongs to */
+  creditCodeId: string;
+  /** FK to default_limits — which limit this item grants credits for */
+  defaultLimitId: string;
+  /** Number of credits this item grants per redemption */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+}
 export interface CreateUserConnectedAccountInput {
   clientMutationId?: string;
   /** The `UserConnectedAccount` to be created by this mutation. */
@@ -11561,6 +13079,46 @@ export interface AppLevelRequirementInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateAppLimitCreditInput {
+  clientMutationId?: string;
+  /** The `AppLimitCredit` to be created by this mutation. */
+  appLimitCredit: AppLimitCreditInput;
+}
+/** An input for mutations affecting `AppLimitCredit` */
+export interface AppLimitCreditInput {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+export interface CreateOrgLimitCreditInput {
+  clientMutationId?: string;
+  /** The `OrgLimitCredit` to be created by this mutation. */
+  orgLimitCredit: OrgLimitCreditInput;
+}
+/** An input for mutations affecting `OrgLimitCredit` */
+export interface OrgLimitCreditInput {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Entity this credit applies to; NULL for actor-only credits */
+  entityId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
 export interface CreateFullTextSearchInput {
   clientMutationId?: string;
   /** The `FullTextSearch` to be created by this mutation. */
@@ -11618,6 +13176,32 @@ export interface CommitInput {
   /** The root of the tree */
   treeId?: string;
   date?: string;
+}
+export interface CreatePubkeySettingInput {
+  clientMutationId?: string;
+  /** The `PubkeySetting` to be created by this mutation. */
+  pubkeySetting: PubkeySettingInput;
+}
+/** An input for mutations affecting `PubkeySetting` */
+export interface PubkeySettingInput {
+  /** Unique identifier for this pubkey settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId: string;
+  /** Schema containing the crypto auth functions (FK to metaschema_public.schema) */
+  schemaId?: string;
+  /** Crypto network for key derivation (e.g. cosmos, ethereum) */
+  cryptoNetwork?: string;
+  /** Field name used to identify the user in crypto auth functions */
+  userField?: string;
+  /** Reference to the sign-up-with-key function (FK to metaschema_public.function) */
+  signUpWithKeyFunctionId?: string;
+  /** Reference to the sign-in challenge request function (FK to metaschema_public.function) */
+  signInRequestChallengeFunctionId?: string;
+  /** Reference to the sign-in failure recording function (FK to metaschema_public.function) */
+  signInRecordFailureFunctionId?: string;
+  /** Reference to the sign-in-with-challenge function (FK to metaschema_public.function) */
+  signInWithChallengeFunctionId?: string;
 }
 export interface CreateRateLimitsModuleInput {
   clientMutationId?: string;
@@ -11776,6 +13360,34 @@ export interface DomainInput {
   subdomain?: ConstructiveInternalTypeHostname;
   /** Root domain of the hostname */
   domain?: ConstructiveInternalTypeHostname;
+}
+export interface CreateRlsSettingInput {
+  clientMutationId?: string;
+  /** The `RlsSetting` to be created by this mutation. */
+  rlsSetting: RlsSettingInput;
+}
+/** An input for mutations affecting `RlsSetting` */
+export interface RlsSettingInput {
+  /** Unique identifier for this RLS settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId: string;
+  /** Schema containing authenticate/authenticate_strict functions (FK to metaschema_public.schema) */
+  authenticateSchemaId?: string;
+  /** Schema containing current_role and related functions (FK to metaschema_public.schema) */
+  roleSchemaId?: string;
+  /** Reference to the authenticate function (FK to metaschema_public.function) */
+  authenticateFunctionId?: string;
+  /** Reference to the strict authenticate function (FK to metaschema_public.function) */
+  authenticateStrictFunctionId?: string;
+  /** Reference to the current_role function (FK to metaschema_public.function) */
+  currentRoleFunctionId?: string;
+  /** Reference to the current_role_id function (FK to metaschema_public.function) */
+  currentRoleIdFunctionId?: string;
+  /** Reference to the current_user_agent function (FK to metaschema_public.function) */
+  currentUserAgentFunctionId?: string;
+  /** Reference to the current_ip_address function (FK to metaschema_public.function) */
+  currentIpAddressFunctionId?: string;
 }
 export interface CreateAgentTaskInput {
   clientMutationId?: string;
@@ -11960,51 +13572,24 @@ export interface OrgChartEdgeInput {
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
 }
-export interface CreateAppLimitInput {
+export interface CreatePartitionInput {
   clientMutationId?: string;
-  /** The `AppLimit` to be created by this mutation. */
-  appLimit: AppLimitInput;
+  /** The `Partition` to be created by this mutation. */
+  partition: PartitionInput;
 }
-/** An input for mutations affecting `AppLimit` */
-export interface AppLimitInput {
+/** An input for mutations affecting `Partition` */
+export interface PartitionInput {
   id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-}
-export interface CreateOrgLimitAggregateInput {
-  clientMutationId?: string;
-  /** The `OrgLimitAggregate` to be created by this mutation. */
-  orgLimitAggregate: OrgLimitAggregateInput;
-}
-/** An input for mutations affecting `OrgLimitAggregate` */
-export interface OrgLimitAggregateInput {
-  id?: string;
-  /** Name identifier of the aggregate limit being tracked */
-  name?: string;
-  /** Entity (org) whose aggregate usage is being tracked */
-  entityId: string;
-  /** Current aggregate usage count for this entity and limit */
-  num?: string;
-  /** Maximum allowed aggregate usage; negative means unlimited */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
+  databaseId: string;
+  tableId: string;
+  strategy: string;
+  partitionKeyId: string;
+  interval?: string;
+  retention?: string;
+  lookahead?: number;
+  namingPattern?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface CreateBlueprintConstructionInput {
   clientMutationId?: string;
@@ -12035,25 +13620,6 @@ export interface BlueprintConstructionInput {
   createdAt?: string;
   /** Timestamp when this construction attempt was last modified. */
   updatedAt?: string;
-}
-export interface CreatePlansModuleInput {
-  clientMutationId?: string;
-  /** The `PlansModule` to be created by this mutation. */
-  plansModule: PlansModuleInput;
-}
-/** An input for mutations affecting `PlansModule` */
-export interface PlansModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  plansTableId?: string;
-  plansTableName?: string;
-  planLimitsTableId?: string;
-  planLimitsTableName?: string;
-  applyPlanFunction?: string;
-  applyPlanAggregateFunction?: string;
-  prefix?: string;
 }
 export interface CreateRlsModuleInput {
   clientMutationId?: string;
@@ -12132,29 +13698,37 @@ export interface AppLevelInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateOrgLimitInput {
+export interface CreateDatabaseSettingInput {
   clientMutationId?: string;
-  /** The `OrgLimit` to be created by this mutation. */
-  orgLimit: OrgLimitInput;
+  /** The `DatabaseSetting` to be created by this mutation. */
+  databaseSetting: DatabaseSettingInput;
 }
-/** An input for mutations affecting `OrgLimit` */
-export interface OrgLimitInput {
+/** An input for mutations affecting `DatabaseSetting` */
+export interface DatabaseSettingInput {
+  /** Unique identifier for this settings record */
   id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  entityId: string;
+  /** Reference to the metaschema database these settings apply to */
+  databaseId: string;
+  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
+  enableAggregates?: boolean;
+  /** Enable PostGIS spatial types and operators in the GraphQL API */
+  enablePostgis?: boolean;
+  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
+  enableSearch?: boolean;
+  /** Enable direct (multipart) file upload mutations in the GraphQL API */
+  enableDirectUploads?: boolean;
+  /** Enable presigned URL upload flow for S3/MinIO storage */
+  enablePresignedUploads?: boolean;
+  /** Enable many-to-many relationship queries in the GraphQL API */
+  enableManyToMany?: boolean;
+  /** Enable connection filter (where argument) in the GraphQL API */
+  enableConnectionFilter?: boolean;
+  /** Enable ltree hierarchical data type support in the GraphQL API */
+  enableLtree?: boolean;
+  /** Enable LLM/AI integration features in the GraphQL API */
+  enableLlm?: boolean;
+  /** Extensible JSON for additional settings that do not have dedicated columns */
+  options?: unknown;
 }
 export interface CreateBlueprintInput {
   clientMutationId?: string;
@@ -12208,6 +13782,61 @@ export interface DenormalizedTableFieldInput {
   funcName?: string;
   funcOrder?: number;
 }
+export interface CreateApiSettingInput {
+  clientMutationId?: string;
+  /** The `ApiSetting` to be created by this mutation. */
+  apiSetting: ApiSettingInput;
+}
+/** An input for mutations affecting `ApiSetting` */
+export interface ApiSettingInput {
+  /** Unique identifier for this API settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId: string;
+  /** API these settings override for */
+  apiId: string;
+  /** Override: enable aggregate queries (NULL = inherit from database_settings) */
+  enableAggregates?: boolean;
+  /** Override: enable PostGIS spatial types (NULL = inherit from database_settings) */
+  enablePostgis?: boolean;
+  /** Override: enable unified search (NULL = inherit from database_settings) */
+  enableSearch?: boolean;
+  /** Override: enable direct (multipart) file uploads (NULL = inherit from database_settings) */
+  enableDirectUploads?: boolean;
+  /** Override: enable presigned URL upload flow (NULL = inherit from database_settings) */
+  enablePresignedUploads?: boolean;
+  /** Override: enable many-to-many relationships (NULL = inherit from database_settings) */
+  enableManyToMany?: boolean;
+  /** Override: enable connection filter (NULL = inherit from database_settings) */
+  enableConnectionFilter?: boolean;
+  /** Override: enable ltree hierarchical data type (NULL = inherit from database_settings) */
+  enableLtree?: boolean;
+  /** Override: enable LLM/AI integration features (NULL = inherit from database_settings) */
+  enableLlm?: boolean;
+  /** Extensible JSON for additional per-API settings that do not have dedicated columns */
+  options?: unknown;
+}
+export interface CreatePlansModuleInput {
+  clientMutationId?: string;
+  /** The `PlansModule` to be created by this mutation. */
+  plansModule: PlansModuleInput;
+}
+/** An input for mutations affecting `PlansModule` */
+export interface PlansModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  plansTableId?: string;
+  plansTableName?: string;
+  planLimitsTableId?: string;
+  planLimitsTableName?: string;
+  planPricingTableId?: string;
+  planOverridesTableId?: string;
+  applyPlanFunction?: string;
+  applyPlanAggregateFunction?: string;
+  prefix?: string;
+}
 export interface CreateOrgMemberProfileInput {
   clientMutationId?: string;
   /** The `OrgMemberProfile` to be created by this mutation. */
@@ -12255,6 +13884,35 @@ export interface SqlActionInput {
   action?: string;
   actionId?: string;
   actorId?: string;
+}
+export interface CreateAppLimitInput {
+  clientMutationId?: string;
+  /** The `AppLimit` to be created by this mutation. */
+  appLimit: AppLimitInput;
+}
+/** An input for mutations affecting `AppLimit` */
+export interface AppLimitInput {
+  id?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** User whose usage is being tracked against this limit */
+  actorId: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
 }
 export interface CreateDatabaseTransferInput {
   clientMutationId?: string;
@@ -12425,6 +14083,67 @@ export interface AstMigrationInput {
   action?: string;
   actionId?: string;
   actorId?: string;
+}
+export interface CreateOrgLimitAggregateInput {
+  clientMutationId?: string;
+  /** The `OrgLimitAggregate` to be created by this mutation. */
+  orgLimitAggregate: OrgLimitAggregateInput;
+}
+/** An input for mutations affecting `OrgLimitAggregate` */
+export interface OrgLimitAggregateInput {
+  id?: string;
+  /** Name identifier of the aggregate limit being tracked */
+  name?: string;
+  /** Entity (org) whose aggregate usage is being tracked */
+  entityId: string;
+  /** Current aggregate usage count for this entity and limit */
+  num?: string;
+  /** Maximum allowed aggregate usage; negative means unlimited */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
+  reserved?: string;
+}
+export interface CreateOrgLimitInput {
+  clientMutationId?: string;
+  /** The `OrgLimit` to be created by this mutation. */
+  orgLimit: OrgLimitInput;
+}
+/** An input for mutations affecting `OrgLimit` */
+export interface OrgLimitInput {
+  id?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** User whose usage is being tracked against this limit */
+  actorId: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  entityId: string;
 }
 export interface CreateEnumInput {
   clientMutationId?: string;
@@ -12865,6 +14584,50 @@ export interface EmbeddingChunkInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateWebauthnSettingInput {
+  clientMutationId?: string;
+  /** The `WebauthnSetting` to be created by this mutation. */
+  webauthnSetting: WebauthnSettingInput;
+}
+/** An input for mutations affecting `WebauthnSetting` */
+export interface WebauthnSettingInput {
+  /** Unique identifier for this WebAuthn settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId: string;
+  /** Schema containing WebAuthn auth procedures (FK to metaschema_public.schema) */
+  schemaId?: string;
+  /** Schema of the webauthn_credentials table (FK to metaschema_public.schema) */
+  credentialsSchemaId?: string;
+  /** Schema of the sessions table (FK to metaschema_public.schema) */
+  sessionsSchemaId?: string;
+  /** Schema of the session_secrets table (FK to metaschema_public.schema) */
+  sessionSecretsSchemaId?: string;
+  /** Reference to the webauthn_credentials table (FK to metaschema_public.table) */
+  credentialsTableId?: string;
+  /** Reference to the sessions table (FK to metaschema_public.table) */
+  sessionsTableId?: string;
+  /** Reference to the session_credentials table (FK to metaschema_public.table) */
+  sessionCredentialsTableId?: string;
+  /** Reference to the session_secrets table (FK to metaschema_public.table) */
+  sessionSecretsTableId?: string;
+  /** Reference to the user field on webauthn_credentials (FK to metaschema_public.field) */
+  userFieldId?: string;
+  /** WebAuthn Relying Party ID (typically the domain name) */
+  rpId?: string;
+  /** WebAuthn Relying Party display name */
+  rpName?: string;
+  /** Allowed origins for WebAuthn registration and authentication */
+  originAllowlist?: string[];
+  /** Attestation conveyance preference (none, indirect, direct, enterprise) */
+  attestationType?: string;
+  /** Whether to require user verification (biometric/PIN) during auth */
+  requireUserVerification?: boolean;
+  /** Resident key requirement (discouraged, preferred, required) */
+  residentKey?: string;
+  /** Challenge TTL in seconds (default 300 = 5 minutes) */
+  challengeExpirySeconds?: string;
+}
 export interface CreateOrgInviteInput {
   clientMutationId?: string;
   /** The `OrgInvite` to be created by this mutation. */
@@ -12982,32 +14745,33 @@ export interface IndexInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateLimitsModuleInput {
+export interface CreateBillingProviderModuleInput {
   clientMutationId?: string;
-  /** The `LimitsModule` to be created by this mutation. */
-  limitsModule: LimitsModuleInput;
+  /** The `BillingProviderModule` to be created by this mutation. */
+  billingProviderModule: BillingProviderModuleInput;
 }
-/** An input for mutations affecting `LimitsModule` */
-export interface LimitsModuleInput {
+/** An input for mutations affecting `BillingProviderModule` */
+export interface BillingProviderModuleInput {
   id?: string;
   databaseId: string;
   schemaId?: string;
   privateSchemaId?: string;
-  tableId?: string;
-  tableName?: string;
-  defaultTableId?: string;
-  defaultTableName?: string;
-  limitIncrementFunction?: string;
-  limitDecrementFunction?: string;
-  limitIncrementTrigger?: string;
-  limitDecrementTrigger?: string;
-  limitUpdateTrigger?: string;
-  limitCheckFunction?: string;
-  aggregateTableId?: string;
+  provider?: string;
+  productsTableId?: string;
+  pricesTableId?: string;
+  subscriptionsTableId?: string;
+  billingCustomersTableId?: string;
+  billingCustomersTableName?: string;
+  billingProductsTableId?: string;
+  billingProductsTableName?: string;
+  billingPricesTableId?: string;
+  billingPricesTableName?: string;
+  billingSubscriptionsTableId?: string;
+  billingSubscriptionsTableName?: string;
+  billingWebhookEventsTableId?: string;
+  billingWebhookEventsTableName?: string;
+  processBillingEventFunction?: string;
   prefix?: string;
-  membershipType: number;
-  entityTableId?: string;
-  actorTableId?: string;
 }
 export interface CreateBlueprintTemplateInput {
   clientMutationId?: string;
@@ -13177,36 +14941,6 @@ export interface ForeignKeyConstraintInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateStorageModuleInput {
-  clientMutationId?: string;
-  /** The `StorageModule` to be created by this mutation. */
-  storageModule: StorageModuleInput;
-}
-/** An input for mutations affecting `StorageModule` */
-export interface StorageModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  membershipType?: number;
-  policies?: unknown;
-  skipDefaultPolicyTables?: string[];
-  entityTableId?: string;
-  endpoint?: string;
-  publicUrlPrefix?: string;
-  provider?: string;
-  allowedOrigins?: string[];
-  restrictReads?: boolean;
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
-}
 export interface CreateTableInput {
   clientMutationId?: string;
   /** The `Table` to be created by this mutation. */
@@ -13233,6 +14967,135 @@ export interface TableInput {
   inheritsId?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateRelationProvisionInput {
+  clientMutationId?: string;
+  /** The `RelationProvision` to be created by this mutation. */
+  relationProvision: RelationProvisionInput;
+}
+/** An input for mutations affecting `RelationProvision` */
+export interface RelationProvisionInput {
+  /** Unique identifier for this relation provision row. */
+  id?: string;
+  /** The database this relation belongs to. Required. Must match the database of both source_table_id and target_table_id. */
+  databaseId: string;
+  /**
+   * The type of relation to create. Uses SuperCase naming:
+   *      - RelationBelongsTo: creates a FK field on source_table referencing target_table (e.g., tasks belongs to projects -> tasks.project_id). Field name auto-derived from target table.
+   *      - RelationHasMany: creates a FK field on target_table referencing source_table (e.g., projects has many tasks -> tasks.project_id). Field name auto-derived from source table. Inverse of BelongsTo — same FK, different perspective.
+   *      - RelationHasOne: creates a FK field + unique constraint on source_table referencing target_table (e.g., user_settings has one user -> user_settings.user_id with UNIQUE). Also supports shared-primary-key patterns (e.g., user_profiles.id = users.id) by setting field_name to the existing PK field.
+   *      - RelationManyToMany: creates a junction table with FK fields to both tables (e.g., projects and tags -> project_tags table).
+   *      Each relation type uses a different subset of columns on this table. Required.
+   */
+  relationType: string;
+  /**
+   * The source table in the relation. Required.
+   *      - RelationBelongsTo: the table that receives the FK field (e.g., tasks in "tasks belongs to projects").
+   *      - RelationHasMany: the parent table being referenced (e.g., projects in "projects has many tasks"). The FK field is created on the target table.
+   *      - RelationHasOne: the table that receives the FK field + unique constraint (e.g., user_settings in "user_settings has one user").
+   *      - RelationManyToMany: one of the two tables being joined (e.g., projects in "projects and tags"). The junction table will have a FK field referencing this table.
+   */
+  sourceTableId: string;
+  /**
+   * The target table in the relation. Required.
+   *      - RelationBelongsTo: the table being referenced by the FK (e.g., projects in "tasks belongs to projects").
+   *      - RelationHasMany: the table that receives the FK field (e.g., tasks in "projects has many tasks").
+   *      - RelationHasOne: the table being referenced by the FK (e.g., users in "user_settings has one user").
+   *      - RelationManyToMany: the other table being joined (e.g., tags in "projects and tags"). The junction table will have a FK field referencing this table.
+   */
+  targetTableId: string;
+  /**
+   * FK field name for RelationBelongsTo, RelationHasOne, and RelationHasMany.
+   *      - RelationBelongsTo/RelationHasOne: if NULL, auto-derived from the target table name (e.g., target "projects" derives "project_id").
+   *      - RelationHasMany: if NULL, auto-derived from the source table name (e.g., source "projects" derives "project_id").
+   *      For RelationHasOne shared-primary-key patterns, set field_name to the existing PK field (e.g., "id") so the FK reuses it.
+   *      Ignored for RelationManyToMany — use source_field_name/target_field_name instead.
+   */
+  fieldName?: string;
+  /** FK delete action for RelationBelongsTo, RelationHasOne, and RelationHasMany. One of: c (CASCADE), r (RESTRICT), n (SET NULL), d (SET DEFAULT), a (NO ACTION). Required — the trigger raises an error if not provided. The caller must explicitly choose the cascade behavior; there is no default. Ignored for RelationManyToMany (junction FK fields always use CASCADE). */
+  deleteAction?: string;
+  /**
+   * Whether the FK field is NOT NULL. Defaults to true.
+   *      - RelationBelongsTo: set to false for optional associations (e.g., tasks.assignee_id that can be NULL).
+   *      - RelationHasMany: set to false if the child can exist without a parent.
+   *      - RelationHasOne: typically true.
+   *      Ignored for RelationManyToMany (junction FK fields are always required).
+   */
+  isRequired?: boolean;
+  /**
+   * Whether the FK field should be required at the API level even though it is nullable at the database level. Defaults to false.
+   *      When true and is_required is false, the field is created as nullable (allowing SET NULL cascade) but a @requiredInput smart tag is added so PostGraphile treats it as non-null in create/update input types.
+   *      When is_required is true, api_required is ignored (the field is already required at both levels).
+   *      Ignored for RelationManyToMany (junction FK fields are always required).
+   */
+  apiRequired?: boolean;
+  /**
+   * For RelationManyToMany: an existing junction table to use. Defaults to uuid_nil().
+   *      - When uuid_nil(): the trigger creates a new junction table via secure_table_provision using junction_table_name.
+   *      - When set to a valid table UUID: the trigger skips table creation and only adds FK fields, composite key (if use_composite_key is true), and security to the existing table.
+   *      Ignored for RelationBelongsTo/RelationHasOne.
+   */
+  junctionTableId?: string;
+  /** For RelationManyToMany: name of the junction table to create or look up. If NULL, auto-derived from source and target table names using inflection_db (e.g., "projects" + "tags" derives "project_tags"). Only used when junction_table_id is uuid_nil(). Ignored for RelationBelongsTo/RelationHasOne. */
+  junctionTableName?: string;
+  /** For RelationManyToMany: schema for the junction table. If NULL, defaults to the source table's schema. Ignored for RelationBelongsTo/RelationHasOne. */
+  junctionSchemaId?: string;
+  /** For RelationManyToMany: FK field name on the junction table referencing the source table. If NULL, auto-derived from the source table name using inflection_db.get_foreign_key_field_name() (e.g., source table "projects" derives "project_id"). Ignored for RelationBelongsTo/RelationHasOne. */
+  sourceFieldName?: string;
+  /** For RelationManyToMany: FK field name on the junction table referencing the target table. If NULL, auto-derived from the target table name using inflection_db.get_foreign_key_field_name() (e.g., target table "tags" derives "tag_id"). Ignored for RelationBelongsTo/RelationHasOne. */
+  targetFieldName?: string;
+  /**
+   * For RelationManyToMany: whether to create a composite primary key from the two FK fields (source + target) on the junction table. Defaults to false.
+   *      - When true: the trigger calls metaschema.pk() with ARRAY[source_field_id, target_field_id] to create a composite PK. No separate id column is created. This enforces uniqueness of the pair and is suitable for simple junction tables.
+   *      - When false: no primary key is created by the trigger. The caller should provide node_type='DataId' to create a UUID primary key, or handle the PK strategy via a separate secure_table_provision row.
+   *      use_composite_key and node_type='DataId' are mutually exclusive — using both would create two conflicting PKs.
+   *      Ignored for RelationBelongsTo/RelationHasOne.
+   */
+  useCompositeKey?: boolean;
+  /**
+   * Whether to create a btree index on FK fields created by this relation. Defaults to true.
+   *      PostgreSQL does not automatically index foreign key columns (only the referenced PK side is indexed).
+   *      Without indexes on FK columns, JOINs, CASCADE deletes, and RLS policy lookups perform sequential scans.
+   *      - RelationBelongsTo: creates an index on the FK field on the source table.
+   *      - RelationHasMany: creates an index on the FK field on the target table.
+   *      - RelationHasOne: skipped — the unique constraint already creates an implicit index.
+   *      - RelationManyToMany: creates indexes on both FK fields on the junction table.
+   *      Set to false only for very small tables or write-heavy tables where index maintenance cost outweighs read performance.
+   */
+  createIndex?: boolean;
+  /**
+   * For RelationManyToMany: whether to expose the M:N shortcut fields in the GraphQL API. Defaults to true.
+   *      When true, sets @behavior +manyToMany on the junction table smart_tags so PostGraphile generates
+   *      clean M:N connection fields (e.g., event.contacts instead of event.contactEventsByEventId).
+   *      When false (or toggled off via UPDATE), the behavior tag is removed and the M:N fields disappear from GraphQL.
+   *      Toggling is supported: UPDATE expose_in_api to true/false and the smart tag is added/removed automatically.
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  exposeInApi?: boolean;
+  /**
+   * For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+   *      Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+   *      Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  nodes?: unknown;
+  /** For RelationManyToMany: array of grant objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "roles" (text[], required), "privileges" (jsonb[], required — array of [privilege, columns] tuples). Example: [{"roles":["authenticated"],"privileges":[["select","*"],["insert","*"],["delete","*"]]}]. Defaults to '[]' (no grants). Ignored for RelationBelongsTo/RelationHasOne. */
+  grants?: unknown;
+  /**
+   * For RelationManyToMany: array of policy objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "$type" (text, required — the Authz* policy generator type), "data" (jsonb, optional — opaque config), "privileges" (text[], optional — e.g. ["select","insert"]; if omitted, derived from grants[] privilege verbs), "policy_role" (text, optional — falls back to first role in first grants[] entry, or 'authenticated'), "permissive" (boolean, optional, defaults to true), "policy_name" (text, optional). Supports multiple policies per row.
+   *      Example: [{"$type": "AuthzEntityMembership", "data": {"entity_field": "entity_id", "membership_type": 2}, "privileges": ["select", "insert", "delete"]}].
+   *      Defaults to '[]' (no policies — the junction table will have RLS enabled but no policies unless added separately).
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  policies?: unknown;
+  /** Output column for RelationBelongsTo/RelationHasOne/RelationHasMany: the UUID of the FK field created (or found). For BelongsTo/HasOne this is on the source table; for HasMany this is on the target table. Populated by the trigger. NULL for RelationManyToMany. Callers should not set this directly. */
+  outFieldId?: string;
+  /** Output column for RelationManyToMany: the UUID of the junction table created (or found). Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
+  outJunctionTableId?: string;
+  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the source table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
+  outSourceFieldId?: string;
+  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
+  outTargetFieldId?: string;
 }
 export interface CreateEntityTypeProvisionInput {
   clientMutationId?: string;
@@ -13420,141 +15283,13 @@ export interface EntityTypeProvisionInput {
   outBucketsTableId?: string;
   /** Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true. */
   outFilesTableId?: string;
+  outPathSharesTableId?: string;
   /**
    * Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
    *      NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
    *      (i.e. the invites_module row was created in a previous run).
    */
   outInvitesModuleId?: string;
-}
-export interface CreateRelationProvisionInput {
-  clientMutationId?: string;
-  /** The `RelationProvision` to be created by this mutation. */
-  relationProvision: RelationProvisionInput;
-}
-/** An input for mutations affecting `RelationProvision` */
-export interface RelationProvisionInput {
-  /** Unique identifier for this relation provision row. */
-  id?: string;
-  /** The database this relation belongs to. Required. Must match the database of both source_table_id and target_table_id. */
-  databaseId: string;
-  /**
-   * The type of relation to create. Uses SuperCase naming:
-   *      - RelationBelongsTo: creates a FK field on source_table referencing target_table (e.g., tasks belongs to projects -> tasks.project_id). Field name auto-derived from target table.
-   *      - RelationHasMany: creates a FK field on target_table referencing source_table (e.g., projects has many tasks -> tasks.project_id). Field name auto-derived from source table. Inverse of BelongsTo — same FK, different perspective.
-   *      - RelationHasOne: creates a FK field + unique constraint on source_table referencing target_table (e.g., user_settings has one user -> user_settings.user_id with UNIQUE). Also supports shared-primary-key patterns (e.g., user_profiles.id = users.id) by setting field_name to the existing PK field.
-   *      - RelationManyToMany: creates a junction table with FK fields to both tables (e.g., projects and tags -> project_tags table).
-   *      Each relation type uses a different subset of columns on this table. Required.
-   */
-  relationType: string;
-  /**
-   * The source table in the relation. Required.
-   *      - RelationBelongsTo: the table that receives the FK field (e.g., tasks in "tasks belongs to projects").
-   *      - RelationHasMany: the parent table being referenced (e.g., projects in "projects has many tasks"). The FK field is created on the target table.
-   *      - RelationHasOne: the table that receives the FK field + unique constraint (e.g., user_settings in "user_settings has one user").
-   *      - RelationManyToMany: one of the two tables being joined (e.g., projects in "projects and tags"). The junction table will have a FK field referencing this table.
-   */
-  sourceTableId: string;
-  /**
-   * The target table in the relation. Required.
-   *      - RelationBelongsTo: the table being referenced by the FK (e.g., projects in "tasks belongs to projects").
-   *      - RelationHasMany: the table that receives the FK field (e.g., tasks in "projects has many tasks").
-   *      - RelationHasOne: the table being referenced by the FK (e.g., users in "user_settings has one user").
-   *      - RelationManyToMany: the other table being joined (e.g., tags in "projects and tags"). The junction table will have a FK field referencing this table.
-   */
-  targetTableId: string;
-  /**
-   * FK field name for RelationBelongsTo, RelationHasOne, and RelationHasMany.
-   *      - RelationBelongsTo/RelationHasOne: if NULL, auto-derived from the target table name (e.g., target "projects" derives "project_id").
-   *      - RelationHasMany: if NULL, auto-derived from the source table name (e.g., source "projects" derives "project_id").
-   *      For RelationHasOne shared-primary-key patterns, set field_name to the existing PK field (e.g., "id") so the FK reuses it.
-   *      Ignored for RelationManyToMany — use source_field_name/target_field_name instead.
-   */
-  fieldName?: string;
-  /** FK delete action for RelationBelongsTo, RelationHasOne, and RelationHasMany. One of: c (CASCADE), r (RESTRICT), n (SET NULL), d (SET DEFAULT), a (NO ACTION). Required — the trigger raises an error if not provided. The caller must explicitly choose the cascade behavior; there is no default. Ignored for RelationManyToMany (junction FK fields always use CASCADE). */
-  deleteAction?: string;
-  /**
-   * Whether the FK field is NOT NULL. Defaults to true.
-   *      - RelationBelongsTo: set to false for optional associations (e.g., tasks.assignee_id that can be NULL).
-   *      - RelationHasMany: set to false if the child can exist without a parent.
-   *      - RelationHasOne: typically true.
-   *      Ignored for RelationManyToMany (junction FK fields are always required).
-   */
-  isRequired?: boolean;
-  /**
-   * Whether the FK field should be required at the API level even though it is nullable at the database level. Defaults to false.
-   *      When true and is_required is false, the field is created as nullable (allowing SET NULL cascade) but a @requiredInput smart tag is added so PostGraphile treats it as non-null in create/update input types.
-   *      When is_required is true, api_required is ignored (the field is already required at both levels).
-   *      Ignored for RelationManyToMany (junction FK fields are always required).
-   */
-  apiRequired?: boolean;
-  /**
-   * For RelationManyToMany: an existing junction table to use. Defaults to uuid_nil().
-   *      - When uuid_nil(): the trigger creates a new junction table via secure_table_provision using junction_table_name.
-   *      - When set to a valid table UUID: the trigger skips table creation and only adds FK fields, composite key (if use_composite_key is true), and security to the existing table.
-   *      Ignored for RelationBelongsTo/RelationHasOne.
-   */
-  junctionTableId?: string;
-  /** For RelationManyToMany: name of the junction table to create or look up. If NULL, auto-derived from source and target table names using inflection_db (e.g., "projects" + "tags" derives "project_tags"). Only used when junction_table_id is uuid_nil(). Ignored for RelationBelongsTo/RelationHasOne. */
-  junctionTableName?: string;
-  /** For RelationManyToMany: schema for the junction table. If NULL, defaults to the source table's schema. Ignored for RelationBelongsTo/RelationHasOne. */
-  junctionSchemaId?: string;
-  /** For RelationManyToMany: FK field name on the junction table referencing the source table. If NULL, auto-derived from the source table name using inflection_db.get_foreign_key_field_name() (e.g., source table "projects" derives "project_id"). Ignored for RelationBelongsTo/RelationHasOne. */
-  sourceFieldName?: string;
-  /** For RelationManyToMany: FK field name on the junction table referencing the target table. If NULL, auto-derived from the target table name using inflection_db.get_foreign_key_field_name() (e.g., target table "tags" derives "tag_id"). Ignored for RelationBelongsTo/RelationHasOne. */
-  targetFieldName?: string;
-  /**
-   * For RelationManyToMany: whether to create a composite primary key from the two FK fields (source + target) on the junction table. Defaults to false.
-   *      - When true: the trigger calls metaschema.pk() with ARRAY[source_field_id, target_field_id] to create a composite PK. No separate id column is created. This enforces uniqueness of the pair and is suitable for simple junction tables.
-   *      - When false: no primary key is created by the trigger. The caller should provide node_type='DataId' to create a UUID primary key, or handle the PK strategy via a separate secure_table_provision row.
-   *      use_composite_key and node_type='DataId' are mutually exclusive — using both would create two conflicting PKs.
-   *      Ignored for RelationBelongsTo/RelationHasOne.
-   */
-  useCompositeKey?: boolean;
-  /**
-   * Whether to create a btree index on FK fields created by this relation. Defaults to true.
-   *      PostgreSQL does not automatically index foreign key columns (only the referenced PK side is indexed).
-   *      Without indexes on FK columns, JOINs, CASCADE deletes, and RLS policy lookups perform sequential scans.
-   *      - RelationBelongsTo: creates an index on the FK field on the source table.
-   *      - RelationHasMany: creates an index on the FK field on the target table.
-   *      - RelationHasOne: skipped — the unique constraint already creates an implicit index.
-   *      - RelationManyToMany: creates indexes on both FK fields on the junction table.
-   *      Set to false only for very small tables or write-heavy tables where index maintenance cost outweighs read performance.
-   */
-  createIndex?: boolean;
-  /**
-   * For RelationManyToMany: whether to expose the M:N shortcut fields in the GraphQL API. Defaults to true.
-   *      When true, sets @behavior +manyToMany on the junction table smart_tags so PostGraphile generates
-   *      clean M:N connection fields (e.g., event.contacts instead of event.contactEventsByEventId).
-   *      When false (or toggled off via UPDATE), the behavior tag is removed and the M:N fields disappear from GraphQL.
-   *      Toggling is supported: UPDATE expose_in_api to true/false and the smart tag is added/removed automatically.
-   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
-   */
-  exposeInApi?: boolean;
-  /**
-   * For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
-   *      Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
-   *      Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
-   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
-   */
-  nodes?: unknown;
-  /** For RelationManyToMany: array of grant objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "roles" (text[], required), "privileges" (jsonb[], required — array of [privilege, columns] tuples). Example: [{"roles":["authenticated"],"privileges":[["select","*"],["insert","*"],["delete","*"]]}]. Defaults to '[]' (no grants). Ignored for RelationBelongsTo/RelationHasOne. */
-  grants?: unknown;
-  /**
-   * For RelationManyToMany: array of policy objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "$type" (text, required — the Authz* policy generator type), "data" (jsonb, optional — opaque config), "privileges" (text[], optional — e.g. ["select","insert"]; if omitted, derived from grants[] privilege verbs), "policy_role" (text, optional — falls back to first role in first grants[] entry, or 'authenticated'), "permissive" (boolean, optional, defaults to true), "policy_name" (text, optional). Supports multiple policies per row.
-   *      Example: [{"$type": "AuthzEntityMembership", "data": {"entity_field": "entity_id", "membership_type": 2}, "privileges": ["select", "insert", "delete"]}].
-   *      Defaults to '[]' (no policies — the junction table will have RLS enabled but no policies unless added separately).
-   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
-   */
-  policies?: unknown;
-  /** Output column for RelationBelongsTo/RelationHasOne/RelationHasMany: the UUID of the FK field created (or found). For BelongsTo/HasOne this is on the source table; for HasMany this is on the target table. Populated by the trigger. NULL for RelationManyToMany. Callers should not set this directly. */
-  outFieldId?: string;
-  /** Output column for RelationManyToMany: the UUID of the junction table created (or found). Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
-  outJunctionTableId?: string;
-  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the source table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
-  outSourceFieldId?: string;
-  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
-  outTargetFieldId?: string;
 }
 export interface CreateLevelsModuleInput {
   clientMutationId?: string;
@@ -13656,6 +15391,81 @@ export interface FieldInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateLimitsModuleInput {
+  clientMutationId?: string;
+  /** The `LimitsModule` to be created by this mutation. */
+  limitsModule: LimitsModuleInput;
+}
+/** An input for mutations affecting `LimitsModule` */
+export interface LimitsModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  tableId?: string;
+  tableName?: string;
+  defaultTableId?: string;
+  defaultTableName?: string;
+  limitIncrementFunction?: string;
+  limitDecrementFunction?: string;
+  limitIncrementTrigger?: string;
+  limitDecrementTrigger?: string;
+  limitUpdateTrigger?: string;
+  limitCheckFunction?: string;
+  limitCreditsTableId?: string;
+  eventsTableId?: string;
+  creditCodesTableId?: string;
+  creditCodeItemsTableId?: string;
+  creditRedemptionsTableId?: string;
+  aggregateTableId?: string;
+  limitCapsTableId?: string;
+  limitCapsDefaultsTableId?: string;
+  capCheckTrigger?: string;
+  resolveCapFunction?: string;
+  prefix?: string;
+  membershipType: number;
+  entityTableId?: string;
+  actorTableId?: string;
+}
+export interface CreateStorageModuleInput {
+  clientMutationId?: string;
+  /** The `StorageModule` to be created by this mutation. */
+  storageModule: StorageModuleInput;
+}
+/** An input for mutations affecting `StorageModule` */
+export interface StorageModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  membershipType?: number;
+  policies?: unknown;
+  skipDefaultPolicyTables?: string[];
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  restrictReads?: boolean;
+  hasPathShares?: boolean;
+  pathSharesTableId?: string;
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
+  maxBulkFiles?: number;
+  maxBulkTotalSize?: string;
+  hasVersioning?: boolean;
+  hasContentHash?: boolean;
+  hasCustomKeys?: boolean;
+  hasAuditLog?: boolean;
+  fileEventsTableId?: string;
+}
 export interface CreateMembershipsModuleInput {
   clientMutationId?: string;
   /** The `MembershipsModule` to be created by this mutation. */
@@ -13720,6 +15530,33 @@ export interface RoleTypePatch {
   id?: number;
   name?: string;
 }
+export interface UpdateAppLimitCreditRedemptionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimitCreditRedemption` being updated. */
+  appLimitCreditRedemptionPatch: AppLimitCreditRedemptionPatch;
+}
+/** Represents an update to a `AppLimitCreditRedemption`. Fields that are set will be updated. */
+export interface AppLimitCreditRedemptionPatch {
+  id?: string;
+  /** FK to credit_codes — which code is being redeemed */
+  creditCodeId?: string;
+  /** Entity receiving the credits (personal org user_id or org entity_id) */
+  entityId?: string;
+}
+export interface UpdateFunctionInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Function` being updated. */
+  functionPatch: FunctionPatch;
+}
+/** Represents an update to a `Function`. Fields that are set will be updated. */
+export interface FunctionPatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  name?: string;
+}
 export interface UpdateViewTableInput {
   clientMutationId?: string;
   id: string;
@@ -13750,6 +15587,24 @@ export interface ApiSchemaPatch {
   schemaId?: string;
   /** API that exposes this schema */
   apiId?: string;
+}
+export interface UpdateCorsSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this CORS settings record */
+  id: string;
+  /** An object where the defined keys will be set on the `CorsSetting` being updated. */
+  corsSettingPatch: CorsSettingPatch;
+}
+/** Represents an update to a `CorsSetting`. Fields that are set will be updated. */
+export interface CorsSettingPatch {
+  /** Unique identifier for this CORS settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId?: string;
+  /** Optional API for per-API override; NULL means database-wide default */
+  apiId?: string;
+  /** Array of allowed CORS origins (e.g. https://example.com) */
+  allowedOrigins?: string[];
 }
 export interface UpdateOrgMemberInput {
   clientMutationId?: string;
@@ -13915,6 +15770,24 @@ export interface SiteModulePatch {
   name?: string;
   /** JSON configuration data for this module */
   data?: unknown;
+}
+export interface UpdateAppLimitCreditCodeInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimitCreditCode` being updated. */
+  appLimitCreditCodePatch: AppLimitCreditCodePatch;
+}
+/** Represents an update to a `AppLimitCreditCode`. Fields that are set will be updated. */
+export interface AppLimitCreditCodePatch {
+  id?: string;
+  /** Human-readable credit code (case-insensitive, unique) */
+  code?: string;
+  /** Maximum total redemptions allowed; NULL for unlimited */
+  maxRedemptions?: number;
+  /** Current number of redemptions (incremented by trigger on credit_redemptions) */
+  currentRedemptions?: number;
+  /** Expiration timestamp; NULL for no expiry */
+  expiresAt?: string;
 }
 export interface UpdateSchemaGrantInput {
   clientMutationId?: string;
@@ -14112,6 +15985,66 @@ export interface OrgPermissionPatch {
   bitstr?: string;
   /** Human-readable description of what this permission allows */
   description?: string;
+}
+export interface UpdateAppLimitCapsDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimitCapsDefault` being updated. */
+  appLimitCapsDefaultPatch: AppLimitCapsDefaultPatch;
+}
+/** Represents an update to a `AppLimitCapsDefault`. Fields that are set will be updated. */
+export interface AppLimitCapsDefaultPatch {
+  id?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name?: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+}
+export interface UpdateOrgLimitCapsDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgLimitCapsDefault` being updated. */
+  orgLimitCapsDefaultPatch: OrgLimitCapsDefaultPatch;
+}
+/** Represents an update to a `OrgLimitCapsDefault`. Fields that are set will be updated. */
+export interface OrgLimitCapsDefaultPatch {
+  id?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name?: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+}
+export interface UpdateAppLimitCapInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimitCap` being updated. */
+  appLimitCapPatch: AppLimitCapPatch;
+}
+/** Represents an update to a `AppLimitCap`. Fields that are set will be updated. */
+export interface AppLimitCapPatch {
+  id?: string;
+  /** Name identifier of the cap being overridden */
+  name?: string;
+  /** Entity this cap override applies to */
+  entityId?: string;
+  /** Override cap value for this entity */
+  max?: string;
+}
+export interface UpdateOrgLimitCapInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgLimitCap` being updated. */
+  orgLimitCapPatch: OrgLimitCapPatch;
+}
+/** Represents an update to a `OrgLimitCap`. Fields that are set will be updated. */
+export interface OrgLimitCapPatch {
+  id?: string;
+  /** Name identifier of the cap being overridden */
+  name?: string;
+  /** Entity this cap override applies to */
+  entityId?: string;
+  /** Override cap value for this entity */
+  max?: string;
 }
 export interface UpdateMembershipTypeInput {
   clientMutationId?: string;
@@ -14374,6 +16307,24 @@ export interface OrgLimitDefaultPatch {
   /** Default soft limit threshold for warnings; NULL means no soft limit */
   softMax?: string;
 }
+export interface UpdateAppLimitCreditCodeItemInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimitCreditCodeItem` being updated. */
+  appLimitCreditCodeItemPatch: AppLimitCreditCodeItemPatch;
+}
+/** Represents an update to a `AppLimitCreditCodeItem`. Fields that are set will be updated. */
+export interface AppLimitCreditCodeItemPatch {
+  id?: string;
+  /** FK to credit_codes — which code this item belongs to */
+  creditCodeId?: string;
+  /** FK to default_limits — which limit this item grants credits for */
+  defaultLimitId?: string;
+  /** Number of credits this item grants per redemption */
+  amount?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+}
 export interface UpdateDatabaseInput {
   clientMutationId?: string;
   id: string;
@@ -14516,6 +16467,48 @@ export interface AppLevelRequirementPatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateAppLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimitCredit` being updated. */
+  appLimitCreditPatch: AppLimitCreditPatch;
+}
+/** Represents an update to a `AppLimitCredit`. Fields that are set will be updated. */
+export interface AppLimitCreditPatch {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId?: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+export interface UpdateOrgLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgLimitCredit` being updated. */
+  orgLimitCreditPatch: OrgLimitCreditPatch;
+}
+/** Represents an update to a `OrgLimitCredit`. Fields that are set will be updated. */
+export interface OrgLimitCreditPatch {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId?: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Entity this credit applies to; NULL for actor-only credits */
+  entityId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
 export interface UpdateFullTextSearchInput {
   clientMutationId?: string;
   id: string;
@@ -14579,6 +16572,34 @@ export interface CommitPatch {
   /** The root of the tree */
   treeId?: string;
   date?: string;
+}
+export interface UpdatePubkeySettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this pubkey settings record */
+  id: string;
+  /** An object where the defined keys will be set on the `PubkeySetting` being updated. */
+  pubkeySettingPatch: PubkeySettingPatch;
+}
+/** Represents an update to a `PubkeySetting`. Fields that are set will be updated. */
+export interface PubkeySettingPatch {
+  /** Unique identifier for this pubkey settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId?: string;
+  /** Schema containing the crypto auth functions (FK to metaschema_public.schema) */
+  schemaId?: string;
+  /** Crypto network for key derivation (e.g. cosmos, ethereum) */
+  cryptoNetwork?: string;
+  /** Field name used to identify the user in crypto auth functions */
+  userField?: string;
+  /** Reference to the sign-up-with-key function (FK to metaschema_public.function) */
+  signUpWithKeyFunctionId?: string;
+  /** Reference to the sign-in challenge request function (FK to metaschema_public.function) */
+  signInRequestChallengeFunctionId?: string;
+  /** Reference to the sign-in failure recording function (FK to metaschema_public.function) */
+  signInRecordFailureFunctionId?: string;
+  /** Reference to the sign-in-with-challenge function (FK to metaschema_public.function) */
+  signInWithChallengeFunctionId?: string;
 }
 export interface UpdateRateLimitsModuleInput {
   clientMutationId?: string;
@@ -14747,6 +16768,36 @@ export interface DomainPatch {
   /** Root domain of the hostname */
   domain?: ConstructiveInternalTypeHostname;
 }
+export interface UpdateRlsSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this RLS settings record */
+  id: string;
+  /** An object where the defined keys will be set on the `RlsSetting` being updated. */
+  rlsSettingPatch: RlsSettingPatch;
+}
+/** Represents an update to a `RlsSetting`. Fields that are set will be updated. */
+export interface RlsSettingPatch {
+  /** Unique identifier for this RLS settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId?: string;
+  /** Schema containing authenticate/authenticate_strict functions (FK to metaschema_public.schema) */
+  authenticateSchemaId?: string;
+  /** Schema containing current_role and related functions (FK to metaschema_public.schema) */
+  roleSchemaId?: string;
+  /** Reference to the authenticate function (FK to metaschema_public.function) */
+  authenticateFunctionId?: string;
+  /** Reference to the strict authenticate function (FK to metaschema_public.function) */
+  authenticateStrictFunctionId?: string;
+  /** Reference to the current_role function (FK to metaschema_public.function) */
+  currentRoleFunctionId?: string;
+  /** Reference to the current_role_id function (FK to metaschema_public.function) */
+  currentRoleIdFunctionId?: string;
+  /** Reference to the current_user_agent function (FK to metaschema_public.function) */
+  currentUserAgentFunctionId?: string;
+  /** Reference to the current_ip_address function (FK to metaschema_public.function) */
+  currentIpAddressFunctionId?: string;
+}
 export interface UpdateAgentTaskInput {
   clientMutationId?: string;
   id: string;
@@ -14884,53 +16935,25 @@ export interface OrgChartEdgePatch {
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
 }
-export interface UpdateAppLimitInput {
+export interface UpdatePartitionInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `AppLimit` being updated. */
-  appLimitPatch: AppLimitPatch;
+  /** An object where the defined keys will be set on the `Partition` being updated. */
+  partitionPatch: PartitionPatch;
 }
-/** Represents an update to a `AppLimit`. Fields that are set will be updated. */
-export interface AppLimitPatch {
+/** Represents an update to a `Partition`. Fields that are set will be updated. */
+export interface PartitionPatch {
   id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId?: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-}
-export interface UpdateOrgLimitAggregateInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgLimitAggregate` being updated. */
-  orgLimitAggregatePatch: OrgLimitAggregatePatch;
-}
-/** Represents an update to a `OrgLimitAggregate`. Fields that are set will be updated. */
-export interface OrgLimitAggregatePatch {
-  id?: string;
-  /** Name identifier of the aggregate limit being tracked */
-  name?: string;
-  /** Entity (org) whose aggregate usage is being tracked */
-  entityId?: string;
-  /** Current aggregate usage count for this entity and limit */
-  num?: string;
-  /** Maximum allowed aggregate usage; negative means unlimited */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
+  databaseId?: string;
+  tableId?: string;
+  strategy?: string;
+  partitionKeyId?: string;
+  interval?: string;
+  retention?: string;
+  lookahead?: number;
+  namingPattern?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface UpdateBlueprintConstructionInput {
   clientMutationId?: string;
@@ -14963,26 +16986,6 @@ export interface BlueprintConstructionPatch {
   createdAt?: string;
   /** Timestamp when this construction attempt was last modified. */
   updatedAt?: string;
-}
-export interface UpdatePlansModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `PlansModule` being updated. */
-  plansModulePatch: PlansModulePatch;
-}
-/** Represents an update to a `PlansModule`. Fields that are set will be updated. */
-export interface PlansModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  plansTableId?: string;
-  plansTableName?: string;
-  planLimitsTableId?: string;
-  planLimitsTableName?: string;
-  applyPlanFunction?: string;
-  applyPlanAggregateFunction?: string;
-  prefix?: string;
 }
 export interface UpdateRlsModuleInput {
   clientMutationId?: string;
@@ -15067,30 +17070,39 @@ export interface AppLevelPatch {
   /** Upload for Badge or icon image associated with this level */
   imageUpload?: File;
 }
-export interface UpdateOrgLimitInput {
+export interface UpdateDatabaseSettingInput {
   clientMutationId?: string;
+  /** Unique identifier for this settings record */
   id: string;
-  /** An object where the defined keys will be set on the `OrgLimit` being updated. */
-  orgLimitPatch: OrgLimitPatch;
+  /** An object where the defined keys will be set on the `DatabaseSetting` being updated. */
+  databaseSettingPatch: DatabaseSettingPatch;
 }
-/** Represents an update to a `OrgLimit`. Fields that are set will be updated. */
-export interface OrgLimitPatch {
+/** Represents an update to a `DatabaseSetting`. Fields that are set will be updated. */
+export interface DatabaseSettingPatch {
+  /** Unique identifier for this settings record */
   id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId?: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  entityId?: string;
+  /** Reference to the metaschema database these settings apply to */
+  databaseId?: string;
+  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
+  enableAggregates?: boolean;
+  /** Enable PostGIS spatial types and operators in the GraphQL API */
+  enablePostgis?: boolean;
+  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
+  enableSearch?: boolean;
+  /** Enable direct (multipart) file upload mutations in the GraphQL API */
+  enableDirectUploads?: boolean;
+  /** Enable presigned URL upload flow for S3/MinIO storage */
+  enablePresignedUploads?: boolean;
+  /** Enable many-to-many relationship queries in the GraphQL API */
+  enableManyToMany?: boolean;
+  /** Enable connection filter (where argument) in the GraphQL API */
+  enableConnectionFilter?: boolean;
+  /** Enable ltree hierarchical data type support in the GraphQL API */
+  enableLtree?: boolean;
+  /** Enable LLM/AI integration features in the GraphQL API */
+  enableLlm?: boolean;
+  /** Extensible JSON for additional settings that do not have dedicated columns */
+  options?: unknown;
 }
 export interface UpdateBlueprintInput {
   clientMutationId?: string;
@@ -15147,6 +17159,64 @@ export interface DenormalizedTableFieldPatch {
   funcName?: string;
   funcOrder?: number;
 }
+export interface UpdateApiSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this API settings record */
+  id: string;
+  /** An object where the defined keys will be set on the `ApiSetting` being updated. */
+  apiSettingPatch: ApiSettingPatch;
+}
+/** Represents an update to a `ApiSetting`. Fields that are set will be updated. */
+export interface ApiSettingPatch {
+  /** Unique identifier for this API settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId?: string;
+  /** API these settings override for */
+  apiId?: string;
+  /** Override: enable aggregate queries (NULL = inherit from database_settings) */
+  enableAggregates?: boolean;
+  /** Override: enable PostGIS spatial types (NULL = inherit from database_settings) */
+  enablePostgis?: boolean;
+  /** Override: enable unified search (NULL = inherit from database_settings) */
+  enableSearch?: boolean;
+  /** Override: enable direct (multipart) file uploads (NULL = inherit from database_settings) */
+  enableDirectUploads?: boolean;
+  /** Override: enable presigned URL upload flow (NULL = inherit from database_settings) */
+  enablePresignedUploads?: boolean;
+  /** Override: enable many-to-many relationships (NULL = inherit from database_settings) */
+  enableManyToMany?: boolean;
+  /** Override: enable connection filter (NULL = inherit from database_settings) */
+  enableConnectionFilter?: boolean;
+  /** Override: enable ltree hierarchical data type (NULL = inherit from database_settings) */
+  enableLtree?: boolean;
+  /** Override: enable LLM/AI integration features (NULL = inherit from database_settings) */
+  enableLlm?: boolean;
+  /** Extensible JSON for additional per-API settings that do not have dedicated columns */
+  options?: unknown;
+}
+export interface UpdatePlansModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlansModule` being updated. */
+  plansModulePatch: PlansModulePatch;
+}
+/** Represents an update to a `PlansModule`. Fields that are set will be updated. */
+export interface PlansModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  plansTableId?: string;
+  plansTableName?: string;
+  planLimitsTableId?: string;
+  planLimitsTableName?: string;
+  planPricingTableId?: string;
+  planOverridesTableId?: string;
+  applyPlanFunction?: string;
+  applyPlanAggregateFunction?: string;
+  prefix?: string;
+}
 export interface UpdateOrgMemberProfileInput {
   clientMutationId?: string;
   id: string;
@@ -15176,6 +17246,36 @@ export interface OrgMemberProfilePatch {
   profilePicture?: ConstructiveInternalTypeImage;
   /** Upload for Profile picture visible to other entity members */
   profilePictureUpload?: File;
+}
+export interface UpdateAppLimitInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimit` being updated. */
+  appLimitPatch: AppLimitPatch;
+}
+/** Represents an update to a `AppLimit`. Fields that are set will be updated. */
+export interface AppLimitPatch {
+  id?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** User whose usage is being tracked against this limit */
+  actorId?: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
 }
 export interface UpdateDatabaseTransferInput {
   clientMutationId?: string;
@@ -15332,6 +17432,69 @@ export interface SecureTableProvisionPatch {
   policies?: unknown;
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
   outFields?: string[];
+}
+export interface UpdateOrgLimitAggregateInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgLimitAggregate` being updated. */
+  orgLimitAggregatePatch: OrgLimitAggregatePatch;
+}
+/** Represents an update to a `OrgLimitAggregate`. Fields that are set will be updated. */
+export interface OrgLimitAggregatePatch {
+  id?: string;
+  /** Name identifier of the aggregate limit being tracked */
+  name?: string;
+  /** Entity (org) whose aggregate usage is being tracked */
+  entityId?: string;
+  /** Current aggregate usage count for this entity and limit */
+  num?: string;
+  /** Maximum allowed aggregate usage; negative means unlimited */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
+  reserved?: string;
+}
+export interface UpdateOrgLimitInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgLimit` being updated. */
+  orgLimitPatch: OrgLimitPatch;
+}
+/** Represents an update to a `OrgLimit`. Fields that are set will be updated. */
+export interface OrgLimitPatch {
+  id?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** User whose usage is being tracked against this limit */
+  actorId?: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  entityId?: string;
 }
 export interface UpdateEnumInput {
   clientMutationId?: string;
@@ -15804,6 +17967,52 @@ export interface EmbeddingChunkPatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateWebauthnSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this WebAuthn settings record */
+  id: string;
+  /** An object where the defined keys will be set on the `WebauthnSetting` being updated. */
+  webauthnSettingPatch: WebauthnSettingPatch;
+}
+/** Represents an update to a `WebauthnSetting`. Fields that are set will be updated. */
+export interface WebauthnSettingPatch {
+  /** Unique identifier for this WebAuthn settings record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId?: string;
+  /** Schema containing WebAuthn auth procedures (FK to metaschema_public.schema) */
+  schemaId?: string;
+  /** Schema of the webauthn_credentials table (FK to metaschema_public.schema) */
+  credentialsSchemaId?: string;
+  /** Schema of the sessions table (FK to metaschema_public.schema) */
+  sessionsSchemaId?: string;
+  /** Schema of the session_secrets table (FK to metaschema_public.schema) */
+  sessionSecretsSchemaId?: string;
+  /** Reference to the webauthn_credentials table (FK to metaschema_public.table) */
+  credentialsTableId?: string;
+  /** Reference to the sessions table (FK to metaschema_public.table) */
+  sessionsTableId?: string;
+  /** Reference to the session_credentials table (FK to metaschema_public.table) */
+  sessionCredentialsTableId?: string;
+  /** Reference to the session_secrets table (FK to metaschema_public.table) */
+  sessionSecretsTableId?: string;
+  /** Reference to the user field on webauthn_credentials (FK to metaschema_public.field) */
+  userFieldId?: string;
+  /** WebAuthn Relying Party ID (typically the domain name) */
+  rpId?: string;
+  /** WebAuthn Relying Party display name */
+  rpName?: string;
+  /** Allowed origins for WebAuthn registration and authentication */
+  originAllowlist?: string[];
+  /** Attestation conveyance preference (none, indirect, direct, enterprise) */
+  attestationType?: string;
+  /** Whether to require user verification (biometric/PIN) during auth */
+  requireUserVerification?: boolean;
+  /** Resident key requirement (discouraged, preferred, required) */
+  residentKey?: string;
+  /** Challenge TTL in seconds (default 300 = 5 minutes) */
+  challengeExpirySeconds?: string;
+}
 export interface UpdateOrgInviteInput {
   clientMutationId?: string;
   id: string;
@@ -15925,33 +18134,34 @@ export interface IndexPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateLimitsModuleInput {
+export interface UpdateBillingProviderModuleInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `LimitsModule` being updated. */
-  limitsModulePatch: LimitsModulePatch;
+  /** An object where the defined keys will be set on the `BillingProviderModule` being updated. */
+  billingProviderModulePatch: BillingProviderModulePatch;
 }
-/** Represents an update to a `LimitsModule`. Fields that are set will be updated. */
-export interface LimitsModulePatch {
+/** Represents an update to a `BillingProviderModule`. Fields that are set will be updated. */
+export interface BillingProviderModulePatch {
   id?: string;
   databaseId?: string;
   schemaId?: string;
   privateSchemaId?: string;
-  tableId?: string;
-  tableName?: string;
-  defaultTableId?: string;
-  defaultTableName?: string;
-  limitIncrementFunction?: string;
-  limitDecrementFunction?: string;
-  limitIncrementTrigger?: string;
-  limitDecrementTrigger?: string;
-  limitUpdateTrigger?: string;
-  limitCheckFunction?: string;
-  aggregateTableId?: string;
+  provider?: string;
+  productsTableId?: string;
+  pricesTableId?: string;
+  subscriptionsTableId?: string;
+  billingCustomersTableId?: string;
+  billingCustomersTableName?: string;
+  billingProductsTableId?: string;
+  billingProductsTableName?: string;
+  billingPricesTableId?: string;
+  billingPricesTableName?: string;
+  billingSubscriptionsTableId?: string;
+  billingSubscriptionsTableName?: string;
+  billingWebhookEventsTableId?: string;
+  billingWebhookEventsTableName?: string;
+  processBillingEventFunction?: string;
   prefix?: string;
-  membershipType?: number;
-  entityTableId?: string;
-  actorTableId?: string;
 }
 export interface UpdateBlueprintTemplateInput {
   clientMutationId?: string;
@@ -16127,37 +18337,6 @@ export interface ForeignKeyConstraintPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateStorageModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `StorageModule` being updated. */
-  storageModulePatch: StorageModulePatch;
-}
-/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
-export interface StorageModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  membershipType?: number;
-  policies?: unknown;
-  skipDefaultPolicyTables?: string[];
-  entityTableId?: string;
-  endpoint?: string;
-  publicUrlPrefix?: string;
-  provider?: string;
-  allowedOrigins?: string[];
-  restrictReads?: boolean;
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
-}
 export interface UpdateTableInput {
   clientMutationId?: string;
   id: string;
@@ -16185,6 +18364,137 @@ export interface TablePatch {
   inheritsId?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateRelationProvisionInput {
+  clientMutationId?: string;
+  /** Unique identifier for this relation provision row. */
+  id: string;
+  /** An object where the defined keys will be set on the `RelationProvision` being updated. */
+  relationProvisionPatch: RelationProvisionPatch;
+}
+/** Represents an update to a `RelationProvision`. Fields that are set will be updated. */
+export interface RelationProvisionPatch {
+  /** Unique identifier for this relation provision row. */
+  id?: string;
+  /** The database this relation belongs to. Required. Must match the database of both source_table_id and target_table_id. */
+  databaseId?: string;
+  /**
+   * The type of relation to create. Uses SuperCase naming:
+   *      - RelationBelongsTo: creates a FK field on source_table referencing target_table (e.g., tasks belongs to projects -> tasks.project_id). Field name auto-derived from target table.
+   *      - RelationHasMany: creates a FK field on target_table referencing source_table (e.g., projects has many tasks -> tasks.project_id). Field name auto-derived from source table. Inverse of BelongsTo — same FK, different perspective.
+   *      - RelationHasOne: creates a FK field + unique constraint on source_table referencing target_table (e.g., user_settings has one user -> user_settings.user_id with UNIQUE). Also supports shared-primary-key patterns (e.g., user_profiles.id = users.id) by setting field_name to the existing PK field.
+   *      - RelationManyToMany: creates a junction table with FK fields to both tables (e.g., projects and tags -> project_tags table).
+   *      Each relation type uses a different subset of columns on this table. Required.
+   */
+  relationType?: string;
+  /**
+   * The source table in the relation. Required.
+   *      - RelationBelongsTo: the table that receives the FK field (e.g., tasks in "tasks belongs to projects").
+   *      - RelationHasMany: the parent table being referenced (e.g., projects in "projects has many tasks"). The FK field is created on the target table.
+   *      - RelationHasOne: the table that receives the FK field + unique constraint (e.g., user_settings in "user_settings has one user").
+   *      - RelationManyToMany: one of the two tables being joined (e.g., projects in "projects and tags"). The junction table will have a FK field referencing this table.
+   */
+  sourceTableId?: string;
+  /**
+   * The target table in the relation. Required.
+   *      - RelationBelongsTo: the table being referenced by the FK (e.g., projects in "tasks belongs to projects").
+   *      - RelationHasMany: the table that receives the FK field (e.g., tasks in "projects has many tasks").
+   *      - RelationHasOne: the table being referenced by the FK (e.g., users in "user_settings has one user").
+   *      - RelationManyToMany: the other table being joined (e.g., tags in "projects and tags"). The junction table will have a FK field referencing this table.
+   */
+  targetTableId?: string;
+  /**
+   * FK field name for RelationBelongsTo, RelationHasOne, and RelationHasMany.
+   *      - RelationBelongsTo/RelationHasOne: if NULL, auto-derived from the target table name (e.g., target "projects" derives "project_id").
+   *      - RelationHasMany: if NULL, auto-derived from the source table name (e.g., source "projects" derives "project_id").
+   *      For RelationHasOne shared-primary-key patterns, set field_name to the existing PK field (e.g., "id") so the FK reuses it.
+   *      Ignored for RelationManyToMany — use source_field_name/target_field_name instead.
+   */
+  fieldName?: string;
+  /** FK delete action for RelationBelongsTo, RelationHasOne, and RelationHasMany. One of: c (CASCADE), r (RESTRICT), n (SET NULL), d (SET DEFAULT), a (NO ACTION). Required — the trigger raises an error if not provided. The caller must explicitly choose the cascade behavior; there is no default. Ignored for RelationManyToMany (junction FK fields always use CASCADE). */
+  deleteAction?: string;
+  /**
+   * Whether the FK field is NOT NULL. Defaults to true.
+   *      - RelationBelongsTo: set to false for optional associations (e.g., tasks.assignee_id that can be NULL).
+   *      - RelationHasMany: set to false if the child can exist without a parent.
+   *      - RelationHasOne: typically true.
+   *      Ignored for RelationManyToMany (junction FK fields are always required).
+   */
+  isRequired?: boolean;
+  /**
+   * Whether the FK field should be required at the API level even though it is nullable at the database level. Defaults to false.
+   *      When true and is_required is false, the field is created as nullable (allowing SET NULL cascade) but a @requiredInput smart tag is added so PostGraphile treats it as non-null in create/update input types.
+   *      When is_required is true, api_required is ignored (the field is already required at both levels).
+   *      Ignored for RelationManyToMany (junction FK fields are always required).
+   */
+  apiRequired?: boolean;
+  /**
+   * For RelationManyToMany: an existing junction table to use. Defaults to uuid_nil().
+   *      - When uuid_nil(): the trigger creates a new junction table via secure_table_provision using junction_table_name.
+   *      - When set to a valid table UUID: the trigger skips table creation and only adds FK fields, composite key (if use_composite_key is true), and security to the existing table.
+   *      Ignored for RelationBelongsTo/RelationHasOne.
+   */
+  junctionTableId?: string;
+  /** For RelationManyToMany: name of the junction table to create or look up. If NULL, auto-derived from source and target table names using inflection_db (e.g., "projects" + "tags" derives "project_tags"). Only used when junction_table_id is uuid_nil(). Ignored for RelationBelongsTo/RelationHasOne. */
+  junctionTableName?: string;
+  /** For RelationManyToMany: schema for the junction table. If NULL, defaults to the source table's schema. Ignored for RelationBelongsTo/RelationHasOne. */
+  junctionSchemaId?: string;
+  /** For RelationManyToMany: FK field name on the junction table referencing the source table. If NULL, auto-derived from the source table name using inflection_db.get_foreign_key_field_name() (e.g., source table "projects" derives "project_id"). Ignored for RelationBelongsTo/RelationHasOne. */
+  sourceFieldName?: string;
+  /** For RelationManyToMany: FK field name on the junction table referencing the target table. If NULL, auto-derived from the target table name using inflection_db.get_foreign_key_field_name() (e.g., target table "tags" derives "tag_id"). Ignored for RelationBelongsTo/RelationHasOne. */
+  targetFieldName?: string;
+  /**
+   * For RelationManyToMany: whether to create a composite primary key from the two FK fields (source + target) on the junction table. Defaults to false.
+   *      - When true: the trigger calls metaschema.pk() with ARRAY[source_field_id, target_field_id] to create a composite PK. No separate id column is created. This enforces uniqueness of the pair and is suitable for simple junction tables.
+   *      - When false: no primary key is created by the trigger. The caller should provide node_type='DataId' to create a UUID primary key, or handle the PK strategy via a separate secure_table_provision row.
+   *      use_composite_key and node_type='DataId' are mutually exclusive — using both would create two conflicting PKs.
+   *      Ignored for RelationBelongsTo/RelationHasOne.
+   */
+  useCompositeKey?: boolean;
+  /**
+   * Whether to create a btree index on FK fields created by this relation. Defaults to true.
+   *      PostgreSQL does not automatically index foreign key columns (only the referenced PK side is indexed).
+   *      Without indexes on FK columns, JOINs, CASCADE deletes, and RLS policy lookups perform sequential scans.
+   *      - RelationBelongsTo: creates an index on the FK field on the source table.
+   *      - RelationHasMany: creates an index on the FK field on the target table.
+   *      - RelationHasOne: skipped — the unique constraint already creates an implicit index.
+   *      - RelationManyToMany: creates indexes on both FK fields on the junction table.
+   *      Set to false only for very small tables or write-heavy tables where index maintenance cost outweighs read performance.
+   */
+  createIndex?: boolean;
+  /**
+   * For RelationManyToMany: whether to expose the M:N shortcut fields in the GraphQL API. Defaults to true.
+   *      When true, sets @behavior +manyToMany on the junction table smart_tags so PostGraphile generates
+   *      clean M:N connection fields (e.g., event.contacts instead of event.contactEventsByEventId).
+   *      When false (or toggled off via UPDATE), the behavior tag is removed and the M:N fields disappear from GraphQL.
+   *      Toggling is supported: UPDATE expose_in_api to true/false and the smart tag is added/removed automatically.
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  exposeInApi?: boolean;
+  /**
+   * For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+   *      Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+   *      Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  nodes?: unknown;
+  /** For RelationManyToMany: array of grant objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "roles" (text[], required), "privileges" (jsonb[], required — array of [privilege, columns] tuples). Example: [{"roles":["authenticated"],"privileges":[["select","*"],["insert","*"],["delete","*"]]}]. Defaults to '[]' (no grants). Ignored for RelationBelongsTo/RelationHasOne. */
+  grants?: unknown;
+  /**
+   * For RelationManyToMany: array of policy objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "$type" (text, required — the Authz* policy generator type), "data" (jsonb, optional — opaque config), "privileges" (text[], optional — e.g. ["select","insert"]; if omitted, derived from grants[] privilege verbs), "policy_role" (text, optional — falls back to first role in first grants[] entry, or 'authenticated'), "permissive" (boolean, optional, defaults to true), "policy_name" (text, optional). Supports multiple policies per row.
+   *      Example: [{"$type": "AuthzEntityMembership", "data": {"entity_field": "entity_id", "membership_type": 2}, "privileges": ["select", "insert", "delete"]}].
+   *      Defaults to '[]' (no policies — the junction table will have RLS enabled but no policies unless added separately).
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  policies?: unknown;
+  /** Output column for RelationBelongsTo/RelationHasOne/RelationHasMany: the UUID of the FK field created (or found). For BelongsTo/HasOne this is on the source table; for HasMany this is on the target table. Populated by the trigger. NULL for RelationManyToMany. Callers should not set this directly. */
+  outFieldId?: string;
+  /** Output column for RelationManyToMany: the UUID of the junction table created (or found). Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
+  outJunctionTableId?: string;
+  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the source table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
+  outSourceFieldId?: string;
+  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
+  outTargetFieldId?: string;
 }
 export interface UpdateEntityTypeProvisionInput {
   clientMutationId?: string;
@@ -16374,143 +18684,13 @@ export interface EntityTypeProvisionPatch {
   outBucketsTableId?: string;
   /** Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true. */
   outFilesTableId?: string;
+  outPathSharesTableId?: string;
   /**
    * Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
    *      NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
    *      (i.e. the invites_module row was created in a previous run).
    */
   outInvitesModuleId?: string;
-}
-export interface UpdateRelationProvisionInput {
-  clientMutationId?: string;
-  /** Unique identifier for this relation provision row. */
-  id: string;
-  /** An object where the defined keys will be set on the `RelationProvision` being updated. */
-  relationProvisionPatch: RelationProvisionPatch;
-}
-/** Represents an update to a `RelationProvision`. Fields that are set will be updated. */
-export interface RelationProvisionPatch {
-  /** Unique identifier for this relation provision row. */
-  id?: string;
-  /** The database this relation belongs to. Required. Must match the database of both source_table_id and target_table_id. */
-  databaseId?: string;
-  /**
-   * The type of relation to create. Uses SuperCase naming:
-   *      - RelationBelongsTo: creates a FK field on source_table referencing target_table (e.g., tasks belongs to projects -> tasks.project_id). Field name auto-derived from target table.
-   *      - RelationHasMany: creates a FK field on target_table referencing source_table (e.g., projects has many tasks -> tasks.project_id). Field name auto-derived from source table. Inverse of BelongsTo — same FK, different perspective.
-   *      - RelationHasOne: creates a FK field + unique constraint on source_table referencing target_table (e.g., user_settings has one user -> user_settings.user_id with UNIQUE). Also supports shared-primary-key patterns (e.g., user_profiles.id = users.id) by setting field_name to the existing PK field.
-   *      - RelationManyToMany: creates a junction table with FK fields to both tables (e.g., projects and tags -> project_tags table).
-   *      Each relation type uses a different subset of columns on this table. Required.
-   */
-  relationType?: string;
-  /**
-   * The source table in the relation. Required.
-   *      - RelationBelongsTo: the table that receives the FK field (e.g., tasks in "tasks belongs to projects").
-   *      - RelationHasMany: the parent table being referenced (e.g., projects in "projects has many tasks"). The FK field is created on the target table.
-   *      - RelationHasOne: the table that receives the FK field + unique constraint (e.g., user_settings in "user_settings has one user").
-   *      - RelationManyToMany: one of the two tables being joined (e.g., projects in "projects and tags"). The junction table will have a FK field referencing this table.
-   */
-  sourceTableId?: string;
-  /**
-   * The target table in the relation. Required.
-   *      - RelationBelongsTo: the table being referenced by the FK (e.g., projects in "tasks belongs to projects").
-   *      - RelationHasMany: the table that receives the FK field (e.g., tasks in "projects has many tasks").
-   *      - RelationHasOne: the table being referenced by the FK (e.g., users in "user_settings has one user").
-   *      - RelationManyToMany: the other table being joined (e.g., tags in "projects and tags"). The junction table will have a FK field referencing this table.
-   */
-  targetTableId?: string;
-  /**
-   * FK field name for RelationBelongsTo, RelationHasOne, and RelationHasMany.
-   *      - RelationBelongsTo/RelationHasOne: if NULL, auto-derived from the target table name (e.g., target "projects" derives "project_id").
-   *      - RelationHasMany: if NULL, auto-derived from the source table name (e.g., source "projects" derives "project_id").
-   *      For RelationHasOne shared-primary-key patterns, set field_name to the existing PK field (e.g., "id") so the FK reuses it.
-   *      Ignored for RelationManyToMany — use source_field_name/target_field_name instead.
-   */
-  fieldName?: string;
-  /** FK delete action for RelationBelongsTo, RelationHasOne, and RelationHasMany. One of: c (CASCADE), r (RESTRICT), n (SET NULL), d (SET DEFAULT), a (NO ACTION). Required — the trigger raises an error if not provided. The caller must explicitly choose the cascade behavior; there is no default. Ignored for RelationManyToMany (junction FK fields always use CASCADE). */
-  deleteAction?: string;
-  /**
-   * Whether the FK field is NOT NULL. Defaults to true.
-   *      - RelationBelongsTo: set to false for optional associations (e.g., tasks.assignee_id that can be NULL).
-   *      - RelationHasMany: set to false if the child can exist without a parent.
-   *      - RelationHasOne: typically true.
-   *      Ignored for RelationManyToMany (junction FK fields are always required).
-   */
-  isRequired?: boolean;
-  /**
-   * Whether the FK field should be required at the API level even though it is nullable at the database level. Defaults to false.
-   *      When true and is_required is false, the field is created as nullable (allowing SET NULL cascade) but a @requiredInput smart tag is added so PostGraphile treats it as non-null in create/update input types.
-   *      When is_required is true, api_required is ignored (the field is already required at both levels).
-   *      Ignored for RelationManyToMany (junction FK fields are always required).
-   */
-  apiRequired?: boolean;
-  /**
-   * For RelationManyToMany: an existing junction table to use. Defaults to uuid_nil().
-   *      - When uuid_nil(): the trigger creates a new junction table via secure_table_provision using junction_table_name.
-   *      - When set to a valid table UUID: the trigger skips table creation and only adds FK fields, composite key (if use_composite_key is true), and security to the existing table.
-   *      Ignored for RelationBelongsTo/RelationHasOne.
-   */
-  junctionTableId?: string;
-  /** For RelationManyToMany: name of the junction table to create or look up. If NULL, auto-derived from source and target table names using inflection_db (e.g., "projects" + "tags" derives "project_tags"). Only used when junction_table_id is uuid_nil(). Ignored for RelationBelongsTo/RelationHasOne. */
-  junctionTableName?: string;
-  /** For RelationManyToMany: schema for the junction table. If NULL, defaults to the source table's schema. Ignored for RelationBelongsTo/RelationHasOne. */
-  junctionSchemaId?: string;
-  /** For RelationManyToMany: FK field name on the junction table referencing the source table. If NULL, auto-derived from the source table name using inflection_db.get_foreign_key_field_name() (e.g., source table "projects" derives "project_id"). Ignored for RelationBelongsTo/RelationHasOne. */
-  sourceFieldName?: string;
-  /** For RelationManyToMany: FK field name on the junction table referencing the target table. If NULL, auto-derived from the target table name using inflection_db.get_foreign_key_field_name() (e.g., target table "tags" derives "tag_id"). Ignored for RelationBelongsTo/RelationHasOne. */
-  targetFieldName?: string;
-  /**
-   * For RelationManyToMany: whether to create a composite primary key from the two FK fields (source + target) on the junction table. Defaults to false.
-   *      - When true: the trigger calls metaschema.pk() with ARRAY[source_field_id, target_field_id] to create a composite PK. No separate id column is created. This enforces uniqueness of the pair and is suitable for simple junction tables.
-   *      - When false: no primary key is created by the trigger. The caller should provide node_type='DataId' to create a UUID primary key, or handle the PK strategy via a separate secure_table_provision row.
-   *      use_composite_key and node_type='DataId' are mutually exclusive — using both would create two conflicting PKs.
-   *      Ignored for RelationBelongsTo/RelationHasOne.
-   */
-  useCompositeKey?: boolean;
-  /**
-   * Whether to create a btree index on FK fields created by this relation. Defaults to true.
-   *      PostgreSQL does not automatically index foreign key columns (only the referenced PK side is indexed).
-   *      Without indexes on FK columns, JOINs, CASCADE deletes, and RLS policy lookups perform sequential scans.
-   *      - RelationBelongsTo: creates an index on the FK field on the source table.
-   *      - RelationHasMany: creates an index on the FK field on the target table.
-   *      - RelationHasOne: skipped — the unique constraint already creates an implicit index.
-   *      - RelationManyToMany: creates indexes on both FK fields on the junction table.
-   *      Set to false only for very small tables or write-heavy tables where index maintenance cost outweighs read performance.
-   */
-  createIndex?: boolean;
-  /**
-   * For RelationManyToMany: whether to expose the M:N shortcut fields in the GraphQL API. Defaults to true.
-   *      When true, sets @behavior +manyToMany on the junction table smart_tags so PostGraphile generates
-   *      clean M:N connection fields (e.g., event.contacts instead of event.contactEventsByEventId).
-   *      When false (or toggled off via UPDATE), the behavior tag is removed and the M:N fields disappear from GraphQL.
-   *      Toggling is supported: UPDATE expose_in_api to true/false and the smart tag is added/removed automatically.
-   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
-   */
-  exposeInApi?: boolean;
-  /**
-   * For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
-   *      Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
-   *      Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
-   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
-   */
-  nodes?: unknown;
-  /** For RelationManyToMany: array of grant objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "roles" (text[], required), "privileges" (jsonb[], required — array of [privilege, columns] tuples). Example: [{"roles":["authenticated"],"privileges":[["select","*"],["insert","*"],["delete","*"]]}]. Defaults to '[]' (no grants). Ignored for RelationBelongsTo/RelationHasOne. */
-  grants?: unknown;
-  /**
-   * For RelationManyToMany: array of policy objects for the junction table. Forwarded to provision_table as-is. Each element is a jsonb object with keys: "$type" (text, required — the Authz* policy generator type), "data" (jsonb, optional — opaque config), "privileges" (text[], optional — e.g. ["select","insert"]; if omitted, derived from grants[] privilege verbs), "policy_role" (text, optional — falls back to first role in first grants[] entry, or 'authenticated'), "permissive" (boolean, optional, defaults to true), "policy_name" (text, optional). Supports multiple policies per row.
-   *      Example: [{"$type": "AuthzEntityMembership", "data": {"entity_field": "entity_id", "membership_type": 2}, "privileges": ["select", "insert", "delete"]}].
-   *      Defaults to '[]' (no policies — the junction table will have RLS enabled but no policies unless added separately).
-   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
-   */
-  policies?: unknown;
-  /** Output column for RelationBelongsTo/RelationHasOne/RelationHasMany: the UUID of the FK field created (or found). For BelongsTo/HasOne this is on the source table; for HasMany this is on the target table. Populated by the trigger. NULL for RelationManyToMany. Callers should not set this directly. */
-  outFieldId?: string;
-  /** Output column for RelationManyToMany: the UUID of the junction table created (or found). Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
-  outJunctionTableId?: string;
-  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the source table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
-  outSourceFieldId?: string;
-  /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
-  outTargetFieldId?: string;
 }
 export interface UpdateLevelsModuleInput {
   clientMutationId?: string;
@@ -16615,6 +18795,83 @@ export interface FieldPatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateLimitsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `LimitsModule` being updated. */
+  limitsModulePatch: LimitsModulePatch;
+}
+/** Represents an update to a `LimitsModule`. Fields that are set will be updated. */
+export interface LimitsModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  tableId?: string;
+  tableName?: string;
+  defaultTableId?: string;
+  defaultTableName?: string;
+  limitIncrementFunction?: string;
+  limitDecrementFunction?: string;
+  limitIncrementTrigger?: string;
+  limitDecrementTrigger?: string;
+  limitUpdateTrigger?: string;
+  limitCheckFunction?: string;
+  limitCreditsTableId?: string;
+  eventsTableId?: string;
+  creditCodesTableId?: string;
+  creditCodeItemsTableId?: string;
+  creditRedemptionsTableId?: string;
+  aggregateTableId?: string;
+  limitCapsTableId?: string;
+  limitCapsDefaultsTableId?: string;
+  capCheckTrigger?: string;
+  resolveCapFunction?: string;
+  prefix?: string;
+  membershipType?: number;
+  entityTableId?: string;
+  actorTableId?: string;
+}
+export interface UpdateStorageModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `StorageModule` being updated. */
+  storageModulePatch: StorageModulePatch;
+}
+/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
+export interface StorageModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  membershipType?: number;
+  policies?: unknown;
+  skipDefaultPolicyTables?: string[];
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  restrictReads?: boolean;
+  hasPathShares?: boolean;
+  pathSharesTableId?: string;
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
+  maxBulkFiles?: number;
+  maxBulkTotalSize?: string;
+  hasVersioning?: boolean;
+  hasContentHash?: boolean;
+  hasCustomKeys?: boolean;
+  hasAuditLog?: boolean;
+  fileEventsTableId?: string;
+}
 export interface UpdateMembershipsModuleInput {
   clientMutationId?: string;
   id: string;
@@ -16666,6 +18923,14 @@ export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
 }
+export interface DeleteAppLimitCreditRedemptionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteFunctionInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteViewTableInput {
   clientMutationId?: string;
   id: string;
@@ -16673,6 +18938,11 @@ export interface DeleteViewTableInput {
 export interface DeleteApiSchemaInput {
   clientMutationId?: string;
   /** Unique identifier for this API-schema mapping */
+  id: string;
+}
+export interface DeleteCorsSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this CORS settings record */
   id: string;
 }
 export interface DeleteOrgMemberInput {
@@ -16721,6 +18991,10 @@ export interface DeleteSiteModuleInput {
   /** Unique identifier for this site module record */
   id: string;
 }
+export interface DeleteAppLimitCreditCodeInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteSchemaGrantInput {
   clientMutationId?: string;
   id: string;
@@ -16766,6 +19040,22 @@ export interface DeleteAppPermissionInput {
   id: string;
 }
 export interface DeleteOrgPermissionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitCapsDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitCapsDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitCapInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitCapInput {
   clientMutationId?: string;
   id: string;
 }
@@ -16831,6 +19121,10 @@ export interface DeleteOrgLimitDefaultInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteAppLimitCreditCodeItemInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteDatabaseInput {
   clientMutationId?: string;
   id: string;
@@ -16861,6 +19155,14 @@ export interface DeleteAppLevelRequirementInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteAppLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteFullTextSearchInput {
   clientMutationId?: string;
   id: string;
@@ -16875,6 +19177,11 @@ export interface DeleteCommitInput {
   id: string;
   /** The repository identifier */
   databaseId: string;
+}
+export interface DeletePubkeySettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this pubkey settings record */
+  id: string;
 }
 export interface DeleteRateLimitsModuleInput {
   clientMutationId?: string;
@@ -16909,6 +19216,11 @@ export interface DeleteDomainInput {
   /** Unique identifier for this domain record */
   id: string;
 }
+export interface DeleteRlsSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this RLS settings record */
+  id: string;
+}
 export interface DeleteAgentTaskInput {
   clientMutationId?: string;
   id: string;
@@ -16933,21 +19245,13 @@ export interface DeleteOrgChartEdgeInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAppLimitInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitAggregateInput {
+export interface DeletePartitionInput {
   clientMutationId?: string;
   id: string;
 }
 export interface DeleteBlueprintConstructionInput {
   clientMutationId?: string;
   /** Unique identifier for this construction attempt. */
-  id: string;
-}
-export interface DeletePlansModuleInput {
-  clientMutationId?: string;
   id: string;
 }
 export interface DeleteRlsModuleInput {
@@ -16966,8 +19270,9 @@ export interface DeleteAppLevelInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteOrgLimitInput {
+export interface DeleteDatabaseSettingInput {
   clientMutationId?: string;
+  /** Unique identifier for this settings record */
   id: string;
 }
 export interface DeleteBlueprintInput {
@@ -16979,7 +19284,20 @@ export interface DeleteDenormalizedTableFieldInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteApiSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this API settings record */
+  id: string;
+}
+export interface DeletePlansModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteOrgMemberProfileInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitInput {
   clientMutationId?: string;
   id: string;
 }
@@ -17006,6 +19324,14 @@ export interface DeleteInvitesModuleInput {
 export interface DeleteSecureTableProvisionInput {
   clientMutationId?: string;
   /** Unique identifier for this provision row. */
+  id: string;
+}
+export interface DeleteOrgLimitAggregateInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitInput {
+  clientMutationId?: string;
   id: string;
 }
 export interface DeleteEnumInput {
@@ -17082,6 +19408,11 @@ export interface DeleteEmbeddingChunkInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteWebauthnSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this WebAuthn settings record */
+  id: string;
+}
 export interface DeleteOrgInviteInput {
   clientMutationId?: string;
   id: string;
@@ -17098,7 +19429,7 @@ export interface DeleteIndexInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteLimitsModuleInput {
+export interface DeleteBillingProviderModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -17123,22 +19454,18 @@ export interface DeleteForeignKeyConstraintInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteStorageModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteTableInput {
   clientMutationId?: string;
-  id: string;
-}
-export interface DeleteEntityTypeProvisionInput {
-  clientMutationId?: string;
-  /** Unique identifier for this provision row. */
   id: string;
 }
 export interface DeleteRelationProvisionInput {
   clientMutationId?: string;
   /** Unique identifier for this relation provision row. */
+  id: string;
+}
+export interface DeleteEntityTypeProvisionInput {
+  clientMutationId?: string;
+  /** Unique identifier for this provision row. */
   id: string;
 }
 export interface DeleteLevelsModuleInput {
@@ -17153,28 +19480,17 @@ export interface DeleteFieldInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteMembershipsModuleInput {
+export interface DeleteLimitsModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface RequestUploadUrlInput {
-  /** Bucket key (e.g., "public", "private") */
-  bucketKey: string;
-  /**
-   * Owner entity ID for entity-scoped uploads.
-   * Omit for app-level (database-wide) storage.
-   * When provided, resolves the storage module for the entity type
-   * that owns this entity instance (e.g., a data room ID, team ID).
-   */
-  ownerId?: string;
-  /** SHA-256 content hash computed by the client (hex-encoded, 64 chars) */
-  contentHash: string;
-  /** MIME type of the file (e.g., "image/png") */
-  contentType: string;
-  /** File size in bytes */
-  size: number;
-  /** Original filename (optional, for display and Content-Disposition) */
-  filename?: string;
+export interface DeleteStorageModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteMembershipsModuleInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -17248,6 +19564,20 @@ export interface RoleTypeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AppLimitCreditRedemption` values. */
+export interface AppLimitCreditRedemptionConnection {
+  nodes: AppLimitCreditRedemption[];
+  edges: AppLimitCreditRedemptionEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Function` values. */
+export interface FunctionConnection {
+  nodes: Function[];
+  edges: FunctionEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `ViewTable` values. */
 export interface ViewTableConnection {
   nodes: ViewTable[];
@@ -17259,6 +19589,13 @@ export interface ViewTableConnection {
 export interface ApiSchemaConnection {
   nodes: ApiSchema[];
   edges: ApiSchemaEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `CorsSetting` values. */
+export interface CorsSettingConnection {
+  nodes: CorsSetting[];
+  edges: CorsSettingEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17339,6 +19676,13 @@ export interface SiteModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AppLimitCreditCode` values. */
+export interface AppLimitCreditCodeConnection {
+  nodes: AppLimitCreditCode[];
+  edges: AppLimitCreditCodeEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `SchemaGrant` values. */
 export interface SchemaGrantConnection {
   nodes: SchemaGrant[];
@@ -17406,6 +19750,34 @@ export interface AppStepConnection {
 export interface OrgPermissionDefaultConnection {
   nodes: OrgPermissionDefault[];
   edges: OrgPermissionDefaultEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLimitCapsDefault` values. */
+export interface AppLimitCapsDefaultConnection {
+  nodes: AppLimitCapsDefault[];
+  edges: AppLimitCapsDefaultEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitCapsDefault` values. */
+export interface OrgLimitCapsDefaultConnection {
+  nodes: OrgLimitCapsDefault[];
+  edges: OrgLimitCapsDefaultEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLimitCap` values. */
+export interface AppLimitCapConnection {
+  nodes: AppLimitCap[];
+  edges: AppLimitCapEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitCap` values. */
+export interface OrgLimitCapConnection {
+  nodes: OrgLimitCap[];
+  edges: OrgLimitCapEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17521,6 +19893,13 @@ export interface OrgLimitDefaultConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AppLimitCreditCodeItem` values. */
+export interface AppLimitCreditCodeItemConnection {
+  nodes: AppLimitCreditCodeItem[];
+  edges: AppLimitCreditCodeItemEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `UserConnectedAccount` values. */
 export interface UserConnectedAccountConnection {
   nodes: UserConnectedAccount[];
@@ -17563,6 +19942,20 @@ export interface SiteMetadatumConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AppLimitCredit` values. */
+export interface AppLimitCreditConnection {
+  nodes: AppLimitCredit[];
+  edges: AppLimitCreditEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitCredit` values. */
+export interface OrgLimitCreditConnection {
+  nodes: OrgLimitCredit[];
+  edges: OrgLimitCreditEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `FullTextSearch` values. */
 export interface FullTextSearchConnection {
   nodes: FullTextSearch[];
@@ -17581,6 +19974,13 @@ export interface TableGrantConnection {
 export interface CommitConnection {
   nodes: Commit[];
   edges: CommitEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PubkeySetting` values. */
+export interface PubkeySettingConnection {
+  nodes: PubkeySetting[];
+  edges: PubkeySettingEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17640,6 +20040,13 @@ export interface DomainConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `RlsSetting` values. */
+export interface RlsSettingConnection {
+  nodes: RlsSetting[];
+  edges: RlsSettingEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `AgentTask` values. */
 export interface AgentTaskConnection {
   nodes: AgentTask[];
@@ -17696,17 +20103,10 @@ export interface OrgChartEdgeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `AppLimit` values. */
-export interface AppLimitConnection {
-  nodes: AppLimit[];
-  edges: AppLimitEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgLimitAggregate` values. */
-export interface OrgLimitAggregateConnection {
-  nodes: OrgLimitAggregate[];
-  edges: OrgLimitAggregateEdge[];
+/** A connection to a list of `Partition` values. */
+export interface PartitionConnection {
+  nodes: Partition[];
+  edges: PartitionEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17714,13 +20114,6 @@ export interface OrgLimitAggregateConnection {
 export interface BlueprintConstructionConnection {
   nodes: BlueprintConstruction[];
   edges: BlueprintConstructionEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `PlansModule` values. */
-export interface PlansModuleConnection {
-  nodes: PlansModule[];
-  edges: PlansModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17752,10 +20145,10 @@ export interface AppLevelConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgLimit` values. */
-export interface OrgLimitConnection {
-  nodes: OrgLimit[];
-  edges: OrgLimitEdge[];
+/** A connection to a list of `DatabaseSetting` values. */
+export interface DatabaseSettingConnection {
+  nodes: DatabaseSetting[];
+  edges: DatabaseSettingEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17773,6 +20166,20 @@ export interface DenormalizedTableFieldConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `ApiSetting` values. */
+export interface ApiSettingConnection {
+  nodes: ApiSetting[];
+  edges: ApiSettingEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlansModule` values. */
+export interface PlansModuleConnection {
+  nodes: PlansModule[];
+  edges: PlansModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgMemberProfile` values. */
 export interface OrgMemberProfileConnection {
   nodes: OrgMemberProfile[];
@@ -17784,6 +20191,13 @@ export interface OrgMemberProfileConnection {
 export interface SqlActionConnection {
   nodes: SqlAction[];
   edges: SqlActionEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLimit` values. */
+export interface AppLimitConnection {
+  nodes: AppLimit[];
+  edges: AppLimitEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17833,6 +20247,20 @@ export interface SecureTableProvisionConnection {
 export interface AstMigrationConnection {
   nodes: AstMigration[];
   edges: AstMigrationEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitAggregate` values. */
+export interface OrgLimitAggregateConnection {
+  nodes: OrgLimitAggregate[];
+  edges: OrgLimitAggregateEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimit` values. */
+export interface OrgLimitConnection {
+  nodes: OrgLimit[];
+  edges: OrgLimitEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17962,6 +20390,13 @@ export interface EmbeddingChunkConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `WebauthnSetting` values. */
+export interface WebauthnSettingConnection {
+  nodes: WebauthnSetting[];
+  edges: WebauthnSettingEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgInvite` values. */
 export interface OrgInviteConnection {
   nodes: OrgInvite[];
@@ -17990,10 +20425,10 @@ export interface IndexConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `LimitsModule` values. */
-export interface LimitsModuleConnection {
-  nodes: LimitsModule[];
-  edges: LimitsModuleEdge[];
+/** A connection to a list of `BillingProviderModule` values. */
+export interface BillingProviderModuleConnection {
+  nodes: BillingProviderModule[];
+  edges: BillingProviderModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -18032,13 +20467,6 @@ export interface ForeignKeyConstraintConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `StorageModule` values. */
-export interface StorageModuleConnection {
-  nodes: StorageModule[];
-  edges: StorageModuleEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `Table` values. */
 export interface TableConnection {
   nodes: Table[];
@@ -18046,17 +20474,17 @@ export interface TableConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `EntityTypeProvision` values. */
-export interface EntityTypeProvisionConnection {
-  nodes: EntityTypeProvision[];
-  edges: EntityTypeProvisionEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `RelationProvision` values. */
 export interface RelationProvisionConnection {
   nodes: RelationProvision[];
   edges: RelationProvisionEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `EntityTypeProvision` values. */
+export interface EntityTypeProvisionConnection {
+  nodes: EntityTypeProvision[];
+  edges: EntityTypeProvisionEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -18078,6 +20506,20 @@ export interface UserAuthModuleConnection {
 export interface FieldConnection {
   nodes: Field[];
   edges: FieldEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `LimitsModule` values. */
+export interface LimitsModuleConnection {
+  nodes: LimitsModule[];
+  edges: LimitsModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `StorageModule` values. */
+export interface StorageModuleConnection {
+  nodes: StorageModule[];
+  edges: StorageModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -18191,6 +20633,9 @@ export interface BootstrapUserPayload {
 export interface SetFieldOrderPayload {
   clientMutationId?: string | null;
 }
+export interface AppendSmartTagsPayload {
+  clientMutationId?: string | null;
+}
 export interface ProvisionUniqueConstraintPayload {
   clientMutationId?: string | null;
 }
@@ -18284,6 +20729,18 @@ export interface CreateRoleTypePayload {
   roleType?: RoleType | null;
   roleTypeEdge?: RoleTypeEdge | null;
 }
+export interface CreateAppLimitCreditRedemptionPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditRedemption` that was created by this mutation. */
+  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
+  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
+}
+export interface CreateFunctionPayload {
+  clientMutationId?: string | null;
+  /** The `Function` that was created by this mutation. */
+  function?: Function | null;
+  functionEdge?: FunctionEdge | null;
+}
 export interface CreateViewTablePayload {
   clientMutationId?: string | null;
   /** The `ViewTable` that was created by this mutation. */
@@ -18295,6 +20752,12 @@ export interface CreateApiSchemaPayload {
   /** The `ApiSchema` that was created by this mutation. */
   apiSchema?: ApiSchema | null;
   apiSchemaEdge?: ApiSchemaEdge | null;
+}
+export interface CreateCorsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `CorsSetting` that was created by this mutation. */
+  corsSetting?: CorsSetting | null;
+  corsSettingEdge?: CorsSettingEdge | null;
 }
 export interface CreateOrgMemberPayload {
   clientMutationId?: string | null;
@@ -18360,6 +20823,12 @@ export interface CreateSiteModulePayload {
   /** The `SiteModule` that was created by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface CreateAppLimitCreditCodePayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditCode` that was created by this mutation. */
+  appLimitCreditCode?: AppLimitCreditCode | null;
+  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
 }
 export interface CreateSchemaGrantPayload {
   clientMutationId?: string | null;
@@ -18432,6 +20901,30 @@ export interface CreateOrgPermissionPayload {
   /** The `OrgPermission` that was created by this mutation. */
   orgPermission?: OrgPermission | null;
   orgPermissionEdge?: OrgPermissionEdge | null;
+}
+export interface CreateAppLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCapsDefault` that was created by this mutation. */
+  appLimitCapsDefault?: AppLimitCapsDefault | null;
+  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
+}
+export interface CreateOrgLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCapsDefault` that was created by this mutation. */
+  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
+  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
+}
+export interface CreateAppLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCap` that was created by this mutation. */
+  appLimitCap?: AppLimitCap | null;
+  appLimitCapEdge?: AppLimitCapEdge | null;
+}
+export interface CreateOrgLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCap` that was created by this mutation. */
+  orgLimitCap?: OrgLimitCap | null;
+  orgLimitCapEdge?: OrgLimitCapEdge | null;
 }
 export interface CreateMembershipTypePayload {
   clientMutationId?: string | null;
@@ -18528,6 +21021,12 @@ export interface CreateOrgLimitDefaultPayload {
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
+export interface CreateAppLimitCreditCodeItemPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditCodeItem` that was created by this mutation. */
+  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
+  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
+}
 export interface CreateUserConnectedAccountPayload {
   clientMutationId?: string | null;
   /** The `UserConnectedAccount` that was created by this mutation. */
@@ -18575,6 +21074,18 @@ export interface CreateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
+export interface CreateAppLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCredit` that was created by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+}
+export interface CreateOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was created by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
 export interface CreateFullTextSearchPayload {
   clientMutationId?: string | null;
   /** The `FullTextSearch` that was created by this mutation. */
@@ -18592,6 +21103,12 @@ export interface CreateCommitPayload {
   /** The `Commit` that was created by this mutation. */
   commit?: Commit | null;
   commitEdge?: CommitEdge | null;
+}
+export interface CreatePubkeySettingPayload {
+  clientMutationId?: string | null;
+  /** The `PubkeySetting` that was created by this mutation. */
+  pubkeySetting?: PubkeySetting | null;
+  pubkeySettingEdge?: PubkeySettingEdge | null;
 }
 export interface CreateRateLimitsModulePayload {
   clientMutationId?: string | null;
@@ -18641,6 +21158,12 @@ export interface CreateDomainPayload {
   domain?: Domain | null;
   domainEdge?: DomainEdge | null;
 }
+export interface CreateRlsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `RlsSetting` that was created by this mutation. */
+  rlsSetting?: RlsSetting | null;
+  rlsSettingEdge?: RlsSettingEdge | null;
+}
 export interface CreateAgentTaskPayload {
   clientMutationId?: string | null;
   /** The `AgentTask` that was created by this mutation. */
@@ -18687,29 +21210,17 @@ export interface CreateOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
-export interface CreateAppLimitPayload {
+export interface CreatePartitionPayload {
   clientMutationId?: string | null;
-  /** The `AppLimit` that was created by this mutation. */
-  appLimit?: AppLimit | null;
-  appLimitEdge?: AppLimitEdge | null;
-}
-export interface CreateOrgLimitAggregatePayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitAggregate` that was created by this mutation. */
-  orgLimitAggregate?: OrgLimitAggregate | null;
-  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+  /** The `Partition` that was created by this mutation. */
+  partition?: Partition | null;
+  partitionEdge?: PartitionEdge | null;
 }
 export interface CreateBlueprintConstructionPayload {
   clientMutationId?: string | null;
   /** The `BlueprintConstruction` that was created by this mutation. */
   blueprintConstruction?: BlueprintConstruction | null;
   blueprintConstructionEdge?: BlueprintConstructionEdge | null;
-}
-export interface CreatePlansModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlansModule` that was created by this mutation. */
-  plansModule?: PlansModule | null;
-  plansModuleEdge?: PlansModuleEdge | null;
 }
 export interface CreateRlsModulePayload {
   clientMutationId?: string | null;
@@ -18735,11 +21246,11 @@ export interface CreateAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface CreateOrgLimitPayload {
+export interface CreateDatabaseSettingPayload {
   clientMutationId?: string | null;
-  /** The `OrgLimit` that was created by this mutation. */
-  orgLimit?: OrgLimit | null;
-  orgLimitEdge?: OrgLimitEdge | null;
+  /** The `DatabaseSetting` that was created by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
 }
 export interface CreateBlueprintPayload {
   clientMutationId?: string | null;
@@ -18753,6 +21264,18 @@ export interface CreateDenormalizedTableFieldPayload {
   denormalizedTableField?: DenormalizedTableField | null;
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
+export interface CreateApiSettingPayload {
+  clientMutationId?: string | null;
+  /** The `ApiSetting` that was created by this mutation. */
+  apiSetting?: ApiSetting | null;
+  apiSettingEdge?: ApiSettingEdge | null;
+}
+export interface CreatePlansModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlansModule` that was created by this mutation. */
+  plansModule?: PlansModule | null;
+  plansModuleEdge?: PlansModuleEdge | null;
+}
 export interface CreateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was created by this mutation. */
@@ -18763,6 +21286,12 @@ export interface CreateSqlActionPayload {
   clientMutationId?: string | null;
   /** The `SqlAction` that was created by this mutation. */
   sqlAction?: SqlAction | null;
+}
+export interface CreateAppLimitPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimit` that was created by this mutation. */
+  appLimit?: AppLimit | null;
+  appLimitEdge?: AppLimitEdge | null;
 }
 export interface CreateDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -18804,6 +21333,18 @@ export interface CreateAstMigrationPayload {
   clientMutationId?: string | null;
   /** The `AstMigration` that was created by this mutation. */
   astMigration?: AstMigration | null;
+}
+export interface CreateOrgLimitAggregatePayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitAggregate` that was created by this mutation. */
+  orgLimitAggregate?: OrgLimitAggregate | null;
+  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+}
+export interface CreateOrgLimitPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimit` that was created by this mutation. */
+  orgLimit?: OrgLimit | null;
+  orgLimitEdge?: OrgLimitEdge | null;
 }
 export interface CreateEnumPayload {
   clientMutationId?: string | null;
@@ -18913,6 +21454,12 @@ export interface CreateEmbeddingChunkPayload {
   embeddingChunk?: EmbeddingChunk | null;
   embeddingChunkEdge?: EmbeddingChunkEdge | null;
 }
+export interface CreateWebauthnSettingPayload {
+  clientMutationId?: string | null;
+  /** The `WebauthnSetting` that was created by this mutation. */
+  webauthnSetting?: WebauthnSetting | null;
+  webauthnSettingEdge?: WebauthnSettingEdge | null;
+}
 export interface CreateOrgInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgInvite` that was created by this mutation. */
@@ -18937,11 +21484,11 @@ export interface CreateIndexPayload {
   index?: Index | null;
   indexEdge?: IndexEdge | null;
 }
-export interface CreateLimitsModulePayload {
+export interface CreateBillingProviderModulePayload {
   clientMutationId?: string | null;
-  /** The `LimitsModule` that was created by this mutation. */
-  limitsModule?: LimitsModule | null;
-  limitsModuleEdge?: LimitsModuleEdge | null;
+  /** The `BillingProviderModule` that was created by this mutation. */
+  billingProviderModule?: BillingProviderModule | null;
+  billingProviderModuleEdge?: BillingProviderModuleEdge | null;
 }
 export interface CreateBlueprintTemplatePayload {
   clientMutationId?: string | null;
@@ -18973,29 +21520,23 @@ export interface CreateForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface CreateStorageModulePayload {
-  clientMutationId?: string | null;
-  /** The `StorageModule` that was created by this mutation. */
-  storageModule?: StorageModule | null;
-  storageModuleEdge?: StorageModuleEdge | null;
-}
 export interface CreateTablePayload {
   clientMutationId?: string | null;
   /** The `Table` that was created by this mutation. */
   table?: Table | null;
   tableEdge?: TableEdge | null;
 }
-export interface CreateEntityTypeProvisionPayload {
-  clientMutationId?: string | null;
-  /** The `EntityTypeProvision` that was created by this mutation. */
-  entityTypeProvision?: EntityTypeProvision | null;
-  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
-}
 export interface CreateRelationProvisionPayload {
   clientMutationId?: string | null;
   /** The `RelationProvision` that was created by this mutation. */
   relationProvision?: RelationProvision | null;
   relationProvisionEdge?: RelationProvisionEdge | null;
+}
+export interface CreateEntityTypeProvisionPayload {
+  clientMutationId?: string | null;
+  /** The `EntityTypeProvision` that was created by this mutation. */
+  entityTypeProvision?: EntityTypeProvision | null;
+  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
 }
 export interface CreateLevelsModulePayload {
   clientMutationId?: string | null;
@@ -19015,6 +21556,18 @@ export interface CreateFieldPayload {
   field?: Field | null;
   fieldEdge?: FieldEdge | null;
 }
+export interface CreateLimitsModulePayload {
+  clientMutationId?: string | null;
+  /** The `LimitsModule` that was created by this mutation. */
+  limitsModule?: LimitsModule | null;
+  limitsModuleEdge?: LimitsModuleEdge | null;
+}
+export interface CreateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was created by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
 export interface CreateMembershipsModulePayload {
   clientMutationId?: string | null;
   /** The `MembershipsModule` that was created by this mutation. */
@@ -19033,6 +21586,18 @@ export interface UpdateRoleTypePayload {
   roleType?: RoleType | null;
   roleTypeEdge?: RoleTypeEdge | null;
 }
+export interface UpdateAppLimitCreditRedemptionPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditRedemption` that was updated by this mutation. */
+  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
+  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
+}
+export interface UpdateFunctionPayload {
+  clientMutationId?: string | null;
+  /** The `Function` that was updated by this mutation. */
+  function?: Function | null;
+  functionEdge?: FunctionEdge | null;
+}
 export interface UpdateViewTablePayload {
   clientMutationId?: string | null;
   /** The `ViewTable` that was updated by this mutation. */
@@ -19044,6 +21609,12 @@ export interface UpdateApiSchemaPayload {
   /** The `ApiSchema` that was updated by this mutation. */
   apiSchema?: ApiSchema | null;
   apiSchemaEdge?: ApiSchemaEdge | null;
+}
+export interface UpdateCorsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `CorsSetting` that was updated by this mutation. */
+  corsSetting?: CorsSetting | null;
+  corsSettingEdge?: CorsSettingEdge | null;
 }
 export interface UpdateOrgMemberPayload {
   clientMutationId?: string | null;
@@ -19104,6 +21675,12 @@ export interface UpdateSiteModulePayload {
   /** The `SiteModule` that was updated by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface UpdateAppLimitCreditCodePayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditCode` that was updated by this mutation. */
+  appLimitCreditCode?: AppLimitCreditCode | null;
+  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
 }
 export interface UpdateSchemaGrantPayload {
   clientMutationId?: string | null;
@@ -19176,6 +21753,30 @@ export interface UpdateOrgPermissionPayload {
   /** The `OrgPermission` that was updated by this mutation. */
   orgPermission?: OrgPermission | null;
   orgPermissionEdge?: OrgPermissionEdge | null;
+}
+export interface UpdateAppLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCapsDefault` that was updated by this mutation. */
+  appLimitCapsDefault?: AppLimitCapsDefault | null;
+  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
+}
+export interface UpdateOrgLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCapsDefault` that was updated by this mutation. */
+  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
+  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
+}
+export interface UpdateAppLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCap` that was updated by this mutation. */
+  appLimitCap?: AppLimitCap | null;
+  appLimitCapEdge?: AppLimitCapEdge | null;
+}
+export interface UpdateOrgLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCap` that was updated by this mutation. */
+  orgLimitCap?: OrgLimitCap | null;
+  orgLimitCapEdge?: OrgLimitCapEdge | null;
 }
 export interface UpdateMembershipTypePayload {
   clientMutationId?: string | null;
@@ -19267,6 +21868,12 @@ export interface UpdateOrgLimitDefaultPayload {
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
+export interface UpdateAppLimitCreditCodeItemPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditCodeItem` that was updated by this mutation. */
+  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
+  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
+}
 export interface UpdateDatabasePayload {
   clientMutationId?: string | null;
   /** The `Database` that was updated by this mutation. */
@@ -19309,6 +21916,18 @@ export interface UpdateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
+export interface UpdateAppLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCredit` that was updated by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+}
+export interface UpdateOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was updated by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
 export interface UpdateFullTextSearchPayload {
   clientMutationId?: string | null;
   /** The `FullTextSearch` that was updated by this mutation. */
@@ -19326,6 +21945,12 @@ export interface UpdateCommitPayload {
   /** The `Commit` that was updated by this mutation. */
   commit?: Commit | null;
   commitEdge?: CommitEdge | null;
+}
+export interface UpdatePubkeySettingPayload {
+  clientMutationId?: string | null;
+  /** The `PubkeySetting` that was updated by this mutation. */
+  pubkeySetting?: PubkeySetting | null;
+  pubkeySettingEdge?: PubkeySettingEdge | null;
 }
 export interface UpdateRateLimitsModulePayload {
   clientMutationId?: string | null;
@@ -19375,6 +22000,12 @@ export interface UpdateDomainPayload {
   domain?: Domain | null;
   domainEdge?: DomainEdge | null;
 }
+export interface UpdateRlsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `RlsSetting` that was updated by this mutation. */
+  rlsSetting?: RlsSetting | null;
+  rlsSettingEdge?: RlsSettingEdge | null;
+}
 export interface UpdateAgentTaskPayload {
   clientMutationId?: string | null;
   /** The `AgentTask` that was updated by this mutation. */
@@ -19411,29 +22042,17 @@ export interface UpdateOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
-export interface UpdateAppLimitPayload {
+export interface UpdatePartitionPayload {
   clientMutationId?: string | null;
-  /** The `AppLimit` that was updated by this mutation. */
-  appLimit?: AppLimit | null;
-  appLimitEdge?: AppLimitEdge | null;
-}
-export interface UpdateOrgLimitAggregatePayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitAggregate` that was updated by this mutation. */
-  orgLimitAggregate?: OrgLimitAggregate | null;
-  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+  /** The `Partition` that was updated by this mutation. */
+  partition?: Partition | null;
+  partitionEdge?: PartitionEdge | null;
 }
 export interface UpdateBlueprintConstructionPayload {
   clientMutationId?: string | null;
   /** The `BlueprintConstruction` that was updated by this mutation. */
   blueprintConstruction?: BlueprintConstruction | null;
   blueprintConstructionEdge?: BlueprintConstructionEdge | null;
-}
-export interface UpdatePlansModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlansModule` that was updated by this mutation. */
-  plansModule?: PlansModule | null;
-  plansModuleEdge?: PlansModuleEdge | null;
 }
 export interface UpdateRlsModulePayload {
   clientMutationId?: string | null;
@@ -19459,11 +22078,11 @@ export interface UpdateAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface UpdateOrgLimitPayload {
+export interface UpdateDatabaseSettingPayload {
   clientMutationId?: string | null;
-  /** The `OrgLimit` that was updated by this mutation. */
-  orgLimit?: OrgLimit | null;
-  orgLimitEdge?: OrgLimitEdge | null;
+  /** The `DatabaseSetting` that was updated by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
 }
 export interface UpdateBlueprintPayload {
   clientMutationId?: string | null;
@@ -19477,11 +22096,29 @@ export interface UpdateDenormalizedTableFieldPayload {
   denormalizedTableField?: DenormalizedTableField | null;
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
+export interface UpdateApiSettingPayload {
+  clientMutationId?: string | null;
+  /** The `ApiSetting` that was updated by this mutation. */
+  apiSetting?: ApiSetting | null;
+  apiSettingEdge?: ApiSettingEdge | null;
+}
+export interface UpdatePlansModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlansModule` that was updated by this mutation. */
+  plansModule?: PlansModule | null;
+  plansModuleEdge?: PlansModuleEdge | null;
+}
 export interface UpdateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was updated by this mutation. */
   orgMemberProfile?: OrgMemberProfile | null;
   orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface UpdateAppLimitPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimit` that was updated by this mutation. */
+  appLimit?: AppLimit | null;
+  appLimitEdge?: AppLimitEdge | null;
 }
 export interface UpdateDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -19518,6 +22155,18 @@ export interface UpdateSecureTableProvisionPayload {
   /** The `SecureTableProvision` that was updated by this mutation. */
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
+}
+export interface UpdateOrgLimitAggregatePayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitAggregate` that was updated by this mutation. */
+  orgLimitAggregate?: OrgLimitAggregate | null;
+  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+}
+export interface UpdateOrgLimitPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimit` that was updated by this mutation. */
+  orgLimit?: OrgLimit | null;
+  orgLimitEdge?: OrgLimitEdge | null;
 }
 export interface UpdateEnumPayload {
   clientMutationId?: string | null;
@@ -19627,6 +22276,12 @@ export interface UpdateEmbeddingChunkPayload {
   embeddingChunk?: EmbeddingChunk | null;
   embeddingChunkEdge?: EmbeddingChunkEdge | null;
 }
+export interface UpdateWebauthnSettingPayload {
+  clientMutationId?: string | null;
+  /** The `WebauthnSetting` that was updated by this mutation. */
+  webauthnSetting?: WebauthnSetting | null;
+  webauthnSettingEdge?: WebauthnSettingEdge | null;
+}
 export interface UpdateOrgInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgInvite` that was updated by this mutation. */
@@ -19651,11 +22306,11 @@ export interface UpdateIndexPayload {
   index?: Index | null;
   indexEdge?: IndexEdge | null;
 }
-export interface UpdateLimitsModulePayload {
+export interface UpdateBillingProviderModulePayload {
   clientMutationId?: string | null;
-  /** The `LimitsModule` that was updated by this mutation. */
-  limitsModule?: LimitsModule | null;
-  limitsModuleEdge?: LimitsModuleEdge | null;
+  /** The `BillingProviderModule` that was updated by this mutation. */
+  billingProviderModule?: BillingProviderModule | null;
+  billingProviderModuleEdge?: BillingProviderModuleEdge | null;
 }
 export interface UpdateBlueprintTemplatePayload {
   clientMutationId?: string | null;
@@ -19687,29 +22342,23 @@ export interface UpdateForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface UpdateStorageModulePayload {
-  clientMutationId?: string | null;
-  /** The `StorageModule` that was updated by this mutation. */
-  storageModule?: StorageModule | null;
-  storageModuleEdge?: StorageModuleEdge | null;
-}
 export interface UpdateTablePayload {
   clientMutationId?: string | null;
   /** The `Table` that was updated by this mutation. */
   table?: Table | null;
   tableEdge?: TableEdge | null;
 }
-export interface UpdateEntityTypeProvisionPayload {
-  clientMutationId?: string | null;
-  /** The `EntityTypeProvision` that was updated by this mutation. */
-  entityTypeProvision?: EntityTypeProvision | null;
-  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
-}
 export interface UpdateRelationProvisionPayload {
   clientMutationId?: string | null;
   /** The `RelationProvision` that was updated by this mutation. */
   relationProvision?: RelationProvision | null;
   relationProvisionEdge?: RelationProvisionEdge | null;
+}
+export interface UpdateEntityTypeProvisionPayload {
+  clientMutationId?: string | null;
+  /** The `EntityTypeProvision` that was updated by this mutation. */
+  entityTypeProvision?: EntityTypeProvision | null;
+  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
 }
 export interface UpdateLevelsModulePayload {
   clientMutationId?: string | null;
@@ -19729,6 +22378,18 @@ export interface UpdateFieldPayload {
   field?: Field | null;
   fieldEdge?: FieldEdge | null;
 }
+export interface UpdateLimitsModulePayload {
+  clientMutationId?: string | null;
+  /** The `LimitsModule` that was updated by this mutation. */
+  limitsModule?: LimitsModule | null;
+  limitsModuleEdge?: LimitsModuleEdge | null;
+}
+export interface UpdateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was updated by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
 export interface UpdateMembershipsModulePayload {
   clientMutationId?: string | null;
   /** The `MembershipsModule` that was updated by this mutation. */
@@ -19747,6 +22408,18 @@ export interface DeleteRoleTypePayload {
   roleType?: RoleType | null;
   roleTypeEdge?: RoleTypeEdge | null;
 }
+export interface DeleteAppLimitCreditRedemptionPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditRedemption` that was deleted by this mutation. */
+  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
+  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
+}
+export interface DeleteFunctionPayload {
+  clientMutationId?: string | null;
+  /** The `Function` that was deleted by this mutation. */
+  function?: Function | null;
+  functionEdge?: FunctionEdge | null;
+}
 export interface DeleteViewTablePayload {
   clientMutationId?: string | null;
   /** The `ViewTable` that was deleted by this mutation. */
@@ -19758,6 +22431,12 @@ export interface DeleteApiSchemaPayload {
   /** The `ApiSchema` that was deleted by this mutation. */
   apiSchema?: ApiSchema | null;
   apiSchemaEdge?: ApiSchemaEdge | null;
+}
+export interface DeleteCorsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `CorsSetting` that was deleted by this mutation. */
+  corsSetting?: CorsSetting | null;
+  corsSettingEdge?: CorsSettingEdge | null;
 }
 export interface DeleteOrgMemberPayload {
   clientMutationId?: string | null;
@@ -19818,6 +22497,12 @@ export interface DeleteSiteModulePayload {
   /** The `SiteModule` that was deleted by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface DeleteAppLimitCreditCodePayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditCode` that was deleted by this mutation. */
+  appLimitCreditCode?: AppLimitCreditCode | null;
+  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
 }
 export interface DeleteSchemaGrantPayload {
   clientMutationId?: string | null;
@@ -19890,6 +22575,30 @@ export interface DeleteOrgPermissionPayload {
   /** The `OrgPermission` that was deleted by this mutation. */
   orgPermission?: OrgPermission | null;
   orgPermissionEdge?: OrgPermissionEdge | null;
+}
+export interface DeleteAppLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCapsDefault` that was deleted by this mutation. */
+  appLimitCapsDefault?: AppLimitCapsDefault | null;
+  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
+}
+export interface DeleteOrgLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCapsDefault` that was deleted by this mutation. */
+  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
+  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
+}
+export interface DeleteAppLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCap` that was deleted by this mutation. */
+  appLimitCap?: AppLimitCap | null;
+  appLimitCapEdge?: AppLimitCapEdge | null;
+}
+export interface DeleteOrgLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCap` that was deleted by this mutation. */
+  orgLimitCap?: OrgLimitCap | null;
+  orgLimitCapEdge?: OrgLimitCapEdge | null;
 }
 export interface DeleteMembershipTypePayload {
   clientMutationId?: string | null;
@@ -19981,6 +22690,12 @@ export interface DeleteOrgLimitDefaultPayload {
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
+export interface DeleteAppLimitCreditCodeItemPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCreditCodeItem` that was deleted by this mutation. */
+  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
+  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
+}
 export interface DeleteDatabasePayload {
   clientMutationId?: string | null;
   /** The `Database` that was deleted by this mutation. */
@@ -20023,6 +22738,18 @@ export interface DeleteAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
+export interface DeleteAppLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCredit` that was deleted by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+}
+export interface DeleteOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was deleted by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
 export interface DeleteFullTextSearchPayload {
   clientMutationId?: string | null;
   /** The `FullTextSearch` that was deleted by this mutation. */
@@ -20040,6 +22767,12 @@ export interface DeleteCommitPayload {
   /** The `Commit` that was deleted by this mutation. */
   commit?: Commit | null;
   commitEdge?: CommitEdge | null;
+}
+export interface DeletePubkeySettingPayload {
+  clientMutationId?: string | null;
+  /** The `PubkeySetting` that was deleted by this mutation. */
+  pubkeySetting?: PubkeySetting | null;
+  pubkeySettingEdge?: PubkeySettingEdge | null;
 }
 export interface DeleteRateLimitsModulePayload {
   clientMutationId?: string | null;
@@ -20089,6 +22822,12 @@ export interface DeleteDomainPayload {
   domain?: Domain | null;
   domainEdge?: DomainEdge | null;
 }
+export interface DeleteRlsSettingPayload {
+  clientMutationId?: string | null;
+  /** The `RlsSetting` that was deleted by this mutation. */
+  rlsSetting?: RlsSetting | null;
+  rlsSettingEdge?: RlsSettingEdge | null;
+}
 export interface DeleteAgentTaskPayload {
   clientMutationId?: string | null;
   /** The `AgentTask` that was deleted by this mutation. */
@@ -20125,29 +22864,17 @@ export interface DeleteOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
-export interface DeleteAppLimitPayload {
+export interface DeletePartitionPayload {
   clientMutationId?: string | null;
-  /** The `AppLimit` that was deleted by this mutation. */
-  appLimit?: AppLimit | null;
-  appLimitEdge?: AppLimitEdge | null;
-}
-export interface DeleteOrgLimitAggregatePayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitAggregate` that was deleted by this mutation. */
-  orgLimitAggregate?: OrgLimitAggregate | null;
-  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+  /** The `Partition` that was deleted by this mutation. */
+  partition?: Partition | null;
+  partitionEdge?: PartitionEdge | null;
 }
 export interface DeleteBlueprintConstructionPayload {
   clientMutationId?: string | null;
   /** The `BlueprintConstruction` that was deleted by this mutation. */
   blueprintConstruction?: BlueprintConstruction | null;
   blueprintConstructionEdge?: BlueprintConstructionEdge | null;
-}
-export interface DeletePlansModulePayload {
-  clientMutationId?: string | null;
-  /** The `PlansModule` that was deleted by this mutation. */
-  plansModule?: PlansModule | null;
-  plansModuleEdge?: PlansModuleEdge | null;
 }
 export interface DeleteRlsModulePayload {
   clientMutationId?: string | null;
@@ -20173,11 +22900,11 @@ export interface DeleteAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface DeleteOrgLimitPayload {
+export interface DeleteDatabaseSettingPayload {
   clientMutationId?: string | null;
-  /** The `OrgLimit` that was deleted by this mutation. */
-  orgLimit?: OrgLimit | null;
-  orgLimitEdge?: OrgLimitEdge | null;
+  /** The `DatabaseSetting` that was deleted by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
 }
 export interface DeleteBlueprintPayload {
   clientMutationId?: string | null;
@@ -20191,11 +22918,29 @@ export interface DeleteDenormalizedTableFieldPayload {
   denormalizedTableField?: DenormalizedTableField | null;
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
+export interface DeleteApiSettingPayload {
+  clientMutationId?: string | null;
+  /** The `ApiSetting` that was deleted by this mutation. */
+  apiSetting?: ApiSetting | null;
+  apiSettingEdge?: ApiSettingEdge | null;
+}
+export interface DeletePlansModulePayload {
+  clientMutationId?: string | null;
+  /** The `PlansModule` that was deleted by this mutation. */
+  plansModule?: PlansModule | null;
+  plansModuleEdge?: PlansModuleEdge | null;
+}
 export interface DeleteOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was deleted by this mutation. */
   orgMemberProfile?: OrgMemberProfile | null;
   orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface DeleteAppLimitPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimit` that was deleted by this mutation. */
+  appLimit?: AppLimit | null;
+  appLimitEdge?: AppLimitEdge | null;
 }
 export interface DeleteDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -20232,6 +22977,18 @@ export interface DeleteSecureTableProvisionPayload {
   /** The `SecureTableProvision` that was deleted by this mutation. */
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
+}
+export interface DeleteOrgLimitAggregatePayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitAggregate` that was deleted by this mutation. */
+  orgLimitAggregate?: OrgLimitAggregate | null;
+  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+}
+export interface DeleteOrgLimitPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimit` that was deleted by this mutation. */
+  orgLimit?: OrgLimit | null;
+  orgLimitEdge?: OrgLimitEdge | null;
 }
 export interface DeleteEnumPayload {
   clientMutationId?: string | null;
@@ -20341,6 +23098,12 @@ export interface DeleteEmbeddingChunkPayload {
   embeddingChunk?: EmbeddingChunk | null;
   embeddingChunkEdge?: EmbeddingChunkEdge | null;
 }
+export interface DeleteWebauthnSettingPayload {
+  clientMutationId?: string | null;
+  /** The `WebauthnSetting` that was deleted by this mutation. */
+  webauthnSetting?: WebauthnSetting | null;
+  webauthnSettingEdge?: WebauthnSettingEdge | null;
+}
 export interface DeleteOrgInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgInvite` that was deleted by this mutation. */
@@ -20365,11 +23128,11 @@ export interface DeleteIndexPayload {
   index?: Index | null;
   indexEdge?: IndexEdge | null;
 }
-export interface DeleteLimitsModulePayload {
+export interface DeleteBillingProviderModulePayload {
   clientMutationId?: string | null;
-  /** The `LimitsModule` that was deleted by this mutation. */
-  limitsModule?: LimitsModule | null;
-  limitsModuleEdge?: LimitsModuleEdge | null;
+  /** The `BillingProviderModule` that was deleted by this mutation. */
+  billingProviderModule?: BillingProviderModule | null;
+  billingProviderModuleEdge?: BillingProviderModuleEdge | null;
 }
 export interface DeleteBlueprintTemplatePayload {
   clientMutationId?: string | null;
@@ -20401,29 +23164,23 @@ export interface DeleteForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
-export interface DeleteStorageModulePayload {
-  clientMutationId?: string | null;
-  /** The `StorageModule` that was deleted by this mutation. */
-  storageModule?: StorageModule | null;
-  storageModuleEdge?: StorageModuleEdge | null;
-}
 export interface DeleteTablePayload {
   clientMutationId?: string | null;
   /** The `Table` that was deleted by this mutation. */
   table?: Table | null;
   tableEdge?: TableEdge | null;
 }
-export interface DeleteEntityTypeProvisionPayload {
-  clientMutationId?: string | null;
-  /** The `EntityTypeProvision` that was deleted by this mutation. */
-  entityTypeProvision?: EntityTypeProvision | null;
-  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
-}
 export interface DeleteRelationProvisionPayload {
   clientMutationId?: string | null;
   /** The `RelationProvision` that was deleted by this mutation. */
   relationProvision?: RelationProvision | null;
   relationProvisionEdge?: RelationProvisionEdge | null;
+}
+export interface DeleteEntityTypeProvisionPayload {
+  clientMutationId?: string | null;
+  /** The `EntityTypeProvision` that was deleted by this mutation. */
+  entityTypeProvision?: EntityTypeProvision | null;
+  entityTypeProvisionEdge?: EntityTypeProvisionEdge | null;
 }
 export interface DeleteLevelsModulePayload {
   clientMutationId?: string | null;
@@ -20443,23 +23200,23 @@ export interface DeleteFieldPayload {
   field?: Field | null;
   fieldEdge?: FieldEdge | null;
 }
+export interface DeleteLimitsModulePayload {
+  clientMutationId?: string | null;
+  /** The `LimitsModule` that was deleted by this mutation. */
+  limitsModule?: LimitsModule | null;
+  limitsModuleEdge?: LimitsModuleEdge | null;
+}
+export interface DeleteStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was deleted by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
 export interface DeleteMembershipsModulePayload {
   clientMutationId?: string | null;
   /** The `MembershipsModule` that was deleted by this mutation. */
   membershipsModule?: MembershipsModule | null;
   membershipsModuleEdge?: MembershipsModuleEdge | null;
-}
-export interface RequestUploadUrlPayload {
-  /** Presigned PUT URL (null if file was deduplicated) */
-  uploadUrl?: string | null;
-  /** The file ID (existing if deduplicated, new if fresh upload) */
-  fileId: string;
-  /** The S3 object key */
-  key: string;
-  /** Whether this file was deduplicated (already exists with same hash) */
-  deduplicated: boolean;
-  /** Presigned URL expiry time (null if deduplicated) */
-  expiresAt?: string | null;
 }
 export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */
@@ -20540,6 +23297,18 @@ export interface RoleTypeEdge {
   /** The `RoleType` at the end of the edge. */
   node?: RoleType | null;
 }
+/** A `AppLimitCreditRedemption` edge in the connection. */
+export interface AppLimitCreditRedemptionEdge {
+  cursor?: string | null;
+  /** The `AppLimitCreditRedemption` at the end of the edge. */
+  node?: AppLimitCreditRedemption | null;
+}
+/** A `Function` edge in the connection. */
+export interface FunctionEdge {
+  cursor?: string | null;
+  /** The `Function` at the end of the edge. */
+  node?: Function | null;
+}
 /** A `ViewTable` edge in the connection. */
 export interface ViewTableEdge {
   cursor?: string | null;
@@ -20551,6 +23320,12 @@ export interface ApiSchemaEdge {
   cursor?: string | null;
   /** The `ApiSchema` at the end of the edge. */
   node?: ApiSchema | null;
+}
+/** A `CorsSetting` edge in the connection. */
+export interface CorsSettingEdge {
+  cursor?: string | null;
+  /** The `CorsSetting` at the end of the edge. */
+  node?: CorsSetting | null;
 }
 /** A `OrgMember` edge in the connection. */
 export interface OrgMemberEdge {
@@ -20618,6 +23393,12 @@ export interface SiteModuleEdge {
   /** The `SiteModule` at the end of the edge. */
   node?: SiteModule | null;
 }
+/** A `AppLimitCreditCode` edge in the connection. */
+export interface AppLimitCreditCodeEdge {
+  cursor?: string | null;
+  /** The `AppLimitCreditCode` at the end of the edge. */
+  node?: AppLimitCreditCode | null;
+}
 /** A `SchemaGrant` edge in the connection. */
 export interface SchemaGrantEdge {
   cursor?: string | null;
@@ -20677,6 +23458,30 @@ export interface OrgPermissionDefaultEdge {
   cursor?: string | null;
   /** The `OrgPermissionDefault` at the end of the edge. */
   node?: OrgPermissionDefault | null;
+}
+/** A `AppLimitCapsDefault` edge in the connection. */
+export interface AppLimitCapsDefaultEdge {
+  cursor?: string | null;
+  /** The `AppLimitCapsDefault` at the end of the edge. */
+  node?: AppLimitCapsDefault | null;
+}
+/** A `OrgLimitCapsDefault` edge in the connection. */
+export interface OrgLimitCapsDefaultEdge {
+  cursor?: string | null;
+  /** The `OrgLimitCapsDefault` at the end of the edge. */
+  node?: OrgLimitCapsDefault | null;
+}
+/** A `AppLimitCap` edge in the connection. */
+export interface AppLimitCapEdge {
+  cursor?: string | null;
+  /** The `AppLimitCap` at the end of the edge. */
+  node?: AppLimitCap | null;
+}
+/** A `OrgLimitCap` edge in the connection. */
+export interface OrgLimitCapEdge {
+  cursor?: string | null;
+  /** The `OrgLimitCap` at the end of the edge. */
+  node?: OrgLimitCap | null;
 }
 /** A `MembershipType` edge in the connection. */
 export interface MembershipTypeEdge {
@@ -20774,6 +23579,12 @@ export interface OrgLimitDefaultEdge {
   /** The `OrgLimitDefault` at the end of the edge. */
   node?: OrgLimitDefault | null;
 }
+/** A `AppLimitCreditCodeItem` edge in the connection. */
+export interface AppLimitCreditCodeItemEdge {
+  cursor?: string | null;
+  /** The `AppLimitCreditCodeItem` at the end of the edge. */
+  node?: AppLimitCreditCodeItem | null;
+}
 /** A `UserConnectedAccount` edge in the connection. */
 export interface UserConnectedAccountEdge {
   cursor?: string | null;
@@ -20810,6 +23621,18 @@ export interface SiteMetadatumEdge {
   /** The `SiteMetadatum` at the end of the edge. */
   node?: SiteMetadatum | null;
 }
+/** A `AppLimitCredit` edge in the connection. */
+export interface AppLimitCreditEdge {
+  cursor?: string | null;
+  /** The `AppLimitCredit` at the end of the edge. */
+  node?: AppLimitCredit | null;
+}
+/** A `OrgLimitCredit` edge in the connection. */
+export interface OrgLimitCreditEdge {
+  cursor?: string | null;
+  /** The `OrgLimitCredit` at the end of the edge. */
+  node?: OrgLimitCredit | null;
+}
 /** A `FullTextSearch` edge in the connection. */
 export interface FullTextSearchEdge {
   cursor?: string | null;
@@ -20827,6 +23650,12 @@ export interface CommitEdge {
   cursor?: string | null;
   /** The `Commit` at the end of the edge. */
   node?: Commit | null;
+}
+/** A `PubkeySetting` edge in the connection. */
+export interface PubkeySettingEdge {
+  cursor?: string | null;
+  /** The `PubkeySetting` at the end of the edge. */
+  node?: PubkeySetting | null;
 }
 /** A `RateLimitsModule` edge in the connection. */
 export interface RateLimitsModuleEdge {
@@ -20876,6 +23705,12 @@ export interface DomainEdge {
   /** The `Domain` at the end of the edge. */
   node?: Domain | null;
 }
+/** A `RlsSetting` edge in the connection. */
+export interface RlsSettingEdge {
+  cursor?: string | null;
+  /** The `RlsSetting` at the end of the edge. */
+  node?: RlsSetting | null;
+}
 /** A `AgentTask` edge in the connection. */
 export interface AgentTaskEdge {
   cursor?: string | null;
@@ -20924,29 +23759,17 @@ export interface OrgChartEdgeEdge {
   /** The `OrgChartEdge` at the end of the edge. */
   node?: OrgChartEdge | null;
 }
-/** A `AppLimit` edge in the connection. */
-export interface AppLimitEdge {
+/** A `Partition` edge in the connection. */
+export interface PartitionEdge {
   cursor?: string | null;
-  /** The `AppLimit` at the end of the edge. */
-  node?: AppLimit | null;
-}
-/** A `OrgLimitAggregate` edge in the connection. */
-export interface OrgLimitAggregateEdge {
-  cursor?: string | null;
-  /** The `OrgLimitAggregate` at the end of the edge. */
-  node?: OrgLimitAggregate | null;
+  /** The `Partition` at the end of the edge. */
+  node?: Partition | null;
 }
 /** A `BlueprintConstruction` edge in the connection. */
 export interface BlueprintConstructionEdge {
   cursor?: string | null;
   /** The `BlueprintConstruction` at the end of the edge. */
   node?: BlueprintConstruction | null;
-}
-/** A `PlansModule` edge in the connection. */
-export interface PlansModuleEdge {
-  cursor?: string | null;
-  /** The `PlansModule` at the end of the edge. */
-  node?: PlansModule | null;
 }
 /** A `RlsModule` edge in the connection. */
 export interface RlsModuleEdge {
@@ -20972,11 +23795,11 @@ export interface AppLevelEdge {
   /** The `AppLevel` at the end of the edge. */
   node?: AppLevel | null;
 }
-/** A `OrgLimit` edge in the connection. */
-export interface OrgLimitEdge {
+/** A `DatabaseSetting` edge in the connection. */
+export interface DatabaseSettingEdge {
   cursor?: string | null;
-  /** The `OrgLimit` at the end of the edge. */
-  node?: OrgLimit | null;
+  /** The `DatabaseSetting` at the end of the edge. */
+  node?: DatabaseSetting | null;
 }
 /** A `Blueprint` edge in the connection. */
 export interface BlueprintEdge {
@@ -20990,6 +23813,18 @@ export interface DenormalizedTableFieldEdge {
   /** The `DenormalizedTableField` at the end of the edge. */
   node?: DenormalizedTableField | null;
 }
+/** A `ApiSetting` edge in the connection. */
+export interface ApiSettingEdge {
+  cursor?: string | null;
+  /** The `ApiSetting` at the end of the edge. */
+  node?: ApiSetting | null;
+}
+/** A `PlansModule` edge in the connection. */
+export interface PlansModuleEdge {
+  cursor?: string | null;
+  /** The `PlansModule` at the end of the edge. */
+  node?: PlansModule | null;
+}
 /** A `OrgMemberProfile` edge in the connection. */
 export interface OrgMemberProfileEdge {
   cursor?: string | null;
@@ -21001,6 +23836,12 @@ export interface SqlActionEdge {
   cursor?: string | null;
   /** The `SqlAction` at the end of the edge. */
   node?: SqlAction | null;
+}
+/** A `AppLimit` edge in the connection. */
+export interface AppLimitEdge {
+  cursor?: string | null;
+  /** The `AppLimit` at the end of the edge. */
+  node?: AppLimit | null;
 }
 /** A `DatabaseTransfer` edge in the connection. */
 export interface DatabaseTransferEdge {
@@ -21043,6 +23884,18 @@ export interface AstMigrationEdge {
   cursor?: string | null;
   /** The `AstMigration` at the end of the edge. */
   node?: AstMigration | null;
+}
+/** A `OrgLimitAggregate` edge in the connection. */
+export interface OrgLimitAggregateEdge {
+  cursor?: string | null;
+  /** The `OrgLimitAggregate` at the end of the edge. */
+  node?: OrgLimitAggregate | null;
+}
+/** A `OrgLimit` edge in the connection. */
+export interface OrgLimitEdge {
+  cursor?: string | null;
+  /** The `OrgLimit` at the end of the edge. */
+  node?: OrgLimit | null;
 }
 /** A `Enum` edge in the connection. */
 export interface EnumEdge {
@@ -21152,6 +24005,12 @@ export interface EmbeddingChunkEdge {
   /** The `EmbeddingChunk` at the end of the edge. */
   node?: EmbeddingChunk | null;
 }
+/** A `WebauthnSetting` edge in the connection. */
+export interface WebauthnSettingEdge {
+  cursor?: string | null;
+  /** The `WebauthnSetting` at the end of the edge. */
+  node?: WebauthnSetting | null;
+}
 /** A `OrgInvite` edge in the connection. */
 export interface OrgInviteEdge {
   cursor?: string | null;
@@ -21176,11 +24035,11 @@ export interface IndexEdge {
   /** The `Index` at the end of the edge. */
   node?: Index | null;
 }
-/** A `LimitsModule` edge in the connection. */
-export interface LimitsModuleEdge {
+/** A `BillingProviderModule` edge in the connection. */
+export interface BillingProviderModuleEdge {
   cursor?: string | null;
-  /** The `LimitsModule` at the end of the edge. */
-  node?: LimitsModule | null;
+  /** The `BillingProviderModule` at the end of the edge. */
+  node?: BillingProviderModule | null;
 }
 /** A `BlueprintTemplate` edge in the connection. */
 export interface BlueprintTemplateEdge {
@@ -21212,29 +24071,23 @@ export interface ForeignKeyConstraintEdge {
   /** The `ForeignKeyConstraint` at the end of the edge. */
   node?: ForeignKeyConstraint | null;
 }
-/** A `StorageModule` edge in the connection. */
-export interface StorageModuleEdge {
-  cursor?: string | null;
-  /** The `StorageModule` at the end of the edge. */
-  node?: StorageModule | null;
-}
 /** A `Table` edge in the connection. */
 export interface TableEdge {
   cursor?: string | null;
   /** The `Table` at the end of the edge. */
   node?: Table | null;
 }
-/** A `EntityTypeProvision` edge in the connection. */
-export interface EntityTypeProvisionEdge {
-  cursor?: string | null;
-  /** The `EntityTypeProvision` at the end of the edge. */
-  node?: EntityTypeProvision | null;
-}
 /** A `RelationProvision` edge in the connection. */
 export interface RelationProvisionEdge {
   cursor?: string | null;
   /** The `RelationProvision` at the end of the edge. */
   node?: RelationProvision | null;
+}
+/** A `EntityTypeProvision` edge in the connection. */
+export interface EntityTypeProvisionEdge {
+  cursor?: string | null;
+  /** The `EntityTypeProvision` at the end of the edge. */
+  node?: EntityTypeProvision | null;
 }
 /** A `LevelsModule` edge in the connection. */
 export interface LevelsModuleEdge {
@@ -21253,6 +24106,18 @@ export interface FieldEdge {
   cursor?: string | null;
   /** The `Field` at the end of the edge. */
   node?: Field | null;
+}
+/** A `LimitsModule` edge in the connection. */
+export interface LimitsModuleEdge {
+  cursor?: string | null;
+  /** The `LimitsModule` at the end of the edge. */
+  node?: LimitsModule | null;
+}
+/** A `StorageModule` edge in the connection. */
+export interface StorageModuleEdge {
+  cursor?: string | null;
+  /** The `StorageModule` at the end of the edge. */
+  node?: StorageModule | null;
 }
 /** A `MembershipsModule` edge in the connection. */
 export interface MembershipsModuleEdge {

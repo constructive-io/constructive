@@ -126,11 +126,42 @@ export function buildSelections(
     if (typeof value === 'object' && value !== null) {
       const nested = value as {
         select?: Record<string, unknown>;
+        args?: Record<string, unknown>;
         first?: number;
         filter?: Record<string, unknown>;
         orderBy?: string[];
         connection?: boolean;
       };
+
+      // Field with arguments (e.g. requestUploadUrl on bucket types)
+      if (nested.args && typeof nested.args === 'object') {
+        const fieldArgs = Object.entries(nested.args).map(([argName, argValue]) =>
+          t.argument({ name: argName, value: buildValueAst(argValue) })
+        );
+        const nestedSelect = nested.select;
+        if (nestedSelect && typeof nestedSelect === 'object') {
+          const subSelections = Object.entries(nestedSelect)
+            .filter(([, v]) => v)
+            .map(([name]) => t.field({ name }));
+          fields.push(
+            t.field({
+              name: key,
+              args: fieldArgs.length ? fieldArgs : undefined,
+              selectionSet: subSelections.length
+                ? t.selectionSet({ selections: subSelections })
+                : undefined,
+            })
+          );
+        } else {
+          fields.push(
+            t.field({
+              name: key,
+              args: fieldArgs.length ? fieldArgs : undefined,
+            })
+          );
+        }
+        continue;
+      }
 
       if (!nested.select || typeof nested.select !== 'object') {
         throw new Error(

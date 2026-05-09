@@ -31,18 +31,27 @@ csdk auth set-token <your-token>
 | `app-permission` | appPermission CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
 | `app-level-requirement` | appLevelRequirement CRUD operations |
+| `app-limit-credit-redemption` | appLimitCreditRedemption CRUD operations |
+| `app-limit-credit-code-item` | appLimitCreditCodeItem CRUD operations |
+| `app-limit-credit` | appLimitCredit CRUD operations |
 | `org-member` | orgMember CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
+| `app-limit-credit-code` | appLimitCreditCode CRUD operations |
 | `org-permission-default` | orgPermissionDefault CRUD operations |
 | `app-admin-grant` | appAdminGrant CRUD operations |
 | `app-owner-grant` | appOwnerGrant CRUD operations |
 | `app-achievement` | appAchievement CRUD operations |
 | `app-step` | appStep CRUD operations |
+| `app-limit-caps-default` | appLimitCapsDefault CRUD operations |
+| `org-limit-caps-default` | orgLimitCapsDefault CRUD operations |
+| `app-limit-cap` | appLimitCap CRUD operations |
+| `org-limit-cap` | orgLimitCap CRUD operations |
 | `org-admin-grant` | orgAdminGrant CRUD operations |
 | `org-owner-grant` | orgOwnerGrant CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
+| `org-limit-credit` | orgLimitCredit CRUD operations |
 | `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
 | `app-claimed-invite` | appClaimedInvite CRUD operations |
 | `app-grant` | appGrant CRUD operations |
@@ -53,13 +62,13 @@ csdk auth set-token <your-token>
 | `org-limit-event` | orgLimitEvent CRUD operations |
 | `org-grant` | orgGrant CRUD operations |
 | `org-chart-edge` | orgChartEdge CRUD operations |
-| `app-limit` | appLimit CRUD operations |
-| `org-limit-aggregate` | orgLimitAggregate CRUD operations |
 | `org-member-profile` | orgMemberProfile CRUD operations |
-| `org-limit` | orgLimit CRUD operations |
 | `app-level` | appLevel CRUD operations |
+| `app-limit` | appLimit CRUD operations |
 | `app-invite` | appInvite CRUD operations |
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
+| `org-limit-aggregate` | orgLimitAggregate CRUD operations |
+| `org-limit` | orgLimit CRUD operations |
 | `org-invite` | orgInvite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
@@ -76,10 +85,6 @@ csdk auth set-token <your-token>
 | `steps-required` | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `submit-app-invite-code` | submitAppInviteCode |
 | `submit-org-invite-code` | submitOrgInviteCode |
-| `request-upload-url` | Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl. |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -249,6 +254,82 @@ CRUD operations for AppLevelRequirement records.
 **Required create fields:** `name`, `level`
 **Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
+### `app-limit-credit-redemption`
+
+CRUD operations for AppLimitCreditRedemption records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCreditRedemption records |
+| `find-first` | Find first matching appLimitCreditRedemption record |
+| `get` | Get a appLimitCreditRedemption by id |
+| `create` | Create a new appLimitCreditRedemption |
+| `update` | Update an existing appLimitCreditRedemption |
+| `delete` | Delete a appLimitCreditRedemption |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `creditCodeId` | UUID |
+| `entityId` | UUID |
+
+**Required create fields:** `creditCodeId`, `entityId`
+
+### `app-limit-credit-code-item`
+
+CRUD operations for AppLimitCreditCodeItem records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCreditCodeItem records |
+| `find-first` | Find first matching appLimitCreditCodeItem record |
+| `get` | Get a appLimitCreditCodeItem by id |
+| `create` | Create a new appLimitCreditCodeItem |
+| `update` | Update an existing appLimitCreditCodeItem |
+| `delete` | Delete a appLimitCreditCodeItem |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `creditCodeId` | UUID |
+| `defaultLimitId` | UUID |
+| `amount` | BigInt |
+| `creditType` | String |
+
+**Required create fields:** `creditCodeId`, `defaultLimitId`, `amount`
+**Optional create fields (backend defaults):** `creditType`
+
+### `app-limit-credit`
+
+CRUD operations for AppLimitCredit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCredit records |
+| `find-first` | Find first matching appLimitCredit record |
+| `get` | Get a appLimitCredit by id |
+| `create` | Create a new appLimitCredit |
+| `update` | Update an existing appLimitCredit |
+| `delete` | Delete a appLimitCredit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `defaultLimitId` | UUID |
+| `actorId` | UUID |
+| `amount` | BigInt |
+| `creditType` | String |
+| `reason` | String |
+
+**Required create fields:** `defaultLimitId`, `amount`
+**Optional create fields (backend defaults):** `actorId`, `creditType`, `reason`
+
 ### `org-member`
 
 CRUD operations for OrgMember records.
@@ -295,6 +376,32 @@ CRUD operations for AppPermissionDefault records.
 | `permissions` | BitString |
 
 **Optional create fields (backend defaults):** `permissions`
+
+### `app-limit-credit-code`
+
+CRUD operations for AppLimitCreditCode records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCreditCode records |
+| `find-first` | Find first matching appLimitCreditCode record |
+| `get` | Get a appLimitCreditCode by id |
+| `create` | Create a new appLimitCreditCode |
+| `update` | Update an existing appLimitCreditCode |
+| `delete` | Delete a appLimitCreditCode |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `code` | String |
+| `maxRedemptions` | Int |
+| `currentRedemptions` | Int |
+| `expiresAt` | Datetime |
+
+**Required create fields:** `code`
+**Optional create fields (backend defaults):** `maxRedemptions`, `currentRedemptions`, `expiresAt`
 
 ### `org-permission-default`
 
@@ -428,6 +535,104 @@ CRUD operations for AppStep records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `actorId`, `count`
 
+### `app-limit-caps-default`
+
+CRUD operations for AppLimitCapsDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCapsDefault records |
+| `find-first` | Find first matching appLimitCapsDefault record |
+| `get` | Get a appLimitCapsDefault by id |
+| `create` | Create a new appLimitCapsDefault |
+| `update` | Update an existing appLimitCapsDefault |
+| `delete` | Delete a appLimitCapsDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `max` | BigInt |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
+### `org-limit-caps-default`
+
+CRUD operations for OrgLimitCapsDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitCapsDefault records |
+| `find-first` | Find first matching orgLimitCapsDefault record |
+| `get` | Get a orgLimitCapsDefault by id |
+| `create` | Create a new orgLimitCapsDefault |
+| `update` | Update an existing orgLimitCapsDefault |
+| `delete` | Delete a orgLimitCapsDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `max` | BigInt |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
+### `app-limit-cap`
+
+CRUD operations for AppLimitCap records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCap records |
+| `find-first` | Find first matching appLimitCap record |
+| `get` | Get a appLimitCap by id |
+| `create` | Create a new appLimitCap |
+| `update` | Update an existing appLimitCap |
+| `delete` | Delete a appLimitCap |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `entityId` | UUID |
+| `max` | BigInt |
+
+**Required create fields:** `name`, `entityId`
+**Optional create fields (backend defaults):** `max`
+
+### `org-limit-cap`
+
+CRUD operations for OrgLimitCap records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitCap records |
+| `find-first` | Find first matching orgLimitCap record |
+| `get` | Get a orgLimitCap by id |
+| `create` | Create a new orgLimitCap |
+| `update` | Update an existing orgLimitCap |
+| `delete` | Delete a orgLimitCap |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `entityId` | UUID |
+| `max` | BigInt |
+
+**Required create fields:** `name`, `entityId`
+**Optional create fields (backend defaults):** `max`
+
 ### `org-admin-grant`
 
 CRUD operations for OrgAdminGrant records.
@@ -560,6 +765,34 @@ CRUD operations for OrgLimitDefault records.
 
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`, `softMax`
+
+### `org-limit-credit`
+
+CRUD operations for OrgLimitCredit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitCredit records |
+| `find-first` | Find first matching orgLimitCredit record |
+| `get` | Get a orgLimitCredit by id |
+| `create` | Create a new orgLimitCredit |
+| `update` | Update an existing orgLimitCredit |
+| `delete` | Delete a orgLimitCredit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `defaultLimitId` | UUID |
+| `actorId` | UUID |
+| `entityId` | UUID |
+| `amount` | BigInt |
+| `creditType` | String |
+| `reason` | String |
+
+**Required create fields:** `defaultLimitId`, `amount`
+**Optional create fields (backend defaults):** `actorId`, `entityId`, `creditType`, `reason`
 
 ### `org-chart-edge-grant`
 
@@ -844,64 +1077,6 @@ CRUD operations for OrgChartEdge records.
 **Required create fields:** `entityId`, `childId`
 **Optional create fields (backend defaults):** `parentId`, `positionTitle`, `positionLevel`
 
-### `app-limit`
-
-CRUD operations for AppLimit records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLimit records |
-| `find-first` | Find first matching appLimit record |
-| `get` | Get a appLimit by id |
-| `create` | Create a new appLimit |
-| `update` | Update an existing appLimit |
-| `delete` | Delete a appLimit |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `actorId` | UUID |
-| `num` | BigInt |
-| `max` | BigInt |
-| `softMax` | BigInt |
-| `windowStart` | Datetime |
-| `windowDuration` | Interval |
-
-**Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`
-
-### `org-limit-aggregate`
-
-CRUD operations for OrgLimitAggregate records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgLimitAggregate records |
-| `find-first` | Find first matching orgLimitAggregate record |
-| `get` | Get a orgLimitAggregate by id |
-| `create` | Create a new orgLimitAggregate |
-| `update` | Update an existing orgLimitAggregate |
-| `delete` | Delete a orgLimitAggregate |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `entityId` | UUID |
-| `num` | BigInt |
-| `max` | BigInt |
-| `softMax` | BigInt |
-| `windowStart` | Datetime |
-| `windowDuration` | Interval |
-
-**Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`
-
 ### `org-member-profile`
 
 CRUD operations for OrgMemberProfile records.
@@ -934,36 +1109,6 @@ CRUD operations for OrgMemberProfile records.
 **Required create fields:** `membershipId`, `entityId`, `actorId`
 **Optional create fields (backend defaults):** `displayName`, `email`, `title`, `bio`, `profilePicture`
 
-### `org-limit`
-
-CRUD operations for OrgLimit records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgLimit records |
-| `find-first` | Find first matching orgLimit record |
-| `get` | Get a orgLimit by id |
-| `create` | Create a new orgLimit |
-| `update` | Update an existing orgLimit |
-| `delete` | Delete a orgLimit |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `actorId` | UUID |
-| `num` | BigInt |
-| `max` | BigInt |
-| `softMax` | BigInt |
-| `windowStart` | Datetime |
-| `windowDuration` | Interval |
-| `entityId` | UUID |
-
-**Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`
-
 ### `app-level`
 
 CRUD operations for AppLevel records.
@@ -991,6 +1136,38 @@ CRUD operations for AppLevel records.
 
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `description`, `image`, `ownerId`
+
+### `app-limit`
+
+CRUD operations for AppLimit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimit records |
+| `find-first` | Find first matching appLimit record |
+| `get` | Get a appLimit by id |
+| `create` | Create a new appLimit |
+| `update` | Update an existing appLimit |
+| `delete` | Delete a appLimit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `actorId` | UUID |
+| `num` | BigInt |
+| `max` | BigInt |
+| `softMax` | BigInt |
+| `windowStart` | Datetime |
+| `windowDuration` | Interval |
+| `planMax` | BigInt |
+| `purchasedCredits` | BigInt |
+| `periodCredits` | BigInt |
+
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`
 
 ### `app-invite`
 
@@ -1059,6 +1236,72 @@ CRUD operations for OrgMembershipSetting records.
 
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `deleteMemberCascadeChildren`, `createChildCascadeOwners`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `allowExternalMembers`, `inviteProfileAssignmentMode`, `populateMemberEmail`, `limitAllocationMode`
+
+### `org-limit-aggregate`
+
+CRUD operations for OrgLimitAggregate records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitAggregate records |
+| `find-first` | Find first matching orgLimitAggregate record |
+| `get` | Get a orgLimitAggregate by id |
+| `create` | Create a new orgLimitAggregate |
+| `update` | Update an existing orgLimitAggregate |
+| `delete` | Delete a orgLimitAggregate |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `entityId` | UUID |
+| `num` | BigInt |
+| `max` | BigInt |
+| `softMax` | BigInt |
+| `windowStart` | Datetime |
+| `windowDuration` | Interval |
+| `planMax` | BigInt |
+| `purchasedCredits` | BigInt |
+| `periodCredits` | BigInt |
+| `reserved` | BigInt |
+
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`, `reserved`
+
+### `org-limit`
+
+CRUD operations for OrgLimit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimit records |
+| `find-first` | Find first matching orgLimit record |
+| `get` | Get a orgLimit by id |
+| `create` | Create a new orgLimit |
+| `update` | Update an existing orgLimit |
+| `delete` | Delete a orgLimit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `actorId` | UUID |
+| `num` | BigInt |
+| `max` | BigInt |
+| `softMax` | BigInt |
+| `windowStart` | Datetime |
+| `windowDuration` | Interval |
+| `planMax` | BigInt |
+| `purchasedCredits` | BigInt |
+| `periodCredits` | BigInt |
+| `entityId` | UUID |
+
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`
 
 ### `org-invite`
 
@@ -1332,25 +1575,6 @@ submitOrgInviteCode
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.token` | String |
-
-### `request-upload-url`
-
-Request a presigned URL for uploading a file directly to S3.
-Client computes SHA-256 of the file content and provides it here.
-If a file with the same hash already exists (dedup), returns the
-existing file ID and deduplicated=true with no uploadUrl.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.bucketKey` | String (required) |
-  | `--input.ownerId` | UUID |
-  | `--input.contentHash` | String (required) |
-  | `--input.contentType` | String (required) |
-  | `--input.size` | Int (required) |
-  | `--input.filename` | String |
 
 ### `provision-bucket`
 

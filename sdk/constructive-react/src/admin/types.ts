@@ -37,6 +37,26 @@ export interface AppLevelRequirement {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface AppLimitCreditRedemption {
+  id: string | null;
+  creditCodeId: string | null;
+  entityId: string | null;
+}
+export interface AppLimitCreditCodeItem {
+  id: string | null;
+  creditCodeId: string | null;
+  defaultLimitId: string | null;
+  amount: string | null;
+  creditType: string | null;
+}
+export interface AppLimitCredit {
+  id: string | null;
+  defaultLimitId: string | null;
+  actorId: string | null;
+  amount: string | null;
+  creditType: string | null;
+  reason: string | null;
+}
 export interface OrgMember {
   id: string | null;
   isAdmin: boolean | null;
@@ -46,6 +66,13 @@ export interface OrgMember {
 export interface AppPermissionDefault {
   id: string | null;
   permissions: string | null;
+}
+export interface AppLimitCreditCode {
+  id: string | null;
+  code: string | null;
+  maxRedemptions: number | null;
+  currentRedemptions: number | null;
+  expiresAt: string | null;
 }
 export interface OrgPermissionDefault {
   id: string | null;
@@ -84,6 +111,28 @@ export interface AppStep {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface AppLimitCapsDefault {
+  id: string | null;
+  name: string | null;
+  max: string | null;
+}
+export interface OrgLimitCapsDefault {
+  id: string | null;
+  name: string | null;
+  max: string | null;
+}
+export interface AppLimitCap {
+  id: string | null;
+  name: string | null;
+  entityId: string | null;
+  max: string | null;
+}
+export interface OrgLimitCap {
+  id: string | null;
+  name: string | null;
+  entityId: string | null;
+  max: string | null;
+}
 export interface OrgAdminGrant {
   id: string | null;
   isGrant: boolean | null;
@@ -121,6 +170,15 @@ export interface OrgLimitDefault {
   name: string | null;
   max: string | null;
   softMax: string | null;
+}
+export interface OrgLimitCredit {
+  id: string | null;
+  defaultLimitId: string | null;
+  actorId: string | null;
+  entityId: string | null;
+  amount: string | null;
+  creditType: string | null;
+  reason: string | null;
 }
 export interface OrgChartEdgeGrant {
   id: string | null;
@@ -219,26 +277,6 @@ export interface OrgChartEdge {
   positionTitle: string | null;
   positionLevel: number | null;
 }
-export interface AppLimit {
-  id: string | null;
-  name: string | null;
-  actorId: string | null;
-  num: string | null;
-  max: string | null;
-  softMax: string | null;
-  windowStart: string | null;
-  windowDuration: string | null;
-}
-export interface OrgLimitAggregate {
-  id: string | null;
-  name: string | null;
-  entityId: string | null;
-  num: string | null;
-  max: string | null;
-  softMax: string | null;
-  windowStart: string | null;
-  windowDuration: string | null;
-}
 export interface OrgMemberProfile {
   id: string | null;
   createdAt: string | null;
@@ -252,17 +290,6 @@ export interface OrgMemberProfile {
   bio: string | null;
   profilePicture: ConstructiveInternalTypeImage | null;
 }
-export interface OrgLimit {
-  id: string | null;
-  name: string | null;
-  actorId: string | null;
-  num: string | null;
-  max: string | null;
-  softMax: string | null;
-  windowStart: string | null;
-  windowDuration: string | null;
-  entityId: string | null;
-}
 export interface AppLevel {
   id: string | null;
   name: string | null;
@@ -271,6 +298,19 @@ export interface AppLevel {
   ownerId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+export interface AppLimit {
+  id: string | null;
+  name: string | null;
+  actorId: string | null;
+  num: string | null;
+  max: string | null;
+  softMax: string | null;
+  windowStart: string | null;
+  windowDuration: string | null;
+  planMax: string | null;
+  purchasedCredits: string | null;
+  periodCredits: string | null;
 }
 export interface AppInvite {
   id: string | null;
@@ -302,6 +342,34 @@ export interface OrgMembershipSetting {
   inviteProfileAssignmentMode: string | null;
   populateMemberEmail: boolean | null;
   limitAllocationMode: string | null;
+}
+export interface OrgLimitAggregate {
+  id: string | null;
+  name: string | null;
+  entityId: string | null;
+  num: string | null;
+  max: string | null;
+  softMax: string | null;
+  windowStart: string | null;
+  windowDuration: string | null;
+  planMax: string | null;
+  purchasedCredits: string | null;
+  periodCredits: string | null;
+  reserved: string | null;
+}
+export interface OrgLimit {
+  id: string | null;
+  name: string | null;
+  actorId: string | null;
+  num: string | null;
+  max: string | null;
+  softMax: string | null;
+  windowStart: string | null;
+  windowDuration: string | null;
+  planMax: string | null;
+  purchasedCredits: string | null;
+  periodCredits: string | null;
+  entityId: string | null;
 }
 export interface OrgInvite {
   id: string | null;
