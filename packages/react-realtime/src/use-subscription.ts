@@ -1,0 +1,192 @@
+/**
+ * useSubscription — generic React hook for GraphQL subscriptions.
+ *
+ * This is the low-level hook. Codegen produces per-table hooks
+ * (e.g., useContactSubscription) that wrap this with correct types.
+ */
+import { useEffect, useRef, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
+import type {
+  SubscriptionEvent,
+  SubscriptionFieldMeta,
+  SubscriptionOperation,
+  Unsubscribe,
+} from '@constructive-io/realtime';
+
+import { useRealtimeClient } from './context';
+
+export interface UseSubscriptionOptions<T, TFilter = Record<string, unknown>> {
+  /** Server-side filter to limit which events are delivered */
+  filter?: TFilter;
+  /** Called when a subscription event is received */
+  onEvent?: (event: SubscriptionEvent<T>) => void;
+  /** Called when the subscription encounters an error */
+  onError?: (error: Error) => void;
+  /** Whether the subscription is active. Set to false to pause. @default true */
+  enabled?: boolean;
+  /**
+   * Cache bridge configuration. When provided, subscription events
+   * automatically update React Query cache entries.
+   */
+  cacheBridge?: CacheBridgeConfig;
+}
+
+export interface CacheBridgeConfig {
+  /**
+   * Query key prefix for single-item queries.
+   * On INSERT/UPDATE: setQueryData([...detailKey, id], data)
+   * On DELETE: removeQueries([...detailKey, id])
+   */
+  detailKey?: readonly unknown[];
+  /**
+   * Query key prefix for list queries.
+   * On any event: invalidateQueries([...listKey])
+   */
+  listKey?: readonly unknown[];
+  /**
+   * Extract the entity ID from the event data for cache key construction.
+   * @default (data) => data.id
+   */
+  getId?: (data: Record<string, unknown>) => string;
+}
+
+/**
+ * Subscribe to a GraphQL subscription field with automatic
+ * React Query cache updates.
+ *
+ * @example
+ * ```tsx
+ * // Low-level usage (codegen wraps this):
+ * useSubscription<Contact, ContactFilter>(
+ *   { fieldName: 'onContactChanged', tableName: 'contact', dataFieldName: 'contact' },
+ *   buildDocument,
+ *   {
+ *     filter: { id: { equalTo: contactId } },
+ *     onEvent: (event) => console.log(event),
+ *     cacheBridge: {
+ *       detailKey: ['contacts', 'detail'],
+ *       listKey: ['contacts', 'list'],
+ *     },
+ *   }
+ * );
+ * ```
+ */
+export function useSubscription<T, TFilter = Record<string, unknown>>(
+  meta: SubscriptionFieldMeta,
+  buildDocument: (filter?: TFilter) => { document: string; variables: Record<string, unknown> },
+  options: UseSubscriptionOptions<T, TFilter>
+): void {
+  const client = useRealtimeClient();
+  const queryClient = useQueryClient();
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+
+  const enabled = options.enabled ?? true;
+  const filterJson = JSON.stringify(options.filter);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    const currentOptions = optionsRef.current;
+    const { document, variables } = buildDocument(currentOptions.filter);
+
+    const unsubscribe: Unsubscribe = client.subscribe<T>(
+      meta,
+      document,
+      variables,
+      {
+        onEvent: (event) => {
+          optionsRef.current.onEvent?.(event);
+
+          if (optionsRef.current.cacheBridge) {
+            applyCacheBridge(queryClient, event, optionsRef.current.cacheBridge);
+          }
+        },
+        onError: (error) => {
+          optionsRef.current.onError?.(error);
+        },
+      }
+    );
+
+    return unsubscribe;
+    // filterJson is the serialized filter — when the filter changes, resubscribe
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, queryClient, meta, buildDocument, enabled, filterJson]);
+}
+
+function applyCacheBridge<T>(
+  queryClient: QueryClient,
+  event: SubscriptionEvent<T>,
+  config: CacheBridgeConfig
+): void {
+  const getId = config.getId ?? ((data: Record<string, unknown>) => data['id'] as string);
+
+  if (event.operation === 'DELETE') {
+    if (config.detailKey && event.data) {
+      const id = getId(event.data as unknown as Record<string, unknown>);
+      queryClient.removeQueries({ queryKey: [...config.detailKey, id] });
+    }
+    if (config.listKey) {
+      queryClient.invalidateQueries({ queryKey: [...config.listKey] });
+    }
+    return;
+  }
+
+  // INSERT or UPDATE
+  if (event.data) {
+    const id = getId(event.data as unknown as Record<string, unknown>);
+
+    if (config.detailKey) {
+      queryClient.setQueryData([...config.detailKey, id], event.data);
+    }
+
+    if (config.listKey) {
+      queryClient.invalidateQueries({ queryKey: [...config.listKey] });
+    }
+  }
+}
+
+/**
+ * Factory to create a typed per-table subscription hook.
+ *
+ * Codegen calls this to produce e.g. useContactSubscription().
+ * This keeps the generated code minimal — just a one-liner that
+ * passes the table's metadata and document builder.
+ *
+ * @example
+ * ```ts
+ * // Generated by codegen:
+ * export const useContactSubscription = createSubscriptionHook<Contact, ContactFilter>(
+ *   { fieldName: 'onContactChanged', tableName: 'contact', dataFieldName: 'contact' },
+ *   (filter) => ({
+ *     document: CONTACT_SUBSCRIPTION_DOC,
+ *     variables: filter ? { filter } : {},
+ *   }),
+ *   { detailKey: contactKeys.detail, listKey: contactKeys.list }
+ * );
+ * ```
+ */
+export function createSubscriptionHook<T, TFilter = Record<string, unknown>>(
+  meta: SubscriptionFieldMeta,
+  buildDocument: (filter?: TFilter) => { document: string; variables: Record<string, unknown> },
+  defaultCacheBridge?: Omit<CacheBridgeConfig, 'getId'>
+) {
+  return function useTypedSubscription(
+    options: Omit<UseSubscriptionOptions<T, TFilter>, 'cacheBridge'> & {
+      cacheBridge?: CacheBridgeConfig | boolean;
+    }
+  ): void {
+    const cacheBridge =
+      options.cacheBridge === true
+        ? defaultCacheBridge
+        : options.cacheBridge === false
+          ? undefined
+          : options.cacheBridge ?? defaultCacheBridge;
+
+    useSubscription<T, TFilter>(meta, buildDocument, {
+      ...options,
+      cacheBridge,
+    });
+  };
+}

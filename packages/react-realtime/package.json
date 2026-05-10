@@ -1,0 +1,53 @@
+{
+  "name": "@constructive-io/react-realtime",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "React hooks for Constructive realtime subscriptions with React Query cache bridge",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@constructive-io/realtime": "workspace:^",
+    "@tanstack/react-query": "^5.90.21"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "@types/react": "^19.2.14",
+    "makage": "^0.3.0",
+    "react": "^19.2.4",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "graphql",
+    "realtime",
+    "subscriptions",
+    "react",
+    "react-query",
+    "constructive"
+  ]
+}

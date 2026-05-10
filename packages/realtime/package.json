@@ -1,0 +1,47 @@
+{
+  "name": "@constructive-io/realtime",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Framework-agnostic realtime subscription client for Constructive GraphQL APIs",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "graphql": "16.13.0",
+    "graphql-ws": "^6.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "makage": "^0.3.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "graphql",
+    "realtime",
+    "subscriptions",
+    "websocket",
+    "constructive"
+  ]
+}
