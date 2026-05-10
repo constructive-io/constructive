@@ -872,7 +872,8 @@ function App() {
 | `useProvisionSpatialRelationMutation` | Mutation | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
 | `useBootstrapUserMutation` | Mutation | bootstrapUser |
 | `useSetFieldOrderMutation` | Mutation | setFieldOrder |
-| `useAppendSmartTagsMutation` | Mutation | appendSmartTags |
+| `useAppendFieldSmartTagsMutation` | Mutation | appendFieldSmartTags |
+| `useAppendTableSmartTagsMutation` | Mutation | appendTableSmartTags |
 | `useProvisionUniqueConstraintMutation` | Mutation | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
 | `useProvisionFullTextSearchMutation` | Mutation | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
 | `useProvisionIndexMutation` | Mutation | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
@@ -4537,16 +4538,27 @@ setFieldOrder
   |----------|------|
   | `input` | SetFieldOrderInput (required) |
 
-### `useAppendSmartTagsMutation`
+### `useAppendFieldSmartTagsMutation`
 
-appendSmartTags
+appendFieldSmartTags
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | AppendSmartTagsInput (required) |
+  | `input` | AppendFieldSmartTagsInput (required) |
+
+### `useAppendTableSmartTagsMutation`
+
+appendTableSmartTags
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | AppendTableSmartTagsInput (required) |
 
 ### `useProvisionUniqueConstraintMutation`
 

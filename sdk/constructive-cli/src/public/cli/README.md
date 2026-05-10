@@ -222,7 +222,8 @@ csdk auth set-token <your-token>
 | `provision-spatial-relation` | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
 | `bootstrap-user` | bootstrapUser |
 | `set-field-order` | setFieldOrder |
-| `append-smart-tags` | appendSmartTags |
+| `append-field-smart-tags` | appendFieldSmartTags |
+| `append-table-smart-tags` | appendTableSmartTags |
 | `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
 | `provision-full-text-search` | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
 | `provision-index` | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
@@ -5509,9 +5510,22 @@ setFieldOrder
   | `--input.clientMutationId` | String |
   | `--input.fieldIds` | UUID |
 
-### `append-smart-tags`
+### `append-field-smart-tags`
 
-appendSmartTags
+appendFieldSmartTags
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pFieldId` | UUID |
+  | `--input.pTags` | JSON |
+
+### `append-table-smart-tags`
+
+appendTableSmartTags
 
 - **Type:** mutation
 - **Arguments:**

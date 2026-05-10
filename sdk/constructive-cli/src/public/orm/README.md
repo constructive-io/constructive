@@ -6553,19 +6553,34 @@ setFieldOrder
 const result = await db.mutation.setFieldOrder({ input: { fieldIds: '<UUID>' } }).execute();
 ```
 
-### `db.mutation.appendSmartTags`
+### `db.mutation.appendFieldSmartTags`
 
-appendSmartTags
+appendFieldSmartTags
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | AppendSmartTagsInput (required) |
+  | `input` | AppendFieldSmartTagsInput (required) |
 
 ```typescript
-const result = await db.mutation.appendSmartTags({ input: { pTableId: '<UUID>', pTags: '<JSON>' } }).execute();
+const result = await db.mutation.appendFieldSmartTags({ input: { pFieldId: '<UUID>', pTags: '<JSON>' } }).execute();
+```
+
+### `db.mutation.appendTableSmartTags`
+
+appendTableSmartTags
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | AppendTableSmartTagsInput (required) |
+
+```typescript
+const result = await db.mutation.appendTableSmartTags({ input: { pTableId: '<UUID>', pTags: '<JSON>' } }).execute();
 ```
 
 ### `db.mutation.provisionUniqueConstraint`

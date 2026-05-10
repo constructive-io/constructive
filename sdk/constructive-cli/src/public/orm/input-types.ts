@@ -22844,7 +22844,12 @@ export interface SetFieldOrderInput {
   clientMutationId?: string;
   fieldIds?: string[];
 }
-export interface AppendSmartTagsInput {
+export interface AppendFieldSmartTagsInput {
+  clientMutationId?: string;
+  pFieldId?: string;
+  pTags?: Record<string, unknown>;
+}
+export interface AppendTableSmartTagsInput {
   clientMutationId?: string;
   pTableId?: string;
   pTags?: Record<string, unknown>;
@@ -31361,10 +31366,16 @@ export interface SetFieldOrderPayload {
 export type SetFieldOrderPayloadSelect = {
   clientMutationId?: boolean;
 };
-export interface AppendSmartTagsPayload {
+export interface AppendFieldSmartTagsPayload {
   clientMutationId?: string | null;
 }
-export type AppendSmartTagsPayloadSelect = {
+export type AppendFieldSmartTagsPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface AppendTableSmartTagsPayload {
+  clientMutationId?: string | null;
+}
+export type AppendTableSmartTagsPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface ProvisionUniqueConstraintPayload {
