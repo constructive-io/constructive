@@ -21,4 +21,5 @@ export type {
   GraphQLTestContext,
   Variables,
 } from './types';
+export { setUserContext } from './utils';
 export { seed, snapshot } from 'pgsql-test';
