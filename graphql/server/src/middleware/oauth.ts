@@ -277,17 +277,23 @@ async function callSignUpIdentity(
 // =============================================================================
 
 export interface OAuthRoutesConfig {
-  baseUrl: string;
+  /** @deprecated baseUrl is now derived from request headers for multi-tenant support */
+  baseUrl?: string;
   errorRedirectPath?: string;
   allowSignup?: boolean;
   requireVerifiedEmail?: boolean;
+}
+
+function getBaseUrl(req: Request): string {
+  const protocol = req.protocol || 'http';
+  const host = req.get('host') || 'localhost:3000';
+  return `${protocol}://${host}`;
 }
 
 export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   const router = Router();
   const oauthConfig = (opts as any).oauth as OAuthRoutesConfig | undefined;
 
-  const baseUrl = oauthConfig?.baseUrl || process.env.APP_BASE_URL || 'http://localhost:3000';
   const errorRedirectPath = oauthConfig?.errorRedirectPath ?? '/auth/error';
   const allowSignup = oauthConfig?.allowSignup ?? true;
   const requireVerifiedEmail = oauthConfig?.requireVerifiedEmail ?? true;
@@ -319,7 +325,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
     // Check if API context is available
     if (!req.api?.rlsModule?.privateSchema?.schemaName) {
       log.error(`[oauth] No API context available for ${provider} initiation`);
-      const errorUrl = new URL(errorRedirectPath, baseUrl);
+      const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', 'API_NOT_CONFIGURED');
       errorUrl.searchParams.set('provider', provider);
       return res.redirect(errorUrl.toString());
@@ -335,7 +341,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       const encryptedSchema = await getEncryptedSecretsSchema(pool, privateSchema);
       if (!encryptedSchema) {
         log.error(`[oauth] Could not resolve encrypted_secrets schema for ${privateSchema}`);
-        const errorUrl = new URL(errorRedirectPath, baseUrl);
+        const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
         errorUrl.searchParams.set('error', 'SCHEMA_NOT_CONFIGURED');
         errorUrl.searchParams.set('provider', provider);
         return res.redirect(errorUrl.toString());
@@ -345,7 +351,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
 
       if (!providerConfig) {
         log.warn(`[oauth] Provider ${provider} not found or not configured`);
-        const errorUrl = new URL(errorRedirectPath, baseUrl);
+        const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
         errorUrl.searchParams.set('error', 'PROVIDER_NOT_CONFIGURED');
         errorUrl.searchParams.set('provider', provider);
         return res.redirect(errorUrl.toString());
@@ -360,13 +366,13 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         sameSite: 'lax',
       });
 
-      const client = createOAuthClientForProvider(providerConfig, baseUrl);
+      const client = createOAuthClientForProvider(providerConfig, getBaseUrl(req));
       const { url } = client.getAuthorizationUrl({ provider, state });
       log.info(`[oauth] Initiating OAuth flow for provider: ${provider}`);
       res.redirect(url);
     } catch (error) {
       log.error(`[oauth] Failed to initiate OAuth for ${provider}:`, error);
-      const errorUrl = new URL(errorRedirectPath, baseUrl);
+      const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', 'OAUTH_INIT_FAILED');
       errorUrl.searchParams.set('provider', provider);
       res.redirect(errorUrl.toString());
@@ -384,7 +390,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
     // Handle OAuth provider errors
     if (oauthError) {
       log.warn(`[oauth] Provider ${provider} returned error: ${oauthError}`);
-      const errorUrl = new URL(errorRedirectPath, baseUrl);
+      const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', oauthError as string);
       if (error_description) {
         errorUrl.searchParams.set('error_description', error_description as string);
@@ -396,7 +402,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
     // Verify state
     if (state !== storedState) {
       log.warn(`[oauth] State mismatch for ${provider}`);
-      const errorUrl = new URL(errorRedirectPath, baseUrl);
+      const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', 'INVALID_STATE');
       errorUrl.searchParams.set('provider', provider);
       return res.redirect(errorUrl.toString());
@@ -405,7 +411,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
     const statePayload = verifySignedState(storedState);
     if (!statePayload) {
       log.warn(`[oauth] Invalid or expired state for ${provider}`);
-      const errorUrl = new URL(errorRedirectPath, baseUrl);
+      const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', 'INVALID_STATE');
       errorUrl.searchParams.set('provider', provider);
       return res.redirect(errorUrl.toString());
@@ -416,7 +422,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
     // Check if API context is available
     if (!req.api?.rlsModule?.privateSchema?.schemaName) {
       log.error(`[oauth] No API context available for ${provider} callback`);
-      const errorUrl = new URL(errorRedirectPath, baseUrl);
+      const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', 'API_NOT_CONFIGURED');
       errorUrl.searchParams.set('provider', provider);
       return res.redirect(errorUrl.toString());
@@ -433,7 +439,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       const encryptedSchema = await getEncryptedSecretsSchema(pool, privateSchema);
       if (!encryptedSchema) {
         log.error(`[oauth] Could not resolve encrypted_secrets schema for ${privateSchema}`);
-        const errorUrl = new URL(errorRedirectPath, baseUrl);
+        const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
         errorUrl.searchParams.set('error', 'SCHEMA_NOT_CONFIGURED');
         errorUrl.searchParams.set('provider', provider);
         return res.redirect(errorUrl.toString());
@@ -443,14 +449,14 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       const providerConfig = await getIdentityProvider(pool, privateSchema, encryptedSchema, provider);
       if (!providerConfig) {
         log.error(`[oauth] Provider ${provider} not found in database`);
-        const errorUrl = new URL(errorRedirectPath, baseUrl);
+        const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
         errorUrl.searchParams.set('error', 'PROVIDER_NOT_CONFIGURED');
         errorUrl.searchParams.set('provider', provider);
         return res.redirect(errorUrl.toString());
       }
 
       // Create OAuth client with provider config from database
-      const client = createOAuthClientForProvider(providerConfig, baseUrl);
+      const client = createOAuthClientForProvider(providerConfig, getBaseUrl(req));
 
       // Exchange code for profile
       const profile = await client.handleCallback({ provider, code: code as string });
@@ -473,7 +479,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
 
           if (!allowSignup) {
             log.warn(`[oauth] Signup disabled, rejecting ${profile.email}`);
-            const errorUrl = new URL(errorRedirectPath, baseUrl);
+            const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
             errorUrl.searchParams.set('error', 'SIGNUP_DISABLED');
             errorUrl.searchParams.set('provider', provider);
             return res.redirect(errorUrl.toString());
@@ -482,7 +488,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           // Shadow attack defense: require verified email for auto-signup
           if (requireVerifiedEmail && !profile.emailVerified) {
             log.warn(`[oauth] Rejecting unverified email for signup: ${profile.email}`);
-            const errorUrl = new URL(errorRedirectPath, baseUrl);
+            const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
             errorUrl.searchParams.set('error', 'EMAIL_NOT_VERIFIED');
             errorUrl.searchParams.set('provider', provider);
             return res.redirect(errorUrl.toString());
@@ -499,7 +505,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       // Handle MFA required
       if (result.mfa_required && result.mfa_challenge_token) {
         log.info(`[oauth] MFA required for ${profile.email}`);
-        const mfaUrl = new URL('/auth/mfa', baseUrl);
+        const mfaUrl = new URL('/auth/mfa', getBaseUrl(req));
         mfaUrl.searchParams.set('token', result.mfa_challenge_token);
         mfaUrl.searchParams.set('redirect_uri', redirectUri);
         return res.redirect(mfaUrl.toString());
@@ -529,7 +535,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
     } catch (error: any) {
       log.error(`[oauth] Callback failed for ${provider}:`, error);
 
-      const errorUrl = new URL(errorRedirectPath, baseUrl);
+      const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', 'CALLBACK_FAILED');
       errorUrl.searchParams.set('message', error.message || 'Unknown error');
       errorUrl.searchParams.set('provider', provider);
