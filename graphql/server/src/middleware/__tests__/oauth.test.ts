@@ -92,6 +92,11 @@ describe('OAuth Middleware', () => {
     return mockQuery;
   };
 
+  const mockRequestHelpers = {
+    get: jest.fn().mockReturnValue('localhost:3000'),
+    protocol: 'http',
+  };
+
   describe('createOAuthRoutes', () => {
     it('always creates routes (providers come from database)', () => {
       const router = createOAuthRoutes(mockOpts as any);
@@ -125,6 +130,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         api: {
           rlsModule: { privateSchema: { schemaName: 'auth_private' } },
           dbname: 'tenant_db',
@@ -150,6 +156,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { redirect_uri: '/dashboard' },
       } as unknown as Request;
@@ -181,6 +188,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { redirect_uri: '/dashboard' },
         api: {
@@ -216,6 +224,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { redirect_uri: '/dashboard' },
         api: {
@@ -259,6 +268,7 @@ describe('OAuth Middleware', () => {
       api: any;
     }> = {}) => {
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { code: 'auth-code', state: 'valid-state' },
         cookies: { oauth_state: 'valid-state' },
@@ -405,6 +415,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { code: 'auth-code', state: validState },
         cookies: {
@@ -475,6 +486,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { code: 'auth-code', state: validState },
         cookies: { oauth_state: validState },
@@ -543,6 +555,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { code: 'auth-code', state: validState },
         cookies: { oauth_state: validState },
@@ -609,6 +622,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { code: 'auth-code', state: validState },
         cookies: { oauth_state: validState },
@@ -672,6 +686,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { code: 'auth-code', state: validState },
         cookies: { oauth_state: validState },
@@ -695,7 +710,7 @@ describe('OAuth Middleware', () => {
 
       await handler(req, res, jest.fn());
 
-      // First query is getIdentityProvider which uses custom_auth_schema
+      // Second query is getIdentityProvider which uses custom_auth_schema
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('"custom_auth_schema".identity_providers'),
         expect.any(Array)
@@ -728,6 +743,7 @@ describe('OAuth Middleware', () => {
       const router = createOAuthRoutes(mockOpts as any);
 
       const req = {
+        ...mockRequestHelpers,
         params: { provider: 'google' },
         query: { redirect_uri: '/dashboard' },
         api: {
