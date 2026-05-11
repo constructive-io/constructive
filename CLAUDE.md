@@ -70,14 +70,13 @@ React Query Hooks or Prisma-like ORM Client
 | `postgres/` | PostgreSQL utilities - introspection, testing (pgsql-test), seeding, AST, query context |
 | `packages/` | Shared utilities - CLI (`cnc`), ORM base, query builder, server utils, client |
 | `uploads/` | File streaming - S3/MinIO, ETags, content-type detection, UUID hashing |
-| `jobs/` | Knative job scheduling - worker, scheduler, service, functions |
-| `functions/` | Knative cloud functions (e.g., send-verification-link, send-email) |
+| `jobs/` | Knative job scheduling - worker, scheduler, service (deprecated: function workloads have moved to the `constructive-functions` repo; this directory will be removed in a follow-up) |
 
 ### Key Packages & CLIs
 
 **`pgpm` CLI** (`pgpm/cli`) - PostgreSQL Package Manager. Commands: `init`, `add`, `deploy`, `revert`, `verify`, `plan`, `install`, `export`, `docker`, `dump`, `tag`. Manages SQL migrations in Sqitch-compatible format with dependency resolution.
 
-**`cnc` CLI** (`packages/cli`, binary: `cnc` or `constructive`) - Full dev toolkit. Commands: `server` (start PostGraphile), `explorer` (GraphiQL UI), `codegen` (generate SDK), `get-graphql-schema`, `jobs`, `context`, `auth`, `execute`.
+**`cnc` CLI** (`packages/cli`, binary: `cnc` or `constructive`) - Full dev toolkit. Commands: `server` (start PostGraphile), `explorer` (GraphiQL UI), `codegen` (generate SDK), `get-graphql-schema`, `context`, `auth`, `execute`.
 
 **`graphql/codegen`** - Generates type-safe clients from GraphQL schema or endpoint:
 - `--react-query` mode: TanStack Query v5 hooks with query key factories
@@ -114,6 +113,8 @@ test('example', async () => {
 ### Job System
 
 Background jobs use Knative: jobs are added to `app_jobs.jobs` table → `knative-job-worker` polls and picks up → POSTs to Knative function URL → function executes (e.g., send email) → returns status.
+
+**Note:** Function implementations (`send-email`, `send-verification-link`, etc.) now live in the dedicated [`constructive-functions`](https://github.com/constructive-io/constructive-functions) repository under `functions/<name>/handler.ts`. The `functions/` directory previously hosted here has been removed; the `jobs/` directory is on the same deprecation path and will follow once the hub-side job-server cutover lands.
 
 ### Database Configuration
 

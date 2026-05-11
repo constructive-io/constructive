@@ -31,16 +31,10 @@ type FunctionRegistryEntry = {
   defaultPort: number;
 };
 
-const functionRegistry: Record<FunctionName, FunctionRegistryEntry> = {
-  'send-email': {
-    moduleName: '@constructive-io/send-email-fn',
-    defaultPort: 8081
-  },
-  'send-verification-link': {
-    moduleName: '@constructive-io/send-verification-link-fn',
-    defaultPort: 8082
-  }
-};
+// Function packages have moved to the constructive-functions repository.
+// This registry is intentionally empty; the legacy in-process launcher is
+// retained only until the hub finishes migrating job-server startup.
+const functionRegistry: Record<FunctionName, FunctionRegistryEntry> = {};
 
 const log = new Logger('knative-job-service');
 const requireFn = createRequire(__filename);

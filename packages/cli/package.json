@@ -50,7 +50,6 @@
     "@constructive-io/graphql-explorer": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@constructive-io/knative-job-service": "workspace:^",
     "@inquirerer/utils": "^3.3.5",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
