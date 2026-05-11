@@ -35,6 +35,7 @@ import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
+import { createCaptchaMiddleware } from './middleware/captcha';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 // Auth cookie handling is done via grafserv plugin in auth-cookie-plugin.ts
 
@@ -200,6 +201,7 @@ class Server {
     // Auth cookie handling is done via grafserv plugin (AuthCookiePlugin in graphile preset)
 
     app.use(authenticate);
+    app.use(createCaptchaMiddleware());
     app.use(graphile(effectiveOpts));
     app.use(flush);
 
