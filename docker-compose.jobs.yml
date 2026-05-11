@@ -72,11 +72,11 @@ services:
         aliases:
           - constructive-server
 
-  # Send email link function (invite, password reset, verification)
-  send-email-link:
-    container_name: send-email-link
+  # Send verification link function (invite, password reset, verification)
+  send-verification-link:
+    container_name: send-verification-link
     image: constructive:dev
-    entrypoint: ["node", "functions/send-email-link/dist/index.js"]
+    entrypoint: ["node", "functions/send-verification-link/dist/index.js"]
     environment:
       NODE_ENV: development
       LOG_LEVEL: info
@@ -98,7 +98,7 @@ services:
       # localhost-style hosts in DRY RUN mode:
       # http://localhost:LOCAL_APP_PORT/...
       LOCAL_APP_PORT: "3000"
-      SEND_EMAIL_LINK_DRY_RUN: "${SEND_EMAIL_LINK_DRY_RUN:-true}"
+      SEND_VERIFICATION_LINK_DRY_RUN: "${SEND_VERIFICATION_LINK_DRY_RUN:-true}"
     ports:
       - "8082:8080"
     networks:
@@ -110,7 +110,7 @@ services:
     image: constructive:dev
     entrypoint: ["node", "jobs/knative-job-service/dist/run.js"]
     depends_on:
-      - send-email-link
+      - send-verification-link
     environment:
       NODE_ENV: development
 
@@ -124,7 +124,7 @@ services:
 
       # Worker configuration
       JOBS_SUPPORT_ANY: "false"
-      JOBS_SUPPORTED: "email:send_email_link,email:simple_email,send-email-link,simple-email"
+      JOBS_SUPPORTED: "email:send_verification_link,email:send_email"
       HOSTNAME: "knative-job-service-1"
 
       # Callback HTTP server (job completion callbacks)
@@ -134,15 +134,15 @@ services:
       JOBS_CALLBACK_HOST: "knative-job-service"
 
       # Function gateway base URL (used by worker when no dev map is present)
-      INTERNAL_GATEWAY_URL: "http://send-email-link:8080"
+      INTERNAL_GATEWAY_URL: "http://send-verification-link:8080"
 
       # Development-only map from task identifier -> function URL
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080","email:send_email_link":"http://send-email-link:8080","email:simple_email":"http://send-email-link:8080"}'
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_verification_link":"http://send-verification-link:8080","email:send_email":"http://send-email:8080"}'
 
       # Scope-based routing: maps scope prefixes to service base URLs
-      # When a task_identifier like "email:send_email_link" is received,
-      # the worker routes to ${SCOPE_URL}/send_email_link
-      INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://send-email-link:8080"}'
+      # When a task_identifier like "email:send_verification_link" is received,
+      # the worker routes to ${SCOPE_URL}/send_verification_link
+      INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://send-verification-link:8080"}'
 
     ports:
       - "8080:8080"

@@ -1,4 +1,4 @@
-# @constructive-io/simple-email-fn
+# @constructive-io/send-email-fn
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -9,7 +9,7 @@
     <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@constructive-io/simple-email-fn"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=functions%2Fsimple-email%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@constructive-io/send-email-fn"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=functions%2Fsend-email%2Fpackage.json"/></a>
 </p>
 
 Simple Knative-compatible email function used with the Constructive jobs system.
@@ -21,7 +21,7 @@ without needing a real mail provider configured.
 
 ## Expected job payload
 
-Jobs should use `task_identifier = 'simple-email'` (or whatever route you
+Jobs should use `task_identifier = 'email:send_email'` (or whatever route you
 configure at your Knative gateway) and a JSON payload like:
 
 ```json
@@ -78,7 +78,7 @@ Email provider configuration is only required when not running in dry‑run mode
 
 Optional:
 
-- `SIMPLE_EMAIL_DRY_RUN` (`true`/`false`): log only, skip send.
+- `SEND_EMAIL_DRY_RUN` (`true`/`false`): log only, skip send.
 - `EMAIL_SEND_USE_SMTP` (`true`/`false`): use SMTP (`simple-smtp-server`).
 
 Mailgun (`@launchql/postmaster`) env vars when `EMAIL_SEND_USE_SMTP` is false:
@@ -100,7 +100,7 @@ SMTP env vars when `EMAIL_SEND_USE_SMTP` is true:
 From the repo root:
 
 ```bash
-pnpm --filter="@constructive-io/simple-email-fn" build
+pnpm --filter="@constructive-io/send-email-fn" build
 ```
 
 This compiles TypeScript into `dist/`.

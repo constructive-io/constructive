@@ -27,7 +27,7 @@ Options:
 Examples:
   cnc jobs up
   cnc jobs up --cwd /path/to/constructive
-  cnc jobs up --with-jobs-server --functions simple-email,send-email-link=8082
+  cnc jobs up --with-jobs-server --functions send-email,send-verification-link=8082
 `;
 
 const questions: Question[] = [

@@ -21,8 +21,8 @@ COPY . .
 RUN set -eux; \
     pnpm install --frozen-lockfile
 
-# Build the simple-email function and its dependencies
-ARG FUNCTION_DIR=functions/simple-email
+# Build the send-email function and its dependencies
+ARG FUNCTION_DIR=functions/send-email
 RUN set -eux; \
     pnpm --filter "./${FUNCTION_DIR}"... build
 
@@ -40,11 +40,11 @@ RUN set -eux; \
 # Copy the built repo from builder (keeps pnpm workspace wiring intact)
 COPY --from=build /app /app
 
-# simple-email function workspace directory
-WORKDIR /app/functions/simple-email
+# send-email function workspace directory
+WORKDIR /app/functions/send-email
 
 ENV NODE_ENV=production
 
-# Entry point for the simple-email function
+# Entry point for the send-email function
 CMD ["node", "dist/index.js"]
 

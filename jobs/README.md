@@ -15,7 +15,7 @@ This document describes the **current** jobs setup using:
 
 - PostgreSQL + `pgpm-database-jobs` (`app_jobs.*`)
 - `@constructive-io/knative-job-service` + `@constructive-io/knative-job-worker`
-- Knative functions (example: `simple-email`)
+- Knative functions (example: `send-email`)
 
 ---
 
@@ -92,14 +92,14 @@ From `jobs/knative-job-service/src/env.ts`:
 
 - Function gateway
   - `KNATIVE_SERVICE_URL` – base URL for Knative functions, e.g.  
-    `http://simple-email.interweb.svc.cluster.local`
+    `http://send-email.interweb.svc.cluster.local`
   - `INTERNAL_GATEWAY_URL` – fallback used by the worker; set this equal to `KNATIVE_SERVICE_URL` to keep env validation happy
 
 ---
 
-## 3. Example function: `send-email-link`
+## 3. Example function: `send-verification-link`
 
-The `functions/send-email-link` package is a **Knative function** that sends email links for:
+The `functions/send-verification-link` package is a **Knative function** that sends verification links for:
 
 - **invite_email** - User invitations
 - **forgot_password** - Password reset emails
@@ -114,7 +114,7 @@ The `functions/send-email-link` package is a **Knative function** that sends ema
 3. Generates HTML email using MJML templates
 4. Sends via Mailgun (or logs in dry-run mode)
 
-### Required env vars (send-email-link)
+### Required env vars (send-verification-link)
 
 ```yaml
 # GraphQL endpoints (admin server with host-based routing)
@@ -130,7 +130,7 @@ MAILGUN_FROM: "no-reply@mg.example.com"
 MAILGUN_REPLY: "support@example.com"
 
 # Dry run mode (no actual emails sent)
-SEND_EMAIL_LINK_DRY_RUN: "true"
+SEND_VERIFICATION_LINK_DRY_RUN: "true"
 ```
 
 ---
@@ -152,7 +152,7 @@ docker-compose -f docker-compose.jobs.yml up --build
 | Service | Port | Description |
 |---------|------|-------------|
 | `constructive-admin-server` | 3001 | GraphQL API with `API_IS_PUBLIC=false` |
-| `send-email-link` | 8082 | Email link function |
+| `send-verification-link` | 8082 | Verification link function |
 | `knative-job-service` | 8080 | Job worker + callback server |
 
 ### Test GraphQL access
@@ -179,7 +179,7 @@ curl -X POST http://localhost:3001/graphql \
 
 ---
 
-## 5. Enqueue a job (send-email-link)
+## 5. Enqueue a job (send-verification-link)
 
 ### Get required IDs
 
@@ -204,7 +204,7 @@ docker exec -it postgres \
     SELECT set_config('jwt.claims.database_id', '$DBID', true);
     SELECT set_config('jwt.claims.user_id', '$SENDER_ID', true);
     SELECT app_jobs.add_job(
-      'send-email-link',
+      'email:send_verification_link',
       json_build_object(
         'email_type',   'invite_email',
         'email',        'user@example.com',
@@ -222,7 +222,7 @@ docker exec -it postgres \
   psql -U postgres -d constructive -c "
     SELECT set_config('jwt.claims.database_id', '$DBID', true);
     SELECT app_jobs.add_job(
-      'send-email-link',
+      'email:send_verification_link',
       json_build_object(
         'email_type',   'forgot_password',
         'email',        'user@example.com',
@@ -240,7 +240,7 @@ docker exec -it postgres \
   psql -U postgres -d constructive -c "
     SELECT set_config('jwt.claims.database_id', '$DBID', true);
     SELECT app_jobs.add_job(
-      'send-email-link',
+      'email:send_verification_link',
       json_build_object(
         'email_type',   'email_verification',
         'email',        'user@example.com',
@@ -254,8 +254,8 @@ docker exec -it postgres \
 ### Watch the logs
 
 ```bash
-# Watch send-email-link function logs
-docker logs -f send-email-link
+# Watch send-verification-link function logs
+docker logs -f send-verification-link
 
 # Watch job service logs
 docker logs -f knative-job-service
@@ -265,8 +265,8 @@ docker logs -f knative-job-service
 
 1. `app_jobs.add_job` inserts into `app_jobs.jobs` and fires `NOTIFY "jobs:insert"`
 2. `knative-job-worker` receives notification, picks up the job
-3. Worker `POST`s payload to `http://send-email-link:8080/`
-4. `send-email-link` queries GraphQL for site/user info
+3. Worker `POST`s payload to `http://send-verification-link:8080/`
+4. `send-verification-link` queries GraphQL for site/user info
 5. Generates email HTML and sends (or logs in dry-run mode)
 6. Returns `{ complete: true }` and job is marked complete
 
@@ -348,7 +348,7 @@ INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://email-service:8080","embed":"http
 
 You can also use `app_jobs.scheduled_jobs` and `@constructive-io/job-scheduler` to run recurring jobs.
 
-Example (generic, not specific to `simple-email`):
+Example (generic, not specific to `send-email`):
 
 ```sql
 -- database_id and actor_id are read from JWT claims automatically

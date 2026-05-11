@@ -6,7 +6,7 @@
 # Services:
 #   - mailpit (SMTP: 1025, Web UI: 8025)
 #   - constructive-admin-server (3002)
-#   - send-email-link (8082)
+#   - send-verification-link (8082)
 #   - knative-job-service (8080)
 #
 # Prerequisites:
@@ -57,11 +57,11 @@ services:
     networks:
       - constructive-net
 
-  # Send email link function (uses SMTP to Mailpit)
-  send-email-link:
-    container_name: send-email-link
+  # Send verification link function (uses SMTP to Mailpit)
+  send-verification-link:
+    container_name: send-verification-link
     image: constructive:dev
-    entrypoint: ["node", "functions/send-email-link/dist/index.js"]
+    entrypoint: ["node", "functions/send-verification-link/dist/index.js"]
     depends_on:
       - mailpit
       - constructive-admin-server
@@ -81,19 +81,19 @@ services:
       # Local app port for email links
       LOCAL_APP_PORT: "3011"
       ALLOW_LOCALHOST: "true"
-      SEND_EMAIL_LINK_DRY_RUN: "false"
+      SEND_VERIFICATION_LINK_DRY_RUN: "false"
     ports:
       - "8082:8080"
     networks:
       - constructive-net
 
-  # Job service (polls app_jobs, triggers send-email-link)
+  # Job service (polls app_jobs, triggers send-verification-link)
   knative-job-service:
     container_name: knative-job-service
     image: constructive:dev
     entrypoint: ["node", "jobs/knative-job-service/dist/run.js"]
     depends_on:
-      - send-email-link
+      - send-verification-link
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -107,16 +107,16 @@ services:
       JOBS_SCHEMA: app_jobs
       # Worker config
       JOBS_SUPPORT_ANY: "true"
-      JOBS_SUPPORTED: "email:send_email_link,email:simple_email,send-email-link"
+      JOBS_SUPPORTED: "email:send_verification_link,email:send_email"
       HOSTNAME: "local-worker"
       # Callback server
       INTERNAL_JOBS_CALLBACK_PORT: "8080"
       INTERNAL_JOBS_CALLBACK_URL: "http://knative-job-service:8080/callback"
       JOBS_CALLBACK_HOST: "knative-job-service"
       # Function gateway
-      INTERNAL_GATEWAY_URL: "http://send-email-link:8080"
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080","email:send_email_link":"http://send-email-link:8080","email:simple_email":"http://send-email-link:8080"}'
-      INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://send-email-link:8080"}'
+      INTERNAL_GATEWAY_URL: "http://send-verification-link:8080"
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_verification_link":"http://send-verification-link:8080","email:send_email":"http://send-email:8080"}'
+      INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://send-verification-link:8080"}'
     ports:
       - "8080:8080"
     networks:

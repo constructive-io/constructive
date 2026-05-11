@@ -1,8 +1,8 @@
 export type FunctionName =
-  | 'simple-email'
-  | 'send-email-link'
-  | 'email:send_email_link'
-  | 'email:simple_email';
+  | 'send-email'
+  | 'send-verification-link'
+  | 'email:send_email'
+  | 'email:send_verification_link';
 
 export type FunctionServiceConfig = {
   name: FunctionName;

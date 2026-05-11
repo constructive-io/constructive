@@ -71,7 +71,7 @@ React Query Hooks or Prisma-like ORM Client
 | `packages/` | Shared utilities - CLI (`cnc`), ORM base, query builder, server utils, client |
 | `uploads/` | File streaming - S3/MinIO, ETags, content-type detection, UUID hashing |
 | `jobs/` | Knative job scheduling - worker, scheduler, service, functions |
-| `functions/` | Knative cloud functions (e.g., send-email-link) |
+| `functions/` | Knative cloud functions (e.g., send-verification-link, send-email) |
 
 ### Key Packages & CLIs
 

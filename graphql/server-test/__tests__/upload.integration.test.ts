@@ -28,7 +28,7 @@
  *   pnpm test -- --testPathPattern=upload.integration
  */
 
-import crypto from 'crypto';
+import { hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
 import path from 'path';
 import { getConnections, seed } from '../src';
 import type supertest from 'supertest';
@@ -199,25 +199,6 @@ const DELETE_APP_BUCKET = `
 // Helpers
 // =========================================================================
 
-function sha256(content: string): string {
-  return crypto.createHash('sha256').update(content).digest('hex');
-}
-
-async function putToPresignedUrl(
-  url: string,
-  content: string,
-  contentType: string,
-): Promise<Response> {
-  return fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': contentType,
-      'Content-Length': Buffer.byteLength(content).toString(),
-    },
-    body: content,
-  });
-}
-
 /**
  * Assert that a mutation was denied specifically by RLS (not by some other error).
  *
@@ -351,8 +332,12 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     describe('Public file upload', () => {
       const fileContent = 'Hello, public world!';
       const contentType = 'text/plain';
-      const contentHash = sha256(fileContent);
+      let contentHash: string;
       let uploadUrl: string;
+
+      beforeAll(async () => {
+        contentHash = await hashContent(fileContent);
+      });
 
       it('should return a presigned PUT URL via uploadAppFile', async () => {
         const res = await postGraphQL({
@@ -389,8 +374,12 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     describe('Private file upload', () => {
       const fileContent = 'Hello, private world!';
       const contentType = 'text/plain';
-      const contentHash = sha256(fileContent);
+      let contentHash: string;
       let uploadUrl: string;
+
+      beforeAll(async () => {
+        contentHash = await hashContent(fileContent);
+      });
 
       it('should return a presigned PUT URL via uploadAppFile', async () => {
         const res = await postGraphQL({
@@ -427,7 +416,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     describe('Deduplication', () => {
       it('should return deduplicated=true for an existing content hash', async () => {
         const fileContent = 'Hello, public world!';
-        const contentHash = sha256(fileContent);
+        const contentHash = await hashContent(fileContent);
 
         const res = await postGraphQL({
           query: UPLOAD_APP_FILE,
@@ -510,7 +499,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   describe('Three-way tenant isolation (Alice, Bob, Mallory)', () => {
     it('Bob uploads a file via his primary API', async () => {
       const fileContent = 'Bob secret data';
-      const contentHash = sha256(fileContent);
+      const contentHash = await hashContent(fileContent);
 
       const res = await postGraphQLViaApi(bobDatabaseId, 'bob-app', {
         query: UPLOAD_APP_FILE,

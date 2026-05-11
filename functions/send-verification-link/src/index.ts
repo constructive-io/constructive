@@ -7,9 +7,9 @@ import { send as sendSmtp } from 'simple-smtp-server';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { createLogger } from '@pgpmjs/logger';
 
-const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
+const isDryRun = parseEnvBoolean(process.env.SEND_VERIFICATION_LINK_DRY_RUN ?? process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
 const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
-const logger = createLogger('send-email-link');
+const logger = createLogger('send-verification-link');
 const app = createJobApp();
 
 const GetUser = gql`
@@ -392,7 +392,7 @@ if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
 
   // Log startup configuration (non-sensitive values only - no API keys or tokens)
-  logger.info('[send-email-link] Starting with config:', {
+  logger.info('[send-verification-link] Starting with config:', {
     port,
     graphqlUrl: process.env.GRAPHQL_URL || 'not set',
     metaGraphqlUrl: process.env.META_GRAPHQL_URL || process.env.GRAPHQL_URL || 'not set',

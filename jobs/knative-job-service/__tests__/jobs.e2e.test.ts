@@ -260,8 +260,8 @@ const getAvailablePort = (): Promise<number> =>
 // processes that may already be listening on the well-known defaults.
 let GRAPHQL_PORT: number;
 let CALLBACK_PORT: number;
-let SIMPLE_EMAIL_PORT: number;
-let SEND_EMAIL_LINK_PORT: number;
+let SEND_EMAIL_PORT: number;
+let SEND_VERIFICATION_LINK_PORT: number;
 let MAILGUN_FAILURE_PORT: number;
 
 const getPgpmModulePath = (pkgName: string): string =>
@@ -360,8 +360,8 @@ describe('jobs e2e', () => {
     TEST_GRAPHQL_HOST: process.env.TEST_GRAPHQL_HOST,
     GRAPHQL_URL: process.env.GRAPHQL_URL,
     META_GRAPHQL_URL: process.env.META_GRAPHQL_URL,
-    SIMPLE_EMAIL_DRY_RUN: process.env.SIMPLE_EMAIL_DRY_RUN,
-    SEND_EMAIL_LINK_DRY_RUN: process.env.SEND_EMAIL_LINK_DRY_RUN,
+    SEND_EMAIL_DRY_RUN: process.env.SEND_EMAIL_DRY_RUN,
+    SEND_VERIFICATION_LINK_DRY_RUN: process.env.SEND_VERIFICATION_LINK_DRY_RUN,
     LOCAL_APP_PORT: process.env.LOCAL_APP_PORT,
     MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN,
     MAILGUN_FROM: process.env.MAILGUN_FROM,
@@ -385,8 +385,8 @@ describe('jobs e2e', () => {
     [
       GRAPHQL_PORT,
       CALLBACK_PORT,
-      SIMPLE_EMAIL_PORT,
-      SEND_EMAIL_LINK_PORT,
+      SEND_EMAIL_PORT,
+      SEND_VERIFICATION_LINK_PORT,
       MAILGUN_FAILURE_PORT
     ] = await Promise.all([
       getAvailablePort(),
@@ -425,8 +425,8 @@ describe('jobs e2e', () => {
     process.env.TEST_GRAPHQL_URL = graphqlUrl;
     process.env.GRAPHQL_URL = graphqlUrl;
     process.env.META_GRAPHQL_URL = graphqlUrl;
-    process.env.SIMPLE_EMAIL_DRY_RUN = 'true';
-    process.env.SEND_EMAIL_LINK_DRY_RUN = 'true';
+    process.env.SEND_EMAIL_DRY_RUN = 'true';
+    process.env.SEND_VERIFICATION_LINK_DRY_RUN = 'true';
     process.env.LOCAL_APP_PORT = String(GRAPHQL_PORT);
     process.env.MAILGUN_DOMAIN = 'mg.constructive.io';
     process.env.MAILGUN_FROM = 'no-reply@mg.constructive.io';
@@ -434,10 +434,10 @@ describe('jobs e2e', () => {
     process.env.MAILGUN_API_KEY = 'change-me-mailgun-api-key';
     process.env.MAILGUN_KEY = 'change-me-mailgun-api-key';
     process.env.JOBS_SUPPORT_ANY = 'false';
-    process.env.JOBS_SUPPORTED = 'simple-email,send-email-link,mailgun-failure';
+    process.env.JOBS_SUPPORTED = 'send-email,send-verification-link,mailgun-failure';
     process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP = JSON.stringify({
-      'simple-email': `http://127.0.0.1:${SIMPLE_EMAIL_PORT}`,
-      'send-email-link': `http://127.0.0.1:${SEND_EMAIL_LINK_PORT}`,
+      'send-email': `http://127.0.0.1:${SEND_EMAIL_PORT}`,
+      'send-verification-link': `http://127.0.0.1:${SEND_VERIFICATION_LINK_PORT}`,
       'mailgun-failure': `http://127.0.0.1:${MAILGUN_FAILURE_PORT}`
     });
     process.env.INTERNAL_JOBS_CALLBACK_PORT = String(CALLBACK_PORT);
@@ -450,8 +450,8 @@ describe('jobs e2e', () => {
     if (pg.config.password) process.env.PGPASSWORD = pg.config.password;
 
     const services: FunctionServiceConfig[] = [
-      { name: 'simple-email', port: SIMPLE_EMAIL_PORT },
-      { name: 'send-email-link', port: SEND_EMAIL_LINK_PORT }
+      { name: 'send-email', port: SEND_EMAIL_PORT },
+      { name: 'send-verification-link', port: SEND_VERIFICATION_LINK_PORT }
     ];
 
     const graphqlOptions: ConstructiveOptions = {
@@ -536,10 +536,10 @@ describe('jobs e2e', () => {
     }
   });
 
-  it('creates and processes a simple-email job', async () => {
+  it('creates and processes a send-email job', async () => {
     const jobInput = {
       dbId: databaseId,
-      identifier: 'simple-email',
+      identifier: 'send-email',
       payload: {
         to: 'user@example.com',
         subject: 'Jobs e2e',
@@ -561,10 +561,10 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  it('creates and processes a send-email-link job', async () => {
+  it('creates and processes a send-verification-link job', async () => {
     const jobInput = {
       dbId: databaseId,
-      identifier: 'send-email-link',
+      identifier: 'send-verification-link',
       payload: {
         email_type: 'invite_email',
         email: 'user@example.com',
@@ -587,10 +587,10 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  it('creates and processes a send-email-link forgot_password job', async () => {
+  it('creates and processes a send-verification-link forgot_password job', async () => {
     const jobInput = {
       dbId: databaseId,
-      identifier: 'send-email-link',
+      identifier: 'send-verification-link',
       payload: {
         email_type: 'forgot_password',
         email: 'user@example.com',
@@ -613,10 +613,10 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  it('creates and processes a send-email-link email_verification job', async () => {
+  it('creates and processes a send-verification-link email_verification job', async () => {
     const jobInput = {
       dbId: databaseId,
-      identifier: 'send-email-link',
+      identifier: 'send-verification-link',
       payload: {
         email_type: 'email_verification',
         email: 'user@example.com',
@@ -639,10 +639,10 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
-  it('fails send-email-link job when required fields are missing', async () => {
+  it('fails send-verification-link job when required fields are missing', async () => {
     const jobInput = {
       dbId: databaseId,
-      identifier: 'send-email-link',
+      identifier: 'send-verification-link',
       maxAttempts: 1,
       payload: {
         email_type: 'forgot_password',
@@ -675,7 +675,7 @@ describe('jobs e2e', () => {
   it('records failed jobs when a function throws', async () => {
     const jobInput = {
       dbId: databaseId,
-      identifier: 'simple-email',
+      identifier: 'send-email',
       maxAttempts: 1,
       payload: {
         to: 'user@example.com',
@@ -707,7 +707,7 @@ describe('jobs e2e', () => {
   it('retries failed jobs until max attempts is reached', async () => {
     const jobInput = {
       dbId: databaseId,
-      identifier: 'simple-email',
+      identifier: 'send-email',
       maxAttempts: 2,
       payload: {
         to: 'user@example.com',

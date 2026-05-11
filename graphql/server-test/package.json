@@ -46,6 +46,7 @@
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/upload-client": "workspace:*",
     "@pgpmjs/types": "workspace:^",
     "express": "^5.2.1",
     "graphile-schema": "workspace:^",

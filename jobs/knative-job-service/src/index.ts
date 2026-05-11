@@ -32,12 +32,12 @@ type FunctionRegistryEntry = {
 };
 
 const functionRegistry: Record<FunctionName, FunctionRegistryEntry> = {
-  'simple-email': {
-    moduleName: '@constructive-io/simple-email-fn',
+  'send-email': {
+    moduleName: '@constructive-io/send-email-fn',
     defaultPort: 8081
   },
-  'send-email-link': {
-    moduleName: '@constructive-io/send-email-link-fn',
+  'send-verification-link': {
+    moduleName: '@constructive-io/send-verification-link-fn',
     defaultPort: 8082
   },
   // Scoped aliases — same implementations, scoped task identifiers

@@ -1,4 +1,4 @@
-# @constructive-io/send-email-link-fn
+# @constructive-io/send-verification-link-fn
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -9,10 +9,10 @@
     <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@constructive-io/send-email-link-fn"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=functions%2Fsend-email-link%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@constructive-io/send-verification-link-fn"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=functions%2Fsend-verification-link%2Fpackage.json"/></a>
 </p>
 
-Knative-compatible email link function used with the Constructive jobs system. It is designed to be invoked by `@constructive-io/knative-job-worker` as an HTTP function named `send-email-link`.
+Knative-compatible email link function used with the Constructive jobs system. It is designed to be invoked by `@constructive-io/knative-job-worker` as an HTTP function named `send-verification-link`.
 
 The function:
 - Reads metadata about the tenant/site from a GraphQL API
@@ -22,7 +22,7 @@ The function:
 
 ## Expected job payload
 
-Jobs should use `task_identifier = 'send-email-link'` and a JSON payload like:
+Jobs should use `task_identifier = 'email:send_verification_link'` and a JSON payload like:
 
 ```json
 {
@@ -95,7 +95,7 @@ Recommended / optional:
 - `DEFAULT_DATABASE_ID`  
   Used if `X-Database-Id` is not provided by the worker. In normal jobs usage, `X-Database-Id` should always be present.
 - `LOCAL_APP_PORT`  
-  Optional port suffix for localhost-style hosts (e.g. `3000`). When the resolved hostname is `localhost` / `*.localhost` and `SEND_EMAIL_LINK_DRY_RUN=true`, links are generated as `http://localhost:LOCAL_APP_PORT/...`. Ignored for non-local hostnames and in production.
+  Optional port suffix for localhost-style hosts (e.g. `3000`). When the resolved hostname is `localhost` / `*.localhost` and `SEND_VERIFICATION_LINK_DRY_RUN=true`, links are generated as `http://localhost:LOCAL_APP_PORT/...`. Ignored for non-local hostnames and in production.
 
 Email delivery (default: `@launchql/postmaster`):
 
@@ -118,7 +118,7 @@ Email delivery (default: `@launchql/postmaster`):
 From the repo root:
 
 ```bash
-pnpm --filter="@constructive-io/send-email-link-fn" build
+pnpm --filter="@constructive-io/send-verification-link-fn" build
 ```
 
 This compiles TypeScript into `dist/`.
@@ -148,9 +148,9 @@ CMD ["node", "dist/index.js"]
 Build and push:
 
 ```bash
-pnpm --filter="@constructive-io/send-email-link-fn" build
-docker build -t your-registry/send-email-link-fn:latest functions/send-email-link
-docker push your-registry/send-email-link-fn:latest
+pnpm --filter="@constructive-io/send-verification-link-fn" build
+docker build -t your-registry/send-verification-link-fn:latest functions/send-verification-link
+docker push your-registry/send-verification-link-fn:latest
 ```
 
 ## Example Knative Service
@@ -159,13 +159,13 @@ docker push your-registry/send-email-link-fn:latest
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: send-email-link
+  name: send-verification-link
   namespace: default
 spec:
   template:
     spec:
       containers:
-        - image: your-registry/send-email-link-fn:latest
+        - image: your-registry/send-verification-link-fn:latest
           env:
             - name: GRAPHQL_URL
               value: "https://api.your-domain.com/graphql"
@@ -186,5 +186,5 @@ spec:
 
 Once deployed, point `@constructive-io/knative-job-worker` at this service by configuring:
 
-- `KNATIVE_SERVICE_URL` to route `/send-email-link` to this function
-- `JOBS_SUPPORTED=send-email-link` (or `JOBS_SUPPORT_ANY=true`)
+- `KNATIVE_SERVICE_URL` to route `/send-verification-link` to this function
+- `JOBS_SUPPORTED=send-verification-link` (or `JOBS_SUPPORT_ANY=true`)

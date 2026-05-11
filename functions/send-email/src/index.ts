@@ -27,9 +27,9 @@ const getRequiredField = (
   return value;
 };
 
-const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
+const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_DRY_RUN ?? process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
 const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
-const logger = createLogger('simple-email');
+const logger = createLogger('send-email');
 const app = createJobApp();
 
 app.post('/', async (req: any, res: any, next: any) => {

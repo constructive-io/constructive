@@ -4,7 +4,7 @@ This guide covers a local development workflow for the jobs stack:
 
 - Postgres + `pgpm-database-jobs`
 - Constructive Admin GraphQL API server (header-based routing)
-- `send-email-link` function
+- `send-verification-link` function
 - `knative-job-service`
 
 It assumes:
@@ -100,14 +100,14 @@ docker compose -f docker-compose.jobs.yml up --build
 This starts:
 
 - `constructive-admin-server` – GraphQL API server with `API_IS_PUBLIC=false` (port 3001)
-- `send-email-link` – Knative-style HTTP function (port 8082)
+- `send-verification-link` – Knative-style HTTP function (port 8082)
 - `knative-job-service` – jobs runtime (callback server + worker + scheduler) (port 8080)
 
 ---
 
 ### Switching dry run vs real Mailgun sending
 
-By default, `docker-compose.jobs.yml` runs `send-email-link` in dry-run mode (no real email is sent), and it uses placeholder Mailgun credentials.
+By default, `docker-compose.jobs.yml` runs `send-verification-link` in dry-run mode (no real email is sent), and it uses placeholder Mailgun credentials.
 
 Dry run (recommended for local development):
 
@@ -117,15 +117,15 @@ docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
 
 In dry-run mode:
 
-- The `send-email-link` container logs the payload it would send instead of hitting Mailgun.
-- You should see log lines like `[send-email-link] DRY RUN email (skipping send) ...`.
+- The `send-verification-link` container logs the payload it would send instead of hitting Mailgun.
+- You should see log lines like `[send-verification-link] DRY RUN email (skipping send) ...`.
 ---
 
-## 5. Ensure GraphQL host routing works for `send-email-link`
+## 5. Ensure GraphQL host routing works for `send-verification-link`
 
-The `send-email-link` function uses host-based routing via the `Host: private.localhost` header to access the private API.
+The `send-verification-link` function uses host-based routing via the `Host: private.localhost` header to access the private API.
 
-For local development, `docker-compose.jobs.yml` configures `send-email-link` with:
+For local development, `docker-compose.jobs.yml` configures `send-verification-link` with:
 
 - `GRAPHQL_URL=http://constructive-admin-server:3000/graphql`
 - `GRAPHQL_HOST_HEADER=private.localhost`
@@ -154,13 +154,13 @@ curl -s -H 'Host: private.localhost' \
 
 You can also access GraphiQL at: http://private.localhost:3001/graphiql
 
-If your GraphQL server requires auth, set `GRAPHQL_AUTH_TOKEN` before starting the jobs stack (it is passed through to the `send-email-link` container).
+If your GraphQL server requires auth, set `GRAPHQL_AUTH_TOKEN` before starting the jobs stack (it is passed through to the `send-verification-link` container).
 
 ---
 
-## 6. Enqueue a test job (`send-email-link`)
+## 6. Enqueue a test job (`send-verification-link`)
 
-`send-email-link` queries GraphQL for site/database metadata, so it requires:
+`send-verification-link` queries GraphQL for site/database metadata, so it requires:
 
 - The app/meta packages deployed in step 3 (`app-svc-local`, `metaschema-schema`, `services`, `metaschema-modules`)
 - A real `database_id`
@@ -168,7 +168,7 @@ If your GraphQL server requires auth, set `GRAPHQL_AUTH_TOKEN` before starting t
 - For localhost development, the site/domain metadata usually resolves to `localhost`.
   In that case, the function will honor the `LOCAL_APP_PORT` env (default `3000` in
   `docker-compose.jobs.yml`) and generate links like `http://localhost:3000/...`
-  when `SEND_EMAIL_LINK_DRY_RUN=true`.
+  when `SEND_VERIFICATION_LINK_DRY_RUN=true`.
 
 ### Get required IDs
 
@@ -191,7 +191,7 @@ docker exec -it postgres \
   psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
-      'send-email-link',
+      'email:send_verification_link',
       json_build_object(
         'email_type',   'invite_email',
         'email',        'user@example.com',
@@ -209,7 +209,7 @@ docker exec -it postgres \
   psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
-      'send-email-link',
+      'email:send_verification_link',
       json_build_object(
         'email_type',   'forgot_password',
         'email',        'user@example.com',
@@ -227,7 +227,7 @@ docker exec -it postgres \
   psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
-      'send-email-link',
+      'email:send_verification_link',
       json_build_object(
         'email_type',   'email_verification',
         'email',        'user@example.com',
@@ -241,8 +241,8 @@ docker exec -it postgres \
 ### Watch the logs
 
 ```sh
-# Watch send-email-link function logs
-docker logs -f send-email-link
+# Watch send-verification-link function logs
+docker logs -f send-verification-link
 
 # Watch job service logs
 docker logs -f knative-job-service
@@ -250,7 +250,7 @@ docker logs -f knative-job-service
 
 You should see a log like:
 
-- `[send-email-link] DRY RUN email (skipping send) ...`
+- `[send-verification-link] DRY RUN email (skipping send) ...`
 
 ---
 
@@ -265,7 +265,7 @@ docker compose -f docker-compose.jobs.yml logs -f
 Useful containers:
 
 - `constructive-admin-server`
-- `send-email-link`
+- `send-verification-link`
 - `knative-job-service`
 - `postgres` (from `docker-compose.yml`)
 
@@ -301,7 +301,7 @@ Real Mailgun credentials are **not required** to run the jobs stack locally; the
 To start the stack with real sending from the command line:
 
 ```sh
-MAILGUN_API_KEY="your-mailgun-key" MAILGUN_KEY="your-mailgun-key" SEND_EMAIL_LINK_DRY_RUN=false docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
+MAILGUN_API_KEY="your-mailgun-key" MAILGUN_KEY="your-mailgun-key" SEND_VERIFICATION_LINK_DRY_RUN=false docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
 ```
 
 Alternatively, you can set the secrets in your shell or a local `.env` file (do not commit this file) in the `constructive/` directory:
@@ -316,7 +316,7 @@ If you're not using `mg.constructive.io`, also override `MAILGUN_DOMAIN`, `MAILG
 To have the container send real email instead of dry-run, set:
 
 ```sh
-export SEND_EMAIL_LINK_DRY_RUN=false
+export SEND_VERIFICATION_LINK_DRY_RUN=false
 ```
 
 Then recreate the stack so the new env is applied:
@@ -329,9 +329,9 @@ If you prefer not to export env vars, create a local override file (don't commit
 
 ```yml
 services:
-  send-email-link:
+  send-verification-link:
     environment:
-      SEND_EMAIL_LINK_DRY_RUN: "false"
+      SEND_VERIFICATION_LINK_DRY_RUN: "false"
 ```
 
 Start the stack with both files:
@@ -340,7 +340,7 @@ Start the stack with both files:
 docker compose -f docker-compose.jobs.yml -f docker-compose.jobs.override.yml up -d --build --force-recreate
 ```
 
-To switch back to dry-run, set `SEND_EMAIL_LINK_DRY_RUN=true` (or delete the override file) and recreate again.
+To switch back to dry-run, set `SEND_VERIFICATION_LINK_DRY_RUN=true` (or delete the override file) and recreate again.
 
 
 ## NOTES:
