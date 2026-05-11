@@ -4,9 +4,6 @@
  * Complements `hashFile` (which accepts File/Blob) with a convenience
  * function for hashing plain strings.
  *
- * Uses Node.js `crypto` when available (CJS/Node), falling back to
- * @noble/hashes in browser/ESM environments. See hash.ts for details.
- *
  * @example
  * ```typescript
  * import { hashContent } from '@constructive-io/upload-client';
@@ -16,6 +13,8 @@
  * ```
  */
 
+import { sha256 } from '@constructive-io/noble-hashes/sha2';
+import { bytesToHex } from '@constructive-io/noble-hashes/utils';
 import { UploadError } from './types';
 
 /**
@@ -27,16 +26,7 @@ import { UploadError } from './types';
 export async function hashContent(content: string): Promise<string> {
   try {
     const data = new TextEncoder().encode(content);
-    try {
-      // Node.js: use built-in crypto (works in CJS and ESM)
-      const crypto = require('crypto');
-      return crypto.createHash('sha256').update(data).digest('hex');
-    } catch {
-      // Browser/non-Node: use @noble/hashes (ESM import works here)
-      const { sha256 } = await import('@noble/hashes/sha2.js');
-      const { bytesToHex } = await import('@noble/hashes/utils.js');
-      return bytesToHex(sha256(data));
-    }
+    return bytesToHex(sha256(data));
   } catch (err) {
     if (err instanceof UploadError) throw err;
     throw new UploadError('HASH_FAILED', 'Failed to compute SHA-256 hash', err);
