@@ -26,10 +26,10 @@ jobs:
         include:
           - platform: linux/amd64
             arch: amd64
-            runner: blacksmith-4vcpu-ubuntu-2404      # x86_64
+            runner: ubuntu-latest      # x86_64
           - platform: linux/arm64
             arch: arm64
-            runner: blacksmith-4vcpu-ubuntu-2404-arm  # native arm
+            runner: ubuntu-latest  # arm builds via QEMU
     runs-on: ${{ matrix.runner }}
 
     permissions:
@@ -118,7 +118,7 @@ jobs:
   # multi-arch manifest for each tag.
   publish-constructive-manifest:
     if: github.event_name != 'pull_request'
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     needs: build-push-constructive
 
     permissions:
