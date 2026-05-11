@@ -1551,6 +1551,14 @@ export interface RateLimitsModule {
   ipRateLimitsTable: string | null;
   rateLimitsTable: string | null;
 }
+export interface UsageSnapshot {
+  databaseId: string | null;
+  metricName: string | null;
+  metricValue: string | null;
+  dimensions: unknown | null;
+  capturedAt: string | null;
+  id: string | null;
+}
 export interface AppMembershipDefault {
   id: string | null;
   createdAt: string | null;

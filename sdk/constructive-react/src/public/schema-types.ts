@@ -141,6 +141,7 @@ import type {
   Trigger,
   TriggerFunction,
   UniqueConstraint,
+  UsageSnapshot,
   User,
   UserAuthModule,
   UserConnectedAccount,
@@ -3354,6 +3355,23 @@ export type RateLimitsModuleOrderBy =
   | 'IP_RATE_LIMITS_TABLE_DESC'
   | 'RATE_LIMITS_TABLE_ASC'
   | 'RATE_LIMITS_TABLE_DESC';
+/** Methods to use when ordering `UsageSnapshot`. */
+export type UsageSnapshotOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'METRIC_NAME_ASC'
+  | 'METRIC_NAME_DESC'
+  | 'METRIC_VALUE_ASC'
+  | 'METRIC_VALUE_DESC'
+  | 'DIMENSIONS_ASC'
+  | 'DIMENSIONS_DESC'
+  | 'CAPTURED_AT_ASC'
+  | 'CAPTURED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC';
 /** Methods to use when ordering `AppMembershipDefault`. */
 export type AppMembershipDefaultOrderBy =
   | 'NATURAL'
@@ -11828,6 +11846,27 @@ export interface CommitFilter {
   /** Negates the expression. */
   not?: CommitFilter;
 }
+/** A filter to be used against `UsageSnapshot` object types. All fields are combined with a logical ‘and.’ */
+export interface UsageSnapshotFilter {
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `metricName` field. */
+  metricName?: StringFilter;
+  /** Filter by the object’s `metricValue` field. */
+  metricValue?: BigIntFilter;
+  /** Filter by the object’s `dimensions` field. */
+  dimensions?: JSONFilter;
+  /** Filter by the object’s `capturedAt` field. */
+  capturedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: UsageSnapshotFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UsageSnapshotFilter[];
+  /** Negates the expression. */
+  not?: UsageSnapshotFilter;
+}
 /** A filter to be used against `AppMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface AppMembershipDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -13150,6 +13189,46 @@ export interface AgentMessageInput {
   /** JSON metadata for extensible key-value storage */
   parts?: unknown;
 }
+export interface CreateAppLimitCreditInput {
+  clientMutationId?: string;
+  /** The `AppLimitCredit` to be created by this mutation. */
+  appLimitCredit: AppLimitCreditInput;
+}
+/** An input for mutations affecting `AppLimitCredit` */
+export interface AppLimitCreditInput {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+export interface CreateOrgLimitCreditInput {
+  clientMutationId?: string;
+  /** The `OrgLimitCredit` to be created by this mutation. */
+  orgLimitCredit: OrgLimitCreditInput;
+}
+/** An input for mutations affecting `OrgLimitCredit` */
+export interface OrgLimitCreditInput {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Entity this credit applies to; NULL for actor-only credits */
+  entityId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
 export interface CreateObjectInput {
   clientMutationId?: string;
   /** The `Object` to be created by this mutation. */
@@ -13205,46 +13284,6 @@ export interface AppLevelRequirementInput {
   priority?: number;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateAppLimitCreditInput {
-  clientMutationId?: string;
-  /** The `AppLimitCredit` to be created by this mutation. */
-  appLimitCredit: AppLimitCreditInput;
-}
-/** An input for mutations affecting `AppLimitCredit` */
-export interface AppLimitCreditInput {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
-}
-export interface CreateOrgLimitCreditInput {
-  clientMutationId?: string;
-  /** The `OrgLimitCredit` to be created by this mutation. */
-  orgLimitCredit: OrgLimitCreditInput;
-}
-/** An input for mutations affecting `OrgLimitCredit` */
-export interface OrgLimitCreditInput {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Entity this credit applies to; NULL for actor-only credits */
-  entityId?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
 }
 export interface CreateFullTextSearchInput {
   clientMutationId?: string;
@@ -13393,6 +13432,25 @@ export interface PhoneNumberInput {
   name?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateUsageSnapshotInput {
+  clientMutationId?: string;
+  /** The `UsageSnapshot` to be created by this mutation. */
+  usageSnapshot: UsageSnapshotInput;
+}
+/** An input for mutations affecting `UsageSnapshot` */
+export interface UsageSnapshotInput {
+  /** The database this snapshot belongs to. References metaschema_public.database.id but declared without an FK constraint — the snapshot collector runs in a platform context where the FK would add overhead without value. */
+  databaseId: string;
+  /** Identifier for the metric being measured (e.g. 'reads', 'writes', 'storage_bytes', 'compute_time_ms'). */
+  metricName: string;
+  /** The measured value at the time of capture. Interpretation depends on metric_name (count, bytes, milliseconds, etc.). */
+  metricValue?: string;
+  /** Optional sub-metric breakdowns as key-value pairs (e.g. {"query_type": "select"} for reads). Empty object when no breakdown is needed. */
+  dimensions?: unknown;
+  /** When this snapshot was taken. Defaults to the current timestamp; the snapshot collector may override this for backdated imports. */
+  capturedAt?: string;
+  id?: string;
 }
 export interface CreateAppClaimedInviteInput {
   clientMutationId?: string;
@@ -13984,6 +14042,35 @@ export interface PlansModuleInput {
   applyPlanAggregateFunction?: string;
   prefix?: string;
 }
+export interface CreateAppLimitInput {
+  clientMutationId?: string;
+  /** The `AppLimit` to be created by this mutation. */
+  appLimit: AppLimitInput;
+}
+/** An input for mutations affecting `AppLimit` */
+export interface AppLimitInput {
+  id?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** User whose usage is being tracked against this limit */
+  actorId: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+}
 export interface CreateOrgMemberProfileInput {
   clientMutationId?: string;
   /** The `OrgMemberProfile` to be created by this mutation. */
@@ -14031,35 +14118,6 @@ export interface SqlActionInput {
   action?: string;
   actionId?: string;
   actorId?: string;
-}
-export interface CreateAppLimitInput {
-  clientMutationId?: string;
-  /** The `AppLimit` to be created by this mutation. */
-  appLimit: AppLimitInput;
-}
-/** An input for mutations affecting `AppLimit` */
-export interface AppLimitInput {
-  id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
-  planMax?: string;
-  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
-  purchasedCredits?: string;
-  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
-  periodCredits?: string;
 }
 export interface CreateDatabaseTransferInput {
   clientMutationId?: string;
@@ -14210,27 +14268,6 @@ export interface SecureTableProvisionInput {
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
   outFields?: string[];
 }
-export interface CreateAstMigrationInput {
-  clientMutationId?: string;
-  /** The `AstMigration` to be created by this mutation. */
-  astMigration: AstMigrationInput;
-}
-/** An input for mutations affecting `AstMigration` */
-export interface AstMigrationInput {
-  id?: number;
-  databaseId?: string;
-  name?: string;
-  requires?: string[];
-  payload?: unknown;
-  deploys?: string;
-  deploy?: unknown;
-  revert?: unknown;
-  verify?: unknown;
-  createdAt?: string;
-  action?: string;
-  actionId?: string;
-  actorId?: string;
-}
 export interface CreateOrgLimitAggregateInput {
   clientMutationId?: string;
   /** The `OrgLimitAggregate` to be created by this mutation. */
@@ -14291,6 +14328,27 @@ export interface OrgLimitInput {
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
   entityId: string;
+}
+export interface CreateAstMigrationInput {
+  clientMutationId?: string;
+  /** The `AstMigration` to be created by this mutation. */
+  astMigration: AstMigrationInput;
+}
+/** An input for mutations affecting `AstMigration` */
+export interface AstMigrationInput {
+  id?: number;
+  databaseId?: string;
+  name?: string;
+  requires?: string[];
+  payload?: unknown;
+  deploys?: string;
+  deploy?: unknown;
+  revert?: unknown;
+  verify?: unknown;
+  createdAt?: string;
+  action?: string;
+  actionId?: string;
+  actorId?: string;
 }
 export interface CreateEnumInput {
   clientMutationId?: string;
@@ -16551,6 +16609,48 @@ export interface AgentMessagePatch {
   /** JSON metadata for extensible key-value storage */
   parts?: unknown;
 }
+export interface UpdateAppLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLimitCredit` being updated. */
+  appLimitCreditPatch: AppLimitCreditPatch;
+}
+/** Represents an update to a `AppLimitCredit`. Fields that are set will be updated. */
+export interface AppLimitCreditPatch {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId?: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+export interface UpdateOrgLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgLimitCredit` being updated. */
+  orgLimitCreditPatch: OrgLimitCreditPatch;
+}
+/** Represents an update to a `OrgLimitCredit`. Fields that are set will be updated. */
+export interface OrgLimitCreditPatch {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId?: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Entity this credit applies to; NULL for actor-only credits */
+  entityId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
 export interface UpdateObjectInput {
   clientMutationId?: string;
   id: string;
@@ -16613,48 +16713,6 @@ export interface AppLevelRequirementPatch {
   priority?: number;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface UpdateAppLimitCreditInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimitCredit` being updated. */
-  appLimitCreditPatch: AppLimitCreditPatch;
-}
-/** Represents an update to a `AppLimitCredit`. Fields that are set will be updated. */
-export interface AppLimitCreditPatch {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId?: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount?: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
-}
-export interface UpdateOrgLimitCreditInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgLimitCredit` being updated. */
-  orgLimitCreditPatch: OrgLimitCreditPatch;
-}
-/** Represents an update to a `OrgLimitCredit`. Fields that are set will be updated. */
-export interface OrgLimitCreditPatch {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId?: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Entity this credit applies to; NULL for actor-only credits */
-  entityId?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount?: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
 }
 export interface UpdateFullTextSearchInput {
   clientMutationId?: string;
@@ -16814,6 +16872,26 @@ export interface PhoneNumberPatch {
   name?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateUsageSnapshotInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `UsageSnapshot` being updated. */
+  usageSnapshotPatch: UsageSnapshotPatch;
+}
+/** Represents an update to a `UsageSnapshot`. Fields that are set will be updated. */
+export interface UsageSnapshotPatch {
+  /** The database this snapshot belongs to. References metaschema_public.database.id but declared without an FK constraint — the snapshot collector runs in a platform context where the FK would add overhead without value. */
+  databaseId?: string;
+  /** Identifier for the metric being measured (e.g. 'reads', 'writes', 'storage_bytes', 'compute_time_ms'). */
+  metricName?: string;
+  /** The measured value at the time of capture. Interpretation depends on metric_name (count, bytes, milliseconds, etc.). */
+  metricValue?: string;
+  /** Optional sub-metric breakdowns as key-value pairs (e.g. {"query_type": "select"} for reads). Empty object when no breakdown is needed. */
+  dimensions?: unknown;
+  /** When this snapshot was taken. Defaults to the current timestamp; the snapshot collector may override this for backdated imports. */
+  capturedAt?: string;
+  id?: string;
 }
 export interface UpdateAppClaimedInviteInput {
   clientMutationId?: string;
@@ -17385,36 +17463,6 @@ export interface PlansModulePatch {
   applyPlanAggregateFunction?: string;
   prefix?: string;
 }
-export interface UpdateOrgMemberProfileInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgMemberProfile` being updated. */
-  orgMemberProfilePatch: OrgMemberProfilePatch;
-}
-/** Represents an update to a `OrgMemberProfile`. Fields that are set will be updated. */
-export interface OrgMemberProfilePatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** References the membership this profile belongs to (1:1) */
-  membershipId?: string;
-  /** References the entity this profile belongs to (used for RLS lookups) */
-  entityId?: string;
-  /** References the user who owns this profile (for self-edit RLS) */
-  actorId?: string;
-  /** Display name shown to other entity members */
-  displayName?: string;
-  /** Email address visible to other entity members (auto-populated from verified primary email) */
-  email?: string;
-  /** Job title or role description visible to other entity members */
-  title?: string;
-  /** Short biography visible to other entity members */
-  bio?: string;
-  /** Profile picture visible to other entity members */
-  profilePicture?: ConstructiveInternalTypeImage;
-  /** Upload for Profile picture visible to other entity members */
-  profilePictureUpload?: File;
-}
 export interface UpdateAppLimitInput {
   clientMutationId?: string;
   id: string;
@@ -17444,6 +17492,36 @@ export interface AppLimitPatch {
   purchasedCredits?: string;
   /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
   periodCredits?: string;
+}
+export interface UpdateOrgMemberProfileInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgMemberProfile` being updated. */
+  orgMemberProfilePatch: OrgMemberProfilePatch;
+}
+/** Represents an update to a `OrgMemberProfile`. Fields that are set will be updated. */
+export interface OrgMemberProfilePatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** References the membership this profile belongs to (1:1) */
+  membershipId?: string;
+  /** References the entity this profile belongs to (used for RLS lookups) */
+  entityId?: string;
+  /** References the user who owns this profile (for self-edit RLS) */
+  actorId?: string;
+  /** Display name shown to other entity members */
+  displayName?: string;
+  /** Email address visible to other entity members (auto-populated from verified primary email) */
+  email?: string;
+  /** Job title or role description visible to other entity members */
+  title?: string;
+  /** Short biography visible to other entity members */
+  bio?: string;
+  /** Profile picture visible to other entity members */
+  profilePicture?: ConstructiveInternalTypeImage;
+  /** Upload for Profile picture visible to other entity members */
+  profilePictureUpload?: File;
 }
 export interface UpdateDatabaseTransferInput {
   clientMutationId?: string;
@@ -19309,6 +19387,14 @@ export interface DeleteAgentMessageInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteAppLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteObjectInput {
   clientMutationId?: string;
   id: string;
@@ -19320,14 +19406,6 @@ export interface DeleteSiteMetadatumInput {
   id: string;
 }
 export interface DeleteAppLevelRequirementInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitCreditInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitCreditInput {
   clientMutationId?: string;
   id: string;
 }
@@ -19360,6 +19438,10 @@ export interface DeleteOrgChartEdgeGrantInput {
   id: string;
 }
 export interface DeletePhoneNumberInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteUsageSnapshotInput {
   clientMutationId?: string;
   id: string;
 }
@@ -19465,11 +19547,11 @@ export interface DeletePlansModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteOrgMemberProfileInput {
+export interface DeleteAppLimitInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAppLimitInput {
+export interface DeleteOrgMemberProfileInput {
   clientMutationId?: string;
   id: string;
 }
@@ -20107,13 +20189,6 @@ export interface AgentMessageConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `SiteMetadatum` values. */
-export interface SiteMetadatumConnection {
-  nodes: SiteMetadatum[];
-  edges: SiteMetadatumEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `AppLimitCredit` values. */
 export interface AppLimitCreditConnection {
   nodes: AppLimitCredit[];
@@ -20125,6 +20200,13 @@ export interface AppLimitCreditConnection {
 export interface OrgLimitCreditConnection {
   nodes: OrgLimitCredit[];
   edges: OrgLimitCreditEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `SiteMetadatum` values. */
+export interface SiteMetadatumConnection {
+  nodes: SiteMetadatum[];
+  edges: SiteMetadatumEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -20174,6 +20256,13 @@ export interface OrgChartEdgeGrantConnection {
 export interface PhoneNumberConnection {
   nodes: PhoneNumber[];
   edges: PhoneNumberEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `UsageSnapshot` values. */
+export interface UsageSnapshotConnection {
+  nodes: UsageSnapshot[];
+  edges: UsageSnapshotEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -20359,6 +20448,13 @@ export interface PlansModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AppLimit` values. */
+export interface AppLimitConnection {
+  nodes: AppLimit[];
+  edges: AppLimitEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgMemberProfile` values. */
 export interface OrgMemberProfileConnection {
   nodes: OrgMemberProfile[];
@@ -20370,13 +20466,6 @@ export interface OrgMemberProfileConnection {
 export interface SqlActionConnection {
   nodes: SqlAction[];
   edges: SqlActionEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AppLimit` values. */
-export interface AppLimitConnection {
-  nodes: AppLimit[];
-  edges: AppLimitEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -20422,13 +20511,6 @@ export interface SecureTableProvisionConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `AstMigration` values. */
-export interface AstMigrationConnection {
-  nodes: AstMigration[];
-  edges: AstMigrationEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `OrgLimitAggregate` values. */
 export interface OrgLimitAggregateConnection {
   nodes: OrgLimitAggregate[];
@@ -20440,6 +20522,13 @@ export interface OrgLimitAggregateConnection {
 export interface OrgLimitConnection {
   nodes: OrgLimit[];
   edges: OrgLimitEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AstMigration` values. */
+export interface AstMigrationConnection {
+  nodes: AstMigration[];
+  edges: AstMigrationEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -21232,6 +21321,18 @@ export interface CreateAgentMessagePayload {
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
 }
+export interface CreateAppLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCredit` that was created by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+}
+export interface CreateOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was created by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
 export interface CreateObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was created by this mutation. */
@@ -21249,18 +21350,6 @@ export interface CreateAppLevelRequirementPayload {
   /** The `AppLevelRequirement` that was created by this mutation. */
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
-}
-export interface CreateAppLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCredit` that was created by this mutation. */
-  appLimitCredit?: AppLimitCredit | null;
-  appLimitCreditEdge?: AppLimitCreditEdge | null;
-}
-export interface CreateOrgLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCredit` that was created by this mutation. */
-  orgLimitCredit?: OrgLimitCredit | null;
-  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
 }
 export interface CreateFullTextSearchPayload {
   clientMutationId?: string | null;
@@ -21303,6 +21392,12 @@ export interface CreatePhoneNumberPayload {
   /** The `PhoneNumber` that was created by this mutation. */
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export interface CreateUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was created by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
 }
 export interface CreateAppClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -21458,6 +21553,12 @@ export interface CreatePlansModulePayload {
   plansModule?: PlansModule | null;
   plansModuleEdge?: PlansModuleEdge | null;
 }
+export interface CreateAppLimitPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimit` that was created by this mutation. */
+  appLimit?: AppLimit | null;
+  appLimitEdge?: AppLimitEdge | null;
+}
 export interface CreateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was created by this mutation. */
@@ -21468,12 +21569,6 @@ export interface CreateSqlActionPayload {
   clientMutationId?: string | null;
   /** The `SqlAction` that was created by this mutation. */
   sqlAction?: SqlAction | null;
-}
-export interface CreateAppLimitPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimit` that was created by this mutation. */
-  appLimit?: AppLimit | null;
-  appLimitEdge?: AppLimitEdge | null;
 }
 export interface CreateDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -21511,11 +21606,6 @@ export interface CreateSecureTableProvisionPayload {
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
 }
-export interface CreateAstMigrationPayload {
-  clientMutationId?: string | null;
-  /** The `AstMigration` that was created by this mutation. */
-  astMigration?: AstMigration | null;
-}
 export interface CreateOrgLimitAggregatePayload {
   clientMutationId?: string | null;
   /** The `OrgLimitAggregate` that was created by this mutation. */
@@ -21527,6 +21617,11 @@ export interface CreateOrgLimitPayload {
   /** The `OrgLimit` that was created by this mutation. */
   orgLimit?: OrgLimit | null;
   orgLimitEdge?: OrgLimitEdge | null;
+}
+export interface CreateAstMigrationPayload {
+  clientMutationId?: string | null;
+  /** The `AstMigration` that was created by this mutation. */
+  astMigration?: AstMigration | null;
 }
 export interface CreateEnumPayload {
   clientMutationId?: string | null;
@@ -22080,6 +22175,18 @@ export interface UpdateAgentMessagePayload {
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
 }
+export interface UpdateAppLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCredit` that was updated by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+}
+export interface UpdateOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was updated by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
 export interface UpdateObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was updated by this mutation. */
@@ -22097,18 +22204,6 @@ export interface UpdateAppLevelRequirementPayload {
   /** The `AppLevelRequirement` that was updated by this mutation. */
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
-}
-export interface UpdateAppLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCredit` that was updated by this mutation. */
-  appLimitCredit?: AppLimitCredit | null;
-  appLimitCreditEdge?: AppLimitCreditEdge | null;
-}
-export interface UpdateOrgLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCredit` that was updated by this mutation. */
-  orgLimitCredit?: OrgLimitCredit | null;
-  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
 }
 export interface UpdateFullTextSearchPayload {
   clientMutationId?: string | null;
@@ -22151,6 +22246,12 @@ export interface UpdatePhoneNumberPayload {
   /** The `PhoneNumber` that was updated by this mutation. */
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export interface UpdateUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was updated by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
 }
 export interface UpdateAppClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -22296,17 +22397,17 @@ export interface UpdatePlansModulePayload {
   plansModule?: PlansModule | null;
   plansModuleEdge?: PlansModuleEdge | null;
 }
-export interface UpdateOrgMemberProfilePayload {
-  clientMutationId?: string | null;
-  /** The `OrgMemberProfile` that was updated by this mutation. */
-  orgMemberProfile?: OrgMemberProfile | null;
-  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
-}
 export interface UpdateAppLimitPayload {
   clientMutationId?: string | null;
   /** The `AppLimit` that was updated by this mutation. */
   appLimit?: AppLimit | null;
   appLimitEdge?: AppLimitEdge | null;
+}
+export interface UpdateOrgMemberProfilePayload {
+  clientMutationId?: string | null;
+  /** The `OrgMemberProfile` that was updated by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
 }
 export interface UpdateDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -22908,6 +23009,18 @@ export interface DeleteAgentMessagePayload {
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
 }
+export interface DeleteAppLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitCredit` that was deleted by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+}
+export interface DeleteOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was deleted by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
 export interface DeleteObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was deleted by this mutation. */
@@ -22925,18 +23038,6 @@ export interface DeleteAppLevelRequirementPayload {
   /** The `AppLevelRequirement` that was deleted by this mutation. */
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
-}
-export interface DeleteAppLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCredit` that was deleted by this mutation. */
-  appLimitCredit?: AppLimitCredit | null;
-  appLimitCreditEdge?: AppLimitCreditEdge | null;
-}
-export interface DeleteOrgLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCredit` that was deleted by this mutation. */
-  orgLimitCredit?: OrgLimitCredit | null;
-  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
 }
 export interface DeleteFullTextSearchPayload {
   clientMutationId?: string | null;
@@ -22979,6 +23080,12 @@ export interface DeletePhoneNumberPayload {
   /** The `PhoneNumber` that was deleted by this mutation. */
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export interface DeleteUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was deleted by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
 }
 export interface DeleteAppClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -23124,17 +23231,17 @@ export interface DeletePlansModulePayload {
   plansModule?: PlansModule | null;
   plansModuleEdge?: PlansModuleEdge | null;
 }
-export interface DeleteOrgMemberProfilePayload {
-  clientMutationId?: string | null;
-  /** The `OrgMemberProfile` that was deleted by this mutation. */
-  orgMemberProfile?: OrgMemberProfile | null;
-  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
-}
 export interface DeleteAppLimitPayload {
   clientMutationId?: string | null;
   /** The `AppLimit` that was deleted by this mutation. */
   appLimit?: AppLimit | null;
   appLimitEdge?: AppLimitEdge | null;
+}
+export interface DeleteOrgMemberProfilePayload {
+  clientMutationId?: string | null;
+  /** The `OrgMemberProfile` that was deleted by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
 }
 export interface DeleteDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -23809,12 +23916,6 @@ export interface AgentMessageEdge {
   /** The `AgentMessage` at the end of the edge. */
   node?: AgentMessage | null;
 }
-/** A `SiteMetadatum` edge in the connection. */
-export interface SiteMetadatumEdge {
-  cursor?: string | null;
-  /** The `SiteMetadatum` at the end of the edge. */
-  node?: SiteMetadatum | null;
-}
 /** A `AppLimitCredit` edge in the connection. */
 export interface AppLimitCreditEdge {
   cursor?: string | null;
@@ -23826,6 +23927,12 @@ export interface OrgLimitCreditEdge {
   cursor?: string | null;
   /** The `OrgLimitCredit` at the end of the edge. */
   node?: OrgLimitCredit | null;
+}
+/** A `SiteMetadatum` edge in the connection. */
+export interface SiteMetadatumEdge {
+  cursor?: string | null;
+  /** The `SiteMetadatum` at the end of the edge. */
+  node?: SiteMetadatum | null;
 }
 /** A `FullTextSearch` edge in the connection. */
 export interface FullTextSearchEdge {
@@ -23868,6 +23975,12 @@ export interface PhoneNumberEdge {
   cursor?: string | null;
   /** The `PhoneNumber` at the end of the edge. */
   node?: PhoneNumber | null;
+}
+/** A `UsageSnapshot` edge in the connection. */
+export interface UsageSnapshotEdge {
+  cursor?: string | null;
+  /** The `UsageSnapshot` at the end of the edge. */
+  node?: UsageSnapshot | null;
 }
 /** A `AppClaimedInvite` edge in the connection. */
 export interface AppClaimedInviteEdge {
@@ -24025,6 +24138,12 @@ export interface PlansModuleEdge {
   /** The `PlansModule` at the end of the edge. */
   node?: PlansModule | null;
 }
+/** A `AppLimit` edge in the connection. */
+export interface AppLimitEdge {
+  cursor?: string | null;
+  /** The `AppLimit` at the end of the edge. */
+  node?: AppLimit | null;
+}
 /** A `OrgMemberProfile` edge in the connection. */
 export interface OrgMemberProfileEdge {
   cursor?: string | null;
@@ -24036,12 +24155,6 @@ export interface SqlActionEdge {
   cursor?: string | null;
   /** The `SqlAction` at the end of the edge. */
   node?: SqlAction | null;
-}
-/** A `AppLimit` edge in the connection. */
-export interface AppLimitEdge {
-  cursor?: string | null;
-  /** The `AppLimit` at the end of the edge. */
-  node?: AppLimit | null;
 }
 /** A `DatabaseTransfer` edge in the connection. */
 export interface DatabaseTransferEdge {
@@ -24079,12 +24192,6 @@ export interface SecureTableProvisionEdge {
   /** The `SecureTableProvision` at the end of the edge. */
   node?: SecureTableProvision | null;
 }
-/** A `AstMigration` edge in the connection. */
-export interface AstMigrationEdge {
-  cursor?: string | null;
-  /** The `AstMigration` at the end of the edge. */
-  node?: AstMigration | null;
-}
 /** A `OrgLimitAggregate` edge in the connection. */
 export interface OrgLimitAggregateEdge {
   cursor?: string | null;
@@ -24096,6 +24203,12 @@ export interface OrgLimitEdge {
   cursor?: string | null;
   /** The `OrgLimit` at the end of the edge. */
   node?: OrgLimit | null;
+}
+/** A `AstMigration` edge in the connection. */
+export interface AstMigrationEdge {
+  cursor?: string | null;
+  /** The `AstMigration` at the end of the edge. */
+  node?: AstMigration | null;
 }
 /** A `Enum` edge in the connection. */
 export interface EnumEdge {

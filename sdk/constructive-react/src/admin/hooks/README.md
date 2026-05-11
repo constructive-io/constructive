@@ -200,6 +200,11 @@ function App() {
 | `useCreateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
 | `useUpdateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
 | `useDeleteOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
+| `useUsageSnapshotsQuery` | Query | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useUsageSnapshotQuery` | Query | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useCreateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useUpdateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useDeleteUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
 | `useOrgMemberProfilesQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useOrgMemberProfileQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useCreateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
@@ -1000,6 +1005,27 @@ const { mutate: create } = useCreateOrgChartEdgeMutation({
   selection: { fields: { id: true } },
 });
 create({ entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', positionTitle: '<String>', positionLevel: '<Int>' });
+```
+
+### UsageSnapshot
+
+```typescript
+// List all usageSnapshots
+const { data, isLoading } = useUsageSnapshotsQuery({
+  selection: { fields: { databaseId: true, metricName: true, metricValue: true, dimensions: true, capturedAt: true, id: true } },
+});
+
+// Get one usageSnapshot
+const { data: item } = useUsageSnapshotQuery({
+  id: '<UUID>',
+  selection: { fields: { databaseId: true, metricName: true, metricValue: true, dimensions: true, capturedAt: true, id: true } },
+});
+
+// Create a usageSnapshot
+const { mutate: create } = useCreateUsageSnapshotMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', metricName: '<String>', metricValue: '<BigInt>', dimensions: '<JSON>', capturedAt: '<Datetime>' });
 ```
 
 ### OrgMemberProfile

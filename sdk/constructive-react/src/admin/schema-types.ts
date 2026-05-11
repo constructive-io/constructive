@@ -51,6 +51,7 @@ import type {
   OrgOwnerGrant,
   OrgPermission,
   OrgPermissionDefault,
+  UsageSnapshot,
   BigFloatFilter,
   BigIntFilter,
   BitStringFilter,
@@ -629,6 +630,23 @@ export type OrgChartEdgeOrderBy =
   | 'POSITION_TITLE_DESC'
   | 'POSITION_LEVEL_ASC'
   | 'POSITION_LEVEL_DESC';
+/** Methods to use when ordering `UsageSnapshot`. */
+export type UsageSnapshotOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'METRIC_NAME_ASC'
+  | 'METRIC_NAME_DESC'
+  | 'METRIC_VALUE_ASC'
+  | 'METRIC_VALUE_DESC'
+  | 'DIMENSIONS_ASC'
+  | 'DIMENSIONS_DESC'
+  | 'CAPTURED_AT_ASC'
+  | 'CAPTURED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC';
 /** Methods to use when ordering `OrgMemberProfile`. */
 export type OrgMemberProfileOrderBy =
   | 'NATURAL'
@@ -1705,6 +1723,27 @@ export interface OrgChartEdgeFilter {
   or?: OrgChartEdgeFilter[];
   /** Negates the expression. */
   not?: OrgChartEdgeFilter;
+}
+/** A filter to be used against `UsageSnapshot` object types. All fields are combined with a logical ‘and.’ */
+export interface UsageSnapshotFilter {
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `metricName` field. */
+  metricName?: StringFilter;
+  /** Filter by the object’s `metricValue` field. */
+  metricValue?: BigIntFilter;
+  /** Filter by the object’s `dimensions` field. */
+  dimensions?: JSONFilter;
+  /** Filter by the object’s `capturedAt` field. */
+  capturedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: UsageSnapshotFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UsageSnapshotFilter[];
+  /** Negates the expression. */
+  not?: UsageSnapshotFilter;
 }
 /** A filter to be used against `OrgMemberProfile` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgMemberProfileFilter {
@@ -2812,6 +2851,25 @@ export interface OrgChartEdgeInput {
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
 }
+export interface CreateUsageSnapshotInput {
+  clientMutationId?: string;
+  /** The `UsageSnapshot` to be created by this mutation. */
+  usageSnapshot: UsageSnapshotInput;
+}
+/** An input for mutations affecting `UsageSnapshot` */
+export interface UsageSnapshotInput {
+  /** The database this snapshot belongs to. References metaschema_public.database.id but declared without an FK constraint — the snapshot collector runs in a platform context where the FK would add overhead without value. */
+  databaseId: string;
+  /** Identifier for the metric being measured (e.g. 'reads', 'writes', 'storage_bytes', 'compute_time_ms'). */
+  metricName: string;
+  /** The measured value at the time of capture. Interpretation depends on metric_name (count, bytes, milliseconds, etc.). */
+  metricValue?: string;
+  /** Optional sub-metric breakdowns as key-value pairs (e.g. {"query_type": "select"} for reads). Empty object when no breakdown is needed. */
+  dimensions?: unknown;
+  /** When this snapshot was taken. Defaults to the current timestamp; the snapshot collector may override this for backdated imports. */
+  capturedAt?: string;
+  id?: string;
+}
 export interface CreateOrgMemberProfileInput {
   clientMutationId?: string;
   /** The `OrgMemberProfile` to be created by this mutation. */
@@ -3689,6 +3747,26 @@ export interface OrgChartEdgePatch {
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number;
 }
+export interface UpdateUsageSnapshotInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `UsageSnapshot` being updated. */
+  usageSnapshotPatch: UsageSnapshotPatch;
+}
+/** Represents an update to a `UsageSnapshot`. Fields that are set will be updated. */
+export interface UsageSnapshotPatch {
+  /** The database this snapshot belongs to. References metaschema_public.database.id but declared without an FK constraint — the snapshot collector runs in a platform context where the FK would add overhead without value. */
+  databaseId?: string;
+  /** Identifier for the metric being measured (e.g. 'reads', 'writes', 'storage_bytes', 'compute_time_ms'). */
+  metricName?: string;
+  /** The measured value at the time of capture. Interpretation depends on metric_name (count, bytes, milliseconds, etc.). */
+  metricValue?: string;
+  /** Optional sub-metric breakdowns as key-value pairs (e.g. {"query_type": "select"} for reads). Empty object when no breakdown is needed. */
+  dimensions?: unknown;
+  /** When this snapshot was taken. Defaults to the current timestamp; the snapshot collector may override this for backdated imports. */
+  capturedAt?: string;
+  id?: string;
+}
 export interface UpdateOrgMemberProfileInput {
   clientMutationId?: string;
   id: string;
@@ -4136,6 +4214,10 @@ export interface DeleteOrgChartEdgeInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteUsageSnapshotInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteOrgMemberProfileInput {
   clientMutationId?: string;
   id: string;
@@ -4437,6 +4519,13 @@ export interface OrgChartEdgeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `UsageSnapshot` values. */
+export interface UsageSnapshotConnection {
+  nodes: UsageSnapshot[];
+  edges: UsageSnapshotEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgMemberProfile` values. */
 export interface OrgMemberProfileConnection {
   nodes: OrgMemberProfile[];
@@ -4721,6 +4810,12 @@ export interface CreateOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
+export interface CreateUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was created by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
+}
 export interface CreateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was created by this mutation. */
@@ -4973,6 +5068,12 @@ export interface UpdateOrgChartEdgePayload {
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
 }
+export interface UpdateUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was updated by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
+}
 export interface UpdateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was updated by this mutation. */
@@ -5224,6 +5325,12 @@ export interface DeleteOrgChartEdgePayload {
   /** The `OrgChartEdge` that was deleted by this mutation. */
   orgChartEdge?: OrgChartEdge | null;
   orgChartEdgeEdge?: OrgChartEdgeEdge | null;
+}
+export interface DeleteUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was deleted by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
 }
 export interface DeleteOrgMemberProfilePayload {
   clientMutationId?: string | null;
@@ -5525,6 +5632,12 @@ export interface OrgChartEdgeEdge {
   cursor?: string | null;
   /** The `OrgChartEdge` at the end of the edge. */
   node?: OrgChartEdge | null;
+}
+/** A `UsageSnapshot` edge in the connection. */
+export interface UsageSnapshotEdge {
+  cursor?: string | null;
+  /** The `UsageSnapshot` at the end of the edge. */
+  node?: UsageSnapshot | null;
 }
 /** A `OrgMemberProfile` edge in the connection. */
 export interface OrgMemberProfileEdge {

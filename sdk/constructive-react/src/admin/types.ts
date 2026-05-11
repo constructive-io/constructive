@@ -277,6 +277,14 @@ export interface OrgChartEdge {
   positionTitle: string | null;
   positionLevel: number | null;
 }
+export interface UsageSnapshot {
+  databaseId: string | null;
+  metricName: string | null;
+  metricValue: string | null;
+  dimensions: unknown | null;
+  capturedAt: string | null;
+  id: string | null;
+}
 export interface OrgMemberProfile {
   id: string | null;
   createdAt: string | null;

@@ -146,6 +146,7 @@ import {
   commitKeys,
   pubkeySettingKeys,
   rateLimitsModuleKeys,
+  usageSnapshotKeys,
   appMembershipDefaultKeys,
   orgMembershipDefaultKeys,
   rlsSettingKeys,
@@ -2327,6 +2328,23 @@ export const invalidate = {
         queryKey: rateLimitsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate usageSnapshot queries */ usageSnapshot: {
+    /** Invalidate all usageSnapshot queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: usageSnapshotKeys.all,
+      }),
+    /** Invalidate usageSnapshot list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: usageSnapshotKeys.lists(),
+      }),
+    /** Invalidate a specific usageSnapshot */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: usageSnapshotKeys.detail(id),
+      }),
+  },
   /** Invalidate appMembershipDefault queries */ appMembershipDefault: {
     /** Invalidate all appMembershipDefault queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -3555,6 +3573,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: rateLimitsModuleKeys.detail(id),
+    });
+  },
+  /** Remove usageSnapshot from cache */ usageSnapshot: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: usageSnapshotKeys.detail(id),
     });
   },
   /** Remove appMembershipDefault from cache */ appMembershipDefault: (

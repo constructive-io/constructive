@@ -71,6 +71,8 @@ export * from './useOrgGrantsQuery';
 export * from './useOrgGrantQuery';
 export * from './useOrgChartEdgesQuery';
 export * from './useOrgChartEdgeQuery';
+export * from './useUsageSnapshotsQuery';
+export * from './useUsageSnapshotQuery';
 export * from './useOrgMemberProfilesQuery';
 export * from './useOrgMemberProfileQuery';
 export * from './useAppLevelsQuery';

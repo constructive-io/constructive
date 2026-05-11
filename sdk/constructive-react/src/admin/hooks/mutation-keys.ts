@@ -347,6 +347,15 @@ export const orgChartEdgeMutationKeys = {
   /** Delete orgChartEdge mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgchartedge', 'delete', id] as const,
 } as const;
+export const usageSnapshotMutationKeys = {
+  /** All usageSnapshot mutation keys */ all: ['mutation', 'usagesnapshot'] as const,
+  /** Create usageSnapshot mutation key */ create: () =>
+    ['mutation', 'usagesnapshot', 'create'] as const,
+  /** Update usageSnapshot mutation key */ update: (id: string | number) =>
+    ['mutation', 'usagesnapshot', 'update', id] as const,
+  /** Delete usageSnapshot mutation key */ delete: (id: string | number) =>
+    ['mutation', 'usagesnapshot', 'delete', id] as const,
+} as const;
 export const orgMemberProfileMutationKeys = {
   /** All orgMemberProfile mutation keys */ all: ['mutation', 'orgmemberprofile'] as const,
   /** Create orgMemberProfile mutation key */ create: () =>
@@ -510,6 +519,7 @@ export const mutationKeys = {
   orgLimitEvent: orgLimitEventMutationKeys,
   orgGrant: orgGrantMutationKeys,
   orgChartEdge: orgChartEdgeMutationKeys,
+  usageSnapshot: usageSnapshotMutationKeys,
   orgMemberProfile: orgMemberProfileMutationKeys,
   appLevel: appLevelMutationKeys,
   appLimit: appLimitMutationKeys,

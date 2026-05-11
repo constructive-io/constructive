@@ -664,6 +664,20 @@ export interface OrgChartEdge {
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number | null;
 }
+/** Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. */
+export interface UsageSnapshot {
+  /** The database this snapshot belongs to. References metaschema_public.database.id but declared without an FK constraint — the snapshot collector runs in a platform context where the FK would add overhead without value. */
+  databaseId?: string | null;
+  /** Identifier for the metric being measured (e.g. 'reads', 'writes', 'storage_bytes', 'compute_time_ms'). */
+  metricName?: string | null;
+  /** The measured value at the time of capture. Interpretation depends on metric_name (count, bytes, milliseconds, etc.). */
+  metricValue?: string | null;
+  /** Optional sub-metric breakdowns as key-value pairs (e.g. {"query_type": "select"} for reads). Empty object when no breakdown is needed. */
+  dimensions?: Record<string, unknown> | null;
+  /** When this snapshot was taken. Defaults to the current timestamp; the snapshot collector may override this for backdated imports. */
+  capturedAt?: string | null;
+  id: string;
+}
 /** Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) */
 export interface OrgMemberProfile {
   id: string;
@@ -984,6 +998,7 @@ export interface AppLimitEventRelations {}
 export interface OrgLimitEventRelations {}
 export interface OrgGrantRelations {}
 export interface OrgChartEdgeRelations {}
+export interface UsageSnapshotRelations {}
 export interface OrgMemberProfileRelations {
   membership?: OrgMembership | null;
 }
@@ -1043,6 +1058,7 @@ export type AppLimitEventWithRelations = AppLimitEvent & AppLimitEventRelations;
 export type OrgLimitEventWithRelations = OrgLimitEvent & OrgLimitEventRelations;
 export type OrgGrantWithRelations = OrgGrant & OrgGrantRelations;
 export type OrgChartEdgeWithRelations = OrgChartEdge & OrgChartEdgeRelations;
+export type UsageSnapshotWithRelations = UsageSnapshot & UsageSnapshotRelations;
 export type OrgMemberProfileWithRelations = OrgMemberProfile & OrgMemberProfileRelations;
 export type AppLevelWithRelations = AppLevel & AppLevelRelations;
 export type AppLimitWithRelations = AppLimit & AppLimitRelations;
@@ -1371,6 +1387,14 @@ export type OrgChartEdgeSelect = {
   parentId?: boolean;
   positionTitle?: boolean;
   positionLevel?: boolean;
+};
+export type UsageSnapshotSelect = {
+  databaseId?: boolean;
+  metricName?: boolean;
+  metricValue?: boolean;
+  dimensions?: boolean;
+  capturedAt?: boolean;
+  id?: boolean;
 };
 export type OrgMemberProfileSelect = {
   id?: boolean;
@@ -2231,6 +2255,26 @@ export interface OrgChartEdgeFilter {
   or?: OrgChartEdgeFilter[];
   /** Negates the expression. */
   not?: OrgChartEdgeFilter;
+}
+export interface UsageSnapshotFilter {
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `metricName` field. */
+  metricName?: StringFilter;
+  /** Filter by the object’s `metricValue` field. */
+  metricValue?: BigIntFilter;
+  /** Filter by the object’s `dimensions` field. */
+  dimensions?: JSONFilter;
+  /** Filter by the object’s `capturedAt` field. */
+  capturedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: UsageSnapshotFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UsageSnapshotFilter[];
+  /** Negates the expression. */
+  not?: UsageSnapshotFilter;
 }
 export interface OrgMemberProfileFilter {
   /** Filter by the object’s `id` field. */
@@ -3113,6 +3157,22 @@ export type OrgChartEdgeOrderBy =
   | 'POSITION_TITLE_DESC'
   | 'POSITION_LEVEL_ASC'
   | 'POSITION_LEVEL_DESC';
+export type UsageSnapshotOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'METRIC_NAME_ASC'
+  | 'METRIC_NAME_DESC'
+  | 'METRIC_VALUE_ASC'
+  | 'METRIC_VALUE_DESC'
+  | 'DIMENSIONS_ASC'
+  | 'DIMENSIONS_DESC'
+  | 'CAPTURED_AT_ASC'
+  | 'CAPTURED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC';
 export type OrgMemberProfileOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -4263,6 +4323,32 @@ export interface UpdateOrgChartEdgeInput {
   orgChartEdgePatch: OrgChartEdgePatch;
 }
 export interface DeleteOrgChartEdgeInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateUsageSnapshotInput {
+  clientMutationId?: string;
+  usageSnapshot: {
+    databaseId: string;
+    metricName: string;
+    metricValue?: string;
+    dimensions?: Record<string, unknown>;
+    capturedAt?: string;
+  };
+}
+export interface UsageSnapshotPatch {
+  databaseId?: string | null;
+  metricName?: string | null;
+  metricValue?: string | null;
+  dimensions?: Record<string, unknown> | null;
+  capturedAt?: string | null;
+}
+export interface UpdateUsageSnapshotInput {
+  clientMutationId?: string;
+  id: string;
+  usageSnapshotPatch: UsageSnapshotPatch;
+}
+export interface DeleteUsageSnapshotInput {
   clientMutationId?: string;
   id: string;
 }
@@ -6767,6 +6853,51 @@ export type DeleteOrgChartEdgePayloadSelect = {
     select: OrgChartEdgeEdgeSelect;
   };
 };
+export interface CreateUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was created by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
+}
+export type CreateUsageSnapshotPayloadSelect = {
+  clientMutationId?: boolean;
+  usageSnapshot?: {
+    select: UsageSnapshotSelect;
+  };
+  usageSnapshotEdge?: {
+    select: UsageSnapshotEdgeSelect;
+  };
+};
+export interface UpdateUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was updated by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
+}
+export type UpdateUsageSnapshotPayloadSelect = {
+  clientMutationId?: boolean;
+  usageSnapshot?: {
+    select: UsageSnapshotSelect;
+  };
+  usageSnapshotEdge?: {
+    select: UsageSnapshotEdgeSelect;
+  };
+};
+export interface DeleteUsageSnapshotPayload {
+  clientMutationId?: string | null;
+  /** The `UsageSnapshot` that was deleted by this mutation. */
+  usageSnapshot?: UsageSnapshot | null;
+  usageSnapshotEdge?: UsageSnapshotEdge | null;
+}
+export type DeleteUsageSnapshotPayloadSelect = {
+  clientMutationId?: boolean;
+  usageSnapshot?: {
+    select: UsageSnapshotSelect;
+  };
+  usageSnapshotEdge?: {
+    select: UsageSnapshotEdgeSelect;
+  };
+};
 export interface CreateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was created by this mutation. */
@@ -7616,6 +7747,18 @@ export type OrgChartEdgeEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgChartEdgeSelect;
+  };
+};
+/** A `UsageSnapshot` edge in the connection. */
+export interface UsageSnapshotEdge {
+  cursor?: string | null;
+  /** The `UsageSnapshot` at the end of the edge. */
+  node?: UsageSnapshot | null;
+}
+export type UsageSnapshotEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: UsageSnapshotSelect;
   };
 };
 /** A `OrgMemberProfile` edge in the connection. */

@@ -745,6 +745,11 @@ function App() {
 | `useCreateRateLimitsModuleMutation` | Mutation | Create a rateLimitsModule |
 | `useUpdateRateLimitsModuleMutation` | Mutation | Update a rateLimitsModule |
 | `useDeleteRateLimitsModuleMutation` | Mutation | Delete a rateLimitsModule |
+| `useUsageSnapshotsQuery` | Query | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useUsageSnapshotQuery` | Query | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useCreateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useUpdateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
+| `useDeleteUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
 | `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
@@ -3641,6 +3646,27 @@ const { mutate: create } = useCreateRateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', rateLimitSettingsTableId: '<UUID>', ipRateLimitsTableId: '<UUID>', rateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', ipRateLimitsTable: '<String>', rateLimitsTable: '<String>' });
+```
+
+### UsageSnapshot
+
+```typescript
+// List all usageSnapshots
+const { data, isLoading } = useUsageSnapshotsQuery({
+  selection: { fields: { databaseId: true, metricName: true, metricValue: true, dimensions: true, capturedAt: true, id: true } },
+});
+
+// Get one usageSnapshot
+const { data: item } = useUsageSnapshotQuery({
+  id: '<UUID>',
+  selection: { fields: { databaseId: true, metricName: true, metricValue: true, dimensions: true, capturedAt: true, id: true } },
+});
+
+// Create a usageSnapshot
+const { mutate: create } = useCreateUsageSnapshotMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', metricName: '<String>', metricValue: '<BigInt>', dimensions: '<JSON>', capturedAt: '<Datetime>' });
 ```
 
 ### AppMembershipDefault

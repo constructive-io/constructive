@@ -343,6 +343,15 @@ export const orgChartEdgeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgChartEdgeKeys.details(), id] as const,
 } as const;
+export const usageSnapshotKeys = {
+  /** All usageSnapshot queries */ all: ['usagesnapshot'] as const,
+  /** List query keys */ lists: () => [...usageSnapshotKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...usageSnapshotKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...usageSnapshotKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...usageSnapshotKeys.details(), id] as const,
+} as const;
 export const orgMemberProfileKeys = {
   /** All orgMemberProfile queries */ all: ['orgmemberprofile'] as const,
   /** List query keys */ lists: () => [...orgMemberProfileKeys.all, 'list'] as const,
@@ -525,6 +534,7 @@ export const queryKeys = {
   orgLimitEvent: orgLimitEventKeys,
   orgGrant: orgGrantKeys,
   orgChartEdge: orgChartEdgeKeys,
+  usageSnapshot: usageSnapshotKeys,
   orgMemberProfile: orgMemberProfileKeys,
   appLevel: appLevelKeys,
   appLimit: appLimitKeys,

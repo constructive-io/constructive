@@ -62,6 +62,7 @@ csdk auth set-token <your-token>
 | `org-limit-event` | orgLimitEvent CRUD operations |
 | `org-grant` | orgGrant CRUD operations |
 | `org-chart-edge` | orgChartEdge CRUD operations |
+| `usage-snapshot` | usageSnapshot CRUD operations |
 | `org-member-profile` | orgMemberProfile CRUD operations |
 | `app-level` | appLevel CRUD operations |
 | `app-limit` | appLimit CRUD operations |
@@ -1076,6 +1077,33 @@ CRUD operations for OrgChartEdge records.
 
 **Required create fields:** `entityId`, `childId`
 **Optional create fields (backend defaults):** `parentId`, `positionTitle`, `positionLevel`
+
+### `usage-snapshot`
+
+CRUD operations for UsageSnapshot records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all usageSnapshot records |
+| `find-first` | Find first matching usageSnapshot record |
+| `get` | Get a usageSnapshot by id |
+| `create` | Create a new usageSnapshot |
+| `update` | Update an existing usageSnapshot |
+| `delete` | Delete a usageSnapshot |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `metricName` | String |
+| `metricValue` | BigInt |
+| `dimensions` | JSON |
+| `capturedAt` | Datetime |
+| `id` | UUID |
+
+**Required create fields:** `databaseId`, `metricName`
+**Optional create fields (backend defaults):** `metricValue`, `dimensions`, `capturedAt`
 
 ### `org-member-profile`
 

@@ -157,6 +157,7 @@ csdk auth set-token <your-token>
 | `commit` | commit CRUD operations |
 | `pubkey-setting` | pubkeySetting CRUD operations |
 | `rate-limits-module` | rateLimitsModule CRUD operations |
+| `usage-snapshot` | usageSnapshot CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `rls-setting` | rlsSetting CRUD operations |
@@ -4312,6 +4313,33 @@ CRUD operations for RateLimitsModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `rateLimitSettingsTableId`, `ipRateLimitsTableId`, `rateLimitsTableId`, `rateLimitSettingsTable`, `ipRateLimitsTable`, `rateLimitsTable`
+
+### `usage-snapshot`
+
+CRUD operations for UsageSnapshot records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all usageSnapshot records |
+| `find-first` | Find first matching usageSnapshot record |
+| `get` | Get a usageSnapshot by id |
+| `create` | Create a new usageSnapshot |
+| `update` | Update an existing usageSnapshot |
+| `delete` | Delete a usageSnapshot |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `metricName` | String |
+| `metricValue` | BigInt |
+| `dimensions` | JSON |
+| `capturedAt` | Datetime |
+| `id` | UUID |
+
+**Required create fields:** `databaseId`, `metricName`
+**Optional create fields (backend defaults):** `metricValue`, `dimensions`, `capturedAt`
 
 ### `app-membership-default`
 

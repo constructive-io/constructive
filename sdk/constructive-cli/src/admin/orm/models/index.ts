@@ -39,6 +39,7 @@ export { AppLimitEventModel } from './appLimitEvent';
 export { OrgLimitEventModel } from './orgLimitEvent';
 export { OrgGrantModel } from './orgGrant';
 export { OrgChartEdgeModel } from './orgChartEdge';
+export { UsageSnapshotModel } from './usageSnapshot';
 export { OrgMemberProfileModel } from './orgMemberProfile';
 export { AppLevelModel } from './appLevel';
 export { AppLimitModel } from './appLimit';

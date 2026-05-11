@@ -1,13 +1,13 @@
 ---
 name: orm-admin
-description: ORM client for the admin API — provides typed CRUD operations for 46 tables and 14 custom operations
+description: ORM client for the admin API — provides typed CRUD operations for 47 tables and 14 custom operations
 ---
 
 # orm-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the admin API — provides typed CRUD operations for 46 tables and 14 custom operations
+ORM client for the admin API — provides typed CRUD operations for 47 tables and 14 custom operations
 
 ## Usage
 
@@ -73,6 +73,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-event](references/org-limit-event.md)
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
+- [usage-snapshot](references/usage-snapshot.md)
 - [org-member-profile](references/org-member-profile.md)
 - [app-level](references/app-level.md)
 - [app-limit](references/app-limit.md)

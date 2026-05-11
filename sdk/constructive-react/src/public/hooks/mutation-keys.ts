@@ -1191,6 +1191,15 @@ export const rateLimitsModuleMutationKeys = {
   /** Delete rateLimitsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'ratelimitsmodule', 'delete', id] as const,
 } as const;
+export const usageSnapshotMutationKeys = {
+  /** All usageSnapshot mutation keys */ all: ['mutation', 'usagesnapshot'] as const,
+  /** Create usageSnapshot mutation key */ create: () =>
+    ['mutation', 'usagesnapshot', 'create'] as const,
+  /** Update usageSnapshot mutation key */ update: (id: string | number) =>
+    ['mutation', 'usagesnapshot', 'update', id] as const,
+  /** Delete usageSnapshot mutation key */ delete: (id: string | number) =>
+    ['mutation', 'usagesnapshot', 'delete', id] as const,
+} as const;
 export const appMembershipDefaultMutationKeys = {
   /** All appMembershipDefault mutation keys */ all: ['mutation', 'appmembershipdefault'] as const,
   /** Create appMembershipDefault mutation key */ create: () =>
@@ -1700,6 +1709,7 @@ export const mutationKeys = {
   commit: commitMutationKeys,
   pubkeySetting: pubkeySettingMutationKeys,
   rateLimitsModule: rateLimitsModuleMutationKeys,
+  usageSnapshot: usageSnapshotMutationKeys,
   appMembershipDefault: appMembershipDefaultMutationKeys,
   orgMembershipDefault: orgMembershipDefaultMutationKeys,
   rlsSetting: rlsSettingMutationKeys,

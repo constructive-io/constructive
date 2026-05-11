@@ -1198,6 +1198,15 @@ export const rateLimitsModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...rateLimitsModuleKeys.details(), id] as const,
 } as const;
+export const usageSnapshotKeys = {
+  /** All usageSnapshot queries */ all: ['usagesnapshot'] as const,
+  /** List query keys */ lists: () => [...usageSnapshotKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...usageSnapshotKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...usageSnapshotKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...usageSnapshotKeys.details(), id] as const,
+} as const;
 export const appMembershipDefaultKeys = {
   /** All appMembershipDefault queries */ all: ['appmembershipdefault'] as const,
   /** List query keys */ lists: () => [...appMembershipDefaultKeys.all, 'list'] as const,
@@ -1555,6 +1564,7 @@ export const queryKeys = {
   commit: commitKeys,
   pubkeySetting: pubkeySettingKeys,
   rateLimitsModule: rateLimitsModuleKeys,
+  usageSnapshot: usageSnapshotKeys,
   appMembershipDefault: appMembershipDefaultKeys,
   orgMembershipDefault: orgMembershipDefaultKeys,
   rlsSetting: rlsSettingKeys,

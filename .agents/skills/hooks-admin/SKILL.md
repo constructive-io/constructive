@@ -1,13 +1,13 @@
 ---
 name: hooks-admin
-description: React Query hooks for the admin API — provides typed query and mutation hooks for 46 tables and 14 custom operations
+description: React Query hooks for the admin API — provides typed query and mutation hooks for 47 tables and 14 custom operations
 ---
 
 # hooks-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the admin API — provides typed query and mutation hooks for 46 tables and 14 custom operations
+React Query hooks for the admin API — provides typed query and mutation hooks for 47 tables and 14 custom operations
 
 ## Usage
 
@@ -73,6 +73,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-event](references/org-limit-event.md)
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
+- [usage-snapshot](references/usage-snapshot.md)
 - [org-member-profile](references/org-member-profile.md)
 - [app-level](references/app-level.md)
 - [app-limit](references/app-limit.md)

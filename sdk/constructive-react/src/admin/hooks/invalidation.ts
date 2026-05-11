@@ -51,6 +51,7 @@ import {
   orgLimitEventKeys,
   orgGrantKeys,
   orgChartEdgeKeys,
+  usageSnapshotKeys,
   orgMemberProfileKeys,
   appLevelKeys,
   appLimitKeys,
@@ -685,6 +686,23 @@ export const invalidate = {
         queryKey: orgChartEdgeKeys.detail(id),
       }),
   },
+  /** Invalidate usageSnapshot queries */ usageSnapshot: {
+    /** Invalidate all usageSnapshot queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: usageSnapshotKeys.all,
+      }),
+    /** Invalidate usageSnapshot list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: usageSnapshotKeys.lists(),
+      }),
+    /** Invalidate a specific usageSnapshot */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: usageSnapshotKeys.detail(id),
+      }),
+  },
   /** Invalidate orgMemberProfile queries */ orgMemberProfile: {
     /** Invalidate all orgMemberProfile queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1133,6 +1151,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgChartEdgeKeys.detail(id),
+    });
+  },
+  /** Remove usageSnapshot from cache */ usageSnapshot: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: usageSnapshotKeys.detail(id),
     });
   },
   /** Remove orgMemberProfile from cache */ orgMemberProfile: (

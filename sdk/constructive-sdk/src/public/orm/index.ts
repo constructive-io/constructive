@@ -136,6 +136,7 @@ import { UserConnectedAccountModel } from './models/userConnectedAccount';
 import { CommitModel } from './models/commit';
 import { PubkeySettingModel } from './models/pubkeySetting';
 import { RateLimitsModuleModel } from './models/rateLimitsModule';
+import { UsageSnapshotModel } from './models/usageSnapshot';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { RlsSettingModel } from './models/rlsSetting';
@@ -319,6 +320,7 @@ export function createClient(config: OrmClientConfig) {
     commit: new CommitModel(client),
     pubkeySetting: new PubkeySettingModel(client),
     rateLimitsModule: new RateLimitsModuleModel(client),
+    usageSnapshot: new UsageSnapshotModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     rlsSetting: new RlsSettingModel(client),

@@ -152,6 +152,7 @@ const db = createClient({
 | `commit` | findMany, findOne, create, update, delete |
 | `pubkeySetting` | findMany, findOne, create, update, delete |
 | `rateLimitsModule` | findMany, findOne, create, update, delete |
+| `usageSnapshot` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
 | `rlsSetting` | findMany, findOne, create, update, delete |
@@ -5115,6 +5116,40 @@ const updated = await db.rateLimitsModule.update({ where: { id: '<UUID>' }, data
 
 // Delete
 const deleted = await db.rateLimitsModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.usageSnapshot`
+
+CRUD operations for UsageSnapshot records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `databaseId` | UUID | Yes |
+| `metricName` | String | Yes |
+| `metricValue` | BigInt | Yes |
+| `dimensions` | JSON | Yes |
+| `capturedAt` | Datetime | Yes |
+| `id` | UUID | No |
+
+**Operations:**
+
+```typescript
+// List all usageSnapshot records
+const items = await db.usageSnapshot.findMany({ select: { databaseId: true, metricName: true, metricValue: true, dimensions: true, capturedAt: true, id: true } }).execute();
+
+// Get one by id
+const item = await db.usageSnapshot.findOne({ id: '<UUID>', select: { databaseId: true, metricName: true, metricValue: true, dimensions: true, capturedAt: true, id: true } }).execute();
+
+// Create
+const created = await db.usageSnapshot.create({ data: { databaseId: '<UUID>', metricName: '<String>', metricValue: '<BigInt>', dimensions: '<JSON>', capturedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.usageSnapshot.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.usageSnapshot.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.appMembershipDefault`

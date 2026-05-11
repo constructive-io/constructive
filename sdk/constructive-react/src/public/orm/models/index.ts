@@ -134,6 +134,7 @@ export { UserConnectedAccountModel } from './userConnectedAccount';
 export { CommitModel } from './commit';
 export { PubkeySettingModel } from './pubkeySetting';
 export { RateLimitsModuleModel } from './rateLimitsModule';
+export { UsageSnapshotModel } from './usageSnapshot';
 export { AppMembershipDefaultModel } from './appMembershipDefault';
 export { OrgMembershipDefaultModel } from './orgMembershipDefault';
 export { RlsSettingModel } from './rlsSetting';

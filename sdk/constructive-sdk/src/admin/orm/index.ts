@@ -41,6 +41,7 @@ import { AppLimitEventModel } from './models/appLimitEvent';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
+import { UsageSnapshotModel } from './models/usageSnapshot';
 import { OrgMemberProfileModel } from './models/orgMemberProfile';
 import { AppLevelModel } from './models/appLevel';
 import { AppLimitModel } from './models/appLimit';
@@ -122,6 +123,7 @@ export function createClient(config: OrmClientConfig) {
     orgLimitEvent: new OrgLimitEventModel(client),
     orgGrant: new OrgGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
+    usageSnapshot: new UsageSnapshotModel(client),
     orgMemberProfile: new OrgMemberProfileModel(client),
     appLevel: new AppLevelModel(client),
     appLimit: new AppLimitModel(client),
