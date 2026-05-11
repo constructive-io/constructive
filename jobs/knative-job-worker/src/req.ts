@@ -5,6 +5,8 @@ import {
   getCallbackBaseUrl,
   getJobGatewayConfig,
   getJobGatewayDevMap,
+  getJobGatewayScopeUrls,
+  parseScopedIdentifier,
   getNodeEnvironment
 } from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
@@ -18,14 +20,36 @@ const completeUrl = getCallbackBaseUrl();
 const nodeEnv = getNodeEnvironment();
 const DEV_MAP = nodeEnv !== 'production' ? getJobGatewayDevMap() : null;
 
+// Scope-based routing: maps scope prefixes to base URLs
+// e.g. {"embed": "http://embed-service:8080", "email": "http://email-service:8080"}
+const SCOPE_URLS = getJobGatewayScopeUrls();
+
 const getFunctionUrl = (fn: string): string => {
+  // 1. Check exact-match dev map first (highest priority)
   if (DEV_MAP && DEV_MAP[fn]) {
     return DEV_MAP[fn] || completeUrl;
   }
 
+  // 2. For scoped identifiers (e.g. "embed:generate_embedding"),
+  //    try scope-based routing via INTERNAL_GATEWAY_SCOPE_URLS
+  const scoped = parseScopedIdentifier(fn);
+  if (scoped) {
+    // Check dev map for the unscoped function name as fallback
+    if (DEV_MAP && DEV_MAP[scoped.fn]) {
+      return DEV_MAP[scoped.fn] || completeUrl;
+    }
+    // Route to scope-specific service
+    if (SCOPE_URLS && SCOPE_URLS[scoped.scope]) {
+      const base = SCOPE_URLS[scoped.scope].replace(/\/$/, '');
+      return `${base}/${scoped.fn}`;
+    }
+  }
+
+  // 3. Fallback to gateway (strips scope prefix for URL path)
   const { gatewayUrl } = getJobGatewayConfig();
   const base = gatewayUrl.replace(/\/$/, '');
-  return `${base}/${fn}`;
+  const path = scoped ? scoped.fn : fn;
+  return `${base}/${path}`;
 };
 
 interface RequestOptions {

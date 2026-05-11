@@ -96,7 +96,7 @@ export const DataChunks: NodeTypeDefinition = {
       chunking_task_name: {
         type: 'string',
         description: 'Task identifier for the chunking job queue',
-        default: 'generate_chunks'
+        default: 'chunk:generate_chunks'
       }
     }
   },

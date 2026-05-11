@@ -19,6 +19,8 @@ import {
   getSchedulerHostname,
   getJobGatewayConfig,
   getJobGatewayDevMap,
+  getJobGatewayScopeUrls,
+  parseScopedIdentifier,
   getJobsCallbackPort,
   getCallbackBaseUrl,
   getNodeEnvironment
@@ -43,6 +45,8 @@ export {
   getSchedulerHostname,
   getJobGatewayConfig,
   getJobGatewayDevMap,
+  getJobGatewayScopeUrls,
+  parseScopedIdentifier,
   getJobsCallbackPort,
   getCallbackBaseUrl,
   getNodeEnvironment

@@ -292,7 +292,59 @@ Completed jobs are removed from `app_jobs.jobs` by the completion logic; failed 
 
 ---
 
-## 5. Scheduled jobs (optional)
+## 5. Task Identifier Naming Convention
+
+All task identifiers follow the **`scope:function_name`** pattern:
+
+```
+<scope>:<function_name>
+```
+
+- **`scope`** — the capability domain (e.g. `email`, `embed`, `chunk`, `extract`, `sms`)
+- **`function_name`** — the specific operation, in `snake_case`
+
+### Rationale
+
+Each scope maps to an independent Knative service with its own autoscaling policy, resource limits, and node affinity. For example, `email:*` functions run on cheap CPU nodes while `embed:*` functions can target GPU nodes.
+
+### Current identifiers
+
+| Scope | Task Identifier | Status |
+|-------|----------------|--------|
+| `email` | `email:send_email_link` | Implemented |
+| `email` | `email:simple_email` | Implemented |
+| `email` | `email:send_account_deletion_link` | Planned |
+| `sms` | `sms:send_sms` | Planned |
+| `embed` | `embed:process_file_embedding` | Planned |
+| `embed` | `embed:process_image_embedding` | Planned |
+| `embed` | `embed:generate_embedding` | Planned |
+| `chunk` | `chunk:generate_chunks` | Planned |
+| `extract` | `extract:process_document_extraction` | Planned |
+| `extract` | `extract:process_media_transcription` | Planned |
+
+### Routing
+
+The `knative-job-worker` resolves task identifiers to function URLs in this order:
+
+1. **Exact match** in `INTERNAL_GATEWAY_DEVELOPMENT_MAP` (dev only)
+2. **Scope routing** via `INTERNAL_GATEWAY_SCOPE_URLS` — extracts scope prefix, routes to scope-specific service base URL
+3. **Fallback** to `INTERNAL_GATEWAY_URL` gateway with the function name as path
+
+Legacy unscoped identifiers (e.g. `send-email-link`) are still supported for backward compatibility.
+
+### Environment variables
+
+```yaml
+# Exact task→URL mapping (development)
+INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_email_link":"http://send-email-link:8080"}'
+
+# Scope→service mapping (production scaling)
+INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://email-service:8080","embed":"http://embed-service:8080"}'
+```
+
+---
+
+## 6. Scheduled jobs (optional)
 
 You can also use `app_jobs.scheduled_jobs` and `@constructive-io/job-scheduler` to run recurring jobs.
 

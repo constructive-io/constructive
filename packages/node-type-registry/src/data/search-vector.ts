@@ -65,7 +65,7 @@ export const SearchVector: NodeTypeDefinition = {
       job_task_name: {
         type: 'string',
         description: 'Task identifier for the job queue',
-        default: 'generate_embedding'
+        default: 'embed:generate_embedding'
       },
       stale_strategy: {
         type: 'string',
@@ -120,7 +120,7 @@ export const SearchVector: NodeTypeDefinition = {
           chunking_task_name: {
             type: 'string',
             description: 'Task identifier for the chunking job queue',
-            default: 'generate_chunks'
+            default: 'chunk:generate_chunks'
           }
         }
       }

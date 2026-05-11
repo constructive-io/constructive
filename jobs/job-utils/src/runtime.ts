@@ -133,6 +133,40 @@ export const getJobGatewayDevMap = ():
   }
 };
 
+// ---- Scope-based routing for scoped task identifiers ----
+// Maps scope prefixes (e.g. "embed", "chunk", "email") to base URLs.
+// Parsed from INTERNAL_GATEWAY_SCOPE_URLS env var (JSON object).
+export const getJobGatewayScopeUrls = ():
+  | Record<string, string>
+  | null => {
+  const map = process.env.INTERNAL_GATEWAY_SCOPE_URLS;
+  if (!map) return null;
+  try {
+    return JSON.parse(map);
+  } catch (err) {
+    console.warn(
+      '[getJobGatewayScopeUrls] Failed to parse INTERNAL_GATEWAY_SCOPE_URLS as JSON:',
+      err,
+      'Value:',
+      map
+    );
+    return null;
+  }
+};
+
+// Parses a scoped task identifier (e.g. "embed:generate_embedding")
+// into { scope, fn } or returns null for unscoped identifiers.
+export const parseScopedIdentifier = (
+  identifier: string
+): { scope: string; fn: string } | null => {
+  const idx = identifier.indexOf(':');
+  if (idx <= 0) return null;
+  return {
+    scope: identifier.substring(0, idx),
+    fn: identifier.substring(idx + 1)
+  };
+};
+
 export const getNodeEnvironment = getNodeEnv;
 
 // Neutral callback helpers (generic HTTP callback)

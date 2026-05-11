@@ -63,7 +63,7 @@ export const DataFileEmbedding: NodeTypeDefinition = {
         description:
           'Job task identifier for the worker. In direct mode this is the ' +
           'embedding worker; in extract mode this is the extraction worker.',
-        default: 'process_file_embedding'
+        default: 'embed:process_file_embedding'
       },
       events: {
         type: 'array',
@@ -174,7 +174,7 @@ export const DataFileEmbedding: NodeTypeDefinition = {
           chunking_task_name: {
             type: 'string',
             description: 'Task identifier for the chunking job queue',
-            default: 'generate_chunks'
+            default: 'chunk:generate_chunks'
           }
         }
       },

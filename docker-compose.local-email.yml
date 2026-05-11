@@ -107,7 +107,7 @@ services:
       JOBS_SCHEMA: app_jobs
       # Worker config
       JOBS_SUPPORT_ANY: "true"
-      JOBS_SUPPORTED: "send-email-link"
+      JOBS_SUPPORTED: "email:send_email_link,email:simple_email,send-email-link"
       HOSTNAME: "local-worker"
       # Callback server
       INTERNAL_JOBS_CALLBACK_PORT: "8080"
@@ -115,7 +115,8 @@ services:
       JOBS_CALLBACK_HOST: "knative-job-service"
       # Function gateway
       INTERNAL_GATEWAY_URL: "http://send-email-link:8080"
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080"}'
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080","email:send_email_link":"http://send-email-link:8080","email:simple_email":"http://send-email-link:8080"}'
+      INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://send-email-link:8080"}'
     ports:
       - "8080:8080"
     networks:

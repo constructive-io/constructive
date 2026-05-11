@@ -124,7 +124,7 @@ services:
 
       # Worker configuration
       JOBS_SUPPORT_ANY: "false"
-      JOBS_SUPPORTED: "send-email-link"
+      JOBS_SUPPORTED: "email:send_email_link,email:simple_email,send-email-link,simple-email"
       HOSTNAME: "knative-job-service-1"
 
       # Callback HTTP server (job completion callbacks)
@@ -137,7 +137,12 @@ services:
       INTERNAL_GATEWAY_URL: "http://send-email-link:8080"
 
       # Development-only map from task identifier -> function URL
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080"}'
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080","email:send_email_link":"http://send-email-link:8080","email:simple_email":"http://send-email-link:8080"}'
+
+      # Scope-based routing: maps scope prefixes to service base URLs
+      # When a task_identifier like "email:send_email_link" is received,
+      # the worker routes to ${SCOPE_URL}/send_email_link
+      INTERNAL_GATEWAY_SCOPE_URLS: '{"email":"http://send-email-link:8080"}'
 
     ports:
       - "8080:8080"

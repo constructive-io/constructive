@@ -39,6 +39,15 @@ const functionRegistry: Record<FunctionName, FunctionRegistryEntry> = {
   'send-email-link': {
     moduleName: '@constructive-io/send-email-link-fn',
     defaultPort: 8082
+  },
+  // Scoped aliases — same implementations, scoped task identifiers
+  'email:simple_email': {
+    moduleName: '@constructive-io/simple-email-fn',
+    defaultPort: 8081
+  },
+  'email:send_email_link': {
+    moduleName: '@constructive-io/send-email-link-fn',
+    defaultPort: 8082
   }
 };
 
