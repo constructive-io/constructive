@@ -31,7 +31,11 @@ interface StatePayload {
 }
 
 function getStateSecret(): string {
-  return process.env.OAUTH_STATE_SECRET || process.env.SESSION_SECRET || 'dev-oauth-state-secret';
+  const secret = process.env.OAUTH_SECRET;
+  if (!secret) {
+    throw new Error('OAUTH_SECRET environment variable is required');
+  }
+  return secret;
 }
 
 function createSignedState(payload: { redirect_uri: string; provider: string }): string {
