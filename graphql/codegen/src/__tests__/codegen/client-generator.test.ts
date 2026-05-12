@@ -3,6 +3,10 @@
  *
  * Tests the generated ORM client files: client.ts, query-builder.ts, select-types.ts, index.ts
  */
+import * as vm from 'node:vm';
+
+import * as ts from 'typescript';
+
 import {
   generateCreateClientFile,
   generateOrmClientFile,
@@ -42,6 +46,79 @@ function createTable(
     inflection: partial.inflection,
     constraints: partial.constraints,
   };
+}
+
+type FetchAdapterConstructor = new (
+  endpoint: string,
+  headers?: Record<string, string>,
+  fetchFn?: typeof globalThis.fetch,
+) => {
+  execute<T>(
+    document: string,
+    variables?: Record<string, unknown>,
+  ): Promise<{ ok: boolean; data: T | null; errors?: unknown[] }>;
+};
+
+function loadGeneratedFetchAdapter(
+  createFetch: () => typeof globalThis.fetch,
+): FetchAdapterConstructor {
+  const { content } = generateOrmClientFile();
+  const { outputText } = ts.transpileModule(content, {
+    compilerOptions: {
+      esModuleInterop: true,
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2022,
+    },
+  });
+  const mod = { exports: {} as Record<string, unknown> };
+
+  vm.runInNewContext(
+    outputText,
+    {
+      exports: mod.exports,
+      globalThis,
+      module: mod,
+      require: (specifier: string) => {
+        if (specifier === '@constructive-io/graphql-query/runtime') {
+          return { createFetch };
+        }
+        if (specifier === './realtime') {
+          return { RealtimeManager: class RealtimeManager {} };
+        }
+        throw new Error(`Unexpected generated client import: ${specifier}`);
+      },
+    },
+    { filename: 'generated-orm-client.cjs' },
+  );
+
+  return mod.exports.FetchAdapter as FetchAdapterConstructor;
+}
+
+function createThisSensitiveFetch(payload: unknown) {
+  const calls: {
+    input: RequestInfo | URL;
+    init?: RequestInit;
+    thisArg: unknown;
+  }[] = [];
+
+  function fetchStub(
+    this: unknown,
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ): Promise<Response> {
+    calls.push({ input, init, thisArg: this });
+    if (this !== globalThis) {
+      return Promise.reject(new TypeError('Illegal invocation'));
+    }
+    return Promise.resolve(
+      new Response(JSON.stringify(payload), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 200,
+      }),
+    );
+  }
+
+  return { calls, fetchStub: fetchStub as typeof globalThis.fetch };
 }
 
 // ============================================================================
@@ -92,154 +169,53 @@ describe('client-generator', () => {
       );
     });
 
-    it('FetchAdapter can execute with a this-sensitive native fetch', async () => {
-      // Simulate browser window.fetch: rejects with TypeError when this
-      // is not the original Window (Chrome rejects asynchronously).
-      function strictFetch(this: unknown): Promise<Response> {
-        if (this !== globalThis) {
-          return Promise.reject(new TypeError('Illegal invocation'));
-        }
-        return Promise.resolve(
-          new Response(JSON.stringify({ data: { answer: 42 } })),
-        );
-      }
+    it('executes with default createFetch result bound to globalThis', async () => {
+      const { calls, fetchStub } = createThisSensitiveFetch({
+        data: { ok: true },
+      });
+      const createFetch = jest.fn(() => fetchStub);
+      const FetchAdapter = loadGeneratedFetchAdapter(createFetch);
+      const adapter = new FetchAdapter('https://api.example/graphql', {
+        Authorization: 'Bearer token',
+      });
 
-      // Replicate the exact constructor pattern generated in FetchAdapter.
-      class TestFetchAdapter {
-        private fetchFn: typeof globalThis.fetch;
-        constructor(fetchFn?: typeof globalThis.fetch) {
-          this.fetchFn = (fetchFn ?? strictFetch).bind(globalThis);
-        }
-        async callFetch(): Promise<Response> {
-          return this.fetchFn('http://test', { method: 'POST' } as RequestInit);
-        }
-      }
-
-      // Without .bind(globalThis) this would reject with TypeError.
-      const adapter = new TestFetchAdapter(strictFetch);
-      const response = await adapter.callFetch();
-      expect(response.ok).toBe(true);
-      const json = (await response.json()) as { data: { answer: number } };
-      expect(json.data).toEqual({ answer: 42 });
+      await expect(
+        adapter.execute<{ ok: boolean }>('query Test { ok }'),
+      ).resolves.toEqual({
+        data: { ok: true },
+        errors: undefined,
+        ok: true,
+      });
+      expect(createFetch).toHaveBeenCalledTimes(1);
+      expect(calls).toHaveLength(1);
+      expect(calls[0].thisArg).toBe(globalThis);
+      expect(calls[0].input).toBe('https://api.example/graphql');
     });
 
-    it('FetchAdapter from generated output binds fetch to globalThis at runtime', async () => {
-      // Simulate browser window.fetch: Chrome returns a Promise that rejects
-      // with TypeError when `this` is not the original Window.
-      function strictFetch(this: unknown): Promise<Response> {
-        if (this !== globalThis) {
-          return Promise.reject(new TypeError('Illegal invocation'));
-        }
-        return Promise.resolve(
-          new Response(JSON.stringify({ data: { answer: 99 } })),
-        );
-      }
-
-      // Mock createFetch so the default path also uses strictFetch.
-      const mockCreateFetch = () => strictFetch;
-
-      // ------------------------------------------------------------------
-      // Extract the ACTUAL fetchFn assignment expression from generated code
-      // (not a hand-copied replica). This closes the drift gap: if the
-      // template changes, the extraction fails or the runtime test breaks.
-      // ------------------------------------------------------------------
-      const generated = generateOrmClientFile().content;
-      const assignmentMatch = generated.match(
-        /this\.fetchFn\s*=\s*([^;]+);/,
-      );
-      expect(assignmentMatch).not.toBeNull();
-      const assignmentRhs = assignmentMatch![1].trim();
-      // e.g. "(fetchFn ?? createFetch()).bind(globalThis)"
-
-      // Build a minimal FetchAdapter using the EXTRACTED assignment from
-      // the generated source. new Function() gives us a JS-evaluable class
-      // whose constructor body is driven by the real template output.
-      const EvalFetchAdapter = new Function(
-        'createFetch',
-        `
-        return class FetchAdapter {
-          constructor(endpoint, headers, fetchFn) {
-            this.fetchFn = ${assignmentRhs};
-          }
-          callFetch() {
-            return this.fetchFn('http://test', { method: 'POST' });
-          }
-        };
-        `,
-      )(mockCreateFetch);
-
-      // --- Case 1: explicit strictFetch passed in ---
-      // With correct precedence (fetchFn ?? createFetch()).bind(globalThis),
-      // the provided strictFetch is bound to globalThis and succeeds.
-      const adapter = new (EvalFetchAdapter as new (
-        endpoint: string,
-        headers: Record<string, string> | undefined,
-        fetchFn?: typeof globalThis.fetch,
-      ) => { fetchFn: typeof globalThis.fetch; callFetch: () => Promise<Response> })(
-        'http://test',
-        {},
-        strictFetch,
-      );
-      const response = await adapter.callFetch();
-      expect(response.ok).toBe(true);
-      const json = (await response.json()) as { data: { answer: number } };
-      expect(json.data).toEqual({ answer: 99 });
-
-      // --- Case 2: no custom fetch (falls back to createFetch()) ---
-      const adapterDefault = new (EvalFetchAdapter as new (
-        endpoint: string,
-        headers: Record<string, string> | undefined,
-        fetchFn?: typeof globalThis.fetch,
-      ) => { fetchFn: typeof globalThis.fetch; callFetch: () => Promise<Response> })(
-        'http://test',
-        {},
+    it('executes with injected fetchFn bound to globalThis', async () => {
+      const { calls, fetchStub } = createThisSensitiveFetch({
+        data: { injected: true },
+      });
+      const createFetch = jest.fn(() => {
+        throw new Error('createFetch should not be called');
+      });
+      const FetchAdapter = loadGeneratedFetchAdapter(createFetch);
+      const adapter = new FetchAdapter(
+        'https://api.example/graphql',
         undefined,
-      );
-      const responseDefault = await adapterDefault.callFetch();
-      expect(responseDefault.ok).toBe(true);
-    });
-
-    it('wrong precedence fetchFn ?? createFetch().bind(globalThis) fails with strict fetch', async () => {
-      // This test proves the precedence matters at runtime.
-      // If the generated code used the wrong precedence
-      //   fetchFn ?? createFetch().bind(globalThis)
-      // then a provided fetchFn would NOT be bound to globalThis.
-      function strictFetch(this: unknown): Promise<Response> {
-        if (this !== globalThis) {
-          return Promise.reject(new TypeError('Illegal invocation'));
-        }
-        return Promise.resolve(new Response('ok'));
-      }
-
-      const mockCreateFetch = () => strictFetch;
-
-      // WRONG precedence: .bind(globalThis) only applies to createFetch(),
-      // not to the provided fetchFn.
-      const WrongPrecedenceAdapter = new Function(
-        'createFetch',
-        `
-        return class {
-          constructor(endpoint, headers, fetchFn) {
-            this.fetchFn = fetchFn ?? createFetch().bind(globalThis);
-          }
-          callFetch() {
-            return this.fetchFn('http://test', { method: 'POST' });
-          }
-        };
-        `,
-      )(mockCreateFetch);
-
-      const adapter = new (WrongPrecedenceAdapter as new (
-        endpoint: string,
-        headers: Record<string, string> | undefined,
-        fetchFn?: typeof globalThis.fetch,
-      ) => { callFetch: () => Promise<Response> })(
-        'http://test',
-        {},
-        strictFetch,
+        fetchStub,
       );
 
-      await expect(adapter.callFetch()).rejects.toThrow('Illegal invocation');
+      await expect(
+        adapter.execute<{ injected: boolean }>('query Test { injected }'),
+      ).resolves.toEqual({
+        data: { injected: true },
+        errors: undefined,
+        ok: true,
+      });
+      expect(createFetch).not.toHaveBeenCalled();
+      expect(calls).toHaveLength(1);
+      expect(calls[0].thisArg).toBe(globalThis);
     });
   });
 
