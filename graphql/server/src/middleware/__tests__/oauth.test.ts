@@ -15,6 +15,7 @@ jest.mock('@constructive-io/oauth', () => ({
 jest.mock('pg-cache', () => ({
   getPgPool: jest.fn().mockReturnValue({
     query: jest.fn(),
+    connect: jest.fn(),
   }),
 }));
 
@@ -88,7 +89,15 @@ describe('OAuth Middleware', () => {
         mockQuery.mockResolvedValueOnce(response);
       }
     });
-    (getPgPool as jest.Mock).mockReturnValue({ query: mockQuery });
+    // Create a mock client for pool.connect()
+    const mockClient = {
+      query: mockQuery,
+      release: jest.fn(),
+    };
+    (getPgPool as jest.Mock).mockReturnValue({
+      query: mockQuery,
+      connect: jest.fn().mockResolvedValue(mockClient),
+    });
     return mockQuery;
   };
 
@@ -403,14 +412,24 @@ describe('OAuth Middleware', () => {
       };
       (OAuthClient as jest.Mock).mockImplementation(() => mockOAuthClient);
 
-      // Query 1: getEncryptedSecretsSchema
-      // Query 2: getIdentityProvider (success)
-      // Query 3: sign_in_identity throws NOT_FOUND
-      const mockQuery = jest.fn()
-        .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
-        .mockResolvedValueOnce({ rows: [mockProviderRow] })
+      // Query 1: getEncryptedSecretsSchema (pool.query)
+      // Query 2: getIdentityProvider (pool.query)
+      // Query 3: set_config for JWT context (dbClient.query)
+      // Query 4: sign_in_identity throws NOT_FOUND (dbClient.query)
+      const mockClientQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{}] }) // set_config
         .mockRejectedValueOnce(new Error('IDENTITY_ACCOUNT_NOT_FOUND'));
-      (getPgPool as jest.Mock).mockReturnValue({ query: mockQuery });
+      const mockClient = {
+        query: mockClientQuery,
+        release: jest.fn(),
+      };
+      const mockPoolQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
+        .mockResolvedValueOnce({ rows: [mockProviderRow] });
+      (getPgPool as jest.Mock).mockReturnValue({
+        query: mockPoolQuery,
+        connect: jest.fn().mockResolvedValue(mockClient),
+      });
 
       const router = createOAuthRoutes(mockOpts as any);
 
@@ -447,7 +466,7 @@ describe('OAuth Middleware', () => {
       );
     });
 
-    it('allows signup with verified email', async () => {
+    it('allows signup with verified email (same-origin - cookie mode)', async () => {
       const validState = createValidState();
 
       // Mock OAuthClient to return verified email
@@ -465,13 +484,14 @@ describe('OAuth Middleware', () => {
       };
       (OAuthClient as jest.Mock).mockImplementation(() => mockOAuthClient);
 
-      // Query 1: getEncryptedSecretsSchema
-      // Query 2: getIdentityProvider
-      // Query 3: sign_in_identity throws NOT_FOUND
-      // Query 4: sign_up_identity succeeds
-      const mockQuery = jest.fn()
-        .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
-        .mockResolvedValueOnce({ rows: [mockProviderRow] })
+      // Query 1: getEncryptedSecretsSchema (pool.query)
+      // Query 2: getIdentityProvider (pool.query)
+      // Query 3: set_config for JWT context (dbClient.query)
+      // Query 4: sign_in_identity throws NOT_FOUND (dbClient.query)
+      // Query 5: sign_up_identity succeeds (dbClient.query)
+      // (No query 6 for same-origin - no generateCrossOriginToken)
+      const mockClientQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{}] }) // set_config
         .mockRejectedValueOnce(new Error('IDENTITY_ACCOUNT_NOT_FOUND'))
         .mockResolvedValueOnce({
           rows: [{
@@ -481,7 +501,17 @@ describe('OAuth Middleware', () => {
             mfa_required: false,
           }],
         });
-      (getPgPool as jest.Mock).mockReturnValue({ query: mockQuery });
+      const mockClient = {
+        query: mockClientQuery,
+        release: jest.fn(),
+      };
+      const mockPoolQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
+        .mockResolvedValueOnce({ rows: [mockProviderRow] });
+      (getPgPool as jest.Mock).mockReturnValue({
+        query: mockPoolQuery,
+        connect: jest.fn().mockResolvedValue(mockClient),
+      });
 
       const router = createOAuthRoutes(mockOpts as any);
 
@@ -510,12 +540,103 @@ describe('OAuth Middleware', () => {
 
       await handler(req, res, jest.fn());
 
+      // Same-origin: should set session cookie, no token in URL
       expect(res.cookie).toHaveBeenCalledWith(
         'constructive_session',
         'new-access-token',
         expect.any(Object)
       );
       expect(res.redirect).toHaveBeenCalledWith('/dashboard');
+    });
+
+    it('allows signup with verified email (cross-origin - token mode)', async () => {
+      // Create state with cross-origin redirect_uri
+      const crossOriginStatePayload = {
+        redirect_uri: 'http://frontend.example.com/auth/callback',
+        provider: 'google',
+        nonce: crypto.randomBytes(16).toString('hex'),
+        exp: Date.now() + 10 * 60 * 1000,
+      };
+      const json = JSON.stringify(crossOriginStatePayload);
+      const sig = crypto.createHmac('sha256', 'test-secret-key-for-testing').update(json).digest('base64url');
+      const crossOriginState = Buffer.from(json).toString('base64url') + '.' + sig;
+
+      const mockOAuthClient = {
+        getAuthorizationUrl: jest.fn(),
+        handleCallback: jest.fn().mockResolvedValue({
+          provider: 'google',
+          providerId: '123456',
+          email: 'user@example.com',
+          emailVerified: true,
+          name: 'User',
+          picture: null,
+          raw: {},
+        }),
+      };
+      (OAuthClient as jest.Mock).mockImplementation(() => mockOAuthClient);
+
+      // Query 1: getEncryptedSecretsSchema (pool.query)
+      // Query 2: getIdentityProvider (pool.query)
+      // Query 6: generateCrossOriginToken UPDATE (pool.query, cross-origin only)
+      const mockPoolQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
+        .mockResolvedValueOnce({ rows: [mockProviderRow] })
+        .mockResolvedValueOnce({ rows: [{ id: 'credential-id' }] });
+      // Query 3: set_config for JWT context (dbClient.query)
+      // Query 4: sign_in_identity throws NOT_FOUND (dbClient.query)
+      // Query 5: sign_up_identity succeeds (dbClient.query)
+      const mockClientQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{}] }) // set_config
+        .mockRejectedValueOnce(new Error('IDENTITY_ACCOUNT_NOT_FOUND'))
+        .mockResolvedValueOnce({
+          rows: [{
+            access_token: 'new-access-token',
+            user_id: 'user-123',
+            out_device_token: null,
+            mfa_required: false,
+          }],
+        });
+      const mockClient = {
+        query: mockClientQuery,
+        release: jest.fn(),
+      };
+      (getPgPool as jest.Mock).mockReturnValue({
+        query: mockPoolQuery,
+        connect: jest.fn().mockResolvedValue(mockClient),
+      });
+
+      const router = createOAuthRoutes(mockOpts as any);
+
+      const req = {
+        ...mockRequestHelpers,
+        params: { provider: 'google' },
+        query: { code: 'auth-code', state: crossOriginState },
+        cookies: { oauth_state: crossOriginState },
+        api: {
+          rlsModule: { privateSchema: { schemaName: 'auth_private' } },
+          dbname: 'tenant_db',
+          authSettings: {},
+        },
+      } as unknown as Request;
+
+      const res = {
+        clearCookie: jest.fn(),
+        cookie: jest.fn(),
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      const callbackRoute = router.stack.find(
+        (layer: any) => layer.route?.path === '/:provider/callback'
+      );
+      const handler = callbackRoute!.route.stack[0].handle;
+
+      await handler(req, res, jest.fn());
+
+      // Cross-origin: should NOT set session cookie, should redirect with token
+      expect(res.cookie).not.toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('http://frontend.example.com/auth/callback?token=')
+      );
     });
   });
 
@@ -537,12 +658,15 @@ describe('OAuth Middleware', () => {
       };
       (OAuthClient as jest.Mock).mockImplementation(() => mockOAuthClient);
 
-      // Query 1: getEncryptedSecretsSchema
-      // Query 2: getIdentityProvider
-      // Query 3: sign_in_identity returns MFA required
-      const mockQuery = jest.fn()
+      // Query 1: getEncryptedSecretsSchema (pool.query)
+      // Query 2: getIdentityProvider (pool.query)
+      const mockPoolQuery = jest.fn()
         .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
-        .mockResolvedValueOnce({ rows: [mockProviderRow] })
+        .mockResolvedValueOnce({ rows: [mockProviderRow] });
+      // Query 3: set_config for JWT context (dbClient.query)
+      // Query 4: sign_in_identity returns MFA required (dbClient.query)
+      const mockClientQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{}] }) // set_config
         .mockResolvedValueOnce({
           rows: [{
             mfa_required: true,
@@ -550,7 +674,14 @@ describe('OAuth Middleware', () => {
             user_id: 'user-123',
           }],
         });
-      (getPgPool as jest.Mock).mockReturnValue({ query: mockQuery });
+      const mockClient = {
+        query: mockClientQuery,
+        release: jest.fn(),
+      };
+      (getPgPool as jest.Mock).mockReturnValue({
+        query: mockPoolQuery,
+        connect: jest.fn().mockResolvedValue(mockClient),
+      });
 
       const router = createOAuthRoutes(mockOpts as any);
 
@@ -606,9 +737,16 @@ describe('OAuth Middleware', () => {
       };
       (OAuthClient as jest.Mock).mockImplementation(() => mockOAuthClient);
 
-      const mockQuery = jest.fn()
+      // Query 1: getEncryptedSecretsSchema (pool.query)
+      // Query 2: getIdentityProvider (pool.query)
+      const mockPoolQuery = jest.fn()
         .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
-        .mockResolvedValueOnce({ rows: [mockProviderRow] })
+        .mockResolvedValueOnce({ rows: [mockProviderRow] });
+      // Query 3: set_config for JWT context (dbClient.query)
+      // Query 4: sign_in_identity succeeds (dbClient.query)
+      // (No query 5 for same-origin - no generateCrossOriginToken)
+      const mockClientQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{}] }) // set_config
         .mockResolvedValueOnce({
           rows: [{
             access_token: 'tenant-access-token',
@@ -617,7 +755,14 @@ describe('OAuth Middleware', () => {
             mfa_required: false,
           }],
         });
-      (getPgPool as jest.Mock).mockReturnValue({ query: mockQuery });
+      const mockClient = {
+        query: mockClientQuery,
+        release: jest.fn(),
+      };
+      (getPgPool as jest.Mock).mockReturnValue({
+        query: mockPoolQuery,
+        connect: jest.fn().mockResolvedValue(mockClient),
+      });
 
       const router = createOAuthRoutes(mockOpts as any);
 
@@ -670,9 +815,16 @@ describe('OAuth Middleware', () => {
       };
       (OAuthClient as jest.Mock).mockImplementation(() => mockOAuthClient);
 
-      const mockQuery = jest.fn()
+      // Query 1: getEncryptedSecretsSchema (pool.query)
+      // Query 2: getIdentityProvider (pool.query)
+      const mockPoolQuery = jest.fn()
         .mockResolvedValueOnce({ rows: [{ encrypted_schema: 'test_encrypted' }] })
-        .mockResolvedValueOnce({ rows: [mockProviderRow] })
+        .mockResolvedValueOnce({ rows: [mockProviderRow] });
+      // Query 3: set_config for JWT context (dbClient.query)
+      // Query 4: sign_in_identity succeeds (dbClient.query)
+      // (No query 5 for same-origin - no generateCrossOriginToken)
+      const mockClientQuery = jest.fn()
+        .mockResolvedValueOnce({ rows: [{}] }) // set_config
         .mockResolvedValueOnce({
           rows: [{
             access_token: 'tenant-access-token',
@@ -681,7 +833,14 @@ describe('OAuth Middleware', () => {
             mfa_required: false,
           }],
         });
-      (getPgPool as jest.Mock).mockReturnValue({ query: mockQuery });
+      const mockClient = {
+        query: mockClientQuery,
+        release: jest.fn(),
+      };
+      (getPgPool as jest.Mock).mockReturnValue({
+        query: mockPoolQuery,
+        connect: jest.fn().mockResolvedValue(mockClient),
+      });
 
       const router = createOAuthRoutes(mockOpts as any);
 
@@ -711,7 +870,7 @@ describe('OAuth Middleware', () => {
       await handler(req, res, jest.fn());
 
       // Second query is getIdentityProvider which uses custom_auth_schema
-      expect(mockQuery).toHaveBeenCalledWith(
+      expect(mockPoolQuery).toHaveBeenCalledWith(
         expect.stringContaining('"custom_auth_schema".identity_providers'),
         expect.any(Array)
       );
