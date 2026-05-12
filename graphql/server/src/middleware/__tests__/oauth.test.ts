@@ -100,8 +100,8 @@ describe('OAuth Middleware', () => {
   describe('createOAuthRoutes', () => {
     it('always creates routes (providers come from database)', () => {
       const router = createOAuthRoutes(mockOpts as any);
-      // Should have 3 routes: /providers, /:provider, /:provider/callback
-      expect(router.stack.length).toBe(3);
+      // Should have 4 routes: /providers, /error, /:provider, /:provider/callback
+      expect(router.stack.length).toBe(4);
     });
   });
 
