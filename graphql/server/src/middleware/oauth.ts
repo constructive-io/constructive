@@ -256,8 +256,8 @@ async function callSignUpIdentity(
     SELECT * FROM "${privateSchema}".sign_up_identity(
       $1::text,
       $2::text,
-      $3::jsonb,
-      $4::text,
+      $3::text,
+      $4::jsonb,
       'access_token'::text
     )
   `;
@@ -265,8 +265,8 @@ async function callSignUpIdentity(
   const result = await pool.query(sql, [
     profile.provider,
     profile.providerId,
-    JSON.stringify(details),
     profile.email,
+    JSON.stringify(details),
   ]);
 
   return result.rows[0] || {};
@@ -315,6 +315,12 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       log.error('[oauth] Failed to fetch providers:', error);
       res.json({ providers: [] });
     }
+  });
+
+  // GET /auth/error - Error page (must be before /:provider to avoid conflict)
+  // Pass to next middleware stack (outside this router) for frontend to handle
+  router.get('/error', (req: Request, res: Response, next) => {
+    next('router');
   });
 
   // GET /auth/:provider - Initiate OAuth flow
