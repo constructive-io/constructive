@@ -3,7 +3,15 @@ import { Parser } from 'csv-to-pg';
 import { getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
 
-import { FieldType, TableConfig, META_TABLE_CONFIG } from './export-utils';
+import {
+  FieldType,
+  TableConfig,
+  META_TABLE_CONFIG,
+  META_TABLE_ORDER,
+  EXPORT_SCHEMAS,
+  EXPORT_BLACKLIST,
+  mapPgTypeToFieldType
+} from './export-utils';
 
 /**
  * Query actual columns from information_schema for a given table.
@@ -127,91 +135,75 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   };
 
   // =============================================================================
-  // metaschema_public tables
+  // Phase 1: Export all configured tables in META_TABLE_ORDER
   // =============================================================================
-  await queryAndParse('database', `SELECT * FROM metaschema_public.database WHERE id = $1 ORDER BY id`);
-  await queryAndParse('schema', `SELECT * FROM metaschema_public.schema WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('function', `SELECT * FROM metaschema_public.function WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('spatial_relation', `SELECT * FROM metaschema_public.spatial_relation WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('table', `SELECT * FROM metaschema_public.table WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('field', `SELECT * FROM metaschema_public.field WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('policy', `SELECT * FROM metaschema_public.policy WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('index', `SELECT * FROM metaschema_public.index WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('trigger', `SELECT * FROM metaschema_public.trigger WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('trigger_function', `SELECT * FROM metaschema_public.trigger_function WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('rls_function', `SELECT * FROM metaschema_public.rls_function WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('foreign_key_constraint', `SELECT * FROM metaschema_public.foreign_key_constraint WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('primary_key_constraint', `SELECT * FROM metaschema_public.primary_key_constraint WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('unique_constraint', `SELECT * FROM metaschema_public.unique_constraint WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('check_constraint', `SELECT * FROM metaschema_public.check_constraint WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('full_text_search', `SELECT * FROM metaschema_public.full_text_search WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('schema_grant', `SELECT * FROM metaschema_public.schema_grant WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('table_grant', `SELECT * FROM metaschema_public.table_grant WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('default_privilege', `SELECT * FROM metaschema_public.default_privilege WHERE database_id = $1 ORDER BY id`);
+  for (const key of META_TABLE_ORDER) {
+    const config = META_TABLE_CONFIG[key];
+    if (!config) continue;
+    const filter_col = key === 'database' ? 'id' : 'database_id';
+    await queryAndParse(
+      key,
+      `SELECT * FROM ${config.schema}.${config.table} WHERE ${filter_col} = $1 ORDER BY id`
+    );
+  }
 
   // =============================================================================
-  // services_public tables
+  // Phase 2: Auto-discover tables not yet in META_TABLE_ORDER
+  // New tables in the export schemas are automatically picked up without
+  // any config changes. Blacklisted tables are skipped.
   // =============================================================================
-  await queryAndParse('domains', `SELECT * FROM services_public.domains WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('sites', `SELECT * FROM services_public.sites WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('apis', `SELECT * FROM services_public.apis WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('apps', `SELECT * FROM services_public.apps WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('site_modules', `SELECT * FROM services_public.site_modules WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('site_themes', `SELECT * FROM services_public.site_themes WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('site_metadata', `SELECT * FROM services_public.site_metadata WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('api_modules', `SELECT * FROM services_public.api_modules WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('api_extensions', `SELECT * FROM services_public.api_extensions WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('api_schemas', `SELECT * FROM services_public.api_schemas WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('database_settings', `SELECT * FROM services_public.database_settings WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('api_settings', `SELECT * FROM services_public.api_settings WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('rls_settings', `SELECT * FROM services_public.rls_settings WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('cors_settings', `SELECT * FROM services_public.cors_settings WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('pubkey_settings', `SELECT * FROM services_public.pubkey_settings WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('webauthn_settings', `SELECT * FROM services_public.webauthn_settings WHERE database_id = $1 ORDER BY id`);
+  const configured_tables = new Set<string>(META_TABLE_ORDER as unknown as string[]);
 
-  // =============================================================================
-  // metaschema_modules_public tables
-  // =============================================================================
-  await queryAndParse('rls_module', `SELECT * FROM metaschema_modules_public.rls_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('user_auth_module', `SELECT * FROM metaschema_modules_public.user_auth_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('memberships_module', `SELECT * FROM metaschema_modules_public.memberships_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('permissions_module', `SELECT * FROM metaschema_modules_public.permissions_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('limits_module', `SELECT * FROM metaschema_modules_public.limits_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('levels_module', `SELECT * FROM metaschema_modules_public.levels_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('users_module', `SELECT * FROM metaschema_modules_public.users_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('hierarchy_module', `SELECT * FROM metaschema_modules_public.hierarchy_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('membership_types_module', `SELECT * FROM metaschema_modules_public.membership_types_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('invites_module', `SELECT * FROM metaschema_modules_public.invites_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('emails_module', `SELECT * FROM metaschema_modules_public.emails_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('sessions_module', `SELECT * FROM metaschema_modules_public.sessions_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('secrets_module', `SELECT * FROM metaschema_modules_public.secrets_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('profiles_module', `SELECT * FROM metaschema_modules_public.profiles_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('encrypted_secrets_module', `SELECT * FROM metaschema_modules_public.encrypted_secrets_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('connected_accounts_module', `SELECT * FROM metaschema_modules_public.connected_accounts_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('phone_numbers_module', `SELECT * FROM metaschema_modules_public.phone_numbers_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('crypto_addresses_module', `SELECT * FROM metaschema_modules_public.crypto_addresses_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('crypto_auth_module', `SELECT * FROM metaschema_modules_public.crypto_auth_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('field_module', `SELECT * FROM metaschema_modules_public.field_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('table_module', `SELECT * FROM metaschema_modules_public.table_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('table_template_module', `SELECT * FROM metaschema_modules_public.table_template_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('secure_table_provision', `SELECT * FROM metaschema_modules_public.secure_table_provision WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('uuid_module', `SELECT * FROM metaschema_modules_public.uuid_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('relation_provision', `SELECT * FROM metaschema_modules_public.relation_provision WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('entity_type_provision', `SELECT * FROM metaschema_modules_public.entity_type_provision WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('rate_limits_module', `SELECT * FROM metaschema_modules_public.rate_limits_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('storage_module', `SELECT * FROM metaschema_modules_public.storage_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('billing_module', `SELECT * FROM metaschema_modules_public.billing_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('billing_provider_module', `SELECT * FROM metaschema_modules_public.billing_provider_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('devices_module', `SELECT * FROM metaschema_modules_public.devices_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('identity_providers_module', `SELECT * FROM metaschema_modules_public.identity_providers_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('notifications_module', `SELECT * FROM metaschema_modules_public.notifications_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('plans_module', `SELECT * FROM metaschema_modules_public.plans_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('realtime_module', `SELECT * FROM metaschema_modules_public.realtime_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('session_secrets_module', `SELECT * FROM metaschema_modules_public.session_secrets_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('webauthn_auth_module', `SELECT * FROM metaschema_modules_public.webauthn_auth_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('webauthn_credentials_module', `SELECT * FROM metaschema_modules_public.webauthn_credentials_module WHERE database_id = $1 ORDER BY id`);
+  const discovered = await pool.query(`
+    SELECT table_schema, table_name
+    FROM information_schema.tables
+    WHERE table_schema = ANY($1) AND table_type = 'BASE TABLE'
+    ORDER BY table_schema, table_name
+  `, [EXPORT_SCHEMAS as unknown as string[]]);
+
+  for (const row of discovered.rows) {
+    const table_name: string = row.table_name;
+    const table_schema: string = row.table_schema;
+
+    if (configured_tables.has(table_name) || EXPORT_BLACKLIST.has(table_name)) {
+      continue;
+    }
+
+    // Auto-infer field types from information_schema
+    const columns = await getTableColumns(pool, table_schema, table_name);
+    if (columns.size === 0) continue;
+
+    const fields: Record<string, FieldType> = {};
+    for (const [col_name, udt_name] of columns) {
+      fields[col_name] = mapPgTypeToFieldType(udt_name);
+    }
+
+    const auto_config: TableConfig = { schema: table_schema, table: table_name, fields };
+    const filter_col = columns.has('database_id') ? 'database_id' : 'id';
+
+    try {
+      const auto_parser = new Parser({
+        schema: auto_config.schema,
+        table: auto_config.table,
+        fields
+      });
+
+      const result = await pool.query(
+        `SELECT * FROM ${table_schema}.${table_name} WHERE ${filter_col} = $1 ORDER BY id`,
+        [database_id]
+      );
+      if (result.rows.length) {
+        const parsed = await auto_parser.parse(result.rows);
+        if (parsed) {
+          sql[table_name] = parsed;
+        }
+      }
+    } catch (err: unknown) {
+      const pg_error = err as { code?: string };
+      if (pg_error.code === '42P01') continue;
+      throw err;
+    }
+  }
 
   return sql;
 };

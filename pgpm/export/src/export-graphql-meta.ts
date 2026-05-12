@@ -7,7 +7,7 @@
  */
 import { Parser } from 'csv-to-pg';
 
-import { FieldType, META_TABLE_CONFIG } from './export-utils';
+import { FieldType, META_TABLE_CONFIG, META_TABLE_ORDER } from './export-utils';
 import { GraphQLClient } from './graphql-client';
 import {
   buildFieldsFragment,
@@ -116,95 +116,20 @@ export const exportGraphQLMeta = async ({
     }
   };
 
-  // Batch queries by schema group — independent HTTP requests run in parallel
-  // within each group for significant speedup over sequential awaits.
+  // Group tables by schema for parallel execution within each group.
+  // Uses META_TABLE_ORDER as the single source of truth for which tables to export.
+  const by_schema = new Map<string, string[]>();
+  for (const key of META_TABLE_ORDER) {
+    const config = META_TABLE_CONFIG[key];
+    if (!config) continue;
+    const group = by_schema.get(config.schema) || [];
+    group.push(key);
+    by_schema.set(config.schema, group);
+  }
 
-  // metaschema_public tables
-  await Promise.all([
-    queryAndParse('database'),
-    queryAndParse('schema'),
-    queryAndParse('function'),
-    queryAndParse('spatial_relation'),
-    queryAndParse('table'),
-    queryAndParse('field'),
-    queryAndParse('policy'),
-    queryAndParse('index'),
-    queryAndParse('trigger'),
-    queryAndParse('trigger_function'),
-    queryAndParse('rls_function'),
-    queryAndParse('foreign_key_constraint'),
-    queryAndParse('primary_key_constraint'),
-    queryAndParse('unique_constraint'),
-    queryAndParse('check_constraint'),
-    queryAndParse('full_text_search'),
-    queryAndParse('schema_grant'),
-    queryAndParse('table_grant'),
-    queryAndParse('default_privilege')
-  ]);
-
-  // services_public tables
-  await Promise.all([
-    queryAndParse('domains'),
-    queryAndParse('sites'),
-    queryAndParse('apis'),
-    queryAndParse('apps'),
-    queryAndParse('site_modules'),
-    queryAndParse('site_themes'),
-    queryAndParse('site_metadata'),
-    queryAndParse('api_modules'),
-    queryAndParse('api_extensions'),
-    queryAndParse('api_schemas'),
-    queryAndParse('database_settings'),
-    queryAndParse('api_settings'),
-    queryAndParse('rls_settings'),
-    queryAndParse('cors_settings'),
-    queryAndParse('pubkey_settings'),
-    queryAndParse('webauthn_settings')
-  ]);
-
-  // metaschema_modules_public tables
-  await Promise.all([
-    queryAndParse('rls_module'),
-    queryAndParse('user_auth_module'),
-    queryAndParse('memberships_module'),
-    queryAndParse('permissions_module'),
-    queryAndParse('limits_module'),
-    queryAndParse('levels_module'),
-    queryAndParse('users_module'),
-    queryAndParse('hierarchy_module'),
-    queryAndParse('membership_types_module'),
-    queryAndParse('invites_module'),
-    queryAndParse('emails_module'),
-    queryAndParse('sessions_module'),
-    queryAndParse('secrets_module'),
-    queryAndParse('profiles_module'),
-    queryAndParse('encrypted_secrets_module'),
-    queryAndParse('connected_accounts_module'),
-    queryAndParse('phone_numbers_module'),
-    queryAndParse('crypto_addresses_module'),
-    queryAndParse('crypto_auth_module'),
-    queryAndParse('field_module'),
-    queryAndParse('table_module'),
-    queryAndParse('table_template_module'),
-    queryAndParse('secure_table_provision'),
-    queryAndParse('uuid_module'),
-    queryAndParse('default_ids_module'),
-    queryAndParse('denormalized_table_field'),
-    queryAndParse('relation_provision'),
-    queryAndParse('entity_type_provision'),
-    queryAndParse('rate_limits_module'),
-    queryAndParse('storage_module'),
-    queryAndParse('billing_module'),
-    queryAndParse('billing_provider_module'),
-    queryAndParse('devices_module'),
-    queryAndParse('identity_providers_module'),
-    queryAndParse('notifications_module'),
-    queryAndParse('plans_module'),
-    queryAndParse('realtime_module'),
-    queryAndParse('session_secrets_module'),
-    queryAndParse('webauthn_auth_module'),
-    queryAndParse('webauthn_credentials_module')
-  ]);
+  for (const [, keys] of by_schema) {
+    await Promise.all(keys.map(key => queryAndParse(key)));
+  }
 
   return sql;
 };
