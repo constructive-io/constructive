@@ -235,6 +235,28 @@ async function callSignInIdentity(
   return result.rows[0] || {};
 }
 
+async function generateCrossOriginToken(
+  pool: Pool,
+  privateSchema: string,
+  accessToken: string
+): Promise<string> {
+  const otToken = crypto.randomBytes(32).toString('base64url');
+
+  const sql = `
+    UPDATE "${privateSchema}".session_credentials
+    SET ot_token = $1
+    WHERE secret_hash = digest($2::text, 'sha256')
+    RETURNING id
+  `;
+
+  const result = await pool.query(sql, [otToken, accessToken]);
+  if (result.rows.length === 0) {
+    throw new Error('Failed to set cross-origin token');
+  }
+
+  return otToken;
+}
+
 async function callSignUpIdentity(
   pool: Pool,
   dbname: string,
@@ -471,16 +493,66 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       // Get device token from cookie
       const deviceToken = req.cookies[DEVICE_TOKEN_COOKIE_NAME] ?? null;
 
+      // Calculate target origin for cross-origin flow
+      const currentOrigin = getBaseUrl(req);
+      let targetOrigin: string;
+      try {
+        const redirectUrl = new URL(redirectUri, currentOrigin);
+        targetOrigin = redirectUrl.origin;
+      } catch {
+        targetOrigin = currentOrigin;
+      }
+
+      // Use a dedicated database client to ensure JWT context is available for sign_in_identity
+      // - user_agent: from browser request (same browser will call signInCrossOrigin)
+      // - origin: target origin (where the token will be exchanged)
+      const userAgent = req.get('user-agent') || '';
+      const dbClient = await pool.connect();
+
       let result: SignInIdentityResult;
 
       try {
-        // Try sign_in_identity first
-        result = await callSignInIdentity(pool, dbname, privateSchema, profile, deviceToken);
-      } catch (err: any) {
-        const errorMessage = err.message || '';
+        // Set JWT context on this connection (false = session-level, persists across queries)
+        await dbClient.query(`
+          SELECT set_config('jwt.claims.user_agent', $1, false),
+                 set_config('jwt.claims.origin', $2, false)
+        `, [userAgent, targetOrigin]);
 
-        // Handle IDENTITY_ACCOUNT_NOT_FOUND - try signup
-        if (errorMessage.includes('IDENTITY_ACCOUNT_NOT_FOUND')) {
+        // Try sign_in_identity first (using same client)
+        const details = {
+          provider: profile.provider,
+          sub: profile.providerId,
+          email: profile.email,
+          email_verified: profile.emailVerified,
+          name: profile.name,
+          picture: profile.picture,
+          raw_userinfo: profile.raw,
+        };
+
+        const signInSql = `
+          SELECT * FROM "${privateSchema}".sign_in_identity(
+            $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::text
+          )
+        `;
+
+        try {
+          const signInResult = await dbClient.query(signInSql, [
+            profile.provider,
+            profile.providerId,
+            JSON.stringify(details),
+            profile.email,
+            deviceToken,
+          ]);
+
+          result = signInResult.rows[0] || {};
+        } catch (err: any) {
+          const errorMessage = err.message || '';
+
+          // Handle IDENTITY_ACCOUNT_NOT_FOUND - try signup
+          if (!errorMessage.includes('IDENTITY_ACCOUNT_NOT_FOUND')) {
+            throw err;
+          }
+
           log.info(`[oauth] Account not found for ${profile.email}, attempting signup`);
 
           if (!allowSignup) {
@@ -488,6 +560,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
             const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
             errorUrl.searchParams.set('error', 'SIGNUP_DISABLED');
             errorUrl.searchParams.set('provider', provider);
+            dbClient.release();
             return res.redirect(errorUrl.toString());
           }
 
@@ -497,15 +570,28 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
             const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
             errorUrl.searchParams.set('error', 'EMAIL_NOT_VERIFIED');
             errorUrl.searchParams.set('provider', provider);
+            dbClient.release();
             return res.redirect(errorUrl.toString());
           }
 
-          // Call sign_up_identity
-          result = await callSignUpIdentity(pool, dbname, privateSchema, profile, deviceToken);
-        } else {
-          // Re-throw other errors
-          throw err;
+          // Call sign_up_identity (using same client with JWT context)
+          const signUpSql = `
+            SELECT * FROM "${privateSchema}".sign_up_identity(
+              $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text
+            )
+          `;
+
+          const signUpResult = await dbClient.query(signUpSql, [
+            profile.provider,
+            profile.providerId,
+            profile.email,
+            JSON.stringify(details),
+          ]);
+
+          result = signUpResult.rows[0] || {};
         }
+      } finally {
+        dbClient.release();
       }
 
       // Handle MFA required
@@ -517,26 +603,38 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         return res.redirect(mfaUrl.toString());
       }
 
-      // Success - set cookies and redirect
+      // Success
       if (!result.access_token) {
         throw new Error('No access token returned from sign_in_identity');
       }
 
-      // Set session cookie
-      const sessionConfig = getSessionCookieConfig(authSettings);
-      setSessionCookie(res, result.access_token, sessionConfig);
-      log.info(`[oauth] Session cookie set for ${profile.email}`);
+      // Determine if this is a cross-origin request
+      // Cookie mode and Token mode are mutually exclusive (Better Auth design)
+      const isCrossOrigin = targetOrigin !== currentOrigin;
 
-      // Set device token cookie if returned
-      if (result.out_device_token) {
-        const deviceConfig = getDeviceTokenCookieConfig(authSettings);
-        setDeviceTokenCookie(res, result.out_device_token, deviceConfig);
-        log.info(`[oauth] Device token cookie set for ${profile.email}`);
+      if (isCrossOrigin) {
+        // Cross-origin: Token mode only
+        // Generate one-time token for frontend to exchange via signInCrossOrigin
+        // Frontend stores access_token in localStorage
+        const otToken = await generateCrossOriginToken(pool, privateSchema, result.access_token);
+        const redirectUrl = new URL(redirectUri, currentOrigin);
+        redirectUrl.searchParams.set('token', otToken);
+        log.info(`[oauth] OAuth success for ${profile.email}, cross-origin redirect with one-time token`);
+        return res.redirect(redirectUrl.toString());
+      } else {
+        // Same-origin: Cookie mode only
+        // Set httpOnly cookies, no token in URL
+        const sessionConfig = getSessionCookieConfig(authSettings);
+        setSessionCookie(res, result.access_token, sessionConfig);
+
+        if (result.out_device_token) {
+          const deviceConfig = getDeviceTokenCookieConfig(authSettings);
+          setDeviceTokenCookie(res, result.out_device_token, deviceConfig);
+        }
+
+        log.info(`[oauth] OAuth success for ${profile.email}, same-origin redirect with cookie`);
+        return res.redirect(redirectUri);
       }
-
-      // Redirect to success URL
-      log.info(`[oauth] OAuth success for ${profile.email}, redirecting to ${redirectUri}`);
-      return res.redirect(redirectUri);
 
     } catch (error: any) {
       log.error(`[oauth] Callback failed for ${provider}:`, error);
