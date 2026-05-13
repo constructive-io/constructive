@@ -224,14 +224,6 @@ async function generateCrossOriginToken(
 // OAuth Routes
 // =============================================================================
 
-export interface OAuthRoutesConfig {
-  /** @deprecated baseUrl is now derived from request headers for multi-tenant support */
-  baseUrl?: string;
-  errorRedirectPath?: string;
-  allowSignup?: boolean;
-  requireVerifiedEmail?: boolean;
-}
-
 function getBaseUrl(req: Request): string {
   const protocol = req.protocol || 'http';
   const host = req.get('host') || 'localhost:3000';
@@ -240,7 +232,7 @@ function getBaseUrl(req: Request): string {
 
 export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   const router = Router();
-  const oauthConfig = (opts as any).oauth as OAuthRoutesConfig | undefined;
+  const oauthConfig = opts.oauth;
 
   const errorRedirectPath = oauthConfig?.errorRedirectPath ?? '/auth/error';
   const allowSignup = oauthConfig?.allowSignup ?? true;

@@ -21,6 +21,20 @@ import {
 import { LlmOptions } from './llm';
 
 /**
+ * OAuth routes configuration
+ */
+export interface OAuthRoutesConfig {
+  /** @deprecated baseUrl is now derived from request headers for multi-tenant support */
+  baseUrl?: string;
+  /** Path to redirect on error (default: /auth/error) */
+  errorRedirectPath?: string;
+  /** Allow signup via OAuth (default: true) */
+  allowSignup?: boolean;
+  /** Require verified email for OAuth signup (default: true) */
+  requireVerifiedEmail?: boolean;
+}
+
+/**
  * GraphQL-specific options for Constructive
  */
 export interface ConstructiveGraphQLOptions {
@@ -59,6 +73,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   jobs?: JobsConfig;
   /** LLM provider configuration (embeddings, chat, RAG) */
   llm?: LlmOptions;
+  /** OAuth routes configuration */
+  oauth?: OAuthRoutesConfig;
 }
 
 /**
