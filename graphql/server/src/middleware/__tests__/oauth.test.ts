@@ -61,11 +61,11 @@ describe('OAuth Middleware', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.OAUTH_STATE_SECRET = 'test-secret-key-for-testing';
+    process.env.OAUTH_SECRET = 'test-secret-key-for-testing';
   });
 
   afterEach(() => {
-    delete process.env.OAUTH_STATE_SECRET;
+    delete process.env.OAUTH_SECRET;
   });
 
   const createValidState = () => {
