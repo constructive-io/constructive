@@ -567,7 +567,6 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
 
       const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
       errorUrl.searchParams.set('error', 'CALLBACK_FAILED');
-      errorUrl.searchParams.set('message', error.message || 'Unknown error');
       errorUrl.searchParams.set('provider', provider);
       return res.redirect(errorUrl.toString());
     }
