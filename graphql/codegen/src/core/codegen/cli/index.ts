@@ -14,7 +14,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
-import { generateUtilsFile, generateNodeFetchFile, generateEntryPointFile, generateEmbedderFile } from './utils-generator';
+import { generateUtilsFile, generateEntryPointFile, generateEmbedderFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: Table[];
@@ -48,12 +48,7 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
       ? cliConfig.toolName
       : 'app';
 
-  // Use top-level nodeHttpAdapter from config (auto-enabled for CLI by generate.ts)
-  const useNodeHttpAdapter = !!config.nodeHttpAdapter;
-
-  const executorFile = generateExecutorFile(toolName, {
-    nodeHttpAdapter: useNodeHttpAdapter,
-  });
+  const executorFile = generateExecutorFile(toolName);
   files.push(executorFile);
 
   const utilsFile = generateUtilsFile();
@@ -65,11 +60,6 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
   );
   if (hasAnyEmbeddings) {
     files.push(generateEmbedderFile());
-  }
-
-  // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
-  if (useNodeHttpAdapter) {
-    files.push(generateNodeFetchFile());
   }
 
   const contextFile = generateContextCommand(toolName);
@@ -139,7 +129,7 @@ export interface GenerateMultiTargetCliOptions {
   toolName: string;
   builtinNames?: BuiltinNames;
   targets: MultiTargetCliTarget[];
-  /** Enable NodeHttpAdapter for *.localhost subdomain routing */
+  /** @deprecated NodeHttpAdapter removed; createClient uses @constructive-io/fetch */
   nodeHttpAdapter?: boolean;
   /** Generate a runnable index.ts entry point */
   entryPoint?: boolean;
@@ -180,9 +170,7 @@ export function generateMultiTargetCli(
     endpoint: t.endpoint,
     ormImportPath: t.ormImportPath,
   }));
-  const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs, {
-    nodeHttpAdapter: !!options.nodeHttpAdapter,
-  });
+  const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs);
   files.push(executorFile);
 
   const utilsFile = generateUtilsFile();
@@ -196,11 +184,6 @@ export function generateMultiTargetCli(
   );
   if (hasAnyMtEmbeddings) {
     files.push(generateEmbedderFile());
-  }
-
-  // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
-  if (options.nodeHttpAdapter) {
-    files.push(generateNodeFetchFile());
   }
 
   const contextFile = generateMultiTargetContextCommand(

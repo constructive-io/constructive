@@ -126,11 +126,6 @@ export async function generate(
   const runOrm =
     runReactQuery || !!config.cli || (options.orm !== undefined ? !!options.orm : false);
 
-  // Auto-enable nodeHttpAdapter when CLI is enabled, unless explicitly set to false
-  const useNodeHttpAdapter =
-    options.nodeHttpAdapter === true ||
-    (runCli && options.nodeHttpAdapter !== false);
-
   const schemaEnabled = !!options.schema?.enabled;
 
   if (!schemaEnabled && !runReactQuery && !runOrm && !runCli) {
@@ -280,7 +275,7 @@ export async function generate(
         mutations: customOperations.mutations,
         typeRegistry: customOperations.typeRegistry,
       },
-      config: { ...config, nodeHttpAdapter: useNodeHttpAdapter },
+      config,
       sharedTypesPath: bothEnabled ? '..' : undefined,
     });
     filesToWrite.push(
@@ -289,16 +284,6 @@ export async function generate(
         path: path.posix.join('orm', file.path),
       })),
     );
-
-    // Generate NodeHttpAdapter in ORM output when enabled
-    if (useNodeHttpAdapter) {
-      const { generateNodeFetchFile } = await import('./codegen/cli/utils-generator');
-      const nodeFetchFile = generateNodeFetchFile();
-      filesToWrite.push({
-        path: path.posix.join('orm', nodeFetchFile.fileName),
-        content: nodeFetchFile.content,
-      });
-    }
   }
 
   // Generate CLI commands
@@ -310,7 +295,7 @@ export async function generate(
         queries: customOperations.queries,
         mutations: customOperations.mutations,
       },
-      config: { ...config, nodeHttpAdapter: useNodeHttpAdapter },
+      config,
       typeRegistry: customOperations.typeRegistry,
     });
     filesToWrite.push(
@@ -707,18 +692,11 @@ export async function generateMulti(
   if (useUnifiedCli && cliTargets.length > 0 && !dryRun) {
     const cliConfig = typeof unifiedCli === 'object' ? unifiedCli : {};
     const toolName = cliConfig.toolName ?? 'app';
-    // Auto-enable nodeHttpAdapter for unified CLI unless explicitly disabled
-    // Check first target config for explicit nodeHttpAdapter setting
     const firstTargetConfig = configs[names[0]];
-    const multiNodeHttpAdapter =
-      firstTargetConfig?.nodeHttpAdapter === true ||
-      (firstTargetConfig?.nodeHttpAdapter !== false);
-
     const { files } = generateMultiTargetCli({
       toolName,
       builtinNames: cliConfig.builtinNames,
       targets: cliTargets,
-      nodeHttpAdapter: multiNodeHttpAdapter,
       entryPoint: cliConfig.entryPoint,
     });
 
