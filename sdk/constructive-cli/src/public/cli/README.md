@@ -164,9 +164,9 @@ csdk auth set-token <your-token>
 | `app-limit-event` | appLimitEvent CRUD operations |
 | `org-limit-event` | orgLimitEvent CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
-| `database-setting` | databaseSetting CRUD operations |
 | `plans-module` | plansModule CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
+| `database-setting` | databaseSetting CRUD operations |
 | `billing-module` | billingModule CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `user` | user CRUD operations |
@@ -1801,10 +1801,11 @@ CRUD operations for ApiSetting records.
 | `enableLtree` | Boolean |
 | `enableLlm` | Boolean |
 | `enableRealtime` | Boolean |
+| `enableBulk` | Boolean |
 | `options` | JSON |
 
 **Required create fields:** `databaseId`, `apiId`
-**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `options`
+**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `options`
 
 ### `connected-accounts-module`
 
@@ -4520,40 +4521,6 @@ CRUD operations for RlsModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
 
-### `database-setting`
-
-CRUD operations for DatabaseSetting records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all databaseSetting records |
-| `find-first` | Find first matching databaseSetting record |
-| `get` | Get a databaseSetting by id |
-| `create` | Create a new databaseSetting |
-| `update` | Update an existing databaseSetting |
-| `delete` | Delete a databaseSetting |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `enableAggregates` | Boolean |
-| `enablePostgis` | Boolean |
-| `enableSearch` | Boolean |
-| `enableDirectUploads` | Boolean |
-| `enablePresignedUploads` | Boolean |
-| `enableManyToMany` | Boolean |
-| `enableConnectionFilter` | Boolean |
-| `enableLtree` | Boolean |
-| `enableLlm` | Boolean |
-| `enableRealtime` | Boolean |
-| `options` | JSON |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `options`
-
 ### `plans-module`
 
 CRUD operations for PlansModule records.
@@ -4620,6 +4587,41 @@ CRUD operations for SqlAction records.
 | `actorId` | UUID |
 
 **Optional create fields (backend defaults):** `name`, `databaseId`, `deploy`, `deps`, `payload`, `content`, `revert`, `verify`, `action`, `actionId`, `actorId`
+
+### `database-setting`
+
+CRUD operations for DatabaseSetting records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseSetting records |
+| `find-first` | Find first matching databaseSetting record |
+| `get` | Get a databaseSetting by id |
+| `create` | Create a new databaseSetting |
+| `update` | Update an existing databaseSetting |
+| `delete` | Delete a databaseSetting |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `enableAggregates` | Boolean |
+| `enablePostgis` | Boolean |
+| `enableSearch` | Boolean |
+| `enableDirectUploads` | Boolean |
+| `enablePresignedUploads` | Boolean |
+| `enableManyToMany` | Boolean |
+| `enableConnectionFilter` | Boolean |
+| `enableLtree` | Boolean |
+| `enableLlm` | Boolean |
+| `enableRealtime` | Boolean |
+| `enableBulk` | Boolean |
+| `options` | JSON |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `options`
 
 ### `billing-module`
 

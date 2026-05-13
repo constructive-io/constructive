@@ -29,6 +29,7 @@ const fieldSchema: FieldSchema = {
   enableLtree: 'boolean',
   enableLlm: 'boolean',
   enableRealtime: 'boolean',
+  enableBulk: 'boolean',
   options: 'json',
 };
 const usage =
@@ -95,6 +96,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       enableLtree: true,
       enableLlm: true,
       enableRealtime: true,
+      enableBulk: true,
       options: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -129,6 +131,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       enableLtree: true,
       enableLlm: true,
       enableRealtime: true,
+      enableBulk: true,
       options: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -175,6 +178,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           enableLtree: true,
           enableLlm: true,
           enableRealtime: true,
+          enableBulk: true,
           options: true,
         },
       })
@@ -274,6 +278,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'enableBulk',
+        message: 'enableBulk',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'options',
         message: 'options',
@@ -299,6 +310,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           enableLtree: cleanedData.enableLtree,
           enableLlm: cleanedData.enableLlm,
           enableRealtime: cleanedData.enableRealtime,
+          enableBulk: cleanedData.enableBulk,
           options: cleanedData.options,
         },
         select: {
@@ -315,6 +327,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           enableLtree: true,
           enableLlm: true,
           enableRealtime: true,
+          enableBulk: true,
           options: true,
         },
       })
@@ -420,6 +433,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'enableBulk',
+        message: 'enableBulk',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'options',
         message: 'options',
@@ -448,6 +468,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           enableLtree: cleanedData.enableLtree,
           enableLlm: cleanedData.enableLlm,
           enableRealtime: cleanedData.enableRealtime,
+          enableBulk: cleanedData.enableBulk,
           options: cleanedData.options,
         },
         select: {
@@ -464,6 +485,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           enableLtree: true,
           enableLlm: true,
           enableRealtime: true,
+          enableBulk: true,
           options: true,
         },
       })
