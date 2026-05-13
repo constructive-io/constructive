@@ -198,47 +198,6 @@ interface SignInIdentityResult {
   out_device_token?: string;
 }
 
-interface SignUpIdentityResult extends SignInIdentityResult {}
-
-async function callSignInIdentity(
-  pool: Pool,
-  dbname: string,
-  privateSchema: string,
-  profile: OAuthProfile,
-  deviceToken: string | null
-): Promise<SignInIdentityResult> {
-  const details = {
-    provider: profile.provider,
-    sub: profile.providerId,
-    email: profile.email,
-    email_verified: profile.emailVerified,
-    name: profile.name,
-    picture: profile.picture,
-    raw_userinfo: profile.raw,
-  };
-
-  const sql = `
-    SELECT * FROM "${privateSchema}".sign_in_identity(
-      $1::text,
-      $2::text,
-      $3::jsonb,
-      $4::text,
-      'access_token'::text,
-      $5::text
-    )
-  `;
-
-  const result = await pool.query(sql, [
-    profile.provider,
-    profile.providerId,
-    JSON.stringify(details),
-    profile.email,
-    deviceToken,
-  ]);
-
-  return result.rows[0] || {};
-}
-
 async function generateCrossOriginToken(
   pool: Pool,
   privateSchema: string,
@@ -259,43 +218,6 @@ async function generateCrossOriginToken(
   }
 
   return otToken;
-}
-
-async function callSignUpIdentity(
-  pool: Pool,
-  dbname: string,
-  privateSchema: string,
-  profile: OAuthProfile,
-  deviceToken: string | null
-): Promise<SignUpIdentityResult> {
-  const details = {
-    provider: profile.provider,
-    sub: profile.providerId,
-    email: profile.email,
-    email_verified: profile.emailVerified,
-    name: profile.name,
-    picture: profile.picture,
-    raw_userinfo: profile.raw,
-  };
-
-  const sql = `
-    SELECT * FROM "${privateSchema}".sign_up_identity(
-      $1::text,
-      $2::text,
-      $3::text,
-      $4::jsonb,
-      'access_token'::text
-    )
-  `;
-
-  const result = await pool.query(sql, [
-    profile.provider,
-    profile.providerId,
-    profile.email,
-    JSON.stringify(details),
-  ]);
-
-  return result.rows[0] || {};
 }
 
 // =============================================================================
