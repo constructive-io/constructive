@@ -1045,6 +1045,8 @@ export interface ApiSetting {
   enableLlm?: boolean | null;
   /** Override: enable realtime subscriptions (NULL = inherit from database_settings) */
   enableRealtime?: boolean | null;
+  /** Override: enable bulk mutations (NULL = inherit from database_settings) */
+  enableBulk?: boolean | null;
   /** Extensible JSON for additional per-API settings that do not have dedicated columns */
   options?: Record<string, unknown> | null;
 }
@@ -2645,35 +2647,6 @@ export interface RlsModule {
   currentRole?: string | null;
   currentRoleId?: string | null;
 }
-/** Database-wide feature flags and settings; controls which platform features are available to all APIs in this database */
-export interface DatabaseSetting {
-  /** Unique identifier for this settings record */
-  id: string;
-  /** Reference to the metaschema database these settings apply to */
-  databaseId?: string | null;
-  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
-  enableAggregates?: boolean | null;
-  /** Enable PostGIS spatial types and operators in the GraphQL API */
-  enablePostgis?: boolean | null;
-  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
-  enableSearch?: boolean | null;
-  /** Enable direct (multipart) file upload mutations in the GraphQL API */
-  enableDirectUploads?: boolean | null;
-  /** Enable presigned URL upload flow for S3/MinIO storage */
-  enablePresignedUploads?: boolean | null;
-  /** Enable many-to-many relationship queries in the GraphQL API */
-  enableManyToMany?: boolean | null;
-  /** Enable connection filter (where argument) in the GraphQL API */
-  enableConnectionFilter?: boolean | null;
-  /** Enable ltree hierarchical data type support in the GraphQL API */
-  enableLtree?: boolean | null;
-  /** Enable LLM/AI integration features in the GraphQL API */
-  enableLlm?: boolean | null;
-  /** Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API */
-  enableRealtime?: boolean | null;
-  /** Extensible JSON for additional settings that do not have dedicated columns */
-  options?: Record<string, unknown> | null;
-}
 export interface PlansModule {
   id: string;
   databaseId?: string | null;
@@ -2703,6 +2676,37 @@ export interface SqlAction {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
+}
+/** Database-wide feature flags and settings; controls which platform features are available to all APIs in this database */
+export interface DatabaseSetting {
+  /** Unique identifier for this settings record */
+  id: string;
+  /** Reference to the metaschema database these settings apply to */
+  databaseId?: string | null;
+  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
+  enableAggregates?: boolean | null;
+  /** Enable PostGIS spatial types and operators in the GraphQL API */
+  enablePostgis?: boolean | null;
+  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
+  enableSearch?: boolean | null;
+  /** Enable direct (multipart) file upload mutations in the GraphQL API */
+  enableDirectUploads?: boolean | null;
+  /** Enable presigned URL upload flow for S3/MinIO storage */
+  enablePresignedUploads?: boolean | null;
+  /** Enable many-to-many relationship queries in the GraphQL API */
+  enableManyToMany?: boolean | null;
+  /** Enable connection filter (where argument) in the GraphQL API */
+  enableConnectionFilter?: boolean | null;
+  /** Enable ltree hierarchical data type support in the GraphQL API */
+  enableLtree?: boolean | null;
+  /** Enable LLM/AI integration features in the GraphQL API */
+  enableLlm?: boolean | null;
+  /** Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API */
+  enableRealtime?: boolean | null;
+  /** Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API */
+  enableBulk?: boolean | null;
+  /** Extensible JSON for additional settings that do not have dedicated columns */
+  options?: Record<string, unknown> | null;
 }
 export interface BillingModule {
   id: string;
@@ -3659,9 +3663,6 @@ export interface RlsModuleRelations {
   sessionsTable?: Table | null;
   usersTable?: Table | null;
 }
-export interface DatabaseSettingRelations {
-  database?: Database | null;
-}
 export interface PlansModuleRelations {
   database?: Database | null;
   planLimitsTable?: Table | null;
@@ -3672,6 +3673,9 @@ export interface PlansModuleRelations {
   schema?: Schema | null;
 }
 export interface SqlActionRelations {}
+export interface DatabaseSettingRelations {
+  database?: Database | null;
+}
 export interface BillingModuleRelations {
   balancesTable?: Table | null;
   database?: Database | null;
@@ -3948,9 +3952,9 @@ export type RlsSettingWithRelations = RlsSetting & RlsSettingRelations;
 export type AppLimitEventWithRelations = AppLimitEvent & AppLimitEventRelations;
 export type OrgLimitEventWithRelations = OrgLimitEvent & OrgLimitEventRelations;
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
-export type DatabaseSettingWithRelations = DatabaseSetting & DatabaseSettingRelations;
 export type PlansModuleWithRelations = PlansModule & PlansModuleRelations;
 export type SqlActionWithRelations = SqlAction & SqlActionRelations;
+export type DatabaseSettingWithRelations = DatabaseSetting & DatabaseSettingRelations;
 export type BillingModuleWithRelations = BillingModule & BillingModuleRelations;
 export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
 export type UserWithRelations = User & UserRelations;
@@ -5592,6 +5596,7 @@ export type ApiSettingSelect = {
   enableLtree?: boolean;
   enableLlm?: boolean;
   enableRealtime?: boolean;
+  enableBulk?: boolean;
   options?: boolean;
   api?: {
     select: ApiSelect;
@@ -7481,24 +7486,6 @@ export type RlsModuleSelect = {
     select: TableSelect;
   };
 };
-export type DatabaseSettingSelect = {
-  id?: boolean;
-  databaseId?: boolean;
-  enableAggregates?: boolean;
-  enablePostgis?: boolean;
-  enableSearch?: boolean;
-  enableDirectUploads?: boolean;
-  enablePresignedUploads?: boolean;
-  enableManyToMany?: boolean;
-  enableConnectionFilter?: boolean;
-  enableLtree?: boolean;
-  enableLlm?: boolean;
-  enableRealtime?: boolean;
-  options?: boolean;
-  database?: {
-    select: DatabaseSelect;
-  };
-};
 export type PlansModuleSelect = {
   id?: boolean;
   databaseId?: boolean;
@@ -7549,6 +7536,25 @@ export type SqlActionSelect = {
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
+};
+export type DatabaseSettingSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  enableAggregates?: boolean;
+  enablePostgis?: boolean;
+  enableSearch?: boolean;
+  enableDirectUploads?: boolean;
+  enablePresignedUploads?: boolean;
+  enableManyToMany?: boolean;
+  enableConnectionFilter?: boolean;
+  enableLtree?: boolean;
+  enableLlm?: boolean;
+  enableRealtime?: boolean;
+  enableBulk?: boolean;
+  options?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
 };
 export type BillingModuleSelect = {
   id?: boolean;
@@ -10239,6 +10245,8 @@ export interface ApiSettingFilter {
   enableLlm?: BooleanFilter;
   /** Filter by the object’s `enableRealtime` field. */
   enableRealtime?: BooleanFilter;
+  /** Filter by the object’s `enableBulk` field. */
+  enableBulk?: BooleanFilter;
   /** Filter by the object’s `options` field. */
   options?: JSONFilter;
   /** Checks for all expressions in this list. */
@@ -13354,42 +13362,6 @@ export interface RlsModuleFilter {
   /** Filter by the object’s `usersTable` relation. */
   usersTable?: TableFilter;
 }
-export interface DatabaseSettingFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `enableAggregates` field. */
-  enableAggregates?: BooleanFilter;
-  /** Filter by the object’s `enablePostgis` field. */
-  enablePostgis?: BooleanFilter;
-  /** Filter by the object’s `enableSearch` field. */
-  enableSearch?: BooleanFilter;
-  /** Filter by the object’s `enableDirectUploads` field. */
-  enableDirectUploads?: BooleanFilter;
-  /** Filter by the object’s `enablePresignedUploads` field. */
-  enablePresignedUploads?: BooleanFilter;
-  /** Filter by the object’s `enableManyToMany` field. */
-  enableManyToMany?: BooleanFilter;
-  /** Filter by the object’s `enableConnectionFilter` field. */
-  enableConnectionFilter?: BooleanFilter;
-  /** Filter by the object’s `enableLtree` field. */
-  enableLtree?: BooleanFilter;
-  /** Filter by the object’s `enableLlm` field. */
-  enableLlm?: BooleanFilter;
-  /** Filter by the object’s `enableRealtime` field. */
-  enableRealtime?: BooleanFilter;
-  /** Filter by the object’s `options` field. */
-  options?: JSONFilter;
-  /** Checks for all expressions in this list. */
-  and?: DatabaseSettingFilter[];
-  /** Checks for any expressions in this list. */
-  or?: DatabaseSettingFilter[];
-  /** Negates the expression. */
-  not?: DatabaseSettingFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-}
 export interface PlansModuleFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -13473,6 +13445,44 @@ export interface SqlActionFilter {
   or?: SqlActionFilter[];
   /** Negates the expression. */
   not?: SqlActionFilter;
+}
+export interface DatabaseSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `enableAggregates` field. */
+  enableAggregates?: BooleanFilter;
+  /** Filter by the object’s `enablePostgis` field. */
+  enablePostgis?: BooleanFilter;
+  /** Filter by the object’s `enableSearch` field. */
+  enableSearch?: BooleanFilter;
+  /** Filter by the object’s `enableDirectUploads` field. */
+  enableDirectUploads?: BooleanFilter;
+  /** Filter by the object’s `enablePresignedUploads` field. */
+  enablePresignedUploads?: BooleanFilter;
+  /** Filter by the object’s `enableManyToMany` field. */
+  enableManyToMany?: BooleanFilter;
+  /** Filter by the object’s `enableConnectionFilter` field. */
+  enableConnectionFilter?: BooleanFilter;
+  /** Filter by the object’s `enableLtree` field. */
+  enableLtree?: BooleanFilter;
+  /** Filter by the object’s `enableLlm` field. */
+  enableLlm?: BooleanFilter;
+  /** Filter by the object’s `enableRealtime` field. */
+  enableRealtime?: BooleanFilter;
+  /** Filter by the object’s `enableBulk` field. */
+  enableBulk?: BooleanFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseSettingFilter[];
+  /** Negates the expression. */
+  not?: DatabaseSettingFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface BillingModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -15296,6 +15306,8 @@ export type ApiSettingOrderBy =
   | 'ENABLE_LLM_DESC'
   | 'ENABLE_REALTIME_ASC'
   | 'ENABLE_REALTIME_DESC'
+  | 'ENABLE_BULK_ASC'
+  | 'ENABLE_BULK_DESC'
   | 'OPTIONS_ASC'
   | 'OPTIONS_DESC';
 export type ConnectedAccountsModuleOrderBy =
@@ -17358,36 +17370,6 @@ export type RlsModuleOrderBy =
   | 'CURRENT_ROLE_DESC'
   | 'CURRENT_ROLE_ID_ASC'
   | 'CURRENT_ROLE_ID_DESC';
-export type DatabaseSettingOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ENABLE_AGGREGATES_ASC'
-  | 'ENABLE_AGGREGATES_DESC'
-  | 'ENABLE_POSTGIS_ASC'
-  | 'ENABLE_POSTGIS_DESC'
-  | 'ENABLE_SEARCH_ASC'
-  | 'ENABLE_SEARCH_DESC'
-  | 'ENABLE_DIRECT_UPLOADS_ASC'
-  | 'ENABLE_DIRECT_UPLOADS_DESC'
-  | 'ENABLE_PRESIGNED_UPLOADS_ASC'
-  | 'ENABLE_PRESIGNED_UPLOADS_DESC'
-  | 'ENABLE_MANY_TO_MANY_ASC'
-  | 'ENABLE_MANY_TO_MANY_DESC'
-  | 'ENABLE_CONNECTION_FILTER_ASC'
-  | 'ENABLE_CONNECTION_FILTER_DESC'
-  | 'ENABLE_LTREE_ASC'
-  | 'ENABLE_LTREE_DESC'
-  | 'ENABLE_LLM_ASC'
-  | 'ENABLE_LLM_DESC'
-  | 'ENABLE_REALTIME_ASC'
-  | 'ENABLE_REALTIME_DESC'
-  | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC';
 export type PlansModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -17446,6 +17428,38 @@ export type SqlActionOrderBy =
   | 'ACTION_ID_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC';
+export type DatabaseSettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENABLE_AGGREGATES_ASC'
+  | 'ENABLE_AGGREGATES_DESC'
+  | 'ENABLE_POSTGIS_ASC'
+  | 'ENABLE_POSTGIS_DESC'
+  | 'ENABLE_SEARCH_ASC'
+  | 'ENABLE_SEARCH_DESC'
+  | 'ENABLE_DIRECT_UPLOADS_ASC'
+  | 'ENABLE_DIRECT_UPLOADS_DESC'
+  | 'ENABLE_PRESIGNED_UPLOADS_ASC'
+  | 'ENABLE_PRESIGNED_UPLOADS_DESC'
+  | 'ENABLE_MANY_TO_MANY_ASC'
+  | 'ENABLE_MANY_TO_MANY_DESC'
+  | 'ENABLE_CONNECTION_FILTER_ASC'
+  | 'ENABLE_CONNECTION_FILTER_DESC'
+  | 'ENABLE_LTREE_ASC'
+  | 'ENABLE_LTREE_DESC'
+  | 'ENABLE_LLM_ASC'
+  | 'ENABLE_LLM_DESC'
+  | 'ENABLE_REALTIME_ASC'
+  | 'ENABLE_REALTIME_DESC'
+  | 'ENABLE_BULK_ASC'
+  | 'ENABLE_BULK_DESC'
+  | 'OPTIONS_ASC'
+  | 'OPTIONS_DESC';
 export type BillingModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -19278,6 +19292,7 @@ export interface CreateApiSettingInput {
     enableLtree?: boolean;
     enableLlm?: boolean;
     enableRealtime?: boolean;
+    enableBulk?: boolean;
     options?: Record<string, unknown>;
   };
 }
@@ -19294,6 +19309,7 @@ export interface ApiSettingPatch {
   enableLtree?: boolean | null;
   enableLlm?: boolean | null;
   enableRealtime?: boolean | null;
+  enableBulk?: boolean | null;
   options?: Record<string, unknown> | null;
 }
 export interface UpdateApiSettingInput {
@@ -22149,46 +22165,6 @@ export interface DeleteRlsModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateDatabaseSettingInput {
-  clientMutationId?: string;
-  databaseSetting: {
-    databaseId: string;
-    enableAggregates?: boolean;
-    enablePostgis?: boolean;
-    enableSearch?: boolean;
-    enableDirectUploads?: boolean;
-    enablePresignedUploads?: boolean;
-    enableManyToMany?: boolean;
-    enableConnectionFilter?: boolean;
-    enableLtree?: boolean;
-    enableLlm?: boolean;
-    enableRealtime?: boolean;
-    options?: Record<string, unknown>;
-  };
-}
-export interface DatabaseSettingPatch {
-  databaseId?: string | null;
-  enableAggregates?: boolean | null;
-  enablePostgis?: boolean | null;
-  enableSearch?: boolean | null;
-  enableDirectUploads?: boolean | null;
-  enablePresignedUploads?: boolean | null;
-  enableManyToMany?: boolean | null;
-  enableConnectionFilter?: boolean | null;
-  enableLtree?: boolean | null;
-  enableLlm?: boolean | null;
-  enableRealtime?: boolean | null;
-  options?: Record<string, unknown> | null;
-}
-export interface UpdateDatabaseSettingInput {
-  clientMutationId?: string;
-  id: string;
-  databaseSettingPatch: DatabaseSettingPatch;
-}
-export interface DeleteDatabaseSettingInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreatePlansModuleInput {
   clientMutationId?: string;
   plansModule: {
@@ -22266,6 +22242,48 @@ export interface UpdateSqlActionInput {
 export interface DeleteSqlActionInput {
   clientMutationId?: string;
   id: number;
+}
+export interface CreateDatabaseSettingInput {
+  clientMutationId?: string;
+  databaseSetting: {
+    databaseId: string;
+    enableAggregates?: boolean;
+    enablePostgis?: boolean;
+    enableSearch?: boolean;
+    enableDirectUploads?: boolean;
+    enablePresignedUploads?: boolean;
+    enableManyToMany?: boolean;
+    enableConnectionFilter?: boolean;
+    enableLtree?: boolean;
+    enableLlm?: boolean;
+    enableRealtime?: boolean;
+    enableBulk?: boolean;
+    options?: Record<string, unknown>;
+  };
+}
+export interface DatabaseSettingPatch {
+  databaseId?: string | null;
+  enableAggregates?: boolean | null;
+  enablePostgis?: boolean | null;
+  enableSearch?: boolean | null;
+  enableDirectUploads?: boolean | null;
+  enablePresignedUploads?: boolean | null;
+  enableManyToMany?: boolean | null;
+  enableConnectionFilter?: boolean | null;
+  enableLtree?: boolean | null;
+  enableLlm?: boolean | null;
+  enableRealtime?: boolean | null;
+  enableBulk?: boolean | null;
+  options?: Record<string, unknown> | null;
+}
+export interface UpdateDatabaseSettingInput {
+  clientMutationId?: string;
+  id: string;
+  databaseSettingPatch: DatabaseSettingPatch;
+}
+export interface DeleteDatabaseSettingInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface CreateBillingModuleInput {
   clientMutationId?: string;
@@ -26604,6 +26622,8 @@ export interface ApiSettingFilter {
   enableLlm?: BooleanFilter;
   /** Filter by the object’s `enableRealtime` field. */
   enableRealtime?: BooleanFilter;
+  /** Filter by the object’s `enableBulk` field. */
+  enableBulk?: BooleanFilter;
   /** Filter by the object’s `options` field. */
   options?: JSONFilter;
   /** Checks for all expressions in this list. */
@@ -30442,6 +30462,8 @@ export interface DatabaseSettingFilter {
   enableLlm?: BooleanFilter;
   /** Filter by the object’s `enableRealtime` field. */
   enableRealtime?: BooleanFilter;
+  /** Filter by the object’s `enableBulk` field. */
+  enableBulk?: BooleanFilter;
   /** Filter by the object’s `options` field. */
   options?: JSONFilter;
   /** Checks for all expressions in this list. */
@@ -37592,51 +37614,6 @@ export type DeleteRlsModulePayloadSelect = {
     select: RlsModuleEdgeSelect;
   };
 };
-export interface CreateDatabaseSettingPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseSetting` that was created by this mutation. */
-  databaseSetting?: DatabaseSetting | null;
-  databaseSettingEdge?: DatabaseSettingEdge | null;
-}
-export type CreateDatabaseSettingPayloadSelect = {
-  clientMutationId?: boolean;
-  databaseSetting?: {
-    select: DatabaseSettingSelect;
-  };
-  databaseSettingEdge?: {
-    select: DatabaseSettingEdgeSelect;
-  };
-};
-export interface UpdateDatabaseSettingPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseSetting` that was updated by this mutation. */
-  databaseSetting?: DatabaseSetting | null;
-  databaseSettingEdge?: DatabaseSettingEdge | null;
-}
-export type UpdateDatabaseSettingPayloadSelect = {
-  clientMutationId?: boolean;
-  databaseSetting?: {
-    select: DatabaseSettingSelect;
-  };
-  databaseSettingEdge?: {
-    select: DatabaseSettingEdgeSelect;
-  };
-};
-export interface DeleteDatabaseSettingPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseSetting` that was deleted by this mutation. */
-  databaseSetting?: DatabaseSetting | null;
-  databaseSettingEdge?: DatabaseSettingEdge | null;
-}
-export type DeleteDatabaseSettingPayloadSelect = {
-  clientMutationId?: boolean;
-  databaseSetting?: {
-    select: DatabaseSettingSelect;
-  };
-  databaseSettingEdge?: {
-    select: DatabaseSettingEdgeSelect;
-  };
-};
 export interface CreatePlansModulePayload {
   clientMutationId?: string | null;
   /** The `PlansModule` that was created by this mutation. */
@@ -37691,6 +37668,51 @@ export type CreateSqlActionPayloadSelect = {
   clientMutationId?: boolean;
   sqlAction?: {
     select: SqlActionSelect;
+  };
+};
+export interface CreateDatabaseSettingPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSetting` that was created by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
+}
+export type CreateDatabaseSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseSetting?: {
+    select: DatabaseSettingSelect;
+  };
+  databaseSettingEdge?: {
+    select: DatabaseSettingEdgeSelect;
+  };
+};
+export interface UpdateDatabaseSettingPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSetting` that was updated by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
+}
+export type UpdateDatabaseSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseSetting?: {
+    select: DatabaseSettingSelect;
+  };
+  databaseSettingEdge?: {
+    select: DatabaseSettingEdgeSelect;
+  };
+};
+export interface DeleteDatabaseSettingPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSetting` that was deleted by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
+}
+export type DeleteDatabaseSettingPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseSetting?: {
+    select: DatabaseSettingSelect;
+  };
+  databaseSettingEdge?: {
+    select: DatabaseSettingEdgeSelect;
   };
 };
 export interface CreateBillingModulePayload {
@@ -39716,18 +39738,6 @@ export type RlsModuleEdgeSelect = {
     select: RlsModuleSelect;
   };
 };
-/** A `DatabaseSetting` edge in the connection. */
-export interface DatabaseSettingEdge {
-  cursor?: string | null;
-  /** The `DatabaseSetting` at the end of the edge. */
-  node?: DatabaseSetting | null;
-}
-export type DatabaseSettingEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: DatabaseSettingSelect;
-  };
-};
 /** A `PlansModule` edge in the connection. */
 export interface PlansModuleEdge {
   cursor?: string | null;
@@ -39738,6 +39748,18 @@ export type PlansModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlansModuleSelect;
+  };
+};
+/** A `DatabaseSetting` edge in the connection. */
+export interface DatabaseSettingEdge {
+  cursor?: string | null;
+  /** The `DatabaseSetting` at the end of the edge. */
+  node?: DatabaseSetting | null;
+}
+export type DatabaseSettingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DatabaseSettingSelect;
   };
 };
 /** A `BillingModule` edge in the connection. */

@@ -1261,15 +1261,6 @@ export const rlsModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...rlsModuleKeys.details(), id] as const,
 } as const;
-export const databaseSettingKeys = {
-  /** All databaseSetting queries */ all: ['databasesetting'] as const,
-  /** List query keys */ lists: () => [...databaseSettingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...databaseSettingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...databaseSettingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...databaseSettingKeys.details(), id] as const,
-} as const;
 export const plansModuleKeys = {
   /** All plansModule queries */ all: ['plansmodule'] as const,
   /** List query keys */ lists: () => [...plansModuleKeys.all, 'list'] as const,
@@ -1287,6 +1278,15 @@ export const sqlActionKeys = {
   /** Detail query keys */ details: () => [...sqlActionKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...sqlActionKeys.details(), id] as const,
+} as const;
+export const databaseSettingKeys = {
+  /** All databaseSetting queries */ all: ['databasesetting'] as const,
+  /** List query keys */ lists: () => [...databaseSettingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...databaseSettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...databaseSettingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...databaseSettingKeys.details(), id] as const,
 } as const;
 export const billingModuleKeys = {
   /** All billingModule queries */ all: ['billingmodule'] as const,
@@ -1571,9 +1571,9 @@ export const queryKeys = {
   appLimitEvent: appLimitEventKeys,
   orgLimitEvent: orgLimitEventKeys,
   rlsModule: rlsModuleKeys,
-  databaseSetting: databaseSettingKeys,
   plansModule: plansModuleKeys,
   sqlAction: sqlActionKeys,
+  databaseSetting: databaseSettingKeys,
   billingModule: billingModuleKeys,
   astMigration: astMigrationKeys,
   user: userKeys,

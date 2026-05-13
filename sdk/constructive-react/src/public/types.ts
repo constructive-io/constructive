@@ -589,6 +589,7 @@ export interface ApiSetting {
   enableLtree: boolean | null;
   enableLlm: boolean | null;
   enableRealtime: boolean | null;
+  enableBulk: boolean | null;
   options: unknown | null;
 }
 export interface ConnectedAccountsModule {
@@ -1626,21 +1627,6 @@ export interface RlsModule {
   currentRole: string | null;
   currentRoleId: string | null;
 }
-export interface DatabaseSetting {
-  id: string | null;
-  databaseId: string | null;
-  enableAggregates: boolean | null;
-  enablePostgis: boolean | null;
-  enableSearch: boolean | null;
-  enableDirectUploads: boolean | null;
-  enablePresignedUploads: boolean | null;
-  enableManyToMany: boolean | null;
-  enableConnectionFilter: boolean | null;
-  enableLtree: boolean | null;
-  enableLlm: boolean | null;
-  enableRealtime: boolean | null;
-  options: unknown | null;
-}
 export interface PlansModule {
   id: string | null;
   databaseId: string | null;
@@ -1670,6 +1656,22 @@ export interface SqlAction {
   action: string | null;
   actionId: string | null;
   actorId: string | null;
+}
+export interface DatabaseSetting {
+  id: string | null;
+  databaseId: string | null;
+  enableAggregates: boolean | null;
+  enablePostgis: boolean | null;
+  enableSearch: boolean | null;
+  enableDirectUploads: boolean | null;
+  enablePresignedUploads: boolean | null;
+  enableManyToMany: boolean | null;
+  enableConnectionFilter: boolean | null;
+  enableLtree: boolean | null;
+  enableLlm: boolean | null;
+  enableRealtime: boolean | null;
+  enableBulk: boolean | null;
+  options: unknown | null;
 }
 export interface BillingModule {
   id: string | null;

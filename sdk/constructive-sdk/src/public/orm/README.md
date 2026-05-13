@@ -159,9 +159,9 @@ const db = createClient({
 | `appLimitEvent` | findMany, findOne, create, update, delete |
 | `orgLimitEvent` | findMany, findOne, create, update, delete |
 | `rlsModule` | findMany, findOne, create, update, delete |
-| `databaseSetting` | findMany, findOne, create, update, delete |
 | `plansModule` | findMany, findOne, create, update, delete |
 | `sqlAction` | findMany, findOne, create, update, delete |
+| `databaseSetting` | findMany, findOne, create, update, delete |
 | `billingModule` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
@@ -2005,19 +2005,20 @@ CRUD operations for ApiSetting records.
 | `enableLtree` | Boolean | Yes |
 | `enableLlm` | Boolean | Yes |
 | `enableRealtime` | Boolean | Yes |
+| `enableBulk` | Boolean | Yes |
 | `options` | JSON | Yes |
 
 **Operations:**
 
 ```typescript
 // List all apiSetting records
-const items = await db.apiSetting.findMany({ select: { id: true, databaseId: true, apiId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, options: true } }).execute();
+const items = await db.apiSetting.findMany({ select: { id: true, databaseId: true, apiId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, options: true } }).execute();
 
 // Get one by id
-const item = await db.apiSetting.findOne({ id: '<UUID>', select: { id: true, databaseId: true, apiId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, options: true } }).execute();
+const item = await db.apiSetting.findOne({ id: '<UUID>', select: { id: true, databaseId: true, apiId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, options: true } }).execute();
 
 // Create
-const created = await db.apiSetting.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', options: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.apiSetting.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', enableBulk: '<Boolean>', options: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.apiSetting.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -5375,47 +5376,6 @@ const updated = await db.rlsModule.update({ where: { id: '<UUID>' }, data: { dat
 const deleted = await db.rlsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.databaseSetting`
-
-CRUD operations for DatabaseSetting records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `enableAggregates` | Boolean | Yes |
-| `enablePostgis` | Boolean | Yes |
-| `enableSearch` | Boolean | Yes |
-| `enableDirectUploads` | Boolean | Yes |
-| `enablePresignedUploads` | Boolean | Yes |
-| `enableManyToMany` | Boolean | Yes |
-| `enableConnectionFilter` | Boolean | Yes |
-| `enableLtree` | Boolean | Yes |
-| `enableLlm` | Boolean | Yes |
-| `enableRealtime` | Boolean | Yes |
-| `options` | JSON | Yes |
-
-**Operations:**
-
-```typescript
-// List all databaseSetting records
-const items = await db.databaseSetting.findMany({ select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, options: true } }).execute();
-
-// Get one by id
-const item = await db.databaseSetting.findOne({ id: '<UUID>', select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, options: true } }).execute();
-
-// Create
-const created = await db.databaseSetting.create({ data: { databaseId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', options: '<JSON>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.databaseSetting.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.databaseSetting.delete({ where: { id: '<UUID>' } }).execute();
-```
-
 ### `db.plansModule`
 
 CRUD operations for PlansModule records.
@@ -5496,6 +5456,48 @@ const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { name
 
 // Delete
 const deleted = await db.sqlAction.delete({ where: { id: '<Int>' } }).execute();
+```
+
+### `db.databaseSetting`
+
+CRUD operations for DatabaseSetting records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `enableAggregates` | Boolean | Yes |
+| `enablePostgis` | Boolean | Yes |
+| `enableSearch` | Boolean | Yes |
+| `enableDirectUploads` | Boolean | Yes |
+| `enablePresignedUploads` | Boolean | Yes |
+| `enableManyToMany` | Boolean | Yes |
+| `enableConnectionFilter` | Boolean | Yes |
+| `enableLtree` | Boolean | Yes |
+| `enableLlm` | Boolean | Yes |
+| `enableRealtime` | Boolean | Yes |
+| `enableBulk` | Boolean | Yes |
+| `options` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all databaseSetting records
+const items = await db.databaseSetting.findMany({ select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, options: true } }).execute();
+
+// Get one by id
+const item = await db.databaseSetting.findOne({ id: '<UUID>', select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, options: true } }).execute();
+
+// Create
+const created = await db.databaseSetting.create({ data: { databaseId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', enableBulk: '<Boolean>', options: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.databaseSetting.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.databaseSetting.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.billingModule`
