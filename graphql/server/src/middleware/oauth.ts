@@ -132,7 +132,7 @@ async function getIdentityProvider(
       ip.display_name,
       ip.enabled,
       ip.client_id,
-      "${encryptedSecretsSchema}".get(ip.id, 'oauth_client_secret') as client_secret,
+      "${encryptedSecretsSchema}".get(ip.client_secret_id, 'oauth_client_secret') as client_secret,
       ip.authorization_url,
       ip.token_url,
       ip.userinfo_url,
