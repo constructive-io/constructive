@@ -471,7 +471,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
 
         const signInSql = `
           SELECT * FROM "${privateSchema}".sign_in_identity(
-            $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::text
+            $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::text, $6::boolean
           )
         `;
 
@@ -482,6 +482,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
             JSON.stringify(details),
             profile.email,
             deviceToken,
+            true,
           ]);
 
           result = signInResult.rows[0] || {};
@@ -517,7 +518,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
           // Call sign_up_identity (using same client with JWT context)
           const signUpSql = `
             SELECT * FROM "${privateSchema}".sign_up_identity(
-              $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text
+              $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::text, $6::boolean
             )
           `;
 
@@ -526,6 +527,8 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
             profile.providerId,
             profile.email,
             JSON.stringify(details),
+            deviceToken,
+            true,
           ]);
 
           result = signUpResult.rows[0] || {};
@@ -564,7 +567,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       } else {
         // Same-origin: Cookie mode only
         // Set httpOnly cookies, no token in URL
-        const sessionConfig = getSessionCookieConfig(authSettings);
+        const sessionConfig = getSessionCookieConfig(authSettings, true);
         setSessionCookie(res, result.access_token, sessionConfig);
 
         if (result.out_device_token) {
