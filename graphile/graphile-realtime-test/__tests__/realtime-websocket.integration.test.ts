@@ -15,10 +15,8 @@
  *   6. Fire pg_notify and verify events arrive over the WebSocket
  */
 
-import { createServer, type Server as HttpServer } from 'node:http';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import type { AddressInfo } from 'node:net';
 
 import { subscribe as grafastSubscribe } from 'grafast';
 import { makeSchema } from 'graphile-build';
@@ -30,78 +28,18 @@ import type { GraphQLSchema, ExecutionResult } from 'graphql';
 import type { GraphileConfig } from 'graphile-config';
 import { seed, getConnections } from 'pgsql-test';
 import type { GetConnectionResult } from 'pgsql-test';
-import { createClient, type Client as GqlWsClient } from 'graphql-ws';
-import { WebSocketServer, WebSocket } from 'ws';
-import { useServer } from 'graphql-ws/use/ws';
+import type { Client as GqlWsClient } from 'graphql-ws';
 
 import { makeRealtimeSmartTagsPlugin } from '../src/smart-tags';
 import { createRealtimeSubscriptionsPlugin } from 'graphile-realtime-subscriptions';
-import { notify, notifyChange, notifyInvalidate } from '../src/notify';
+import { notifyChange, notifyInvalidate, notify } from '../src/notify';
+import { nextWsEvent, collectWsEvents } from '../src/ws-helpers';
+import { createWsTestServer } from '../src/ws-server';
+import type { WsTestServer } from '../src/ws-server';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/**
- * Collect the next event from a graphql-ws subscription.
- * Returns a promise that resolves with the first `next` payload,
- * or rejects on error / timeout.
- */
-function nextEvent<T = Record<string, unknown>>(
-  client: GqlWsClient,
-  query: string,
-  variables?: Record<string, unknown>,
-  timeoutMs = 10000,
-): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      unsubscribe();
-      reject(new Error(`nextEvent timed out after ${timeoutMs}ms`));
-    }, timeoutMs);
-
-    const unsubscribe = client.subscribe(
-      { query, variables },
-      {
-        next(value) {
-          clearTimeout(timer);
-          unsubscribe();
-          resolve(value.data as T);
-        },
-        error(err) {
-          clearTimeout(timer);
-          unsubscribe();
-          reject(Array.isArray(err) ? err[0] : err);
-        },
-        complete() {
-          clearTimeout(timer);
-          reject(new Error('Subscription completed without yielding a value'));
-        },
-      },
-    );
-  });
-}
-
-/**
- * Subscribe and collect events into an array until unsubscribe is called.
- */
-function collectWsEvents<T = Record<string, unknown>>(
-  client: GqlWsClient,
-  query: string,
-  variables?: Record<string, unknown>,
-): { events: T[]; unsubscribe: () => void } {
-  const events: T[] = [];
-  const unsubscribe = client.subscribe(
-    { query, variables },
-    {
-      next(value) {
-        events.push(value.data as T);
-      },
-      error() { /* swallow */ },
-      complete() { /* done */ },
-    },
-  );
-  return { events, unsubscribe };
-}
 
 // ─── Test Suite ─────────────────────────────────────────────────────────────
 
@@ -113,9 +51,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   let pgSubscriberKey: string;
   let pgServiceRef: any;
 
-  let httpServer: HttpServer;
-  let wss: WebSocketServer;
-  let serverCleanup: { dispose: () => Promise<void> };
+  let wsServer: WsTestServer;
   let wsClient: GqlWsClient;
 
   beforeAll(async () => {
@@ -158,71 +94,24 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
     pgSubscriber = (pgService as any).pgSubscriber;
     pgSubscriberKey = (pgService as any).pgSubscriberKey ?? 'pgSubscriber';
 
-    // 3. Start HTTP server + WebSocket server
-    httpServer = createServer();
-    wss = new WebSocketServer({ server: httpServer, path: '/graphql' });
-
-    // Wire graphql-ws server to the ws WebSocketServer
-    serverCleanup = useServer(
-      {
-        schema,
-        subscribe: async (args) => {
-          // Thread the pgSubscriber into the grafast context
-          const contextValue = {
-            [pgSubscriberKey]: pgSubscriber,
-            ...(typeof args.contextValue === 'object' && args.contextValue !== null
-              ? args.contextValue as Record<string, unknown>
-              : {}),
-          };
-
-          try {
-            const result = await grafastSubscribe({
-              schema: args.schema,
-              document: args.document,
-              variableValues: args.variableValues as Record<string, unknown> | undefined,
-              contextValue,
-              resolvedPreset,
-            });
-            return result as AsyncIterableIterator<ExecutionResult> | ExecutionResult;
-          } catch (err: unknown) {
-            console.error('[WS subscribe] grafastSubscribe threw:', err);
-            throw err;
-          }
-        },
-      },
-      wss,
-    );
-
-    await new Promise<void>((resolve) => {
-      httpServer.listen(0, '127.0.0.1', () => resolve());
+    // 3. Start WebSocket test server
+    wsServer = await createWsTestServer({
+      schema,
+      resolvedPreset,
+      pgSubscriber,
+      pgSubscriberKey,
     });
-
-    const addr = httpServer.address() as AddressInfo;
-    const serverUrl = `ws://127.0.0.1:${addr.port}/graphql`;
 
     // 4. Create graphql-ws client over a real WebSocket
-    wsClient = createClient({
-      url: serverUrl,
-      webSocketImpl: WebSocket,
-      retryAttempts: 0,
-    });
+    wsClient = wsServer.createClient();
 
     // Give the pgSubscriber time to establish LISTEN
     await delay(300);
   }, 30000);
 
   afterAll(async () => {
-    if (wsClient) {
-      await wsClient.dispose();
-    }
-    if (serverCleanup) {
-      await serverCleanup.dispose();
-    }
-    if (wss) {
-      wss.close();
-    }
-    if (httpServer?.listening) {
-      await new Promise<void>((resolve) => httpServer.close(() => resolve()));
+    if (wsServer) {
+      await wsServer.dispose();
     }
     if (pgSubscriber && typeof pgSubscriber.release === 'function') {
       await pgSubscriber.release();
@@ -261,7 +150,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   it('establishes a WebSocket connection and receives INSERT events', async () => {
     const testId = randomUUID();
 
-    const eventPromise = nextEvent<{
+    const eventPromise = nextWsEvent<{
       onItemChanged: { event: string; rowId: string; overflow: boolean };
     }>(
       wsClient,
@@ -290,7 +179,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   it('delivers UPDATE and DELETE events over WebSocket', async () => {
     // UPDATE
     const updateId = randomUUID();
-    const updatePromise = nextEvent<{
+    const updatePromise = nextWsEvent<{
       onItemChanged: { event: string; overflow: boolean };
     }>(
       wsClient,
@@ -304,7 +193,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
     // DELETE
     const deleteId = randomUUID();
-    const deletePromise = nextEvent<{
+    const deletePromise = nextWsEvent<{
       onItemChanged: { event: string; overflow: boolean };
     }>(
       wsClient,
@@ -320,7 +209,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   // ─── INVALIDATE (overflow) ────────────────────────────────────────────
 
   it('delivers INVALIDATE (overflow) events via WebSocket', async () => {
-    const eventPromise = nextEvent<{
+    const eventPromise = nextWsEvent<{
       onItemChanged: { event: string; overflow: boolean };
     }>(
       wsClient,
@@ -358,8 +247,6 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
     await delay(300);
 
     // Fire for unwatched ID — the event still arrives but with parsed=null
-    // (grafast subscriptions don't support event-level inhibition, so the
-    // plugin returns null parsed data which surfaces as event='UNKNOWN')
     await notifyChange(conn.pg.client, 'realtime_test', 'items', 'UPDATE', [unwatchedId]);
     await delay(200);
 
@@ -369,14 +256,11 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
     unsubscribe();
 
-    // Both NOTIFY events arrive, but the plugin marks non-matching ones
-    // with event='UNKNOWN' and rowId=null so clients can filter them out
     const relevant = events.filter(e => e.onItemChanged.event !== 'UNKNOWN');
     expect(relevant.length).toBe(1);
     expect(relevant[0].onItemChanged.event).toBe('INSERT');
     expect(relevant[0].onItemChanged.rowId).toBe(watchedId);
 
-    // The unwatched event should have been marked as UNKNOWN
     const filtered = events.filter(e => e.onItemChanged.event === 'UNKNOWN');
     expect(filtered.length).toBe(1);
     expect(filtered[0].onItemChanged.rowId).toBeNull();
@@ -388,7 +272,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
     const testId = randomUUID();
 
     // Subscriber 1 on the existing client
-    const promise1 = nextEvent<{
+    const promise1 = nextWsEvent<{
       onItemChanged: { event: string };
     }>(
       wsClient,
@@ -396,14 +280,9 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
     );
 
     // Subscriber 2 on a separate WebSocket client
-    const addr = httpServer.address() as AddressInfo;
-    const wsClient2 = createClient({
-      url: `ws://127.0.0.1:${addr.port}/graphql`,
-      webSocketImpl: WebSocket,
-      retryAttempts: 0,
-    });
+    const wsClient2 = wsServer.createClient();
 
-    const promise2 = nextEvent<{
+    const promise2 = nextWsEvent<{
       onItemChanged: { event: string };
     }>(
       wsClient2,
@@ -426,7 +305,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   it('handles raw NOTIFY payloads via WebSocket', async () => {
     const testId = randomUUID();
 
-    const eventPromise = nextEvent<{
+    const eventPromise = nextWsEvent<{
       onItemChanged: { event: string; rowId: string; overflow: boolean };
     }>(
       wsClient,
