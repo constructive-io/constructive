@@ -91,7 +91,7 @@ export async function fetchDatabaseTransferQuery<S extends DatabaseTransferSelec
 export async function fetchDatabaseTransferQuery(params: {
   id: string;
   selection: SelectionConfig<DatabaseTransferSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DatabaseTransferSelect>(params.selection);
   return getClient()
     .databaseTransfer.findOne({

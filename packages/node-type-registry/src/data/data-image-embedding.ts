@@ -117,12 +117,6 @@ export const DataImageEmbedding: NodeTypeDefinition = {
             format: 'column-ref',
             description: 'JSONB field for extraction metadata',
             default: 'extracted_metadata'
-          },
-          status_field: {
-            type: 'string',
-            format: 'column-ref',
-            description: 'Extraction lifecycle status field',
-            default: 'extraction_status'
           }
         }
       },
@@ -150,19 +144,6 @@ export const DataImageEmbedding: NodeTypeDefinition = {
           enqueue_chunking_job: { type: 'boolean', default: true },
           chunking_task_name: { type: 'string', default: 'generate_chunks' }
         }
-      },
-
-      // ── Stale tracking (forwarded to DataFileEmbedding) ────────────
-      stale_strategy: {
-        type: 'string',
-        enum: ['column', 'null', 'hash'],
-        description: 'Strategy for tracking embedding staleness in extract mode',
-        default: 'column'
-      },
-      include_stale_field: {
-        type: 'boolean',
-        description: 'Whether to include the embedding_stale boolean field',
-        default: true
       }
     }
   },

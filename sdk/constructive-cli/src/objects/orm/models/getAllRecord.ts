@@ -70,13 +70,11 @@ export class GetAllRecordModel {
     });
   }
   findFirst<S extends GetAllRecordSelect>(
-    args: FindFirstArgs<S, GetAllRecordFilter> & {
+    args: FindFirstArgs<S, GetAllRecordFilter, GetAllRecordsOrderBy> & {
       select: S;
     } & StrictSelect<S, GetAllRecordSelect>
   ): QueryBuilder<{
-    getAll: {
-      nodes: InferSelectResult<GetAllRecordWithRelations, S>[];
-    };
+    getAllRecord: InferSelectResult<GetAllRecordWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'GetAllRecord',
@@ -84,17 +82,26 @@ export class GetAllRecordModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'GetAllRecordFilter',
+      'GetAllRecordsOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'GetAllRecord',
-      fieldName: 'getAll',
+      fieldName: 'getAllRecord',
       document,
       variables,
+      transform: (data: {
+        getAll?: {
+          nodes?: InferSelectResult<GetAllRecordWithRelations, S>[];
+        };
+      }) => ({
+        getAllRecord: data.getAll?.nodes?.[0] ?? null,
+      }),
     });
   }
   create<S extends GetAllRecordSelect>(

@@ -70,13 +70,11 @@ export class RealtimeModuleModel {
     });
   }
   findFirst<S extends RealtimeModuleSelect>(
-    args: FindFirstArgs<S, RealtimeModuleFilter> & {
+    args: FindFirstArgs<S, RealtimeModuleFilter, RealtimeModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, RealtimeModuleSelect>
   ): QueryBuilder<{
-    realtimeModules: {
-      nodes: InferSelectResult<RealtimeModuleWithRelations, S>[];
-    };
+    realtimeModule: InferSelectResult<RealtimeModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'RealtimeModule',
@@ -84,17 +82,26 @@ export class RealtimeModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'RealtimeModuleFilter',
+      'RealtimeModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'RealtimeModule',
-      fieldName: 'realtimeModules',
+      fieldName: 'realtimeModule',
       document,
       variables,
+      transform: (data: {
+        realtimeModules?: {
+          nodes?: InferSelectResult<RealtimeModuleWithRelations, S>[];
+        };
+      }) => ({
+        realtimeModule: data.realtimeModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends RealtimeModuleSelect>(

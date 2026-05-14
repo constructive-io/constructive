@@ -16,7 +16,7 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 
-export interface FindManyArgs<TSelect, TWhere, TOrderBy = never> {
+export interface FindManyArgs<TSelect, TWhere, TOrderBy> {
   select?: TSelect;
   where?: TWhere;
   orderBy?: TOrderBy[];
@@ -27,9 +27,10 @@ export interface FindManyArgs<TSelect, TWhere, TOrderBy = never> {
   offset?: number;
 }
 
-export interface FindFirstArgs<TSelect, TWhere> {
+export interface FindFirstArgs<TSelect, TWhere, TOrderBy> {
   select?: TSelect;
   where?: TWhere;
+  orderBy?: TOrderBy[];
 }
 
 export interface CreateArgs<TSelect, TData> {
@@ -50,6 +51,34 @@ export type FindOneArgs<TSelect, TIdName extends string = 'id', TId = string> = 
 export interface DeleteArgs<TWhere, TSelect = undefined> {
   where: TWhere;
   select?: TSelect;
+}
+
+export interface BulkInsertArgs<TSelect, TData, TOnConflict = unknown> {
+  data: TData[];
+  select?: TSelect;
+  onConflict?: TOnConflict;
+}
+
+export interface BulkUpsertArgs<TSelect, TData, TOnConflict = unknown> {
+  data: TData[];
+  select?: TSelect;
+  onConflict: TOnConflict;
+}
+
+export interface BulkUpdateArgs<TSelect, TWhere, TData> {
+  where: TWhere;
+  data: TData;
+  select?: TSelect;
+}
+
+export interface BulkDeleteArgs<TSelect, TWhere> {
+  where: TWhere;
+  select?: TSelect;
+}
+
+export interface BulkMutationResult<T> {
+  affectedCount: number;
+  returning: T[];
 }
 
 type DepthLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;

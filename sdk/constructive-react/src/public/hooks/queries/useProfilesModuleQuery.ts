@@ -91,7 +91,7 @@ export async function fetchProfilesModuleQuery<S extends ProfilesModuleSelect>(p
 export async function fetchProfilesModuleQuery(params: {
   id: string;
   selection: SelectionConfig<ProfilesModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ProfilesModuleSelect>(params.selection);
   return getClient()
     .profilesModule.findOne({

@@ -91,7 +91,7 @@ export async function fetchRlsSettingQuery<S extends RlsSettingSelect>(params: {
 export async function fetchRlsSettingQuery(params: {
   id: string;
   selection: SelectionConfig<RlsSettingSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<RlsSettingSelect>(params.selection);
   return getClient()
     .rlsSetting.findOne({

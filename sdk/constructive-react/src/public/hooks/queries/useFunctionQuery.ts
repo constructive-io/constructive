@@ -91,7 +91,7 @@ export async function fetchFunctionQuery<S extends FunctionSelect>(params: {
 export async function fetchFunctionQuery(params: {
   id: string;
   selection: SelectionConfig<FunctionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<FunctionSelect>(params.selection);
   return getClient()
     .function.findOne({

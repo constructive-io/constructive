@@ -70,13 +70,11 @@ export class TableModel {
     });
   }
   findFirst<S extends TableSelect>(
-    args: FindFirstArgs<S, TableFilter> & {
+    args: FindFirstArgs<S, TableFilter, TableOrderBy> & {
       select: S;
     } & StrictSelect<S, TableSelect>
   ): QueryBuilder<{
-    tables: {
-      nodes: InferSelectResult<TableWithRelations, S>[];
-    };
+    table: InferSelectResult<TableWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Table',
@@ -84,17 +82,26 @@ export class TableModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'TableFilter',
+      'TableOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Table',
-      fieldName: 'tables',
+      fieldName: 'table',
       document,
       variables,
+      transform: (data: {
+        tables?: {
+          nodes?: InferSelectResult<TableWithRelations, S>[];
+        };
+      }) => ({
+        table: data.tables?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends TableSelect>(

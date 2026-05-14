@@ -36,6 +36,7 @@ jobs:
   # =========================================================================
   build:
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
     steps:
       - name: Configure Git (for tests)
         run: |
@@ -78,54 +79,19 @@ jobs:
   unit-tests:
     needs: build
     runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
         include:
-          - package: uploads/mime-bytes
-            env: {}
-          - package: uploads/uuid-hash
-            env: {}
-          - package: uploads/uuid-stream
-            env: {}
-          - package: uploads/etag-hash
-            env: {}
-          - package: uploads/etag-stream
-            env: {}
-          - package: uploads/stream-to-etag
-            env: {}
-          - package: uploads/content-type-stream
-            env: {}
-          - package: uploads/upload-names
-            env: {}
-          - package: packages/url-domains
-            env: {}
-          - package: packages/query-builder
-            env: {}
-          - package: packages/csrf
-            env: {}
-          - package: packages/oauth
-            env: {}
-          - package: packages/12factor-env
-            env: {}
-          - package: packages/orm
-            env: {}
-          - package: packages/postmaster
-            env: {}
-          - package: packages/smtppostmaster
-            env: {}
-          - package: packages/csv-to-pg
-            env: {}
-          - package: postgres/pgsql-client
-            env: {}
-          - package: postgres/pg-ast
-            env: {}
-          - package: graphql/query
-            env: {}
-          - package: graphql/codegen
-            env: {}
-          - package: packages/cli
-            env: {}
+          - batch: uploads
+            packages: 'uploads/mime-bytes uploads/uuid-hash uploads/uuid-stream uploads/etag-hash uploads/etag-stream uploads/stream-to-etag uploads/content-type-stream uploads/upload-names'
+          - batch: packages-core
+            packages: 'packages/url-domains packages/query-builder packages/csrf packages/oauth packages/12factor-env packages/orm'
+          - batch: packages-services
+            packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
+          - batch: graphql
+            packages: 'graphql/query graphql/codegen'
 
     steps:
       - name: Download workspace
@@ -150,9 +116,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Test ${{ matrix.package }}
-        run: cd ./${{ matrix.package }} && pnpm test
-        env: ${{ matrix.env }}
+      - name: Test ${{ matrix.batch }}
+        run: |
+          for pkg in ${{ matrix.packages }}; do
+            echo "::group::Testing $pkg"
+            (cd ./$pkg && pnpm test)
+            echo "::endgroup::"
+          done
 
   # =========================================================================
   # TIER 2 – PostgreSQL-only tests
@@ -160,6 +130,7 @@ jobs:
   pg-tests:
     needs: build
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -190,6 +161,8 @@ jobs:
           - package: graphile/graphile-search
             env: {}
           - package: graphile/graphile-ltree
+            env: {}
+          - package: graphile/graphile-bulk-mutations
             env: {}
           - package: graphql/orm-test
             env: {}
@@ -263,6 +236,7 @@ jobs:
   integration-tests:
     needs: build
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:

@@ -91,7 +91,7 @@ export async function fetchPlansModuleQuery<S extends PlansModuleSelect>(params:
 export async function fetchPlansModuleQuery(params: {
   id: string;
   selection: SelectionConfig<PlansModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<PlansModuleSelect>(params.selection);
   return getClient()
     .plansModule.findOne({

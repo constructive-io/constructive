@@ -143,9 +143,9 @@ import { RlsSettingModel } from './models/rlsSetting';
 import { AppLimitEventModel } from './models/appLimitEvent';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
 import { RlsModuleModel } from './models/rlsModule';
-import { DatabaseSettingModel } from './models/databaseSetting';
 import { PlansModuleModel } from './models/plansModule';
 import { SqlActionModel } from './models/sqlAction';
+import { DatabaseSettingModel } from './models/databaseSetting';
 import { BillingModuleModel } from './models/billingModule';
 import { AstMigrationModel } from './models/astMigration';
 import { UserModel } from './models/user';
@@ -161,7 +161,6 @@ export { GraphQLRequestError } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
-export { NodeHttpAdapter } from './node-fetch';
 export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
@@ -328,9 +327,9 @@ export function createClient(config: OrmClientConfig) {
     appLimitEvent: new AppLimitEventModel(client),
     orgLimitEvent: new OrgLimitEventModel(client),
     rlsModule: new RlsModuleModel(client),
-    databaseSetting: new DatabaseSettingModel(client),
     plansModule: new PlansModuleModel(client),
     sqlAction: new SqlActionModel(client),
+    databaseSetting: new DatabaseSettingModel(client),
     billingModule: new BillingModuleModel(client),
     astMigration: new AstMigrationModel(client),
     user: new UserModel(client),

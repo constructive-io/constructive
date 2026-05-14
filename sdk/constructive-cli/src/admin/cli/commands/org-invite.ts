@@ -27,13 +27,14 @@ const fieldSchema: FieldSchema = {
   multiple: 'boolean',
   data: 'json',
   profileId: 'uuid',
+  isReadOnly: 'boolean',
   expiresAt: 'string',
   createdAt: 'string',
   updatedAt: 'string',
   entityId: 'uuid',
 };
 const usage =
-  '\norg-invite <command>\n\nCommands:\n  list                  List orgInvite records\n  find-first            Find first matching orgInvite record\n  get                   Get a orgInvite by ID\n  create                Create a new orgInvite\n  update                Update an existing orgInvite\n  delete                Delete a orgInvite\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
+  '\norg-invite <command>\n\nCommands:\n  list                  List orgInvite records\n  find-first            Find first matching orgInvite record\n  get                   Get a orgInvite by ID\n  create                Create a new orgInvite\n  update                Update an existing orgInvite\n  delete                Delete a orgInvite\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -94,6 +95,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       multiple: true,
       data: true,
       profileId: true,
+      isReadOnly: true,
       expiresAt: true,
       createdAt: true,
       updatedAt: true,
@@ -129,13 +131,14 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       multiple: true,
       data: true,
       profileId: true,
+      isReadOnly: true,
       expiresAt: true,
       createdAt: true,
       updatedAt: true,
       entityId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgInviteSelect, OrgInviteFilter> & {
+      FindFirstArgs<OrgInviteSelect, OrgInviteFilter, OrgInviteOrderBy> & {
         select: OrgInviteSelect;
       }
     >(argv, defaultSelect);
@@ -176,6 +179,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           multiple: true,
           data: true,
           profileId: true,
+          isReadOnly: true,
           expiresAt: true,
           createdAt: true,
           updatedAt: true,
@@ -266,6 +270,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'isReadOnly',
+        message: 'isReadOnly',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'expiresAt',
         message: 'expiresAt',
@@ -295,6 +306,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           multiple: cleanedData.multiple,
           data: cleanedData.data,
           profileId: cleanedData.profileId,
+          isReadOnly: cleanedData.isReadOnly,
           expiresAt: cleanedData.expiresAt,
           entityId: cleanedData.entityId,
         },
@@ -310,6 +322,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           multiple: true,
           data: true,
           profileId: true,
+          isReadOnly: true,
           expiresAt: true,
           createdAt: true,
           updatedAt: true,
@@ -406,6 +419,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'isReadOnly',
+        message: 'isReadOnly',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'expiresAt',
         message: 'expiresAt',
@@ -438,6 +458,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           multiple: cleanedData.multiple,
           data: cleanedData.data,
           profileId: cleanedData.profileId,
+          isReadOnly: cleanedData.isReadOnly,
           expiresAt: cleanedData.expiresAt,
           entityId: cleanedData.entityId,
         },
@@ -453,6 +474,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           multiple: true,
           data: true,
           profileId: true,
+          isReadOnly: true,
           expiresAt: true,
           createdAt: true,
           updatedAt: true,

@@ -91,7 +91,7 @@ export async function fetchViewGrantQuery<S extends ViewGrantSelect>(params: {
 export async function fetchViewGrantQuery(params: {
   id: string;
   selection: SelectionConfig<ViewGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ViewGrantSelect>(params.selection);
   return getClient()
     .viewGrant.findOne({

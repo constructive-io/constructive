@@ -191,7 +191,19 @@ db.setContext({
 });
 ```
 
-This applies the settings using `SET LOCAL` statements, ensuring they persist only for the current transaction and maintain proper isolation between tests.
+This applies the settings using `SET LOCAL` and `set_config(..., true)` statements, ensuring they persist only for the current transaction and maintain proper isolation between tests.
+
+> **⚠️ Important:** `set_config(..., true)` is **transaction-local**. Inside test bodies (`it()` blocks), `beforeEach()` has already started a transaction, so context persists across queries automatically. However, in `beforeAll()` there is no active transaction — each query runs in auto-commit mode and context is lost between calls. If you need context-aware operations in `beforeAll()`, wrap them in explicit `db.begin()` / `db.commit()`:
+>
+> ```ts
+> beforeAll(async () => {
+>   ({ db, teardown } = await getConnections());
+>   await db.begin();
+>   db.setContext({ role: 'authenticated', 'jwt.claims.user_id': '123' });
+>   await db.query('SELECT current_user_id()'); // context persists within transaction
+>   await db.commit();
+> });
+> ```
 
 #### Testing Role-Based Access
 

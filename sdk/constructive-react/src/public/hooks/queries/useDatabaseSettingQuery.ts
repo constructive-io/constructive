@@ -91,7 +91,7 @@ export async function fetchDatabaseSettingQuery<S extends DatabaseSettingSelect>
 export async function fetchDatabaseSettingQuery(params: {
   id: string;
   selection: SelectionConfig<DatabaseSettingSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DatabaseSettingSelect>(params.selection);
   return getClient()
     .databaseSetting.findOne({

@@ -70,13 +70,11 @@ export class EmbeddingChunkModel {
     });
   }
   findFirst<S extends EmbeddingChunkSelect>(
-    args: FindFirstArgs<S, EmbeddingChunkFilter> & {
+    args: FindFirstArgs<S, EmbeddingChunkFilter, EmbeddingChunkOrderBy> & {
       select: S;
     } & StrictSelect<S, EmbeddingChunkSelect>
   ): QueryBuilder<{
-    embeddingChunks: {
-      nodes: InferSelectResult<EmbeddingChunkWithRelations, S>[];
-    };
+    embeddingChunk: InferSelectResult<EmbeddingChunkWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'EmbeddingChunk',
@@ -84,17 +82,26 @@ export class EmbeddingChunkModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'EmbeddingChunkFilter',
+      'EmbeddingChunkOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'EmbeddingChunk',
-      fieldName: 'embeddingChunks',
+      fieldName: 'embeddingChunk',
       document,
       variables,
+      transform: (data: {
+        embeddingChunks?: {
+          nodes?: InferSelectResult<EmbeddingChunkWithRelations, S>[];
+        };
+      }) => ({
+        embeddingChunk: data.embeddingChunks?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends EmbeddingChunkSelect>(

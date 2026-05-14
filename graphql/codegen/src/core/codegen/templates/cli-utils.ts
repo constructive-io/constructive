@@ -283,8 +283,8 @@ export function parseFindManyArgs<T = Record<string, unknown>>(
 
 /**
  * Build findFirst args from CLI argv.
- * Like parseFindManyArgs but only includes select and where
- * (no pagination flags — findFirst returns the first matching record).
+ * Like parseFindManyArgs but without pagination flags (no limit/offset/after/before/last)
+ * — findFirst returns the first matching record. Supports select, where, and orderBy.
  */
 export function parseFindFirstArgs<T = Record<string, unknown>>(
   argv: Record<string, unknown>,
@@ -293,10 +293,12 @@ export function parseFindFirstArgs<T = Record<string, unknown>>(
   const select = parseSelectFlag(argv, defaultSelect);
   const parsed = unflattenDotNotation(argv);
   const where = parsed.where;
+  const orderBy = parseOrderByFlag(argv);
 
   return {
     select,
     ...(where !== undefined ? { where } : {}),
+    ...(orderBy !== undefined ? { orderBy } : {}),
   } as unknown as T;
 }
 

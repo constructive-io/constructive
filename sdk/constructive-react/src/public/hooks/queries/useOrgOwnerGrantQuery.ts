@@ -91,7 +91,7 @@ export async function fetchOrgOwnerGrantQuery<S extends OrgOwnerGrantSelect>(par
 export async function fetchOrgOwnerGrantQuery(params: {
   id: string;
   selection: SelectionConfig<OrgOwnerGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgOwnerGrantSelect>(params.selection);
   return getClient()
     .orgOwnerGrant.findOne({

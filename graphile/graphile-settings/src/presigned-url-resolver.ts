@@ -86,24 +86,21 @@ export function getPresignedUrlS3Config(): S3Config {
 }
 
 /**
- * Create a per-database bucket name resolver.
+ * Create a per-(database, bucketKey) bucket name resolver.
  *
- * Uses the BUCKET_NAME env var as a prefix. For each database, the S3 bucket
- * name becomes `{prefix}-{databaseId}` (e.g., "myapp-abc123def456").
+ * Uses the BUCKET_NAME env var as a prefix. For each (database, bucketKey)
+ * pair, the S3 bucket name becomes `{prefix}-{bucketKey}-{databaseId}`
+ * (e.g., "myapp-public-abc123def456").
  *
- * In local development with MinIO (default BUCKET_NAME="test-bucket"),
- * all databases share the same bucket for simplicity — the resolver
- * returns the prefix as-is when it looks like a local dev bucket.
- *
- * In production, set BUCKET_NAME to your org prefix (e.g., "myapp")
- * and each database gets its own isolated S3 bucket.
+ * This aligns with the bucket provisioner plugin which creates separate
+ * S3 buckets per logical bucket key.
  */
 export function createBucketNameResolver(): BucketNameResolver {
   const { cdn } = getEnvOptions();
   const prefix = cdn?.bucketName || 'test-bucket';
 
-  return (databaseId: string): string => {
-    return `${prefix}-${databaseId}`;
+  return (databaseId: string, bucketKey: string): string => {
+    return `${prefix}-${bucketKey}-${databaseId}`;
   };
 }
 

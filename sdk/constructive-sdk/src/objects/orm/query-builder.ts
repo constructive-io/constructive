@@ -324,8 +324,9 @@ export function buildFindFirstDocument<TSelect, TWhere>(
   operationName: string,
   queryField: string,
   select: TSelect,
-  args: { where?: TWhere },
+  args: { where?: TWhere; orderBy?: string[] },
   filterTypeName: string,
+  orderByTypeName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
@@ -348,6 +349,16 @@ export function buildFindFirstDocument<TSelect, TWhere>(
       varName: 'where',
       typeName: filterTypeName,
       value: args.where,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    {
+      varName: 'orderBy',
+      typeName: '[' + orderByTypeName + '!]',
+      value: args.orderBy?.length ? args.orderBy : undefined,
     },
     variableDefinitions,
     queryArgs,
@@ -889,4 +900,146 @@ function buildValueAst(
   }
 
   throw new Error('Unsupported value type: ' + typeof value);
+}
+
+// ============================================================================
+// Bulk Mutation Document Builders
+// ============================================================================
+
+export function buildBulkInsertDocument<TSelect, TData>(
+  operationName: string,
+  mutationField: string,
+  select: TSelect,
+  data: TData[],
+  inputTypeName: string,
+  onConflict?: unknown,
+  connectionFieldsMap?: Record<string, Record<string, string>>
+): { document: string; variables: Record<string, unknown> } {
+  const selections = select
+    ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
+    : [t.field({ name: 'id' })];
+
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [
+        t.field({ name: 'affectedCount' }),
+        t.field({
+          name: 'returning',
+          selectionSet: t.selectionSet({ selections }),
+        }),
+      ],
+    }),
+    variables: {
+      input: {
+        values: data,
+        ...(onConflict ? { onConflict } : {}),
+      },
+    },
+  };
+}
+
+export function buildBulkUpsertDocument<TSelect, TData>(
+  operationName: string,
+  mutationField: string,
+  select: TSelect,
+  data: TData[],
+  inputTypeName: string,
+  onConflict: unknown,
+  connectionFieldsMap?: Record<string, Record<string, string>>
+): { document: string; variables: Record<string, unknown> } {
+  const selections = select
+    ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
+    : [t.field({ name: 'id' })];
+
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [
+        t.field({ name: 'affectedCount' }),
+        t.field({
+          name: 'returning',
+          selectionSet: t.selectionSet({ selections }),
+        }),
+      ],
+    }),
+    variables: {
+      input: {
+        values: data,
+        onConflict,
+      },
+    },
+  };
+}
+
+export function buildBulkUpdateDocument<TSelect, TWhere, TData>(
+  operationName: string,
+  mutationField: string,
+  select: TSelect,
+  where: TWhere,
+  data: TData,
+  inputTypeName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>
+): { document: string; variables: Record<string, unknown> } {
+  const selections = select
+    ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
+    : [t.field({ name: 'id' })];
+
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [
+        t.field({ name: 'affectedCount' }),
+        t.field({
+          name: 'returning',
+          selectionSet: t.selectionSet({ selections }),
+        }),
+      ],
+    }),
+    variables: {
+      input: {
+        where,
+        patch: data,
+      },
+    },
+  };
+}
+
+export function buildBulkDeleteDocument<TSelect, TWhere>(
+  operationName: string,
+  mutationField: string,
+  select: TSelect,
+  where: TWhere,
+  inputTypeName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>
+): { document: string; variables: Record<string, unknown> } {
+  const selections = select
+    ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
+    : [t.field({ name: 'id' })];
+
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [
+        t.field({ name: 'affectedCount' }),
+        t.field({
+          name: 'returning',
+          selectionSet: t.selectionSet({ selections }),
+        }),
+      ],
+    }),
+    variables: {
+      input: {
+        where,
+      },
+    },
+  };
 }

@@ -70,13 +70,11 @@ export class RefModel {
     });
   }
   findFirst<S extends RefSelect>(
-    args: FindFirstArgs<S, RefFilter> & {
+    args: FindFirstArgs<S, RefFilter, RefOrderBy> & {
       select: S;
     } & StrictSelect<S, RefSelect>
   ): QueryBuilder<{
-    refs: {
-      nodes: InferSelectResult<RefWithRelations, S>[];
-    };
+    ref: InferSelectResult<RefWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Ref',
@@ -84,17 +82,26 @@ export class RefModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'RefFilter',
+      'RefOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Ref',
-      fieldName: 'refs',
+      fieldName: 'ref',
       document,
       variables,
+      transform: (data: {
+        refs?: {
+          nodes?: InferSelectResult<RefWithRelations, S>[];
+        };
+      }) => ({
+        ref: data.refs?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends RefSelect>(

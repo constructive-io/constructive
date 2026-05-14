@@ -91,7 +91,7 @@ export async function fetchEmailsModuleQuery<S extends EmailsModuleSelect>(param
 export async function fetchEmailsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<EmailsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<EmailsModuleSelect>(params.selection);
   return getClient()
     .emailsModule.findOne({

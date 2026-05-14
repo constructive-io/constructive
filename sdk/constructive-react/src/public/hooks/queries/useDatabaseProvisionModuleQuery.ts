@@ -99,7 +99,7 @@ export async function fetchDatabaseProvisionModuleQuery<
 export async function fetchDatabaseProvisionModuleQuery(params: {
   id: string;
   selection: SelectionConfig<DatabaseProvisionModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DatabaseProvisionModuleSelect>(params.selection);
   return getClient()
     .databaseProvisionModule.findOne({

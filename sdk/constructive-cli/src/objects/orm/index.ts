@@ -17,7 +17,6 @@ export { GraphQLRequestError } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
-export { NodeHttpAdapter } from './node-fetch';
 export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**

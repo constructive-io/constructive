@@ -83,9 +83,6 @@ describe('getGraphQLQueryName', () => {
     expect(getGraphQLQueryName('sql_actions')).toBe('sqlActions');
   });
 
-  it('should convert database_extension', () => {
-    expect(getGraphQLQueryName('database_extension')).toBe('databaseExtensions');
-  });
 });
 
 describe('graphqlRowToPostgresRow', () => {

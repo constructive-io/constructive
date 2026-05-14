@@ -70,13 +70,11 @@ export class OrgOwnerGrantModel {
     });
   }
   findFirst<S extends OrgOwnerGrantSelect>(
-    args: FindFirstArgs<S, OrgOwnerGrantFilter> & {
+    args: FindFirstArgs<S, OrgOwnerGrantFilter, OrgOwnerGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgOwnerGrantSelect>
   ): QueryBuilder<{
-    orgOwnerGrants: {
-      nodes: InferSelectResult<OrgOwnerGrantWithRelations, S>[];
-    };
+    orgOwnerGrant: InferSelectResult<OrgOwnerGrantWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgOwnerGrant',
@@ -84,17 +82,26 @@ export class OrgOwnerGrantModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgOwnerGrantFilter',
+      'OrgOwnerGrantOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgOwnerGrant',
-      fieldName: 'orgOwnerGrants',
+      fieldName: 'orgOwnerGrant',
       document,
       variables,
+      transform: (data: {
+        orgOwnerGrants?: {
+          nodes?: InferSelectResult<OrgOwnerGrantWithRelations, S>[];
+        };
+      }) => ({
+        orgOwnerGrant: data.orgOwnerGrants?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgOwnerGrantSelect>(

@@ -91,7 +91,7 @@ export async function fetchStorageModuleQuery<S extends StorageModuleSelect>(par
 export async function fetchStorageModuleQuery(params: {
   id: string;
   selection: SelectionConfig<StorageModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<StorageModuleSelect>(params.selection);
   return getClient()
     .storageModule.findOne({

@@ -70,13 +70,11 @@ export class AppModel {
     });
   }
   findFirst<S extends AppSelect>(
-    args: FindFirstArgs<S, AppFilter> & {
+    args: FindFirstArgs<S, AppFilter, AppOrderBy> & {
       select: S;
     } & StrictSelect<S, AppSelect>
   ): QueryBuilder<{
-    apps: {
-      nodes: InferSelectResult<AppWithRelations, S>[];
-    };
+    app: InferSelectResult<AppWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'App',
@@ -84,17 +82,26 @@ export class AppModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppFilter',
+      'AppOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'App',
-      fieldName: 'apps',
+      fieldName: 'app',
       document,
       variables,
+      transform: (data: {
+        apps?: {
+          nodes?: InferSelectResult<AppWithRelations, S>[];
+        };
+      }) => ({
+        app: data.apps?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppSelect>(

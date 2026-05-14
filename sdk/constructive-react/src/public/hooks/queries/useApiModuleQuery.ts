@@ -91,7 +91,7 @@ export async function fetchApiModuleQuery<S extends ApiModuleSelect>(params: {
 export async function fetchApiModuleQuery(params: {
   id: string;
   selection: SelectionConfig<ApiModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ApiModuleSelect>(params.selection);
   return getClient()
     .apiModule.findOne({

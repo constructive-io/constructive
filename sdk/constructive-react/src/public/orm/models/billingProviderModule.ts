@@ -72,13 +72,11 @@ export class BillingProviderModuleModel {
     });
   }
   findFirst<S extends BillingProviderModuleSelect>(
-    args: FindFirstArgs<S, BillingProviderModuleFilter> & {
+    args: FindFirstArgs<S, BillingProviderModuleFilter, BillingProviderModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, BillingProviderModuleSelect>
   ): QueryBuilder<{
-    billingProviderModules: {
-      nodes: InferSelectResult<BillingProviderModuleWithRelations, S>[];
-    };
+    billingProviderModule: InferSelectResult<BillingProviderModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'BillingProviderModule',
@@ -86,17 +84,26 @@ export class BillingProviderModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'BillingProviderModuleFilter',
+      'BillingProviderModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'BillingProviderModule',
-      fieldName: 'billingProviderModules',
+      fieldName: 'billingProviderModule',
       document,
       variables,
+      transform: (data: {
+        billingProviderModules?: {
+          nodes?: InferSelectResult<BillingProviderModuleWithRelations, S>[];
+        };
+      }) => ({
+        billingProviderModule: data.billingProviderModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends BillingProviderModuleSelect>(

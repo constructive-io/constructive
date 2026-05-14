@@ -70,13 +70,11 @@ export class OrgLimitCreditModel {
     });
   }
   findFirst<S extends OrgLimitCreditSelect>(
-    args: FindFirstArgs<S, OrgLimitCreditFilter> & {
+    args: FindFirstArgs<S, OrgLimitCreditFilter, OrgLimitCreditOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgLimitCreditSelect>
   ): QueryBuilder<{
-    orgLimitCredits: {
-      nodes: InferSelectResult<OrgLimitCreditWithRelations, S>[];
-    };
+    orgLimitCredit: InferSelectResult<OrgLimitCreditWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgLimitCredit',
@@ -84,17 +82,26 @@ export class OrgLimitCreditModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgLimitCreditFilter',
+      'OrgLimitCreditOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgLimitCredit',
-      fieldName: 'orgLimitCredits',
+      fieldName: 'orgLimitCredit',
       document,
       variables,
+      transform: (data: {
+        orgLimitCredits?: {
+          nodes?: InferSelectResult<OrgLimitCreditWithRelations, S>[];
+        };
+      }) => ({
+        orgLimitCredit: data.orgLimitCredits?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgLimitCreditSelect>(

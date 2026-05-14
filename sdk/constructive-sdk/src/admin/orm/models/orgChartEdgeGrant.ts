@@ -70,13 +70,11 @@ export class OrgChartEdgeGrantModel {
     });
   }
   findFirst<S extends OrgChartEdgeGrantSelect>(
-    args: FindFirstArgs<S, OrgChartEdgeGrantFilter> & {
+    args: FindFirstArgs<S, OrgChartEdgeGrantFilter, OrgChartEdgeGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgChartEdgeGrantSelect>
   ): QueryBuilder<{
-    orgChartEdgeGrants: {
-      nodes: InferSelectResult<OrgChartEdgeGrantWithRelations, S>[];
-    };
+    orgChartEdgeGrant: InferSelectResult<OrgChartEdgeGrantWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgChartEdgeGrant',
@@ -84,17 +82,26 @@ export class OrgChartEdgeGrantModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgChartEdgeGrantFilter',
+      'OrgChartEdgeGrantOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgChartEdgeGrant',
-      fieldName: 'orgChartEdgeGrants',
+      fieldName: 'orgChartEdgeGrant',
       document,
       variables,
+      transform: (data: {
+        orgChartEdgeGrants?: {
+          nodes?: InferSelectResult<OrgChartEdgeGrantWithRelations, S>[];
+        };
+      }) => ({
+        orgChartEdgeGrant: data.orgChartEdgeGrants?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgChartEdgeGrantSelect>(

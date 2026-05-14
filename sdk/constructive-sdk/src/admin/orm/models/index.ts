@@ -47,6 +47,6 @@ export { AppInviteModel } from './appInvite';
 export { OrgMembershipSettingModel } from './orgMembershipSetting';
 export { OrgLimitAggregateModel } from './orgLimitAggregate';
 export { OrgLimitModel } from './orgLimit';
-export { OrgInviteModel } from './orgInvite';
 export { AppMembershipModel } from './appMembership';
+export { OrgInviteModel } from './orgInvite';
 export { OrgMembershipModel } from './orgMembership';

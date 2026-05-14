@@ -99,7 +99,7 @@ export async function fetchIdentityProvidersModuleQuery<
 export async function fetchIdentityProvidersModuleQuery(params: {
   id: string;
   selection: SelectionConfig<IdentityProvidersModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<IdentityProvidersModuleSelect>(params.selection);
   return getClient()
     .identityProvidersModule.findOne({

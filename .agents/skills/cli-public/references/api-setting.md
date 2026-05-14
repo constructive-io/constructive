@@ -12,8 +12,8 @@ csdk api-setting list --where.<field>.<op> <value> --orderBy <values>
 csdk api-setting list --limit 10 --after <cursor>
 csdk api-setting find-first --where.<field>.<op> <value>
 csdk api-setting get --id <UUID>
-csdk api-setting create --databaseId <UUID> --apiId <UUID> [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--options <JSON>]
-csdk api-setting update --id <UUID> [--databaseId <UUID>] [--apiId <UUID>] [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--options <JSON>]
+csdk api-setting create --databaseId <UUID> --apiId <UUID> [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--enableRealtime <Boolean>] [--enableBulk <Boolean>] [--options <JSON>]
+csdk api-setting update --id <UUID> [--databaseId <UUID>] [--apiId <UUID>] [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--enableRealtime <Boolean>] [--enableBulk <Boolean>] [--options <JSON>]
 csdk api-setting delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk api-setting list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a apiSetting
 
 ```bash
-csdk api-setting create --databaseId <UUID> --apiId <UUID> [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--options <JSON>]
+csdk api-setting create --databaseId <UUID> --apiId <UUID> [--enableAggregates <Boolean>] [--enablePostgis <Boolean>] [--enableSearch <Boolean>] [--enableDirectUploads <Boolean>] [--enablePresignedUploads <Boolean>] [--enableManyToMany <Boolean>] [--enableConnectionFilter <Boolean>] [--enableLtree <Boolean>] [--enableLlm <Boolean>] [--enableRealtime <Boolean>] [--enableBulk <Boolean>] [--options <JSON>]
 ```
 
 ### Get a apiSetting by id

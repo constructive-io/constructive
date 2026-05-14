@@ -91,7 +91,7 @@ export async function fetchCheckConstraintQuery<S extends CheckConstraintSelect>
 export async function fetchCheckConstraintQuery(params: {
   id: string;
   selection: SelectionConfig<CheckConstraintSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<CheckConstraintSelect>(params.selection);
   return getClient()
     .checkConstraint.findOne({

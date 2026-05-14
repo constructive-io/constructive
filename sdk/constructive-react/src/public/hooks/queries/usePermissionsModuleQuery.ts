@@ -97,7 +97,7 @@ export async function fetchPermissionsModuleQuery<S extends PermissionsModuleSel
 export async function fetchPermissionsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<PermissionsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<PermissionsModuleSelect>(params.selection);
   return getClient()
     .permissionsModule.findOne({

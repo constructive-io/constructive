@@ -70,13 +70,11 @@ export class CryptoAddressModel {
     });
   }
   findFirst<S extends CryptoAddressSelect>(
-    args: FindFirstArgs<S, CryptoAddressFilter> & {
+    args: FindFirstArgs<S, CryptoAddressFilter, CryptoAddressOrderBy> & {
       select: S;
     } & StrictSelect<S, CryptoAddressSelect>
   ): QueryBuilder<{
-    cryptoAddresses: {
-      nodes: InferSelectResult<CryptoAddressWithRelations, S>[];
-    };
+    cryptoAddress: InferSelectResult<CryptoAddressWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'CryptoAddress',
@@ -84,17 +82,26 @@ export class CryptoAddressModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'CryptoAddressFilter',
+      'CryptoAddressOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'CryptoAddress',
-      fieldName: 'cryptoAddresses',
+      fieldName: 'cryptoAddress',
       document,
       variables,
+      transform: (data: {
+        cryptoAddresses?: {
+          nodes?: InferSelectResult<CryptoAddressWithRelations, S>[];
+        };
+      }) => ({
+        cryptoAddress: data.cryptoAddresses?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends CryptoAddressSelect>(

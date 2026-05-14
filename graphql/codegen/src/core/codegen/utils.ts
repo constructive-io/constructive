@@ -211,6 +211,46 @@ export function getDeleteMutationName(table: Table): string {
 }
 
 // ============================================================================
+// Bulk mutation naming helpers
+// ============================================================================
+
+export function getBulkCreateMutationHookName(table: Table): string {
+  const { typeName } = getTableNames(table);
+  return `useBulkCreate${typeName}Mutation`;
+}
+
+export function getBulkUpsertMutationHookName(table: Table): string {
+  const { typeName } = getTableNames(table);
+  return `useBulkUpsert${typeName}Mutation`;
+}
+
+export function getBulkUpdateMutationHookName(table: Table): string {
+  const { typeName } = getTableNames(table);
+  return `useBulkUpdate${typeName}Mutation`;
+}
+
+export function getBulkDeleteMutationHookName(table: Table): string {
+  const { typeName } = getTableNames(table);
+  return `useBulkDelete${typeName}Mutation`;
+}
+
+export function getBulkCreateMutationFileName(table: Table): string {
+  return `${getBulkCreateMutationHookName(table)}.ts`;
+}
+
+export function getBulkUpsertMutationFileName(table: Table): string {
+  return `${getBulkUpsertMutationHookName(table)}.ts`;
+}
+
+export function getBulkUpdateMutationFileName(table: Table): string {
+  return `${getBulkUpdateMutationHookName(table)}.ts`;
+}
+
+export function getBulkDeleteMutationFileName(table: Table): string {
+  return `${getBulkDeleteMutationHookName(table)}.ts`;
+}
+
+// ============================================================================
 // Type names
 // ============================================================================
 

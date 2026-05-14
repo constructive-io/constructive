@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.1](https://github.com/constructive-io/jobs/compare/@constructive-io/job-utils@2.10.0...@constructive-io/job-utils@2.10.1) (2026-05-11)
+
+**Note:** Version bump only for package @constructive-io/job-utils
+
 # [2.10.0](https://github.com/constructive-io/jobs/compare/@constructive-io/job-utils@2.9.0...@constructive-io/job-utils@2.10.0) (2026-05-11)
 
 **Note:** Version bump only for package @constructive-io/job-utils

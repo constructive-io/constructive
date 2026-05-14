@@ -97,7 +97,7 @@ export async function fetchNotificationsModuleQuery<S extends NotificationsModul
 export async function fetchNotificationsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<NotificationsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<NotificationsModuleSelect>(params.selection);
   return getClient()
     .notificationsModule.findOne({

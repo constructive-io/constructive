@@ -33,6 +33,7 @@ export interface DatabaseSettings {
   enableLtree: boolean;
   enableLlm: boolean;
   enableRealtime: boolean;
+  enableBulk: boolean;
 }
 
 /**
@@ -99,6 +100,8 @@ export interface AuthSettings {
   cookieHttponly?: boolean;
   cookieMaxAge?: string | null;
   cookiePath?: string;
+  /** Remember me duration (seconds) for extended session cookies */
+  rememberMeDuration?: string | null;
   /** reCAPTCHA / CAPTCHA */
   enableCaptcha?: boolean;
   captchaSiteKey?: string | null;

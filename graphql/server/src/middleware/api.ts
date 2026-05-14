@@ -133,6 +133,7 @@ const AUTH_SETTINGS_SQL = (schemaName: string, tableName: string) => `
     cookie_httponly,
     cookie_max_age,
     cookie_path,
+    remember_me_duration,
     enable_captcha,
     captcha_site_key
   FROM "${schemaName}"."${tableName}"
@@ -218,6 +219,7 @@ const DATABASE_SETTINGS_SQL = `
     ds.enable_connection_filter,
     ds.enable_ltree,
     ds.enable_llm,
+    ds.enable_bulk,
     COALESCE(aps.enable_aggregates, ds.enable_aggregates) AS resolved_enable_aggregates,
     COALESCE(aps.enable_postgis, ds.enable_postgis) AS resolved_enable_postgis,
     COALESCE(aps.enable_search, ds.enable_search) AS resolved_enable_search,
@@ -226,7 +228,9 @@ const DATABASE_SETTINGS_SQL = `
     COALESCE(aps.enable_many_to_many, ds.enable_many_to_many) AS resolved_enable_many_to_many,
     COALESCE(aps.enable_connection_filter, ds.enable_connection_filter) AS resolved_enable_connection_filter,
     COALESCE(aps.enable_ltree, ds.enable_ltree) AS resolved_enable_ltree,
-    COALESCE(aps.enable_llm, ds.enable_llm) AS resolved_enable_llm
+    COALESCE(aps.enable_llm, ds.enable_llm) AS resolved_enable_llm,
+    COALESCE(aps.enable_realtime, ds.enable_realtime) AS resolved_enable_realtime,
+    COALESCE(aps.enable_bulk, ds.enable_bulk) AS resolved_enable_bulk
   FROM services_public.database_settings ds
   LEFT JOIN services_public.api_settings aps ON ds.database_id = aps.database_id AND aps.api_id = $2
   WHERE ds.database_id = $1
@@ -265,6 +269,7 @@ interface AuthSettingsRow {
   cookie_httponly: boolean;
   cookie_max_age: string | null;
   cookie_path: string;
+  remember_me_duration: string | null;
   enable_captcha: boolean;
   captcha_site_key: string | null;
 }
@@ -325,6 +330,8 @@ interface DatabaseSettingsRow {
   resolved_enable_connection_filter: boolean;
   resolved_enable_ltree: boolean;
   resolved_enable_llm: boolean;
+  resolved_enable_realtime: boolean;
+  resolved_enable_bulk: boolean;
 }
 
 interface ApiListRow {
@@ -422,6 +429,10 @@ const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
 
 const toRlsModuleFromSettings = (row: RlsModuleData | null): RlsModule | undefined => {
   if (!row) return undefined;
+  // If metaschema_public.function rows are missing (e.g. trigger was skipped
+  // during migration), the LEFT JOINs resolve NULL.  Return undefined so the
+  // caller falls back to the legacy api_modules lookup.
+  if (!row.authenticate || !row.authenticate_schema) return undefined;
   return {
     authenticate: row.authenticate,
     authenticateStrict: row.authenticate_strict,
@@ -447,6 +458,7 @@ const toAuthSettings = (row: AuthSettingsRow | null): AuthSettings | undefined =
     cookieHttponly: row.cookie_httponly,
     cookieMaxAge: row.cookie_max_age,
     cookiePath: row.cookie_path,
+    rememberMeDuration: row.remember_me_duration,
     enableCaptcha: row.enable_captcha,
     captchaSiteKey: row.captcha_site_key,
   };
@@ -672,9 +684,8 @@ const toDatabaseSettings = (row: DatabaseSettingsRow | null): DatabaseSettings |
     enableConnectionFilter: row.resolved_enable_connection_filter,
     enableLtree: row.resolved_enable_ltree,
     enableLlm: row.resolved_enable_llm,
-    // Reads from the COALESCE cascade once constructive-db#1105 is merged and
-    // the enable_realtime column exists in database_settings / api_settings.
-    enableRealtime: false,
+    enableRealtime: row.resolved_enable_realtime,
+    enableBulk: row.resolved_enable_bulk,
   };
 };
 

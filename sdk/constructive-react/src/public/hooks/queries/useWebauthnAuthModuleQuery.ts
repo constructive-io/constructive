@@ -97,7 +97,7 @@ export async function fetchWebauthnAuthModuleQuery<S extends WebauthnAuthModuleS
 export async function fetchWebauthnAuthModuleQuery(params: {
   id: string;
   selection: SelectionConfig<WebauthnAuthModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<WebauthnAuthModuleSelect>(params.selection);
   return getClient()
     .webauthnAuthModule.findOne({

@@ -99,7 +99,7 @@ export async function fetchBillingProviderModuleQuery<
 export async function fetchBillingProviderModuleQuery(params: {
   id: string;
   selection: SelectionConfig<BillingProviderModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<BillingProviderModuleSelect>(params.selection);
   return getClient()
     .billingProviderModule.findOne({

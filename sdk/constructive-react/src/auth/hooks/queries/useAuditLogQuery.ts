@@ -91,7 +91,7 @@ export async function fetchAuditLogQuery<S extends AuditLogSelect>(params: {
 export async function fetchAuditLogQuery(params: {
   id: string;
   selection: SelectionConfig<AuditLogSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AuditLogSelect>(params.selection);
   return getClient()
     .auditLog.findOne({

@@ -88,6 +88,14 @@ export interface TableQueryNames {
   delete: string | null;
   /** Patch field name in update mutation input (e.g., "userPatch" for UpdateUserInput) */
   patchFieldName?: string;
+  /** Bulk insert mutation name (e.g., "bulkCreateUsers") */
+  bulkInsert?: string | null;
+  /** Bulk upsert mutation name (e.g., "bulkUpsertUsers") */
+  bulkUpsert?: string | null;
+  /** Bulk update mutation name (e.g., "bulkUpdateUsers") */
+  bulkUpdate?: string | null;
+  /** Bulk delete mutation name (e.g., "bulkDeleteUsers") */
+  bulkDelete?: string | null;
 }
 
 /**

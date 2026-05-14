@@ -137,7 +137,6 @@ export function generateCreateClientFile(
   tables: Table[],
   hasCustomQueries: boolean,
   hasCustomMutations: boolean,
-  options?: { nodeHttpAdapter?: boolean },
 ): GeneratedClientFile {
   const statements: t.Statement[] = [];
 
@@ -230,22 +229,6 @@ export function generateCreateClientFile(
 
   // Re-export all models
   statements.push(t.exportAllDeclaration(t.stringLiteral('./models')));
-
-  // Re-export NodeHttpAdapter when enabled (for use in any Node.js application)
-  if (options?.nodeHttpAdapter) {
-    statements.push(
-      t.exportNamedDeclaration(
-        null,
-        [
-          t.exportSpecifier(
-            t.identifier('NodeHttpAdapter'),
-            t.identifier('NodeHttpAdapter'),
-          ),
-        ],
-        t.stringLiteral('./node-fetch'),
-      ),
-    );
-  }
 
   // Re-export custom operations
   if (hasCustomQueries) {

@@ -112,7 +112,8 @@ const ALLOWED_NODE_TYPES = new Set([
   'sval',
   'fval',
   'boolval',
-  'bsval'
+  'bsval',
+  'isnull'
 ]);
 
 /**

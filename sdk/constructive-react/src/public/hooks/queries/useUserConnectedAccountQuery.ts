@@ -97,7 +97,7 @@ export async function fetchUserConnectedAccountQuery<S extends UserConnectedAcco
 export async function fetchUserConnectedAccountQuery(params: {
   id: string;
   selection: SelectionConfig<UserConnectedAccountSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<UserConnectedAccountSelect>(params.selection);
   return getClient()
     .userConnectedAccount.findOne({

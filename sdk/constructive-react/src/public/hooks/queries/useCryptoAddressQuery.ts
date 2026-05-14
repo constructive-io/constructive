@@ -91,7 +91,7 @@ export async function fetchCryptoAddressQuery<S extends CryptoAddressSelect>(par
 export async function fetchCryptoAddressQuery(params: {
   id: string;
   selection: SelectionConfig<CryptoAddressSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<CryptoAddressSelect>(params.selection);
   return getClient()
     .cryptoAddress.findOne({

@@ -70,13 +70,11 @@ export class WebauthnSettingModel {
     });
   }
   findFirst<S extends WebauthnSettingSelect>(
-    args: FindFirstArgs<S, WebauthnSettingFilter> & {
+    args: FindFirstArgs<S, WebauthnSettingFilter, WebauthnSettingOrderBy> & {
       select: S;
     } & StrictSelect<S, WebauthnSettingSelect>
   ): QueryBuilder<{
-    webauthnSettings: {
-      nodes: InferSelectResult<WebauthnSettingWithRelations, S>[];
-    };
+    webauthnSetting: InferSelectResult<WebauthnSettingWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'WebauthnSetting',
@@ -84,17 +82,26 @@ export class WebauthnSettingModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'WebauthnSettingFilter',
+      'WebauthnSettingOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'WebauthnSetting',
-      fieldName: 'webauthnSettings',
+      fieldName: 'webauthnSetting',
       document,
       variables,
+      transform: (data: {
+        webauthnSettings?: {
+          nodes?: InferSelectResult<WebauthnSettingWithRelations, S>[];
+        };
+      }) => ({
+        webauthnSetting: data.webauthnSettings?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends WebauthnSettingSelect>(

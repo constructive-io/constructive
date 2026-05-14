@@ -118,7 +118,7 @@ export async function fetchEntityTypeProvisionQuery<S extends EntityTypeProvisio
 export async function fetchEntityTypeProvisionQuery(params: {
   id: string;
   selection: SelectionConfig<EntityTypeProvisionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<EntityTypeProvisionSelect>(params.selection);
   return getClient()
     .entityTypeProvision.findOne({

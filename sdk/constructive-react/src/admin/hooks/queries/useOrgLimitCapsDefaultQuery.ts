@@ -97,7 +97,7 @@ export async function fetchOrgLimitCapsDefaultQuery<S extends OrgLimitCapsDefaul
 export async function fetchOrgLimitCapsDefaultQuery(params: {
   id: string;
   selection: SelectionConfig<OrgLimitCapsDefaultSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgLimitCapsDefaultSelect>(params.selection);
   return getClient()
     .orgLimitCapsDefault.findOne({

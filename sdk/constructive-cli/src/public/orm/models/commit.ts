@@ -70,13 +70,11 @@ export class CommitModel {
     });
   }
   findFirst<S extends CommitSelect>(
-    args: FindFirstArgs<S, CommitFilter> & {
+    args: FindFirstArgs<S, CommitFilter, CommitOrderBy> & {
       select: S;
     } & StrictSelect<S, CommitSelect>
   ): QueryBuilder<{
-    commits: {
-      nodes: InferSelectResult<CommitWithRelations, S>[];
-    };
+    commit: InferSelectResult<CommitWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Commit',
@@ -84,17 +82,26 @@ export class CommitModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'CommitFilter',
+      'CommitOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Commit',
-      fieldName: 'commits',
+      fieldName: 'commit',
       document,
       variables,
+      transform: (data: {
+        commits?: {
+          nodes?: InferSelectResult<CommitWithRelations, S>[];
+        };
+      }) => ({
+        commit: data.commits?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends CommitSelect>(

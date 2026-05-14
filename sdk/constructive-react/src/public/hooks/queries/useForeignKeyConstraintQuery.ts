@@ -97,7 +97,7 @@ export async function fetchForeignKeyConstraintQuery<S extends ForeignKeyConstra
 export async function fetchForeignKeyConstraintQuery(params: {
   id: string;
   selection: SelectionConfig<ForeignKeyConstraintSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ForeignKeyConstraintSelect>(params.selection);
   return getClient()
     .foreignKeyConstraint.findOne({

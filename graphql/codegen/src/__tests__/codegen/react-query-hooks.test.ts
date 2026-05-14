@@ -337,10 +337,8 @@ describe('Query Hook Generators', () => {
 });
 
 describe('Regression: FindManyArgs TCondition type arg', () => {
-  // Bug: queries.ts passed 3 type args to FindManyArgs (TSelect, TWhere, TOrderBy),
-  // but the template defines 4 params: FindManyArgs<TSelect, TWhere, TCondition = never, TOrderBy = never>.
-  // This caused TOrderBy to land in the TCondition slot, defaulting TOrderBy to `never`
-  // and breaking all hook orderBy params.
+  // Regression guard: queries.ts passes 3 type args to FindManyArgs (TSelect, TWhere, TOrderBy).
+  // A prior bug had 4 params with defaults, causing TOrderBy to land in the wrong slot.
 
   it('does not include Condition type in generated hooks', () => {
     const result = generateListQueryHook(simpleUserTable, {

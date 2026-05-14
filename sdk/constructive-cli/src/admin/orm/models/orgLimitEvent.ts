@@ -70,13 +70,11 @@ export class OrgLimitEventModel {
     });
   }
   findFirst<S extends OrgLimitEventSelect>(
-    args: FindFirstArgs<S, OrgLimitEventFilter> & {
+    args: FindFirstArgs<S, OrgLimitEventFilter, OrgLimitEventOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgLimitEventSelect>
   ): QueryBuilder<{
-    orgLimitEvents: {
-      nodes: InferSelectResult<OrgLimitEventWithRelations, S>[];
-    };
+    orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgLimitEvent',
@@ -84,17 +82,26 @@ export class OrgLimitEventModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgLimitEventFilter',
+      'OrgLimitEventOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgLimitEvent',
-      fieldName: 'orgLimitEvents',
+      fieldName: 'orgLimitEvent',
       document,
       variables,
+      transform: (data: {
+        orgLimitEvents?: {
+          nodes?: InferSelectResult<OrgLimitEventWithRelations, S>[];
+        };
+      }) => ({
+        orgLimitEvent: data.orgLimitEvents?.nodes?.[0] ?? null,
+      }),
     });
   }
   create<S extends OrgLimitEventSelect>(

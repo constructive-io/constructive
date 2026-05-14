@@ -88,7 +88,10 @@ export async function fetchRefQuery<S extends RefSelect>(params: {
 }): Promise<{
   ref: InferSelectResult<RefWithRelations, S> | null;
 }>;
-export async function fetchRefQuery(params: { id: string; selection: SelectionConfig<RefSelect> }) {
+export async function fetchRefQuery(params: {
+  id: string;
+  selection: SelectionConfig<RefSelect>;
+}): Promise<any> {
   const args = buildSelectionArgs<RefSelect>(params.selection);
   return getClient()
     .ref.findOne({

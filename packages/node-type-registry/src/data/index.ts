@@ -4,6 +4,7 @@ export { CheckNotEqual } from './check-not-equal';
 export { CheckOneOf } from './check-one-of';
 export { DataAggregateLimitCounter } from './data-aggregate-limit-counter';
 export { DataBillingMeter } from './data-billing-meter';
+export { DataBulk } from './data-bulk';
 export { DataChunks } from './data-chunks';
 export { DataCompositeField } from './data-composite-field';
 export { DataDirectOwner } from './data-direct-owner';

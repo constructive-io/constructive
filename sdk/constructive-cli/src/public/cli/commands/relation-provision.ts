@@ -42,7 +42,7 @@ const fieldSchema: FieldSchema = {
   outTargetFieldId: 'uuid',
 };
 const usage =
-  '\nrelation-provision <command>\n\nCommands:\n  list                  List relationProvision records\n  find-first            Find first matching relationProvision record\n  get                   Get a relationProvision by ID\n  create                Create a new relationProvision\n  update                Update an existing relationProvision\n  delete                Delete a relationProvision\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
+  '\nrelation-provision <command>\n\nCommands:\n  list                  List relationProvision records\n  find-first            Find first matching relationProvision record\n  get                   Get a relationProvision by ID\n  create                Create a new relationProvision\n  update                Update an existing relationProvision\n  delete                Delete a relationProvision\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -162,7 +162,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       outTargetFieldId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<RelationProvisionSelect, RelationProvisionFilter> & {
+      FindFirstArgs<RelationProvisionSelect, RelationProvisionFilter, RelationProvisionOrderBy> & {
         select: RelationProvisionSelect;
       }
     >(argv, defaultSelect);

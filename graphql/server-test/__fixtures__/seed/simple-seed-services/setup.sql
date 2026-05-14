@@ -302,6 +302,8 @@ CREATE TABLE IF NOT EXISTS services_public.database_settings (
   enable_connection_filter boolean NOT NULL DEFAULT true,
   enable_ltree boolean NOT NULL DEFAULT true,
   enable_llm boolean NOT NULL DEFAULT false,
+  enable_realtime boolean NOT NULL DEFAULT false,
+  enable_bulk boolean NOT NULL DEFAULT false,
   options jsonb NOT NULL DEFAULT '{}'::jsonb,
   CONSTRAINT ds_db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE
 );
@@ -320,6 +322,8 @@ CREATE TABLE IF NOT EXISTS services_public.api_settings (
   enable_connection_filter boolean,
   enable_ltree boolean,
   enable_llm boolean,
+  enable_realtime boolean,
+  enable_bulk boolean,
   options jsonb NOT NULL DEFAULT '{}'::jsonb,
   CONSTRAINT as_db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
   CONSTRAINT as_api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE

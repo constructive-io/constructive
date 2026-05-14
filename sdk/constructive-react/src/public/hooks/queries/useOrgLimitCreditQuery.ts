@@ -91,7 +91,7 @@ export async function fetchOrgLimitCreditQuery<S extends OrgLimitCreditSelect>(p
 export async function fetchOrgLimitCreditQuery(params: {
   id: string;
   selection: SelectionConfig<OrgLimitCreditSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgLimitCreditSelect>(params.selection);
   return getClient()
     .orgLimitCredit.findOne({

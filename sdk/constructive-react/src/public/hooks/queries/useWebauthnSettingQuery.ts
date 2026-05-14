@@ -91,7 +91,7 @@ export async function fetchWebauthnSettingQuery<S extends WebauthnSettingSelect>
 export async function fetchWebauthnSettingQuery(params: {
   id: string;
   selection: SelectionConfig<WebauthnSettingSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<WebauthnSettingSelect>(params.selection);
   return getClient()
     .webauthnSetting.findOne({

@@ -70,13 +70,11 @@ export class AgentTaskModel {
     });
   }
   findFirst<S extends AgentTaskSelect>(
-    args: FindFirstArgs<S, AgentTaskFilter> & {
+    args: FindFirstArgs<S, AgentTaskFilter, AgentTaskOrderBy> & {
       select: S;
     } & StrictSelect<S, AgentTaskSelect>
   ): QueryBuilder<{
-    agentTasks: {
-      nodes: InferSelectResult<AgentTaskWithRelations, S>[];
-    };
+    agentTask: InferSelectResult<AgentTaskWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AgentTask',
@@ -84,17 +82,26 @@ export class AgentTaskModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AgentTaskFilter',
+      'AgentTaskOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AgentTask',
-      fieldName: 'agentTasks',
+      fieldName: 'agentTask',
       document,
       variables,
+      transform: (data: {
+        agentTasks?: {
+          nodes?: InferSelectResult<AgentTaskWithRelations, S>[];
+        };
+      }) => ({
+        agentTask: data.agentTasks?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AgentTaskSelect>(

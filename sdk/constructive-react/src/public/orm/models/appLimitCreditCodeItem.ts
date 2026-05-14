@@ -72,13 +72,11 @@ export class AppLimitCreditCodeItemModel {
     });
   }
   findFirst<S extends AppLimitCreditCodeItemSelect>(
-    args: FindFirstArgs<S, AppLimitCreditCodeItemFilter> & {
+    args: FindFirstArgs<S, AppLimitCreditCodeItemFilter, AppLimitCreditCodeItemOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLimitCreditCodeItemSelect>
   ): QueryBuilder<{
-    appLimitCreditCodeItems: {
-      nodes: InferSelectResult<AppLimitCreditCodeItemWithRelations, S>[];
-    };
+    appLimitCreditCodeItem: InferSelectResult<AppLimitCreditCodeItemWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppLimitCreditCodeItem',
@@ -86,17 +84,26 @@ export class AppLimitCreditCodeItemModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppLimitCreditCodeItemFilter',
+      'AppLimitCreditCodeItemOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppLimitCreditCodeItem',
-      fieldName: 'appLimitCreditCodeItems',
+      fieldName: 'appLimitCreditCodeItem',
       document,
       variables,
+      transform: (data: {
+        appLimitCreditCodeItems?: {
+          nodes?: InferSelectResult<AppLimitCreditCodeItemWithRelations, S>[];
+        };
+      }) => ({
+        appLimitCreditCodeItem: data.appLimitCreditCodeItems?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppLimitCreditCodeItemSelect>(

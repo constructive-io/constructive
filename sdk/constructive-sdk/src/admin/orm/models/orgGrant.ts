@@ -70,13 +70,11 @@ export class OrgGrantModel {
     });
   }
   findFirst<S extends OrgGrantSelect>(
-    args: FindFirstArgs<S, OrgGrantFilter> & {
+    args: FindFirstArgs<S, OrgGrantFilter, OrgGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgGrantSelect>
   ): QueryBuilder<{
-    orgGrants: {
-      nodes: InferSelectResult<OrgGrantWithRelations, S>[];
-    };
+    orgGrant: InferSelectResult<OrgGrantWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgGrant',
@@ -84,17 +82,26 @@ export class OrgGrantModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgGrantFilter',
+      'OrgGrantOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgGrant',
-      fieldName: 'orgGrants',
+      fieldName: 'orgGrant',
       document,
       variables,
+      transform: (data: {
+        orgGrants?: {
+          nodes?: InferSelectResult<OrgGrantWithRelations, S>[];
+        };
+      }) => ({
+        orgGrant: data.orgGrants?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgGrantSelect>(

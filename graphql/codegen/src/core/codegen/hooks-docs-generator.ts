@@ -22,6 +22,10 @@ import {
   getCreateMutationHookName,
   getUpdateMutationHookName,
   getDeleteMutationHookName,
+  getBulkCreateMutationHookName,
+  getBulkUpsertMutationHookName,
+  getBulkUpdateMutationHookName,
+  getBulkDeleteMutationHookName,
   hasValidPrimaryKey,
   ucFirst,
   lcFirst,
@@ -91,6 +95,26 @@ export function generateHooksReadme(
         `| \`${getDeleteMutationHookName(table)}\` | Mutation | ${table.description || `Delete a ${singularName}`} |`,
       );
     }
+    if (table.query?.bulkInsert) {
+      lines.push(
+        `| \`${getBulkCreateMutationHookName(table)}\` | Mutation | Bulk create ${pluralName} |`,
+      );
+    }
+    if (table.query?.bulkUpsert) {
+      lines.push(
+        `| \`${getBulkUpsertMutationHookName(table)}\` | Mutation | Bulk upsert ${pluralName} |`,
+      );
+    }
+    if (table.query?.bulkUpdate) {
+      lines.push(
+        `| \`${getBulkUpdateMutationHookName(table)}\` | Mutation | Bulk update ${pluralName} |`,
+      );
+    }
+    if (table.query?.bulkDelete) {
+      lines.push(
+        `| \`${getBulkDeleteMutationHookName(table)}\` | Mutation | Bulk delete ${pluralName} |`,
+      );
+    }
   }
   for (const op of customOperations) {
     lines.push(
@@ -145,6 +169,20 @@ export function generateHooksReadme(
       lines.push(
         `create({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
       );
+      if (table.query?.bulkInsert) {
+        lines.push('');
+        lines.push(`// Bulk create ${pluralName}`);
+        lines.push(
+          `const { mutate: bulkCreate } = ${getBulkCreateMutationHookName(table)}({`,
+        );
+        lines.push(
+          `  selection: { fields: { ${pk.name}: true } },`,
+        );
+        lines.push('});');
+        lines.push(
+          `bulkCreate({ data: [{ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }] });`,
+        );
+      }
       lines.push('```');
       lines.push('');
     }
@@ -226,6 +264,7 @@ export function generateHooksAgentsDocs(
   lines.push('');
   lines.push('- Query hooks: `use<PluralName>Query`, `use<SingularName>Query`');
   lines.push('- Mutation hooks: `useCreate<Name>Mutation`, `useUpdate<Name>Mutation`, `useDelete<Name>Mutation`');
+  lines.push('- Bulk mutation hooks (when enabled): `useBulkCreate<Name>Mutation`, `useBulkUpsert<Name>Mutation`, `useBulkUpdate<Name>Mutation`, `useBulkDelete<Name>Mutation`');
   lines.push('- All hooks accept a `selection` parameter to pick fields');
   lines.push('');
 
@@ -282,6 +321,10 @@ export function generateHooksSkills(
                 `${getDeleteMutationHookName(table)}({})`,
               ]
             : []),
+          ...(table.query?.bulkInsert ? [`${getBulkCreateMutationHookName(table)}() — bulk create with data array`] : []),
+          ...(table.query?.bulkUpsert ? [`${getBulkUpsertMutationHookName(table)}() — bulk upsert with onConflict`] : []),
+          ...(table.query?.bulkUpdate ? [`${getBulkUpdateMutationHookName(table)}() — bulk update with where + data`] : []),
+          ...(table.query?.bulkDelete ? [`${getBulkDeleteMutationHookName(table)}() — bulk delete with where`] : []),
         ],
         examples: [
           {
@@ -365,6 +408,7 @@ export function generateHooksSkills(
           '',
           `// Query hooks: use<Model>Query, use<Model>sQuery`,
           `// Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation`,
+          `// Bulk mutation hooks (when enabled): useBulkCreate<Model>Mutation, useBulkUpsert<Model>Mutation, etc.`,
           '',
           `const { data, isLoading } = ${hookExamples[0] || 'useModelQuery'}({`,
           `  selection: { fields: { id: true } },`,

@@ -70,13 +70,11 @@ export class PhoneNumbersModuleModel {
     });
   }
   findFirst<S extends PhoneNumbersModuleSelect>(
-    args: FindFirstArgs<S, PhoneNumbersModuleFilter> & {
+    args: FindFirstArgs<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, PhoneNumbersModuleSelect>
   ): QueryBuilder<{
-    phoneNumbersModules: {
-      nodes: InferSelectResult<PhoneNumbersModuleWithRelations, S>[];
-    };
+    phoneNumbersModule: InferSelectResult<PhoneNumbersModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'PhoneNumbersModule',
@@ -84,17 +82,26 @@ export class PhoneNumbersModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'PhoneNumbersModuleFilter',
+      'PhoneNumbersModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'PhoneNumbersModule',
-      fieldName: 'phoneNumbersModules',
+      fieldName: 'phoneNumbersModule',
       document,
       variables,
+      transform: (data: {
+        phoneNumbersModules?: {
+          nodes?: InferSelectResult<PhoneNumbersModuleWithRelations, S>[];
+        };
+      }) => ({
+        phoneNumbersModule: data.phoneNumbersModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends PhoneNumbersModuleSelect>(

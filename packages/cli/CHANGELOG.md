@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.20.10](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.9...@constructive-io/cli@7.20.10) (2026-05-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.9](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.8...@constructive-io/cli@7.20.9) (2026-05-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.8](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.7...@constructive-io/cli@7.20.8) (2026-05-13)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.7](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.6...@constructive-io/cli@7.20.7) (2026-05-13)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.6](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.5...@constructive-io/cli@7.20.6) (2026-05-13)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.5](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.4...@constructive-io/cli@7.20.5) (2026-05-12)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.4](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.3...@constructive-io/cli@7.20.4) (2026-05-12)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.2...@constructive-io/cli@7.20.3) (2026-05-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.1...@constructive-io/cli@7.20.2) (2026-05-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [7.20.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.20.0...@constructive-io/cli@7.20.1) (2026-05-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 # [7.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.19.8...@constructive-io/cli@7.20.0) (2026-05-11)
 
 **Note:** Version bump only for package @constructive-io/cli

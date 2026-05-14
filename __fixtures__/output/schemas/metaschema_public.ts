@@ -68,18 +68,6 @@ export class database implements database {
     this.updated_at = data.updated_at;
   }
 }
-export interface database_extension {
-  name: string;
-  database_id: UUID;
-}
-export class database_extension implements database_extension {
-  name: string;
-  database_id: UUID;
-  constructor(data: database_extension) {
-    this.name = data.name;
-    this.database_id = data.database_id;
-  }
-}
 export interface extension {
   name: string;
   public_schemas: any | null;

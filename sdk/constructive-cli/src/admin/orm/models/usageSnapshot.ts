@@ -70,13 +70,11 @@ export class UsageSnapshotModel {
     });
   }
   findFirst<S extends UsageSnapshotSelect>(
-    args: FindFirstArgs<S, UsageSnapshotFilter> & {
+    args: FindFirstArgs<S, UsageSnapshotFilter, UsageSnapshotOrderBy> & {
       select: S;
     } & StrictSelect<S, UsageSnapshotSelect>
   ): QueryBuilder<{
-    usageSnapshots: {
-      nodes: InferSelectResult<UsageSnapshotWithRelations, S>[];
-    };
+    usageSnapshot: InferSelectResult<UsageSnapshotWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'UsageSnapshot',
@@ -84,17 +82,26 @@ export class UsageSnapshotModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'UsageSnapshotFilter',
+      'UsageSnapshotOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'UsageSnapshot',
-      fieldName: 'usageSnapshots',
+      fieldName: 'usageSnapshot',
       document,
       variables,
+      transform: (data: {
+        usageSnapshots?: {
+          nodes?: InferSelectResult<UsageSnapshotWithRelations, S>[];
+        };
+      }) => ({
+        usageSnapshot: data.usageSnapshots?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends UsageSnapshotSelect>(

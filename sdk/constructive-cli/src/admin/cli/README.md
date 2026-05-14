@@ -70,8 +70,8 @@ csdk auth set-token <your-token>
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
 | `org-limit-aggregate` | orgLimitAggregate CRUD operations |
 | `org-limit` | orgLimit CRUD operations |
-| `org-invite` | orgInvite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
+| `org-invite` | orgInvite CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
@@ -1331,42 +1331,6 @@ CRUD operations for OrgLimit records.
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`
 
-### `org-invite`
-
-CRUD operations for OrgInvite records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgInvite records |
-| `find-first` | Find first matching orgInvite record |
-| `get` | Get a orgInvite by id |
-| `create` | Create a new orgInvite |
-| `update` | Update an existing orgInvite |
-| `delete` | Delete a orgInvite |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `email` | Email |
-| `senderId` | UUID |
-| `receiverId` | UUID |
-| `inviteToken` | String |
-| `inviteValid` | Boolean |
-| `inviteLimit` | Int |
-| `inviteCount` | Int |
-| `multiple` | Boolean |
-| `data` | JSON |
-| `profileId` | UUID |
-| `expiresAt` | Datetime |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `entityId` | UUID |
-
-**Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `expiresAt`
-
 ### `app-membership`
 
 CRUD operations for AppMembership records.
@@ -1403,6 +1367,43 @@ CRUD operations for AppMembership records.
 
 **Required create fields:** `actorId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+
+### `org-invite`
+
+CRUD operations for OrgInvite records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgInvite records |
+| `find-first` | Find first matching orgInvite record |
+| `get` | Get a orgInvite by id |
+| `create` | Create a new orgInvite |
+| `update` | Update an existing orgInvite |
+| `delete` | Delete a orgInvite |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `email` | Email |
+| `senderId` | UUID |
+| `receiverId` | UUID |
+| `inviteToken` | String |
+| `inviteValid` | Boolean |
+| `inviteLimit` | Int |
+| `inviteCount` | Int |
+| `multiple` | Boolean |
+| `data` | JSON |
+| `profileId` | UUID |
+| `isReadOnly` | Boolean |
+| `expiresAt` | Datetime |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `entityId` | UUID |
+
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `isReadOnly`, `expiresAt`
 
 ### `org-membership`
 

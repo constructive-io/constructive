@@ -91,7 +91,7 @@ export async function fetchAppAchievementQuery<S extends AppAchievementSelect>(p
 export async function fetchAppAchievementQuery(params: {
   id: string;
   selection: SelectionConfig<AppAchievementSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppAchievementSelect>(params.selection);
   return getClient()
     .appAchievement.findOne({

@@ -70,13 +70,11 @@ export class AppAdminGrantModel {
     });
   }
   findFirst<S extends AppAdminGrantSelect>(
-    args: FindFirstArgs<S, AppAdminGrantFilter> & {
+    args: FindFirstArgs<S, AppAdminGrantFilter, AppAdminGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, AppAdminGrantSelect>
   ): QueryBuilder<{
-    appAdminGrants: {
-      nodes: InferSelectResult<AppAdminGrantWithRelations, S>[];
-    };
+    appAdminGrant: InferSelectResult<AppAdminGrantWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppAdminGrant',
@@ -84,17 +82,26 @@ export class AppAdminGrantModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppAdminGrantFilter',
+      'AppAdminGrantOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppAdminGrant',
-      fieldName: 'appAdminGrants',
+      fieldName: 'appAdminGrant',
       document,
       variables,
+      transform: (data: {
+        appAdminGrants?: {
+          nodes?: InferSelectResult<AppAdminGrantWithRelations, S>[];
+        };
+      }) => ({
+        appAdminGrant: data.appAdminGrants?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppAdminGrantSelect>(

@@ -91,7 +91,7 @@ export async function fetchAppAdminGrantQuery<S extends AppAdminGrantSelect>(par
 export async function fetchAppAdminGrantQuery(params: {
   id: string;
   selection: SelectionConfig<AppAdminGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppAdminGrantSelect>(params.selection);
   return getClient()
     .appAdminGrant.findOne({

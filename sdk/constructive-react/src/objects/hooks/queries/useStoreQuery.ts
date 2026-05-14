@@ -91,7 +91,7 @@ export async function fetchStoreQuery<S extends StoreSelect>(params: {
 export async function fetchStoreQuery(params: {
   id: string;
   selection: SelectionConfig<StoreSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<StoreSelect>(params.selection);
   return getClient()
     .store.findOne({

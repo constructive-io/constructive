@@ -70,13 +70,11 @@ export class CryptoAuthModuleModel {
     });
   }
   findFirst<S extends CryptoAuthModuleSelect>(
-    args: FindFirstArgs<S, CryptoAuthModuleFilter> & {
+    args: FindFirstArgs<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, CryptoAuthModuleSelect>
   ): QueryBuilder<{
-    cryptoAuthModules: {
-      nodes: InferSelectResult<CryptoAuthModuleWithRelations, S>[];
-    };
+    cryptoAuthModule: InferSelectResult<CryptoAuthModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'CryptoAuthModule',
@@ -84,17 +82,26 @@ export class CryptoAuthModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'CryptoAuthModuleFilter',
+      'CryptoAuthModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'CryptoAuthModule',
-      fieldName: 'cryptoAuthModules',
+      fieldName: 'cryptoAuthModule',
       document,
       variables,
+      transform: (data: {
+        cryptoAuthModules?: {
+          nodes?: InferSelectResult<CryptoAuthModuleWithRelations, S>[];
+        };
+      }) => ({
+        cryptoAuthModule: data.cryptoAuthModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends CryptoAuthModuleSelect>(

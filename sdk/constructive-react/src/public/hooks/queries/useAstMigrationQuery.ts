@@ -91,7 +91,7 @@ export async function fetchAstMigrationQuery<S extends AstMigrationSelect>(param
 export async function fetchAstMigrationQuery(params: {
   id: number;
   selection: SelectionConfig<AstMigrationSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AstMigrationSelect>(params.selection);
   return getClient()
     .astMigration.findOne({

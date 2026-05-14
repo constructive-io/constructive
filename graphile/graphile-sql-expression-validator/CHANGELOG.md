@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.12.0](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@2.11.1...graphile-sql-expression-validator@2.12.0) (2026-05-14)
+
+### Features
+
+- add FieldType/FieldDefault AST validators with schema-aware allowlists ([4d4e69f](https://github.com/constructive-io/constructive/commit/4d4e69faddf38afd5c7e2a32be7f4ff2fb32ffb6))
+
+## [2.11.1](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@2.11.0...graphile-sql-expression-validator@2.11.1) (2026-05-11)
+
+**Note:** Version bump only for package graphile-sql-expression-validator
+
 # [2.11.0](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@2.10.0...graphile-sql-expression-validator@2.11.0) (2026-05-11)
 
 **Note:** Version bump only for package graphile-sql-expression-validator

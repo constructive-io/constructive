@@ -70,13 +70,11 @@ export class ObjectModel {
     });
   }
   findFirst<S extends ObjectSelect>(
-    args: FindFirstArgs<S, ObjectFilter> & {
+    args: FindFirstArgs<S, ObjectFilter, ObjectOrderBy> & {
       select: S;
     } & StrictSelect<S, ObjectSelect>
   ): QueryBuilder<{
-    objects: {
-      nodes: InferSelectResult<ObjectWithRelations, S>[];
-    };
+    object: InferSelectResult<ObjectWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Object',
@@ -84,17 +82,26 @@ export class ObjectModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ObjectFilter',
+      'ObjectOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Object',
-      fieldName: 'objects',
+      fieldName: 'object',
       document,
       variables,
+      transform: (data: {
+        objects?: {
+          nodes?: InferSelectResult<ObjectWithRelations, S>[];
+        };
+      }) => ({
+        object: data.objects?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ObjectSelect>(
@@ -103,7 +110,7 @@ export class ObjectModel {
       select: S;
     } & StrictSelect<S, ObjectSelect>
   ): QueryBuilder<{
-    getNodeAtPath: InferSelectResult<ObjectWithRelations, S> | null;
+    object: InferSelectResult<ObjectWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindOneDocument(
       'Object',
@@ -118,7 +125,7 @@ export class ObjectModel {
       client: this.client,
       operation: 'query',
       operationName: 'Object',
-      fieldName: 'getNodeAtPath',
+      fieldName: 'object',
       document,
       variables,
     });

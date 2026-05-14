@@ -14,6 +14,7 @@ import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 import type { DatabaseSettings } from '../types';
+import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -210,6 +211,7 @@ const buildPreset = (
 ): GraphileConfig.Preset => {
   return {
   extends: [createConstructivePreset(databaseSettings)],
+  plugins: [AuthCookiePlugin],
   pgServices: [
     makePgService({
       pool,
@@ -242,6 +244,9 @@ const buildPreset = (
         }
         if (req.get('User-Agent')) {
           context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
+        }
+        if (req.deviceToken) {
+          context['jwt.claims.device_token'] = req.deviceToken;
         }
 
         if (req.token?.user_id) {

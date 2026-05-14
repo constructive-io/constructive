@@ -70,13 +70,11 @@ export class DatabaseSettingModel {
     });
   }
   findFirst<S extends DatabaseSettingSelect>(
-    args: FindFirstArgs<S, DatabaseSettingFilter> & {
+    args: FindFirstArgs<S, DatabaseSettingFilter, DatabaseSettingOrderBy> & {
       select: S;
     } & StrictSelect<S, DatabaseSettingSelect>
   ): QueryBuilder<{
-    databaseSettings: {
-      nodes: InferSelectResult<DatabaseSettingWithRelations, S>[];
-    };
+    databaseSetting: InferSelectResult<DatabaseSettingWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'DatabaseSetting',
@@ -84,17 +82,26 @@ export class DatabaseSettingModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DatabaseSettingFilter',
+      'DatabaseSettingOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'DatabaseSetting',
-      fieldName: 'databaseSettings',
+      fieldName: 'databaseSetting',
       document,
       variables,
+      transform: (data: {
+        databaseSettings?: {
+          nodes?: InferSelectResult<DatabaseSettingWithRelations, S>[];
+        };
+      }) => ({
+        databaseSetting: data.databaseSettings?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DatabaseSettingSelect>(

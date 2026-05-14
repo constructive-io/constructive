@@ -32,6 +32,11 @@ interface ErrorResponse {
   logLevel: 'warn' | 'error';
 }
 
+const isCsrfError = (err: Error): boolean => {
+  const code = (err as unknown as { code?: string }).code;
+  return typeof code === 'string' && code.startsWith('CSRF_');
+};
+
 const categorizeError = (err: Error): ErrorResponse => {
   if (isApiError(err)) {
     return {
@@ -40,6 +45,10 @@ const categorizeError = (err: Error): ErrorResponse => {
       message: sanitizeMessage(err),
       logLevel: err.statusCode >= 500 ? 'error' : 'warn',
     };
+  }
+  if (isCsrfError(err)) {
+    const code = (err as unknown as { code: string }).code;
+    return { statusCode: 403, code, message: err.message, logLevel: 'warn' };
   }
   if (err.message?.includes('ECONNREFUSED') || err.message?.includes('connection terminated')) {
     return { statusCode: 503, code: 'SERVICE_UNAVAILABLE', message: sanitizeMessage(err), logLevel: 'error' };

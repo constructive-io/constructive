@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.34.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.33.1...node-type-registry@0.34.0) (2026-05-12)
+
+### Features
+
+- add relational/nested insert support and DataBulk node type ([63d5371](https://github.com/constructive-io/constructive/commit/63d5371131b17953d4891aeced62001e8115ce32))
+
+## [0.33.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.33.0...node-type-registry@0.33.1) (2026-05-11)
+
+**Note:** Version bump only for package node-type-registry
+
+# [0.33.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.32.0...node-type-registry@0.33.0) (2026-05-11)
+
+### Bug Fixes
+
+- change Check\* node type category from 'data' to 'check' ([b8aa14e](https://github.com/constructive-io/constructive/commit/b8aa14e242346025621acd2de5b5caf744448f61))
+
+### Features
+
+- add CheckOneOf, CheckGreaterThan, CheckLessThan, CheckNotEqual node types ([3f645be](https://github.com/constructive-io/constructive/commit/3f645be69dbb1218f41f82c24f053c4bbc92bef7))
+
 # [0.32.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.31.0...node-type-registry@0.32.0) (2026-05-11)
 
 **Note:** Version bump only for package node-type-registry

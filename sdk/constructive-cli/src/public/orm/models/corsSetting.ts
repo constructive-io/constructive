@@ -70,13 +70,11 @@ export class CorsSettingModel {
     });
   }
   findFirst<S extends CorsSettingSelect>(
-    args: FindFirstArgs<S, CorsSettingFilter> & {
+    args: FindFirstArgs<S, CorsSettingFilter, CorsSettingOrderBy> & {
       select: S;
     } & StrictSelect<S, CorsSettingSelect>
   ): QueryBuilder<{
-    corsSettings: {
-      nodes: InferSelectResult<CorsSettingWithRelations, S>[];
-    };
+    corsSetting: InferSelectResult<CorsSettingWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'CorsSetting',
@@ -84,17 +82,26 @@ export class CorsSettingModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'CorsSettingFilter',
+      'CorsSettingOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'CorsSetting',
-      fieldName: 'corsSettings',
+      fieldName: 'corsSetting',
       document,
       variables,
+      transform: (data: {
+        corsSettings?: {
+          nodes?: InferSelectResult<CorsSettingWithRelations, S>[];
+        };
+      }) => ({
+        corsSetting: data.corsSettings?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends CorsSettingSelect>(

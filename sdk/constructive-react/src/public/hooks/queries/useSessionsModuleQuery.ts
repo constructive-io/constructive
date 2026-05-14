@@ -91,7 +91,7 @@ export async function fetchSessionsModuleQuery<S extends SessionsModuleSelect>(p
 export async function fetchSessionsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<SessionsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SessionsModuleSelect>(params.selection);
   return getClient()
     .sessionsModule.findOne({

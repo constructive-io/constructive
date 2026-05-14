@@ -91,7 +91,7 @@ export async function fetchUsageSnapshotQuery<S extends UsageSnapshotSelect>(par
 export async function fetchUsageSnapshotQuery(params: {
   id: string;
   selection: SelectionConfig<UsageSnapshotSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<UsageSnapshotSelect>(params.selection);
   return getClient()
     .usageSnapshot.findOne({

@@ -91,7 +91,7 @@ export async function fetchUserQuery<S extends UserSelect>(params: {
 export async function fetchUserQuery(params: {
   id: string;
   selection: SelectionConfig<UserSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   return getClient()
     .user.findOne({

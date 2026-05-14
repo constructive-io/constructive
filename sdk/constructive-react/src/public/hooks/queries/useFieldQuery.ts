@@ -91,7 +91,7 @@ export async function fetchFieldQuery<S extends FieldSelect>(params: {
 export async function fetchFieldQuery(params: {
   id: string;
   selection: SelectionConfig<FieldSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<FieldSelect>(params.selection);
   return getClient()
     .field.findOne({

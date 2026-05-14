@@ -3,9 +3,9 @@
  *
  * Generated ORM clients need runtime dependencies at execution time.
  * This module re-exports so generated code can consolidate imports:
- *   - @0no-co/graphql.web  — parseType, print
- *   - @constructive-io/graphql-types — GraphQLAdapter, GraphQLError, QueryResult
- *   - ./localhost-fetch — createFetch (isomorphic *.localhost-aware fetch)
+ *   - @0no-co/graphql.web              — parseType, print
+ *   - @constructive-io/graphql-types   — GraphQLAdapter, GraphQLError, QueryResult
+ *   - @constructive-io/fetch           — createFetch (isomorphic *.localhost-aware fetch)
  *
  * gql-ast is intentionally NOT re-exported here because the templates
  * use `import * as t from 'gql-ast'` — mixing it into this namespace
@@ -17,12 +17,9 @@
  *   import type { GraphQLAdapter } from '@constructive-io/graphql-query/runtime';
  */
 
-// From @0no-co/graphql.web — GraphQL parsing/printing
 export { parseType, print } from '@0no-co/graphql.web';
 
-// From @constructive-io/graphql-types — adapter interface + result types
 export type { GraphQLAdapter, GraphQLError, QueryResult } from '@constructive-io/graphql-types';
 
-// Isomorphic fetch with *.localhost DNS + Host header fix for Node.js
-export { createFetch } from './localhost-fetch';
-export type { FetchFunction } from './localhost-fetch';
+export { createFetch } from '@constructive-io/fetch';
+export type { FetchFunction } from '@constructive-io/fetch';

@@ -379,23 +379,6 @@ export interface OrgLimit {
   periodCredits: string | null;
   entityId: string | null;
 }
-export interface OrgInvite {
-  id: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  senderId: string | null;
-  receiverId: string | null;
-  inviteToken: string | null;
-  inviteValid: boolean | null;
-  inviteLimit: number | null;
-  inviteCount: number | null;
-  multiple: boolean | null;
-  data: unknown | null;
-  profileId: string | null;
-  expiresAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  entityId: string | null;
-}
 export interface AppMembership {
   id: string | null;
   createdAt: string | null;
@@ -413,6 +396,24 @@ export interface AppMembership {
   granted: string | null;
   actorId: string | null;
   profileId: string | null;
+}
+export interface OrgInvite {
+  id: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  senderId: string | null;
+  receiverId: string | null;
+  inviteToken: string | null;
+  inviteValid: boolean | null;
+  inviteLimit: number | null;
+  inviteCount: number | null;
+  multiple: boolean | null;
+  data: unknown | null;
+  profileId: string | null;
+  isReadOnly: boolean | null;
+  expiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  entityId: string | null;
 }
 export interface OrgMembership {
   id: string | null;

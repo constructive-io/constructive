@@ -114,12 +114,6 @@ export const DataFileEmbedding: NodeTypeDefinition = {
             format: 'column-ref',
             description: 'JSONB field for extraction metadata (page count, language, etc.)',
             default: 'extracted_metadata'
-          },
-          status_field: {
-            type: 'string',
-            format: 'column-ref',
-            description: 'Extraction lifecycle status field',
-            default: 'extraction_status'
           }
         }
       },
@@ -177,21 +171,6 @@ export const DataFileEmbedding: NodeTypeDefinition = {
             default: 'generate_chunks'
           }
         }
-      },
-
-      // ── Stale tracking (meaningful in extract mode) ────────────────
-      stale_strategy: {
-        type: 'string',
-        enum: ['column', 'null', 'hash'],
-        description:
-          'Strategy for tracking embedding staleness when extraction is enabled. ' +
-          'column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash.',
-        default: 'column'
-      },
-      include_stale_field: {
-        type: 'boolean',
-        description: 'Whether to include the embedding_stale boolean field (extract mode)',
-        default: true
       }
     }
   },

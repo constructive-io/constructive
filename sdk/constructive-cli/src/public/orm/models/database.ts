@@ -70,13 +70,11 @@ export class DatabaseModel {
     });
   }
   findFirst<S extends DatabaseSelect>(
-    args: FindFirstArgs<S, DatabaseFilter> & {
+    args: FindFirstArgs<S, DatabaseFilter, DatabaseOrderBy> & {
       select: S;
     } & StrictSelect<S, DatabaseSelect>
   ): QueryBuilder<{
-    databases: {
-      nodes: InferSelectResult<DatabaseWithRelations, S>[];
-    };
+    database: InferSelectResult<DatabaseWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Database',
@@ -84,17 +82,26 @@ export class DatabaseModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DatabaseFilter',
+      'DatabaseOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Database',
-      fieldName: 'databases',
+      fieldName: 'database',
       document,
       variables,
+      transform: (data: {
+        databases?: {
+          nodes?: InferSelectResult<DatabaseWithRelations, S>[];
+        };
+      }) => ({
+        database: data.databases?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DatabaseSelect>(

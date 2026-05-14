@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/constructive-io/constructive/compare/graphile-settings@5.0.1...graphile-settings@5.0.2) (2026-05-14)
+
+**Note:** Version bump only for package graphile-settings
+
+## [5.0.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.0.0...graphile-settings@5.0.1) (2026-05-14)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.0.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.33.2...graphile-settings@5.0.0) (2026-05-13)
+
+### Bug Fixes
+
+- scope BucketNameResolver to (databaseId, bucketKey) ([304d201](https://github.com/constructive-io/constructive/commit/304d201a03bd5fcc059566c373ccf6465b134489))
+
+### Features
+
+- wire enable_bulk database setting into GraphQL server and graphile-settings ([d5ab604](https://github.com/constructive-io/constructive/commit/d5ab604955912f8c70a88bd9b9fe32b8f24c7981))
+
+### BREAKING CHANGES
+
+- custom resolveBucketName callbacks must now accept
+  (databaseId: string, bucketKey: string) instead of (databaseId: string).
+
+## [4.33.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.33.1...graphile-settings@4.33.2) (2026-05-12)
+
+**Note:** Version bump only for package graphile-settings
+
+## [4.33.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.33.0...graphile-settings@4.33.1) (2026-05-11)
+
+**Note:** Version bump only for package graphile-settings
+
+# [4.33.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.32.0...graphile-settings@4.33.0) (2026-05-11)
+
+### Features
+
+- integrate RealtimeManager into constructive preset and cache lifecycle ([a4dd5b9](https://github.com/constructive-io/constructive/commit/a4dd5b9e8b0440ed49749f0eac1b3d2f3841f4a5))
+
 # [4.32.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.31.1...graphile-settings@4.32.0) (2026-05-11)
 
 **Note:** Version bump only for package graphile-settings

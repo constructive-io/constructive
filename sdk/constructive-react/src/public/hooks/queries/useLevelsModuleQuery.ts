@@ -91,7 +91,7 @@ export async function fetchLevelsModuleQuery<S extends LevelsModuleSelect>(param
 export async function fetchLevelsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<LevelsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<LevelsModuleSelect>(params.selection);
   return getClient()
     .levelsModule.findOne({

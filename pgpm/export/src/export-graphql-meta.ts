@@ -122,8 +122,9 @@ export const exportGraphQLMeta = async ({
   // metaschema_public tables
   await Promise.all([
     queryAndParse('database'),
-    queryAndParse('database_extension'),
     queryAndParse('schema'),
+    queryAndParse('function'),
+    queryAndParse('spatial_relation'),
     queryAndParse('table'),
     queryAndParse('field'),
     queryAndParse('policy'),
@@ -188,7 +189,21 @@ export const exportGraphQLMeta = async ({
     queryAndParse('secure_table_provision'),
     queryAndParse('uuid_module'),
     queryAndParse('default_ids_module'),
-    queryAndParse('denormalized_table_field')
+    queryAndParse('denormalized_table_field'),
+    queryAndParse('relation_provision'),
+    queryAndParse('entity_type_provision'),
+    queryAndParse('rate_limits_module'),
+    queryAndParse('storage_module'),
+    queryAndParse('billing_module'),
+    queryAndParse('billing_provider_module'),
+    queryAndParse('devices_module'),
+    queryAndParse('identity_providers_module'),
+    queryAndParse('notifications_module'),
+    queryAndParse('plans_module'),
+    queryAndParse('realtime_module'),
+    queryAndParse('session_secrets_module'),
+    queryAndParse('webauthn_auth_module'),
+    queryAndParse('webauthn_credentials_module')
   ]);
 
   return sql;

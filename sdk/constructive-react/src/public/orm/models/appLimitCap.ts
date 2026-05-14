@@ -70,13 +70,11 @@ export class AppLimitCapModel {
     });
   }
   findFirst<S extends AppLimitCapSelect>(
-    args: FindFirstArgs<S, AppLimitCapFilter> & {
+    args: FindFirstArgs<S, AppLimitCapFilter, AppLimitCapOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLimitCapSelect>
   ): QueryBuilder<{
-    appLimitCaps: {
-      nodes: InferSelectResult<AppLimitCapWithRelations, S>[];
-    };
+    appLimitCap: InferSelectResult<AppLimitCapWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppLimitCap',
@@ -84,17 +82,26 @@ export class AppLimitCapModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppLimitCapFilter',
+      'AppLimitCapOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppLimitCap',
-      fieldName: 'appLimitCaps',
+      fieldName: 'appLimitCap',
       document,
       variables,
+      transform: (data: {
+        appLimitCaps?: {
+          nodes?: InferSelectResult<AppLimitCapWithRelations, S>[];
+        };
+      }) => ({
+        appLimitCap: data.appLimitCaps?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppLimitCapSelect>(

@@ -1,0 +1,59 @@
+{
+  "name": "graphile-realtime-test",
+  "version": "0.2.0",
+  "description": "Subscription testing utilities for graphile-realtime-subscriptions — smart tag injection, grafast.subscribe() helpers, and pg_notify simulation",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "testing",
+    "graphql",
+    "graphile",
+    "constructive",
+    "subscriptions",
+    "realtime",
+    "notify",
+    "test"
+  ],
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "dependencies": {
+    "graphile-realtime-subscriptions": "workspace:^",
+    "graphile-test": "workspace:^"
+  },
+  "peerDependencies": {
+    "grafast": "1.0.0",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
+    "graphql": "16.13.0",
+    "pg": "^8.20.0",
+    "postgraphile": "5.0.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.18.0",
+    "makage": "^0.3.0",
+    "pgsql-test": "workspace:^"
+  }
+}

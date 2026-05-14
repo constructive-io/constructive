@@ -13,7 +13,7 @@ import { META_TABLE_CONFIG, META_TABLE_ORDER } from '../src/export-utils';
 describe('Export Meta Config Validation', () => {
   describe('metaschema_public tables', () => {
     const required = [
-      'database', 'database_extension', 'schema', 'table', 'field',
+      'database', 'schema', 'table', 'field',
       'policy', 'index', 'trigger', 'trigger_function', 'rls_function',
       'foreign_key_constraint', 'primary_key_constraint', 'unique_constraint',
       'check_constraint', 'full_text_search', 'schema_grant', 'table_grant',

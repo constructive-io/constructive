@@ -12,6 +12,9 @@ const isDev = () => getNodeEnv() === 'development';
 /** Default cookie name for session tokens. */
 const SESSION_COOKIE_NAME = 'constructive_session';
 
+/** Cookie name for trusted device tracking. */
+const DEVICE_TOKEN_COOKIE_NAME = 'constructive_device_token';
+
 /**
  * Extract a named cookie value from the raw Cookie header.
  * Avoids pulling in cookie-parser as a dependency.
@@ -141,6 +144,13 @@ export const createAuthenticateMiddleware = (
         `[auth] Skipping auth: authFn=${authFn ?? 'none'}, ` +
           `privateSchema=${rlsModule.privateSchema?.schemaName ?? 'none'}`
       );
+    }
+
+    // Read device token cookie for trusted device tracking
+    const deviceToken = parseCookieToken(req, DEVICE_TOKEN_COOKIE_NAME);
+    if (deviceToken) {
+      req.deviceToken = deviceToken;
+      log.info('[auth] Device token cookie present');
     }
 
     next();

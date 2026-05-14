@@ -70,13 +70,11 @@ export class FullTextSearchModel {
     });
   }
   findFirst<S extends FullTextSearchSelect>(
-    args: FindFirstArgs<S, FullTextSearchFilter> & {
+    args: FindFirstArgs<S, FullTextSearchFilter, FullTextSearchOrderBy> & {
       select: S;
     } & StrictSelect<S, FullTextSearchSelect>
   ): QueryBuilder<{
-    fullTextSearches: {
-      nodes: InferSelectResult<FullTextSearchWithRelations, S>[];
-    };
+    fullTextSearch: InferSelectResult<FullTextSearchWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'FullTextSearch',
@@ -84,17 +82,26 @@ export class FullTextSearchModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'FullTextSearchFilter',
+      'FullTextSearchOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'FullTextSearch',
-      fieldName: 'fullTextSearches',
+      fieldName: 'fullTextSearch',
       document,
       variables,
+      transform: (data: {
+        fullTextSearches?: {
+          nodes?: InferSelectResult<FullTextSearchWithRelations, S>[];
+        };
+      }) => ({
+        fullTextSearch: data.fullTextSearches?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends FullTextSearchSelect>(

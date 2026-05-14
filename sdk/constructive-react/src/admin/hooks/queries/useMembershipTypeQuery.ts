@@ -91,7 +91,7 @@ export async function fetchMembershipTypeQuery<S extends MembershipTypeSelect>(p
 export async function fetchMembershipTypeQuery(params: {
   id: number;
   selection: SelectionConfig<MembershipTypeSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<MembershipTypeSelect>(params.selection);
   return getClient()
     .membershipType.findOne({

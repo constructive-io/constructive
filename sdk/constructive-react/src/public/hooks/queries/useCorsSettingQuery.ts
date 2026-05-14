@@ -91,7 +91,7 @@ export async function fetchCorsSettingQuery<S extends CorsSettingSelect>(params:
 export async function fetchCorsSettingQuery(params: {
   id: string;
   selection: SelectionConfig<CorsSettingSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<CorsSettingSelect>(params.selection);
   return getClient()
     .corsSetting.findOne({

@@ -29,8 +29,14 @@ export class FileTypeDetector {
   private extensionCache: Map<string, FileTypeDefinition[]>;
 
   constructor(options: FileTypeDetectorOptions = {}) {
-    // Create a copy of FILE_TYPES to avoid modifying the global registry
-    this.fileTypes = [...FILE_TYPES];
+    // Create a copy of FILE_TYPES sorted so that longer magic byte sequences
+    // are checked before shorter ones. This ensures that specific formats
+    // (e.g. HEIC with 8-byte signature "ftypheic") are matched before generic
+    // container formats (e.g. MP4 with 4-byte signature "ftyp") that share
+    // the same prefix.
+    this.fileTypes = [...FILE_TYPES].sort(
+      (a, b) => b.magicBytes.length - a.magicBytes.length
+    );
     this.options = {
       peekBytes: options.peekBytes || 32,
       checkMultipleOffsets: options.checkMultipleOffsets !== false,

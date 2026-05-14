@@ -91,7 +91,7 @@ export async function fetchDatabaseQuery<S extends DatabaseSelect>(params: {
 export async function fetchDatabaseQuery(params: {
   id: string;
   selection: SelectionConfig<DatabaseSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<DatabaseSelect>(params.selection);
   return getClient()
     .database.findOne({

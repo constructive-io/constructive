@@ -91,7 +91,7 @@ export async function fetchPartitionQuery<S extends PartitionSelect>(params: {
 export async function fetchPartitionQuery(params: {
   id: string;
   selection: SelectionConfig<PartitionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<PartitionSelect>(params.selection);
   return getClient()
     .partition.findOne({

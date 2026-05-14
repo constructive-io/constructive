@@ -70,13 +70,11 @@ export class UniqueConstraintModel {
     });
   }
   findFirst<S extends UniqueConstraintSelect>(
-    args: FindFirstArgs<S, UniqueConstraintFilter> & {
+    args: FindFirstArgs<S, UniqueConstraintFilter, UniqueConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, UniqueConstraintSelect>
   ): QueryBuilder<{
-    uniqueConstraints: {
-      nodes: InferSelectResult<UniqueConstraintWithRelations, S>[];
-    };
+    uniqueConstraint: InferSelectResult<UniqueConstraintWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'UniqueConstraint',
@@ -84,17 +82,26 @@ export class UniqueConstraintModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'UniqueConstraintFilter',
+      'UniqueConstraintOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'UniqueConstraint',
-      fieldName: 'uniqueConstraints',
+      fieldName: 'uniqueConstraint',
       document,
       variables,
+      transform: (data: {
+        uniqueConstraints?: {
+          nodes?: InferSelectResult<UniqueConstraintWithRelations, S>[];
+        };
+      }) => ({
+        uniqueConstraint: data.uniqueConstraints?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends UniqueConstraintSelect>(

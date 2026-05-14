@@ -70,13 +70,11 @@ export class DevicesModuleModel {
     });
   }
   findFirst<S extends DevicesModuleSelect>(
-    args: FindFirstArgs<S, DevicesModuleFilter> & {
+    args: FindFirstArgs<S, DevicesModuleFilter, DevicesModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, DevicesModuleSelect>
   ): QueryBuilder<{
-    devicesModules: {
-      nodes: InferSelectResult<DevicesModuleWithRelations, S>[];
-    };
+    devicesModule: InferSelectResult<DevicesModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'DevicesModule',
@@ -84,17 +82,26 @@ export class DevicesModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DevicesModuleFilter',
+      'DevicesModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'DevicesModule',
-      fieldName: 'devicesModules',
+      fieldName: 'devicesModule',
       document,
       variables,
+      transform: (data: {
+        devicesModules?: {
+          nodes?: InferSelectResult<DevicesModuleWithRelations, S>[];
+        };
+      }) => ({
+        devicesModule: data.devicesModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DevicesModuleSelect>(

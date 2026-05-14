@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.23.9](https://github.com/constructive-io/constructive/compare/pgpm@4.23.8...pgpm@4.23.9) (2026-05-14)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.8](https://github.com/constructive-io/constructive/compare/pgpm@4.23.7...pgpm@4.23.8) (2026-05-14)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.7](https://github.com/constructive-io/constructive/compare/pgpm@4.23.6...pgpm@4.23.7) (2026-05-13)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.6](https://github.com/constructive-io/constructive/compare/pgpm@4.23.5...pgpm@4.23.6) (2026-05-13)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.5](https://github.com/constructive-io/constructive/compare/pgpm@4.23.4...pgpm@4.23.5) (2026-05-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.4](https://github.com/constructive-io/constructive/compare/pgpm@4.23.3...pgpm@4.23.4) (2026-05-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.3](https://github.com/constructive-io/constructive/compare/pgpm@4.23.2...pgpm@4.23.3) (2026-05-11)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.2](https://github.com/constructive-io/constructive/compare/pgpm@4.23.1...pgpm@4.23.2) (2026-05-11)
+
+**Note:** Version bump only for package pgpm
+
+## [4.23.1](https://github.com/constructive-io/constructive/compare/pgpm@4.23.0...pgpm@4.23.1) (2026-05-11)
+
+**Note:** Version bump only for package pgpm
+
 # [4.23.0](https://github.com/constructive-io/constructive/compare/pgpm@4.22.7...pgpm@4.23.0) (2026-05-11)
 
 **Note:** Version bump only for package pgpm

@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.18.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.18.5...@constructive-io/graphql-explorer@4.18.6) (2026-05-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [4.18.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.18.4...@constructive-io/graphql-explorer@4.18.5) (2026-05-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [4.18.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.18.3...@constructive-io/graphql-explorer@4.18.4) (2026-05-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [4.18.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.18.2...@constructive-io/graphql-explorer@4.18.3) (2026-05-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [4.18.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.18.1...@constructive-io/graphql-explorer@4.18.2) (2026-05-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [4.18.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.18.0...@constructive-io/graphql-explorer@4.18.1) (2026-05-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
 # [4.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.17.6...@constructive-io/graphql-explorer@4.18.0) (2026-05-11)
 
 **Note:** Version bump only for package @constructive-io/graphql-explorer

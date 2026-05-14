@@ -70,13 +70,11 @@ export class SiteModuleModel {
     });
   }
   findFirst<S extends SiteModuleSelect>(
-    args: FindFirstArgs<S, SiteModuleFilter> & {
+    args: FindFirstArgs<S, SiteModuleFilter, SiteModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteModuleSelect>
   ): QueryBuilder<{
-    siteModules: {
-      nodes: InferSelectResult<SiteModuleWithRelations, S>[];
-    };
+    siteModule: InferSelectResult<SiteModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SiteModule',
@@ -84,17 +82,26 @@ export class SiteModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SiteModuleFilter',
+      'SiteModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SiteModule',
-      fieldName: 'siteModules',
+      fieldName: 'siteModule',
       document,
       variables,
+      transform: (data: {
+        siteModules?: {
+          nodes?: InferSelectResult<SiteModuleWithRelations, S>[];
+        };
+      }) => ({
+        siteModule: data.siteModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SiteModuleSelect>(

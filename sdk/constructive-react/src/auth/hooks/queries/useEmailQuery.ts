@@ -91,7 +91,7 @@ export async function fetchEmailQuery<S extends EmailSelect>(params: {
 export async function fetchEmailQuery(params: {
   id: string;
   selection: SelectionConfig<EmailSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<EmailSelect>(params.selection);
   return getClient()
     .email.findOne({

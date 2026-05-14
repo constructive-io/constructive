@@ -70,13 +70,11 @@ export class PermissionsModuleModel {
     });
   }
   findFirst<S extends PermissionsModuleSelect>(
-    args: FindFirstArgs<S, PermissionsModuleFilter> & {
+    args: FindFirstArgs<S, PermissionsModuleFilter, PermissionsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, PermissionsModuleSelect>
   ): QueryBuilder<{
-    permissionsModules: {
-      nodes: InferSelectResult<PermissionsModuleWithRelations, S>[];
-    };
+    permissionsModule: InferSelectResult<PermissionsModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'PermissionsModule',
@@ -84,17 +82,26 @@ export class PermissionsModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'PermissionsModuleFilter',
+      'PermissionsModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'PermissionsModule',
-      fieldName: 'permissionsModules',
+      fieldName: 'permissionsModule',
       document,
       variables,
+      transform: (data: {
+        permissionsModules?: {
+          nodes?: InferSelectResult<PermissionsModuleWithRelations, S>[];
+        };
+      }) => ({
+        permissionsModule: data.permissionsModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends PermissionsModuleSelect>(

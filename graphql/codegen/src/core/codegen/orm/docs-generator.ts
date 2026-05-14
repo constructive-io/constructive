@@ -50,8 +50,14 @@ export function generateOrmReadme(
   lines.push('|-------|------------|');
   for (const table of tables) {
     const { singularName } = getTableNames(table);
+    const bulkOps: string[] = [];
+    if (table.query?.bulkInsert) bulkOps.push('bulkCreate');
+    if (table.query?.bulkUpsert) bulkOps.push('bulkUpsert');
+    if (table.query?.bulkUpdate) bulkOps.push('bulkUpdate');
+    if (table.query?.bulkDelete) bulkOps.push('bulkDelete');
+    const ops = ['findMany', 'findOne', 'create', 'update', 'delete', ...bulkOps].join(', ');
     lines.push(
-      `| \`${singularName}\` | findMany, findOne, create, update, delete |`,
+      `| \`${singularName}\` | ${ops} |`,
     );
   }
   lines.push('');
@@ -108,6 +114,34 @@ export function generateOrmReadme(
       lines.push(
         `const deleted = await db.${singularName}.delete({ where: { ${pk.name}: ${pkPlaceholder(pk)} } }).execute();`,
       );
+      if (table.query?.bulkInsert) {
+        lines.push('');
+        lines.push(`// Bulk Create`);
+        lines.push(
+          `const bulkCreated = await db.${singularName}.bulkCreate({ data: [{ ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }], select: { ${pk.name}: true } }).execute();`,
+        );
+      }
+      if (table.query?.bulkUpsert) {
+        lines.push('');
+        lines.push(`// Bulk Upsert`);
+        lines.push(
+          `const bulkUpserted = await db.${singularName}.bulkUpsert({ data: [{ ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }], onConflict: { constraint: 'PRIMARY_KEY', action: 'UPDATE' }, select: { ${pk.name}: true } }).execute();`,
+        );
+      }
+      if (table.query?.bulkUpdate) {
+        lines.push('');
+        lines.push(`// Bulk Update`);
+        lines.push(
+          `const bulkUpdated = await db.${singularName}.bulkUpdate({ where: { ${editableFields[0]?.name || 'field'}: { equalTo: ${editableFields[0] ? fieldPlaceholder(editableFields[0]) : "'<String>'"} } }, data: { ${editableFields[0]?.name || 'field'}: ${editableFields[0] ? fieldPlaceholder(editableFields[0]) : "'<String>'"} }, select: { ${pk.name}: true } }).execute();`,
+        );
+      }
+      if (table.query?.bulkDelete) {
+        lines.push('');
+        lines.push(`// Bulk Delete`);
+        lines.push(
+          `const bulkDeleted = await db.${singularName}.bulkDelete({ where: { ${pk.name}: { equalTo: ${pkPlaceholder(pk)} } } }).execute();`,
+        );
+      }
       lines.push('```');
       lines.push('');
       const ormSpecialGroups = categorizeSpecialFields(table);
@@ -227,6 +261,7 @@ export function generateOrmAgentsDocs(
   lines.push('');
   lines.push('- Access models via `db.<ModelName>` (e.g. `db.User`)');
   lines.push('- CRUD methods: `findMany`, `findOne`, `create`, `update`, `delete`');
+  lines.push('- Bulk methods (when enabled via smart tags): `bulkCreate`, `bulkUpsert`, `bulkUpdate`, `bulkDelete`');
   lines.push('- Chain `.execute().unwrap()` to run and throw on error, or `.execute()` alone for discriminated union result');
   lines.push('- Custom operations via `db.query.<name>` or `db.mutation.<name>`');
   lines.push('');
@@ -269,6 +304,20 @@ export function generateOrmSkills(
         ormSkillSpecialGroups.map((g) => `**${g.label}:** ${g.fields.map((f) => `\`${f.name}\``).join(', ')}\n${g.description}`).join('\n\n')
       : ormSkillBaseDesc;
 
+    const bulkUsageLines: string[] = [];
+    if (table.query?.bulkInsert) {
+      bulkUsageLines.push(`db.${modelName}.bulkCreate({ data: [...], select: { id: true } }).execute()`);
+    }
+    if (table.query?.bulkUpsert) {
+      bulkUsageLines.push(`db.${modelName}.bulkUpsert({ data: [...], onConflict: { constraint: '...', action: 'UPDATE' }, select: { id: true } }).execute()`);
+    }
+    if (table.query?.bulkUpdate) {
+      bulkUsageLines.push(`db.${modelName}.bulkUpdate({ where: {...}, data: {...}, select: { id: true } }).execute()`);
+    }
+    if (table.query?.bulkDelete) {
+      bulkUsageLines.push(`db.${modelName}.bulkDelete({ where: {...} }).execute()`);
+    }
+
     files.push({
       fileName: `${skillName}/references/${refName}.md`,
       content: buildSkillReference({
@@ -281,6 +330,7 @@ export function generateOrmSkills(
           `db.${modelName}.create({ data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }, select: { id: true } }).execute()`,
           `db.${modelName}.update({ where: { ${pk.name}: ${pkPlaceholder(pk)} }, data: { ${editableFields[0]?.name || 'field'}: ${editableFields[0] ? fieldPlaceholder(editableFields[0]) : "'<String>'"} }, select: { id: true } }).execute()`,
           `db.${modelName}.delete({ where: { ${pk.name}: ${pkPlaceholder(pk)} } }).execute()`,
+          ...bulkUsageLines,
         ],
         examples: [
           {
@@ -335,6 +385,7 @@ export function generateOrmSkills(
 
   // Generate the overview SKILL.md
   const tableNames = tables.map((t) => lcFirst(getTableNames(t).singularName));
+  const hasBulkTables = tables.some((t) => t.query?.bulkInsert || t.query?.bulkUpsert || t.query?.bulkUpdate || t.query?.bulkDelete);
   files.push({
     fileName: `${skillName}/SKILL.md`,
     content: buildSkillFile(
@@ -352,6 +403,14 @@ export function generateOrmSkills(
           `db.<model>.create({ data: { ... }, select: { id: true } }).execute()`,
           `db.<model>.update({ where: { id: '<UUID>' }, data: { ... }, select: { id: true } }).execute()`,
           `db.<model>.delete({ where: { id: '<UUID>' } }).execute()`,
+          ...(hasBulkTables ? [
+            '',
+            `// Bulk operations (on tables with @behavior +bulkInsert/+bulkUpsert/+bulkUpdate/+bulkDelete)`,
+            `db.<model>.bulkCreate({ data: [...], select: { id: true } }).execute()`,
+            `db.<model>.bulkUpsert({ data: [...], onConflict: { constraint: '...', action: 'UPDATE' }, select: { id: true } }).execute()`,
+            `db.<model>.bulkUpdate({ where: {...}, data: {...}, select: { id: true } }).execute()`,
+            `db.<model>.bulkDelete({ where: {...} }).execute()`,
+          ] : []),
         ],
         examples: [
           {

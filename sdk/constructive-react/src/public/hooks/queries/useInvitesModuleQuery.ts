@@ -91,7 +91,7 @@ export async function fetchInvitesModuleQuery<S extends InvitesModuleSelect>(par
 export async function fetchInvitesModuleQuery(params: {
   id: string;
   selection: SelectionConfig<InvitesModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<InvitesModuleSelect>(params.selection);
   return getClient()
     .invitesModule.findOne({

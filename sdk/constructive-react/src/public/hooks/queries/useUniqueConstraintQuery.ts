@@ -91,7 +91,7 @@ export async function fetchUniqueConstraintQuery<S extends UniqueConstraintSelec
 export async function fetchUniqueConstraintQuery(params: {
   id: string;
   selection: SelectionConfig<UniqueConstraintSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<UniqueConstraintSelect>(params.selection);
   return getClient()
     .uniqueConstraint.findOne({

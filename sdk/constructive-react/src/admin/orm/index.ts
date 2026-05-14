@@ -49,8 +49,8 @@ import { AppInviteModel } from './models/appInvite';
 import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
 import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
 import { OrgLimitModel } from './models/orgLimit';
-import { OrgInviteModel } from './models/orgInvite';
 import { AppMembershipModel } from './models/appMembership';
+import { OrgInviteModel } from './models/orgInvite';
 import { OrgMembershipModel } from './models/orgMembership';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -131,8 +131,8 @@ export function createClient(config: OrmClientConfig) {
     orgMembershipSetting: new OrgMembershipSettingModel(client),
     orgLimitAggregate: new OrgLimitAggregateModel(client),
     orgLimit: new OrgLimitModel(client),
-    orgInvite: new OrgInviteModel(client),
     appMembership: new AppMembershipModel(client),
+    orgInvite: new OrgInviteModel(client),
     orgMembership: new OrgMembershipModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

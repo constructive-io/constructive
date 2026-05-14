@@ -91,7 +91,7 @@ export async function fetchLimitsModuleQuery<S extends LimitsModuleSelect>(param
 export async function fetchLimitsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<LimitsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<LimitsModuleSelect>(params.selection);
   return getClient()
     .limitsModule.findOne({

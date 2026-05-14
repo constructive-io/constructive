@@ -1,10 +1,12 @@
+import { createCsrfMiddleware } from '@constructive-io/csrf';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
-import express, { Express, RequestHandler } from 'express';
+import cookieParser from 'cookie-parser';
+import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Server as HttpServer } from 'http';
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
@@ -32,7 +34,9 @@ import { createDebugDatabaseMiddleware } from './middleware/observability/debug-
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
+// Auth cookie handling is done via AuthCookiePlugin in grafserv
 import { createCaptchaMiddleware } from './middleware/captcha';
+import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
@@ -145,6 +149,7 @@ class Server {
     }
 
     app.use(poweredBy('constructive'));
+    app.use(cookieParser());
     app.use(cors(fallbackOrigin));
     app.use('/graphql', graphqlUpload.graphqlUploadExpress({
       maxFileSize: 10 * 1024 * 1024, // 10 MB
@@ -160,6 +165,36 @@ class Server {
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
     app.use(createCaptchaMiddleware());
+
+    // CSRF protection for cookie-authenticated requests
+    // Skip CSRF for Bearer token auth (not vulnerable to CSRF) and anonymous requests
+    const csrf = createCsrfMiddleware({
+      cookieOptions: {
+        httpOnly: false, // SPA clients need to read this via document.cookie
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      },
+    });
+    const csrfProtect: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+      // Skip CSRF for Bearer token auth
+      const auth = req.headers.authorization;
+      if (auth?.toLowerCase().startsWith('bearer ')) {
+        return next();
+      }
+      // Skip if no session cookie (anonymous requests)
+      const sessionCookie = parseCookieValue(req, SESSION_COOKIE_NAME);
+      if (!sessionCookie) {
+        return next();
+      }
+      // Apply CSRF protection for cookie-authenticated requests
+      csrf.protect(req as any, res as any, next);
+    };
+    const csrfSetToken: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+      csrf.setToken(req as any, res as any, next);
+    };
+    app.use(csrfSetToken); // Set CSRF token cookie on all requests
+    app.use('/graphql', csrfProtect); // Enforce CSRF on GraphQL mutations
+
     app.use(graphile(effectiveOpts));
     app.use(flush);
 

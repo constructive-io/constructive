@@ -99,7 +99,7 @@ export async function fetchAppLimitCreditCodeItemQuery<
 export async function fetchAppLimitCreditCodeItemQuery(params: {
   id: string;
   selection: SelectionConfig<AppLimitCreditCodeItemSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppLimitCreditCodeItemSelect>(params.selection);
   return getClient()
     .appLimitCreditCodeItem.findOne({

@@ -415,15 +415,6 @@ export const orgLimitKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitKeys.details(), id] as const,
 } as const;
-export const orgInviteKeys = {
-  /** All orgInvite queries */ all: ['orginvite'] as const,
-  /** List query keys */ lists: () => [...orgInviteKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...orgInviteKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgInviteKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgInviteKeys.details(), id] as const,
-} as const;
 export const appMembershipKeys = {
   /** All appMembership queries */ all: ['appmembership'] as const,
   /** List query keys */ lists: () => [...appMembershipKeys.all, 'list'] as const,
@@ -432,6 +423,15 @@ export const appMembershipKeys = {
   /** Detail query keys */ details: () => [...appMembershipKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...appMembershipKeys.details(), id] as const,
+} as const;
+export const orgInviteKeys = {
+  /** All orgInvite queries */ all: ['orginvite'] as const,
+  /** List query keys */ lists: () => [...orgInviteKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...orgInviteKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...orgInviteKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...orgInviteKeys.details(), id] as const,
 } as const;
 export const orgMembershipKeys = {
   /** All orgMembership queries */ all: ['orgmembership'] as const,
@@ -542,8 +542,8 @@ export const queryKeys = {
   orgMembershipSetting: orgMembershipSettingKeys,
   orgLimitAggregate: orgLimitAggregateKeys,
   orgLimit: orgLimitKeys,
-  orgInvite: orgInviteKeys,
   appMembership: appMembershipKeys,
+  orgInvite: orgInviteKeys,
   orgMembership: orgMembershipKeys,
   custom: customQueryKeys,
 } as const;

@@ -91,7 +91,7 @@ export async function fetchOrgChartEdgeQuery<S extends OrgChartEdgeSelect>(param
 export async function fetchOrgChartEdgeQuery(params: {
   id: string;
   selection: SelectionConfig<OrgChartEdgeSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgChartEdgeSelect>(params.selection);
   return getClient()
     .orgChartEdge.findOne({

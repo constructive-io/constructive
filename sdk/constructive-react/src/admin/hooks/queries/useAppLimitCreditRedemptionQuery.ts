@@ -102,7 +102,7 @@ export async function fetchAppLimitCreditRedemptionQuery<
 export async function fetchAppLimitCreditRedemptionQuery(params: {
   id: string;
   selection: SelectionConfig<AppLimitCreditRedemptionSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppLimitCreditRedemptionSelect>(params.selection);
   return getClient()
     .appLimitCreditRedemption.findOne({

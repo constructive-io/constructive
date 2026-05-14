@@ -5,7 +5,7 @@ export const SearchVector: NodeTypeDefinition = {
   slug: 'search_vector',
   category: 'search',
   display_name: 'Vector Search',
-  description: 'Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), stale tracking strategies (column, null, hash), and automatic job enqueue triggers for embedding generation.',
+  description: 'Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), per-field {field_name}_updated_at timestamp tracking (read-only in GraphQL), and automatic job enqueue triggers for embedding generation.',
   parameter_schema: {
     type: 'object',
     properties: {
@@ -44,11 +44,6 @@ export const SearchVector: NodeTypeDefinition = {
         description: 'Index-specific options. HNSW: {m, ef_construction}. IVFFlat: {lists}.',
         default: {}
       },
-      include_stale_field: {
-        type: 'boolean',
-        description: 'When stale_strategy is column, adds an embedding_stale boolean field',
-        default: true
-      },
       source_fields: {
         type: 'array',
         items: {
@@ -66,16 +61,6 @@ export const SearchVector: NodeTypeDefinition = {
         type: 'string',
         description: 'Task identifier for the job queue',
         default: 'generate_embedding'
-      },
-      stale_strategy: {
-        type: 'string',
-        enum: [
-          'column',
-          'null',
-          'hash'
-        ],
-        description: 'Strategy for tracking embedding staleness. column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash of source fields.',
-        default: 'column'
       },
       chunks: {
         type: 'object',

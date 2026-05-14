@@ -70,13 +70,11 @@ export class IdentityProviderModel {
     });
   }
   findFirst<S extends IdentityProviderSelect>(
-    args: FindFirstArgs<S, IdentityProviderFilter> & {
+    args: FindFirstArgs<S, IdentityProviderFilter, IdentityProviderOrderBy> & {
       select: S;
     } & StrictSelect<S, IdentityProviderSelect>
   ): QueryBuilder<{
-    identityProviders: {
-      nodes: InferSelectResult<IdentityProviderWithRelations, S>[];
-    };
+    identityProvider: InferSelectResult<IdentityProviderWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'IdentityProvider',
@@ -84,17 +82,26 @@ export class IdentityProviderModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'IdentityProviderFilter',
+      'IdentityProviderOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'IdentityProvider',
-      fieldName: 'identityProviders',
+      fieldName: 'identityProvider',
       document,
       variables,
+      transform: (data: {
+        identityProviders?: {
+          nodes?: InferSelectResult<IdentityProviderWithRelations, S>[];
+        };
+      }) => ({
+        identityProvider: data.identityProviders?.nodes?.[0] ?? null,
+      }),
     });
   }
   create<S extends IdentityProviderSelect>(

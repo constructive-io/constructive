@@ -97,7 +97,7 @@ export async function fetchAppPermissionDefaultQuery<S extends AppPermissionDefa
 export async function fetchAppPermissionDefaultQuery(params: {
   id: string;
   selection: SelectionConfig<AppPermissionDefaultSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppPermissionDefaultSelect>(params.selection);
   return getClient()
     .appPermissionDefault.findOne({

@@ -70,13 +70,11 @@ export class RoleTypeModel {
     });
   }
   findFirst<S extends RoleTypeSelect>(
-    args: FindFirstArgs<S, RoleTypeFilter> & {
+    args: FindFirstArgs<S, RoleTypeFilter, RoleTypeOrderBy> & {
       select: S;
     } & StrictSelect<S, RoleTypeSelect>
   ): QueryBuilder<{
-    roleTypes: {
-      nodes: InferSelectResult<RoleTypeWithRelations, S>[];
-    };
+    roleType: InferSelectResult<RoleTypeWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'RoleType',
@@ -84,17 +82,26 @@ export class RoleTypeModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'RoleTypeFilter',
+      'RoleTypeOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'RoleType',
-      fieldName: 'roleTypes',
+      fieldName: 'roleType',
       document,
       variables,
+      transform: (data: {
+        roleTypes?: {
+          nodes?: InferSelectResult<RoleTypeWithRelations, S>[];
+        };
+      }) => ({
+        roleType: data.roleTypes?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends RoleTypeSelect>(

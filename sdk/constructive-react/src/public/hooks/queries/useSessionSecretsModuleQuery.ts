@@ -97,7 +97,7 @@ export async function fetchSessionSecretsModuleQuery<S extends SessionSecretsMod
 export async function fetchSessionSecretsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<SessionSecretsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SessionSecretsModuleSelect>(params.selection);
   return getClient()
     .sessionSecretsModule.findOne({

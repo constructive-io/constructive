@@ -91,7 +91,7 @@ export async function fetchAppMembershipQuery<S extends AppMembershipSelect>(par
 export async function fetchAppMembershipQuery(params: {
   id: string;
   selection: SelectionConfig<AppMembershipSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppMembershipSelect>(params.selection);
   return getClient()
     .appMembership.findOne({

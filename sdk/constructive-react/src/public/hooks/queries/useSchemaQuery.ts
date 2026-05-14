@@ -91,7 +91,7 @@ export async function fetchSchemaQuery<S extends SchemaSelect>(params: {
 export async function fetchSchemaQuery(params: {
   id: string;
   selection: SelectionConfig<SchemaSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SchemaSelect>(params.selection);
   return getClient()
     .schema.findOne({

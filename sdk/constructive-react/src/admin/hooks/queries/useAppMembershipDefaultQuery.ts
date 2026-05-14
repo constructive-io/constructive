@@ -97,7 +97,7 @@ export async function fetchAppMembershipDefaultQuery<S extends AppMembershipDefa
 export async function fetchAppMembershipDefaultQuery(params: {
   id: string;
   selection: SelectionConfig<AppMembershipDefaultSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppMembershipDefaultSelect>(params.selection);
   return getClient()
     .appMembershipDefault.findOne({

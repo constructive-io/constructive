@@ -70,13 +70,11 @@ export class PubkeySettingModel {
     });
   }
   findFirst<S extends PubkeySettingSelect>(
-    args: FindFirstArgs<S, PubkeySettingFilter> & {
+    args: FindFirstArgs<S, PubkeySettingFilter, PubkeySettingOrderBy> & {
       select: S;
     } & StrictSelect<S, PubkeySettingSelect>
   ): QueryBuilder<{
-    pubkeySettings: {
-      nodes: InferSelectResult<PubkeySettingWithRelations, S>[];
-    };
+    pubkeySetting: InferSelectResult<PubkeySettingWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'PubkeySetting',
@@ -84,17 +82,26 @@ export class PubkeySettingModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'PubkeySettingFilter',
+      'PubkeySettingOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'PubkeySetting',
-      fieldName: 'pubkeySettings',
+      fieldName: 'pubkeySetting',
       document,
       variables,
+      transform: (data: {
+        pubkeySettings?: {
+          nodes?: InferSelectResult<PubkeySettingWithRelations, S>[];
+        };
+      }) => ({
+        pubkeySetting: data.pubkeySettings?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends PubkeySettingSelect>(

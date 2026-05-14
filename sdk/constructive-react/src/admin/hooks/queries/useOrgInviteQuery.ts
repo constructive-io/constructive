@@ -91,7 +91,7 @@ export async function fetchOrgInviteQuery<S extends OrgInviteSelect>(params: {
 export async function fetchOrgInviteQuery(params: {
   id: string;
   selection: SelectionConfig<OrgInviteSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgInviteSelect>(params.selection);
   return getClient()
     .orgInvite.findOne({

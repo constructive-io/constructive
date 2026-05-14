@@ -91,7 +91,7 @@ export async function fetchAppLimitCapQuery<S extends AppLimitCapSelect>(params:
 export async function fetchAppLimitCapQuery(params: {
   id: string;
   selection: SelectionConfig<AppLimitCapSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppLimitCapSelect>(params.selection);
   return getClient()
     .appLimitCap.findOne({

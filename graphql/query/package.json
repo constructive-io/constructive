@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-query",
-  "version": "3.23.0",
+  "version": "3.24.2",
   "description": "Constructive GraphQL Query",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.1.2",
+    "@constructive-io/fetch": "^1.0.0",
     "@constructive-io/graphql-types": "workspace:^",
     "ajv": "^8.18.0",
     "gql-ast": "workspace:^",

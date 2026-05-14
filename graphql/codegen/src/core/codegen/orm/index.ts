@@ -177,7 +177,6 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
     tables,
     hasCustomQueries,
     hasCustomMutations,
-    { nodeHttpAdapter: !!options.config.nodeHttpAdapter },
   );
   files.push({ path: indexFile.fileName, content: indexFile.content });
 

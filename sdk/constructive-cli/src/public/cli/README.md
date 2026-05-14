@@ -164,9 +164,9 @@ csdk auth set-token <your-token>
 | `app-limit-event` | appLimitEvent CRUD operations |
 | `org-limit-event` | orgLimitEvent CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
-| `database-setting` | databaseSetting CRUD operations |
 | `plans-module` | plansModule CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
+| `database-setting` | databaseSetting CRUD operations |
 | `billing-module` | billingModule CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `user` | user CRUD operations |
@@ -215,7 +215,7 @@ csdk auth set-token <your-token>
 | `verify-email` | verifyEmail |
 | `freeze-objects` | freezeObjects |
 | `init-empty-repo` | initEmptyRepo |
-| `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Six phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level indexes/fts/unique_constraints are deferred to phases 3-5 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
+| `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Seven phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
 | `provision-new-user` | provisionNewUser |
 | `reset-password` | resetPassword |
 | `remove-node-at-path` | removeNodeAtPath |
@@ -223,6 +223,7 @@ csdk auth set-token <your-token>
 | `provision-spatial-relation` | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
 | `bootstrap-user` | bootstrapUser |
 | `set-field-order` | setFieldOrder |
+| `provision-check-constraint` | Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists. |
 | `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
 | `provision-full-text-search` | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
 | `provision-index` | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
@@ -1799,10 +1800,12 @@ CRUD operations for ApiSetting records.
 | `enableConnectionFilter` | Boolean |
 | `enableLtree` | Boolean |
 | `enableLlm` | Boolean |
+| `enableRealtime` | Boolean |
+| `enableBulk` | Boolean |
 | `options` | JSON |
 
 **Required create fields:** `databaseId`, `apiId`
-**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `options`
+**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `options`
 
 ### `connected-accounts-module`
 
@@ -3639,13 +3642,14 @@ CRUD operations for OrgInvite records.
 | `multiple` | Boolean |
 | `data` | JSON |
 | `profileId` | UUID |
+| `isReadOnly` | Boolean |
 | `expiresAt` | Datetime |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
 
 **Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `expiresAt`
+**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `profileId`, `isReadOnly`, `expiresAt`
 
 ### `org-claimed-invite`
 
@@ -4517,39 +4521,6 @@ CRUD operations for RlsModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
 
-### `database-setting`
-
-CRUD operations for DatabaseSetting records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all databaseSetting records |
-| `find-first` | Find first matching databaseSetting record |
-| `get` | Get a databaseSetting by id |
-| `create` | Create a new databaseSetting |
-| `update` | Update an existing databaseSetting |
-| `delete` | Delete a databaseSetting |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `enableAggregates` | Boolean |
-| `enablePostgis` | Boolean |
-| `enableSearch` | Boolean |
-| `enableDirectUploads` | Boolean |
-| `enablePresignedUploads` | Boolean |
-| `enableManyToMany` | Boolean |
-| `enableConnectionFilter` | Boolean |
-| `enableLtree` | Boolean |
-| `enableLlm` | Boolean |
-| `options` | JSON |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `options`
-
 ### `plans-module`
 
 CRUD operations for PlansModule records.
@@ -4616,6 +4587,41 @@ CRUD operations for SqlAction records.
 | `actorId` | UUID |
 
 **Optional create fields (backend defaults):** `name`, `databaseId`, `deploy`, `deps`, `payload`, `content`, `revert`, `verify`, `action`, `actionId`, `actorId`
+
+### `database-setting`
+
+CRUD operations for DatabaseSetting records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all databaseSetting records |
+| `find-first` | Find first matching databaseSetting record |
+| `get` | Get a databaseSetting by id |
+| `create` | Create a new databaseSetting |
+| `update` | Update an existing databaseSetting |
+| `delete` | Delete a databaseSetting |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `enableAggregates` | Boolean |
+| `enablePostgis` | Boolean |
+| `enableSearch` | Boolean |
+| `enableDirectUploads` | Boolean |
+| `enablePresignedUploads` | Boolean |
+| `enableManyToMany` | Boolean |
+| `enableConnectionFilter` | Boolean |
+| `enableLtree` | Boolean |
+| `enableLlm` | Boolean |
+| `enableRealtime` | Boolean |
+| `enableBulk` | Boolean |
+| `options` | JSON |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `options`
 
 ### `billing-module`
 
@@ -5419,7 +5425,7 @@ initEmptyRepo
 
 ### `construct-blueprint`
 
-Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Six phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level indexes/fts/unique_constraints are deferred to phases 3-5 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
+Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Seven phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
 
 - **Type:** mutation
 - **Arguments:**
@@ -5535,6 +5541,20 @@ setFieldOrder
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.fieldIds` | UUID |
+
+### `provision-check-constraint`
+
+Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.tableId` | UUID |
+  | `--input.definition` | JSON |
 
 ### `provision-unique-constraint`
 

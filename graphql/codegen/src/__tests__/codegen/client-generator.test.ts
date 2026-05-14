@@ -3,6 +3,10 @@
  *
  * Tests the generated ORM client files: client.ts, query-builder.ts, select-types.ts, index.ts
  */
+import * as vm from 'node:vm';
+
+import * as ts from 'typescript';
+
 import {
   generateCreateClientFile,
   generateOrmClientFile,
@@ -44,6 +48,79 @@ function createTable(
   };
 }
 
+type FetchAdapterConstructor = new (
+  endpoint: string,
+  headers?: Record<string, string>,
+  fetchFn?: typeof globalThis.fetch,
+) => {
+  execute<T>(
+    document: string,
+    variables?: Record<string, unknown>,
+  ): Promise<{ ok: boolean; data: T | null; errors?: unknown[] }>;
+};
+
+function loadGeneratedFetchAdapter(
+  createFetch: () => typeof globalThis.fetch,
+): FetchAdapterConstructor {
+  const { content } = generateOrmClientFile();
+  const { outputText } = ts.transpileModule(content, {
+    compilerOptions: {
+      esModuleInterop: true,
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2022,
+    },
+  });
+  const mod = { exports: {} as Record<string, unknown> };
+
+  vm.runInNewContext(
+    outputText,
+    {
+      exports: mod.exports,
+      globalThis,
+      module: mod,
+      require: (specifier: string) => {
+        if (specifier === '@constructive-io/graphql-query/runtime') {
+          return { createFetch };
+        }
+        if (specifier === './realtime') {
+          return { RealtimeManager: class RealtimeManager {} };
+        }
+        throw new Error(`Unexpected generated client import: ${specifier}`);
+      },
+    },
+    { filename: 'generated-orm-client.cjs' },
+  );
+
+  return mod.exports.FetchAdapter as FetchAdapterConstructor;
+}
+
+function createThisSensitiveFetch(payload: unknown) {
+  const calls: {
+    input: RequestInfo | URL;
+    init?: RequestInit;
+    thisArg: unknown;
+  }[] = [];
+
+  function fetchStub(
+    this: unknown,
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ): Promise<Response> {
+    calls.push({ input, init, thisArg: this });
+    if (this !== globalThis) {
+      return Promise.reject(new TypeError('Illegal invocation'));
+    }
+    return Promise.resolve(
+      new Response(JSON.stringify(payload), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 200,
+      }),
+    );
+  }
+
+  return { calls, fetchStub: fetchStub as typeof globalThis.fetch };
+}
+
 // ============================================================================
 // Tests
 // ============================================================================
@@ -75,6 +152,70 @@ describe('client-generator', () => {
         "import { createFetch } from '@constructive-io/graphql-query/runtime'",
       );
       expect(result.content).toContain('createFetch()');
+    });
+
+    it('FetchAdapter constructor binds the selected fetch function to globalThis', () => {
+      const result = generateOrmClientFile();
+
+      // Must match the exact constructor assignment with correct precedence:
+      // this.fetchFn = (fetchFn ?? createFetch()).bind(globalThis);
+      // Guards against a stray .bind(globalThis) in a comment or wrong
+      // precedence like fetchFn ?? createFetch().bind(globalThis).
+      expect(result.content).toMatch(
+        /this\.fetchFn\s*=\s*\(\s*fetchFn\s*\?\?\s*createFetch\(\)\s*\)\.bind\(globalThis\)\s*;/,
+      );
+      expect(result.content).not.toMatch(
+        /fetchFn\s*\?\?\s*createFetch\(\)\.bind\(globalThis\)/,
+      );
+    });
+
+    it('executes with default createFetch result bound to globalThis', async () => {
+      const { calls, fetchStub } = createThisSensitiveFetch({
+        data: { ok: true },
+      });
+      const createFetch = jest.fn(() => fetchStub);
+      const FetchAdapter = loadGeneratedFetchAdapter(createFetch);
+      const adapter = new FetchAdapter('https://api.example/graphql', {
+        Authorization: 'Bearer token',
+      });
+
+      await expect(
+        adapter.execute<{ ok: boolean }>('query Test { ok }'),
+      ).resolves.toEqual({
+        data: { ok: true },
+        errors: undefined,
+        ok: true,
+      });
+      expect(createFetch).toHaveBeenCalledTimes(1);
+      expect(calls).toHaveLength(1);
+      expect(calls[0].thisArg).toBe(globalThis);
+      expect(calls[0].input).toBe('https://api.example/graphql');
+    });
+
+    it('executes with injected fetchFn bound to globalThis', async () => {
+      const { calls, fetchStub } = createThisSensitiveFetch({
+        data: { injected: true },
+      });
+      const createFetch = jest.fn(() => {
+        throw new Error('createFetch should not be called');
+      });
+      const FetchAdapter = loadGeneratedFetchAdapter(createFetch);
+      const adapter = new FetchAdapter(
+        'https://api.example/graphql',
+        undefined,
+        fetchStub,
+      );
+
+      await expect(
+        adapter.execute<{ injected: boolean }>('query Test { injected }'),
+      ).resolves.toEqual({
+        data: { injected: true },
+        errors: undefined,
+        ok: true,
+      });
+      expect(createFetch).not.toHaveBeenCalled();
+      expect(calls).toHaveLength(1);
+      expect(calls[0].thisArg).toBe(globalThis);
     });
   });
 

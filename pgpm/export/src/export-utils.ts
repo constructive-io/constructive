@@ -124,8 +124,10 @@ SET session_replication_role TO DEFAULT;`;
 export const META_TABLE_ORDER = [
   'database',
   'schema',
+  'function',
   'table',
   'field',
+  'spatial_relation',
   'policy',
   'index',
   'trigger',
@@ -180,7 +182,21 @@ export const META_TABLE_ORDER = [
   'uuid_module',
   'default_ids_module',
   'denormalized_table_field',
-  'table_template_module'
+  'table_template_module',
+  'relation_provision',
+  'entity_type_provision',
+  'rate_limits_module',
+  'storage_module',
+  'billing_module',
+  'billing_provider_module',
+  'devices_module',
+  'identity_providers_module',
+  'notifications_module',
+  'plans_module',
+  'realtime_module',
+  'session_secrets_module',
+  'webauthn_auth_module',
+  'webauthn_credentials_module'
 ] as const;
 
 // =============================================================================
@@ -221,16 +237,6 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       hash: 'uuid'
     }
   },
-  database_extension: {
-    schema: 'metaschema_public',
-    table: 'database_extension',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      name: 'text',
-      schema_id: 'uuid'
-    }
-  },
   schema: {
     schema: 'metaschema_public',
     table: 'schema',
@@ -241,6 +247,16 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       schema_name: 'text',
       description: 'text',
       is_public: 'boolean'
+    }
+  },
+  function: {
+    schema: 'metaschema_public',
+    table: 'function',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      name: 'text'
     }
   },
   table: {
@@ -580,6 +596,7 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       enable_connection_filter: 'boolean',
       enable_ltree: 'boolean',
       enable_llm: 'boolean',
+      enable_bulk: 'boolean',
       options: 'jsonb'
     }
   },
@@ -599,6 +616,7 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       enable_connection_filter: 'boolean',
       enable_ltree: 'boolean',
       enable_llm: 'boolean',
+      enable_bulk: 'boolean',
       options: 'jsonb'
     }
   },
@@ -1092,9 +1110,8 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       schema_id: 'uuid',
       table_id: 'uuid',
       table_name: 'text',
-      node_type: 'text',
+      nodes: 'jsonb',
       use_rls: 'boolean',
-      node_data: 'jsonb',
       fields: 'jsonb[]',
       grants: 'jsonb',
       policies: 'jsonb',
@@ -1136,6 +1153,314 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       update_defaults: 'boolean',
       func_name: 'text',
       func_order: 'int'
+    }
+  },
+  relation_provision: {
+    schema: 'metaschema_modules_public',
+    table: 'relation_provision',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      relation_type: 'text',
+      source_table_id: 'uuid',
+      target_table_id: 'uuid',
+      field_name: 'text',
+      delete_action: 'text',
+      is_required: 'boolean',
+      api_required: 'boolean',
+      junction_table_id: 'uuid',
+      junction_table_name: 'text',
+      junction_schema_id: 'uuid',
+      source_field_name: 'text',
+      target_field_name: 'text',
+      use_composite_key: 'boolean',
+      create_index: 'boolean',
+      expose_in_api: 'boolean',
+      nodes: 'jsonb',
+      grants: 'jsonb',
+      policies: 'jsonb',
+      out_field_id: 'uuid',
+      out_junction_table_id: 'uuid',
+      out_source_field_id: 'uuid',
+      out_target_field_id: 'uuid'
+    }
+  },
+  rate_limits_module: {
+    schema: 'metaschema_modules_public',
+    table: 'rate_limits_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      rate_limit_settings_table_id: 'uuid',
+      ip_rate_limits_table_id: 'uuid',
+      rate_limits_table_id: 'uuid',
+      rate_limit_settings_table: 'text',
+      ip_rate_limits_table: 'text',
+      rate_limits_table: 'text'
+    }
+  },
+  storage_module: {
+    schema: 'metaschema_modules_public',
+    table: 'storage_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      buckets_table_id: 'uuid',
+      files_table_id: 'uuid',
+      buckets_table_name: 'text',
+      files_table_name: 'text',
+      membership_type: 'int',
+      policies: 'jsonb',
+      skip_default_policy_tables: 'text[]',
+      entity_table_id: 'uuid',
+      endpoint: 'text',
+      public_url_prefix: 'text',
+      provider: 'text',
+      allowed_origins: 'text[]',
+      restrict_reads: 'boolean',
+      has_path_shares: 'boolean',
+      path_shares_table_id: 'uuid',
+      upload_url_expiry_seconds: 'int',
+      download_url_expiry_seconds: 'int',
+      max_filename_length: 'int',
+      cache_ttl_seconds: 'int',
+      max_bulk_files: 'int',
+      has_versioning: 'boolean',
+      has_content_hash: 'boolean',
+      has_custom_keys: 'boolean',
+      has_audit_log: 'boolean',
+      file_events_table_id: 'uuid'
+    }
+  },
+  entity_type_provision: {
+    schema: 'metaschema_modules_public',
+    table: 'entity_type_provision',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      name: 'text',
+      prefix: 'text',
+      description: 'text',
+      parent_entity: 'text',
+      table_name: 'text',
+      is_visible: 'boolean',
+      has_limits: 'boolean',
+      has_profiles: 'boolean',
+      has_levels: 'boolean',
+      has_storage: 'boolean',
+      has_invites: 'boolean',
+      storage_config: 'jsonb',
+      skip_entity_policies: 'boolean',
+      table_provision: 'jsonb',
+      out_membership_type: 'int',
+      out_entity_table_id: 'uuid',
+      out_entity_table_name: 'text',
+      out_installed_modules: 'text[]',
+      out_storage_module_id: 'uuid',
+      out_buckets_table_id: 'uuid',
+      out_files_table_id: 'uuid',
+      out_path_shares_table_id: 'uuid',
+      out_invites_module_id: 'uuid'
+    }
+  },
+  billing_module: {
+    schema: 'metaschema_modules_public',
+    table: 'billing_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      meters_table_id: 'uuid',
+      meters_table_name: 'text',
+      plan_subscriptions_table_id: 'uuid',
+      plan_subscriptions_table_name: 'text',
+      ledger_table_id: 'uuid',
+      ledger_table_name: 'text',
+      balances_table_id: 'uuid',
+      balances_table_name: 'text',
+      record_usage_function: 'text',
+      prefix: 'text'
+    }
+  },
+  billing_provider_module: {
+    schema: 'metaschema_modules_public',
+    table: 'billing_provider_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      provider: 'text',
+      products_table_id: 'uuid',
+      prices_table_id: 'uuid',
+      subscriptions_table_id: 'uuid',
+      billing_customers_table_id: 'uuid',
+      billing_customers_table_name: 'text',
+      billing_products_table_id: 'uuid',
+      billing_products_table_name: 'text',
+      billing_prices_table_id: 'uuid',
+      billing_prices_table_name: 'text',
+      billing_subscriptions_table_id: 'uuid',
+      billing_subscriptions_table_name: 'text',
+      billing_webhook_events_table_id: 'uuid',
+      billing_webhook_events_table_name: 'text',
+      process_billing_event_function: 'text',
+      prefix: 'text'
+    }
+  },
+  devices_module: {
+    schema: 'metaschema_modules_public',
+    table: 'devices_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      user_devices_table_id: 'uuid',
+      device_settings_table_id: 'uuid',
+      user_devices_table: 'text',
+      device_settings_table: 'text'
+    }
+  },
+  identity_providers_module: {
+    schema: 'metaschema_modules_public',
+    table: 'identity_providers_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text'
+    }
+  },
+  notifications_module: {
+    schema: 'metaschema_modules_public',
+    table: 'notifications_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      notifications_table_id: 'uuid',
+      read_state_table_id: 'uuid',
+      preferences_table_id: 'uuid',
+      channels_table_id: 'uuid',
+      delivery_log_table_id: 'uuid',
+      owner_table_id: 'uuid',
+      user_settings_table_id: 'uuid',
+      organization_settings_table_id: 'uuid',
+      has_channels: 'boolean',
+      has_preferences: 'boolean',
+      has_settings_extension: 'boolean',
+      has_digest_metadata: 'boolean',
+      has_subscriptions: 'boolean'
+    }
+  },
+  plans_module: {
+    schema: 'metaschema_modules_public',
+    table: 'plans_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      plans_table_id: 'uuid',
+      plans_table_name: 'text',
+      plan_limits_table_id: 'uuid',
+      plan_limits_table_name: 'text',
+      plan_pricing_table_id: 'uuid',
+      plan_overrides_table_id: 'uuid',
+      apply_plan_function: 'text',
+      apply_plan_aggregate_function: 'text',
+      prefix: 'text'
+    }
+  },
+  realtime_module: {
+    schema: 'metaschema_modules_public',
+    table: 'realtime_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      subscriptions_schema_id: 'uuid',
+      change_log_table_id: 'uuid',
+      listener_node_table_id: 'uuid',
+      source_registry_table_id: 'uuid',
+      retention_hours: 'int',
+      lookahead_hours: 'int',
+      partition_interval: 'text',
+      notify_channel: 'text'
+    }
+  },
+  session_secrets_module: {
+    schema: 'metaschema_modules_public',
+    table: 'session_secrets_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text',
+      sessions_table_id: 'uuid'
+    }
+  },
+  webauthn_auth_module: {
+    schema: 'metaschema_modules_public',
+    table: 'webauthn_auth_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      users_table_id: 'uuid',
+      credentials_table_id: 'uuid',
+      sessions_table_id: 'uuid',
+      session_credentials_table_id: 'uuid',
+      session_secrets_table_id: 'uuid',
+      auth_settings_table_id: 'uuid',
+      rp_id: 'text',
+      rp_name: 'text',
+      origin_allowlist: 'text[]',
+      attestation_type: 'text',
+      require_user_verification: 'boolean',
+      resident_key: 'text',
+      challenge_expiry: 'interval'
+    }
+  },
+  webauthn_credentials_module: {
+    schema: 'metaschema_modules_public',
+    table: 'webauthn_credentials_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      owner_table_id: 'uuid',
+      table_name: 'text'
+    }
+  },
+  spatial_relation: {
+    schema: 'metaschema_public',
+    table: 'spatial_relation',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      table_id: 'uuid',
+      field_id: 'uuid',
+      ref_table_id: 'uuid',
+      ref_field_id: 'uuid',
+      name: 'text',
+      operator: 'text',
+      param_name: 'text',
+      category: 'text',
+      module: 'text',
+      scope: 'int',
+      tags: 'text[]'
     }
   }
 };

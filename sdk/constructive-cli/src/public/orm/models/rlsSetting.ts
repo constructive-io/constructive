@@ -70,13 +70,11 @@ export class RlsSettingModel {
     });
   }
   findFirst<S extends RlsSettingSelect>(
-    args: FindFirstArgs<S, RlsSettingFilter> & {
+    args: FindFirstArgs<S, RlsSettingFilter, RlsSettingOrderBy> & {
       select: S;
     } & StrictSelect<S, RlsSettingSelect>
   ): QueryBuilder<{
-    rlsSettings: {
-      nodes: InferSelectResult<RlsSettingWithRelations, S>[];
-    };
+    rlsSetting: InferSelectResult<RlsSettingWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'RlsSetting',
@@ -84,17 +82,26 @@ export class RlsSettingModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'RlsSettingFilter',
+      'RlsSettingOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'RlsSetting',
-      fieldName: 'rlsSettings',
+      fieldName: 'rlsSetting',
       document,
       variables,
+      transform: (data: {
+        rlsSettings?: {
+          nodes?: InferSelectResult<RlsSettingWithRelations, S>[];
+        };
+      }) => ({
+        rlsSetting: data.rlsSettings?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends RlsSettingSelect>(

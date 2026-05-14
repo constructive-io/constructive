@@ -91,7 +91,7 @@ export async function fetchOrgLimitQuery<S extends OrgLimitSelect>(params: {
 export async function fetchOrgLimitQuery(params: {
   id: string;
   selection: SelectionConfig<OrgLimitSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgLimitSelect>(params.selection);
   return getClient()
     .orgLimit.findOne({

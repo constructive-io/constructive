@@ -29,6 +29,21 @@ beforeEach(() => db.beforeEach());
 afterEach(() => db.afterEach());
 ```
 
+## Transaction-Local Context
+
+`setContext()` uses `set_config('key', 'value', true)` — the `true` makes settings **transaction-local**. This means:
+
+- **In `it()` blocks:** Works automatically. `beforeEach()` starts a transaction, so context persists across queries.
+- **In `beforeAll()`:** No active transaction. Context is lost between queries. Wrap context-dependent operations in explicit `db.begin()` / `db.commit()`.
+
+```ts
+// In beforeAll — explicit transaction required
+await db.begin();
+db.setContext({ role: 'authenticated', 'jwt.claims.user_id': userId });
+await db.query('...'); // context persists
+await db.commit();
+```
+
 ## Seeding Notes
 
 - For raw SQL seeding, use `seed.sqlfile([...paths])`.

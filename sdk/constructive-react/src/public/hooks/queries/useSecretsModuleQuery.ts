@@ -91,7 +91,7 @@ export async function fetchSecretsModuleQuery<S extends SecretsModuleSelect>(par
 export async function fetchSecretsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<SecretsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SecretsModuleSelect>(params.selection);
   return getClient()
     .secretsModule.findOne({

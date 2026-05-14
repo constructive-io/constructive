@@ -27,7 +27,7 @@ const fieldSchema: FieldSchema = {
   rateLimitsTable: 'string',
 };
 const usage =
-  '\nrate-limits-module <command>\n\nCommands:\n  list                  List rateLimitsModule records\n  find-first            Find first matching rateLimitsModule record\n  get                   Get a rateLimitsModule by ID\n  create                Create a new rateLimitsModule\n  update                Update an existing rateLimitsModule\n  delete                Delete a rateLimitsModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
+  '\nrate-limits-module <command>\n\nCommands:\n  list                  List rateLimitsModule records\n  find-first            Find first matching rateLimitsModule record\n  get                   Get a rateLimitsModule by ID\n  create                Create a new rateLimitsModule\n  update                Update an existing rateLimitsModule\n  delete                Delete a rateLimitsModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -117,7 +117,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       rateLimitsTable: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<RateLimitsModuleSelect, RateLimitsModuleFilter> & {
+      FindFirstArgs<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy> & {
         select: RateLimitsModuleSelect;
       }
     >(argv, defaultSelect);

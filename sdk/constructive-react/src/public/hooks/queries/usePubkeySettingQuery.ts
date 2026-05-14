@@ -91,7 +91,7 @@ export async function fetchPubkeySettingQuery<S extends PubkeySettingSelect>(par
 export async function fetchPubkeySettingQuery(params: {
   id: string;
   selection: SelectionConfig<PubkeySettingSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<PubkeySettingSelect>(params.selection);
   return getClient()
     .pubkeySetting.findOne({

@@ -50,13 +50,7 @@ describe('META_TABLE_CONFIG and META_TABLE_ORDER consistency', () => {
       }
     }
 
-    // database_extension is in config but intentionally not in META_TABLE_ORDER
-    // (it's queried but not included in the meta package output)
-    // If there are other exceptions, document them here.
-    const knownExceptions = ['database_extension'];
-    const unexpectedMissing = missingFromOrder.filter(k => !knownExceptions.includes(k));
-
-    expect(unexpectedMissing).toEqual([]);
+    expect(missingFromOrder).toEqual([]);
   });
 
   it('META_TABLE_ORDER should not have duplicates', () => {

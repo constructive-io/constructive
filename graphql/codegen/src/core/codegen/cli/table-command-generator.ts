@@ -520,7 +520,7 @@ function buildFindManyArgsType(table: Table): t.TSType {
 
 /**
  * Build the FindFirstArgs type instantiation for a table:
- * FindFirstArgs<SelectType, FilterType> & { select: SelectType }
+ * FindFirstArgs<SelectType, FilterType, OrderByType> & { select: SelectType }
  *
  * The intersection with { select: SelectType } makes select required,
  * matching what the ORM's findFirst method expects.
@@ -529,11 +529,13 @@ function buildFindFirstArgsType(table: Table): t.TSType {
   const { typeName } = getTableNames(table);
   const selectTypeName = `${typeName}Select`;
   const whereTypeName = getFilterTypeName(table);
+  const orderByTypeName = getOrderByTypeName(table);
   const findFirstType = t.tsTypeReference(
     t.identifier('FindFirstArgs'),
     t.tsTypeParameterInstantiation([
       t.tsTypeReference(t.identifier(selectTypeName)),
       t.tsTypeReference(t.identifier(whereTypeName)),
+      t.tsTypeReference(t.identifier(orderByTypeName)),
     ]),
   );
   // Intersect with { select: SelectType } to make select required
@@ -1322,6 +1324,275 @@ function buildMutationHandler(
   );
 }
 
+type BulkCliOp = 'bulk-create' | 'bulk-upsert' | 'bulk-update' | 'bulk-delete';
+
+function buildBulkMutationHandler(
+  table: Table,
+  operation: BulkCliOp,
+  targetName?: string,
+): t.FunctionDeclaration {
+  const { singularName } = getTableNames(table);
+  const selectObj = buildSelectObject(table);
+
+  // Map CLI op name to ORM method name
+  const ormMethod = (() => {
+    switch (operation) {
+      case 'bulk-create': return 'bulkCreate';
+      case 'bulk-upsert': return 'bulkUpsert';
+      case 'bulk-update': return 'bulkUpdate';
+      case 'bulk-delete': return 'bulkDelete';
+    }
+  })();
+
+  const tryBody: t.Statement[] = [];
+
+  if (operation === 'bulk-create' || operation === 'bulk-upsert') {
+    // Parse --data (JSON array) from argv
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('dataRaw'),
+          t.memberExpression(t.identifier('argv'), t.identifier('data')),
+        ),
+      ]),
+    );
+    tryBody.push(
+      t.ifStatement(
+        t.unaryExpression('!', t.identifier('dataRaw')),
+        t.blockStatement([
+          t.expressionStatement(
+            t.callExpression(
+              t.memberExpression(t.identifier('console'), t.identifier('error')),
+              [t.stringLiteral(`--data is required for ${operation}. Provide a JSON array.`)],
+            ),
+          ),
+          t.expressionStatement(
+            t.callExpression(
+              t.memberExpression(t.identifier('process'), t.identifier('exit')),
+              [t.numericLiteral(1)],
+            ),
+          ),
+        ]),
+      ),
+    );
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('data'),
+          t.callExpression(
+            t.memberExpression(t.identifier('JSON'), t.identifier('parse')),
+            [t.tsAsExpression(t.identifier('dataRaw'), t.tsStringKeyword())],
+          ),
+        ),
+      ]),
+    );
+
+    let ormArgs: t.ObjectExpression;
+    if (operation === 'bulk-upsert') {
+      // Also parse --on-conflict
+      tryBody.push(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.identifier('onConflictRaw'),
+            t.memberExpression(t.identifier('argv'), t.identifier('on-conflict')),
+          ),
+        ]),
+      );
+      tryBody.push(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.identifier('onConflict'),
+            t.conditionalExpression(
+              t.identifier('onConflictRaw'),
+              t.callExpression(
+                t.memberExpression(t.identifier('JSON'), t.identifier('parse')),
+                [t.tsAsExpression(t.identifier('onConflictRaw'), t.tsStringKeyword())],
+              ),
+              t.objectExpression([]),
+            ),
+          ),
+        ]),
+      );
+      ormArgs = t.objectExpression([
+        t.objectProperty(t.identifier('data'), t.identifier('data')),
+        t.objectProperty(t.identifier('onConflict'), t.identifier('onConflict')),
+        t.objectProperty(t.identifier('select'), selectObj),
+      ]);
+    } else {
+      ormArgs = t.objectExpression([
+        t.objectProperty(t.identifier('data'), t.identifier('data')),
+        t.objectProperty(t.identifier('select'), selectObj),
+      ]);
+    }
+
+    tryBody.push(buildGetClientStatement(targetName));
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('result'),
+          t.awaitExpression(buildOrmCall(singularName, ormMethod, ormArgs)),
+        ),
+      ]),
+    );
+  } else if (operation === 'bulk-update') {
+    // Parse --where (JSON) and --data (JSON)
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('whereRaw'),
+          t.memberExpression(t.identifier('argv'), t.identifier('where')),
+        ),
+      ]),
+    );
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('dataRaw'),
+          t.memberExpression(t.identifier('argv'), t.identifier('data')),
+        ),
+      ]),
+    );
+    tryBody.push(
+      t.ifStatement(
+        t.logicalExpression(
+          '||',
+          t.unaryExpression('!', t.identifier('whereRaw')),
+          t.unaryExpression('!', t.identifier('dataRaw')),
+        ),
+        t.blockStatement([
+          t.expressionStatement(
+            t.callExpression(
+              t.memberExpression(t.identifier('console'), t.identifier('error')),
+              [t.stringLiteral('--where and --data are required for bulk-update. Provide JSON objects.')],
+            ),
+          ),
+          t.expressionStatement(
+            t.callExpression(
+              t.memberExpression(t.identifier('process'), t.identifier('exit')),
+              [t.numericLiteral(1)],
+            ),
+          ),
+        ]),
+      ),
+    );
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('where'),
+          t.callExpression(
+            t.memberExpression(t.identifier('JSON'), t.identifier('parse')),
+            [t.tsAsExpression(t.identifier('whereRaw'), t.tsStringKeyword())],
+          ),
+        ),
+      ]),
+    );
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('data'),
+          t.callExpression(
+            t.memberExpression(t.identifier('JSON'), t.identifier('parse')),
+            [t.tsAsExpression(t.identifier('dataRaw'), t.tsStringKeyword())],
+          ),
+        ),
+      ]),
+    );
+    tryBody.push(buildGetClientStatement(targetName));
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('result'),
+          t.awaitExpression(
+            buildOrmCall(singularName, ormMethod, t.objectExpression([
+              t.objectProperty(t.identifier('where'), t.identifier('where')),
+              t.objectProperty(t.identifier('data'), t.identifier('data')),
+              t.objectProperty(t.identifier('select'), selectObj),
+            ])),
+          ),
+        ),
+      ]),
+    );
+  } else {
+    // bulk-delete: parse --where (JSON)
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('whereRaw'),
+          t.memberExpression(t.identifier('argv'), t.identifier('where')),
+        ),
+      ]),
+    );
+    tryBody.push(
+      t.ifStatement(
+        t.unaryExpression('!', t.identifier('whereRaw')),
+        t.blockStatement([
+          t.expressionStatement(
+            t.callExpression(
+              t.memberExpression(t.identifier('console'), t.identifier('error')),
+              [t.stringLiteral('--where is required for bulk-delete. Provide a JSON object.')],
+            ),
+          ),
+          t.expressionStatement(
+            t.callExpression(
+              t.memberExpression(t.identifier('process'), t.identifier('exit')),
+              [t.numericLiteral(1)],
+            ),
+          ),
+        ]),
+      ),
+    );
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('where'),
+          t.callExpression(
+            t.memberExpression(t.identifier('JSON'), t.identifier('parse')),
+            [t.tsAsExpression(t.identifier('whereRaw'), t.tsStringKeyword())],
+          ),
+        ),
+      ]),
+    );
+    tryBody.push(buildGetClientStatement(targetName));
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('result'),
+          t.awaitExpression(
+            buildOrmCall(singularName, ormMethod, t.objectExpression([
+              t.objectProperty(t.identifier('where'), t.identifier('where')),
+              t.objectProperty(t.identifier('select'), selectObj),
+            ])),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  tryBody.push(buildJsonLog(t.identifier('result')));
+
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = buildArgvType();
+  const prompterParam = t.identifier('prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+
+  const handlerName = `handle${toPascalCase(operation)}`;
+
+  return t.functionDeclaration(
+    t.identifier(handlerName),
+    [argvParam, prompterParam],
+    t.blockStatement([
+      t.tryStatement(
+        t.blockStatement(tryBody),
+        buildErrorCatch(`Failed to ${operation}.`),
+      ),
+    ]),
+    false,
+    true,
+  );
+}
+
 export interface TableCommandOptions {
   targetName?: string;
   executorImportPath?: string;
@@ -1439,12 +1710,22 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     );
   }
 
+  // Detect bulk mutations
+  const hasBulkCreate = !!table.query?.bulkInsert;
+  const hasBulkUpsert = !!table.query?.bulkUpsert;
+  const hasBulkUpdate = !!table.query?.bulkUpdate;
+  const hasBulkDelete = !!table.query?.bulkDelete;
+
   const subcommands: string[] = ['list', 'find-first'];
   if (hasSearchFields) subcommands.push('search');
   if (hasGet) subcommands.push('get');
   subcommands.push('create');
   if (hasUpdate) subcommands.push('update');
   if (hasDelete) subcommands.push('delete');
+  if (hasBulkCreate) subcommands.push('bulk-create');
+  if (hasBulkUpsert) subcommands.push('bulk-upsert');
+  if (hasBulkUpdate) subcommands.push('bulk-update');
+  if (hasBulkDelete) subcommands.push('bulk-delete');
 
   const usageLines = [
     '',
@@ -1466,6 +1747,10 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     );
   }
   if (hasDelete) usageLines.push(`  delete                Delete a ${singularName}`);
+  if (hasBulkCreate) usageLines.push(`  bulk-create           Bulk create ${singularName} records`);
+  if (hasBulkUpsert) usageLines.push(`  bulk-upsert           Bulk upsert ${singularName} records`);
+  if (hasBulkUpdate) usageLines.push(`  bulk-update           Bulk update ${singularName} records`);
+  if (hasBulkDelete) usageLines.push(`  bulk-delete           Bulk delete ${singularName} records`);
   usageLines.push(
     '',
     'List Options:',
@@ -1483,6 +1768,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     '  --select <fields>     Comma-separated list of fields to return',
     '  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)',
     '  --condition.<f>.<op>  Condition filter (dot-notation)',
+    '  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)',
     '',
   );
   if (hasSearchFields) {
@@ -1684,6 +1970,10 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   statements.push(buildMutationHandler(table, 'create', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasDelete) statements.push(buildMutationHandler(table, 'delete', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
+  if (hasBulkCreate) statements.push(buildBulkMutationHandler(table, 'bulk-create', tn));
+  if (hasBulkUpsert) statements.push(buildBulkMutationHandler(table, 'bulk-upsert', tn));
+  if (hasBulkUpdate) statements.push(buildBulkMutationHandler(table, 'bulk-update', tn));
+  if (hasBulkDelete) statements.push(buildBulkMutationHandler(table, 'bulk-delete', tn));
 
   const header = getGeneratedFileHeader(`CLI commands for ${table.name}`);
   const code = generateCode(statements);

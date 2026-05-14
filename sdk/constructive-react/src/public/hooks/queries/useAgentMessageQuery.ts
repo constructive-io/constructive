@@ -91,7 +91,7 @@ export async function fetchAgentMessageQuery<S extends AgentMessageSelect>(param
 export async function fetchAgentMessageQuery(params: {
   id: string;
   selection: SelectionConfig<AgentMessageSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AgentMessageSelect>(params.selection);
   return getClient()
     .agentMessage.findOne({

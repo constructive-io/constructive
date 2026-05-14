@@ -140,6 +140,27 @@ function generateEntityMutationKeysDeclaration(
   addJSDocComment(deleteProp, [`Delete ${singularName} mutation key`]);
   properties.push(deleteProp);
 
+  // Bulk mutation keys (only if table has bulk operations)
+  const bulkOps: Array<{ key: string; queryField: string | null | undefined }> = [
+    { key: 'bulkCreate', queryField: table.query?.bulkInsert },
+    { key: 'bulkUpsert', queryField: table.query?.bulkUpsert },
+    { key: 'bulkUpdate', queryField: table.query?.bulkUpdate },
+    { key: 'bulkDelete', queryField: table.query?.bulkDelete },
+  ];
+  for (const { key, queryField } of bulkOps) {
+    if (!queryField) continue;
+    const arrowFn = t.arrowFunctionExpression(
+      [],
+      constArray([
+        t.stringLiteral('mutation'),
+        t.stringLiteral(entityKey),
+        t.stringLiteral(key),
+      ]),
+    );
+    const prop = t.objectProperty(t.identifier(key), arrowFn);
+    properties.push(prop);
+  }
+
   return t.exportNamedDeclaration(
     t.variableDeclaration('const', [
       t.variableDeclarator(

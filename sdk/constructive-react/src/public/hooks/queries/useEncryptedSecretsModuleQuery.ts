@@ -99,7 +99,7 @@ export async function fetchEncryptedSecretsModuleQuery<
 export async function fetchEncryptedSecretsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<EncryptedSecretsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<EncryptedSecretsModuleSelect>(params.selection);
   return getClient()
     .encryptedSecretsModule.findOne({

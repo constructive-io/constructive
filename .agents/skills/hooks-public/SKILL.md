@@ -1,13 +1,13 @@
 ---
 name: hooks-public
-description: React Query hooks for the public API — provides typed query and mutation hooks for 149 tables and 70 custom operations
+description: React Query hooks for the public API — provides typed query and mutation hooks for 149 tables and 71 custom operations
 ---
 
 # hooks-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the public API — provides typed query and mutation hooks for 149 tables and 70 custom operations
+React Query hooks for the public API — provides typed query and mutation hooks for 149 tables and 71 custom operations
 
 ## Usage
 
@@ -175,9 +175,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-limit-event](references/app-limit-event.md)
 - [org-limit-event](references/org-limit-event.md)
 - [rls-module](references/rls-module.md)
-- [database-setting](references/database-setting.md)
 - [plans-module](references/plans-module.md)
 - [sql-action](references/sql-action.md)
+- [database-setting](references/database-setting.md)
 - [billing-module](references/billing-module.md)
 - [ast-migration](references/ast-migration.md)
 - [user](references/user.md)
@@ -234,6 +234,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [provision-spatial-relation](references/provision-spatial-relation.md)
 - [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
+- [provision-check-constraint](references/provision-check-constraint.md)
 - [provision-unique-constraint](references/provision-unique-constraint.md)
 - [provision-full-text-search](references/provision-full-text-search.md)
 - [provision-index](references/provision-index.md)

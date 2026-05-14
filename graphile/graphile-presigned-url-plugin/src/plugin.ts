@@ -92,10 +92,11 @@ function resolveS3ForDatabase(
   options: PresignedUrlPluginOptions,
   storageConfig: StorageModuleConfig,
   databaseId: string,
+  bucketKey: string,
 ): S3Config {
   const globalS3 = resolveS3(options);
   const bucket = options.resolveBucketName
-    ? options.resolveBucketName(databaseId)
+    ? options.resolveBucketName(databaseId, bucketKey)
     : globalS3.bucket;
   const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
 
@@ -282,7 +283,7 @@ export function createPresignedUrlPlugin(
                           );
                           if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
-                          const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
+                          const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key);
                           await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId, storageConfig.allowedOrigins);
 
                           return processSingleFile(options, txClient, storageConfig, databaseId, bucket, s3ForDb, {
@@ -397,7 +398,7 @@ export function createPresignedUrlPlugin(
                             );
                           }
 
-                          const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
+                          const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key);
                           await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId, storageConfig.allowedOrigins);
 
                           const results = [];
@@ -533,7 +534,17 @@ export function createPresignedUrlPlugin(
                       }
 
                       // No other references — attempt sync S3 delete
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
+                      // Look up the bucket key for scoped S3 resolution
+                      const bucketResult = await pgClient.query({
+                        text: `SELECT key FROM ${storageConfig.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                        values: [fileRow!.bucket_id],
+                      });
+                      const bucketKey = bucketResult.rows[0]?.key;
+                      if (!bucketKey) {
+                        log.warn(`Bucket not found for bucket_id=${fileRow!.bucket_id}; skipping S3 delete`);
+                        return;
+                      }
+                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucketKey);
                       await deleteS3Object(s3ForDb, fileRow!.key);
                       log.info(`Sync S3 delete succeeded for key=${fileRow!.key}`);
                     });

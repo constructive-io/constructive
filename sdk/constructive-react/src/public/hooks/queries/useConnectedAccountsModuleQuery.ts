@@ -99,7 +99,7 @@ export async function fetchConnectedAccountsModuleQuery<
 export async function fetchConnectedAccountsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<ConnectedAccountsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ConnectedAccountsModuleSelect>(params.selection);
   return getClient()
     .connectedAccountsModule.findOne({

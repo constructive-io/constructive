@@ -70,13 +70,11 @@ export class AppInviteModel {
     });
   }
   findFirst<S extends AppInviteSelect>(
-    args: FindFirstArgs<S, AppInviteFilter> & {
+    args: FindFirstArgs<S, AppInviteFilter, AppInviteOrderBy> & {
       select: S;
     } & StrictSelect<S, AppInviteSelect>
   ): QueryBuilder<{
-    appInvites: {
-      nodes: InferSelectResult<AppInviteWithRelations, S>[];
-    };
+    appInvite: InferSelectResult<AppInviteWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppInvite',
@@ -84,17 +82,26 @@ export class AppInviteModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppInviteFilter',
+      'AppInviteOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppInvite',
-      fieldName: 'appInvites',
+      fieldName: 'appInvite',
       document,
       variables,
+      transform: (data: {
+        appInvites?: {
+          nodes?: InferSelectResult<AppInviteWithRelations, S>[];
+        };
+      }) => ({
+        appInvite: data.appInvites?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppInviteSelect>(

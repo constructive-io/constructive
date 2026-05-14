@@ -91,7 +91,7 @@ export async function fetchApiSettingQuery<S extends ApiSettingSelect>(params: {
 export async function fetchApiSettingQuery(params: {
   id: string;
   selection: SelectionConfig<ApiSettingSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<ApiSettingSelect>(params.selection);
   return getClient()
     .apiSetting.findOne({

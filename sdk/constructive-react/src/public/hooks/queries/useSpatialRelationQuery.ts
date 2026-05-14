@@ -91,7 +91,7 @@ export async function fetchSpatialRelationQuery<S extends SpatialRelationSelect>
 export async function fetchSpatialRelationQuery(params: {
   id: string;
   selection: SelectionConfig<SpatialRelationSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<SpatialRelationSelect>(params.selection);
   return getClient()
     .spatialRelation.findOne({

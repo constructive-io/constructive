@@ -140,12 +140,6 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             name text,
             hash uuid
           );
-          CREATE TABLE metaschema_public.database_extension (
-            id uuid PRIMARY KEY,
-            database_id uuid,
-            name text,
-            schema_id uuid
-          );
           CREATE TABLE metaschema_public.schema (
             id uuid PRIMARY KEY,
             database_id uuid,

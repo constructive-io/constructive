@@ -91,7 +91,7 @@ export async function fetchRlsModuleQuery<S extends RlsModuleSelect>(params: {
 export async function fetchRlsModuleQuery(params: {
   id: string;
   selection: SelectionConfig<RlsModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<RlsModuleSelect>(params.selection);
   return getClient()
     .rlsModule.findOne({

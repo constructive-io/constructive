@@ -70,13 +70,11 @@ export class LimitsModuleModel {
     });
   }
   findFirst<S extends LimitsModuleSelect>(
-    args: FindFirstArgs<S, LimitsModuleFilter> & {
+    args: FindFirstArgs<S, LimitsModuleFilter, LimitsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, LimitsModuleSelect>
   ): QueryBuilder<{
-    limitsModules: {
-      nodes: InferSelectResult<LimitsModuleWithRelations, S>[];
-    };
+    limitsModule: InferSelectResult<LimitsModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'LimitsModule',
@@ -84,17 +82,26 @@ export class LimitsModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'LimitsModuleFilter',
+      'LimitsModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'LimitsModule',
-      fieldName: 'limitsModules',
+      fieldName: 'limitsModule',
       document,
       variables,
+      transform: (data: {
+        limitsModules?: {
+          nodes?: InferSelectResult<LimitsModuleWithRelations, S>[];
+        };
+      }) => ({
+        limitsModule: data.limitsModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends LimitsModuleSelect>(

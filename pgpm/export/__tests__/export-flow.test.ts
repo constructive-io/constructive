@@ -218,12 +218,6 @@ const SCHEMA_SHIMS_SQL = `
     verify_email_function text
   );
 
-  -- Additional metaschema_public table required by exportMeta
-  CREATE TABLE IF NOT EXISTS metaschema_public.database_extension (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    database_id uuid,
-    name text
-  );
 `;
 
 describe('Export Flow E2E', () => {

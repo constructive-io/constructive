@@ -70,13 +70,11 @@ export class ViewGrantModel {
     });
   }
   findFirst<S extends ViewGrantSelect>(
-    args: FindFirstArgs<S, ViewGrantFilter> & {
+    args: FindFirstArgs<S, ViewGrantFilter, ViewGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewGrantSelect>
   ): QueryBuilder<{
-    viewGrants: {
-      nodes: InferSelectResult<ViewGrantWithRelations, S>[];
-    };
+    viewGrant: InferSelectResult<ViewGrantWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'ViewGrant',
@@ -84,17 +82,26 @@ export class ViewGrantModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ViewGrantFilter',
+      'ViewGrantOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'ViewGrant',
-      fieldName: 'viewGrants',
+      fieldName: 'viewGrant',
       document,
       variables,
+      transform: (data: {
+        viewGrants?: {
+          nodes?: InferSelectResult<ViewGrantWithRelations, S>[];
+        };
+      }) => ({
+        viewGrant: data.viewGrants?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ViewGrantSelect>(

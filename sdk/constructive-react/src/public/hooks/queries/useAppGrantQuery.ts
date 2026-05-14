@@ -91,7 +91,7 @@ export async function fetchAppGrantQuery<S extends AppGrantSelect>(params: {
 export async function fetchAppGrantQuery(params: {
   id: string;
   selection: SelectionConfig<AppGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppGrantSelect>(params.selection);
   return getClient()
     .appGrant.findOne({

@@ -70,13 +70,11 @@ export class PlansModuleModel {
     });
   }
   findFirst<S extends PlansModuleSelect>(
-    args: FindFirstArgs<S, PlansModuleFilter> & {
+    args: FindFirstArgs<S, PlansModuleFilter, PlansModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, PlansModuleSelect>
   ): QueryBuilder<{
-    plansModules: {
-      nodes: InferSelectResult<PlansModuleWithRelations, S>[];
-    };
+    plansModule: InferSelectResult<PlansModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'PlansModule',
@@ -84,17 +82,26 @@ export class PlansModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'PlansModuleFilter',
+      'PlansModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'PlansModule',
-      fieldName: 'plansModules',
+      fieldName: 'plansModule',
       document,
       variables,
+      transform: (data: {
+        plansModules?: {
+          nodes?: InferSelectResult<PlansModuleWithRelations, S>[];
+        };
+      }) => ({
+        plansModule: data.plansModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends PlansModuleSelect>(

@@ -27,10 +27,12 @@ const fieldSchema: FieldSchema = {
   enableConnectionFilter: 'boolean',
   enableLtree: 'boolean',
   enableLlm: 'boolean',
+  enableRealtime: 'boolean',
+  enableBulk: 'boolean',
   options: 'json',
 };
 const usage =
-  '\ndatabase-setting <command>\n\nCommands:\n  list                  List databaseSetting records\n  find-first            Find first matching databaseSetting record\n  get                   Get a databaseSetting by ID\n  create                Create a new databaseSetting\n  update                Update an existing databaseSetting\n  delete                Delete a databaseSetting\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
+  '\ndatabase-setting <command>\n\nCommands:\n  list                  List databaseSetting records\n  find-first            Find first matching databaseSetting record\n  get                   Get a databaseSetting by ID\n  create                Create a new databaseSetting\n  update                Update an existing databaseSetting\n  delete                Delete a databaseSetting\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -91,6 +93,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       enableConnectionFilter: true,
       enableLtree: true,
       enableLlm: true,
+      enableRealtime: true,
+      enableBulk: true,
       options: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -123,10 +127,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       enableConnectionFilter: true,
       enableLtree: true,
       enableLlm: true,
+      enableRealtime: true,
+      enableBulk: true,
       options: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<DatabaseSettingSelect, DatabaseSettingFilter> & {
+      FindFirstArgs<DatabaseSettingSelect, DatabaseSettingFilter, DatabaseSettingOrderBy> & {
         select: DatabaseSettingSelect;
       }
     >(argv, defaultSelect);
@@ -167,6 +173,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           enableConnectionFilter: true,
           enableLtree: true,
           enableLlm: true,
+          enableRealtime: true,
+          enableBulk: true,
           options: true,
         },
       })
@@ -253,6 +261,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'enableRealtime',
+        message: 'enableRealtime',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'enableBulk',
+        message: 'enableBulk',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'options',
         message: 'options',
@@ -279,6 +301,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           enableConnectionFilter: cleanedData.enableConnectionFilter,
           enableLtree: cleanedData.enableLtree,
           enableLlm: cleanedData.enableLlm,
+          enableRealtime: cleanedData.enableRealtime,
+          enableBulk: cleanedData.enableBulk,
           options: cleanedData.options,
         },
         select: {
@@ -293,6 +317,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           enableConnectionFilter: true,
           enableLtree: true,
           enableLlm: true,
+          enableRealtime: true,
+          enableBulk: true,
           options: true,
         },
       })
@@ -385,6 +411,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'enableRealtime',
+        message: 'enableRealtime',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'enableBulk',
+        message: 'enableBulk',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'options',
         message: 'options',
@@ -411,6 +451,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           enableConnectionFilter: cleanedData.enableConnectionFilter,
           enableLtree: cleanedData.enableLtree,
           enableLlm: cleanedData.enableLlm,
+          enableRealtime: cleanedData.enableRealtime,
+          enableBulk: cleanedData.enableBulk,
           options: cleanedData.options,
         },
         select: {
@@ -425,6 +467,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           enableConnectionFilter: true,
           enableLtree: true,
           enableLlm: true,
+          enableRealtime: true,
+          enableBulk: true,
           options: true,
         },
       })

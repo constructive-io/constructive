@@ -91,7 +91,7 @@ export async function fetchHierarchyModuleQuery<S extends HierarchyModuleSelect>
 export async function fetchHierarchyModuleQuery(params: {
   id: string;
   selection: SelectionConfig<HierarchyModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<HierarchyModuleSelect>(params.selection);
   return getClient()
     .hierarchyModule.findOne({

@@ -70,13 +70,11 @@ export class OrgLimitCapsDefaultModel {
     });
   }
   findFirst<S extends OrgLimitCapsDefaultSelect>(
-    args: FindFirstArgs<S, OrgLimitCapsDefaultFilter> & {
+    args: FindFirstArgs<S, OrgLimitCapsDefaultFilter, OrgLimitCapsDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgLimitCapsDefaultSelect>
   ): QueryBuilder<{
-    orgLimitCapsDefaults: {
-      nodes: InferSelectResult<OrgLimitCapsDefaultWithRelations, S>[];
-    };
+    orgLimitCapsDefault: InferSelectResult<OrgLimitCapsDefaultWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgLimitCapsDefault',
@@ -84,17 +82,26 @@ export class OrgLimitCapsDefaultModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgLimitCapsDefaultFilter',
+      'OrgLimitCapsDefaultOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgLimitCapsDefault',
-      fieldName: 'orgLimitCapsDefaults',
+      fieldName: 'orgLimitCapsDefault',
       document,
       variables,
+      transform: (data: {
+        orgLimitCapsDefaults?: {
+          nodes?: InferSelectResult<OrgLimitCapsDefaultWithRelations, S>[];
+        };
+      }) => ({
+        orgLimitCapsDefault: data.orgLimitCapsDefaults?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgLimitCapsDefaultSelect>(

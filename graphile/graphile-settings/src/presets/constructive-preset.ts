@@ -1,4 +1,5 @@
 import { BucketProvisionerPreset } from 'graphile-bucket-provisioner-plugin';
+import { BulkMutationPreset } from 'graphile-bulk-mutations';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { createFolderOperatorFactory, GraphileLtreePreset } from 'graphile-ltree';
@@ -46,6 +47,7 @@ export interface ConstructivePresetOptions {
   enableLtree?: boolean;
   enableLlm?: boolean;
   enableRealtime?: boolean;
+  enableBulk?: boolean;
 }
 
 const DEFAULTS: Required<ConstructivePresetOptions> = {
@@ -59,6 +61,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
   enableLtree: true,
   enableLlm: false,
   enableRealtime: false,
+  enableBulk: false,
 };
 
 /**
@@ -92,6 +95,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
  * - enablePresignedUploads  -> PresignedUrlPreset, BucketProvisionerPreset
  * - enableAggregates        -> PgAggregatesPreset (off by default)
  * - enableRealtime          -> RealtimeSubscriptionsPreset (off by default)
+ * - enableBulk              -> BulkMutationPreset (off by default)
  * - enableLlm               -> (no plugin yet, reserved for future use)
  *
  * RELATION FILTERS (when enableConnectionFilter is true):
@@ -188,6 +192,10 @@ export function createConstructivePreset(
 
   if (opts.enableRealtime) {
     presets.push(RealtimeSubscriptionsPreset());
+  }
+
+  if (opts.enableBulk) {
+    presets.push(BulkMutationPreset());
   }
 
   // ----- connectionFilterOperatorFactories -----

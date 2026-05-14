@@ -319,6 +319,10 @@ function buildCleanTable(
     update: mutationOps.update,
     delete: mutationOps.delete,
     patchFieldName,
+    bulkInsert: mutationOps.bulkInsert,
+    bulkUpsert: mutationOps.bulkUpsert,
+    bulkUpdate: mutationOps.bulkUpdate,
+    bulkDelete: mutationOps.bulkDelete,
   };
 
   // Extract description from entity type (PostgreSQL COMMENT), strip smart comments
@@ -689,6 +693,10 @@ interface MutationOperations {
   create: string | null;
   update: string | null;
   delete: string | null;
+  bulkInsert: string | null;
+  bulkUpsert: string | null;
+  bulkUpdate: string | null;
+  bulkDelete: string | null;
 }
 
 /**
@@ -698,6 +706,10 @@ interface MutationOperations {
  * - create{EntityName}
  * - update{EntityName} or update{EntityName}ById
  * - delete{EntityName} or delete{EntityName}ById
+ * - bulkCreate{PluralName} (bulk insert)
+ * - bulkUpsert{PluralName} (bulk upsert)
+ * - bulkUpdate{PluralName} (bulk update)
+ * - bulkDelete{PluralName} (bulk delete)
  */
 function matchMutationOperations(
   entityName: string,
@@ -706,10 +718,21 @@ function matchMutationOperations(
   let create: string | null = null;
   let update: string | null = null;
   let del: string | null = null;
+  let bulkInsert: string | null = null;
+  let bulkUpsert: string | null = null;
+  let bulkUpdate: string | null = null;
+  let bulkDelete: string | null = null;
 
   const expectedCreate = `create${entityName}`;
   const expectedUpdate = `update${entityName}`;
   const expectedDelete = `delete${entityName}`;
+
+  // Bulk mutation patterns use plural form: bulkCreate{Plural}
+  const pluralName = pluralize(entityName);
+  const expectedBulkInsert = `bulkCreate${pluralName}`;
+  const expectedBulkUpsert = `bulkUpsert${pluralName}`;
+  const expectedBulkUpdate = `bulkUpdate${pluralName}`;
+  const expectedBulkDelete = `bulkDelete${pluralName}`;
 
   for (const field of mutationFields) {
     // Exact match for create
@@ -738,9 +761,23 @@ function matchMutationOperations(
     ) {
       del = field.name;
     }
+
+    // Bulk mutations
+    if (field.name === expectedBulkInsert) {
+      bulkInsert = field.name;
+    }
+    if (field.name === expectedBulkUpsert) {
+      bulkUpsert = field.name;
+    }
+    if (field.name === expectedBulkUpdate) {
+      bulkUpdate = field.name;
+    }
+    if (field.name === expectedBulkDelete) {
+      bulkDelete = field.name;
+    }
   }
 
-  return { create, update, delete: del };
+  return { create, update, delete: del, bulkInsert, bulkUpsert, bulkUpdate, bulkDelete };
 }
 
 // ============================================================================

@@ -70,13 +70,11 @@ export class FunctionModel {
     });
   }
   findFirst<S extends FunctionSelect>(
-    args: FindFirstArgs<S, FunctionFilter> & {
+    args: FindFirstArgs<S, FunctionFilter, FunctionOrderBy> & {
       select: S;
     } & StrictSelect<S, FunctionSelect>
   ): QueryBuilder<{
-    functions: {
-      nodes: InferSelectResult<FunctionWithRelations, S>[];
-    };
+    function: InferSelectResult<FunctionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Function',
@@ -84,17 +82,26 @@ export class FunctionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'FunctionFilter',
+      'FunctionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Function',
-      fieldName: 'functions',
+      fieldName: 'function',
       document,
       variables,
+      transform: (data: {
+        functions?: {
+          nodes?: InferSelectResult<FunctionWithRelations, S>[];
+        };
+      }) => ({
+        function: data.functions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends FunctionSelect>(

@@ -1252,15 +1252,6 @@ export const rlsModuleMutationKeys = {
   /** Delete rlsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'rlsmodule', 'delete', id] as const,
 } as const;
-export const databaseSettingMutationKeys = {
-  /** All databaseSetting mutation keys */ all: ['mutation', 'databasesetting'] as const,
-  /** Create databaseSetting mutation key */ create: () =>
-    ['mutation', 'databasesetting', 'create'] as const,
-  /** Update databaseSetting mutation key */ update: (id: string | number) =>
-    ['mutation', 'databasesetting', 'update', id] as const,
-  /** Delete databaseSetting mutation key */ delete: (id: string | number) =>
-    ['mutation', 'databasesetting', 'delete', id] as const,
-} as const;
 export const plansModuleMutationKeys = {
   /** All plansModule mutation keys */ all: ['mutation', 'plansmodule'] as const,
   /** Create plansModule mutation key */ create: () =>
@@ -1277,6 +1268,15 @@ export const sqlActionMutationKeys = {
     ['mutation', 'sqlaction', 'update', id] as const,
   /** Delete sqlAction mutation key */ delete: (id: string | number) =>
     ['mutation', 'sqlaction', 'delete', id] as const,
+} as const;
+export const databaseSettingMutationKeys = {
+  /** All databaseSetting mutation keys */ all: ['mutation', 'databasesetting'] as const,
+  /** Create databaseSetting mutation key */ create: () =>
+    ['mutation', 'databasesetting', 'create'] as const,
+  /** Update databaseSetting mutation key */ update: (id: string | number) =>
+    ['mutation', 'databasesetting', 'update', id] as const,
+  /** Delete databaseSetting mutation key */ delete: (id: string | number) =>
+    ['mutation', 'databasesetting', 'delete', id] as const,
 } as const;
 export const billingModuleMutationKeys = {
   /** All billingModule mutation keys */ all: ['mutation', 'billingmodule'] as const,
@@ -1466,6 +1466,12 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'setFieldOrder', identifier] as const)
       : (['mutation', 'setFieldOrder'] as const),
+  /** Mutation key for provisionCheckConstraint */ provisionCheckConstraint: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'provisionCheckConstraint', identifier] as const)
+      : (['mutation', 'provisionCheckConstraint'] as const),
   /** Mutation key for provisionUniqueConstraint */ provisionUniqueConstraint: (
     identifier?: string
   ) =>
@@ -1716,9 +1722,9 @@ export const mutationKeys = {
   appLimitEvent: appLimitEventMutationKeys,
   orgLimitEvent: orgLimitEventMutationKeys,
   rlsModule: rlsModuleMutationKeys,
-  databaseSetting: databaseSettingMutationKeys,
   plansModule: plansModuleMutationKeys,
   sqlAction: sqlActionMutationKeys,
+  databaseSetting: databaseSettingMutationKeys,
   billingModule: billingModuleMutationKeys,
   astMigration: astMigrationMutationKeys,
   user: userMutationKeys,

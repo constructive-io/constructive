@@ -70,13 +70,11 @@ export class CheckConstraintModel {
     });
   }
   findFirst<S extends CheckConstraintSelect>(
-    args: FindFirstArgs<S, CheckConstraintFilter> & {
+    args: FindFirstArgs<S, CheckConstraintFilter, CheckConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, CheckConstraintSelect>
   ): QueryBuilder<{
-    checkConstraints: {
-      nodes: InferSelectResult<CheckConstraintWithRelations, S>[];
-    };
+    checkConstraint: InferSelectResult<CheckConstraintWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'CheckConstraint',
@@ -84,17 +82,26 @@ export class CheckConstraintModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'CheckConstraintFilter',
+      'CheckConstraintOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'CheckConstraint',
-      fieldName: 'checkConstraints',
+      fieldName: 'checkConstraint',
       document,
       variables,
+      transform: (data: {
+        checkConstraints?: {
+          nodes?: InferSelectResult<CheckConstraintWithRelations, S>[];
+        };
+      }) => ({
+        checkConstraint: data.checkConstraints?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends CheckConstraintSelect>(

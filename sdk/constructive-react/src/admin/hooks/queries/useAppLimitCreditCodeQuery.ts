@@ -97,7 +97,7 @@ export async function fetchAppLimitCreditCodeQuery<S extends AppLimitCreditCodeS
 export async function fetchAppLimitCreditCodeQuery(params: {
   id: string;
   selection: SelectionConfig<AppLimitCreditCodeSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<AppLimitCreditCodeSelect>(params.selection);
   return getClient()
     .appLimitCreditCode.findOne({

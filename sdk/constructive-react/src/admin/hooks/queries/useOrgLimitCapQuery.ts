@@ -91,7 +91,7 @@ export async function fetchOrgLimitCapQuery<S extends OrgLimitCapSelect>(params:
 export async function fetchOrgLimitCapQuery(params: {
   id: string;
   selection: SelectionConfig<OrgLimitCapSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgLimitCapSelect>(params.selection);
   return getClient()
     .orgLimitCap.findOne({

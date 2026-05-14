@@ -60,10 +60,11 @@ function resolveS3ForDatabase(
   options: PresignedUrlPluginOptions,
   storageConfig: StorageModuleConfig,
   databaseId: string,
+  bucketKey: string,
 ): S3Config {
   const globalS3 = resolveS3(options);
   const bucket = options.resolveBucketName
-    ? options.resolveBucketName(databaseId)
+    ? options.resolveBucketName(databaseId, bucketKey)
     : globalS3.bucket;
   const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
 
@@ -127,6 +128,7 @@ export function createDownloadUrlPlugin(
                     const $key = $parent.get('key');
                     const $isPublic = $parent.get('is_public');
                     const $filename = $parent.get('filename');
+                    const $bucketId = $parent.get('bucket_id');
 
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
                     const $pgSettings = (grafastContext() as any).get('pgSettings');
@@ -135,11 +137,12 @@ export function createDownloadUrlPlugin(
                       key: $key,
                       isPublic: $isPublic,
                       filename: $filename,
+                      bucketId: $bucketId,
                       withPgClient: $withPgClient,
                       pgSettings: $pgSettings,
                     });
 
-                    return lambda($combined, async ({ key, isPublic, filename, withPgClient, pgSettings }: any) => {
+                    return lambda($combined, async ({ key, isPublic, filename, bucketId, withPgClient, pgSettings }: any) => {
                       if (!key) return null;
 
                       let s3ForDb = resolveS3(options);
@@ -155,11 +158,24 @@ export function createDownloadUrlPlugin(
                             const allConfigs = await loadAllStorageModules(pgClient, databaseId);
                             const config = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
                             if (!config) return null;
-                            return { config, databaseId };
+
+                            // Look up the bucket key for scoped S3 resolution
+                            let bucketKey = 'public';
+                            if (bucketId) {
+                              const bucketResult = await pgClient.query({
+                                text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                                values: [bucketId],
+                              });
+                              if (bucketResult.rows[0]?.key) {
+                                bucketKey = bucketResult.rows[0].key;
+                              }
+                            }
+
+                            return { config, databaseId, bucketKey };
                           });
                           if (resolved) {
                             downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;
-                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId);
+                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId, resolved.bucketKey);
                           }
                         }
                       } catch {

@@ -97,7 +97,7 @@ export async function fetchWebauthnCredentialQuery<S extends WebauthnCredentialS
 export async function fetchWebauthnCredentialQuery(params: {
   id: string;
   selection: SelectionConfig<WebauthnCredentialSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<WebauthnCredentialSelect>(params.selection);
   return getClient()
     .webauthnCredential.findOne({

@@ -91,7 +91,7 @@ export async function fetchRealtimeModuleQuery<S extends RealtimeModuleSelect>(p
 export async function fetchRealtimeModuleQuery(params: {
   id: string;
   selection: SelectionConfig<RealtimeModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<RealtimeModuleSelect>(params.selection);
   return getClient()
     .realtimeModule.findOne({

@@ -91,7 +91,7 @@ export async function fetchTableGrantQuery<S extends TableGrantSelect>(params: {
 export async function fetchTableGrantQuery(params: {
   id: string;
   selection: SelectionConfig<TableGrantSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<TableGrantSelect>(params.selection);
   return getClient()
     .tableGrant.findOne({

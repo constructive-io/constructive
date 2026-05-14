@@ -91,7 +91,7 @@ export async function fetchOrgMemberQuery<S extends OrgMemberSelect>(params: {
 export async function fetchOrgMemberQuery(params: {
   id: string;
   selection: SelectionConfig<OrgMemberSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<OrgMemberSelect>(params.selection);
   return getClient()
     .orgMember.findOne({

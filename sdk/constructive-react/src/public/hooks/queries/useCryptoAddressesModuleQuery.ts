@@ -99,7 +99,7 @@ export async function fetchCryptoAddressesModuleQuery<
 export async function fetchCryptoAddressesModuleQuery(params: {
   id: string;
   selection: SelectionConfig<CryptoAddressesModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<CryptoAddressesModuleSelect>(params.selection);
   return getClient()
     .cryptoAddressesModule.findOne({

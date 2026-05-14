@@ -58,7 +58,7 @@ export class FetchAdapter implements GraphQLAdapter {
     fetchFn?: typeof globalThis.fetch
   ) {
     this.headers = headers ?? {};
-    this.fetchFn = fetchFn ?? createFetch();
+    this.fetchFn = (fetchFn ?? createFetch()).bind(globalThis);
   }
 
   async execute<T>(document: string, variables?: Record<string, unknown>): Promise<QueryResult<T>> {

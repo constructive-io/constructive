@@ -50,3 +50,25 @@ export {
   createSqlExpressionValidatorPlugin,
   SqlExpressionValidatorPreset
 } from './plugin';
+
+// FieldType / FieldDefault structured models
+export {
+  validateFieldType,
+  validateFieldDefault,
+  fieldTypeToAst,
+  fieldTypeToSql,
+  fieldDefaultToAst,
+  fieldDefaultToSql,
+  FORBIDDEN_TYPES
+} from './field-types';
+
+// FieldType / FieldDefault types
+export type {
+  FieldType,
+  FieldDefault,
+  FieldDefaultArg,
+  FieldTypeValidationOptions,
+  FieldDefaultValidationOptions,
+  FieldTypeValidationResult,
+  FieldDefaultValidationResult
+} from './field-types';

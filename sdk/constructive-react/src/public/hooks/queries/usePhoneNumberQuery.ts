@@ -91,7 +91,7 @@ export async function fetchPhoneNumberQuery<S extends PhoneNumberSelect>(params:
 export async function fetchPhoneNumberQuery(params: {
   id: string;
   selection: SelectionConfig<PhoneNumberSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<PhoneNumberSelect>(params.selection);
   return getClient()
     .phoneNumber.findOne({

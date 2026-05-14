@@ -59,8 +59,8 @@ import {
   orgMembershipSettingKeys,
   orgLimitAggregateKeys,
   orgLimitKeys,
-  orgInviteKeys,
   appMembershipKeys,
+  orgInviteKeys,
   orgMembershipKeys,
 } from './query-keys';
 /**
@@ -813,23 +813,6 @@ export const invalidate = {
         queryKey: orgLimitKeys.detail(id),
       }),
   },
-  /** Invalidate orgInvite queries */ orgInvite: {
-    /** Invalidate all orgInvite queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgInviteKeys.all,
-      }),
-    /** Invalidate orgInvite list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgInviteKeys.lists(),
-      }),
-    /** Invalidate a specific orgInvite */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgInviteKeys.detail(id),
-      }),
-  },
   /** Invalidate appMembership queries */ appMembership: {
     /** Invalidate all appMembership queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -845,6 +828,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: appMembershipKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgInvite queries */ orgInvite: {
+    /** Invalidate all orgInvite queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgInviteKeys.all,
+      }),
+    /** Invalidate orgInvite list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgInviteKeys.lists(),
+      }),
+    /** Invalidate a specific orgInvite */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgInviteKeys.detail(id),
       }),
   },
   /** Invalidate orgMembership queries */ orgMembership: {
@@ -1205,17 +1205,17 @@ export const remove = {
       queryKey: orgLimitKeys.detail(id),
     });
   },
-  /** Remove orgInvite from cache */ orgInvite: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: orgInviteKeys.detail(id),
-    });
-  },
   /** Remove appMembership from cache */ appMembership: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: appMembershipKeys.detail(id),
+    });
+  },
+  /** Remove orgInvite from cache */ orgInvite: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: orgInviteKeys.detail(id),
     });
   },
   /** Remove orgMembership from cache */ orgMembership: (

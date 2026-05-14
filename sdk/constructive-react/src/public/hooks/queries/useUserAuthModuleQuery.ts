@@ -91,7 +91,7 @@ export async function fetchUserAuthModuleQuery<S extends UserAuthModuleSelect>(p
 export async function fetchUserAuthModuleQuery(params: {
   id: string;
   selection: SelectionConfig<UserAuthModuleSelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<UserAuthModuleSelect>(params.selection);
   return getClient()
     .userAuthModule.findOne({

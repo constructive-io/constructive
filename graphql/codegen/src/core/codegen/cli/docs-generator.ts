@@ -139,6 +139,18 @@ export function generateReadme(
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
       lines.push(`| \`delete\` | Delete a ${singularName} |`);
+      if (table.query?.bulkInsert) {
+        lines.push(`| \`bulk-create\` | Bulk create ${singularName} records |`);
+      }
+      if (table.query?.bulkUpsert) {
+        lines.push(`| \`bulk-upsert\` | Bulk upsert ${singularName} records |`);
+      }
+      if (table.query?.bulkUpdate) {
+        lines.push(`| \`bulk-update\` | Bulk update ${singularName} records |`);
+      }
+      if (table.query?.bulkDelete) {
+        lines.push(`| \`bulk-delete\` | Bulk delete ${singularName} records |`);
+      }
       lines.push('');
       lines.push('**Fields:**');
       lines.push('');
@@ -465,6 +477,10 @@ export function generateSkills(
           `${toolName} ${kebab} create ${createFlags}`,
           `${toolName} ${kebab} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
           `${toolName} ${kebab} delete --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
+          ...(table.query?.bulkInsert ? [`${toolName} ${kebab} bulk-create --data '<JSON array>'`] : []),
+          ...(table.query?.bulkUpsert ? [`${toolName} ${kebab} bulk-upsert --data '<JSON array>'`] : []),
+          ...(table.query?.bulkUpdate ? [`${toolName} ${kebab} bulk-update --where '<JSON>' --data '<JSON>'`] : []),
+          ...(table.query?.bulkDelete ? [`${toolName} ${kebab} bulk-delete --where '<JSON>'`] : []),
         ],
         examples: [
           {
@@ -797,6 +813,18 @@ export function generateMultiTargetReadme(
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
       lines.push(`| \`delete\` | Delete a ${singularName} |`);
+      if (table.query?.bulkInsert) {
+        lines.push(`| \`bulk-create\` | Bulk create ${singularName} records |`);
+      }
+      if (table.query?.bulkUpsert) {
+        lines.push(`| \`bulk-upsert\` | Bulk upsert ${singularName} records |`);
+      }
+      if (table.query?.bulkUpdate) {
+        lines.push(`| \`bulk-update\` | Bulk update ${singularName} records |`);
+      }
+      if (table.query?.bulkDelete) {
+        lines.push(`| \`bulk-delete\` | Bulk delete ${singularName} records |`);
+      }
       lines.push('');
       lines.push('**Fields:**');
       lines.push('');

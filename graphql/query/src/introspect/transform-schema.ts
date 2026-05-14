@@ -347,6 +347,10 @@ export function getTableOperationNames(
       create: string;
       update: string | null;
       delete: string | null;
+      bulkInsert?: string | null;
+      bulkUpsert?: string | null;
+      bulkUpdate?: string | null;
+      bulkDelete?: string | null;
     };
   }>,
 ): TableOperationNames {
@@ -365,6 +369,12 @@ export function getTableOperationNames(
       mutations.add(table.query.create);
       if (table.query.update) mutations.add(table.query.update);
       if (table.query.delete) mutations.add(table.query.delete);
+
+      // Add bulk mutation names
+      if (table.query.bulkInsert) mutations.add(table.query.bulkInsert);
+      if (table.query.bulkUpsert) mutations.add(table.query.bulkUpsert);
+      if (table.query.bulkUpdate) mutations.add(table.query.bulkUpdate);
+      if (table.query.bulkDelete) mutations.add(table.query.bulkDelete);
     }
   }
 

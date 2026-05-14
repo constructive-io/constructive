@@ -70,13 +70,11 @@ export class EnumModel {
     });
   }
   findFirst<S extends EnumSelect>(
-    args: FindFirstArgs<S, EnumFilter> & {
+    args: FindFirstArgs<S, EnumFilter, EnumOrderBy> & {
       select: S;
     } & StrictSelect<S, EnumSelect>
   ): QueryBuilder<{
-    enums: {
-      nodes: InferSelectResult<EnumWithRelations, S>[];
-    };
+    enum: InferSelectResult<EnumWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Enum',
@@ -84,17 +82,26 @@ export class EnumModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'EnumFilter',
+      'EnumOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Enum',
-      fieldName: 'enums',
+      fieldName: 'enum',
       document,
       variables,
+      transform: (data: {
+        enums?: {
+          nodes?: InferSelectResult<EnumWithRelations, S>[];
+        };
+      }) => ({
+        enum: data.enums?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends EnumSelect>(

@@ -18,12 +18,15 @@ RUN set -eux; \
     npm install -g pnpm@10.10.0; \
     rm -rf /var/lib/apt/lists/*
 
-# Copy full repo (build context must be repo root when building this image)
-COPY . .
+# Fetch all dependencies into the pnpm store (cached unless lockfile changes).
+# This layer avoids re-downloading packages when only source code changes.
+COPY pnpm-lock.yaml ./
+RUN pnpm fetch
 
-# Install and build all workspaces
+# Copy full repo and install from local store + build
+COPY . .
 RUN set -eux; \
-    CI=true pnpm install --frozen-lockfile; \
+    CI=true pnpm install --frozen-lockfile --offline; \
     pnpm run build
 
 ################################################################################

@@ -106,9 +106,6 @@ const SCHEMA_SHIMS_SQL = `
   CREATE TABLE IF NOT EXISTS metaschema_public.database (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), owner_id uuid, name text, hash uuid
   );
-  CREATE TABLE IF NOT EXISTS metaschema_public.database_extension (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid, name text
-  );
   CREATE TABLE IF NOT EXISTS metaschema_public.schema (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(), database_id uuid REFERENCES metaschema_public.database(id),
     name text, schema_name text, description text

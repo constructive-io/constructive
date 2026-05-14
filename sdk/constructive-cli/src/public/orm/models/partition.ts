@@ -70,13 +70,11 @@ export class PartitionModel {
     });
   }
   findFirst<S extends PartitionSelect>(
-    args: FindFirstArgs<S, PartitionFilter> & {
+    args: FindFirstArgs<S, PartitionFilter, PartitionOrderBy> & {
       select: S;
     } & StrictSelect<S, PartitionSelect>
   ): QueryBuilder<{
-    partitions: {
-      nodes: InferSelectResult<PartitionWithRelations, S>[];
-    };
+    partition: InferSelectResult<PartitionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Partition',
@@ -84,17 +82,26 @@ export class PartitionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'PartitionFilter',
+      'PartitionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Partition',
-      fieldName: 'partitions',
+      fieldName: 'partition',
       document,
       variables,
+      transform: (data: {
+        partitions?: {
+          nodes?: InferSelectResult<PartitionWithRelations, S>[];
+        };
+      }) => ({
+        partition: data.partitions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends PartitionSelect>(

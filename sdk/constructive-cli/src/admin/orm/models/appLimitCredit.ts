@@ -70,13 +70,11 @@ export class AppLimitCreditModel {
     });
   }
   findFirst<S extends AppLimitCreditSelect>(
-    args: FindFirstArgs<S, AppLimitCreditFilter> & {
+    args: FindFirstArgs<S, AppLimitCreditFilter, AppLimitCreditOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLimitCreditSelect>
   ): QueryBuilder<{
-    appLimitCredits: {
-      nodes: InferSelectResult<AppLimitCreditWithRelations, S>[];
-    };
+    appLimitCredit: InferSelectResult<AppLimitCreditWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppLimitCredit',
@@ -84,17 +82,26 @@ export class AppLimitCreditModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppLimitCreditFilter',
+      'AppLimitCreditOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppLimitCredit',
-      fieldName: 'appLimitCredits',
+      fieldName: 'appLimitCredit',
       document,
       variables,
+      transform: (data: {
+        appLimitCredits?: {
+          nodes?: InferSelectResult<AppLimitCreditWithRelations, S>[];
+        };
+      }) => ({
+        appLimitCredit: data.appLimitCredits?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppLimitCreditSelect>(

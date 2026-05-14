@@ -91,7 +91,7 @@ export async function fetchNodeTypeRegistryQuery<S extends NodeTypeRegistrySelec
 export async function fetchNodeTypeRegistryQuery(params: {
   name: string;
   selection: SelectionConfig<NodeTypeRegistrySelect>;
-}) {
+}): Promise<any> {
   const args = buildSelectionArgs<NodeTypeRegistrySelect>(params.selection);
   return getClient()
     .nodeTypeRegistry.findOne({

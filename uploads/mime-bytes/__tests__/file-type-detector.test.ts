@@ -65,6 +65,7 @@ describe('FileTypeDetector', () => {
     });
 
     it('should detect MP4 files with offset', async () => {
+      // ftyp + "isom" brand = generic MP4
       const mp4Buffer = Buffer.from([
         0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70,
         0x69, 0x73, 0x6F, 0x6D, 0x00, 0x00, 0x02, 0x00
@@ -75,6 +76,34 @@ describe('FileTypeDetector', () => {
       expect(result?.name).toBe('mp4');
       expect(result?.mimeType).toBe('video/mp4');
       expect(result?.extensions).toContain('mp4');
+    });
+
+    it('should detect HEIC files (not misidentify as MP4)', async () => {
+      // ftyp + "heic" brand = HEIC image
+      const heicBuffer = Buffer.from([
+        0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70,
+        0x68, 0x65, 0x69, 0x63, 0x00, 0x00, 0x00, 0x00
+      ]);
+
+      const result = await detector.detectFromBuffer(heicBuffer);
+      expect(result).toBeDefined();
+      expect(result?.name).toBe('heic');
+      expect(result?.mimeType).toBe('image/heic');
+      expect(result?.extensions).toContain('heic');
+    });
+
+    it('should detect HEIF files (not misidentify as MP4)', async () => {
+      // ftyp + "mif1" brand = HEIF image
+      const heifBuffer = Buffer.from([
+        0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70,
+        0x6D, 0x69, 0x66, 0x31, 0x00, 0x00, 0x00, 0x00
+      ]);
+
+      const result = await detector.detectFromBuffer(heifBuffer);
+      expect(result).toBeDefined();
+      expect(result?.name).toBe('heif');
+      expect(result?.mimeType).toBe('image/heif');
+      expect(result?.extensions).toContain('heif');
     });
 
     it('should detect UTF-8 BOM', async () => {
