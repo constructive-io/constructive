@@ -1,4 +1,4 @@
-export type FunctionName = 'send-email' | 'send-verification-link';
+export type FunctionName = string;
 
 export type FunctionServiceConfig = {
   name: FunctionName;

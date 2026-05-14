@@ -6,7 +6,6 @@ import codegen from './commands/codegen';
 import context from './commands/context';
 import execute from './commands/execute';
 import explorer from './commands/explorer';
-import jobs from './commands/jobs';
 import server from './commands/server';
 import { usageText } from './utils';
 
@@ -15,7 +14,6 @@ const createCommandMap = (): Record<string, Function> => {
     server,
     explorer,
     codegen,
-    jobs,
     context,
     auth,
     execute,
