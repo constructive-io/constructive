@@ -215,7 +215,7 @@ function buildPlans(
       subscribePlan(_$root: any, args: any) {
         const $pgSubscriber = (grafastContext() as any).get('pgSubscriber');
         const $topic = constant(notifyChannel);
-        const $ids = args.get('ids');
+        const $ids = args.getRaw('ids');
 
         return listen($pgSubscriber, $topic, ($payload: any) => {
           const $parsed = lambda([$payload, $ids], (pair: unknown) => {

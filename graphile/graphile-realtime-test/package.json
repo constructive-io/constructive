@@ -52,8 +52,15 @@
     "postgraphile": "5.0.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/pg": "^8.18.0",
+    "@types/ws": "^8.18.1",
+    "express": "^5.2.1",
+    "grafserv": "1.0.0",
+    "graphql-ws": "^6.0.8",
     "makage": "^0.3.0",
-    "pgsql-test": "workspace:^"
+    "pgsql-test": "workspace:^",
+    "postgraphile": "5.0.0",
+    "ws": "^8.20.1"
   }
 }
