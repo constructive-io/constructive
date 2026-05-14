@@ -28,6 +28,10 @@ jest.mock('@pgpmjs/logger', () => ({
   })),
 }));
 
+jest.mock('express-rate-limit', () => {
+  return jest.fn(() => (_req: any, _res: any, next: any) => next());
+});
+
 // Import after mocks
 import { createOAuthRoutes } from '../oauth';
 import { OAuthClient } from '@constructive-io/oauth';
@@ -112,6 +116,27 @@ describe('OAuth Middleware', () => {
       // Should have 4 routes: /providers, /error, /:provider, /:provider/callback
       expect(router.stack.length).toBe(4);
     });
+
+    it('applies rate limiting to OAuth initiation and callback routes', () => {
+      const router = createOAuthRoutes(mockOpts as any);
+
+      const initiateRoute = router.stack.find(
+        (layer: any) => layer.route?.path === '/:provider' && layer.route?.methods?.get
+      );
+      const callbackRoute = router.stack.find(
+        (layer: any) => layer.route?.path === '/:provider/callback'
+      );
+      const providersRoute = router.stack.find(
+        (layer: any) => layer.route?.path === '/providers'
+      );
+
+      // Initiate and callback routes should have 2 handlers (rate limiter + handler)
+      expect(initiateRoute!.route.stack.length).toBe(2);
+      expect(callbackRoute!.route.stack.length).toBe(2);
+
+      // Providers route should have 1 handler (no rate limiting)
+      expect(providersRoute!.route.stack.length).toBe(1);
+    });
   });
 
   describe('Providers Endpoint', () => {
@@ -126,7 +151,7 @@ describe('OAuth Middleware', () => {
       const providersRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/providers'
       );
-      const handler = providersRoute!.route.stack[0].handle;
+      const handler = providersRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -152,7 +177,7 @@ describe('OAuth Middleware', () => {
       const providersRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/providers'
       );
-      const handler = providersRoute!.route.stack[0].handle;
+      const handler = providersRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -177,7 +202,7 @@ describe('OAuth Middleware', () => {
       const initiateRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider' && layer.route?.methods?.get
       );
-      const handler = initiateRoute!.route.stack[0].handle;
+      const handler = initiateRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -213,7 +238,7 @@ describe('OAuth Middleware', () => {
       const initiateRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider' && layer.route?.methods?.get
       );
-      const handler = initiateRoute!.route.stack[0].handle;
+      const handler = initiateRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -253,7 +278,7 @@ describe('OAuth Middleware', () => {
       const initiateRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider' && layer.route?.methods?.get
       );
-      const handler = initiateRoute!.route.stack[0].handle;
+      const handler = initiateRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -312,7 +337,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -334,7 +359,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -362,7 +387,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -383,7 +408,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -457,7 +482,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -536,7 +561,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -628,7 +653,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -706,7 +731,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -787,7 +812,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -865,7 +890,7 @@ describe('OAuth Middleware', () => {
       const callbackRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider/callback'
       );
-      const handler = callbackRoute!.route.stack[0].handle;
+      const handler = callbackRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 
@@ -919,7 +944,7 @@ describe('OAuth Middleware', () => {
       const initiateRoute = router.stack.find(
         (layer: any) => layer.route?.path === '/:provider' && layer.route?.methods?.get
       );
-      const handler = initiateRoute!.route.stack[0].handle;
+      const handler = initiateRoute!.route.stack.slice(-1)[0].handle;
 
       await handler(req, res, jest.fn());
 

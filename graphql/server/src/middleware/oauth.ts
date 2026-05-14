@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { OAuthClient, OAuthProfile } from '@constructive-io/oauth';
 import { Logger } from '@pgpmjs/logger';
 import { Pool } from 'pg';
@@ -238,6 +239,27 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   const allowSignup = oauthConfig?.allowSignup ?? true;
   const requireVerifiedEmail = oauthConfig?.requireVerifiedEmail ?? true;
 
+  // Rate limiters for OAuth endpoints (disabled in development/test)
+  const skipRateLimit = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+
+  const oauthInitLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // 10 requests per minute per IP
+    skip: () => skipRateLimit,
+    message: { error: 'TOO_MANY_REQUESTS', message: 'Too many OAuth requests, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const oauthCallbackLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 30, // 30 requests per minute per IP
+    skip: () => skipRateLimit,
+    message: { error: 'TOO_MANY_REQUESTS', message: 'Too many OAuth callback requests, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
   // GET /auth/providers - List available providers from database
   router.get('/providers', async (req: Request, res: Response) => {
     if (!req.api?.rlsModule?.privateSchema?.schemaName) {
@@ -264,7 +286,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   });
 
   // GET /auth/:provider - Initiate OAuth flow
-  router.get('/:provider', async (req: Request, res: Response) => {
+  router.get('/:provider', oauthInitLimiter, async (req: Request, res: Response) => {
     const { provider } = req.params;
     const redirectUri = (req.query.redirect_uri as string) || '/';
 
@@ -326,7 +348,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   });
 
   // GET /auth/:provider/callback - Handle OAuth callback
-  router.get('/:provider/callback', async (req: Request, res: Response) => {
+  router.get('/:provider/callback', oauthCallbackLimiter, async (req: Request, res: Response) => {
     const { provider } = req.params;
     const { code, state, error: oauthError, error_description } = req.query;
 
