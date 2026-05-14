@@ -41,10 +41,31 @@ export const DB_REQUIRED_EXTENSIONS = [
 ] as const;
 
 /**
+ * Schemas that participate in meta/module export.
+ * Tables in these schemas are candidates for auto-discovery.
+ */
+export const EXPORT_SCHEMAS = [
+  'metaschema_public',
+  'services_public',
+  'metaschema_modules_public'
+] as const;
+
+/**
+ * Tables excluded from auto-discovery.
+ * These exist in the export schemas but should not be exported.
+ */
+export const EXPORT_BLACKLIST = new Set([
+  'node_type_registry',
+  'blueprint',
+  'blueprint_construction',
+  'blueprint_template'
+]);
+
+/**
  * Map PostgreSQL data types to FieldType values.
  * Uses udt_name from information_schema which gives the base type name.
  */
-const mapPgTypeToFieldType = (udtName: string): FieldType => {
+export const mapPgTypeToFieldType = (udtName: string): FieldType => {
   switch (udtName) {
     case 'uuid':
       return 'uuid';

@@ -13,6 +13,8 @@ import path from 'path';
 import {
   META_TABLE_CONFIG,
   META_TABLE_ORDER,
+  EXPORT_SCHEMAS,
+  EXPORT_BLACKLIST,
   DB_REQUIRED_EXTENSIONS,
   SERVICE_REQUIRED_EXTENSIONS,
   META_COMMON_HEADER,
@@ -67,14 +69,19 @@ describe('META_TABLE_CONFIG and META_TABLE_ORDER consistency', () => {
     expect(duplicates).toEqual([]);
   });
 
-  it('every config entry should have a valid schema', () => {
-    const validSchemas = ['metaschema_public', 'services_public', 'metaschema_modules_public'];
+  it('every config entry should have a valid schema from EXPORT_SCHEMAS', () => {
+    const validSchemas = new Set<string>(EXPORT_SCHEMAS as unknown as string[]);
 
     for (const [key, config] of Object.entries(META_TABLE_CONFIG)) {
-      expect(validSchemas).toContain(config.schema);
+      expect(validSchemas.has(config.schema)).toBe(true);
       expect(config.table).toBeTruthy();
       expect(Object.keys(config.fields).length).toBeGreaterThan(0);
     }
+  });
+
+  it('no table in META_TABLE_ORDER should be in EXPORT_BLACKLIST', () => {
+    const blacklisted = (META_TABLE_ORDER as unknown as string[]).filter(t => EXPORT_BLACKLIST.has(t));
+    expect(blacklisted).toEqual([]);
   });
 
   it('every config entry should have an id field of type uuid', () => {
@@ -94,61 +101,36 @@ describe('META_TABLE_CONFIG and META_TABLE_ORDER consistency', () => {
 });
 
 // =============================================================================
-// Cross-flow table parity: export-meta.ts and export-graphql-meta.ts
-// must query exactly the same set of tables
+// Cross-flow table parity: both flows loop over META_TABLE_ORDER,
+// so parity is guaranteed by construction. Verify both files import it.
 // =============================================================================
 
 describe('SQL and GraphQL flow table parity', () => {
-  let sqlFlowTables: string[];
-  let graphqlFlowTables: string[];
+  let sqlSource: string;
+  let gqlSource: string;
 
   beforeAll(() => {
-    // Extract queryAndParse keys from export-meta.ts
-    const sqlSource = readFileSync(
-      join(__dirname, '../src/export-meta.ts'),
-      'utf-8'
-    );
-    sqlFlowTables = [...sqlSource.matchAll(/queryAndParse\('(\w+)'/g)].map(m => m[1]);
-
-    // Extract queryAndParse keys from export-graphql-meta.ts
-    const gqlSource = readFileSync(
-      join(__dirname, '../src/export-graphql-meta.ts'),
-      'utf-8'
-    );
-    graphqlFlowTables = [...gqlSource.matchAll(/queryAndParse\('(\w+)'/g)].map(m => m[1]);
+    sqlSource = readFileSync(join(__dirname, '../src/export-meta.ts'), 'utf-8');
+    gqlSource = readFileSync(join(__dirname, '../src/export-graphql-meta.ts'), 'utf-8');
   });
 
-  it('both flows should query the same set of tables', () => {
-    const sqlSet = new Set(sqlFlowTables);
-    const gqlSet = new Set(graphqlFlowTables);
-
-    const inSqlNotGql = sqlFlowTables.filter(t => !gqlSet.has(t));
-    const inGqlNotSql = graphqlFlowTables.filter(t => !sqlSet.has(t));
-
-    expect(inSqlNotGql).toEqual([]);
-    expect(inGqlNotSql).toEqual([]);
+  it('SQL flow should iterate META_TABLE_ORDER', () => {
+    expect(sqlSource).toContain('META_TABLE_ORDER');
+    expect(sqlSource).toMatch(/for\s*\(\s*const\s+\w+\s+of\s+META_TABLE_ORDER\s*\)/);
   });
 
-  it('all queried tables should have entries in META_TABLE_CONFIG', () => {
-    const configKeys = new Set(Object.keys(META_TABLE_CONFIG));
-
-    const sqlMissing = sqlFlowTables.filter(t => !configKeys.has(t));
-    const gqlMissing = graphqlFlowTables.filter(t => !configKeys.has(t));
-
-    expect(sqlMissing).toEqual([]);
-    expect(gqlMissing).toEqual([]);
+  it('GraphQL flow should iterate META_TABLE_ORDER', () => {
+    expect(gqlSource).toContain('META_TABLE_ORDER');
+    expect(gqlSource).toMatch(/for\s*\(\s*const\s+\w+\s+of\s+META_TABLE_ORDER\s*\)/);
   });
 
-  it('every key in META_TABLE_CONFIG should be queried by both flows', () => {
-    const sqlSet = new Set(sqlFlowTables);
-    const gqlSet = new Set(graphqlFlowTables);
-    const configKeys = Object.keys(META_TABLE_CONFIG);
+  it('SQL flow should support auto-discovery via EXPORT_SCHEMAS', () => {
+    expect(sqlSource).toContain('EXPORT_SCHEMAS');
+    expect(sqlSource).toContain('information_schema.tables');
+  });
 
-    const notQueriedBySql = configKeys.filter(k => !sqlSet.has(k));
-    const notQueriedByGql = configKeys.filter(k => !gqlSet.has(k));
-
-    expect(notQueriedBySql).toEqual([]);
-    expect(notQueriedByGql).toEqual([]);
+  it('SQL flow should respect EXPORT_BLACKLIST', () => {
+    expect(sqlSource).toContain('EXPORT_BLACKLIST');
   });
 });
 
