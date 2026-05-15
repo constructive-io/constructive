@@ -26,6 +26,7 @@ const OAUTH_STATE_MAX_AGE = 10 * 60 * 1000; // 10 minutes
 interface StatePayload {
   redirect_uri: string;
   provider: string;
+  device_token?: string;
   nonce: string;
   exp: number;
 }
@@ -38,12 +39,16 @@ function getStateSecret(): string {
   return secret;
 }
 
-function createSignedState(payload: { redirect_uri: string; provider: string }): string {
+function createSignedState(payload: { redirect_uri: string; provider: string; device_token?: string }): string {
   const data: StatePayload = {
-    ...payload,
+    redirect_uri: payload.redirect_uri,
+    provider: payload.provider,
     nonce: crypto.randomBytes(16).toString('hex'),
     exp: Date.now() + OAUTH_STATE_MAX_AGE,
   };
+  if (payload.device_token) {
+    data.device_token = payload.device_token;
+  }
   const json = JSON.stringify(data);
   const sig = crypto.createHmac('sha256', getStateSecret()).update(json).digest('base64url');
   return Buffer.from(json).toString('base64url') + '.' + sig;
@@ -131,13 +136,14 @@ async function getIdentityProvider(
       ip.display_name,
       ip.enabled,
       ip.client_id,
-      "${encryptedSecretsSchema}".get(ip.id, 'oauth_client_secret') as client_secret,
+      encode(es.value, 'escape') as client_secret,
       ip.authorization_url,
       ip.token_url,
       ip.userinfo_url,
       ip.scopes,
       ip.pkce_enabled
     FROM "${privateSchema}".identity_providers ip
+    LEFT JOIN "${encryptedSecretsSchema}".encrypted_secrets es ON es.id = ip.client_secret_id
     WHERE ip.slug = $1 AND ip.enabled = true
   `;
 
@@ -267,6 +273,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   router.get('/:provider', async (req: Request, res: Response) => {
     const { provider } = req.params;
     const redirectUri = (req.query.redirect_uri as string) || '/';
+    const deviceToken = (req.query.device_token as string) || undefined;
 
     // Check if API context is available
     if (!req.api?.rlsModule?.privateSchema?.schemaName) {
@@ -303,7 +310,7 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         return res.redirect(errorUrl.toString());
       }
 
-      const state = createSignedState({ redirect_uri: redirectUri, provider });
+      const state = createSignedState({ redirect_uri: redirectUri, provider, device_token: deviceToken });
 
       res.cookie(OAUTH_STATE_COOKIE, state, {
         httpOnly: true,
@@ -408,8 +415,8 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
       const profile = await client.handleCallback({ provider, code: code as string });
       log.info(`[oauth] Got profile for ${provider}: ${profile.email}`);
 
-      // Get device token from cookie
-      const deviceToken = req.cookies[DEVICE_TOKEN_COOKIE_NAME] ?? null;
+      // Get device token: prefer from state (cross-origin), fallback to cookie (same-origin)
+      const deviceToken = statePayload.device_token || req.cookies[DEVICE_TOKEN_COOKIE_NAME] || null;
 
       // Calculate target origin for cross-origin flow
       const currentOrigin = getBaseUrl(req);
@@ -537,6 +544,9 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
         const otToken = await generateCrossOriginToken(pool, privateSchema, result.access_token);
         const redirectUrl = new URL(redirectUri, currentOrigin);
         redirectUrl.searchParams.set('token', otToken);
+        if (result.out_device_token) {
+          redirectUrl.searchParams.set('device_token', result.out_device_token);
+        }
         log.info(`[oauth] OAuth success for ${profile.email}, cross-origin redirect with one-time token`);
         return res.redirect(redirectUrl.toString());
       } else {
