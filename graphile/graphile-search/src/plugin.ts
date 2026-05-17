@@ -344,6 +344,63 @@ export function createUnifiedSearchPlugin(
             adapter.registerTypes(build);
           }
 
+          // Register UnifiedSearchInput — accepts text, optional vector, metric, and distance.
+          // When both text and vector are provided, all adapters participate (true hybrid search).
+          if (enableUnifiedSearch) {
+            const hasVectorAdapter = adapters.some((a) => a.name === 'vector');
+            const {
+              graphql: { GraphQLString: GQLString, GraphQLFloat: GQLFloat, GraphQLList, GraphQLNonNull, GraphQLBoolean },
+            } = build;
+
+            build.registerInputObjectType(
+              'UnifiedSearchInput',
+              {},
+              () => {
+                const fields: Record<string, any> = {
+                  text: {
+                    type: GQLString,
+                    description:
+                      'Text query dispatched to all text-compatible adapters ' +
+                      '(tsvector, BM25, pg_trgm). At least one of text or vector must be provided.',
+                  },
+                };
+
+                if (hasVectorAdapter) {
+                  const VectorMetricEnum = build.getTypeByName('VectorMetric') as any;
+                  fields.vector = {
+                    type: new GraphQLList(new GraphQLNonNull(GQLFloat)),
+                    description:
+                      'Query vector for semantic similarity search via pgvector. ' +
+                      'When provided alongside text, both text and vector results are OR-combined ' +
+                      'for true hybrid retrieval. When a Graphile LLM plugin is loaded, ' +
+                      'this field may be auto-populated from the text input.',
+                  };
+                  fields.metric = {
+                    type: VectorMetricEnum,
+                    description: 'Similarity metric for vector search (default: COSINE).',
+                  };
+                  fields.distance = {
+                    type: GQLFloat,
+                    description: 'Maximum vector distance threshold. Only rows within this distance are included.',
+                  };
+                  fields.includeChunks = {
+                    type: GraphQLBoolean,
+                    description:
+                      'When true (default), vector search includes chunks for tables with @hasChunks.',
+                  };
+                }
+
+                return {
+                  description:
+                    'Unified search input. Provide text for keyword search, vector for semantic search, ' +
+                    'or both for hybrid retrieval. WHERE clauses from all active adapters are OR-combined.',
+                  fields: () => fields,
+                };
+              },
+              'UnifiedSearchPlugin registering UnifiedSearchInput type'
+            );
+          }
+
           // Register StringTrgmFilter — a variant of StringFilter that includes
           // trgm operators (similarTo, wordSimilarTo). Only string columns on
           // tables that qualify for trgm will use this type instead of StringFilter.
@@ -858,106 +915,166 @@ export function createUnifiedSearchPlugin(
           }
 
           // ── unifiedSearch composite filter ──
-          // Adds a single `unifiedSearch: String` field that fans out the same
-          // text query to all adapters where supportsTextSearch is true.
-          // WHERE clauses are combined with OR (match ANY algorithm).
+          // Accepts UnifiedSearchInput { text, vector, metric, distance, includeChunks }.
+          // Text is dispatched to all text-compatible adapters (tsvector, BM25, trgm).
+          // Vector is dispatched to pgvector. WHERE clauses are OR-combined.
           if (enableUnifiedSearch) {
             // Collect text-compatible adapters and their columns for this codec
             const textAdapterColumns = adapterColumns.filter(
               (ac) => ac.adapter.supportsTextSearch && ac.adapter.buildTextSearchInput
             );
+            // Collect vector adapter and its columns for this codec
+            const vectorAdapterColumns = adapterColumns.filter(
+              (ac) => ac.adapter.name === 'vector'
+            );
 
-            if (textAdapterColumns.length > 0) {
+            // Need at least one text or vector adapter column to show the field
+            if (textAdapterColumns.length > 0 || vectorAdapterColumns.length > 0) {
               const fieldName = 'unifiedSearch';
+              const UnifiedSearchInputType = build.getTypeByName('UnifiedSearchInput') as any;
 
-              newFields = build.extend(
-                newFields,
-                {
-                  [fieldName]: fieldWithHooks(
-                    {
-                      fieldName,
-                      isPgConnectionFilterField: true,
-                    } as any,
-                    {
-                      description: build.wrapDescription(
-                        'Composite unified search. Provide a search string and it will be dispatched ' +
-                        'to all text-compatible search algorithms (tsvector, BM25, pg_trgm) simultaneously. ' +
-                        'Rows matching ANY algorithm are returned. All matching score fields are populated.',
-                        'field'
-                      ),
-                      type: build.graphql.GraphQLString as any,
-                      apply: function plan($condition: any, val: any) {
-                        if (val == null || (typeof val === 'string' && val.trim().length === 0)) return;
+              if (UnifiedSearchInputType) {
+                newFields = build.extend(
+                  newFields,
+                  {
+                    [fieldName]: fieldWithHooks(
+                      {
+                        fieldName,
+                        isPgConnectionFilterField: true,
+                      } as any,
+                      {
+                        description: build.wrapDescription(
+                          'Unified hybrid search. Provide text for keyword search (dispatched to tsvector, BM25, pg_trgm), ' +
+                          'vector for semantic search (dispatched to pgvector), or both for true hybrid retrieval. ' +
+                          'WHERE clauses from all active adapters are OR-combined. ' +
+                          'All matching score fields (tsvRank, bm25Score, trgmSimilarity, vectorDistance) are populated.',
+                          'field'
+                        ),
+                        type: UnifiedSearchInputType,
+                        apply: function plan($condition: any, val: any) {
+                          if (val == null) return;
 
-                        const text = typeof val === 'string' ? val : String(val);
-                        const qb = getQueryBuilder(build, $condition);
+                          const { text, vector, metric, distance, includeChunks } = val;
+                          const hasText = typeof text === 'string' && text.trim().length > 0;
+                          const hasVector = Array.isArray(vector) && vector.length > 0;
 
-                        // Collect all WHERE clauses (combined with OR)
-                        const whereClauses: any[] = [];
+                          if (!hasText && !hasVector) return;
 
-                        for (const { adapter, columns } of textAdapterColumns) {
-                          for (const column of columns) {
-                            // Convert text to adapter-specific filter input
-                            const filterInput = adapter.buildTextSearchInput!(text);
+                          const qb = getQueryBuilder(build, $condition);
+                          const whereClauses: any[] = [];
 
-                            const result = adapter.buildFilterApply(
-                              sql,
-                              $condition.alias,
-                              column,
-                              filterInput,
-                              build,
-                            );
-                            if (!result) continue;
+                          // ── Text path: dispatch to all text-compatible adapters ──
+                          if (hasText) {
+                            for (const { adapter, columns } of textAdapterColumns) {
+                              for (const column of columns) {
+                                const filterInput = adapter.buildTextSearchInput!(text);
+                                const result = adapter.buildFilterApply(
+                                  sql,
+                                  $condition.alias,
+                                  column,
+                                  filterInput,
+                                  build,
+                                );
+                                if (!result) continue;
 
-                            // Collect WHERE clause for OR combination
-                            if (result.whereClause) {
-                              whereClauses.push(result.whereClause);
-                            }
+                                if (result.whereClause) {
+                                  whereClauses.push(result.whereClause);
+                                }
 
-                            // Still inject score into SELECT so score fields are populated
-                            if (qb && qb.mode === 'normal') {
-                              const baseFieldName = inflection.attribute({
-                                codec: pgCodec as any,
-                                attributeName: column.attributeName,
-                              });
-                              const scoreMetaKey = `__unified_search_${adapter.name}_${baseFieldName}`;
-                              const wrappedScoreSql = sql`${sql.parens(result.scoreExpression)}::text`;
-                              const scoreIndex = qb.selectAndReturnIndex(wrappedScoreSql);
-                              qb.setMeta(scoreMetaKey, {
-                                selectIndex: scoreIndex,
-                              } as SearchScoreDetails);
+                                if (qb && qb.mode === 'normal') {
+                                  const baseFieldName = inflection.attribute({
+                                    codec: pgCodec as any,
+                                    attributeName: column.attributeName,
+                                  });
+                                  const scoreMetaKey = `__unified_search_${adapter.name}_${baseFieldName}`;
+                                  const wrappedScoreSql = sql`${sql.parens(result.scoreExpression)}::text`;
+                                  const scoreIndex = qb.selectAndReturnIndex(wrappedScoreSql);
+                                  qb.setMeta(scoreMetaKey, {
+                                    selectIndex: scoreIndex,
+                                  } as SearchScoreDetails);
 
-                              // ORDER BY: read the direction stored by the orderBy
-                              // enum (which ran first) via the shared alias key.
-                              const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
-                              const dirs = _pendingOrderDirections.get($condition.alias);
-                              const explicitDir = dirs?.[orderKey];
-                              if (explicitDir) {
-                                qb.orderBy({
-                                  fragment: result.scoreExpression,
-                                  codec: TYPES.float,
-                                  direction: explicitDir,
-                                });
+                                  const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
+                                  const dirs = _pendingOrderDirections.get($condition.alias);
+                                  const explicitDir = dirs?.[orderKey];
+                                  if (explicitDir) {
+                                    qb.orderBy({
+                                      fragment: result.scoreExpression,
+                                      codec: TYPES.float,
+                                      direction: explicitDir,
+                                    });
+                                  }
+                                }
                               }
                             }
                           }
-                        }
 
-                        // Apply combined WHERE with OR
-                        if (whereClauses.length > 0) {
-                          if (whereClauses.length === 1) {
-                            $condition.where(whereClauses[0]);
-                          } else {
-                            const combined = sql.fragment`(${sql.join(whereClauses, ' OR ')})`;
-                            $condition.where(combined);
+                          // ── Vector path: dispatch to pgvector adapter ──
+                          if (hasVector) {
+                            for (const { adapter, columns } of vectorAdapterColumns) {
+                              for (const column of columns) {
+                                const vectorFilterInput = {
+                                  vector,
+                                  metric: metric || undefined,
+                                  distance: distance ?? undefined,
+                                  includeChunks: includeChunks ?? undefined,
+                                };
+
+                                const result = adapter.buildFilterApply(
+                                  sql,
+                                  $condition.alias,
+                                  column,
+                                  vectorFilterInput,
+                                  build,
+                                );
+                                if (!result) continue;
+
+                                if (result.whereClause) {
+                                  whereClauses.push(result.whereClause);
+                                }
+
+                                if (qb && qb.mode === 'normal') {
+                                  const baseFieldName = inflection.attribute({
+                                    codec: pgCodec as any,
+                                    attributeName: column.attributeName,
+                                  });
+                                  const scoreMetaKey = `__unified_search_${adapter.name}_${baseFieldName}`;
+                                  const wrappedScoreSql = sql`${sql.parens(result.scoreExpression)}::text`;
+                                  const scoreIndex = qb.selectAndReturnIndex(wrappedScoreSql);
+                                  qb.setMeta(scoreMetaKey, {
+                                    selectIndex: scoreIndex,
+                                  } as SearchScoreDetails);
+
+                                  const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
+                                  const dirs = _pendingOrderDirections.get($condition.alias);
+                                  const explicitDir = dirs?.[orderKey];
+                                  if (explicitDir) {
+                                    qb.orderBy({
+                                      fragment: result.scoreExpression,
+                                      codec: TYPES.float,
+                                      direction: explicitDir,
+                                    });
+                                  }
+                                }
+                              }
+                            }
                           }
-                        }
-                      },
-                    }
-                  ),
-                },
-                `UnifiedSearchPlugin adding unifiedSearch composite filter on '${codec.name}'`
-              );
+
+                          // Apply combined WHERE with OR (true hybrid: match ANY path)
+                          if (whereClauses.length > 0) {
+                            if (whereClauses.length === 1) {
+                              $condition.where(whereClauses[0]);
+                            } else {
+                              const combined = sql.fragment`(${sql.join(whereClauses, ' OR ')})`;
+                              $condition.where(combined);
+                            }
+                          }
+                        },
+                      }
+                    ),
+                  },
+                  `UnifiedSearchPlugin adding unifiedSearch composite filter on '${codec.name}'`
+                );
+              }
             }
           }
 

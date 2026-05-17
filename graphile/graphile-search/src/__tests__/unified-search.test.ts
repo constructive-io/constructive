@@ -594,7 +594,7 @@ describe('graphile-search (unified search plugin)', () => {
       const allResult = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            where: { unifiedSearch: "machine learning" }
+            where: { unifiedSearch: { text: "machine learning" } }
             orderBy: BODY_BM25_SCORE_ASC
           ) {
             nodes { rowId title bodyBm25Score }
@@ -609,7 +609,7 @@ describe('graphile-search (unified search plugin)', () => {
       const limitResult = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            where: { unifiedSearch: "machine learning" }
+            where: { unifiedSearch: { text: "machine learning" } }
             orderBy: BODY_BM25_SCORE_ASC
             first: 1
           ) {
@@ -732,38 +732,26 @@ describe('graphile-search (unified search plugin)', () => {
       }
     });
 
-    it('mega query v2: unifiedSearch + searchScore with composite ordering', async () => {
-      // Mega Query v2 — New-style: uses the unified `unifiedSearch` composite
-      // filter that fans out to all text-compatible algorithms (tsvector, BM25, trgm)
-      // with a single string, plus a manual pgvector filter for semantic search.
-      // Orders by composite searchScore (highest overall relevance first).
+    it('mega query v2: unifiedSearch { text } + separate vectorEmbedding filter', async () => {
+      // Mega Query v2 — uses the unified `unifiedSearch` input type with text field
+      // for text-compatible algorithms, plus a separate pgvector filter.
       const result = await query<AllDocumentsResult>(`
         query MegaQueryV2_UnifiedSearch {
           allDocuments(
             where: {
-              # unifiedSearch: single string fans out to tsvector + BM25 + trgm
-              # automatically — no need to specify each algorithm separately
-              unifiedSearch: "machine learning"
-
-              # pgvector still needs its own filter (vectors aren't text)
+              unifiedSearch: { text: "machine learning" }
               vectorEmbedding: { vector: [1, 0, 0], metric: COSINE }
             }
-            # Order by composite searchScore (higher = more relevant across all algorithms),
-            # then by vector distance as tiebreaker (lower = semantically closer)
             orderBy: [SEARCH_SCORE_DESC, EMBEDDING_VECTOR_DISTANCE_ASC]
           ) {
             nodes {
               rowId
               title
               body
-
-              # Per-adapter scores — populated by unifiedSearch for text algorithms
               tsvRank
               bodyBm25Score
               titleTrgmSimilarity
               embeddingVectorDistance
-
-              # Composite normalized score — the single number that blends everything
               searchScore
             }
           }
@@ -776,15 +764,69 @@ describe('graphile-search (unified search plugin)', () => {
       expect(nodes!.length).toBeGreaterThan(0);
 
       for (const node of nodes!) {
-        // searchScore should be populated (composite of active algorithms)
         expect(typeof node.searchScore).toBe('number');
         expect(node.searchScore).toBeGreaterThanOrEqual(0);
         expect(node.searchScore).toBeLessThanOrEqual(1);
 
-        // Vector distance should be populated (manual filter)
         expect(typeof node.embeddingVectorDistance).toBe('number');
         expect(node.embeddingVectorDistance).toBeGreaterThanOrEqual(0);
       }
+    });
+
+    it('mega query v3: true hybrid via unifiedSearch { text, vector }', async () => {
+      // Mega Query v3 — true hybrid: text + vector in a SINGLE unifiedSearch input.
+      // WHERE clauses are OR-combined (match text OR vector).
+      // searchScore blends all adapters into a single 0..1 relevance number.
+      const result = await query<AllDocumentsResult>(`
+        query MegaQueryV3_HybridUnified {
+          allDocuments(
+            where: {
+              unifiedSearch: {
+                text: "machine learning"
+                vector: [1, 0, 0]
+                metric: COSINE
+              }
+            }
+            orderBy: SEARCH_SCORE_DESC
+          ) {
+            nodes {
+              rowId
+              title
+              tsvRank
+              bodyBm25Score
+              titleTrgmSimilarity
+              embeddingVectorDistance
+              searchScore
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      for (const node of nodes!) {
+        // searchScore blends ALL active signals (text + vector)
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThanOrEqual(0);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
+      }
+
+      // At least one node should have vector distance populated (from the vector path)
+      const hasVectorScore = nodes!.some(
+        (n) => n.embeddingVectorDistance != null && n.embeddingVectorDistance >= 0
+      );
+      expect(hasVectorScore).toBe(true);
+
+      // At least one node should have a text score populated (from the text path)
+      const hasTextScore = nodes!.some(
+        (n) => (n.tsvRank != null && n.tsvRank > 0) ||
+               (n.bodyBm25Score != null) ||
+               (n.titleTrgmSimilarity != null && n.titleTrgmSimilarity > 0)
+      );
+      expect(hasTextScore).toBe(true);
     });
   });
 
@@ -795,7 +837,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            unifiedSearch: "learning"
+            unifiedSearch: { text: "learning" }
           }) {
             nodes {
               title
@@ -813,7 +855,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            unifiedSearch: "machine learning"
+            unifiedSearch: { text: "machine learning" }
           }) {
             nodes {
               title
@@ -843,7 +885,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            unifiedSearch: "learning"
+            unifiedSearch: { text: "learning" }
             tsvTsv: "machine"
           }) {
             nodes {
@@ -864,7 +906,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            unifiedSearch: "xyzzy_nonexistent_term_12345"
+            unifiedSearch: { text: "xyzzy_nonexistent_term_12345" }
           }) {
             nodes {
               title
@@ -876,6 +918,104 @@ describe('graphile-search (unified search plugin)', () => {
       expect(result.errors).toBeUndefined();
       const nodes = result.data?.allDocuments?.nodes ?? [];
       expect(nodes.length).toBe(0);
+    });
+
+    it('vector-only via unifiedSearch: { vector } (no text)', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(where: {
+            unifiedSearch: {
+              vector: [1, 0, 0]
+              metric: COSINE
+              distance: 1.5
+            }
+          }) {
+            nodes {
+              rowId
+              title
+              embeddingVectorDistance
+              searchScore
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes ?? [];
+      expect(nodes.length).toBeGreaterThan(0);
+
+      for (const node of nodes) {
+        // Vector distance should be populated
+        expect(typeof node.embeddingVectorDistance).toBe('number');
+        expect(node.embeddingVectorDistance).toBeGreaterThanOrEqual(0);
+        expect(node.embeddingVectorDistance).toBeLessThanOrEqual(1.5);
+
+        // searchScore should blend the vector signal
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThanOrEqual(0);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('hybrid text + vector: returns broader results than either alone', async () => {
+      // Text-only results
+      const textResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(where: {
+            unifiedSearch: { text: "quantum" }
+          }) {
+            nodes { rowId }
+          }
+        }
+      `);
+
+      // Vector-only results (close to [0, 0, 1])
+      const vectorResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(where: {
+            unifiedSearch: { vector: [0, 0, 1], metric: COSINE, distance: 0.5 }
+          }) {
+            nodes { rowId }
+          }
+        }
+      `);
+
+      // Hybrid results (text OR vector)
+      const hybridResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(where: {
+            unifiedSearch: {
+              text: "quantum"
+              vector: [0, 0, 1]
+              metric: COSINE
+              distance: 0.5
+            }
+          }) {
+            nodes { rowId }
+          }
+        }
+      `);
+
+      expect(textResult.errors).toBeUndefined();
+      expect(vectorResult.errors).toBeUndefined();
+      expect(hybridResult.errors).toBeUndefined();
+
+      const textIds = new Set((textResult.data?.allDocuments?.nodes ?? []).map((n) => n.rowId));
+      const vectorIds = new Set((vectorResult.data?.allDocuments?.nodes ?? []).map((n) => n.rowId));
+      const hybridIds = new Set((hybridResult.data?.allDocuments?.nodes ?? []).map((n) => n.rowId));
+
+      // Hybrid results should be a superset of both text and vector results
+      // (since WHERE is OR-combined: match text OR match vector)
+      for (const id of textIds) {
+        expect(hybridIds.has(id)).toBe(true);
+      }
+      for (const id of vectorIds) {
+        expect(hybridIds.has(id)).toBe(true);
+      }
+
+      // Hybrid should have at least as many results as either alone
+      expect(hybridIds.size).toBeGreaterThanOrEqual(textIds.size);
+      expect(hybridIds.size).toBeGreaterThanOrEqual(vectorIds.size);
     });
   });
 
