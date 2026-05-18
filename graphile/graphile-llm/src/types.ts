@@ -178,13 +178,6 @@ export interface MeteringConfig {
   chatMeterSlug?: string;
 
   /**
-   * Estimated tokens per embedding call (for the pre-check).
-   * The actual token count recorded after the call is based on input length.
-   * @default 256
-   */
-  estimatedEmbeddingTokens?: number;
-
-  /**
    * Disable metering entirely (e.g. for local dev).
    * When true, billing functions are never called.
    * @default false
