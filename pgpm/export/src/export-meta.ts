@@ -3,7 +3,7 @@ import { Parser } from 'csv-to-pg';
 import { getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
 
-import { FieldType, TableConfig, META_TABLE_CONFIG } from './export-utils';
+import { FieldType, TableConfig, META_TABLE_CONFIG, mapPgTypeToFieldType } from './export-utils';
 
 /**
  * Query actual columns from information_schema for a given table.
@@ -25,10 +25,10 @@ const getTableColumns = async (pool: Pool, schemaName: string, tableName: string
 };
 
 /**
- * Build dynamic fields config by intersecting the hardcoded config with actual database columns.
- * - Only includes columns that exist in the database
- * - Preserves special type hints from config (image, upload, url) for columns that exist
- * - Infers types from PostgreSQL for columns not in config
+ * Build dynamic fields config from the database via information_schema.
+ * - All fields are derived from `information_schema.columns` + `mapPgTypeToFieldType`.
+ * - `typeOverrides` from the config are applied on top for special types
+ *   (image, upload, url) that cannot be inferred from PG types alone.
  */
 const buildDynamicFields = async (
   pool: Pool,
@@ -43,13 +43,18 @@ const buildDynamicFields = async (
 
   const dynamicFields: Record<string, FieldType> = {};
 
-  // For each column in the hardcoded config, check if it exists in the database
-  for (const [fieldName, fieldType] of Object.entries(tableConfig.fields)) {
-    if (actualColumns.has(fieldName)) {
-      // Column exists - use the config's type hint (preserves special types like 'image', 'upload', 'url')
-      dynamicFields[fieldName] = fieldType;
+  // Derive all fields from information_schema
+  for (const [columnName, udtName] of actualColumns) {
+    dynamicFields[columnName] = mapPgTypeToFieldType(udtName);
+  }
+
+  // Apply type overrides (image, upload, url)
+  if (tableConfig.typeOverrides) {
+    for (const [fieldName, fieldType] of Object.entries(tableConfig.typeOverrides)) {
+      if (dynamicFields[fieldName]) {
+        dynamicFields[fieldName] = fieldType;
+      }
     }
-    // If column doesn't exist in database, skip it (this fixes the bug)
   }
 
   return dynamicFields;
@@ -70,8 +75,9 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   });
   const sql: Record<string, string> = {};
 
-  // Cache for dynamically built parsers
+  // Cache for dynamically built parsers and their field configs
   const parsers: Record<string, Parser> = {};
+  const parserFields: Record<string, Record<string, FieldType>> = {};
 
   // Build parser dynamically by querying actual columns from the database
   const getParser = async (key: string): Promise<Parser | null> => {
@@ -91,6 +97,8 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
       // No columns found (table doesn't exist or no matching columns)
       return null;
     }
+
+    parserFields[key] = dynamicFields;
 
     const parser = new Parser({
       schema: tableConfig.schema,
@@ -112,6 +120,24 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
 
       const result = await pool.query(query, [database_id]);
       if (result.rows.length) {
+        // Truncate timestamptz to second precision to match PostGraphile's Datetime scalar
+        // which truncates milliseconds in the GraphQL flow
+        const fields = parserFields[key];
+        if (fields) {
+          for (const row of result.rows) {
+            for (const [fieldName, fieldType] of Object.entries(fields)) {
+              if (fieldType === 'timestamptz') {
+                const val = row[fieldName];
+                if (val instanceof Date) {
+                  // Truncate to second precision and convert to ISO string
+                  // so both SQL and GraphQL flows pass the same value type to the Parser
+                  row[fieldName] = new Date(Math.floor(val.getTime() / 1000) * 1000).toISOString();
+                }
+              }
+            }
+          }
+        }
+
         const parsed = await parser.parse(result.rows);
         if (parsed) {
           sql[key] = parsed;

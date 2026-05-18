@@ -206,7 +206,7 @@ const SCHEMA_SHIMS_SQL = `
     sign_in_function text,
     sign_up_function text,
     sign_out_function text,
-    sign_in_one_time_token_function text,
+    sign_in_cross_origin_function text,
     one_time_token_function text,
     extend_token_expires text,
     send_account_deletion_email_function text,

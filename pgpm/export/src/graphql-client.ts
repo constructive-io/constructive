@@ -3,6 +3,8 @@
  * Used by the GraphQL export flow to fetch data from the Constructive GraphQL API.
  */
 
+import { GraphQLTypeInfo, unwrapGraphQLType } from './graphql-naming';
+
 interface GraphQLClientOptions {
   endpoint: string;
   token?: string;
@@ -187,5 +189,71 @@ export class GraphQLClient {
     }
 
     return parts.length > 0 ? `(${parts.join(', ')})` : '';
+  }
+
+  /**
+   * Introspect a GraphQL type to discover its fields and their types.
+   * Used by the dynamic export flow to discover what fields are available
+   * instead of hardcoding them in META_TABLE_CONFIG.
+   *
+   * Returns a Map of camelCase field name → { typeName, list, nonNull }.
+   */
+  async introspectType(typeName: string): Promise<Map<string, GraphQLTypeInfo>> {
+    const result = await this.query<{
+      __type: {
+        fields: Array<{
+          name: string;
+          type: {
+            name: string | null;
+            kind: string | null;
+            ofType: {
+              name: string | null;
+              kind: string | null;
+              ofType: {
+                name: string | null;
+                kind: string | null;
+                ofType: {
+                  name: string | null;
+                  kind: string | null;
+                } | null;
+              } | null;
+            } | null;
+          };
+        }>;
+      };
+    }>(`
+      query IntrospectType($typeName: String!) {
+        __type(name: $typeName) {
+          fields {
+            name
+            type {
+              name
+              kind
+              ofType {
+                name
+                kind
+                ofType {
+                  name
+                  kind
+                  ofType {
+                    name
+                    kind
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `, { typeName });
+
+    const fields = new Map<string, GraphQLTypeInfo>();
+    if (result.__type?.fields) {
+      for (const field of result.__type.fields) {
+        const typeInfo = unwrapGraphQLType(field.type);
+        fields.set(field.name, typeInfo);
+      }
+    }
+    return fields;
   }
 }
