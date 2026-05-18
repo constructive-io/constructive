@@ -8,8 +8,7 @@
  * - Resolves an embedder from configuration (llm_module, env vars, or preset options)
  * - Adds a `text: String` field to `VectorNearbyInput` for text-based vector search
  * - Adds `{column}Text: String` companion fields on mutation inputs for vector columns
- * - Integrates with billing_module for metering (check_billing_quota + record_usage)
- * - Graceful degradation: search falls back to text-only when embedding quota exceeded
+ * - Optionally enables billing/metering via the LlmMeteringPlugin
  *
  * This preset is standalone — it is NOT included in ConstructivePreset by default.
  * Projects that want LLM features opt in by adding it to their preset.
@@ -44,13 +43,14 @@
  * };
  * ```
  *
- * @example With billing metering:
+ * @example With billing metering (opt-in):
  * ```typescript
  * GraphileLlmPreset({
  *   defaultEmbedder: { provider: 'ollama' },
  *   metering: {
  *     embeddingMeterSlug: 'embedding_tokens',
  *     chatMeterSlug: 'chat_tokens',
+ *     resolveEntityId: (pgSettings) => pgSettings['jwt.claims.user_id'],
  *   },
  * })
  * ```
@@ -61,6 +61,7 @@ import { createLlmModulePlugin } from './plugins/llm-module-plugin';
 import { createLlmTextSearchPlugin } from './plugins/text-search-plugin';
 import { createLlmTextMutationPlugin } from './plugins/text-mutation-plugin';
 import { createLlmRagPlugin } from './plugins/rag-plugin';
+import { createLlmMeteringPlugin } from './plugins/metering-plugin';
 import type { GraphileLlmOptions } from './types';
 
 /**
@@ -77,11 +78,19 @@ export function GraphileLlmPreset(
     enableTextMutations = true,
     enableRag = false,
     ragDefaults,
+    metering,
   } = options;
 
   const plugins: GraphileConfig.Plugin[] = [
     createLlmModulePlugin(options),
   ];
+
+  // Metering is opt-in: only loaded when metering is truthy
+  // (true, or a MeteringConfig object)
+  if (metering) {
+    const meteringConfig = metering === true ? {} : metering;
+    plugins.push(createLlmMeteringPlugin(meteringConfig));
+  }
 
   if (enableTextSearch) {
     plugins.push(createLlmTextSearchPlugin());

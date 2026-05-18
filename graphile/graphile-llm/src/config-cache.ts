@@ -56,6 +56,12 @@ export interface LlmBillingCacheEntry {
 
 // ─── SQL Queries ────────────────────────────────────────────────────────────
 
+/**
+ * Check if the billing_module table exists before querying it.
+ * This prevents hard errors on databases that don't have the billing
+ * module provisioned (the metaschema_modules_public schema or the
+ * billing_module table might not exist at all).
+ */
 const BILLING_MODULE_SQL = `
   SELECT
     s.schema_name AS public_schema,
@@ -93,11 +99,25 @@ const billingCache = new LRUCache<string, LlmBillingCacheEntry>({
 
 // ─── Resolution Functions ───────────────────────────────────────────────────
 
+/**
+ * SQL to check if a schema exists. Used as a guard before querying
+ * metaschema tables that may not be provisioned.
+ */
+const SCHEMA_EXISTS_SQL = `
+  SELECT 1 FROM information_schema.schemata WHERE schema_name = $1 LIMIT 1
+`;
+
 async function resolveBillingConfig(
   pgClient: PgClient,
   databaseId: string,
 ): Promise<BillingConfig | null> {
   try {
+    // Guard: check if the metaschema_modules_public schema exists.
+    // If the database doesn't have the billing module provisioned,
+    // this schema (or the billing_module table) won't exist.
+    const schemaCheck = await pgClient.query(SCHEMA_EXISTS_SQL, ['metaschema_modules_public']);
+    if (schemaCheck.rows.length === 0) return null;
+
     const result = await pgClient.query(BILLING_MODULE_SQL, [databaseId]);
     const row = result.rows[0];
     if (!row?.record_usage_function) return null;
@@ -110,6 +130,7 @@ async function resolveBillingConfig(
       checkBillingQuotaFunction: 'check_billing_quota',
     };
   } catch {
+    // Schema/table doesn't exist or query failed — billing not available
     return null;
   }
 }

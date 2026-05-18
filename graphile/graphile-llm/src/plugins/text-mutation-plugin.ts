@@ -9,29 +9,19 @@
  * Example:
  *   mutation { createArticle(input: { embeddingText: "Machine learning concepts" }) }
  *
- * Billing integration:
- *   When billing_module is provisioned and metering is not disabled,
- *   embedding calls are wrapped with quota checks and usage recording.
- *   Unlike search (which gracefully degrades), mutations THROW on quota
- *   exceeded — you can't silently skip writing a vector the user asked for.
+ * If the embedder returns null (e.g. quota exceeded when the metering plugin
+ * is loaded), the mutation throws an error — unlike search, mutations cannot
+ * silently skip writing a vector the user asked for.
  *
  * This is the mutation counterpart to LlmTextSearchPlugin (which handles
  * filter/query-side text-to-vector). Together they let clients work entirely
  * with text/prompts instead of raw float vectors.
- *
- * The companion fields are only added when the LLM plugin is loaded.
- * If no embedder is configured, the fields are still registered for schema
- * stability but return a clear error at execution time.
  */
 
 import 'graphile-build';
 import 'graphile-build-pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { EmbedderFunction } from '../types';
-import type { MeteringOptions, MeteringContext, WithPgClient } from '../metering';
-import { meteredEmbed, QuotaExceededError } from '../metering';
-import { getLlmBillingConfig } from '../config-cache';
-import type { PgClient } from '../config-cache';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
 
@@ -73,47 +63,6 @@ function getTextToVectorMapping(
     }
   }
   return mapping;
-}
-
-/**
- * Build a MeteringContext from the GraphQL context, if billing is available.
- */
-async function buildMeteringContext(
-  graphqlContext: any,
-  meteringOptions: MeteringOptions | null,
-  meteringDisabled: boolean,
-): Promise<MeteringContext | null> {
-  if (meteringDisabled || !meteringOptions) return null;
-  if (meteringOptions.skipMetering) return null;
-
-  const pgSettings: Record<string, string> = graphqlContext?.pgSettings ?? {};
-  const entityId = pgSettings['jwt.claims.membership_id']
-    ?? pgSettings['jwt.claims.user_id']
-    ?? null;
-  const databaseId = pgSettings['jwt.claims.database_id'] ?? null;
-  if (!entityId || !databaseId) return null;
-
-  const withPgClient: WithPgClient | undefined = graphqlContext?.withPgClient;
-  if (!withPgClient) return null;
-
-  let billingConfig = null;
-  try {
-    await withPgClient(pgSettings, async (pgClient: PgClient) => {
-      const entry = await getLlmBillingConfig(pgClient, databaseId);
-      billingConfig = entry.billing;
-    });
-  } catch {
-    return null;
-  }
-
-  if (!billingConfig) return null;
-
-  return {
-    withPgClient,
-    pgSettings,
-    billing: billingConfig,
-    entityId,
-  };
 }
 
 /**
@@ -210,8 +159,7 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
          * field values, embed them using the configured embedder, and inject
          * the resulting vector into the corresponding vector field.
          *
-         * When metering is active, checks billing quota before embedding.
-         * Unlike search, mutations throw on quota exceeded.
+         * If the embedder returns null (e.g. quota exceeded), throws an error.
          */
         GraphQLObjectType_fields_field(field, build, context) {
           const {
@@ -233,9 +181,9 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             return field;
           }
 
-          const embedder: EmbedderFunction | null = (build as any).llmEmbedder;
-          const meteringOptions: MeteringOptions | null = (build as any).llmMeteringOptions;
-          const meteringDisabled: boolean = (build as any).llmMeteringDisabled ?? false;
+          const embedder = (build as any).llmEmbedder as
+            | ((text: string) => Promise<number[] | null>)
+            | null;
 
           const defaultResolver = (obj: any) => obj[fieldName];
           const { resolve: oldResolve = defaultResolver, ...rest } = field;
@@ -243,13 +191,6 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
           return {
             ...rest,
             async resolve(source: any, args: any, graphqlContext: any, info: any) {
-              const meteringCtx = await buildMeteringContext(
-                graphqlContext,
-                meteringOptions,
-                meteringDisabled,
-              );
-              const resolvedMeteringOptions = meteringOptions ?? {};
-
               async function embedTextFields(obj: any): Promise<void> {
                 if (!obj || typeof obj !== 'object') return;
 
@@ -269,29 +210,21 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
                         );
                       }
 
-                      const meterResult = await meteredEmbed(
-                        embedder,
-                        value,
-                        meteringCtx,
-                        resolvedMeteringOptions,
+                      const vector = await embedder(value);
+
+                      if (vector === null) {
+                        throw new Error(
+                          `EMBED_QUOTA_EXCEEDED: Cannot embed ${key} — embedding quota exceeded. ` +
+                          'Upgrade your plan or wait for the next billing period.'
+                        );
+                      }
+
+                      console.log(
+                        `[graphile-llm] Mutation embed: field=${key}, dims=${vector.length}`
                       );
 
-                      if (meterResult.quotaExceeded) {
-                        throw new QuotaExceededError(
-                          resolvedMeteringOptions.embeddingMeterSlug ?? 'embedding_tokens',
-                          meteringCtx?.entityId ?? 'unknown',
-                        );
-                      }
-
-                      if (meterResult.result) {
-                        console.log(
-                          `[graphile-llm] Mutation embed: field=${key}, dims=${meterResult.result.length}, ` +
-                          `latency=${meterResult.latencyMs}ms, metered=${meterResult.metered}`
-                        );
-
-                        obj[vectorFieldName] = meterResult.result;
-                        delete obj[key];
-                      }
+                      obj[vectorFieldName] = vector;
+                      delete obj[key];
                     })());
                     continue;
                   }

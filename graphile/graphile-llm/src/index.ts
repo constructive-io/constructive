@@ -33,11 +33,14 @@
 // Preset (recommended entry point)
 export { GraphileLlmPreset } from './preset';
 
-// Individual plugins
+// Individual plugins (pure — no billing dependency)
 export { createLlmModulePlugin } from './plugins/llm-module-plugin';
 export { createLlmTextSearchPlugin } from './plugins/text-search-plugin';
 export { createLlmTextMutationPlugin } from './plugins/text-mutation-plugin';
 export { createLlmRagPlugin } from './plugins/rag-plugin';
+
+// Metering plugin (opt-in billing integration)
+export { createLlmMeteringPlugin } from './plugins/metering-plugin';
 
 // Embedder utilities
 export {
@@ -53,11 +56,11 @@ export {
   buildChatCompleterFromEnv,
 } from './chat';
 
-// Metering
+// Metering utilities (for custom integration)
 export { meteredEmbed, meteredChat, QuotaExceededError } from './metering';
 export type { MeteringContext, MeteringOptions, MeterResult, WithPgClient } from './metering';
 
-// Config cache
+// Config cache (for custom integration)
 export {
   getLlmBillingConfig,
   invalidateLlmBillingConfig,
