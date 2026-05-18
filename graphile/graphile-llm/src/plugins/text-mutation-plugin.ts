@@ -9,13 +9,15 @@
  * Example:
  *   mutation { createArticle(input: { embeddingText: "Machine learning concepts" }) }
  *
+ * Billing integration:
+ *   When billing_module is provisioned and metering is not disabled,
+ *   embedding calls are wrapped with quota checks and usage recording.
+ *   Unlike search (which gracefully degrades), mutations THROW on quota
+ *   exceeded — you can't silently skip writing a vector the user asked for.
+ *
  * This is the mutation counterpart to LlmTextSearchPlugin (which handles
  * filter/query-side text-to-vector). Together they let clients work entirely
  * with text/prompts instead of raw float vectors.
- *
- * Runtime embedding uses the v4-style resolver wrapping approach (same as
- * graphile-upload-plugin and graphile-bucket-provisioner-plugin). grafserv v5
- * supports this through its backwards-compatibility layer.
  *
  * The companion fields are only added when the LLM plugin is loaded.
  * If no embedder is configured, the fields are still registered for schema
@@ -26,6 +28,10 @@ import 'graphile-build';
 import 'graphile-build-pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { EmbedderFunction } from '../types';
+import type { MeteringOptions, MeteringContext, WithPgClient } from '../metering';
+import { meteredEmbed, QuotaExceededError } from '../metering';
+import { getLlmBillingConfig } from '../config-cache';
+import type { PgClient } from '../config-cache';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
 
@@ -70,6 +76,47 @@ function getTextToVectorMapping(
 }
 
 /**
+ * Build a MeteringContext from the GraphQL context, if billing is available.
+ */
+async function buildMeteringContext(
+  graphqlContext: any,
+  meteringOptions: MeteringOptions | null,
+  meteringDisabled: boolean,
+): Promise<MeteringContext | null> {
+  if (meteringDisabled || !meteringOptions) return null;
+  if (meteringOptions.skipMetering) return null;
+
+  const pgSettings: Record<string, string> = graphqlContext?.pgSettings ?? {};
+  const entityId = pgSettings['jwt.claims.membership_id']
+    ?? pgSettings['jwt.claims.user_id']
+    ?? null;
+  const databaseId = pgSettings['jwt.claims.database_id'] ?? null;
+  if (!entityId || !databaseId) return null;
+
+  const withPgClient: WithPgClient | undefined = graphqlContext?.withPgClient;
+  if (!withPgClient) return null;
+
+  let billingConfig = null;
+  try {
+    await withPgClient(pgSettings, async (pgClient: PgClient) => {
+      const entry = await getLlmBillingConfig(pgClient, databaseId);
+      billingConfig = entry.billing;
+    });
+  } catch {
+    return null;
+  }
+
+  if (!billingConfig) return null;
+
+  return {
+    withPgClient,
+    pgSettings,
+    billing: billingConfig,
+    entityId,
+  };
+}
+
+/**
  * Creates the LlmTextMutationPlugin.
  *
  * Hooks into GraphQLInputObjectType_fields for create/update input types
@@ -82,7 +129,7 @@ function getTextToVectorMapping(
 export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
   return {
     name: 'LlmTextMutationPlugin',
-    version: '0.1.0',
+    version: '0.2.0',
     description:
       'Adds text companion fields on mutation inputs for vector columns — ' +
       'text is embedded server-side before storing',
@@ -110,7 +157,6 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             },
           } = context as any;
 
-          // Only intercept create/update input types for table rows
           if (!pgCodec?.attributes || (!isPgPatch && !isPgBaseInput && !isMutationInput)) {
             return fields;
           }
@@ -119,7 +165,6 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             graphql: { GraphQLString },
           } = build;
 
-          // Find vector columns on this table
           const vectorColumns: string[] = [];
           for (const [attributeName, attribute] of Object.entries(
             pgCodec.attributes as Record<string, any>
@@ -136,7 +181,6 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
           let newFields = fields;
 
           for (const columnName of vectorColumns) {
-            // Convert snake_case column name to camelCase field name
             const fieldName = build.inflection.attribute({
               codec: pgCodec,
               attributeName: columnName,
@@ -166,41 +210,46 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
          * field values, embed them using the configured embedder, and inject
          * the resulting vector into the corresponding vector field.
          *
-         * Uses the same v4-style resolver wrapping pattern as graphile-upload-plugin
-         * and graphile-bucket-provisioner-plugin. grafserv v5 supports this through
-         * its backwards-compatibility layer.
+         * When metering is active, checks billing quota before embedding.
+         * Unlike search, mutations throw on quota exceeded.
          */
         GraphQLObjectType_fields_field(field, build, context) {
           const {
             scope: { isRootMutation, fieldName, pgCodec },
           } = context as any;
 
-          // Only wrap root mutation fields on tables with attributes
           if (!isRootMutation || !pgCodec || !pgCodec.attributes) {
             return field;
           }
 
-          // Only wrap create/update mutations
           const isCreate = fieldName.startsWith('create');
           const isUpdate = fieldName.startsWith('update');
           if (!isCreate && !isUpdate) {
             return field;
           }
 
-          // Build the text→vector mapping for this codec
           const textToVectorMap = getTextToVectorMapping(pgCodec, build);
           if (Object.keys(textToVectorMap).length === 0) {
             return field;
           }
 
           const embedder: EmbedderFunction | null = (build as any).llmEmbedder;
+          const meteringOptions: MeteringOptions | null = (build as any).llmMeteringOptions;
+          const meteringDisabled: boolean = (build as any).llmMeteringDisabled ?? false;
+
           const defaultResolver = (obj: any) => obj[fieldName];
           const { resolve: oldResolve = defaultResolver, ...rest } = field;
 
           return {
             ...rest,
             async resolve(source: any, args: any, graphqlContext: any, info: any) {
-              // Walk through the input args and embed any *Text companion fields
+              const meteringCtx = await buildMeteringContext(
+                graphqlContext,
+                meteringOptions,
+                meteringDisabled,
+              );
+              const resolvedMeteringOptions = meteringOptions ?? {};
+
               async function embedTextFields(obj: any): Promise<void> {
                 if (!obj || typeof obj !== 'object') return;
 
@@ -209,7 +258,6 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
                 for (const key of Object.keys(obj)) {
                   const value = obj[key];
 
-                  // Check if this key is a *Text companion field
                   if (key in textToVectorMap && typeof value === 'string') {
                     const vectorFieldName = textToVectorMap[key];
 
@@ -221,23 +269,33 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
                         );
                       }
 
-                      const startTime = Date.now();
-                      const vector = await embedder(value);
-                      const latencyMs = Date.now() - startTime;
-
-                      console.log(
-                        `[graphile-llm] Mutation embed: field=${key}, dims=${vector.length}, latency=${latencyMs}ms`
+                      const meterResult = await meteredEmbed(
+                        embedder,
+                        value,
+                        meteringCtx,
+                        resolvedMeteringOptions,
                       );
 
-                      // Inject the vector into the corresponding field
-                      obj[vectorFieldName] = vector;
-                      // Remove the consumed *Text field
-                      delete obj[key];
+                      if (meterResult.quotaExceeded) {
+                        throw new QuotaExceededError(
+                          resolvedMeteringOptions.embeddingMeterSlug ?? 'embedding_tokens',
+                          meteringCtx?.entityId ?? 'unknown',
+                        );
+                      }
+
+                      if (meterResult.result) {
+                        console.log(
+                          `[graphile-llm] Mutation embed: field=${key}, dims=${meterResult.result.length}, ` +
+                          `latency=${meterResult.latencyMs}ms, metered=${meterResult.metered}`
+                        );
+
+                        obj[vectorFieldName] = meterResult.result;
+                        delete obj[key];
+                      }
                     })());
                     continue;
                   }
 
-                  // Recurse into nested objects (e.g. input.article.embeddingText)
                   if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
                     pending.push(embedTextFields(value));
                   }

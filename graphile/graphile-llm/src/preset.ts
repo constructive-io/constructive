@@ -8,7 +8,8 @@
  * - Resolves an embedder from configuration (llm_module, env vars, or preset options)
  * - Adds a `text: String` field to `VectorNearbyInput` for text-based vector search
  * - Adds `{column}Text: String` companion fields on mutation inputs for vector columns
- * - Logs token usage to console (metering integration deferred to billing system)
+ * - Integrates with billing_module for metering (check_billing_quota + record_usage)
+ * - Graceful degradation: search falls back to text-only when embedding quota exceeded
  *
  * This preset is standalone — it is NOT included in ConstructivePreset by default.
  * Projects that want LLM features opt in by adding it to their preset.
@@ -41,6 +42,17 @@
  *     }),
  *   ],
  * };
+ * ```
+ *
+ * @example With billing metering:
+ * ```typescript
+ * GraphileLlmPreset({
+ *   defaultEmbedder: { provider: 'ollama' },
+ *   metering: {
+ *     embeddingMeterSlug: 'embedding_tokens',
+ *     chatMeterSlug: 'chat_tokens',
+ *   },
+ * })
  * ```
  */
 
