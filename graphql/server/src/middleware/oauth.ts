@@ -501,7 +501,6 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
             const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
             errorUrl.searchParams.set('error', 'SIGNUP_DISABLED');
             errorUrl.searchParams.set('provider', provider);
-            dbClient.release();
             return res.redirect(errorUrl.toString());
           }
 
@@ -511,7 +510,6 @@ export function createOAuthRoutes(opts: ConstructiveOptions): Router {
             const errorUrl = new URL(errorRedirectPath, getBaseUrl(req));
             errorUrl.searchParams.set('error', 'EMAIL_NOT_VERIFIED');
             errorUrl.searchParams.set('provider', provider);
-            dbClient.release();
             return res.redirect(errorUrl.toString());
           }
 
