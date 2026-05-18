@@ -30,7 +30,8 @@
   },
   "dependencies": {
     "@agentic-kit/ollama": "^1.0.3",
-    "@constructive-io/graphql-env": "workspace:^"
+    "@constructive-io/graphql-env": "workspace:^",
+    "lru-cache": "^11.2.7"
   },
   "peerDependencies": {
     "@dataplan/pg": "1.0.0",

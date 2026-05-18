@@ -152,6 +152,42 @@ export interface ChunkTableInfo {
   contentField: string;
 }
 
+// ─── Metering Types ─────────────────────────────────────────────────────────
+
+/**
+ * Configuration for billing/metering integration.
+ * When provided, embedding and chat calls are wrapped with quota checks
+ * and usage recording via the billing_module functions.
+ */
+export interface MeteringConfig {
+  /**
+   * Meter slug for embedding operations.
+   * Must match a slug in the billing_module meters table.
+   * @default 'embedding_tokens'
+   */
+  embeddingMeterSlug?: string;
+
+  /**
+   * Meter slug for chat completion operations.
+   * @default 'chat_tokens'
+   */
+  chatMeterSlug?: string;
+
+  /**
+   * Estimated tokens per embedding call (for the pre-check).
+   * The actual token count recorded after the call is based on input length.
+   * @default 256
+   */
+  estimatedEmbeddingTokens?: number;
+
+  /**
+   * Disable metering entirely (e.g. for local dev).
+   * When true, billing functions are never called.
+   * @default false
+   */
+  skipMetering?: boolean;
+}
+
 // ─── Plugin Options ─────────────────────────────────────────────────────────
 
 /**
@@ -198,4 +234,17 @@ export interface GraphileLlmOptions {
    * Individual queries can override these values.
    */
   ragDefaults?: RagDefaults;
+
+  /**
+   * Billing/metering configuration.
+   * When provided (or when billing_module is provisioned on the database),
+   * embedding and chat calls are wrapped with quota checks + usage recording.
+   *
+   * Set to `false` to explicitly disable metering even when billing_module exists.
+   * Set to `true` or omit to auto-detect from the billing_module.
+   * Provide a MeteringConfig object for fine-grained control.
+   *
+   * @default undefined (auto-detect from billing_module)
+   */
+  metering?: boolean | MeteringConfig;
 }

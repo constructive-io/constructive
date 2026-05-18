@@ -53,6 +53,18 @@ export {
   buildChatCompleterFromEnv,
 } from './chat';
 
+// Metering
+export { meteredEmbed, meteredChat, QuotaExceededError } from './metering';
+export type { MeteringContext, MeteringOptions, MeterResult, WithPgClient } from './metering';
+
+// Config cache
+export {
+  getLlmBillingConfig,
+  invalidateLlmBillingConfig,
+  getLlmBillingCacheStats,
+} from './config-cache';
+export type { BillingConfig, LlmBillingCacheEntry, PgClient } from './config-cache';
+
 // Types
 export type {
   EmbedderFunction,
@@ -63,6 +75,7 @@ export type {
   ChatOptions,
   LlmModuleData,
   GraphileLlmOptions,
+  MeteringConfig,
   RagDefaults,
   ChunkTableInfo,
 } from './types';
