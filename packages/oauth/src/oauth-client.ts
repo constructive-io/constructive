@@ -182,9 +182,9 @@ export class OAuthClient {
 
       if (response.ok) {
         const emails = await response.json();
-        const email = extractPrimaryEmail(emails);
-        if (email) {
-          return { ...profile, email };
+        const extracted = extractPrimaryEmail(emails);
+        if (extracted) {
+          return { ...profile, email: extracted.email, emailVerified: extracted.verified };
         }
       }
     } catch {

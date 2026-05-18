@@ -12,6 +12,7 @@ export {
 export {
   ConstructiveGraphQLOptions,
   ConstructiveOptions,
+  OAuthRoutesConfig,
   constructiveGraphqlDefaults,
   constructiveDefaults
 } from './constructive';

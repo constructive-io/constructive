@@ -14,6 +14,7 @@ export interface OAuthProfile {
   provider: string;
   providerId: string;
   email: string | null;
+  emailVerified: boolean;
   name: string | null;
   picture: string | null;
   raw: unknown;

@@ -27,6 +27,7 @@ export const facebookProvider: OAuthProviderConfig = {
       provider: 'facebook',
       providerId: profile.id,
       email: profile.email || null,
+      emailVerified: !!profile.email, // Facebook emails are verified by platform
       name: profile.name || null,
       picture: profile.picture?.data?.url || null,
       raw: data,
