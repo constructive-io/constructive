@@ -8,7 +8,7 @@
  * Resolution flow:
  *   1. Billing config from `metaschema_modules_public.billing_module`
  *      (schema name + function names for record_usage, check_billing_quota)
- *   2. API key from `app_secrets_get(name)` in the encrypted_secrets private schema
+ *   2. API key from `app_secrets_get(name)` in the config_secrets_user_module private schema
  *
  * All queries run through the Graphile `withPgClient` callback, which gives us
  * a client connected to the tenant database with proper role settings.
@@ -75,14 +75,14 @@ const BILLING_MODULE_SQL = `
 `;
 
 /**
- * Discover the private schema for the encrypted_secrets module.
+ * Discover the private schema for the config_secrets_user_module.
  * The app_secrets_get function lives in this schema.
  */
-const ENCRYPTED_SECRETS_SCHEMA_SQL = `
-  SELECT ps.schema_name AS private_schema
-  FROM metaschema_modules_public.encrypted_secrets_module esm
-  JOIN metaschema_public.schema ps ON esm.private_schema_id = ps.id
-  WHERE esm.database_id = $1
+const SECRETS_MODULE_SCHEMA_SQL = `
+  SELECT s.schema_name AS private_schema
+  FROM metaschema_modules_public.config_secrets_user_module csm
+  JOIN metaschema_public.schema s ON csm.schema_id = s.id
+  WHERE csm.database_id = $1
   LIMIT 1
 `;
 
@@ -161,7 +161,7 @@ async function resolveApiKey(
 
   // Discover the encrypted_secrets private schema
   try {
-    const schemaResult = await pgClient.query(ENCRYPTED_SECRETS_SCHEMA_SQL, [databaseId]);
+    const schemaResult = await pgClient.query(SECRETS_MODULE_SCHEMA_SQL, [databaseId]);
     const privateSchema = schemaResult.rows[0]?.private_schema as string | undefined;
     if (!privateSchema) return null;
 
