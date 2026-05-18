@@ -152,6 +152,47 @@ export interface ChunkTableInfo {
   contentField: string;
 }
 
+// ─── Metering Types ─────────────────────────────────────────────────────────
+
+/**
+ * Configuration for billing/metering integration.
+ * When provided, embedding and chat calls are wrapped with quota checks
+ * and usage recording via the billing_module functions.
+ */
+export interface MeteringConfig {
+  /**
+   * Meter slug for embedding operations.
+   * Must match a slug in the billing_module meters table.
+   *
+   * @default the embedding model name (e.g. 'text-embedding-3-small')
+   * — meter slug = model name, so each model has its own meter
+   * in the three-level waterfall (per-model → inference pool → universal).
+   */
+  embeddingMeterSlug?: string;
+
+  /**
+   * Meter slug for chat completion operations.
+   *
+   * @default the chat model name (e.g. 'gpt-4o-mini')
+   */
+  chatMeterSlug?: string;
+
+  /**
+   * Disable metering entirely (e.g. for local dev).
+   * When true, billing functions are never called.
+   * @default false
+   */
+  skipMetering?: boolean;
+
+  /**
+   * Resolve the billing entity_id from pgSettings.
+   * The entity_id identifies who gets billed (user, org, etc.).
+   *
+   * @default reads jwt.claims.user_id
+   */
+  resolveEntityId?: (pgSettings: Record<string, string>) => string | null;
+}
+
 // ─── Plugin Options ─────────────────────────────────────────────────────────
 
 /**
@@ -198,4 +239,17 @@ export interface GraphileLlmOptions {
    * Individual queries can override these values.
    */
   ragDefaults?: RagDefaults;
+
+  /**
+   * Billing/metering configuration (opt-in).
+   * When truthy, loads the LlmMeteringPlugin which wraps the embedder
+   * with billing quota checks + usage recording.
+   *
+   * Set to `true` to enable metering with defaults (entity_id from jwt.claims.user_id).
+   * Provide a MeteringConfig object for fine-grained control (custom entity_id, meter slugs).
+   * Set to `false` or omit to disable metering entirely.
+   *
+   * @default undefined (metering disabled)
+   */
+  metering?: boolean | MeteringConfig;
 }
