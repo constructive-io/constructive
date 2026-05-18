@@ -2,12 +2,16 @@
  * metering — Billing-aware wrappers for embedder and chat functions
  *
  * Wraps EmbedderFunction and ChatFunction with:
- *   1. Pre-check: `check_billing_quota(meter_slug, entity_id, amount)`
+ *   1. Pre-check: `check_billing_quota(meter_slug, entity_id, estimated_amount)`
  *   2. Execute the underlying function
- *   3. Post-record: `record_usage(meter_slug, entity_id, amount, metadata)`
+ *   3. Post-record: `record_usage(meter_slug, entity_id, actual_amount)`
  *
  * When the quota check fails, the wrapper returns null (graceful degradation)
  * instead of throwing, so the search pipeline can fall back to text-only.
+ *
+ * Token counts are estimated from text length (~4 chars per token). No
+ * tokenizer needed — the billing system uses tokens as abstract units
+ * and the credit_cost on each model's meter normalizes the relative expense.
  *
  * The billing functions live in the tenant database and are called via the
  * Graphile `withPgClient` callback. Function locations (schema, names) are
@@ -44,8 +48,6 @@ export interface MeteringOptions {
   embeddingMeterSlug?: string;
   /** Meter slug for chat completion operations (default: model name from build config) */
   chatMeterSlug?: string;
-  /** Estimated tokens per embedding call (for pre-check). Default: 256 */
-  estimatedEmbeddingTokens?: number;
   /** Whether to skip metering entirely (e.g. for local dev). Default: false */
   skipMetering?: boolean;
 }
@@ -60,10 +62,6 @@ export interface MeterResult<T> {
   /** Latency of the underlying function call in ms */
   latencyMs: number;
 }
-
-// ─── Defaults ───────────────────────────────────────────────────────────────
-
-const DEFAULT_ESTIMATED_EMBEDDING_TOKENS = 256;
 
 // ─── Billing SQL Helpers ────────────────────────────────────────────────────
 
@@ -142,19 +140,6 @@ export async function meteredEmbed(
 
   const meterSlug = options.embeddingMeterSlug;
   if (!meterSlug) {
-    // No meter slug configured — can't meter without knowing the model name
-    const result = await embedder(text);
-    return {
-      result,
-      metered: false,
-      quotaExceeded: false,
-      latencyMs: Date.now() - startTime,
-    };
-  }
-  const estimatedTokens = options.estimatedEmbeddingTokens ?? DEFAULT_ESTIMATED_EMBEDDING_TOKENS;
-  const skip = options.skipMetering ?? false;
-
-  if (skip) {
     const result = await embedder(text);
     return {
       result,
@@ -164,21 +149,30 @@ export async function meteredEmbed(
     };
   }
 
-  // Pre-check quota via withPgClient
+  if (options.skipMetering) {
+    const result = await embedder(text);
+    return {
+      result,
+      metered: false,
+      quotaExceeded: false,
+      latencyMs: Date.now() - startTime,
+    };
+  }
+
+  // Estimate tokens from text length (~4 chars per token)
+  const estimatedTokens = Math.ceil(text.length / 4);
+
+  // Pre-check: can this entity afford this call?
   let allowed = true;
   try {
     await ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
       allowed = await checkQuota(pgClient, ctx.billing, ctx.entityId, meterSlug, estimatedTokens);
     });
   } catch {
-    // If we can't check quota, allow the call
     allowed = true;
   }
 
   if (!allowed) {
-    console.log(
-      `[graphile-llm] Embedding quota exceeded: entity=${ctx.entityId}, meter=${meterSlug}`
-    );
     return {
       result: null,
       metered: true,
@@ -191,15 +185,12 @@ export async function meteredEmbed(
   const result = await embedder(text);
   const latencyMs = Date.now() - startTime;
 
-  // Estimate actual token count (rough: ~4 chars per token)
+  // Record actual usage
   const actualTokens = Math.ceil(text.length / 4);
-
-  // Record usage (fire-and-forget via withPgClient)
   ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
     await recordUsage(pgClient, ctx.billing, ctx.entityId, meterSlug, actualTokens, {
-      type: 'embedding',
-      dims: result.length,
       input_chars: text.length,
+      dims: result.length,
       latency_ms: latencyMs,
     });
   }).catch(() => {});
@@ -246,9 +237,8 @@ export async function meteredChat(
       latencyMs: Date.now() - startTime,
     };
   }
-  const skip = meteringOptions.skipMetering ?? false;
 
-  if (skip) {
+  if (meteringOptions.skipMetering) {
     const result = await chat(messages, chatOptions);
     return {
       result,
@@ -258,13 +248,13 @@ export async function meteredChat(
     };
   }
 
-  // Estimate input tokens from message content
+  // Estimate tokens from message content (~4 chars per token)
   const inputChars = messages.reduce((sum, m) => sum + m.content.length, 0);
   const estimatedInputTokens = Math.ceil(inputChars / 4);
   const estimatedOutputTokens = chatOptions?.maxTokens ?? 1000;
   const estimatedTotal = estimatedInputTokens + estimatedOutputTokens;
 
-  // Pre-check quota
+  // Pre-check: can this entity afford this call?
   let allowed = true;
   try {
     await ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
@@ -275,9 +265,6 @@ export async function meteredChat(
   }
 
   if (!allowed) {
-    console.log(
-      `[graphile-llm] Chat quota exceeded: entity=${ctx.entityId}, meter=${meterSlug}`
-    );
     return {
       result: null,
       metered: true,
@@ -290,14 +277,11 @@ export async function meteredChat(
   const result = await chat(messages, chatOptions);
   const latencyMs = Date.now() - startTime;
 
-  // Estimate actual tokens (input + output)
+  // Record actual usage
   const actualOutputTokens = Math.ceil(result.length / 4);
   const actualTotal = estimatedInputTokens + actualOutputTokens;
-
-  // Record usage (fire-and-forget)
   ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
     await recordUsage(pgClient, ctx.billing, ctx.entityId, meterSlug, actualTotal, {
-      type: 'chat',
       input_tokens: estimatedInputTokens,
       output_tokens: actualOutputTokens,
       messages_count: messages.length,

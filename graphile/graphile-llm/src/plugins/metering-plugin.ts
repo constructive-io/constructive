@@ -129,7 +129,6 @@ export function createLlmMeteringPlugin(
   const {
     embeddingMeterSlug: configEmbeddingSlug,
     chatMeterSlug: configChatSlug,
-    estimatedEmbeddingTokens,
     skipMetering,
     resolveEntityId = defaultResolveEntityId,
   } = meteringConfig;
@@ -167,7 +166,6 @@ export function createLlmMeteringPlugin(
           const meteringOptions: MeteringOptions = {
             embeddingMeterSlug: embeddingSlug,
             chatMeterSlug: chatSlug,
-            estimatedEmbeddingTokens,
             skipMetering,
           };
 
