@@ -43,14 +43,22 @@
  * };
  * ```
  *
- * @example With billing metering (opt-in):
+ * @example With billing metering (opt-in, meter slug = model name by default):
  * ```typescript
  * GraphileLlmPreset({
- *   defaultEmbedder: { provider: 'ollama' },
+ *   defaultEmbedder: { provider: 'openai', model: 'text-embedding-3-small' },
+ *   metering: true,
+ *   // → embedding calls metered under 'text-embedding-3-small' meter slug
+ *   // → three-level waterfall: text-embedding-3-small → inference pool → universal
+ * })
+ * ```
+ *
+ * @example With custom entity_id resolution (bill per-database):
+ * ```typescript
+ * GraphileLlmPreset({
+ *   defaultEmbedder: { provider: 'openai', model: 'text-embedding-3-small' },
  *   metering: {
- *     embeddingMeterSlug: 'embedding_tokens',
- *     chatMeterSlug: 'chat_tokens',
- *     resolveEntityId: (pgSettings) => pgSettings['jwt.claims.user_id'],
+ *     resolveEntityId: (pgSettings) => pgSettings['jwt.claims.database_id'],
  *   },
  * })
  * ```

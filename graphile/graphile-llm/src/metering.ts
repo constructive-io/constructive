@@ -40,9 +40,9 @@ export interface MeteringContext {
 }
 
 export interface MeteringOptions {
-  /** Meter slug for embedding operations (default: 'embedding_tokens') */
+  /** Meter slug for embedding operations (default: model name from build config) */
   embeddingMeterSlug?: string;
-  /** Meter slug for chat completion operations (default: 'chat_tokens') */
+  /** Meter slug for chat completion operations (default: model name from build config) */
   chatMeterSlug?: string;
   /** Estimated tokens per embedding call (for pre-check). Default: 256 */
   estimatedEmbeddingTokens?: number;
@@ -63,8 +63,6 @@ export interface MeterResult<T> {
 
 // ─── Defaults ───────────────────────────────────────────────────────────────
 
-const DEFAULT_EMBEDDING_METER_SLUG = 'embedding_tokens';
-const DEFAULT_CHAT_METER_SLUG = 'chat_tokens';
 const DEFAULT_ESTIMATED_EMBEDDING_TOKENS = 256;
 
 // ─── Billing SQL Helpers ────────────────────────────────────────────────────
@@ -142,7 +140,17 @@ export async function meteredEmbed(
     };
   }
 
-  const meterSlug = options.embeddingMeterSlug ?? DEFAULT_EMBEDDING_METER_SLUG;
+  const meterSlug = options.embeddingMeterSlug;
+  if (!meterSlug) {
+    // No meter slug configured — can't meter without knowing the model name
+    const result = await embedder(text);
+    return {
+      result,
+      metered: false,
+      quotaExceeded: false,
+      latencyMs: Date.now() - startTime,
+    };
+  }
   const estimatedTokens = options.estimatedEmbeddingTokens ?? DEFAULT_ESTIMATED_EMBEDDING_TOKENS;
   const skip = options.skipMetering ?? false;
 
@@ -228,7 +236,16 @@ export async function meteredChat(
     };
   }
 
-  const meterSlug = meteringOptions.chatMeterSlug ?? DEFAULT_CHAT_METER_SLUG;
+  const meterSlug = meteringOptions.chatMeterSlug;
+  if (!meterSlug) {
+    const result = await chat(messages, chatOptions);
+    return {
+      result,
+      metered: false,
+      quotaExceeded: false,
+      latencyMs: Date.now() - startTime,
+    };
+  }
   const skip = meteringOptions.skipMetering ?? false;
 
   if (skip) {

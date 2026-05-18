@@ -127,19 +127,12 @@ export function createLlmMeteringPlugin(
   meteringConfig: MeteringConfig = {},
 ): GraphileConfig.Plugin {
   const {
-    embeddingMeterSlug,
-    chatMeterSlug,
+    embeddingMeterSlug: configEmbeddingSlug,
+    chatMeterSlug: configChatSlug,
     estimatedEmbeddingTokens,
     skipMetering,
     resolveEntityId = defaultResolveEntityId,
   } = meteringConfig;
-
-  const meteringOptions: MeteringOptions = {
-    embeddingMeterSlug,
-    chatMeterSlug,
-    estimatedEmbeddingTokens,
-    skipMetering,
-  };
 
   return {
     name: 'LlmMeteringPlugin',
@@ -159,8 +152,24 @@ export function createLlmMeteringPlugin(
             return build;
           }
 
-          const slug = embeddingMeterSlug ?? 'embedding_tokens';
-          console.log(`[graphile-llm] Metering enabled — embedding meter: ${slug}`);
+          // Meter slug = model name by default (three-level waterfall: model → inference → universal)
+          const embeddingModel: string | null = (build as any).llmEmbeddingModel;
+          const chatModel: string | null = (build as any).llmChatModel;
+          const embeddingSlug = configEmbeddingSlug ?? embeddingModel ?? undefined;
+          const chatSlug = configChatSlug ?? chatModel ?? undefined;
+
+          if (embeddingSlug) {
+            console.log(`[graphile-llm] Metering enabled — embedding meter: ${embeddingSlug}`);
+          } else {
+            console.log('[graphile-llm] Metering enabled but no embedding model name — usage will not be metered');
+          }
+
+          const meteringOptions: MeteringOptions = {
+            embeddingMeterSlug: embeddingSlug,
+            chatMeterSlug: chatSlug,
+            estimatedEmbeddingTokens,
+            skipMetering,
+          };
 
           // Replace the embedder with a metered version.
           // Same signature except it can return null (quota exceeded).

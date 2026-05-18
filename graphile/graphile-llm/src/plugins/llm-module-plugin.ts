@@ -35,6 +35,10 @@ declare global {
       llmEmbedder: EmbedderFunction | null;
       /** The resolved chat completion function, or null if not configured */
       llmChatCompleter: ChatFunction | null;
+      /** The embedding model name (used as billing meter slug) */
+      llmEmbeddingModel: string | null;
+      /** The chat model name (used as billing meter slug) */
+      llmChatModel: string | null;
     }
   }
   namespace GraphileConfig {
@@ -102,7 +106,9 @@ export function createLlmModulePlugin(
           return build.extend(build, {
             llmEmbedder: embedder,
             llmChatCompleter: chat,
-          }, 'LlmModulePlugin adding llmEmbedder and llmChatCompleter to build');
+            llmEmbeddingModel: defaultEmbedder?.model ?? process.env.EMBEDDER_MODEL ?? null,
+            llmChatModel: defaultChatCompleter?.model ?? process.env.CHAT_MODEL ?? null,
+          }, 'LlmModulePlugin adding llmEmbedder, llmChatCompleter, and model names to build');
         },
       },
     },
