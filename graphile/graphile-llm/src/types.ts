@@ -163,13 +163,17 @@ export interface MeteringConfig {
   /**
    * Meter slug for embedding operations.
    * Must match a slug in the billing_module meters table.
-   * @default 'embedding_tokens'
+   *
+   * @default the embedding model name (e.g. 'text-embedding-3-small')
+   * — meter slug = model name, so each model has its own meter
+   * in the three-level waterfall (per-model → inference pool → universal).
    */
   embeddingMeterSlug?: string;
 
   /**
    * Meter slug for chat completion operations.
-   * @default 'chat_tokens'
+   *
+   * @default the chat model name (e.g. 'gpt-4o-mini')
    */
   chatMeterSlug?: string;
 
