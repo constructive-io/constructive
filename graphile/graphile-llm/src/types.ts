@@ -186,6 +186,14 @@ export interface MeteringConfig {
    * @default false
    */
   skipMetering?: boolean;
+
+  /**
+   * Resolve the billing entity_id from pgSettings.
+   * The entity_id identifies who gets billed (user, org, etc.).
+   *
+   * @default reads jwt.claims.user_id
+   */
+  resolveEntityId?: (pgSettings: Record<string, string>) => string | null;
 }
 
 // ─── Plugin Options ─────────────────────────────────────────────────────────
@@ -236,15 +244,15 @@ export interface GraphileLlmOptions {
   ragDefaults?: RagDefaults;
 
   /**
-   * Billing/metering configuration.
-   * When provided (or when billing_module is provisioned on the database),
-   * embedding and chat calls are wrapped with quota checks + usage recording.
+   * Billing/metering configuration (opt-in).
+   * When truthy, loads the LlmMeteringPlugin which wraps the embedder
+   * with billing quota checks + usage recording.
    *
-   * Set to `false` to explicitly disable metering even when billing_module exists.
-   * Set to `true` or omit to auto-detect from the billing_module.
-   * Provide a MeteringConfig object for fine-grained control.
+   * Set to `true` to enable metering with defaults (entity_id from jwt.claims.user_id).
+   * Provide a MeteringConfig object for fine-grained control (custom entity_id, meter slugs).
+   * Set to `false` or omit to disable metering entirely.
    *
-   * @default undefined (auto-detect from billing_module)
+   * @default undefined (metering disabled)
    */
   metering?: boolean | MeteringConfig;
 }
