@@ -11,9 +11,9 @@ import type {
   User,
   ObjectSelect,
   UserSelect,
+  ObjectConnection,
   AppPermissionConnection,
   OrgPermissionConnection,
-  ObjectConnection,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface RequireStepUpVariables {
@@ -26,7 +26,7 @@ export interface OrgPermissionsGetPaddedMaskVariables {
   mask?: string;
 }
 export interface RevParseVariables {
-  dbId?: string;
+  sId?: string;
   storeId?: string;
   refname?: string;
 }
@@ -68,6 +68,39 @@ export interface AppPermissionsGetMaskByNamesVariables {
 export interface OrgPermissionsGetMaskByNamesVariables {
   names?: string[];
 }
+export interface GetAllObjectsFromRootVariables {
+  sId?: string;
+  id?: string;
+  /** Only read the first `n` values of the set. */
+  first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
+  offset?: number;
+  /** Read all values in the set after (below) this cursor. */
+  after?: string;
+}
+export interface GetPathObjectsFromRootVariables {
+  sId?: string;
+  id?: string;
+  path?: string[];
+  /** Only read the first `n` values of the set. */
+  first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
+  offset?: number;
+  /** Read all values in the set after (below) this cursor. */
+  after?: string;
+}
+export interface GetObjectAtPathVariables {
+  sId?: string;
+  storeId?: string;
+  path?: string[];
+  refname?: string;
+}
 export interface AppPermissionsGetByMaskVariables {
   mask?: string;
   /** Only read the first `n` values of the set. */
@@ -91,39 +124,6 @@ export interface OrgPermissionsGetByMaskVariables {
   offset?: number;
   /** Read all values in the set after (below) this cursor. */
   after?: string;
-}
-export interface GetAllObjectsFromRootVariables {
-  databaseId?: string;
-  id?: string;
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-}
-export interface GetPathObjectsFromRootVariables {
-  databaseId?: string;
-  id?: string;
-  path?: string[];
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-}
-export interface GetObjectAtPathVariables {
-  dbId?: string;
-  storeId?: string;
-  path?: string[];
-  refname?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -292,7 +292,7 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'dbId',
+              name: 'sId',
               type: 'UUID',
             },
             {
@@ -547,6 +547,141 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
+    getAllObjectsFromRoot: (
+      args: GetAllObjectsFromRootVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        getAllObjectsFromRoot: ObjectConnection | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'GetAllObjectsFromRoot',
+        fieldName: 'getAllObjectsFromRoot',
+        ...buildCustomDocument(
+          'query',
+          'GetAllObjectsFromRoot',
+          'getAllObjectsFromRoot',
+          options?.select,
+          args,
+          [
+            {
+              name: 'sId',
+              type: 'UUID',
+            },
+            {
+              name: 'id',
+              type: 'UUID',
+            },
+            {
+              name: 'first',
+              type: 'Int',
+            },
+            {
+              name: 'offset',
+              type: 'Int',
+            },
+            {
+              name: 'after',
+              type: 'Cursor',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    getPathObjectsFromRoot: (
+      args: GetPathObjectsFromRootVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        getPathObjectsFromRoot: ObjectConnection | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'GetPathObjectsFromRoot',
+        fieldName: 'getPathObjectsFromRoot',
+        ...buildCustomDocument(
+          'query',
+          'GetPathObjectsFromRoot',
+          'getPathObjectsFromRoot',
+          options?.select,
+          args,
+          [
+            {
+              name: 'sId',
+              type: 'UUID',
+            },
+            {
+              name: 'id',
+              type: 'UUID',
+            },
+            {
+              name: 'path',
+              type: '[String]',
+            },
+            {
+              name: 'first',
+              type: 'Int',
+            },
+            {
+              name: 'offset',
+              type: 'Int',
+            },
+            {
+              name: 'after',
+              type: 'Cursor',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    getObjectAtPath: <S extends ObjectSelect>(
+      args: GetObjectAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ObjectSelect>
+    ) =>
+      new QueryBuilder<{
+        getObjectAtPath: InferSelectResult<Object, S> | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'GetObjectAtPath',
+        fieldName: 'getObjectAtPath',
+        ...buildCustomDocument(
+          'query',
+          'GetObjectAtPath',
+          'getObjectAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'sId',
+              type: 'UUID',
+            },
+            {
+              name: 'storeId',
+              type: 'UUID',
+            },
+            {
+              name: 'path',
+              type: '[String]',
+            },
+            {
+              name: 'refname',
+              type: 'String',
+            },
+          ],
+          connectionFieldsMap,
+          'Object'
+        ),
+      }),
     appPermissionsGetByMask: (
       args: AppPermissionsGetByMaskVariables,
       options?: {
@@ -627,141 +762,6 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           undefined
-        ),
-      }),
-    getAllObjectsFromRoot: (
-      args: GetAllObjectsFromRootVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        getAllObjectsFromRoot: ObjectConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'GetAllObjectsFromRoot',
-        fieldName: 'getAllObjectsFromRoot',
-        ...buildCustomDocument(
-          'query',
-          'GetAllObjectsFromRoot',
-          'getAllObjectsFromRoot',
-          options?.select,
-          args,
-          [
-            {
-              name: 'databaseId',
-              type: 'UUID',
-            },
-            {
-              name: 'id',
-              type: 'UUID',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    getPathObjectsFromRoot: (
-      args: GetPathObjectsFromRootVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        getPathObjectsFromRoot: ObjectConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'GetPathObjectsFromRoot',
-        fieldName: 'getPathObjectsFromRoot',
-        ...buildCustomDocument(
-          'query',
-          'GetPathObjectsFromRoot',
-          'getPathObjectsFromRoot',
-          options?.select,
-          args,
-          [
-            {
-              name: 'databaseId',
-              type: 'UUID',
-            },
-            {
-              name: 'id',
-              type: 'UUID',
-            },
-            {
-              name: 'path',
-              type: '[String]',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    getObjectAtPath: <S extends ObjectSelect>(
-      args: GetObjectAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ObjectSelect>
-    ) =>
-      new QueryBuilder<{
-        getObjectAtPath: InferSelectResult<Object, S> | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'GetObjectAtPath',
-        fieldName: 'getObjectAtPath',
-        ...buildCustomDocument(
-          'query',
-          'GetObjectAtPath',
-          'getObjectAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'dbId',
-              type: 'UUID',
-            },
-            {
-              name: 'storeId',
-              type: 'UUID',
-            },
-            {
-              name: 'path',
-              type: '[String]',
-            },
-            {
-              name: 'refname',
-              type: 'String',
-            },
-          ],
-          connectionFieldsMap,
-          'Object'
         ),
       }),
     currentUser: <S extends UserSelect>(

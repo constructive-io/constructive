@@ -7,7 +7,7 @@ Execute the removeNodeAtPath mutation
 ## Usage
 
 ```bash
-csdk remove-node-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String>
+csdk remove-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk remove-node-at-path --input.clientMutationId <String> --input.dbId <UUID> -
 ### Run removeNodeAtPath
 
 ```bash
-csdk remove-node-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String>
+csdk remove-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String>
 ```

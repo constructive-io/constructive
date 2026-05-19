@@ -22,7 +22,7 @@ export const getObjectAtPathQueryKey = customQueryKeys.getObjectAtPath;
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useGetObjectAtPathQuery({ variables: { dbId, storeId, path, refname }, selection: { fields: { id: true } } });
+ * const { data, isLoading } = useGetObjectAtPathQuery({ variables: { sId, storeId, path, refname }, selection: { fields: { id: true } } });
  *
  * if (data?.getObjectAtPath) {
  *   console.log(data.getObjectAtPath);
@@ -78,7 +78,7 @@ export function useGetObjectAtPathQuery(
  *
  * @example
  * ```ts
- * const data = await fetchGetObjectAtPathQuery({ variables: { dbId, storeId, path, refname }, selection: { fields: { id: true } } });
+ * const data = await fetchGetObjectAtPathQuery({ variables: { sId, storeId, path, refname }, selection: { fields: { id: true } } });
  * ```
  */
 export async function fetchGetObjectAtPathQuery<S extends ObjectSelect>(params: {
@@ -106,7 +106,7 @@ export async function fetchGetObjectAtPathQuery(params: {
  *
  * @example
  * ```ts
- * await prefetchGetObjectAtPathQuery(queryClient, { variables: { dbId, storeId, path, refname }, selection: { fields: { id: true } } });
+ * await prefetchGetObjectAtPathQuery(queryClient, { variables: { sId, storeId, path, refname }, selection: { fields: { id: true } } });
  * ```
  */
 export async function prefetchGetObjectAtPathQuery<S extends ObjectSelect>(

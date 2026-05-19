@@ -9,7 +9,7 @@ A ref is a data structure for pointing to a commit.
 ```typescript
 db.ref.findMany({ select: { id: true } }).execute()
 db.ref.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.ref.create({ data: { name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' }, select: { id: true } }).execute()
+db.ref.create({ data: { name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' }, select: { id: true } }).execute()
 db.ref.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
 db.ref.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.ref.findMany({
 
 ```typescript
 const item = await db.ref.create({
-  data: { name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' },
+  data: { name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

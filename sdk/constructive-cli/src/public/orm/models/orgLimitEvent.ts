@@ -104,6 +104,46 @@ export class OrgLimitEventModel {
       }),
     });
   }
+  findOne<S extends OrgLimitEventSelect>(
+    args: {
+      id: string;
+      select: S;
+    } & StrictSelect<S, OrgLimitEventSelect>
+  ): QueryBuilder<{
+    orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S> | null;
+  }> {
+    const { document, variables } = buildFindManyDocument(
+      'OrgLimitEvent',
+      'orgLimitEvents',
+      args.select,
+      {
+        where: {
+          id: {
+            equalTo: args.id,
+          },
+        },
+        first: 1,
+      },
+      'OrgLimitEventFilter',
+      'OrgLimitEventOrderBy',
+      connectionFieldsMap
+    );
+    return new QueryBuilder({
+      client: this.client,
+      operation: 'query',
+      operationName: 'OrgLimitEvent',
+      fieldName: 'orgLimitEvent',
+      document,
+      variables,
+      transform: (data: {
+        orgLimitEvents?: {
+          nodes?: InferSelectResult<OrgLimitEventWithRelations, S>[];
+        };
+      }) => ({
+        orgLimitEvent: data.orgLimitEvents?.nodes?.[0] ?? null,
+      }),
+    });
+  }
   create<S extends OrgLimitEventSelect>(
     args: CreateArgs<S, CreateOrgLimitEventInput['orgLimitEvent']> & {
       select: S;
@@ -127,6 +167,76 @@ export class OrgLimitEventModel {
       operation: 'mutation',
       operationName: 'OrgLimitEvent',
       fieldName: 'createOrgLimitEvent',
+      document,
+      variables,
+    });
+  }
+  update<S extends OrgLimitEventSelect>(
+    args: UpdateArgs<
+      S,
+      {
+        id: string;
+      },
+      OrgLimitEventPatch
+    > & {
+      select: S;
+    } & StrictSelect<S, OrgLimitEventSelect>
+  ): QueryBuilder<{
+    updateOrgLimitEvent: {
+      orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
+    };
+  }> {
+    const { document, variables } = buildUpdateByPkDocument(
+      'OrgLimitEvent',
+      'updateOrgLimitEvent',
+      'orgLimitEvent',
+      args.select,
+      args.where.id,
+      args.data,
+      'UpdateOrgLimitEventInput',
+      'id',
+      'orgLimitEventPatch',
+      connectionFieldsMap
+    );
+    return new QueryBuilder({
+      client: this.client,
+      operation: 'mutation',
+      operationName: 'OrgLimitEvent',
+      fieldName: 'updateOrgLimitEvent',
+      document,
+      variables,
+    });
+  }
+  delete<S extends OrgLimitEventSelect>(
+    args: DeleteArgs<
+      {
+        id: string;
+      },
+      S
+    > & {
+      select: S;
+    } & StrictSelect<S, OrgLimitEventSelect>
+  ): QueryBuilder<{
+    deleteOrgLimitEvent: {
+      orgLimitEvent: InferSelectResult<OrgLimitEventWithRelations, S>;
+    };
+  }> {
+    const { document, variables } = buildDeleteByPkDocument(
+      'OrgLimitEvent',
+      'deleteOrgLimitEvent',
+      'orgLimitEvent',
+      {
+        id: args.where.id,
+      },
+      'DeleteOrgLimitEventInput',
+      args.select,
+      connectionFieldsMap
+    );
+    return new QueryBuilder({
+      client: this.client,
+      operation: 'mutation',
+      operationName: 'OrgLimitEvent',
+      fieldName: 'deleteOrgLimitEvent',
       document,
       variables,
     });

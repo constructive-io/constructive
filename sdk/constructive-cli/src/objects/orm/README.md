@@ -69,7 +69,7 @@ CRUD operations for Object records.
 |-------|------|----------|
 | `hashUuid` | UUID | Yes |
 | `id` | UUID | No |
-| `databaseId` | UUID | Yes |
+| `scopeId` | UUID | Yes |
 | `kids` | UUID | Yes |
 | `ktree` | String | Yes |
 | `data` | JSON | Yes |
@@ -80,13 +80,13 @@ CRUD operations for Object records.
 
 ```typescript
 // List all object records
-const items = await db.object.findMany({ select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
+const items = await db.object.findMany({ select: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.object.findOne({ id: '<UUID>', select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
+const item = await db.object.findOne({ id: '<UUID>', select: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
 
 // Create
-const created = await db.object.create({ data: { hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.object.create({ data: { hashUuid: '<UUID>', scopeId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.object.update({ where: { id: '<UUID>' }, data: { hashUuid: '<UUID>' }, select: { id: true } }).execute();
@@ -105,7 +105,7 @@ CRUD operations for Ref records.
 |-------|------|----------|
 | `id` | UUID | No |
 | `name` | String | Yes |
-| `databaseId` | UUID | Yes |
+| `scopeId` | UUID | Yes |
 | `storeId` | UUID | Yes |
 | `commitId` | UUID | Yes |
 
@@ -113,13 +113,13 @@ CRUD operations for Ref records.
 
 ```typescript
 // List all ref records
-const items = await db.ref.findMany({ select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const items = await db.ref.findMany({ select: { id: true, name: true, scopeId: true, storeId: true, commitId: true } }).execute();
 
 // Get one by id
-const item = await db.ref.findOne({ id: '<UUID>', select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const item = await db.ref.findOne({ id: '<UUID>', select: { id: true, name: true, scopeId: true, storeId: true, commitId: true } }).execute();
 
 // Create
-const created = await db.ref.create({ data: { name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.ref.create({ data: { name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.ref.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
@@ -138,7 +138,7 @@ CRUD operations for Store records.
 |-------|------|----------|
 | `id` | UUID | No |
 | `name` | String | Yes |
-| `databaseId` | UUID | Yes |
+| `scopeId` | UUID | Yes |
 | `hash` | UUID | Yes |
 | `createdAt` | Datetime | No |
 
@@ -146,13 +146,13 @@ CRUD operations for Store records.
 
 ```typescript
 // List all store records
-const items = await db.store.findMany({ select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const items = await db.store.findMany({ select: { id: true, name: true, scopeId: true, hash: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.store.findOne({ id: '<UUID>', select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const item = await db.store.findOne({ id: '<UUID>', select: { id: true, name: true, scopeId: true, hash: true, createdAt: true } }).execute();
 
 // Create
-const created = await db.store.create({ data: { name: '<String>', databaseId: '<UUID>', hash: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.store.create({ data: { name: '<String>', scopeId: '<UUID>', hash: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.store.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
@@ -171,7 +171,7 @@ CRUD operations for Commit records.
 |-------|------|----------|
 | `id` | UUID | No |
 | `message` | String | Yes |
-| `databaseId` | UUID | Yes |
+| `scopeId` | UUID | Yes |
 | `storeId` | UUID | Yes |
 | `parentIds` | UUID | Yes |
 | `authorId` | UUID | Yes |
@@ -183,13 +183,13 @@ CRUD operations for Commit records.
 
 ```typescript
 // List all commit records
-const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
+const items = await db.commit.findMany({ select: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
 
 // Get one by id
-const item = await db.commit.findOne({ id: '<UUID>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
+const item = await db.commit.findOne({ id: '<UUID>', select: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
 
 // Create
-const created = await db.commit.create({ data: { message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.commit.create({ data: { message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.commit.update({ where: { id: '<UUID>' }, data: { message: '<String>' }, select: { id: true } }).execute();
@@ -209,12 +209,12 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
+  | `sId` | UUID |
   | `storeId` | UUID |
   | `refname` | String |
 
 ```typescript
-const result = await db.query.revParse({ dbId: '<UUID>', storeId: '<UUID>', refname: '<String>' }).execute();
+const result = await db.query.revParse({ sId: '<UUID>', storeId: '<UUID>', refname: '<String>' }).execute();
 ```
 
 ### `db.query.getAllObjectsFromRoot`
@@ -226,14 +226,14 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
+  | `sId` | UUID |
   | `id` | UUID |
   | `first` | Int |
   | `offset` | Int |
   | `after` | Cursor |
 
 ```typescript
-const result = await db.query.getAllObjectsFromRoot({ databaseId: '<UUID>', id: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
+const result = await db.query.getAllObjectsFromRoot({ sId: '<UUID>', id: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
 ```
 
 ### `db.query.getPathObjectsFromRoot`
@@ -245,7 +245,7 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
+  | `sId` | UUID |
   | `id` | UUID |
   | `path` | [String] |
   | `first` | Int |
@@ -253,7 +253,7 @@ Reads and enables pagination through a set of `Object`.
   | `after` | Cursor |
 
 ```typescript
-const result = await db.query.getPathObjectsFromRoot({ databaseId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
+const result = await db.query.getPathObjectsFromRoot({ sId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
 ```
 
 ### `db.query.getObjectAtPath`
@@ -265,13 +265,13 @@ getObjectAtPath
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
+  | `sId` | UUID |
   | `storeId` | UUID |
   | `path` | [String] |
   | `refname` | String |
 
 ```typescript
-const result = await db.query.getObjectAtPath({ dbId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' }).execute();
+const result = await db.query.getObjectAtPath({ sId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' }).execute();
 ```
 
 ### `db.mutation.freezeObjects`
@@ -286,7 +286,7 @@ freezeObjects
   | `input` | FreezeObjectsInput (required) |
 
 ```typescript
-const result = await db.mutation.freezeObjects({ input: { databaseId: '<UUID>', id: '<UUID>' } }).execute();
+const result = await db.mutation.freezeObjects({ input: { sId: '<UUID>', id: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.initEmptyRepo`
@@ -301,7 +301,7 @@ initEmptyRepo
   | `input` | InitEmptyRepoInput (required) |
 
 ```typescript
-const result = await db.mutation.initEmptyRepo({ input: { dbId: '<UUID>', storeId: '<UUID>' } }).execute();
+const result = await db.mutation.initEmptyRepo({ input: { sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.removeNodeAtPath`
@@ -316,7 +316,7 @@ removeNodeAtPath
   | `input` | RemoveNodeAtPathInput (required) |
 
 ```typescript
-const result = await db.mutation.removeNodeAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>' } }).execute();
+const result = await db.mutation.removeNodeAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>' } }).execute();
 ```
 
 ### `db.mutation.setDataAtPath`
@@ -331,7 +331,7 @@ setDataAtPath
   | `input` | SetDataAtPathInput (required) |
 
 ```typescript
-const result = await db.mutation.setDataAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
+const result = await db.mutation.setDataAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
 ```
 
 ### `db.mutation.setPropsAndCommit`
@@ -346,7 +346,7 @@ setPropsAndCommit
   | `input` | SetPropsAndCommitInput (required) |
 
 ```typescript
-const result = await db.mutation.setPropsAndCommit({ input: { dbId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute();
+const result = await db.mutation.setPropsAndCommit({ input: { sId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute();
 ```
 
 ### `db.mutation.insertNodeAtPath`

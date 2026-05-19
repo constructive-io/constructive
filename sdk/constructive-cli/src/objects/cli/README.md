@@ -130,14 +130,14 @@ CRUD operations for Object records.
 |-------|------|
 | `hashUuid` | UUID |
 | `id` | UUID |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `kids` | UUID |
 | `ktree` | String |
 | `data` | JSON |
 | `frzn` | Boolean |
 | `createdAt` | Datetime |
 
-**Required create fields:** `databaseId`
+**Required create fields:** `scopeId`
 **Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
 
 ### `ref`
@@ -159,11 +159,11 @@ CRUD operations for Ref records.
 |-------|------|
 | `id` | UUID |
 | `name` | String |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `storeId` | UUID |
 | `commitId` | UUID |
 
-**Required create fields:** `name`, `databaseId`, `storeId`
+**Required create fields:** `name`, `scopeId`, `storeId`
 **Optional create fields (backend defaults):** `commitId`
 
 ### `store`
@@ -185,11 +185,11 @@ CRUD operations for Store records.
 |-------|------|
 | `id` | UUID |
 | `name` | String |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `hash` | UUID |
 | `createdAt` | Datetime |
 
-**Required create fields:** `name`, `databaseId`
+**Required create fields:** `name`, `scopeId`
 **Optional create fields (backend defaults):** `hash`
 
 ### `commit`
@@ -211,7 +211,7 @@ CRUD operations for Commit records.
 |-------|------|
 | `id` | UUID |
 | `message` | String |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `storeId` | UUID |
 | `parentIds` | UUID |
 | `authorId` | UUID |
@@ -219,7 +219,7 @@ CRUD operations for Commit records.
 | `treeId` | UUID |
 | `date` | Datetime |
 
-**Required create fields:** `databaseId`, `storeId`
+**Required create fields:** `scopeId`, `storeId`
 **Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ## Custom Operations
@@ -233,7 +233,7 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `--dbId` | UUID |
+  | `--sId` | UUID |
   | `--storeId` | UUID |
   | `--refname` | String |
 
@@ -246,7 +246,7 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `--databaseId` | UUID |
+  | `--sId` | UUID |
   | `--id` | UUID |
   | `--first` | Int |
   | `--offset` | Int |
@@ -261,7 +261,7 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `--databaseId` | UUID |
+  | `--sId` | UUID |
   | `--id` | UUID |
   | `--path` | String |
   | `--first` | Int |
@@ -277,7 +277,7 @@ getObjectAtPath
 
   | Argument | Type |
   |----------|------|
-  | `--dbId` | UUID |
+  | `--sId` | UUID |
   | `--storeId` | UUID |
   | `--path` | String |
   | `--refname` | String |
@@ -292,7 +292,7 @@ freezeObjects
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.id` | UUID |
 
 ### `init-empty-repo`
@@ -305,7 +305,7 @@ initEmptyRepo
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
 
 ### `remove-node-at-path`
@@ -318,7 +318,7 @@ removeNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
 
@@ -332,7 +332,7 @@ setDataAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
   | `--input.data` | JSON |
@@ -347,7 +347,7 @@ setPropsAndCommit
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
   | `--input.refname` | String |
   | `--input.path` | String |
@@ -363,7 +363,7 @@ insertNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
   | `--input.data` | JSON |
@@ -380,7 +380,7 @@ updateNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
   | `--input.data` | JSON |
@@ -397,7 +397,7 @@ setAndCommit
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
   | `--input.refname` | String |
   | `--input.path` | String |

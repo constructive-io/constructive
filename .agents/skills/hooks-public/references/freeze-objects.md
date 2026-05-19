@@ -7,7 +7,7 @@ React Query mutation hook for freezeObjects
 ## Usage
 
 ```typescript
-const { mutate } = useFreezeObjectsMutation(); mutate({ input: { databaseId: '<UUID>', id: '<UUID>' } });
+const { mutate } = useFreezeObjectsMutation(); mutate({ input: { sId: '<UUID>', id: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useFreezeObjectsMutation(); mutate({ input: { databaseId: '<U
 
 ```typescript
 const { mutate, isLoading } = useFreezeObjectsMutation();
-mutate({ input: { databaseId: '<UUID>', id: '<UUID>' } });
+mutate({ input: { sId: '<UUID>', id: '<UUID>' } });
 ```

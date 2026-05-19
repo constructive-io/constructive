@@ -38,6 +38,11 @@ function App() {
 | `useCreateOrgGetSubordinatesRecordMutation` | Mutation | Create a orgGetSubordinatesRecord |
 | `useGetAllQuery` | Query | List all getAll |
 | `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
+| `useObjectsQuery` | Query | List all objects |
+| `useObjectQuery` | Query | Get one object |
+| `useCreateObjectMutation` | Mutation | Create a object |
+| `useUpdateObjectMutation` | Mutation | Update a object |
+| `useDeleteObjectMutation` | Mutation | Delete a object |
 | `useAppPermissionsQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useAppPermissionQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useCreateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
@@ -48,11 +53,6 @@ function App() {
 | `useCreateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useUpdateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useDeleteOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useObjectsQuery` | Query | List all objects |
-| `useObjectQuery` | Query | Get one object |
-| `useCreateObjectMutation` | Mutation | Create a object |
-| `useUpdateObjectMutation` | Mutation | Update a object |
-| `useDeleteObjectMutation` | Mutation | Delete a object |
 | `useDatabasesQuery` | Query | List all databases |
 | `useDatabaseQuery` | Query | Get one database |
 | `useCreateDatabaseMutation` | Mutation | Create a database |
@@ -208,6 +208,11 @@ function App() {
 | `useCreateRealtimeModuleMutation` | Mutation | Create a realtimeModule |
 | `useUpdateRealtimeModuleMutation` | Mutation | Update a realtimeModule |
 | `useDeleteRealtimeModuleMutation` | Mutation | Delete a realtimeModule |
+| `useConfigSecretsOrgModulesQuery` | Query | Config row for the config_secrets_org_module, which provisions an organization-scoped encrypted key-value secrets store with manage_secrets permission and entity-membership RLS. |
+| `useConfigSecretsOrgModuleQuery` | Query | Config row for the config_secrets_org_module, which provisions an organization-scoped encrypted key-value secrets store with manage_secrets permission and entity-membership RLS. |
+| `useCreateConfigSecretsOrgModuleMutation` | Mutation | Config row for the config_secrets_org_module, which provisions an organization-scoped encrypted key-value secrets store with manage_secrets permission and entity-membership RLS. |
+| `useUpdateConfigSecretsOrgModuleMutation` | Mutation | Config row for the config_secrets_org_module, which provisions an organization-scoped encrypted key-value secrets store with manage_secrets permission and entity-membership RLS. |
+| `useDeleteConfigSecretsOrgModuleMutation` | Mutation | Config row for the config_secrets_org_module, which provisions an organization-scoped encrypted key-value secrets store with manage_secrets permission and entity-membership RLS. |
 | `useSchemaGrantsQuery` | Query | List all schemaGrants |
 | `useSchemaGrantQuery` | Query | Get one schemaGrant |
 | `useCreateSchemaGrantMutation` | Mutation | Create a schemaGrant |
@@ -328,11 +333,11 @@ function App() {
 | `useCreateEmailsModuleMutation` | Mutation | Create a emailsModule |
 | `useUpdateEmailsModuleMutation` | Mutation | Update a emailsModule |
 | `useDeleteEmailsModuleMutation` | Mutation | Delete a emailsModule |
-| `useEncryptedSecretsModulesQuery` | Query | List all encryptedSecretsModules |
-| `useEncryptedSecretsModuleQuery` | Query | Get one encryptedSecretsModule |
-| `useCreateEncryptedSecretsModuleMutation` | Mutation | Create a encryptedSecretsModule |
-| `useUpdateEncryptedSecretsModuleMutation` | Mutation | Update a encryptedSecretsModule |
-| `useDeleteEncryptedSecretsModuleMutation` | Mutation | Delete a encryptedSecretsModule |
+| `useConfigSecretsUserModulesQuery` | Query | List all configSecretsUserModules |
+| `useConfigSecretsUserModuleQuery` | Query | Get one configSecretsUserModule |
+| `useCreateConfigSecretsUserModuleMutation` | Mutation | Create a configSecretsUserModule |
+| `useUpdateConfigSecretsUserModuleMutation` | Mutation | Update a configSecretsUserModule |
+| `useDeleteConfigSecretsUserModuleMutation` | Mutation | Delete a configSecretsUserModule |
 | `useInvitesModulesQuery` | Query | List all invitesModules |
 | `useInvitesModuleQuery` | Query | Get one invitesModule |
 | `useCreateInvitesModuleMutation` | Mutation | Create a invitesModule |
@@ -633,11 +638,6 @@ function App() {
 | `useCreateAgentTaskMutation` | Mutation | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
 | `useUpdateAgentTaskMutation` | Mutation | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
 | `useDeleteAgentTaskMutation` | Mutation | An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only. |
-| `useRoleTypesQuery` | Query | List all roleTypes |
-| `useRoleTypeQuery` | Query | Get one roleType |
-| `useCreateRoleTypeMutation` | Mutation | Create a roleType |
-| `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
-| `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
 | `useIdentityProvidersQuery` | Query | List all identityProviders |
 | `useCreateIdentityProviderMutation` | Mutation | Create a identityProvider |
 | `useRefsQuery` | Query | A ref is a data structure for pointing to a commit. |
@@ -655,11 +655,16 @@ function App() {
 | `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
-| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
-| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
-| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
-| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useRoleTypesQuery` | Query | List all roleTypes |
+| `useRoleTypeQuery` | Query | Get one roleType |
+| `useCreateRoleTypeMutation` | Mutation | Create a roleType |
+| `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
+| `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
+| `useMigrateFilesQuery` | Query | List all migrateFiles |
+| `useMigrateFileQuery` | Query | Get one migrateFile |
+| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
+| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
+| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
 | `useAppLimitCapsDefaultsQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
 | `useAppLimitCapsDefaultQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
 | `useCreateAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
@@ -670,56 +675,61 @@ function App() {
 | `useCreateOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
 | `useUpdateOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
 | `useDeleteOrgLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
-| `useAppLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useAppLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useCreateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useUpdateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useDeleteAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useOrgLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useOrgLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useCreateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useUpdateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useDeleteOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
-| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useMigrateFilesQuery` | Query | List all migrateFiles |
-| `useMigrateFileQuery` | Query | Get one migrateFile |
-| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
-| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
-| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
 | `useDevicesModulesQuery` | Query | List all devicesModules |
 | `useDevicesModuleQuery` | Query | Get one devicesModule |
 | `useCreateDevicesModuleMutation` | Mutation | Create a devicesModule |
 | `useUpdateDevicesModuleMutation` | Mutation | Update a devicesModule |
 | `useDeleteDevicesModuleMutation` | Mutation | Delete a devicesModule |
+| `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useUpdateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useDeleteAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useNodeTypeRegistriesQuery` | Query | List all nodeTypeRegistries |
 | `useNodeTypeRegistryQuery` | Query | Get one nodeTypeRegistry |
 | `useCreateNodeTypeRegistryMutation` | Mutation | Create a nodeTypeRegistry |
 | `useUpdateNodeTypeRegistryMutation` | Mutation | Update a nodeTypeRegistry |
 | `useDeleteNodeTypeRegistryMutation` | Mutation | Delete a nodeTypeRegistry |
+| `useAppLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useAppLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useCreateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useUpdateAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useDeleteAppLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
 | `useAppLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useAppLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useCreateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useOrgLimitCapsQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useOrgLimitCapQuery` | Query | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useCreateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useUpdateOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
+| `useDeleteOrgLimitCapMutation` | Mutation | Per-entity cap overrides. Allows specific orgs/entities to have different cap values than the scope default. |
 | `useOrgLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useOrgLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
-| `useAppLimitWarningsQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
-| `useAppLimitWarningQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
-| `useCreateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
-| `useUpdateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
-| `useDeleteAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useUserConnectedAccountsQuery` | Query | List all userConnectedAccounts |
 | `useUserConnectedAccountQuery` | Query | Get one userConnectedAccount |
 | `useCreateUserConnectedAccountMutation` | Mutation | Create a userConnectedAccount |
 | `useUpdateUserConnectedAccountMutation` | Mutation | Update a userConnectedAccount |
 | `useDeleteUserConnectedAccountMutation` | Mutation | Delete a userConnectedAccount |
+| `useAppLimitCreditCodesQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
+| `useAppLimitCreditCodeQuery` | Query | Redeemable credit codes managed by admins with the add_credits permission |
+| `useCreateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useUpdateAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useDeleteAppLimitCreditCodeMutation` | Mutation | Redeemable credit codes managed by admins with the add_credits permission |
+| `useAppLimitWarningsQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useAppLimitWarningQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useCreateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useUpdateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useDeleteAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useCommitsQuery` | Query | A commit records changes to the repository. |
 | `useCommitQuery` | Query | A commit records changes to the repository. |
 | `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
@@ -740,30 +750,26 @@ function App() {
 | `useCreateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
 | `useUpdateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
 | `useDeleteUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
-| `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useUpdateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useDeleteAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useRlsSettingsQuery` | Query | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
 | `useRlsSettingQuery` | Query | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
 | `useCreateRlsSettingMutation` | Mutation | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
 | `useUpdateRlsSettingMutation` | Mutation | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
 | `useDeleteRlsSettingMutation` | Mutation | Per-database RLS module runtime configuration; typed replacement for api_modules rls_module JSONB entries |
-| `useAppLimitEventsQuery` | Query | Append-only log of limit events for historical reporting and audit |
-| `useCreateAppLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
-| `useOrgLimitEventsQuery` | Query | Append-only log of limit events for historical reporting and audit |
-| `useCreateOrgLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
 | `useRlsModulesQuery` | Query | List all rlsModules |
 | `useRlsModuleQuery` | Query | Get one rlsModule |
 | `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
 | `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
 | `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
+| `useInferenceLogModulesQuery` | Query | List all inferenceLogModules |
+| `useInferenceLogModuleQuery` | Query | Get one inferenceLogModule |
+| `useCreateInferenceLogModuleMutation` | Mutation | Create a inferenceLogModule |
+| `useUpdateInferenceLogModuleMutation` | Mutation | Update a inferenceLogModule |
+| `useDeleteInferenceLogModuleMutation` | Mutation | Delete a inferenceLogModule |
 | `useRateLimitMetersModulesQuery` | Query | List all rateLimitMetersModules |
 | `useRateLimitMetersModuleQuery` | Query | Get one rateLimitMetersModule |
 | `useCreateRateLimitMetersModuleMutation` | Mutation | Create a rateLimitMetersModule |
@@ -779,41 +785,51 @@ function App() {
 | `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
 | `useUpdateSqlActionMutation` | Mutation | Update a sqlAction |
 | `useDeleteSqlActionMutation` | Mutation | Delete a sqlAction |
+| `useAppLimitEventsQuery` | Query | Append-only log of limit events for historical reporting and audit |
+| `useAppLimitEventQuery` | Query | Append-only log of limit events for historical reporting and audit |
+| `useCreateAppLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
+| `useUpdateAppLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
+| `useDeleteAppLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
+| `useOrgLimitEventsQuery` | Query | Append-only log of limit events for historical reporting and audit |
+| `useOrgLimitEventQuery` | Query | Append-only log of limit events for historical reporting and audit |
+| `useCreateOrgLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
+| `useUpdateOrgLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
+| `useDeleteOrgLimitEventMutation` | Mutation | Append-only log of limit events for historical reporting and audit |
 | `useDatabaseSettingsQuery` | Query | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
 | `useDatabaseSettingQuery` | Query | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
 | `useCreateDatabaseSettingMutation` | Mutation | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
 | `useUpdateDatabaseSettingMutation` | Mutation | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
 | `useDeleteDatabaseSettingMutation` | Mutation | Database-wide feature flags and settings; controls which platform features are available to all APIs in this database |
-| `useBillingModulesQuery` | Query | List all billingModules |
-| `useBillingModuleQuery` | Query | Get one billingModule |
-| `useCreateBillingModuleMutation` | Mutation | Create a billingModule |
-| `useUpdateBillingModuleMutation` | Mutation | Update a billingModule |
-| `useDeleteBillingModuleMutation` | Mutation | Delete a billingModule |
-| `useAstMigrationsQuery` | Query | List all astMigrations |
-| `useAstMigrationQuery` | Query | Get one astMigration |
-| `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
-| `useUpdateAstMigrationMutation` | Mutation | Update a astMigration |
-| `useDeleteAstMigrationMutation` | Mutation | Delete a astMigration |
-| `useUsersQuery` | Query | List all users |
-| `useUserQuery` | Query | Get one user |
-| `useCreateUserMutation` | Mutation | Create a user |
-| `useUpdateUserMutation` | Mutation | Update a user |
-| `useDeleteUserMutation` | Mutation | Delete a user |
 | `useOrgMembershipSettingsQuery` | Query | Per-entity settings for the memberships module |
 | `useOrgMembershipSettingQuery` | Query | Per-entity settings for the memberships module |
 | `useCreateOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
 | `useUpdateOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
 | `useDeleteOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
-| `useWebauthnSettingsQuery` | Query | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useWebauthnSettingQuery` | Query | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useCreateWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useUpdateWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
-| `useDeleteWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
+| `useBillingModulesQuery` | Query | List all billingModules |
+| `useBillingModuleQuery` | Query | Get one billingModule |
+| `useCreateBillingModuleMutation` | Mutation | Create a billingModule |
+| `useUpdateBillingModuleMutation` | Mutation | Update a billingModule |
+| `useDeleteBillingModuleMutation` | Mutation | Delete a billingModule |
 | `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useUpdateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useDeleteAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useUsersQuery` | Query | List all users |
+| `useUserQuery` | Query | Get one user |
+| `useCreateUserMutation` | Mutation | Create a user |
+| `useUpdateUserMutation` | Mutation | Update a user |
+| `useDeleteUserMutation` | Mutation | Delete a user |
+| `useAstMigrationsQuery` | Query | List all astMigrations |
+| `useAstMigrationQuery` | Query | Get one astMigration |
+| `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
+| `useUpdateAstMigrationMutation` | Mutation | Update a astMigration |
+| `useDeleteAstMigrationMutation` | Mutation | Delete a astMigration |
+| `useWebauthnSettingsQuery` | Query | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
+| `useWebauthnSettingQuery` | Query | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
+| `useCreateWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
+| `useUpdateWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
+| `useDeleteWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
 | `useBillingProviderModulesQuery` | Query | List all billingProviderModules |
 | `useBillingProviderModuleQuery` | Query | Get one billingProviderModule |
 | `useCreateBillingProviderModuleMutation` | Mutation | Create a billingProviderModule |
@@ -838,11 +854,11 @@ function App() {
 | `useResolveBlueprintTableQuery` | Query | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
 | `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
-| `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
-| `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
 | `useGetAllObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
 | `useGetPathObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
 | `useGetObjectAtPathQuery` | Query | getObjectAtPath |
+| `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
+| `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
 | `useCurrentUserQuery` | Query | currentUser |
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useSignOutMutation` | Mutation | signOut |
@@ -868,7 +884,10 @@ function App() {
 | `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
 | `useCopyTemplateToBlueprintMutation` | Mutation | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
 | `useProvisionSpatialRelationMutation` | Mutation | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
+| `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useBootstrapUserMutation` | Mutation | bootstrapUser |
+| `useSignUpMutation` | Mutation | signUp |
+| `useSignInMutation` | Mutation | signIn |
 | `useSetFieldOrderMutation` | Mutation | setFieldOrder |
 | `useProvisionCheckConstraintMutation` | Mutation | Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists. |
 | `useProvisionUniqueConstraintMutation` | Mutation | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
@@ -882,7 +901,6 @@ function App() {
 | `useSetAndCommitMutation` | Mutation | setAndCommit |
 | `useProvisionRelationMutation` | Mutation | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
 | `useApplyRlsMutation` | Mutation | applyRls |
-| `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useCreateUserDatabaseMutation` | Mutation | Creates a new user database with all required modules, permissions, and RLS policies.
 
 Parameters:
@@ -902,12 +920,10 @@ Example usage:
  |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useCreateApiKeyMutation` | Mutation | createApiKey |
+| `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
+| `useProvisionTableMutation` | Mutation | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
-| `useSignUpMutation` | Mutation | signUp |
-| `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
-| `useSignInMutation` | Mutation | signIn |
-| `useProvisionTableMutation` | Mutation | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -960,6 +976,27 @@ const { mutate: create } = useCreateGetAllRecordMutation({
 create({ path: '<String>', data: '<JSON>' });
 ```
 
+### Object
+
+```typescript
+// List all objects
+const { data, isLoading } = useObjectsQuery({
+  selection: { fields: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+});
+
+// Get one object
+const { data: item } = useObjectQuery({
+  id: '<UUID>',
+  selection: { fields: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+});
+
+// Create a object
+const { mutate: create } = useCreateObjectMutation({
+  selection: { fields: { id: true } },
+});
+create({ hashUuid: '<UUID>', scopeId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
+```
+
 ### AppPermission
 
 ```typescript
@@ -1000,27 +1037,6 @@ const { mutate: create } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' });
-```
-
-### Object
-
-```typescript
-// List all objects
-const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
-});
-
-// Get one object
-const { data: item } = useObjectQuery({
-  id: '<UUID>',
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
-});
-
-// Create a object
-const { mutate: create } = useCreateObjectMutation({
-  selection: { fields: { id: true } },
-});
-create({ hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
 ```
 
 ### Database
@@ -1527,6 +1543,27 @@ const { mutate: create } = useCreateRealtimeModuleMutation({
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', premake: '<Int>', interval: '<String>', notifyChannel: '<String>' });
 ```
 
+### ConfigSecretsOrgModule
+
+```typescript
+// List all configSecretsOrgModules
+const { data, isLoading } = useConfigSecretsOrgModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+});
+
+// Get one configSecretsOrgModule
+const { data: item } = useConfigSecretsOrgModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+});
+
+// Create a configSecretsOrgModule
+const { mutate: create } = useCreateConfigSecretsOrgModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
+```
+
 ### SchemaGrant
 
 ```typescript
@@ -1805,20 +1842,20 @@ create({ databaseId: '<UUID>', targetOwnerId: '<UUID>', sourceApproved: '<Boolea
 ```typescript
 // List all partitions
 const { data, isLoading } = usePartitionsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, retentionKeepTable: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one partition
 const { data: item } = usePartitionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, retentionKeepTable: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a partition
 const { mutate: create } = useCreatePartitionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', premake: '<Int>', namingPattern: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', retentionKeepTable: '<Boolean>', premake: '<Int>', namingPattern: '<String>' });
 ```
 
 ### Api
@@ -2031,22 +2068,22 @@ const { mutate: create } = useCreateEmailsModuleMutation({
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>' });
 ```
 
-### EncryptedSecretsModule
+### ConfigSecretsUserModule
 
 ```typescript
-// List all encryptedSecretsModules
-const { data, isLoading } = useEncryptedSecretsModulesQuery({
+// List all configSecretsUserModules
+const { data, isLoading } = useConfigSecretsUserModulesQuery({
   selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
 });
 
-// Get one encryptedSecretsModule
-const { data: item } = useEncryptedSecretsModuleQuery({
+// Get one configSecretsUserModule
+const { data: item } = useConfigSecretsUserModuleQuery({
   id: '<UUID>',
   selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
 });
 
-// Create a encryptedSecretsModule
-const { mutate: create } = useCreateEncryptedSecretsModuleMutation({
+// Create a configSecretsUserModule
+const { mutate: create } = useCreateConfigSecretsUserModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
@@ -2372,20 +2409,20 @@ create({ blueprintId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', status
 ```typescript
 // List all storageModules
 const { data, isLoading } = useStorageModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, hasPathShares: true, pathSharesTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true, maxBulkFiles: true, maxBulkTotalSize: true, hasVersioning: true, hasContentHash: true, hasCustomKeys: true, hasAuditLog: true, hasConfirmUpload: true, confirmUploadDelay: true, fileEventsTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, storageKey: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, hasPathShares: true, pathSharesTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true, maxBulkFiles: true, maxBulkTotalSize: true, hasVersioning: true, hasContentHash: true, hasCustomKeys: true, hasAuditLog: true, hasConfirmUpload: true, confirmUploadDelay: true, fileEventsTableId: true } },
 });
 
 // Get one storageModule
 const { data: item } = useStorageModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, hasPathShares: true, pathSharesTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true, maxBulkFiles: true, maxBulkTotalSize: true, hasVersioning: true, hasContentHash: true, hasCustomKeys: true, hasAuditLog: true, hasConfirmUpload: true, confirmUploadDelay: true, fileEventsTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, bucketsTableName: true, filesTableName: true, membershipType: true, storageKey: true, policies: true, skipDefaultPolicyTables: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, restrictReads: true, hasPathShares: true, pathSharesTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true, maxBulkFiles: true, maxBulkTotalSize: true, hasVersioning: true, hasContentHash: true, hasCustomKeys: true, hasAuditLog: true, hasConfirmUpload: true, confirmUploadDelay: true, fileEventsTableId: true } },
 });
 
 // Create a storageModule
 const { mutate: create } = useCreateStorageModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', membershipType: '<Int>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', restrictReads: '<Boolean>', hasPathShares: '<Boolean>', pathSharesTableId: '<UUID>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>', maxBulkFiles: '<Int>', maxBulkTotalSize: '<BigInt>', hasVersioning: '<Boolean>', hasContentHash: '<Boolean>', hasCustomKeys: '<Boolean>', hasAuditLog: '<Boolean>', hasConfirmUpload: '<Boolean>', confirmUploadDelay: '<Interval>', fileEventsTableId: '<UUID>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', membershipType: '<Int>', storageKey: '<String>', policies: '<JSON>', skipDefaultPolicyTables: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', restrictReads: '<Boolean>', hasPathShares: '<Boolean>', pathSharesTableId: '<UUID>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>', maxBulkFiles: '<Int>', maxBulkTotalSize: '<BigInt>', hasVersioning: '<Boolean>', hasContentHash: '<Boolean>', hasCustomKeys: '<Boolean>', hasAuditLog: '<Boolean>', hasConfirmUpload: '<Boolean>', confirmUploadDelay: '<Interval>', fileEventsTableId: '<UUID>' });
 ```
 
 ### EntityTypeProvision
@@ -3165,27 +3202,6 @@ const { mutate: create } = useCreateAgentTaskMutation({
 create({ threadId: '<UUID>', entityId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', ownerId: '<UUID>', status: '<String>' });
 ```
 
-### RoleType
-
-```typescript
-// List all roleTypes
-const { data, isLoading } = useRoleTypesQuery({
-  selection: { fields: { id: true, name: true } },
-});
-
-// Get one roleType
-const { data: item } = useRoleTypeQuery({
-  id: '<Int>',
-  selection: { fields: { id: true, name: true } },
-});
-
-// Create a roleType
-const { mutate: create } = useCreateRoleTypeMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>' });
-```
-
 ### IdentityProvider
 
 ```typescript
@@ -3206,20 +3222,20 @@ create({ slug: '<String>', kind: '<String>', displayName: '<String>', enabled: '
 ```typescript
 // List all refs
 const { data, isLoading } = useRefsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, storeId: true, commitId: true } },
 });
 
 // Get one ref
 const { data: item } = useRefQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, storeId: true, commitId: true } },
 });
 
 // Create a ref
 const { mutate: create } = useCreateRefMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' });
+create({ name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' });
 ```
 
 ### Store
@@ -3227,20 +3243,20 @@ create({ name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<
 ```typescript
 // List all stores
 const { data, isLoading } = useStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, hash: true, createdAt: true } },
 });
 
 // Get one store
 const { data: item } = useStoreQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, hash: true, createdAt: true } },
 });
 
 // Create a store
 const { mutate: create } = useCreateStoreMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
+create({ name: '<String>', scopeId: '<UUID>', hash: '<UUID>' });
 ```
 
 ### AppPermissionDefault
@@ -3264,25 +3280,46 @@ const { mutate: create } = useCreateAppPermissionDefaultMutation({
 create({ permissions: '<BitString>' });
 ```
 
-### AppLimitCreditCode
+### RoleType
 
 ```typescript
-// List all appLimitCreditCodes
-const { data, isLoading } = useAppLimitCreditCodesQuery({
-  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+// List all roleTypes
+const { data, isLoading } = useRoleTypesQuery({
+  selection: { fields: { id: true, name: true } },
 });
 
-// Get one appLimitCreditCode
-const { data: item } = useAppLimitCreditCodeQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+// Get one roleType
+const { data: item } = useRoleTypeQuery({
+  id: '<Int>',
+  selection: { fields: { id: true, name: true } },
 });
 
-// Create a appLimitCreditCode
-const { mutate: create } = useCreateAppLimitCreditCodeMutation({
+// Create a roleType
+const { mutate: create } = useCreateRoleTypeMutation({
   selection: { fields: { id: true } },
 });
-create({ code: '<String>', maxRedemptions: '<Int>', currentRedemptions: '<Int>', expiresAt: '<Datetime>' });
+create({ name: '<String>' });
+```
+
+### MigrateFile
+
+```typescript
+// List all migrateFiles
+const { data, isLoading } = useMigrateFilesQuery({
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Get one migrateFile
+const { data: item } = useMigrateFileQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Create a migrateFile
+const { mutate: create } = useCreateMigrateFileMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', upload: '<Upload>' });
 ```
 
 ### AppLimitCapsDefault
@@ -3327,90 +3364,6 @@ const { mutate: create } = useCreateOrgLimitCapsDefaultMutation({
 create({ name: '<String>', max: '<BigInt>' });
 ```
 
-### AppLimitCap
-
-```typescript
-// List all appLimitCaps
-const { data, isLoading } = useAppLimitCapsQuery({
-  selection: { fields: { id: true, name: true, entityId: true, max: true } },
-});
-
-// Get one appLimitCap
-const { data: item } = useAppLimitCapQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, entityId: true, max: true } },
-});
-
-// Create a appLimitCap
-const { mutate: create } = useCreateAppLimitCapMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
-```
-
-### OrgLimitCap
-
-```typescript
-// List all orgLimitCaps
-const { data, isLoading } = useOrgLimitCapsQuery({
-  selection: { fields: { id: true, name: true, entityId: true, max: true } },
-});
-
-// Get one orgLimitCap
-const { data: item } = useOrgLimitCapQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, entityId: true, max: true } },
-});
-
-// Create a orgLimitCap
-const { mutate: create } = useCreateOrgLimitCapMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
-```
-
-### MembershipType
-
-```typescript
-// List all membershipTypes
-const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
-});
-
-// Get one membershipType
-const { data: item } = useMembershipTypeQuery({
-  id: '<Int>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
-});
-
-// Create a membershipType
-const { mutate: create } = useCreateMembershipTypeMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', description: '<String>', prefix: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' });
-```
-
-### MigrateFile
-
-```typescript
-// List all migrateFiles
-const { data, isLoading } = useMigrateFilesQuery({
-  selection: { fields: { id: true, databaseId: true, upload: true } },
-});
-
-// Get one migrateFile
-const { data: item } = useMigrateFileQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, upload: true } },
-});
-
-// Create a migrateFile
-const { mutate: create } = useCreateMigrateFileMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', upload: '<Upload>' });
-```
-
 ### DevicesModule
 
 ```typescript
@@ -3430,6 +3383,48 @@ const { mutate: create } = useCreateDevicesModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', deviceSettingsTableId: '<UUID>', userDevicesTable: '<String>', deviceSettingsTable: '<String>' });
+```
+
+### AppMembershipDefault
+
+```typescript
+// List all appMembershipDefaults
+const { data, isLoading } = useAppMembershipDefaultsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+});
+
+// Get one appMembershipDefault
+const { data: item } = useAppMembershipDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+});
+
+// Create a appMembershipDefault
+const { mutate: create } = useCreateAppMembershipDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' });
+```
+
+### OrgMembershipDefault
+
+```typescript
+// List all orgMembershipDefaults
+const { data, isLoading } = useOrgMembershipDefaultsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } },
+});
+
+// Get one orgMembershipDefault
+const { data: item } = useOrgMembershipDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } },
+});
+
+// Create a orgMembershipDefault
+const { mutate: create } = useCreateOrgMembershipDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>' });
 ```
 
 ### NodeTypeRegistry
@@ -3453,6 +3448,27 @@ const { mutate: create } = useCreateNodeTypeRegistryMutation({
 create({ slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', parameterSchema: '<JSON>', tags: '<String>' });
 ```
 
+### AppLimitCap
+
+```typescript
+// List all appLimitCaps
+const { data, isLoading } = useAppLimitCapsQuery({
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Get one appLimitCap
+const { data: item } = useAppLimitCapQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Create a appLimitCap
+const { mutate: create } = useCreateAppLimitCapMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
+```
+
 ### AppLimitDefault
 
 ```typescript
@@ -3472,6 +3488,27 @@ const { mutate: create } = useCreateAppLimitDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', max: '<BigInt>', softMax: '<BigInt>' });
+```
+
+### OrgLimitCap
+
+```typescript
+// List all orgLimitCaps
+const { data, isLoading } = useOrgLimitCapsQuery({
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Get one orgLimitCap
+const { data: item } = useOrgLimitCapQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, entityId: true, max: true } },
+});
+
+// Create a orgLimitCap
+const { mutate: create } = useCreateOrgLimitCapMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', entityId: '<UUID>', max: '<BigInt>' });
 ```
 
 ### OrgLimitDefault
@@ -3495,27 +3532,6 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
 create({ name: '<String>', max: '<BigInt>', softMax: '<BigInt>' });
 ```
 
-### AppLimitWarning
-
-```typescript
-// List all appLimitWarnings
-const { data, isLoading } = useAppLimitWarningsQuery({
-  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
-});
-
-// Get one appLimitWarning
-const { data: item } = useAppLimitWarningQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
-});
-
-// Create a appLimitWarning
-const { mutate: create } = useCreateAppLimitWarningMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>' });
-```
-
 ### UserConnectedAccount
 
 ```typescript
@@ -3537,25 +3553,67 @@ const { mutate: create } = useCreateUserConnectedAccountMutation({
 create({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
 ```
 
+### AppLimitCreditCode
+
+```typescript
+// List all appLimitCreditCodes
+const { data, isLoading } = useAppLimitCreditCodesQuery({
+  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+});
+
+// Get one appLimitCreditCode
+const { data: item } = useAppLimitCreditCodeQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, code: true, maxRedemptions: true, currentRedemptions: true, expiresAt: true } },
+});
+
+// Create a appLimitCreditCode
+const { mutate: create } = useCreateAppLimitCreditCodeMutation({
+  selection: { fields: { id: true } },
+});
+create({ code: '<String>', maxRedemptions: '<Int>', currentRedemptions: '<Int>', expiresAt: '<Datetime>' });
+```
+
+### AppLimitWarning
+
+```typescript
+// List all appLimitWarnings
+const { data, isLoading } = useAppLimitWarningsQuery({
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
+});
+
+// Get one appLimitWarning
+const { data: item } = useAppLimitWarningQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
+});
+
+// Create a appLimitWarning
+const { mutate: create } = useCreateAppLimitWarningMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>' });
+```
+
 ### Commit
 
 ```typescript
 // List all commits
 const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
 });
 
 // Get one commit
 const { data: item } = useCommitQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
 });
 
 // Create a commit
 const { mutate: create } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
+create({ message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
 ```
 
 ### PubkeySetting
@@ -3621,46 +3679,25 @@ const { mutate: create } = useCreateUsageSnapshotMutation({
 create({ databaseId: '<UUID>', metricName: '<String>', metricValue: '<BigInt>', dimensions: '<JSON>', capturedAt: '<Datetime>' });
 ```
 
-### AppMembershipDefault
+### MembershipType
 
 ```typescript
-// List all appMembershipDefaults
-const { data, isLoading } = useAppMembershipDefaultsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+// List all membershipTypes
+const { data, isLoading } = useMembershipTypesQuery({
+  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
 });
 
-// Get one appMembershipDefault
-const { data: item } = useAppMembershipDefaultQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+// Get one membershipType
+const { data: item } = useMembershipTypeQuery({
+  id: '<Int>',
+  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
 });
 
-// Create a appMembershipDefault
-const { mutate: create } = useCreateAppMembershipDefaultMutation({
+// Create a membershipType
+const { mutate: create } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' });
-```
-
-### OrgMembershipDefault
-
-```typescript
-// List all orgMembershipDefaults
-const { data, isLoading } = useOrgMembershipDefaultsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } },
-});
-
-// Get one orgMembershipDefault
-const { data: item } = useOrgMembershipDefaultQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } },
-});
-
-// Create a orgMembershipDefault
-const { mutate: create } = useCreateOrgMembershipDefaultMutation({
-  selection: { fields: { id: true } },
-});
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>' });
+create({ name: '<String>', description: '<String>', prefix: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' });
 ```
 
 ### RlsSetting
@@ -3684,36 +3721,6 @@ const { mutate: create } = useCreateRlsSettingMutation({
 create({ databaseId: '<UUID>', authenticateSchemaId: '<UUID>', roleSchemaId: '<UUID>', authenticateFunctionId: '<UUID>', authenticateStrictFunctionId: '<UUID>', currentRoleFunctionId: '<UUID>', currentRoleIdFunctionId: '<UUID>', currentUserAgentFunctionId: '<UUID>', currentIpAddressFunctionId: '<UUID>' });
 ```
 
-### AppLimitEvent
-
-```typescript
-// List all appLimitEvents
-const { data, isLoading } = useAppLimitEventsQuery({
-  selection: { fields: { name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
-});
-
-// Create a appLimitEvent
-const { mutate: create } = useCreateAppLimitEventMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', actorId: '<UUID>', entityId: '<UUID>', eventType: '<String>', delta: '<BigInt>', numBefore: '<BigInt>', numAfter: '<BigInt>', maxAtEvent: '<BigInt>', reason: '<String>' });
-```
-
-### OrgLimitEvent
-
-```typescript
-// List all orgLimitEvents
-const { data, isLoading } = useOrgLimitEventsQuery({
-  selection: { fields: { name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
-});
-
-// Create a orgLimitEvent
-const { mutate: create } = useCreateOrgLimitEventMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', actorId: '<UUID>', entityId: '<UUID>', eventType: '<String>', delta: '<BigInt>', numBefore: '<BigInt>', numAfter: '<BigInt>', maxAtEvent: '<BigInt>', reason: '<String>' });
-```
-
 ### RlsModule
 
 ```typescript
@@ -3733,6 +3740,27 @@ const { mutate: create } = useCreateRlsModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>' });
+```
+
+### InferenceLogModule
+
+```typescript
+// List all inferenceLogModules
+const { data, isLoading } = useInferenceLogModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, inferenceLogTableId: true, inferenceLogTableName: true, usageDailyTableId: true, usageDailyTableName: true, interval: true, retention: true, premake: true, prefix: true } },
+});
+
+// Get one inferenceLogModule
+const { data: item } = useInferenceLogModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, inferenceLogTableId: true, inferenceLogTableName: true, usageDailyTableId: true, usageDailyTableName: true, interval: true, retention: true, premake: true, prefix: true } },
+});
+
+// Create a inferenceLogModule
+const { mutate: create } = useCreateInferenceLogModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', inferenceLogTableId: '<UUID>', inferenceLogTableName: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>', interval: '<String>', retention: '<String>', premake: '<Int>', prefix: '<String>' });
 ```
 
 ### RateLimitMetersModule
@@ -3798,6 +3826,48 @@ const { mutate: create } = useCreateSqlActionMutation({
 create({ name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' });
 ```
 
+### AppLimitEvent
+
+```typescript
+// List all appLimitEvents
+const { data, isLoading } = useAppLimitEventsQuery({
+  selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
+});
+
+// Get one appLimitEvent
+const { data: item } = useAppLimitEventQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
+});
+
+// Create a appLimitEvent
+const { mutate: create } = useCreateAppLimitEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', actorId: '<UUID>', entityId: '<UUID>', eventType: '<String>', delta: '<BigInt>', numBefore: '<BigInt>', numAfter: '<BigInt>', maxAtEvent: '<BigInt>', reason: '<String>' });
+```
+
+### OrgLimitEvent
+
+```typescript
+// List all orgLimitEvents
+const { data, isLoading } = useOrgLimitEventsQuery({
+  selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
+});
+
+// Get one orgLimitEvent
+const { data: item } = useOrgLimitEventQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
+});
+
+// Create a orgLimitEvent
+const { mutate: create } = useCreateOrgLimitEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', actorId: '<UUID>', entityId: '<UUID>', eventType: '<String>', delta: '<BigInt>', numBefore: '<BigInt>', numAfter: '<BigInt>', maxAtEvent: '<BigInt>', reason: '<String>' });
+```
+
 ### DatabaseSetting
 
 ```typescript
@@ -3817,69 +3887,6 @@ const { mutate: create } = useCreateDatabaseSettingMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', enableBulk: '<Boolean>', options: '<JSON>' });
-```
-
-### BillingModule
-
-```typescript
-// List all billingModules
-const { data, isLoading } = useBillingModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, recordUsageFunction: true, prefix: true } },
-});
-
-// Get one billingModule
-const { data: item } = useBillingModuleQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, recordUsageFunction: true, prefix: true } },
-});
-
-// Create a billingModule
-const { mutate: create } = useCreateBillingModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', recordUsageFunction: '<String>', prefix: '<String>' });
-```
-
-### AstMigration
-
-```typescript
-// List all astMigrations
-const { data, isLoading } = useAstMigrationsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
-});
-
-// Get one astMigration
-const { data: item } = useAstMigrationQuery({
-  id: '<Int>',
-  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
-});
-
-// Create a astMigration
-const { mutate: create } = useCreateAstMigrationMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: '<JSON>', deploys: '<String>', deploy: '<JSON>', revert: '<JSON>', verify: '<JSON>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' });
-```
-
-### User
-
-```typescript
-// List all users
-const { data, isLoading } = useUsersQuery({
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
-});
-
-// Get one user
-const { data: item } = useUserQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
-});
-
-// Create a user
-const { mutate: create } = useCreateUserMutation({
-  selection: { fields: { id: true } },
-});
-create({ username: '<String>', displayName: '<String>', profilePicture: '<Image>', searchTsv: '<FullText>', type: '<Int>', searchTsvRank: '<Float>', displayNameTrgmSimilarity: '<Float>', searchScore: '<Float>' });
 ```
 
 ### OrgMembershipSetting
@@ -3903,25 +3910,25 @@ const { mutate: create } = useCreateOrgMembershipSettingMutation({
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', entityId: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', createChildCascadeOwners: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', allowExternalMembers: '<Boolean>', inviteProfileAssignmentMode: '<String>', populateMemberEmail: '<Boolean>', limitAllocationMode: '<String>' });
 ```
 
-### WebauthnSetting
+### BillingModule
 
 ```typescript
-// List all webauthnSettings
-const { data, isLoading } = useWebauthnSettingsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, credentialsSchemaId: true, sessionsSchemaId: true, sessionSecretsSchemaId: true, credentialsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, sessionSecretsTableId: true, userFieldId: true, rpId: true, rpName: true, originAllowlist: true, attestationType: true, requireUserVerification: true, residentKey: true, challengeExpirySeconds: true } },
+// List all billingModules
+const { data, isLoading } = useBillingModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, recordUsageFunction: true, prefix: true } },
 });
 
-// Get one webauthnSetting
-const { data: item } = useWebauthnSettingQuery({
+// Get one billingModule
+const { data: item } = useBillingModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, credentialsSchemaId: true, sessionsSchemaId: true, sessionSecretsSchemaId: true, credentialsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, sessionSecretsTableId: true, userFieldId: true, rpId: true, rpName: true, originAllowlist: true, attestationType: true, requireUserVerification: true, residentKey: true, challengeExpirySeconds: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, recordUsageFunction: true, prefix: true } },
 });
 
-// Create a webauthnSetting
-const { mutate: create } = useCreateWebauthnSettingMutation({
+// Create a billingModule
+const { mutate: create } = useCreateBillingModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', credentialsSchemaId: '<UUID>', sessionsSchemaId: '<UUID>', sessionSecretsSchemaId: '<UUID>', credentialsTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionSecretsTableId: '<UUID>', userFieldId: '<UUID>', rpId: '<String>', rpName: '<String>', originAllowlist: '<String>', attestationType: '<String>', requireUserVerification: '<Boolean>', residentKey: '<String>', challengeExpirySeconds: '<BigInt>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', meterCreditsTableId: '<UUID>', meterCreditsTableName: '<String>', recordUsageFunction: '<String>', prefix: '<String>' });
 ```
 
 ### AppMembership
@@ -3943,6 +3950,69 @@ const { mutate: create } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
+```
+
+### User
+
+```typescript
+// List all users
+const { data, isLoading } = useUsersQuery({
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one user
+const { data: item } = useUserQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a user
+const { mutate: create } = useCreateUserMutation({
+  selection: { fields: { id: true } },
+});
+create({ username: '<String>', displayName: '<String>', profilePicture: '<Image>', searchTsv: '<FullText>', type: '<Int>', searchTsvRank: '<Float>', displayNameTrgmSimilarity: '<Float>', searchScore: '<Float>' });
+```
+
+### AstMigration
+
+```typescript
+// List all astMigrations
+const { data, isLoading } = useAstMigrationsQuery({
+  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
+});
+
+// Get one astMigration
+const { data: item } = useAstMigrationQuery({
+  id: '<Int>',
+  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
+});
+
+// Create a astMigration
+const { mutate: create } = useCreateAstMigrationMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: '<JSON>', deploys: '<String>', deploy: '<JSON>', revert: '<JSON>', verify: '<JSON>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' });
+```
+
+### WebauthnSetting
+
+```typescript
+// List all webauthnSettings
+const { data, isLoading } = useWebauthnSettingsQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, credentialsSchemaId: true, sessionsSchemaId: true, sessionSecretsSchemaId: true, credentialsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, sessionSecretsTableId: true, userFieldId: true, rpId: true, rpName: true, originAllowlist: true, attestationType: true, requireUserVerification: true, residentKey: true, challengeExpirySeconds: true } },
+});
+
+// Get one webauthnSetting
+const { data: item } = useWebauthnSettingQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, credentialsSchemaId: true, sessionsSchemaId: true, sessionSecretsSchemaId: true, credentialsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, sessionSecretsTableId: true, userFieldId: true, rpId: true, rpName: true, originAllowlist: true, attestationType: true, requireUserVerification: true, residentKey: true, challengeExpirySeconds: true } },
+});
+
+// Create a webauthnSetting
+const { mutate: create } = useCreateWebauthnSettingMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', credentialsSchemaId: '<UUID>', sessionsSchemaId: '<UUID>', sessionSecretsSchemaId: '<UUID>', credentialsTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionSecretsTableId: '<UUID>', userFieldId: '<UUID>', rpId: '<String>', rpName: '<String>', originAllowlist: '<String>', attestationType: '<String>', requireUserVerification: '<Boolean>', residentKey: '<String>', challengeExpirySeconds: '<BigInt>' });
 ```
 
 ### BillingProviderModule
@@ -4052,7 +4122,7 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
+  | `sId` | UUID |
   | `storeId` | UUID |
   | `refname` | String |
 
@@ -4142,6 +4212,51 @@ orgPermissionsGetMaskByNames
   |----------|------|
   | `names` | [String] |
 
+### `useGetAllObjectsFromRootQuery`
+
+Reads and enables pagination through a set of `Object`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `sId` | UUID |
+  | `id` | UUID |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
+
+### `useGetPathObjectsFromRootQuery`
+
+Reads and enables pagination through a set of `Object`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `sId` | UUID |
+  | `id` | UUID |
+  | `path` | [String] |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
+
+### `useGetObjectAtPathQuery`
+
+getObjectAtPath
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `sId` | UUID |
+  | `storeId` | UUID |
+  | `path` | [String] |
+  | `refname` | String |
+
 ### `useAppPermissionsGetByMaskQuery`
 
 Reads and enables pagination through a set of `AppPermission`.
@@ -4169,51 +4284,6 @@ Reads and enables pagination through a set of `OrgPermission`.
   | `first` | Int |
   | `offset` | Int |
   | `after` | Cursor |
-
-### `useGetAllObjectsFromRootQuery`
-
-Reads and enables pagination through a set of `Object`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-### `useGetPathObjectsFromRootQuery`
-
-Reads and enables pagination through a set of `Object`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `path` | [String] |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-### `useGetObjectAtPathQuery`
-
-getObjectAtPath
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `path` | [String] |
-  | `refname` | String |
 
 ### `useCurrentUserQuery`
 
@@ -4486,6 +4556,17 @@ Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row dec
   |----------|------|
   | `input` | ProvisionSpatialRelationInput (required) |
 
+### `useSignInCrossOriginMutation`
+
+signInCrossOrigin
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInCrossOriginInput (required) |
+
 ### `useBootstrapUserMutation`
 
 bootstrapUser
@@ -4496,6 +4577,28 @@ bootstrapUser
   | Argument | Type |
   |----------|------|
   | `input` | BootstrapUserInput (required) |
+
+### `useSignUpMutation`
+
+signUp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignUpInput (required) |
+
+### `useSignInMutation`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInInput (required) |
 
 ### `useSetFieldOrderMutation`
 
@@ -4640,17 +4743,6 @@ applyRls
   |----------|------|
   | `input` | ApplyRlsInput (required) |
 
-### `useSignInCrossOriginMutation`
-
-signInCrossOrigin
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SignInCrossOriginInput (required) |
-
 ### `useCreateUserDatabaseMutation`
 
 Creates a new user database with all required modules, permissions, and RLS policies.
@@ -4700,6 +4792,28 @@ createApiKey
   |----------|------|
   | `input` | CreateApiKeyInput (required) |
 
+### `useRequestCrossOriginTokenMutation`
+
+requestCrossOriginToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestCrossOriginTokenInput (required) |
+
+### `useProvisionTableMutation`
+
+Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionTableInput (required) |
+
 ### `useSendVerificationEmailMutation`
 
 sendVerificationEmail
@@ -4721,50 +4835,6 @@ forgotPassword
   | Argument | Type |
   |----------|------|
   | `input` | ForgotPasswordInput (required) |
-
-### `useSignUpMutation`
-
-signUp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SignUpInput (required) |
-
-### `useRequestCrossOriginTokenMutation`
-
-requestCrossOriginToken
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RequestCrossOriginTokenInput (required) |
-
-### `useSignInMutation`
-
-signIn
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SignInInput (required) |
-
-### `useProvisionTableMutation`
-
-Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionTableInput (required) |
 
 ### `useProvisionBucketMutation`
 

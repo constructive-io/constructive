@@ -29,9 +29,9 @@ csdk auth set-token <your-token>
 | `org-get-managers-record` | orgGetManagersRecord CRUD operations |
 | `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
 | `get-all-record` | getAllRecord CRUD operations |
+| `object` | object CRUD operations |
 | `app-permission` | appPermission CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
-| `object` | object CRUD operations |
 | `database` | database CRUD operations |
 | `schema` | schema CRUD operations |
 | `table` | table CRUD operations |
@@ -56,6 +56,7 @@ csdk auth set-token <your-token>
 | `session-secrets-module` | sessionSecretsModule CRUD operations |
 | `identity-providers-module` | identityProvidersModule CRUD operations |
 | `realtime-module` | realtimeModule CRUD operations |
+| `config-secrets-org-module` | configSecretsOrgModule CRUD operations |
 | `schema-grant` | schemaGrant CRUD operations |
 | `default-privilege` | defaultPrivilege CRUD operations |
 | `enum` | enum CRUD operations |
@@ -80,7 +81,7 @@ csdk auth set-token <your-token>
 | `default-ids-module` | defaultIdsModule CRUD operations |
 | `denormalized-table-field` | denormalizedTableField CRUD operations |
 | `emails-module` | emailsModule CRUD operations |
-| `encrypted-secrets-module` | encryptedSecretsModule CRUD operations |
+| `config-secrets-user-module` | configSecretsUserModule CRUD operations |
 | `invites-module` | invitesModule CRUD operations |
 | `events-module` | eventsModule CRUD operations |
 | `limits-module` | limitsModule CRUD operations |
@@ -134,44 +135,45 @@ csdk auth set-token <your-token>
 | `agent-thread` | agentThread CRUD operations |
 | `agent-message` | agentMessage CRUD operations |
 | `agent-task` | agentTask CRUD operations |
-| `role-type` | roleType CRUD operations |
 | `identity-provider` | identityProvider CRUD operations |
 | `ref` | ref CRUD operations |
 | `store` | store CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
-| `app-limit-credit-code` | appLimitCreditCode CRUD operations |
+| `role-type` | roleType CRUD operations |
+| `migrate-file` | migrateFile CRUD operations |
 | `app-limit-caps-default` | appLimitCapsDefault CRUD operations |
 | `org-limit-caps-default` | orgLimitCapsDefault CRUD operations |
-| `app-limit-cap` | appLimitCap CRUD operations |
-| `org-limit-cap` | orgLimitCap CRUD operations |
-| `membership-type` | membershipType CRUD operations |
-| `migrate-file` | migrateFile CRUD operations |
 | `devices-module` | devicesModule CRUD operations |
+| `app-membership-default` | appMembershipDefault CRUD operations |
+| `org-membership-default` | orgMembershipDefault CRUD operations |
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
+| `app-limit-cap` | appLimitCap CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
+| `org-limit-cap` | orgLimitCap CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
-| `app-limit-warning` | appLimitWarning CRUD operations |
 | `user-connected-account` | userConnectedAccount CRUD operations |
+| `app-limit-credit-code` | appLimitCreditCode CRUD operations |
+| `app-limit-warning` | appLimitWarning CRUD operations |
 | `commit` | commit CRUD operations |
 | `pubkey-setting` | pubkeySetting CRUD operations |
 | `rate-limits-module` | rateLimitsModule CRUD operations |
 | `usage-snapshot` | usageSnapshot CRUD operations |
-| `app-membership-default` | appMembershipDefault CRUD operations |
-| `org-membership-default` | orgMembershipDefault CRUD operations |
+| `membership-type` | membershipType CRUD operations |
 | `rls-setting` | rlsSetting CRUD operations |
-| `app-limit-event` | appLimitEvent CRUD operations |
-| `org-limit-event` | orgLimitEvent CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
+| `inference-log-module` | inferenceLogModule CRUD operations |
 | `rate-limit-meters-module` | rateLimitMetersModule CRUD operations |
 | `plans-module` | plansModule CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
+| `app-limit-event` | appLimitEvent CRUD operations |
+| `org-limit-event` | orgLimitEvent CRUD operations |
 | `database-setting` | databaseSetting CRUD operations |
-| `billing-module` | billingModule CRUD operations |
-| `ast-migration` | astMigration CRUD operations |
-| `user` | user CRUD operations |
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
-| `webauthn-setting` | webauthnSetting CRUD operations |
+| `billing-module` | billingModule CRUD operations |
 | `app-membership` | appMembership CRUD operations |
+| `user` | user CRUD operations |
+| `ast-migration` | astMigration CRUD operations |
+| `webauthn-setting` | webauthnSetting CRUD operations |
 | `billing-provider-module` | billingProviderModule CRUD operations |
 | `hierarchy-module` | hierarchyModule CRUD operations |
 | `current-user-id` | currentUserId |
@@ -188,11 +190,11 @@ csdk auth set-token <your-token>
 | `resolve-blueprint-table` | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
 | `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
-| `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
-| `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `get-all-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-path-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-object-at-path` | getObjectAtPath |
+| `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
+| `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `current-user` | currentUser |
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `sign-out` | signOut |
@@ -218,7 +220,10 @@ csdk auth set-token <your-token>
 | `remove-node-at-path` | removeNodeAtPath |
 | `copy-template-to-blueprint` | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
 | `provision-spatial-relation` | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
+| `sign-in-cross-origin` | signInCrossOrigin |
 | `bootstrap-user` | bootstrapUser |
+| `sign-up` | signUp |
+| `sign-in` | signIn |
 | `set-field-order` | setFieldOrder |
 | `provision-check-constraint` | Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists. |
 | `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
@@ -232,7 +237,6 @@ csdk auth set-token <your-token>
 | `set-and-commit` | setAndCommit |
 | `provision-relation` | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
 | `apply-rls` | applyRls |
-| `sign-in-cross-origin` | signInCrossOrigin |
 | `create-user-database` | Creates a new user database with all required modules, permissions, and RLS policies.
 
 Parameters:
@@ -252,12 +256,10 @@ Example usage:
  |
 | `extend-token-expires` | extendTokenExpires |
 | `create-api-key` | createApiKey |
+| `request-cross-origin-token` | requestCrossOriginToken |
+| `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `send-verification-email` | sendVerificationEmail |
 | `forgot-password` | forgotPassword |
-| `sign-up` | signUp |
-| `request-cross-origin-token` | requestCrossOriginToken |
-| `sign-in` | signIn |
-| `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -370,6 +372,35 @@ CRUD operations for GetAllRecord records.
 
 **Required create fields:** `path`, `data`
 
+### `object`
+
+CRUD operations for Object records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all object records |
+| `find-first` | Find first matching object record |
+| `get` | Get a object by id |
+| `create` | Create a new object |
+| `update` | Update an existing object |
+| `delete` | Delete a object |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `hashUuid` | UUID |
+| `id` | UUID |
+| `scopeId` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+| `data` | JSON |
+| `frzn` | Boolean |
+| `createdAt` | Datetime |
+
+**Required create fields:** `scopeId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
+
 ### `app-permission`
 
 CRUD operations for AppPermission records.
@@ -419,35 +450,6 @@ CRUD operations for OrgPermission records.
 | `description` | String |
 
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
-
-### `object`
-
-CRUD operations for Object records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all object records |
-| `find-first` | Find first matching object record |
-| `get` | Get a object by id |
-| `create` | Create a new object |
-| `update` | Update an existing object |
-| `delete` | Delete a object |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `hashUuid` | UUID |
-| `id` | UUID |
-| `databaseId` | UUID |
-| `kids` | UUID |
-| `ktree` | String |
-| `data` | JSON |
-| `frzn` | Boolean |
-| `createdAt` | Datetime |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
 
 ### `database`
 
@@ -1275,6 +1277,32 @@ CRUD operations for RealtimeModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `subscriptionsSchemaId`, `changeLogTableId`, `listenerNodeTableId`, `sourceRegistryTableId`, `retentionHours`, `premake`, `interval`, `notifyChannel`
 
+### `config-secrets-org-module`
+
+CRUD operations for ConfigSecretsOrgModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all configSecretsOrgModule records |
+| `find-first` | Find first matching configSecretsOrgModule record |
+| `get` | Get a configSecretsOrgModule by id |
+| `create` | Create a new configSecretsOrgModule |
+| `update` | Update an existing configSecretsOrgModule |
+| `delete` | Delete a configSecretsOrgModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `tableId` | UUID |
+| `tableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
+
 ### `schema-grant`
 
 CRUD operations for SchemaGrant records.
@@ -1650,13 +1678,14 @@ CRUD operations for Partition records.
 | `partitionKeyId` | UUID |
 | `interval` | String |
 | `retention` | String |
+| `retentionKeepTable` | Boolean |
 | `premake` | Int |
 | `namingPattern` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `tableId`, `strategy`, `partitionKeyId`
-**Optional create fields (backend defaults):** `interval`, `retention`, `premake`, `namingPattern`
+**Optional create fields (backend defaults):** `interval`, `retention`, `retentionKeepTable`, `premake`, `namingPattern`
 
 ### `api`
 
@@ -1957,18 +1986,18 @@ CRUD operations for EmailsModule records.
 **Required create fields:** `databaseId`, `tableName`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`
 
-### `encrypted-secrets-module`
+### `config-secrets-user-module`
 
-CRUD operations for EncryptedSecretsModule records.
+CRUD operations for ConfigSecretsUserModule records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all encryptedSecretsModule records |
-| `find-first` | Find first matching encryptedSecretsModule record |
-| `get` | Get a encryptedSecretsModule by id |
-| `create` | Create a new encryptedSecretsModule |
-| `update` | Update an existing encryptedSecretsModule |
-| `delete` | Delete a encryptedSecretsModule |
+| `list` | List all configSecretsUserModule records |
+| `find-first` | Find first matching configSecretsUserModule record |
+| `get` | Get a configSecretsUserModule by id |
+| `create` | Create a new configSecretsUserModule |
+| `update` | Update an existing configSecretsUserModule |
+| `delete` | Delete a configSecretsUserModule |
 
 **Fields:**
 
@@ -2584,6 +2613,7 @@ CRUD operations for StorageModule records.
 | `bucketsTableName` | String |
 | `filesTableName` | String |
 | `membershipType` | Int |
+| `storageKey` | String |
 | `policies` | JSON |
 | `skipDefaultPolicyTables` | String |
 | `entityTableId` | UUID |
@@ -2610,7 +2640,7 @@ CRUD operations for StorageModule records.
 | `fileEventsTableId` | UUID |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `bucketsTableName`, `filesTableName`, `membershipType`, `policies`, `skipDefaultPolicyTables`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `restrictReads`, `hasPathShares`, `pathSharesTableId`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`, `maxBulkFiles`, `maxBulkTotalSize`, `hasVersioning`, `hasContentHash`, `hasCustomKeys`, `hasAuditLog`, `hasConfirmUpload`, `confirmUploadDelay`, `fileEventsTableId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `bucketsTableName`, `filesTableName`, `membershipType`, `storageKey`, `policies`, `skipDefaultPolicyTables`, `entityTableId`, `endpoint`, `publicUrlPrefix`, `provider`, `allowedOrigins`, `restrictReads`, `hasPathShares`, `pathSharesTableId`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`, `maxBulkFiles`, `maxBulkTotalSize`, `hasVersioning`, `hasContentHash`, `hasCustomKeys`, `hasAuditLog`, `hasConfirmUpload`, `confirmUploadDelay`, `fileEventsTableId`
 
 ### `entity-type-provision`
 
@@ -3739,28 +3769,6 @@ CRUD operations for AgentTask records.
 **Required create fields:** `threadId`, `entityId`, `description`
 **Optional create fields (backend defaults):** `source`, `error`, `ownerId`, `status`
 
-### `role-type`
-
-CRUD operations for RoleType records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all roleType records |
-| `find-first` | Find first matching roleType record |
-| `get` | Get a roleType by id |
-| `create` | Create a new roleType |
-| `update` | Update an existing roleType |
-| `delete` | Delete a roleType |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-
-**Required create fields:** `name`
-
 ### `identity-provider`
 
 CRUD operations for IdentityProvider records.
@@ -3805,11 +3813,11 @@ CRUD operations for Ref records.
 |-------|------|
 | `id` | UUID |
 | `name` | String |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `storeId` | UUID |
 | `commitId` | UUID |
 
-**Required create fields:** `name`, `databaseId`, `storeId`
+**Required create fields:** `name`, `scopeId`, `storeId`
 **Optional create fields (backend defaults):** `commitId`
 
 ### `store`
@@ -3831,11 +3839,11 @@ CRUD operations for Store records.
 |-------|------|
 | `id` | UUID |
 | `name` | String |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `hash` | UUID |
 | `createdAt` | Datetime |
 
-**Required create fields:** `name`, `databaseId`
+**Required create fields:** `name`, `scopeId`
 **Optional create fields (backend defaults):** `hash`
 
 ### `app-permission-default`
@@ -3860,31 +3868,50 @@ CRUD operations for AppPermissionDefault records.
 
 **Optional create fields (backend defaults):** `permissions`
 
-### `app-limit-credit-code`
+### `role-type`
 
-CRUD operations for AppLimitCreditCode records.
+CRUD operations for RoleType records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all appLimitCreditCode records |
-| `find-first` | Find first matching appLimitCreditCode record |
-| `get` | Get a appLimitCreditCode by id |
-| `create` | Create a new appLimitCreditCode |
-| `update` | Update an existing appLimitCreditCode |
-| `delete` | Delete a appLimitCreditCode |
+| `list` | List all roleType records |
+| `find-first` | Find first matching roleType record |
+| `get` | Get a roleType by id |
+| `create` | Create a new roleType |
+| `update` | Update an existing roleType |
+| `delete` | Delete a roleType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | Int |
+| `name` | String |
+
+**Required create fields:** `name`
+
+### `migrate-file`
+
+CRUD operations for MigrateFile records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all migrateFile records |
+| `find-first` | Find first matching migrateFile record |
+| `get` | Get a migrateFile by id |
+| `create` | Create a new migrateFile |
+| `update` | Update an existing migrateFile |
+| `delete` | Delete a migrateFile |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `code` | String |
-| `maxRedemptions` | Int |
-| `currentRedemptions` | Int |
-| `expiresAt` | Datetime |
+| `databaseId` | UUID |
+| `upload` | Upload |
 
-**Required create fields:** `code`
-**Optional create fields (backend defaults):** `maxRedemptions`, `currentRedemptions`, `expiresAt`
+**Optional create fields (backend defaults):** `databaseId`, `upload`
 
 ### `app-limit-caps-default`
 
@@ -3934,106 +3961,6 @@ CRUD operations for OrgLimitCapsDefault records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`
 
-### `app-limit-cap`
-
-CRUD operations for AppLimitCap records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLimitCap records |
-| `find-first` | Find first matching appLimitCap record |
-| `get` | Get a appLimitCap by id |
-| `create` | Create a new appLimitCap |
-| `update` | Update an existing appLimitCap |
-| `delete` | Delete a appLimitCap |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `entityId` | UUID |
-| `max` | BigInt |
-
-**Required create fields:** `name`, `entityId`
-**Optional create fields (backend defaults):** `max`
-
-### `org-limit-cap`
-
-CRUD operations for OrgLimitCap records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgLimitCap records |
-| `find-first` | Find first matching orgLimitCap record |
-| `get` | Get a orgLimitCap by id |
-| `create` | Create a new orgLimitCap |
-| `update` | Update an existing orgLimitCap |
-| `delete` | Delete a orgLimitCap |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `entityId` | UUID |
-| `max` | BigInt |
-
-**Required create fields:** `name`, `entityId`
-**Optional create fields (backend defaults):** `max`
-
-### `membership-type`
-
-CRUD operations for MembershipType records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all membershipType records |
-| `find-first` | Find first matching membershipType record |
-| `get` | Get a membershipType by id |
-| `create` | Create a new membershipType |
-| `update` | Update an existing membershipType |
-| `delete` | Delete a membershipType |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-| `description` | String |
-| `prefix` | String |
-| `parentMembershipType` | Int |
-| `hasUsersTableEntry` | Boolean |
-
-**Required create fields:** `name`, `description`, `prefix`
-**Optional create fields (backend defaults):** `parentMembershipType`, `hasUsersTableEntry`
-
-### `migrate-file`
-
-CRUD operations for MigrateFile records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all migrateFile records |
-| `find-first` | Find first matching migrateFile record |
-| `get` | Get a migrateFile by id |
-| `create` | Create a new migrateFile |
-| `update` | Update an existing migrateFile |
-| `delete` | Delete a migrateFile |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `upload` | Upload |
-
-**Optional create fields (backend defaults):** `databaseId`, `upload`
-
 ### `devices-module`
 
 CRUD operations for DevicesModule records.
@@ -4061,6 +3988,61 @@ CRUD operations for DevicesModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `userDevicesTableId`, `deviceSettingsTableId`, `userDevicesTable`, `deviceSettingsTable`
+
+### `app-membership-default`
+
+CRUD operations for AppMembershipDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appMembershipDefault records |
+| `find-first` | Find first matching appMembershipDefault record |
+| `get` | Get a appMembershipDefault by id |
+| `create` | Create a new appMembershipDefault |
+| `update` | Update an existing appMembershipDefault |
+| `delete` | Delete a appMembershipDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `isVerified` | Boolean |
+
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
+
+### `org-membership-default`
+
+CRUD operations for OrgMembershipDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgMembershipDefault records |
+| `find-first` | Find first matching orgMembershipDefault record |
+| `get` | Get a orgMembershipDefault by id |
+| `create` | Create a new orgMembershipDefault |
+| `update` | Update an existing orgMembershipDefault |
+| `delete` | Delete a orgMembershipDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `entityId` | UUID |
+
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`
 
 ### `node-type-registry`
 
@@ -4090,6 +4072,31 @@ CRUD operations for NodeTypeRegistry records.
 **Required create fields:** `slug`, `category`
 **Optional create fields (backend defaults):** `displayName`, `description`, `parameterSchema`, `tags`
 
+### `app-limit-cap`
+
+CRUD operations for AppLimitCap records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCap records |
+| `find-first` | Find first matching appLimitCap record |
+| `get` | Get a appLimitCap by id |
+| `create` | Create a new appLimitCap |
+| `update` | Update an existing appLimitCap |
+| `delete` | Delete a appLimitCap |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `entityId` | UUID |
+| `max` | BigInt |
+
+**Required create fields:** `name`, `entityId`
+**Optional create fields (backend defaults):** `max`
+
 ### `app-limit-default`
 
 CRUD operations for AppLimitDefault records.
@@ -4115,6 +4122,31 @@ CRUD operations for AppLimitDefault records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`, `softMax`
 
+### `org-limit-cap`
+
+CRUD operations for OrgLimitCap records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitCap records |
+| `find-first` | Find first matching orgLimitCap record |
+| `get` | Get a orgLimitCap by id |
+| `create` | Create a new orgLimitCap |
+| `update` | Update an existing orgLimitCap |
+| `delete` | Delete a orgLimitCap |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `entityId` | UUID |
+| `max` | BigInt |
+
+**Required create fields:** `name`, `entityId`
+**Optional create fields (backend defaults):** `max`
+
 ### `org-limit-default`
 
 CRUD operations for OrgLimitDefault records.
@@ -4139,31 +4171,6 @@ CRUD operations for OrgLimitDefault records.
 
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`, `softMax`
-
-### `app-limit-warning`
-
-CRUD operations for AppLimitWarning records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLimitWarning records |
-| `find-first` | Find first matching appLimitWarning record |
-| `get` | Get a appLimitWarning by id |
-| `create` | Create a new appLimitWarning |
-| `update` | Update an existing appLimitWarning |
-| `delete` | Delete a appLimitWarning |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `warningType` | String |
-| `thresholdValue` | BigInt |
-| `taskIdentifier` | String |
-
-**Required create fields:** `name`, `warningType`, `thresholdValue`, `taskIdentifier`
 
 ### `user-connected-account`
 
@@ -4193,6 +4200,57 @@ CRUD operations for UserConnectedAccount records.
 
 **Optional create fields (backend defaults):** `ownerId`, `service`, `identifier`, `details`, `isVerified`
 
+### `app-limit-credit-code`
+
+CRUD operations for AppLimitCreditCode records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitCreditCode records |
+| `find-first` | Find first matching appLimitCreditCode record |
+| `get` | Get a appLimitCreditCode by id |
+| `create` | Create a new appLimitCreditCode |
+| `update` | Update an existing appLimitCreditCode |
+| `delete` | Delete a appLimitCreditCode |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `code` | String |
+| `maxRedemptions` | Int |
+| `currentRedemptions` | Int |
+| `expiresAt` | Datetime |
+
+**Required create fields:** `code`
+**Optional create fields (backend defaults):** `maxRedemptions`, `currentRedemptions`, `expiresAt`
+
+### `app-limit-warning`
+
+CRUD operations for AppLimitWarning records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitWarning records |
+| `find-first` | Find first matching appLimitWarning record |
+| `get` | Get a appLimitWarning by id |
+| `create` | Create a new appLimitWarning |
+| `update` | Update an existing appLimitWarning |
+| `delete` | Delete a appLimitWarning |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `warningType` | String |
+| `thresholdValue` | BigInt |
+| `taskIdentifier` | String |
+
+**Required create fields:** `name`, `warningType`, `thresholdValue`, `taskIdentifier`
+
 ### `commit`
 
 CRUD operations for Commit records.
@@ -4212,7 +4270,7 @@ CRUD operations for Commit records.
 |-------|------|
 | `id` | UUID |
 | `message` | String |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `storeId` | UUID |
 | `parentIds` | UUID |
 | `authorId` | UUID |
@@ -4220,7 +4278,7 @@ CRUD operations for Commit records.
 | `treeId` | UUID |
 | `date` | Datetime |
 
-**Required create fields:** `databaseId`, `storeId`
+**Required create fields:** `scopeId`, `storeId`
 **Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ### `pubkey-setting`
@@ -4310,60 +4368,32 @@ CRUD operations for UsageSnapshot records.
 **Required create fields:** `databaseId`, `metricName`
 **Optional create fields (backend defaults):** `metricValue`, `dimensions`, `capturedAt`
 
-### `app-membership-default`
+### `membership-type`
 
-CRUD operations for AppMembershipDefault records.
+CRUD operations for MembershipType records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all appMembershipDefault records |
-| `find-first` | Find first matching appMembershipDefault record |
-| `get` | Get a appMembershipDefault by id |
-| `create` | Create a new appMembershipDefault |
-| `update` | Update an existing appMembershipDefault |
-| `delete` | Delete a appMembershipDefault |
+| `list` | List all membershipType records |
+| `find-first` | Find first matching membershipType record |
+| `get` | Get a membershipType by id |
+| `create` | Create a new membershipType |
+| `update` | Update an existing membershipType |
+| `delete` | Delete a membershipType |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `isVerified` | Boolean |
+| `id` | Int |
+| `name` | String |
+| `description` | String |
+| `prefix` | String |
+| `parentMembershipType` | Int |
+| `hasUsersTableEntry` | Boolean |
 
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
-
-### `org-membership-default`
-
-CRUD operations for OrgMembershipDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgMembershipDefault records |
-| `find-first` | Find first matching orgMembershipDefault record |
-| `get` | Get a orgMembershipDefault by id |
-| `create` | Create a new orgMembershipDefault |
-| `update` | Update an existing orgMembershipDefault |
-| `delete` | Delete a orgMembershipDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `entityId` | UUID |
-
-**Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`
+**Required create fields:** `name`, `description`, `prefix`
+**Optional create fields (backend defaults):** `parentMembershipType`, `hasUsersTableEntry`
 
 ### `rls-setting`
 
@@ -4396,64 +4426,6 @@ CRUD operations for RlsSetting records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `authenticateSchemaId`, `roleSchemaId`, `authenticateFunctionId`, `authenticateStrictFunctionId`, `currentRoleFunctionId`, `currentRoleIdFunctionId`, `currentUserAgentFunctionId`, `currentIpAddressFunctionId`
 
-### `app-limit-event`
-
-CRUD operations for AppLimitEvent records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLimitEvent records |
-| `find-first` | Find first matching appLimitEvent record |
-| `get` | Get a appLimitEvent by id |
-| `create` | Create a new appLimitEvent |
-| `update` | Update an existing appLimitEvent |
-| `delete` | Delete a appLimitEvent |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `name` | String |
-| `actorId` | UUID |
-| `entityId` | UUID |
-| `eventType` | String |
-| `delta` | BigInt |
-| `numBefore` | BigInt |
-| `numAfter` | BigInt |
-| `maxAtEvent` | BigInt |
-| `reason` | String |
-
-**Optional create fields (backend defaults):** `name`, `actorId`, `entityId`, `eventType`, `delta`, `numBefore`, `numAfter`, `maxAtEvent`, `reason`
-
-### `org-limit-event`
-
-CRUD operations for OrgLimitEvent records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgLimitEvent records |
-| `find-first` | Find first matching orgLimitEvent record |
-| `get` | Get a orgLimitEvent by id |
-| `create` | Create a new orgLimitEvent |
-| `update` | Update an existing orgLimitEvent |
-| `delete` | Delete a orgLimitEvent |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `name` | String |
-| `actorId` | UUID |
-| `entityId` | UUID |
-| `eventType` | String |
-| `delta` | BigInt |
-| `numBefore` | BigInt |
-| `numAfter` | BigInt |
-| `maxAtEvent` | BigInt |
-| `reason` | String |
-
-**Optional create fields (backend defaults):** `name`, `actorId`, `entityId`, `eventType`, `delta`, `numBefore`, `numAfter`, `maxAtEvent`, `reason`
-
 ### `rls-module`
 
 CRUD operations for RlsModule records.
@@ -4485,6 +4457,39 @@ CRUD operations for RlsModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
+
+### `inference-log-module`
+
+CRUD operations for InferenceLogModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all inferenceLogModule records |
+| `find-first` | Find first matching inferenceLogModule record |
+| `get` | Get a inferenceLogModule by id |
+| `create` | Create a new inferenceLogModule |
+| `update` | Update an existing inferenceLogModule |
+| `delete` | Delete a inferenceLogModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `inferenceLogTableId` | UUID |
+| `inferenceLogTableName` | String |
+| `usageDailyTableId` | UUID |
+| `usageDailyTableName` | String |
+| `interval` | String |
+| `retention` | String |
+| `premake` | Int |
+| `prefix` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `inferenceLogTableId`, `inferenceLogTableName`, `usageDailyTableId`, `usageDailyTableName`, `interval`, `retention`, `premake`, `prefix`
 
 ### `rate-limit-meters-module`
 
@@ -4586,6 +4591,68 @@ CRUD operations for SqlAction records.
 
 **Optional create fields (backend defaults):** `name`, `databaseId`, `deploy`, `deps`, `payload`, `content`, `revert`, `verify`, `action`, `actionId`, `actorId`
 
+### `app-limit-event`
+
+CRUD operations for AppLimitEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitEvent records |
+| `find-first` | Find first matching appLimitEvent record |
+| `get` | Get a appLimitEvent by id |
+| `create` | Create a new appLimitEvent |
+| `update` | Update an existing appLimitEvent |
+| `delete` | Delete a appLimitEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `name` | String |
+| `actorId` | UUID |
+| `entityId` | UUID |
+| `eventType` | String |
+| `delta` | BigInt |
+| `numBefore` | BigInt |
+| `numAfter` | BigInt |
+| `maxAtEvent` | BigInt |
+| `reason` | String |
+
+**Optional create fields (backend defaults):** `name`, `actorId`, `entityId`, `eventType`, `delta`, `numBefore`, `numAfter`, `maxAtEvent`, `reason`
+
+### `org-limit-event`
+
+CRUD operations for OrgLimitEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitEvent records |
+| `find-first` | Find first matching orgLimitEvent record |
+| `get` | Get a orgLimitEvent by id |
+| `create` | Create a new orgLimitEvent |
+| `update` | Update an existing orgLimitEvent |
+| `delete` | Delete a orgLimitEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `name` | String |
+| `actorId` | UUID |
+| `entityId` | UUID |
+| `eventType` | String |
+| `delta` | BigInt |
+| `numBefore` | BigInt |
+| `numAfter` | BigInt |
+| `maxAtEvent` | BigInt |
+| `reason` | String |
+
+**Optional create fields (backend defaults):** `name`, `actorId`, `entityId`, `eventType`, `delta`, `numBefore`, `numAfter`, `maxAtEvent`, `reason`
+
 ### `database-setting`
 
 CRUD operations for DatabaseSetting records.
@@ -4621,6 +4688,41 @@ CRUD operations for DatabaseSetting records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `options`
 
+### `org-membership-setting`
+
+CRUD operations for OrgMembershipSetting records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgMembershipSetting records |
+| `find-first` | Find first matching orgMembershipSetting record |
+| `get` | Get a orgMembershipSetting by id |
+| `create` | Create a new orgMembershipSetting |
+| `update` | Update an existing orgMembershipSetting |
+| `delete` | Delete a orgMembershipSetting |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `entityId` | UUID |
+| `deleteMemberCascadeChildren` | Boolean |
+| `createChildCascadeOwners` | Boolean |
+| `createChildCascadeAdmins` | Boolean |
+| `createChildCascadeMembers` | Boolean |
+| `allowExternalMembers` | Boolean |
+| `inviteProfileAssignmentMode` | String |
+| `populateMemberEmail` | Boolean |
+| `limitAllocationMode` | String |
+
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `deleteMemberCascadeChildren`, `createChildCascadeOwners`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `allowExternalMembers`, `inviteProfileAssignmentMode`, `populateMemberEmail`, `limitAllocationMode`
+
 ### `billing-module`
 
 CRUD operations for BillingModule records.
@@ -4650,44 +4752,50 @@ CRUD operations for BillingModule records.
 | `ledgerTableName` | String |
 | `balancesTableId` | UUID |
 | `balancesTableName` | String |
+| `meterCreditsTableId` | UUID |
+| `meterCreditsTableName` | String |
 | `recordUsageFunction` | String |
 | `prefix` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `metersTableId`, `metersTableName`, `planSubscriptionsTableId`, `planSubscriptionsTableName`, `ledgerTableId`, `ledgerTableName`, `balancesTableId`, `balancesTableName`, `recordUsageFunction`, `prefix`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `metersTableId`, `metersTableName`, `planSubscriptionsTableId`, `planSubscriptionsTableName`, `ledgerTableId`, `ledgerTableName`, `balancesTableId`, `balancesTableName`, `meterCreditsTableId`, `meterCreditsTableName`, `recordUsageFunction`, `prefix`
 
-### `ast-migration`
+### `app-membership`
 
-CRUD operations for AstMigration records.
+CRUD operations for AppMembership records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all astMigration records |
-| `find-first` | Find first matching astMigration record |
-| `get` | Get a astMigration by id |
-| `create` | Create a new astMigration |
-| `update` | Update an existing astMigration |
-| `delete` | Delete a astMigration |
+| `list` | List all appMembership records |
+| `find-first` | Find first matching appMembership record |
+| `get` | Get a appMembership by id |
+| `create` | Create a new appMembership |
+| `update` | Update an existing appMembership |
+| `delete` | Delete a appMembership |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | Int |
-| `databaseId` | UUID |
-| `name` | String |
-| `requires` | String |
-| `payload` | JSON |
-| `deploys` | String |
-| `deploy` | JSON |
-| `revert` | JSON |
-| `verify` | JSON |
+| `id` | UUID |
 | `createdAt` | Datetime |
-| `action` | String |
-| `actionId` | UUID |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `isBanned` | Boolean |
+| `isDisabled` | Boolean |
+| `isVerified` | Boolean |
+| `isActive` | Boolean |
+| `isOwner` | Boolean |
+| `isAdmin` | Boolean |
+| `permissions` | BitString |
+| `granted` | BitString |
 | `actorId` | UUID |
+| `profileId` | UUID |
 
-**Optional create fields (backend defaults):** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `user`
 
@@ -4747,40 +4855,38 @@ csdk user search "query" --limit 10 --select id,title,searchScore
 ```
 
 
-### `org-membership-setting`
+### `ast-migration`
 
-CRUD operations for OrgMembershipSetting records.
+CRUD operations for AstMigration records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all orgMembershipSetting records |
-| `find-first` | Find first matching orgMembershipSetting record |
-| `get` | Get a orgMembershipSetting by id |
-| `create` | Create a new orgMembershipSetting |
-| `update` | Update an existing orgMembershipSetting |
-| `delete` | Delete a orgMembershipSetting |
+| `list` | List all astMigration records |
+| `find-first` | Find first matching astMigration record |
+| `get` | Get a astMigration by id |
+| `create` | Create a new astMigration |
+| `update` | Update an existing astMigration |
+| `delete` | Delete a astMigration |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
+| `id` | Int |
+| `databaseId` | UUID |
+| `name` | String |
+| `requires` | String |
+| `payload` | JSON |
+| `deploys` | String |
+| `deploy` | JSON |
+| `revert` | JSON |
+| `verify` | JSON |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `entityId` | UUID |
-| `deleteMemberCascadeChildren` | Boolean |
-| `createChildCascadeOwners` | Boolean |
-| `createChildCascadeAdmins` | Boolean |
-| `createChildCascadeMembers` | Boolean |
-| `allowExternalMembers` | Boolean |
-| `inviteProfileAssignmentMode` | String |
-| `populateMemberEmail` | Boolean |
-| `limitAllocationMode` | String |
+| `action` | String |
+| `actionId` | UUID |
+| `actorId` | UUID |
 
-**Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `deleteMemberCascadeChildren`, `createChildCascadeOwners`, `createChildCascadeAdmins`, `createChildCascadeMembers`, `allowExternalMembers`, `inviteProfileAssignmentMode`, `populateMemberEmail`, `limitAllocationMode`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
 
 ### `webauthn-setting`
 
@@ -4820,43 +4926,6 @@ CRUD operations for WebauthnSetting records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `credentialsSchemaId`, `sessionsSchemaId`, `sessionSecretsSchemaId`, `credentialsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `sessionSecretsTableId`, `userFieldId`, `rpId`, `rpName`, `originAllowlist`, `attestationType`, `requireUserVerification`, `residentKey`, `challengeExpirySeconds`
-
-### `app-membership`
-
-CRUD operations for AppMembership records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appMembership records |
-| `find-first` | Find first matching appMembership record |
-| `get` | Get a appMembership by id |
-| `create` | Create a new appMembership |
-| `update` | Update an existing appMembership |
-| `delete` | Delete a appMembership |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `isBanned` | Boolean |
-| `isDisabled` | Boolean |
-| `isVerified` | Boolean |
-| `isActive` | Boolean |
-| `isOwner` | Boolean |
-| `isAdmin` | Boolean |
-| `permissions` | BitString |
-| `granted` | BitString |
-| `actorId` | UUID |
-| `profileId` | UUID |
-
-**Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `billing-provider-module`
 
@@ -5005,7 +5074,7 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `--dbId` | UUID |
+  | `--sId` | UUID |
   | `--storeId` | UUID |
   | `--refname` | String |
 
@@ -5095,6 +5164,51 @@ orgPermissionsGetMaskByNames
   |----------|------|
   | `--names` | String |
 
+### `get-all-objects-from-root`
+
+Reads and enables pagination through a set of `Object`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--sId` | UUID |
+  | `--id` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
+
+### `get-path-objects-from-root`
+
+Reads and enables pagination through a set of `Object`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--sId` | UUID |
+  | `--id` | UUID |
+  | `--path` | String |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
+
+### `get-object-at-path`
+
+getObjectAtPath
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--sId` | UUID |
+  | `--storeId` | UUID |
+  | `--path` | String |
+  | `--refname` | String |
+
 ### `app-permissions-get-by-mask`
 
 Reads and enables pagination through a set of `AppPermission`.
@@ -5122,51 +5236,6 @@ Reads and enables pagination through a set of `OrgPermission`.
   | `--first` | Int |
   | `--offset` | Int |
   | `--after` | Cursor |
-
-### `get-all-objects-from-root`
-
-Reads and enables pagination through a set of `Object`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--databaseId` | UUID |
-  | `--id` | UUID |
-  | `--first` | Int |
-  | `--offset` | Int |
-  | `--after` | Cursor |
-
-### `get-path-objects-from-root`
-
-Reads and enables pagination through a set of `Object`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--databaseId` | UUID |
-  | `--id` | UUID |
-  | `--path` | String |
-  | `--first` | Int |
-  | `--offset` | Int |
-  | `--after` | Cursor |
-
-### `get-object-at-path`
-
-getObjectAtPath
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--dbId` | UUID |
-  | `--storeId` | UUID |
-  | `--path` | String |
-  | `--refname` | String |
 
 ### `current-user`
 
@@ -5378,7 +5447,7 @@ freezeObjects
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.id` | UUID |
 
 ### `init-empty-repo`
@@ -5391,7 +5460,7 @@ initEmptyRepo
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
 
 ### `construct-blueprint`
@@ -5444,7 +5513,7 @@ removeNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
 
@@ -5483,6 +5552,19 @@ Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row dec
   | `--input.pOperator` | String |
   | `--input.pParamName` | String |
 
+### `sign-in-cross-origin`
+
+signInCrossOrigin
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
+  | `--input.credentialKind` | String |
+
 ### `bootstrap-user`
 
 bootstrapUser
@@ -5500,6 +5582,40 @@ bootstrapUser
   | `--input.username` | String |
   | `--input.displayName` | String |
   | `--input.returnApiKey` | Boolean |
+
+### `sign-up`
+
+signUp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
+  | `--input.deviceToken` | String |
+
+### `sign-in`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
+  | `--input.deviceToken` | String |
 
 ### `set-field-order`
 
@@ -5579,7 +5695,7 @@ setDataAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
   | `--input.data` | JSON |
@@ -5594,7 +5710,7 @@ setPropsAndCommit
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
   | `--input.refname` | String |
   | `--input.path` | String |
@@ -5626,7 +5742,7 @@ insertNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
   | `--input.data` | JSON |
@@ -5643,7 +5759,7 @@ updateNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.root` | UUID |
   | `--input.path` | String |
   | `--input.data` | JSON |
@@ -5660,7 +5776,7 @@ setAndCommit
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
+  | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
   | `--input.refname` | String |
   | `--input.path` | String |
@@ -5715,19 +5831,6 @@ applyRls
   | `--input.fieldIds` | UUID |
   | `--input.permissive` | Boolean |
   | `--input.name` | String |
-
-### `sign-in-cross-origin`
-
-signInCrossOrigin
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.token` | String |
-  | `--input.credentialKind` | String |
 
 ### `create-user-database`
 
@@ -5790,47 +5893,6 @@ createApiKey
   | `--input.mfaLevel` | String |
   | `--input.expiresIn` | IntervalInput |
 
-### `send-verification-email`
-
-sendVerificationEmail
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | Email |
-
-### `forgot-password`
-
-forgotPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | Email |
-
-### `sign-up`
-
-signUp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | String |
-  | `--input.password` | String |
-  | `--input.rememberMe` | Boolean |
-  | `--input.credentialKind` | String |
-  | `--input.csrfToken` | String |
-  | `--input.deviceToken` | String |
-
 ### `request-cross-origin-token`
 
 requestCrossOriginToken
@@ -5845,23 +5907,6 @@ requestCrossOriginToken
   | `--input.password` | String |
   | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
-
-### `sign-in`
-
-signIn
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | String |
-  | `--input.password` | String |
-  | `--input.rememberMe` | Boolean |
-  | `--input.credentialKind` | String |
-  | `--input.csrfToken` | String |
-  | `--input.deviceToken` | String |
 
 ### `provision-table`
 
@@ -5886,6 +5931,30 @@ Composable table provisioning: creates or finds a table, then creates fields (so
   | `--input.fullTextSearches` | JSON |
   | `--input.uniqueConstraints` | JSON |
   | `--input.description` | String |
+
+### `send-verification-email`
+
+sendVerificationEmail
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | Email |
+
+### `forgot-password`
+
+forgotPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | Email |
 
 ### `provision-bucket`
 

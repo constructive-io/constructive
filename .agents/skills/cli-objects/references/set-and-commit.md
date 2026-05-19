@@ -7,7 +7,7 @@ Execute the setAndCommit mutation
 ## Usage
 
 ```bash
-csdk set-and-commit --input.clientMutationId <String> --input.dbId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk set-and-commit --input.clientMutationId <String> --input.sId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk set-and-commit --input.clientMutationId <String> --input.dbId <UUID> --inpu
 ### Run setAndCommit
 
 ```bash
-csdk set-and-commit --input.clientMutationId <String> --input.dbId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk set-and-commit --input.clientMutationId <String> --input.sId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
 ```
