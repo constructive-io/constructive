@@ -788,13 +788,17 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintStorageConfig', [
       addJSDoc(
+        optionalProp('storage_key', t.tsStringKeyword()),
+        'Discriminator for multi-module storage. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{storage_key}_buckets. Max 16 chars, lowercase snake_case.'
+      ),
+      addJSDoc(
         optionalProp(
           'buckets',
           t.tsArrayType(
             t.tsTypeReference(t.identifier('BlueprintBucketSeed'))
           )
         ),
-        'Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. Only used for app-level storage (not entity-scoped).'
+        'Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning.'
       ),
       addJSDoc(
         optionalProp('upload_url_expiry_seconds', t.tsNumberKeyword()),
@@ -1024,10 +1028,7 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
         optionalProp('has_levels', t.tsBooleanKeyword()),
         'Whether to provision a levels module for this entity type. Defaults to false.'
       ),
-      addJSDoc(
-        optionalProp('has_storage', t.tsBooleanKeyword()),
-        'Whether to provision a storage module (buckets, files tables) for this entity type. Defaults to false.'
-      ),
+
       addJSDoc(
         optionalProp('has_invites', t.tsBooleanKeyword()),
         'Whether to provision entity-scoped invite tables ({prefix}_invites, {prefix}_claimed_invites) and a submit_{prefix}_invite_code() function. Defaults to false.'
@@ -1050,9 +1051,11 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp(
           'storage',
-          t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          )
         ),
-        'Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS).'
+        'Storage module configuration array. Each entry provisions a separate storage module with its own tables, RLS, and settings. When non-empty, has_storage is derived as true. Each entry may specify a storage_key for multi-module support (defaults to "default").'
       )
     ]),
     'An entity type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
@@ -1187,9 +1190,11 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp(
           'storage',
-          t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          )
         ),
-        'App-level storage configuration. Creates a storage_module (membership_type = NULL), seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). Use provisions for per-table policy overrides. For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead.'
+        'App-level storage configuration array. Each entry creates a storage_module (membership_type = NULL) with its own tables and settings. For entity-scoped storage, use entity_types[].storage instead.'
       ),
       addJSDoc(
         optionalProp(

@@ -1209,7 +1209,9 @@ export interface BlueprintBucketSeed {
 }
 /** Storage configuration for an entity type. Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions. */
 export interface BlueprintStorageConfig {
-  /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. Only used for app-level storage (not entity-scoped). */
+  /** Discriminator for multi-module storage. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{storage_key}_buckets. Max 16 chars, lowercase snake_case. */
+  storage_key?: string;
+  /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. */
   buckets?: BlueprintBucketSeed[];
   /** Override for presigned upload URL expiry time in seconds. */
   upload_url_expiry_seconds?: number;
@@ -1300,8 +1302,7 @@ export interface BlueprintEntityType {
   has_profiles?: boolean;
   /** Whether to provision a levels module for this entity type. Defaults to false. */
   has_levels?: boolean;
-  /** Whether to provision a storage module (buckets, files tables) for this entity type. Defaults to false. */
-  has_storage?: boolean;
+
   /** Whether to provision entity-scoped invite tables ({prefix}_invites, {prefix}_claimed_invites) and a submit_{prefix}_invite_code() function. Defaults to false. */
   has_invites?: boolean;
   /** Whether to auto-attach an EventTracker to the claimed_invites table for invite-based achievements. Requires has_invites=true AND has_levels=true. When true, records 'invite_claimed' events credited to the sender (inviter) on each claimed invite. Defaults to false. */
@@ -1310,8 +1311,8 @@ export interface BlueprintEntityType {
   skip_entity_policies?: boolean;
   /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
   table_provision?: BlueprintEntityTableProvision;
-  /** Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). */
-  storage?: BlueprintStorageConfig;
+  /** Storage configuration (array-only). A non-empty array enables storage provisioning. Each entry creates a separate storage module with its own tables ({prefix}_{storage_key}_buckets/files). Controls RLS policies, bucket seeding, and module-level settings. */
+  storage?: BlueprintStorageConfig[];
 }
 /**
  * ===========================================================================
@@ -1594,8 +1595,8 @@ export interface BlueprintDefinition {
   unique_constraints?: BlueprintUniqueConstraint[];
   /** Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security. */
   entity_types?: BlueprintEntityType[];
-  /** App-level storage configuration. Creates a storage_module (membership_type = NULL), seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). Use provisions for per-table policy overrides. For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead. */
-  storage?: BlueprintStorageConfig;
+  /** App-level storage configuration (array-only). Creates storage_module(s) (membership_type = NULL), seeds initial buckets, and overrides module-level settings. Each entry creates a separate storage module. For entity-scoped storage, use entity_types[].storage instead. */
+  storage?: BlueprintStorageConfig[];
   /** Achievement definitions. Each entry creates a level with requirements and optional rewards in the events_module. Requires events_module to be provisioned (e.g., via entity_types[].has_levels = true or modules includes events_module). */
   achievements?: BlueprintAchievement[];
 }
