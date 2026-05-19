@@ -1,3 +1,16 @@
+export interface AuthzGrantMeta {
+  privilege: string;
+  role: string;
+}
+
+export interface AuthzPolicyMeta {
+  policyType: string;
+  description: string;
+  grants: AuthzGrantMeta[];
+  permissive: boolean;
+  name?: string;
+}
+
 export interface TableMeta {
   name: string;
   schemaName: string;
@@ -10,6 +23,7 @@ export interface TableMeta {
   relations: RelationsMeta;
   inflection: InflectionMeta;
   query: QueryMeta;
+  authz?: AuthzPolicyMeta[];
 }
 
 export interface FieldMeta {
