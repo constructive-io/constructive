@@ -1461,6 +1461,9 @@ importers:
 
   graphql/server:
     dependencies:
+      '@agentic-kit/ollama':
+        specifier: ^1.0.3
+        version: 1.0.3(encoding@0.1.13)
       '@constructive-io/csrf':
         specifier: workspace:^
         version: link:../../packages/csrf/dist
@@ -1527,6 +1530,9 @@ importers:
       graphile-config:
         specifier: 1.0.0
         version: 1.0.0
+      graphile-llm:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-llm/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist

@@ -41,6 +41,7 @@
     "backend"
   ],
   "dependencies": {
+    "@agentic-kit/ollama": "^1.0.3",
     "@constructive-io/csrf": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
@@ -62,6 +63,7 @@
     "graphile-build": "5.0.0",
     "graphile-build-pg": "5.0.0",
     "graphile-cache": "workspace:^",
+    "graphile-llm": "workspace:^",
     "graphile-config": "1.0.0",
     "graphile-settings": "workspace:^",
     "graphile-utils": "5.0.0",

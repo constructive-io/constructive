@@ -38,6 +38,8 @@ import { createRequestLogger } from './middleware/observability/request-logger';
 import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
+import { createLlmApiRouter } from './middleware/llm-api';
+import { getAgentDiscovery } from 'graphile-llm';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
 const log = new Logger('server');
@@ -194,6 +196,10 @@ class Server {
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
     app.use('/graphql', csrfProtect); // Enforce CSRF on GraphQL mutations
+
+    // LLM Agent REST API — mounted before graphile so SSE streaming
+    // routes are handled without going through PostGraphile
+    app.use(createLlmApiRouter(getAgentDiscovery));
 
     app.use(graphile(effectiveOpts));
     app.use(flush);
