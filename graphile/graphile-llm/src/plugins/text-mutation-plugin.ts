@@ -243,12 +243,15 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
                         `[graphile-llm] Mutation embed: field=${key}, dims=${vector.length}`
                       );
 
+                      // Inject the vector into the corresponding field
                       obj[vectorFieldName] = vector;
+                      // Remove the consumed *Text field
                       delete obj[key];
                     })());
                     continue;
                   }
 
+                  // Recurse into nested objects (e.g. input.article.embeddingText)
                   if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
                     pending.push(embedTextFields(value));
                   }

@@ -86,6 +86,7 @@ async function embedTextInWhere(
           `[graphile-llm] Search embed: field=${key}, dims=${vector.length}`
         );
 
+        // Replace text with vector
         value.vector = vector;
         delete value.text;
       })());
@@ -192,10 +193,12 @@ export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
           return {
             ...rest,
             async resolve(source: any, args: any, graphqlContext: any, info: any) {
+              // If the query has a `where` argument, check for text fields
               if (args?.where) {
                 await embedTextInWhere(args.where, embedder);
               }
 
+              // Also handle `filter` for relay-style connections
               if (args?.filter) {
                 await embedTextInWhere(args.filter, embedder);
               }
