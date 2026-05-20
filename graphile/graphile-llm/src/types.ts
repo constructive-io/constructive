@@ -253,11 +253,4 @@ export interface GraphileLlmOptions {
    */
   metering?: boolean | MeteringConfig;
 
-  /**
-   * Whether to enable agent table discovery via smart tags.
-   * When enabled, scans for @agentThread/@agentMessage/@agentTask tagged tables
-   * and caches their schema/table names for the REST API middleware.
-   * @default true
-   */
-  enableAgentDiscovery?: boolean;
 }

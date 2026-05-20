@@ -2,8 +2,8 @@
  * LLM API Router
  *
  * Express router providing a REST streaming endpoint for AI agent conversations.
- * Uses the agent tables (agent_thread, agent_message) discovered by
- * LlmAgentDiscoveryPlugin via smart tags.
+ * Uses the agent tables (agent_thread, agent_message) discovered from the
+ * agent_chat_module config table at runtime.
  *
  * Hybrid architecture:
  *   - GraphQL handles CRUD (threads, messages, tasks) via PostGraphile
@@ -22,8 +22,7 @@ import { Logger } from '@pgpmjs/logger';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import OllamaClient from '@agentic-kit/ollama';
-import { getLlmEnvOptions } from 'graphile-llm';
-import type { AgentDiscovery } from 'graphile-llm';
+import { getLlmEnvOptions, getAgentDiscovery } from 'graphile-llm';
 
 const log = new Logger('llm-api');
 
@@ -113,13 +112,9 @@ function resolveOllamaClient(): { client: OllamaClient; model: string } | null {
 
 /**
  * Creates the LLM API router.
- *
- * @param getDiscovery - Function to look up agent discovery by dbname.
- *                       Typically imported from graphile-llm's agent-discovery-plugin.
+ * Agent table discovery queries the agent_chat_module config table.
  */
-export function createLlmApiRouter(
-  getDiscovery: (dbname: string) => AgentDiscovery | null,
-): Router {
+export function createLlmApiRouter(): Router {
   const router = Router();
 
   // JSON body parsing scoped to this router
@@ -140,7 +135,8 @@ export function createLlmApiRouter(
         return;
       }
 
-      const discovery = getDiscovery(dbname);
+      const pool = getPgPool({ database: dbname });
+      const discovery = await getAgentDiscovery(pool, dbname);
       if (!discovery?.thread) {
         res.status(404).json({ error: 'Agent module not provisioned for this database' });
         return;
@@ -148,7 +144,6 @@ export function createLlmApiRouter(
 
       const body: CreateThreadBody = req.body || {};
       const { thread } = discovery;
-      const pool = getPgPool({ database: dbname });
       const pgSettings = getPgSettings(req);
       const entityId = req.params.entity_id;
 
@@ -201,7 +196,8 @@ export function createLlmApiRouter(
           return;
         }
 
-        const discovery = getDiscovery(dbname);
+        const pool = getPgPool({ database: dbname });
+        const discovery = await getAgentDiscovery(pool, dbname);
         if (!discovery?.thread || !discovery?.message) {
           res.status(404).json({ error: 'Agent module not provisioned for this database' });
           return;
@@ -214,7 +210,6 @@ export function createLlmApiRouter(
         }
 
         const { thread, message: msgTable } = discovery;
-        const pool = getPgPool({ database: dbname });
         const pgSettings = getPgSettings(req);
         const threadId = req.params.thread_id;
         const userId = req.token.user_id;

@@ -846,7 +846,7 @@ describe('GraphileLlmPreset toggles', () => {
     expect(pluginNames).not.toContain('LlmTextMutationPlugin');
   });
 
-  it('all toggles false leaves only LlmModulePlugin and LlmAgentDiscoveryPlugin', async () => {
+  it('all toggles false leaves only LlmModulePlugin', async () => {
     const { GraphileLlmPreset } = await import('../../src/preset');
     const preset = GraphileLlmPreset({
       enableTextSearch: false,
@@ -855,7 +855,7 @@ describe('GraphileLlmPreset toggles', () => {
     });
 
     const pluginNames = preset.plugins!.map((p: any) => p.name);
-    expect(pluginNames).toEqual(['LlmModulePlugin', 'LlmAgentDiscoveryPlugin']);
+    expect(pluginNames).toEqual(['LlmModulePlugin']);
   });
 
   it('default options include text search and mutations but not RAG', async () => {
@@ -866,7 +866,6 @@ describe('GraphileLlmPreset toggles', () => {
     expect(pluginNames).toContain('LlmModulePlugin');
     expect(pluginNames).toContain('LlmTextSearchPlugin');
     expect(pluginNames).toContain('LlmTextMutationPlugin');
-    expect(pluginNames).toContain('LlmAgentDiscoveryPlugin');
     expect(pluginNames).not.toContain('LlmRagPlugin');
   });
 });

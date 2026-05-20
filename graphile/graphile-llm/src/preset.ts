@@ -70,7 +70,6 @@ import { createLlmTextSearchPlugin } from './plugins/text-search-plugin';
 import { createLlmTextMutationPlugin } from './plugins/text-mutation-plugin';
 import { createLlmRagPlugin } from './plugins/rag-plugin';
 import { createLlmMeteringPlugin } from './plugins/metering-plugin';
-import { LlmAgentDiscoveryPlugin } from './plugins/agent-discovery-plugin';
 import type { GraphileLlmOptions } from './types';
 
 /**
@@ -86,7 +85,6 @@ export function GraphileLlmPreset(
     enableTextSearch = true,
     enableTextMutations = true,
     enableRag = false,
-    enableAgentDiscovery = true,
     ragDefaults,
     metering,
   } = options;
@@ -112,10 +110,6 @@ export function GraphileLlmPreset(
 
   if (enableRag) {
     plugins.push(createLlmRagPlugin(ragDefaults));
-  }
-
-  if (enableAgentDiscovery) {
-    plugins.push(LlmAgentDiscoveryPlugin);
   }
 
   return {

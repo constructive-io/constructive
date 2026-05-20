@@ -46,8 +46,8 @@ export { createLlmRagPlugin } from './plugins/rag-plugin';
 // Metering plugin (opt-in billing integration)
 export { createLlmMeteringPlugin } from './plugins/metering-plugin';
 
-// Agent discovery plugin (smart tag based table discovery)
-export { LlmAgentDiscoveryPlugin, getAgentDiscovery, clearAgentDiscoveryCache } from './plugins/agent-discovery-plugin';
+// Agent discovery (queries agent_chat_module config table at runtime)
+export { getAgentDiscovery, clearAgentDiscoveryCache } from './plugins/agent-discovery-plugin';
 export type { AgentTableInfo, AgentDiscovery } from './plugins/agent-discovery-plugin';
 
 // Embedder utilities

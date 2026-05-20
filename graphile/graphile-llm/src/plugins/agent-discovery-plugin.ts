@@ -1,31 +1,23 @@
 /**
- * LlmAgentDiscoveryPlugin
+ * Agent Discovery
  *
- * Discovers agent tables at PostGraphile schema build time by scanning
- * the pgRegistry for tables tagged with @agentThread, @agentMessage,
- * and @agentTask smart tags.
+ * Discovers agent tables by querying the agent_chat_module config table
+ * at runtime. The module stores schema_id, table names, and table IDs
+ * when provisioned — no smart tags needed.
  *
- * Results are:
- *   1. Placed on the build context (for other plugins)
- *   2. Stored in a module-level cache keyed by cacheKey (for the REST API
- *      middleware to look up discovered table names without access to the
- *      PostGraphile build)
- *
- * Smart tags are set via construct_blueprint() when the agent blueprint
- * includes `"smart_tags": { "agentThread": true }` on a table entry.
+ * Results are cached per-database with a TTL so the REST middleware
+ * doesn't hit the database on every request.
  */
 
-import type { GraphileConfig } from 'graphile-config';
+import { Pool } from 'pg';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface AgentTableInfo {
-  /** The PostgreSQL schema name (e.g. 'constructive_agent_public') */
+  /** The PostgreSQL schema name (e.g. 'agent_public') */
   schemaName: string;
   /** The table name (e.g. 'agent_thread') */
   tableName: string;
-  /** The codec name from pgRegistry */
-  codecName: string;
 }
 
 export interface AgentDiscovery {
@@ -34,139 +26,74 @@ export interface AgentDiscovery {
   task: AgentTableInfo | null;
 }
 
-// ─── Module-level cache ─────────────────────────────────────────────────────
+// ─── Cache ──────────────────────────────────────────────────────────────────
 
-/** Cache of agent discovery results, keyed by graphile cache key (dbname-based) */
-const agentDiscoveryCache = new Map<string, AgentDiscovery>();
-
-/**
- * Look up cached agent discovery for a given database name.
- * Called by the REST API middleware at request time.
- *
- * The key should match the graphile cache key format used by
- * the server (typically the dbname or a composite key).
- * Falls back to scanning all entries if an exact match isn't found
- * (single-database deployments).
- */
-export function getAgentDiscovery(dbname: string): AgentDiscovery | null {
-  // Exact match
-  const exact = agentDiscoveryCache.get(dbname);
-  if (exact) return exact;
-
-  // If there's only one entry, return it (single-database deployment)
-  if (agentDiscoveryCache.size === 1) {
-    return agentDiscoveryCache.values().next().value ?? null;
-  }
-
-  // Scan for partial key match (key might contain dbname as a substring)
-  for (const [key, value] of agentDiscoveryCache) {
-    if (key.includes(dbname)) return value;
-  }
-
-  return null;
+interface CacheEntry {
+  discovery: AgentDiscovery | null;
+  expiresAt: number;
 }
+
+const CACHE_TTL_MS = 60_000;
+
+const agentDiscoveryCache = new Map<string, CacheEntry>();
 
 /** Clear all cached discovery results (for testing) */
 export function clearAgentDiscoveryCache(): void {
   agentDiscoveryCache.clear();
 }
 
-// ─── TypeScript Augmentation ────────────────────────────────────────────────
+// ─── Discovery Query ────────────────────────────────────────────────────────
 
-declare global {
-  namespace GraphileBuild {
-    interface Build {
-      /** Discovered agent tables from smart tags, or null if agent blueprint not provisioned */
-      agentDiscovery: AgentDiscovery | null;
+const DISCOVERY_SQL = `
+  SELECT
+    s.schema_name,
+    acm.thread_table_name,
+    acm.message_table_name,
+    acm.task_table_name
+  FROM metaschema_modules_public.agent_chat_module acm
+  JOIN metaschema_public.schema s ON s.id = acm.schema_id
+  LIMIT 1
+`;
+
+/**
+ * Look up agent table info for a database, querying the module config table.
+ * Results are cached per-database for CACHE_TTL_MS.
+ */
+export async function getAgentDiscovery(
+  pool: Pool,
+  dbname: string,
+): Promise<AgentDiscovery | null> {
+  const now = Date.now();
+  const cached = agentDiscoveryCache.get(dbname);
+  if (cached && cached.expiresAt > now) {
+    return cached.discovery;
+  }
+
+  let discovery: AgentDiscovery | null = null;
+
+  try {
+    const { rows } = await pool.query(DISCOVERY_SQL);
+
+    if (rows.length > 0) {
+      const row = rows[0];
+      const schemaName: string = row.schema_name;
+
+      discovery = {
+        thread: row.thread_table_name
+          ? { schemaName, tableName: row.thread_table_name }
+          : null,
+        message: row.message_table_name
+          ? { schemaName, tableName: row.message_table_name }
+          : null,
+        task: row.task_table_name
+          ? { schemaName, tableName: row.task_table_name }
+          : null,
+      };
     }
+  } catch {
+    // Module table doesn't exist in this database — not provisioned
   }
-  namespace GraphileConfig {
-    interface Plugins {
-      LlmAgentDiscoveryPlugin: true;
-    }
-  }
+
+  agentDiscoveryCache.set(dbname, { discovery, expiresAt: now + CACHE_TTL_MS });
+  return discovery;
 }
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-function findTaggedTable(
-  build: any,
-  tagName: string,
-): AgentTableInfo | null {
-  const pgRegistry = build.pgRegistry;
-  if (!pgRegistry) return null;
-
-  for (const source of Object.values(pgRegistry.pgResources || {})) {
-    const codec = (source as any)?.codec;
-    if (!codec?.attributes) continue;
-
-    const tags = codec.extensions?.tags;
-    if (!tags?.[tagName]) continue;
-
-    const schemaName = codec.extensions?.pg?.schemaName
-      ?? (source as any)?.extensions?.pg?.schemaName
-      ?? null;
-    const tableName = codec.extensions?.pg?.name
-      ?? codec.name
-      ?? null;
-
-    if (!schemaName || !tableName) continue;
-
-    return {
-      schemaName,
-      tableName,
-      codecName: codec.name || tableName,
-    };
-  }
-
-  return null;
-}
-
-// ─── Plugin ─────────────────────────────────────────────────────────────────
-
-export const LlmAgentDiscoveryPlugin: GraphileConfig.Plugin = {
-  name: 'LlmAgentDiscoveryPlugin',
-  version: '0.1.0',
-  description:
-    'Discovers agent tables by @agentThread/@agentMessage/@agentTask smart tags ' +
-    'and makes schema/table names available on the build context and module cache',
-
-  schema: {
-    hooks: {
-      build(build) {
-        const thread = findTaggedTable(build, 'agentThread');
-        const message = findTaggedTable(build, 'agentMessage');
-        const task = findTaggedTable(build, 'agentTask');
-
-        const discovery: AgentDiscovery | null =
-          thread || message || task
-            ? { thread, message, task }
-            : null;
-
-        if (discovery) {
-          const parts: string[] = [];
-          if (thread) parts.push(`thread=${thread.schemaName}.${thread.tableName}`);
-          if (message) parts.push(`message=${message.schemaName}.${message.tableName}`);
-          if (task) parts.push(`task=${task.schemaName}.${task.tableName}`);
-          console.log(`[graphile-llm] Agent tables discovered: ${parts.join(', ')}`);
-
-          // Store in module-level cache for the REST middleware.
-          // Use the first schema name as cache key (all agent tables share one schema).
-          const cacheKey = thread?.schemaName ?? message?.schemaName ?? 'agent';
-          agentDiscoveryCache.set(cacheKey, discovery);
-        } else {
-          console.log(
-            '[graphile-llm] No agent tables found (no @agentThread/@agentMessage/@agentTask tags). ' +
-            'Agent REST API will be disabled.',
-          );
-        }
-
-        return build.extend(
-          build,
-          { agentDiscovery: discovery },
-          'LlmAgentDiscoveryPlugin adding agentDiscovery to build',
-        );
-      },
-    },
-  },
-};
