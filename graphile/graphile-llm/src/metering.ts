@@ -159,14 +159,11 @@ export async function meteredEmbed(
     };
   }
 
-  // Estimate tokens from text length (~4 chars per token)
-  const estimatedTokens = Math.ceil(text.length / 4);
-
   // Pre-check: can this entity afford this call?
   let allowed = true;
   try {
     await ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
-      allowed = await checkQuota(pgClient, ctx.billing, ctx.entityId, meterSlug, estimatedTokens);
+      allowed = await checkQuota(pgClient, ctx.billing, ctx.entityId, meterSlug, 1);
     });
   } catch {
     allowed = true;
@@ -185,10 +182,9 @@ export async function meteredEmbed(
   const result = await embedder(text);
   const latencyMs = Date.now() - startTime;
 
-  // Record actual usage
-  const actualTokens = Math.ceil(text.length / 4);
+  // Record actual usage (input_chars as the metered amount)
   ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
-    await recordUsage(pgClient, ctx.billing, ctx.entityId, meterSlug, actualTokens, {
+    await recordUsage(pgClient, ctx.billing, ctx.entityId, meterSlug, text.length, {
       input_chars: text.length,
       dims: result.length,
       latency_ms: latencyMs,
@@ -248,17 +244,11 @@ export async function meteredChat(
     };
   }
 
-  // Estimate tokens from message content (~4 chars per token)
-  const inputChars = messages.reduce((sum, m) => sum + m.content.length, 0);
-  const estimatedInputTokens = Math.ceil(inputChars / 4);
-  const estimatedOutputTokens = chatOptions?.maxTokens ?? 1000;
-  const estimatedTotal = estimatedInputTokens + estimatedOutputTokens;
-
   // Pre-check: can this entity afford this call?
   let allowed = true;
   try {
     await ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
-      allowed = await checkQuota(pgClient, ctx.billing, ctx.entityId, meterSlug, estimatedTotal);
+      allowed = await checkQuota(pgClient, ctx.billing, ctx.entityId, meterSlug, 1);
     });
   } catch {
     allowed = true;
@@ -277,13 +267,12 @@ export async function meteredChat(
   const result = await chat(messages, chatOptions);
   const latencyMs = Date.now() - startTime;
 
-  // Record actual usage
-  const actualOutputTokens = Math.ceil(result.length / 4);
-  const actualTotal = estimatedInputTokens + actualOutputTokens;
+  // Record actual usage (input + output chars as the metered amount)
+  const inputChars = messages.reduce((sum, m) => sum + m.content.length, 0);
   ctx.withPgClient(ctx.pgSettings, async (pgClient) => {
-    await recordUsage(pgClient, ctx.billing, ctx.entityId, meterSlug, actualTotal, {
-      input_tokens: estimatedInputTokens,
-      output_tokens: actualOutputTokens,
+    await recordUsage(pgClient, ctx.billing, ctx.entityId, meterSlug, inputChars + result.length, {
+      input_chars: inputChars,
+      output_chars: result.length,
       messages_count: messages.length,
       latency_ms: latencyMs,
     });
