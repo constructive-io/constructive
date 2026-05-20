@@ -1003,3 +1003,69 @@ describe('edge cases', () => {
     );
   });
 });
+
+// ============================================================================
+// Tests - Table Field Argument Input Types (Bucket-style computed fields)
+// ============================================================================
+
+describe('table field argument input types', () => {
+  it('emits Input types referenced only by table-field args', () => {
+    // Bucket-style computed field: requestBulkUploadUrls(files: [FooBulkUploadFileInput!]!)
+    const bucketTable = createTable({
+      name: 'FooBucket',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        {
+          name: 'requestBulkUploadUrls',
+          type: { gqlType: 'String', isArray: true } as FieldType,
+          args: [
+            {
+              name: 'files',
+              type: createNonNull(
+                createList(
+                  createNonNull(
+                    createTypeRef('INPUT_OBJECT', 'FooBulkUploadFileInput'),
+                  ),
+                ),
+              ),
+              isRequired: true,
+            },
+          ],
+        },
+      ],
+    });
+
+    const registry = createTypeRegistry({
+      FooBulkUploadFileInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'FooBulkUploadFileInput',
+        inputFields: [
+          {
+            name: 'fileName',
+            type: createNonNull(createTypeRef('SCALAR', 'String')),
+          },
+          {
+            name: 'contentType',
+            type: createTypeRef('SCALAR', 'String'),
+          },
+          {
+            name: 'sizeBytes',
+            type: createNonNull(createTypeRef('SCALAR', 'Int')),
+          },
+        ],
+      },
+    });
+
+    // No custom operations — input type is referenced only via the
+    // computed field's `args`. Without the field-arg seeding fix, this
+    // type would be inlined into FooBucketSelect but never declared.
+    const result = generateInputTypesFile(registry, new Set(), [bucketTable]);
+
+    expect(result.content).toContain(
+      'export interface FooBulkUploadFileInput {',
+    );
+    expect(result.content).toContain('fileName: string;');
+    expect(result.content).toContain('contentType?: string;');
+    expect(result.content).toContain('sizeBytes: number;');
+  });
+});

@@ -1993,6 +1993,33 @@ function collectFilterExtraInputTypes(
   return extraTypes;
 }
 
+/**
+ * Collect input type names referenced by table field arguments.
+ *
+ * Computed fields (e.g., `requestBulkUploadUrls(files: [FooBulkUploadFileInput!]!)`
+ * on bucket tables) reference custom Input types in their args. These are inlined
+ * into the generated `*Select` types via `typeRefToTs`, but were never registered
+ * for generation, leaving the referenced Input interfaces undefined. Seed them
+ * here so `generateCustomInputTypes` emits them (transitively, via its nested
+ * field-type follow logic).
+ */
+function collectFieldArgInputTypes(tables: Table[]): Set<string> {
+  const out = new Set<string>();
+  for (const table of tables) {
+    for (const field of table.fields) {
+      if (!field.args || field.args.length === 0) continue;
+      for (const arg of field.args) {
+        const baseName = getTypeBaseName(arg.type);
+        if (!baseName) continue;
+        if (baseName.endsWith('Input') || baseName.endsWith('Filter')) {
+          out.add(baseName);
+        }
+      }
+    }
+  }
+  return out;
+}
+
 // ============================================================================
 // Main Generator (AST-based)
 // ============================================================================
@@ -2064,6 +2091,15 @@ export function generateInputTypesFile(
       typeRegistry,
     );
     for (const typeName of filterExtraTypes) {
+      mergedUsedInputTypes.add(typeName);
+    }
+    // Seed input types referenced by table-field args (e.g.,
+    // `requestBulkUploadUrls(files: [DataRoomBucketsBulkUploadFileInput!]!)`
+    // on bucket tables). These are inlined into *Select types via typeRefToTs
+    // but are not part of any operation's args, so they would otherwise never
+    // be registered for generation.
+    const fieldArgTypes = collectFieldArgInputTypes(tablesList);
+    for (const typeName of fieldArgTypes) {
       mergedUsedInputTypes.add(typeName);
     }
   }

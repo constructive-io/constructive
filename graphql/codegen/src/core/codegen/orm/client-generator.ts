@@ -196,7 +196,7 @@ export function generateCreateClientFile(
   typeExportDecl.exportKind = 'type';
   statements.push(typeExportDecl);
 
-  // export { GraphQLRequestError } from './client';
+  // export { GraphQLRequestError, FetchAdapter } from './client';
   statements.push(
     t.exportNamedDeclaration(
       null,
@@ -204,6 +204,10 @@ export function generateCreateClientFile(
         t.exportSpecifier(
           t.identifier('GraphQLRequestError'),
           t.identifier('GraphQLRequestError'),
+        ),
+        t.exportSpecifier(
+          t.identifier('FetchAdapter'),
+          t.identifier('FetchAdapter'),
         ),
       ],
       t.stringLiteral('./client'),
