@@ -65,6 +65,16 @@ export function createLlmModulePlugin(
     schema: {
       hooks: {
         build(build) {
+          // Resolve the embedder from available sources:
+          // 1. Preset default embedder option
+          // 2. Environment variables
+          // 3. null (disabled)
+          //
+          // Note: Per-database llm_module resolution happens at request time,
+          // not schema build time. The defaultEmbedder and env vars provide
+          // the schema-build-time embedder so that text fields are registered
+          // in the GraphQL schema. At execution time, the actual embedder
+          // used may differ per-database based on the llm_module config.
           let embedder: EmbedderFunction | null = null;
 
           if (defaultEmbedder) {
@@ -84,6 +94,10 @@ export function createLlmModulePlugin(
             );
           }
 
+          // Resolve the chat completer from available sources:
+          // 1. Preset default chat completer option
+          // 2. Environment variables
+          // 3. null (disabled — RAG queries will error)
           let chat: ChatFunction | null = null;
 
           if (defaultChatCompleter) {

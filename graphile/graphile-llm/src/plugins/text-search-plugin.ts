@@ -6,9 +6,22 @@
  * raw float vectors for similarity search — the plugin converts text to
  * vectors server-side using the configured embedder.
  *
+ * This mirrors the graphile-postgis pattern where `WithinDistanceInput`
+ * accepts a compound input (point + distance) and the plugin handles
+ * the conversion to SQL internally.
+ *
  * The `text` field is mutually exclusive with `vector`: clients provide
  * one or the other. When `text` is provided, the plugin embeds it and
  * injects the resulting vector into the normal pgvector pipeline.
+ *
+ * Runtime embedding for query filters uses the v4-style resolver wrapping
+ * approach (same as graphile-upload-plugin). When a connection query's
+ * `where` argument includes a VectorNearbyInput with `text`, the resolver
+ * wrapper embeds the text and replaces it with the resulting vector before
+ * the plan executes.
+ *
+ * If the embedder is not configured, the `text` field is still registered
+ * (so the schema is stable) but will return a clear error at execution time.
  *
  * If the embedder returns null (e.g. quota exceeded when the metering
  * plugin is loaded), the text field is silently removed — the query
@@ -83,6 +96,7 @@ async function embedTextInWhere(
     if (!Array.isArray(value)) {
       pending.push(embedTextInWhere(value, embedder));
     } else {
+      // Handle arrays (e.g. AND: [...], OR: [...])
       for (const item of value) {
         pending.push(embedTextInWhere(item, embedder));
       }
@@ -117,6 +131,9 @@ export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
       hooks: {
         /**
          * Add the `text: String` field to VectorNearbyInput.
+         *
+         * We intercept VectorNearbyInput specifically and add a `text` field.
+         * The field is optional — clients provide either `text` or `vector`.
          */
         GraphQLInputObjectType_fields(fields, build, context) {
           const {
@@ -150,12 +167,16 @@ export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
          * Wrap connection query resolvers to intercept `where` arguments that
          * contain VectorNearbyInput with `text`, embed the text, and replace
          * it with the resulting vector before the plan executes.
+         *
+         * Uses the same v4-style resolver wrapping pattern as graphile-upload-plugin
+         * and graphile-bucket-provisioner-plugin.
          */
         GraphQLObjectType_fields_field(field, build, context) {
           const {
             scope: { isRootQuery, pgCodec },
           } = context as any;
 
+          // Only wrap root query fields on tables with vector columns
           if (!isRootQuery || !pgCodec || !hasVectorColumns(pgCodec)) {
             return field;
           }

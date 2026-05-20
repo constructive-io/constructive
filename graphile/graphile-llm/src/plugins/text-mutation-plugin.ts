@@ -16,6 +16,14 @@
  * This is the mutation counterpart to LlmTextSearchPlugin (which handles
  * filter/query-side text-to-vector). Together they let clients work entirely
  * with text/prompts instead of raw float vectors.
+ *
+ * Runtime embedding uses the v4-style resolver wrapping approach (same as
+ * graphile-upload-plugin and graphile-bucket-provisioner-plugin). grafserv v5
+ * supports this through its backwards-compatibility layer.
+ *
+ * The companion fields are only added when the LLM plugin is loaded.
+ * If no embedder is configured, the fields are still registered for schema
+ * stability but return a clear error at execution time.
  */
 
 import 'graphile-build';
@@ -106,6 +114,7 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             },
           } = context as any;
 
+          // Only intercept create/update input types for table rows
           if (!pgCodec?.attributes || (!isPgPatch && !isPgBaseInput && !isMutationInput)) {
             return fields;
           }
@@ -114,6 +123,7 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             graphql: { GraphQLString },
           } = build;
 
+          // Find vector columns on this table
           const vectorColumns: string[] = [];
           for (const [attributeName, attribute] of Object.entries(
             pgCodec.attributes as Record<string, any>
@@ -130,6 +140,7 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
           let newFields = fields;
 
           for (const columnName of vectorColumns) {
+            // Convert snake_case column name to camelCase field name
             const fieldName = build.inflection.attribute({
               codec: pgCodec,
               attributeName: columnName,
@@ -159,6 +170,10 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
          * field values, embed them using the configured embedder, and inject
          * the resulting vector into the corresponding vector field.
          *
+         * Uses the same v4-style resolver wrapping pattern as graphile-upload-plugin
+         * and graphile-bucket-provisioner-plugin. grafserv v5 supports this through
+         * its backwards-compatibility layer.
+         *
          * If the embedder returns null (e.g. quota exceeded), throws an error.
          */
         GraphQLObjectType_fields_field(field, build, context) {
@@ -166,16 +181,19 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             scope: { isRootMutation, fieldName, pgCodec },
           } = context as any;
 
+          // Only wrap root mutation fields on tables with attributes
           if (!isRootMutation || !pgCodec || !pgCodec.attributes) {
             return field;
           }
 
+          // Only wrap create/update mutations
           const isCreate = fieldName.startsWith('create');
           const isUpdate = fieldName.startsWith('update');
           if (!isCreate && !isUpdate) {
             return field;
           }
 
+          // Build the text→vector mapping for this codec
           const textToVectorMap = getTextToVectorMapping(pgCodec, build);
           if (Object.keys(textToVectorMap).length === 0) {
             return field;
@@ -191,6 +209,7 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
           return {
             ...rest,
             async resolve(source: any, args: any, graphqlContext: any, info: any) {
+              // Walk through the input args and embed any *Text companion fields
               async function embedTextFields(obj: any): Promise<void> {
                 if (!obj || typeof obj !== 'object') return;
 
@@ -199,6 +218,7 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
                 for (const key of Object.keys(obj)) {
                   const value = obj[key];
 
+                  // Check if this key is a *Text companion field
                   if (key in textToVectorMap && typeof value === 'string') {
                     const vectorFieldName = textToVectorMap[key];
 
