@@ -55,7 +55,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "dir=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+          save-always: true
 
       - name: Install dependencies
         run: pnpm install
@@ -111,7 +123,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "dir=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore pnpm store (no save)
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -216,7 +239,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "dir=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore pnpm store (no save)
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -324,7 +358,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "dir=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore pnpm store (no save)
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
