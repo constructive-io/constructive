@@ -22,7 +22,7 @@ import { Logger } from '@pgpmjs/logger';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import OllamaClient from '@agentic-kit/ollama';
-import { getEnvOptions } from '@constructive-io/graphql-env';
+import { getLlmEnvOptions } from 'graphile-llm';
 import type { AgentDiscovery } from 'graphile-llm';
 
 const log = new Logger('llm-api');
@@ -97,23 +97,12 @@ async function withRlsClient<T>(
 }
 
 function resolveOllamaClient(): { client: OllamaClient; model: string } | null {
-  const { llm } = getEnvOptions();
-  const provider = llm?.chat?.provider;
-  const model = llm?.chat?.model ?? 'llama3';
-  const baseUrl = llm?.chat?.baseUrl ?? 'http://localhost:11434';
+  const { chat } = getLlmEnvOptions();
 
-  if (provider === 'ollama' || (!provider && process.env.CHAT_PROVIDER === 'ollama')) {
+  if (chat.provider === 'ollama') {
     return {
-      client: new OllamaClient(process.env.CHAT_BASE_URL ?? baseUrl),
-      model: process.env.CHAT_MODEL ?? model,
-    };
-  }
-
-  // Fallback: try env vars directly
-  if (process.env.CHAT_BASE_URL || process.env.CHAT_MODEL) {
-    return {
-      client: new OllamaClient(process.env.CHAT_BASE_URL ?? 'http://localhost:11434'),
-      model: process.env.CHAT_MODEL ?? 'llama3',
+      client: new OllamaClient(chat.baseUrl),
+      model: chat.model,
     };
   }
 

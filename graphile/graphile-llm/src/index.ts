@@ -30,6 +30,10 @@
  * ```
  */
 
+// Environment configuration (single source of truth for LLM defaults)
+export { getLlmEnvOptions } from './env';
+export type { LlmEnvOptions, LlmProviderConfig } from './env';
+
 // Preset (recommended entry point)
 export { GraphileLlmPreset } from './preset';
 

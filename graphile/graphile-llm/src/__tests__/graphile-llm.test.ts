@@ -102,11 +102,12 @@ describe('Embedder abstraction', () => {
       process.env = originalEnv;
     });
 
-    it('returns null when EMBEDDER_PROVIDER is not set', () => {
+    it('returns default ollama embedder when EMBEDDER_PROVIDER is not set', () => {
       process.env = { ...originalEnv };
       delete process.env.EMBEDDER_PROVIDER;
       const embedder = buildEmbedderFromEnv();
-      expect(embedder).toBeNull();
+      expect(embedder).not.toBeNull();
+      expect(typeof embedder).toBe('function');
     });
 
     it('builds embedder from environment variables', () => {
@@ -491,11 +492,12 @@ describe('Chat completion abstraction', () => {
       process.env = originalEnv;
     });
 
-    it('returns null when CHAT_PROVIDER is not set', () => {
+    it('returns default ollama chat completer when CHAT_PROVIDER is not set', () => {
       process.env = { ...originalEnv };
       delete process.env.CHAT_PROVIDER;
       const chat = buildChatCompleterFromEnv();
-      expect(chat).toBeNull();
+      expect(chat).not.toBeNull();
+      expect(typeof chat).toBe('function');
     });
 
     it('builds chat completer from environment variables', () => {
@@ -844,7 +846,7 @@ describe('GraphileLlmPreset toggles', () => {
     expect(pluginNames).not.toContain('LlmTextMutationPlugin');
   });
 
-  it('all toggles false leaves only LlmModulePlugin', async () => {
+  it('all toggles false leaves only LlmModulePlugin and LlmAgentDiscoveryPlugin', async () => {
     const { GraphileLlmPreset } = await import('../../src/preset');
     const preset = GraphileLlmPreset({
       enableTextSearch: false,
@@ -853,7 +855,7 @@ describe('GraphileLlmPreset toggles', () => {
     });
 
     const pluginNames = preset.plugins!.map((p: any) => p.name);
-    expect(pluginNames).toEqual(['LlmModulePlugin']);
+    expect(pluginNames).toEqual(['LlmModulePlugin', 'LlmAgentDiscoveryPlugin']);
   });
 
   it('default options include text search and mutations but not RAG', async () => {
@@ -864,6 +866,7 @@ describe('GraphileLlmPreset toggles', () => {
     expect(pluginNames).toContain('LlmModulePlugin');
     expect(pluginNames).toContain('LlmTextSearchPlugin');
     expect(pluginNames).toContain('LlmTextMutationPlugin');
+    expect(pluginNames).toContain('LlmAgentDiscoveryPlugin');
     expect(pluginNames).not.toContain('LlmRagPlugin');
   });
 });

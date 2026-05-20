@@ -331,9 +331,6 @@ importers:
       '@agentic-kit/ollama':
         specifier: ^1.0.3
         version: 1.0.3(encoding@0.1.13)
-      '@constructive-io/graphql-env':
-        specifier: workspace:^
-        version: link:../../graphql/env/dist
       '@dataplan/pg':
         specifier: 1.0.0
         version: 1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0)

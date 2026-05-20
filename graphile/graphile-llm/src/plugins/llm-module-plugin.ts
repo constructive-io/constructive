@@ -24,6 +24,7 @@
 import type { GraphileConfig } from 'graphile-config';
 import { buildEmbedder, buildEmbedderFromEnv } from '../embedder';
 import { buildChatCompleter, buildChatCompleterFromEnv } from '../chat';
+import { getLlmEnvOptions } from '../env';
 import type { EmbedderFunction, ChatFunction, GraphileLlmOptions } from '../types';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
@@ -120,8 +121,8 @@ export function createLlmModulePlugin(
           return build.extend(build, {
             llmEmbedder: embedder,
             llmChatCompleter: chat,
-            llmEmbeddingModel: defaultEmbedder?.model ?? process.env.EMBEDDER_MODEL ?? null,
-            llmChatModel: defaultChatCompleter?.model ?? process.env.CHAT_MODEL ?? null,
+            llmEmbeddingModel: defaultEmbedder?.model ?? getLlmEnvOptions().embedding.model,
+            llmChatModel: defaultChatCompleter?.model ?? getLlmEnvOptions().chat.model,
           }, 'LlmModulePlugin adding llmEmbedder, llmChatCompleter, and model names to build');
         },
       },
