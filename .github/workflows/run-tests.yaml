@@ -416,5 +416,5 @@ jobs:
           curl -s http://localhost:11434/api/pull -d '{"name":"nomic-embed-text:latest"}' | tail -1
           echo "nomic-embed-text pulled"
 
-      - name: Test graphile-llm
-        run: cd ./graphile/graphile-llm && pnpm test
+      - name: Test graphile-llm metering
+        run: cd ./graphile/graphile-llm && npx jest metering-e2e --verbose
