@@ -9,7 +9,7 @@ import { MigrateFileModel } from './models/migrateFile';
 import { SqlActionModel } from './models/sqlAction';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
-export { GraphQLRequestError } from './client';
+export { GraphQLRequestError, FetchAdapter } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';

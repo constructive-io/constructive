@@ -53,13 +53,14 @@ export const webauthnCredentialMutationKeys = {
   /** Delete webauthnCredential mutation key */ delete: (id: string | number) =>
     ['mutation', 'webauthncredential', 'delete', id] as const,
 } as const;
-export const auditLogMutationKeys = {
-  /** All auditLog mutation keys */ all: ['mutation', 'auditlog'] as const,
-  /** Create auditLog mutation key */ create: () => ['mutation', 'auditlog', 'create'] as const,
-  /** Update auditLog mutation key */ update: (id: string | number) =>
-    ['mutation', 'auditlog', 'update', id] as const,
-  /** Delete auditLog mutation key */ delete: (id: string | number) =>
-    ['mutation', 'auditlog', 'delete', id] as const,
+export const auditLogAuthMutationKeys = {
+  /** All auditLogAuth mutation keys */ all: ['mutation', 'auditlogauth'] as const,
+  /** Create auditLogAuth mutation key */ create: () =>
+    ['mutation', 'auditlogauth', 'create'] as const,
+  /** Update auditLogAuth mutation key */ update: (id: string | number) =>
+    ['mutation', 'auditlogauth', 'update', id] as const,
+  /** Delete auditLogAuth mutation key */ delete: (id: string | number) =>
+    ['mutation', 'auditlogauth', 'delete', id] as const,
 } as const;
 export const identityProviderMutationKeys = {
   /** All identityProvider mutation keys */ all: ['mutation', 'identityprovider'] as const,
@@ -161,10 +162,6 @@ export const customMutationKeys = {
       : (['mutation', 'signInCrossOrigin'] as const),
   /** Mutation key for signUp */ signUp: (identifier?: string) =>
     identifier ? (['mutation', 'signUp', identifier] as const) : (['mutation', 'signUp'] as const),
-  /** Mutation key for requestCrossOriginToken */ requestCrossOriginToken: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'requestCrossOriginToken', identifier] as const)
-      : (['mutation', 'requestCrossOriginToken'] as const),
   /** Mutation key for signIn */ signIn: (identifier?: string) =>
     identifier ? (['mutation', 'signIn', identifier] as const) : (['mutation', 'signIn'] as const),
   /** Mutation key for extendTokenExpires */ extendTokenExpires: (identifier?: string) =>
@@ -175,6 +172,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'createApiKey', identifier] as const)
       : (['mutation', 'createApiKey'] as const),
+  /** Mutation key for requestCrossOriginToken */ requestCrossOriginToken: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'requestCrossOriginToken', identifier] as const)
+      : (['mutation', 'requestCrossOriginToken'] as const),
   /** Mutation key for forgotPassword */ forgotPassword: (identifier?: string) =>
     identifier
       ? (['mutation', 'forgotPassword', identifier] as const)
@@ -215,7 +216,7 @@ export const mutationKeys = {
   phoneNumber: phoneNumberMutationKeys,
   cryptoAddress: cryptoAddressMutationKeys,
   webauthnCredential: webauthnCredentialMutationKeys,
-  auditLog: auditLogMutationKeys,
+  auditLogAuth: auditLogAuthMutationKeys,
   identityProvider: identityProviderMutationKeys,
   roleType: roleTypeMutationKeys,
   userConnectedAccount: userConnectedAccountMutationKeys,

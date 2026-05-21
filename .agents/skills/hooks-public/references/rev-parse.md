@@ -7,7 +7,7 @@ React Query query hook for revParse
 ## Usage
 
 ```typescript
-useRevParseQuery({ dbId: '<UUID>', storeId: '<UUID>', refname: '<String>' })
+useRevParseQuery({ sId: '<UUID>', storeId: '<UUID>', refname: '<String>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useRevParseQuery({ dbId: '<UUID>', storeId: '<UUID>', refname: '<String>' })
 ### Use useRevParseQuery
 
 ```typescript
-const { data, isLoading } = useRevParseQuery({ dbId: '<UUID>', storeId: '<UUID>', refname: '<String>' });
+const { data, isLoading } = useRevParseQuery({ sId: '<UUID>', storeId: '<UUID>', refname: '<String>' });
 ```

@@ -19,7 +19,7 @@ export const revParseQueryKey = customQueryKeys.revParse;
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useRevParseQuery({ variables: { dbId, storeId, refname } });
+ * const { data, isLoading } = useRevParseQuery({ variables: { sId, storeId, refname } });
  *
  * if (data?.revParse) {
  *   console.log(data.revParse);
@@ -76,7 +76,7 @@ export function useRevParseQuery<
  *
  * @example
  * ```ts
- * const data = await fetchRevParseQuery({ variables: { dbId, storeId, refname } });
+ * const data = await fetchRevParseQuery({ variables: { sId, storeId, refname } });
  * ```
  */
 export async function fetchRevParseQuery(params?: { variables?: RevParseVariables }) {
@@ -88,7 +88,7 @@ export async function fetchRevParseQuery(params?: { variables?: RevParseVariable
  *
  * @example
  * ```ts
- * await prefetchRevParseQuery(queryClient, { variables: { dbId, storeId, refname } });
+ * await prefetchRevParseQuery(queryClient, { variables: { sId, storeId, refname } });
  * ```
  */
 export async function prefetchRevParseQuery(

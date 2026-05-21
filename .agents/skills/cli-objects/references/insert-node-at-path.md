@@ -7,7 +7,7 @@ Execute the insertNodeAtPath mutation
 ## Usage
 
 ```bash
-csdk insert-node-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk insert-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk insert-node-at-path --input.clientMutationId <String> --input.dbId <UUID> -
 ### Run insertNodeAtPath
 
 ```bash
-csdk insert-node-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk insert-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
 ```

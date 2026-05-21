@@ -1,10 +1,10 @@
 """The root query type which gives access points into the data universe."""
 type Query {
-  revParse(dbId: UUID, storeId: UUID, refname: String): UUID
+  revParse(sId: UUID, storeId: UUID, refname: String): UUID
 
   """Reads and enables pagination through a set of `GetAllRecord`."""
   getAll(
-    databaseId: UUID
+    sId: UUID
     id: UUID
 
     """Only read the first `n` values of the set."""
@@ -22,7 +22,7 @@ type Query {
 
   """Reads and enables pagination through a set of `Object`."""
   getAllObjectsFromRoot(
-    databaseId: UUID
+    sId: UUID
     id: UUID
 
     """Only read the first `n` values of the set."""
@@ -37,11 +37,11 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): ObjectConnection
-  getNodeAtPath(databaseId: UUID, id: UUID, path: [String]): Object
+  getNodeAtPath(sId: UUID, id: UUID, path: [String]): Object
 
   """Reads and enables pagination through a set of `Object`."""
   getPathObjectsFromRoot(
-    databaseId: UUID
+    sId: UUID
     id: UUID
     path: [String]
 
@@ -57,7 +57,7 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): ObjectConnection
-  getObjectAtPath(dbId: UUID, storeId: UUID, path: [String], refname: String): Object
+  getObjectAtPath(sId: UUID, storeId: UUID, path: [String], refname: String): Object
 
   """Reads and enables pagination through a set of `Ref`."""
   refs(
@@ -260,7 +260,7 @@ type ObjectConnection {
 type Object {
   hashUuid: UUID
   id: UUID!
-  databaseId: UUID!
+  scopeId: UUID!
   kids: [UUID]
   ktree: [String]
   data: JSON
@@ -310,7 +310,7 @@ type Ref {
 
   """The name of the ref or branch"""
   name: String!
-  databaseId: UUID!
+  scopeId: UUID!
   storeId: UUID!
   commitId: UUID
 }
@@ -334,8 +334,8 @@ input RefFilter {
   """Filter by the object’s `name` field."""
   name: StringFilter
 
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
 
   """Filter by the object’s `storeId` field."""
   storeId: UUIDFilter
@@ -536,8 +536,8 @@ enum RefOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
   STORE_ID_ASC
   STORE_ID_DESC
   COMMIT_ID_ASC
@@ -569,8 +569,8 @@ type Store {
   """The name of the store (e.g., metaschema, migrations)."""
   name: String!
 
-  """The database this store belongs to."""
-  databaseId: UUID!
+  """The scope this store belongs to."""
+  scopeId: UUID!
 
   """The current head tree_id for this store."""
   hash: UUID
@@ -596,8 +596,8 @@ input StoreFilter {
   """Filter by the object’s `name` field."""
   name: StringFilter
 
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
 
   """Filter by the object’s `hash` field."""
   hash: UUIDFilter
@@ -666,8 +666,8 @@ enum StoreOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
   HASH_ASC
   HASH_DESC
   CREATED_AT_ASC
@@ -699,8 +699,8 @@ type Commit {
   """The commit message"""
   message: String
 
-  """The repository identifier"""
-  databaseId: UUID!
+  """The scope identifier"""
+  scopeId: UUID!
   storeId: UUID!
 
   """Parent commits"""
@@ -736,8 +736,8 @@ input CommitFilter {
   """Filter by the object’s `message` field."""
   message: StringFilter
 
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
 
   """Filter by the object’s `storeId` field."""
   storeId: UUIDFilter
@@ -839,8 +839,8 @@ enum CommitOrderBy {
   ID_DESC
   MESSAGE_ASC
   MESSAGE_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
   STORE_ID_ASC
   STORE_ID_DESC
   PARENT_IDS_ASC
@@ -862,8 +862,8 @@ input ObjectFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
+  """Filter by the object’s `scopeId` field."""
+  scopeId: UUIDFilter
 
   """Filter by the object’s `kids` field."""
   kids: UUIDListFilter
@@ -1059,8 +1059,8 @@ enum ObjectOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
+  SCOPE_ID_ASC
+  SCOPE_ID_DESC
   KIDS_ASC
   KIDS_DESC
   KTREE_ASC
@@ -1407,7 +1407,7 @@ input FreezeObjectsInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  databaseId: UUID
+  sId: UUID
   id: UUID
 }
 
@@ -1432,7 +1432,7 @@ input InitEmptyRepoInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
+  sId: UUID
   storeId: UUID
 }
 
@@ -1458,7 +1458,7 @@ input RemoveNodeAtPathInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
+  sId: UUID
   root: UUID
   path: [String]
 }
@@ -1485,7 +1485,7 @@ input SetDataAtPathInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
+  sId: UUID
   root: UUID
   path: [String]
   data: JSON
@@ -1513,7 +1513,7 @@ input SetPropsAndCommitInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
+  sId: UUID
   storeId: UUID
   refname: String
   path: [String]
@@ -1542,7 +1542,7 @@ input InsertNodeAtPathInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
+  sId: UUID
   root: UUID
   path: [String]
   data: JSON
@@ -1572,7 +1572,7 @@ input UpdateNodeAtPathInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
+  sId: UUID
   root: UUID
   path: [String]
   data: JSON
@@ -1602,7 +1602,7 @@ input SetAndCommitInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
+  sId: UUID
   storeId: UUID
   refname: String
   path: [String]
@@ -1653,7 +1653,7 @@ input RefInput {
 
   """The name of the ref or branch"""
   name: String!
-  databaseId: UUID!
+  scopeId: UUID!
   storeId: UUID!
   commitId: UUID
 }
@@ -1701,8 +1701,8 @@ input StoreInput {
   """The name of the store (e.g., metaschema, migrations)."""
   name: String!
 
-  """The database this store belongs to."""
-  databaseId: UUID!
+  """The scope this store belongs to."""
+  scopeId: UUID!
 
   """The current head tree_id for this store."""
   hash: UUID
@@ -1752,8 +1752,8 @@ input CommitInput {
   """The commit message"""
   message: String
 
-  """The repository identifier"""
-  databaseId: UUID!
+  """The scope identifier"""
+  scopeId: UUID!
   storeId: UUID!
 
   """Parent commits"""
@@ -1808,7 +1808,7 @@ input CreateObjectInput {
 """An input for mutations affecting `Object`"""
 input ObjectInput {
   id: UUID!
-  databaseId: UUID!
+  scopeId: UUID!
   kids: [UUID]
   ktree: [String]
   data: JSON
@@ -1849,7 +1849,7 @@ input UpdateRefInput {
 
   """The primary unique identifier for the ref."""
   id: UUID!
-  databaseId: UUID!
+  scopeId: UUID!
 
   """
   An object where the defined keys will be set on the `Ref` being updated.
@@ -1864,7 +1864,7 @@ input RefPatch {
 
   """The name of the ref or branch"""
   name: String
-  databaseId: UUID
+  scopeId: UUID
   storeId: UUID
   commitId: UUID
 }
@@ -1919,8 +1919,8 @@ input StorePatch {
   """The name of the store (e.g., metaschema, migrations)."""
   name: String
 
-  """The database this store belongs to."""
-  databaseId: UUID
+  """The scope this store belongs to."""
+  scopeId: UUID
 
   """The current head tree_id for this store."""
   hash: UUID
@@ -1961,8 +1961,8 @@ input UpdateCommitInput {
   """The primary unique identifier for the commit."""
   id: UUID!
 
-  """The repository identifier"""
-  databaseId: UUID!
+  """The scope identifier"""
+  scopeId: UUID!
 
   """
   An object where the defined keys will be set on the `Commit` being updated.
@@ -1980,8 +1980,8 @@ input CommitPatch {
   """The commit message"""
   message: String
 
-  """The repository identifier"""
-  databaseId: UUID
+  """The scope identifier"""
+  scopeId: UUID
   storeId: UUID
 
   """Parent commits"""
@@ -2029,7 +2029,7 @@ input UpdateObjectInput {
   """
   clientMutationId: String
   id: UUID!
-  databaseId: UUID!
+  scopeId: UUID!
 
   """
   An object where the defined keys will be set on the `Object` being updated.
@@ -2042,7 +2042,7 @@ Represents an update to a `Object`. Fields that are set will be updated.
 """
 input ObjectPatch {
   id: UUID
-  databaseId: UUID
+  scopeId: UUID
   kids: [UUID]
   ktree: [String]
   data: JSON
@@ -2083,7 +2083,7 @@ input DeleteRefInput {
 
   """The primary unique identifier for the ref."""
   id: UUID!
-  databaseId: UUID!
+  scopeId: UUID!
 }
 
 """The output of our delete `Store` mutation."""
@@ -2155,8 +2155,8 @@ input DeleteCommitInput {
   """The primary unique identifier for the commit."""
   id: UUID!
 
-  """The repository identifier"""
-  databaseId: UUID!
+  """The scope identifier"""
+  scopeId: UUID!
 }
 
 """The output of our delete `Object` mutation."""
@@ -2190,7 +2190,7 @@ input DeleteObjectInput {
   """
   clientMutationId: String
   id: UUID!
-  databaseId: UUID!
+  scopeId: UUID!
 }
 
 input ProvisionBucketInput {

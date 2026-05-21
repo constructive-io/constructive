@@ -7,7 +7,7 @@ React Query mutation hook for setPropsAndCommit
 ## Usage
 
 ```typescript
-const { mutate } = useSetPropsAndCommitMutation(); mutate({ input: { dbId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } });
+const { mutate } = useSetPropsAndCommitMutation(); mutate({ input: { sId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSetPropsAndCommitMutation(); mutate({ input: { dbId: '<UUI
 
 ```typescript
 const { mutate, isLoading } = useSetPropsAndCommitMutation();
-mutate({ input: { dbId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } });
+mutate({ input: { sId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } });
 ```

@@ -7,7 +7,7 @@ React Query query hook for getObjectAtPath
 ## Usage
 
 ```typescript
-useGetObjectAtPathQuery({ dbId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' })
+useGetObjectAtPathQuery({ sId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useGetObjectAtPathQuery({ dbId: '<UUID>', storeId: '<UUID>', path: '<String>', r
 ### Use useGetObjectAtPathQuery
 
 ```typescript
-const { data, isLoading } = useGetObjectAtPathQuery({ dbId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' });
+const { data, isLoading } = useGetObjectAtPathQuery({ sId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' });
 ```

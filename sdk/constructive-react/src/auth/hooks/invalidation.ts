@@ -19,7 +19,7 @@ import {
   phoneNumberKeys,
   cryptoAddressKeys,
   webauthnCredentialKeys,
-  auditLogKeys,
+  auditLogAuthKeys,
   identityProviderKeys,
   roleTypeKeys,
   userConnectedAccountKeys,
@@ -110,18 +110,21 @@ export const invalidate = {
         queryKey: webauthnCredentialKeys.detail(id),
       }),
   },
-  /** Invalidate auditLog queries */ auditLog: {
-    /** Invalidate all auditLog queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate auditLogAuth queries */ auditLogAuth: {
+    /** Invalidate all auditLogAuth queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: auditLogKeys.all,
+        queryKey: auditLogAuthKeys.all,
       }),
-    /** Invalidate auditLog list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate auditLogAuth list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: auditLogKeys.lists(),
+        queryKey: auditLogAuthKeys.lists(),
       }),
-    /** Invalidate a specific auditLog */ detail: (queryClient: QueryClient, id: string | number) =>
+    /** Invalidate a specific auditLogAuth */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
       queryClient.invalidateQueries({
-        queryKey: auditLogKeys.detail(id),
+        queryKey: auditLogAuthKeys.detail(id),
       }),
   },
   /** Invalidate identityProvider queries */ identityProvider: {
@@ -228,9 +231,12 @@ export const remove = {
       queryKey: webauthnCredentialKeys.detail(id),
     });
   },
-  /** Remove auditLog from cache */ auditLog: (queryClient: QueryClient, id: string | number) => {
+  /** Remove auditLogAuth from cache */ auditLogAuth: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
     queryClient.removeQueries({
-      queryKey: auditLogKeys.detail(id),
+      queryKey: auditLogAuthKeys.detail(id),
     });
   },
   /** Remove identityProvider from cache */ identityProvider: (
