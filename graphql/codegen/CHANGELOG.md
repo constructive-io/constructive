@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.43.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.42.4...@constructive-io/graphql-codegen@4.43.0) (2026-05-20)
+
+### Features
+
+- Generate `model.subscribe<S>({ select, ids?, onEvent, onError?, onComplete? })` on ORM models with `table.subscription` metadata.
+- Generate `useXxxSubscription<S>` React Query hooks that delegate to ORM `subscribe()`.
+- Expose `createClient().realtime` namespace: `getConnectionState`, `onConnectionStateChange`, `getActiveSubscriptionCount`, `isEnabled`, `dispose`.
+- New runtime `RealtimeManager` template wraps a `graphql-ws` client; tracks connection state including new `error` state; multiplexes subscriptions.
+- Requires `@constructive-io/graphql-query >= 3.26.0`.
+
 ## [4.42.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.42.3...@constructive-io/graphql-codegen@4.42.4) (2026-05-19)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
