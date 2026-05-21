@@ -9,7 +9,7 @@ ORM operations for RealtimeModule records
 ```typescript
 db.realtimeModule.findMany({ select: { id: true } }).execute()
 db.realtimeModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.realtimeModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', lookaheadHours: '<Int>', partitionInterval: '<String>', notifyChannel: '<String>' }, select: { id: true } }).execute()
+db.realtimeModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', premake: '<Int>', interval: '<String>', notifyChannel: '<String>' }, select: { id: true } }).execute()
 db.realtimeModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.realtimeModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.realtimeModule.findMany({
 
 ```typescript
 const item = await db.realtimeModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', lookaheadHours: '<Int>', partitionInterval: '<String>', notifyChannel: '<String>' },
+  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', premake: '<Int>', interval: '<String>', notifyChannel: '<String>' },
   select: { id: true }
 }).execute();
 ```

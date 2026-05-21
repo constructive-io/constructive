@@ -49,7 +49,7 @@ describe('Export Meta Config Validation', () => {
       'permissions_module', 'limits_module', 'levels_module',
       'users_module', 'hierarchy_module', 'membership_types_module',
       'invites_module', 'emails_module', 'sessions_module',
-      'secrets_module', 'profiles_module', 'encrypted_secrets_module',
+      'user_state_module', 'profiles_module', 'config_secrets_user_module',
       'connected_accounts_module', 'phone_numbers_module',
       'crypto_addresses_module', 'crypto_auth_module',
       'field_module', 'table_module', 'table_template_module',

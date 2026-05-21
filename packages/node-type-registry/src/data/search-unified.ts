@@ -110,6 +110,16 @@ export const SearchUnified: NodeTypeDefinition = {
               format: 'column-ref'
             }
           },
+          embedding_model: {
+            type: 'string',
+            description:
+              'Embedding model identifier. When null, the worker falls back to runtime config.'
+          },
+          embedding_provider: {
+            type: 'string',
+            description:
+              'Embedding provider name. When null, the worker falls back to runtime config.'
+          },
           search_score_weight: {
             type: 'number',
             default: 1

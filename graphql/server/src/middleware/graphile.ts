@@ -275,15 +275,24 @@ const buildPreset = (
             pgSettings['default_transaction_read_only'] = 'on';
           }
 
+          if (req.requestId) {
+            pgSettings['request.id'] = req.requestId;
+          }
+
           return { pgSettings };
         }
       }
 
+      const anonSettings: Record<string, string> = {
+        role: anonRole,
+        ...context,
+      };
+      if (req?.requestId) {
+        anonSettings['request.id'] = req.requestId;
+      }
+
       return {
-        pgSettings: {
-          role: anonRole,
-          ...context,
-        },
+        pgSettings: anonSettings,
       };
     },
   },

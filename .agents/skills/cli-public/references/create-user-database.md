@@ -9,7 +9,7 @@ Parameters:
   - owner_id: UUID of the owner user (required)
   - include_invites: Include invite system (default: true)
   - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include levels/achievements (default: false)
+  - include_levels: Include events/analytics (default: false)
   - bitlen: Bit length for permission masks (default: 64)
   - tokens_expiration: Token expiration interval (default: 30 days)
 

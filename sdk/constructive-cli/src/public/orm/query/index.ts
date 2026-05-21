@@ -14,7 +14,6 @@ import type {
   AppPermissionConnection,
   OrgPermissionConnection,
   ObjectConnection,
-  AppLevelRequirementConnection,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface RequireStepUpVariables {
@@ -25,10 +24,6 @@ export interface AppPermissionsGetPaddedMaskVariables {
 }
 export interface OrgPermissionsGetPaddedMaskVariables {
   mask?: string;
-}
-export interface StepsAchievedVariables {
-  level?: string;
-  roleId?: string;
 }
 export interface RevParseVariables {
   dbId?: string;
@@ -129,19 +124,6 @@ export interface GetObjectAtPathVariables {
   storeId?: string;
   path?: string[];
   refname?: string;
-}
-export interface StepsRequiredVariables {
-  level?: string;
-  roleId?: string;
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -283,39 +265,6 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'mask',
               type: 'BitString',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    stepsAchieved: (
-      args: StepsAchievedVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        stepsAchieved: boolean | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'StepsAchieved',
-        fieldName: 'stepsAchieved',
-        ...buildCustomDocument(
-          'query',
-          'StepsAchieved',
-          'stepsAchieved',
-          options?.select,
-          args,
-          [
-            {
-              name: 'level',
-              type: 'String',
-            },
-            {
-              name: 'roleId',
-              type: 'UUID',
             },
           ],
           connectionFieldsMap,
@@ -813,51 +762,6 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'Object'
-        ),
-      }),
-    stepsRequired: (
-      args: StepsRequiredVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        stepsRequired: AppLevelRequirementConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'StepsRequired',
-        fieldName: 'stepsRequired',
-        ...buildCustomDocument(
-          'query',
-          'StepsRequired',
-          'stepsRequired',
-          options?.select,
-          args,
-          [
-            {
-              name: 'level',
-              type: 'String',
-            },
-            {
-              name: 'roleId',
-              type: 'UUID',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
         ),
       }),
     currentUser: <S extends UserSelect>(

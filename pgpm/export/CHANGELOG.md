@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.16.0...@pgpmjs/export@0.17.0) (2026-05-20)
+
+### Bug Fixes
+
+- remove pgpm-uuid from required extensions and module map ([e84ef56](https://github.com/constructive-io/constructive/commit/e84ef5682aa3210838a5b5bec151a33da69c7a12))
+
+### Features
+
+- add missing modules to export flow ([827dc87](https://github.com/constructive-io/constructive/commit/827dc8727dc4a47c8b41bea0ace4dca4fc2def49))
+
+# [0.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.15.3...@pgpmjs/export@0.16.0) (2026-05-19)
+
+### Features
+
+- add org_secrets_module to export pipeline ([c71f4a2](https://github.com/constructive-io/constructive/commit/c71f4a2f938f895dbcf91a9efc7a5c0f1bce243c))
+- rename secrets_module to user_state_module and encrypted_secrets_module to user_secrets_module in presets and export pipeline ([2bb18f8](https://github.com/constructive-io/constructive/commit/2bb18f8c3c519bbe3df1e665dce32b9be64eab70))
+- rename user_secrets_module/org_secrets_module to config_secrets_user_module/config_secrets_org_module ([4228cf8](https://github.com/constructive-io/constructive/commit/4228cf8f05e5fcefc8fd5a6a221a5cc098e71b76))
+
+## [0.15.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.15.2...@pgpmjs/export@0.15.3) (2026-05-17)
+
+**Note:** Version bump only for package @pgpmjs/export
+
 ## [0.15.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.15.1...@pgpmjs/export@0.15.2) (2026-05-15)
 
 **Note:** Version bump only for package @pgpmjs/export

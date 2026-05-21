@@ -27,16 +27,6 @@ export interface OrgPermission {
   bitstr: string | null;
   description: string | null;
 }
-export interface AppLevelRequirement {
-  id: string | null;
-  name: string | null;
-  level: string | null;
-  description: string | null;
-  requiredCount: number | null;
-  priority: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface AppLimitCreditRedemption {
   id: string | null;
   creditCodeId: string | null;
@@ -92,22 +82,6 @@ export interface AppOwnerGrant {
   isGrant: boolean | null;
   actorId: string | null;
   grantorId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface AppAchievement {
-  id: string | null;
-  actorId: string | null;
-  name: string | null;
-  count: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface AppStep {
-  id: string | null;
-  actorId: string | null;
-  name: string | null;
-  count: number | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -179,6 +153,21 @@ export interface OrgLimitCredit {
   amount: string | null;
   creditType: string | null;
   reason: string | null;
+}
+export interface AppLimitWarning {
+  id: string | null;
+  name: string | null;
+  warningType: string | null;
+  thresholdValue: string | null;
+  taskIdentifier: string | null;
+}
+export interface OrgLimitWarning {
+  id: string | null;
+  name: string | null;
+  warningType: string | null;
+  thresholdValue: string | null;
+  taskIdentifier: string | null;
+  entityId: string | null;
 }
 export interface OrgChartEdgeGrant {
   id: string | null;
@@ -285,28 +274,6 @@ export interface UsageSnapshot {
   capturedAt: string | null;
   id: string | null;
 }
-export interface OrgMemberProfile {
-  id: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  membershipId: string | null;
-  entityId: string | null;
-  actorId: string | null;
-  displayName: string | null;
-  email: string | null;
-  title: string | null;
-  bio: string | null;
-  profilePicture: ConstructiveInternalTypeImage | null;
-}
-export interface AppLevel {
-  id: string | null;
-  name: string | null;
-  description: string | null;
-  image: ConstructiveInternalTypeImage | null;
-  ownerId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface AppLimit {
   id: string | null;
   name: string | null;
@@ -378,6 +345,19 @@ export interface OrgLimit {
   purchasedCredits: string | null;
   periodCredits: string | null;
   entityId: string | null;
+}
+export interface OrgMemberProfile {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  membershipId: string | null;
+  entityId: string | null;
+  actorId: string | null;
+  displayName: string | null;
+  email: string | null;
+  title: string | null;
+  bio: string | null;
+  profilePicture: ConstructiveInternalTypeImage | null;
 }
 export interface AppMembership {
   id: string | null;

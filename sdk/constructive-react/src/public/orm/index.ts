@@ -11,7 +11,6 @@ import { GetAllRecordModel } from './models/getAllRecord';
 import { AppPermissionModel } from './models/appPermission';
 import { OrgPermissionModel } from './models/orgPermission';
 import { ObjectModel } from './models/object';
-import { AppLevelRequirementModel } from './models/appLevelRequirement';
 import { DatabaseModel } from './models/database';
 import { SchemaModel } from './models/schema';
 import { TableModel } from './models/table';
@@ -62,14 +61,14 @@ import { DenormalizedTableFieldModel } from './models/denormalizedTableField';
 import { EmailsModuleModel } from './models/emailsModule';
 import { EncryptedSecretsModuleModel } from './models/encryptedSecretsModule';
 import { InvitesModuleModel } from './models/invitesModule';
-import { LevelsModuleModel } from './models/levelsModule';
+import { EventsModuleModel } from './models/eventsModule';
 import { LimitsModuleModel } from './models/limitsModule';
 import { MembershipTypesModuleModel } from './models/membershipTypesModule';
 import { MembershipsModuleModel } from './models/membershipsModule';
 import { PermissionsModuleModel } from './models/permissionsModule';
 import { PhoneNumbersModuleModel } from './models/phoneNumbersModule';
 import { ProfilesModuleModel } from './models/profilesModule';
-import { SecretsModuleModel } from './models/secretsModule';
+import { UserStateModuleModel } from './models/userStateModule';
 import { SessionsModuleModel } from './models/sessionsModule';
 import { UserAuthModuleModel } from './models/userAuthModule';
 import { UsersModuleModel } from './models/usersModule';
@@ -101,9 +100,7 @@ import { AppLimitCreditRedemptionModel } from './models/appLimitCreditRedemption
 import { OrgLimitModel } from './models/orgLimit';
 import { OrgLimitCreditModel } from './models/orgLimitCredit';
 import { OrgLimitAggregateModel } from './models/orgLimitAggregate';
-import { AppStepModel } from './models/appStep';
-import { AppAchievementModel } from './models/appAchievement';
-import { AppLevelModel } from './models/appLevel';
+import { OrgLimitWarningModel } from './models/orgLimitWarning';
 import { EmailModel } from './models/email';
 import { PhoneNumberModel } from './models/phoneNumber';
 import { CryptoAddressModel } from './models/cryptoAddress';
@@ -132,6 +129,7 @@ import { DevicesModuleModel } from './models/devicesModule';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
+import { AppLimitWarningModel } from './models/appLimitWarning';
 import { UserConnectedAccountModel } from './models/userConnectedAccount';
 import { CommitModel } from './models/commit';
 import { PubkeySettingModel } from './models/pubkeySetting';
@@ -143,6 +141,7 @@ import { RlsSettingModel } from './models/rlsSetting';
 import { AppLimitEventModel } from './models/appLimitEvent';
 import { OrgLimitEventModel } from './models/orgLimitEvent';
 import { RlsModuleModel } from './models/rlsModule';
+import { RateLimitMetersModuleModel } from './models/rateLimitMetersModule';
 import { PlansModuleModel } from './models/plansModule';
 import { SqlActionModel } from './models/sqlAction';
 import { DatabaseSettingModel } from './models/databaseSetting';
@@ -195,7 +194,6 @@ export function createClient(config: OrmClientConfig) {
     appPermission: new AppPermissionModel(client),
     orgPermission: new OrgPermissionModel(client),
     object: new ObjectModel(client),
-    appLevelRequirement: new AppLevelRequirementModel(client),
     database: new DatabaseModel(client),
     schema: new SchemaModel(client),
     table: new TableModel(client),
@@ -246,14 +244,14 @@ export function createClient(config: OrmClientConfig) {
     emailsModule: new EmailsModuleModel(client),
     encryptedSecretsModule: new EncryptedSecretsModuleModel(client),
     invitesModule: new InvitesModuleModel(client),
-    levelsModule: new LevelsModuleModel(client),
+    eventsModule: new EventsModuleModel(client),
     limitsModule: new LimitsModuleModel(client),
     membershipTypesModule: new MembershipTypesModuleModel(client),
     membershipsModule: new MembershipsModuleModel(client),
     permissionsModule: new PermissionsModuleModel(client),
     phoneNumbersModule: new PhoneNumbersModuleModel(client),
     profilesModule: new ProfilesModuleModel(client),
-    secretsModule: new SecretsModuleModel(client),
+    userStateModule: new UserStateModuleModel(client),
     sessionsModule: new SessionsModuleModel(client),
     userAuthModule: new UserAuthModuleModel(client),
     usersModule: new UsersModuleModel(client),
@@ -285,9 +283,7 @@ export function createClient(config: OrmClientConfig) {
     orgLimit: new OrgLimitModel(client),
     orgLimitCredit: new OrgLimitCreditModel(client),
     orgLimitAggregate: new OrgLimitAggregateModel(client),
-    appStep: new AppStepModel(client),
-    appAchievement: new AppAchievementModel(client),
-    appLevel: new AppLevelModel(client),
+    orgLimitWarning: new OrgLimitWarningModel(client),
     email: new EmailModel(client),
     phoneNumber: new PhoneNumberModel(client),
     cryptoAddress: new CryptoAddressModel(client),
@@ -316,6 +312,7 @@ export function createClient(config: OrmClientConfig) {
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
+    appLimitWarning: new AppLimitWarningModel(client),
     userConnectedAccount: new UserConnectedAccountModel(client),
     commit: new CommitModel(client),
     pubkeySetting: new PubkeySettingModel(client),
@@ -327,6 +324,7 @@ export function createClient(config: OrmClientConfig) {
     appLimitEvent: new AppLimitEventModel(client),
     orgLimitEvent: new OrgLimitEventModel(client),
     rlsModule: new RlsModuleModel(client),
+    rateLimitMetersModule: new RateLimitMetersModuleModel(client),
     plansModule: new PlansModuleModel(client),
     sqlAction: new SqlActionModel(client),
     databaseSetting: new DatabaseSettingModel(client),

@@ -6,7 +6,7 @@ import type { ModulePreset } from './types';
  *
  * This is the barest foundation: a `users` table, a `sessions` table so
  * something upstream can mint tokens, `rls_module` so row-level security
- * is enforceable, and `secrets_module` so you can issue API keys. Nothing
+ * is enforceable, and `user_state_module` so you can issue API keys. Nothing
  * else.
  *
  * You still write your own identity bridge on top (or rely on a header-based
@@ -35,13 +35,13 @@ export const PresetMinimal: ModulePreset = {
     'users_module',
     'sessions_module',
     'rls_module',
-    'secrets_module'
+    'user_state_module'
   ],
   includes_notes: {
     users_module: 'The canonical users table. Required by every preset.',
     sessions_module: 'Session/token storage; needed so whatever upstream auth can mint a session row.',
     rls_module: 'RLS policy infrastructure. Without it, row-level security is not enforced.',
-    secrets_module: 'API-key storage. Optional for this preset but almost always wanted alongside upstream auth.'
+    user_state_module: 'API-key storage. Optional for this preset but almost always wanted alongside upstream auth.'
   },
   omits_notes: {
     user_auth_module: 'No server-side sign_up/sign_in procedures in this preset.',

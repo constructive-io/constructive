@@ -30,7 +30,6 @@ csdk auth set-token <your-token>
 | `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
 | `app-permission` | appPermission CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
-| `app-level-requirement` | appLevelRequirement CRUD operations |
 | `app-limit-credit-redemption` | appLimitCreditRedemption CRUD operations |
 | `app-limit-credit-code-item` | appLimitCreditCodeItem CRUD operations |
 | `app-limit-credit` | appLimitCredit CRUD operations |
@@ -40,8 +39,6 @@ csdk auth set-token <your-token>
 | `org-permission-default` | orgPermissionDefault CRUD operations |
 | `app-admin-grant` | appAdminGrant CRUD operations |
 | `app-owner-grant` | appOwnerGrant CRUD operations |
-| `app-achievement` | appAchievement CRUD operations |
-| `app-step` | appStep CRUD operations |
 | `app-limit-caps-default` | appLimitCapsDefault CRUD operations |
 | `org-limit-caps-default` | orgLimitCapsDefault CRUD operations |
 | `app-limit-cap` | appLimitCap CRUD operations |
@@ -52,6 +49,8 @@ csdk auth set-token <your-token>
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `org-limit-credit` | orgLimitCredit CRUD operations |
+| `app-limit-warning` | appLimitWarning CRUD operations |
+| `org-limit-warning` | orgLimitWarning CRUD operations |
 | `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
 | `app-claimed-invite` | appClaimedInvite CRUD operations |
 | `app-grant` | appGrant CRUD operations |
@@ -63,13 +62,12 @@ csdk auth set-token <your-token>
 | `org-grant` | orgGrant CRUD operations |
 | `org-chart-edge` | orgChartEdge CRUD operations |
 | `usage-snapshot` | usageSnapshot CRUD operations |
-| `org-member-profile` | orgMemberProfile CRUD operations |
-| `app-level` | appLevel CRUD operations |
 | `app-limit` | appLimit CRUD operations |
 | `app-invite` | appInvite CRUD operations |
 | `org-membership-setting` | orgMembershipSetting CRUD operations |
 | `org-limit-aggregate` | orgLimitAggregate CRUD operations |
 | `org-limit` | orgLimit CRUD operations |
+| `org-member-profile` | orgMemberProfile CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `org-invite` | orgInvite CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
@@ -78,12 +76,10 @@ csdk auth set-token <your-token>
 | `org-is-manager-of` | orgIsManagerOf |
 | `app-permissions-get-mask` | appPermissionsGetMask |
 | `org-permissions-get-mask` | orgPermissionsGetMask |
-| `steps-achieved` | stepsAchieved |
 | `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
 | `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
 | `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
 | `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
-| `steps-required` | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `submit-app-invite-code` | submitAppInviteCode |
 | `submit-org-invite-code` | submitOrgInviteCode |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
@@ -225,35 +221,6 @@ CRUD operations for OrgPermission records.
 | `description` | String |
 
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
-
-### `app-level-requirement`
-
-CRUD operations for AppLevelRequirement records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLevelRequirement records |
-| `find-first` | Find first matching appLevelRequirement record |
-| `get` | Get a appLevelRequirement by id |
-| `create` | Create a new appLevelRequirement |
-| `update` | Update an existing appLevelRequirement |
-| `delete` | Delete a appLevelRequirement |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `level` | String |
-| `description` | String |
-| `requiredCount` | Int |
-| `priority` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`, `level`
-**Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
 ### `app-limit-credit-redemption`
 
@@ -481,60 +448,6 @@ CRUD operations for AppOwnerGrant records.
 
 **Required create fields:** `actorId`
 **Optional create fields (backend defaults):** `isGrant`, `grantorId`
-
-### `app-achievement`
-
-CRUD operations for AppAchievement records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appAchievement records |
-| `find-first` | Find first matching appAchievement record |
-| `get` | Get a appAchievement by id |
-| `create` | Create a new appAchievement |
-| `update` | Update an existing appAchievement |
-| `delete` | Delete a appAchievement |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `actorId` | UUID |
-| `name` | String |
-| `count` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `actorId`, `count`
-
-### `app-step`
-
-CRUD operations for AppStep records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appStep records |
-| `find-first` | Find first matching appStep record |
-| `get` | Get a appStep by id |
-| `create` | Create a new appStep |
-| `update` | Update an existing appStep |
-| `delete` | Delete a appStep |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `actorId` | UUID |
-| `name` | String |
-| `count` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `actorId`, `count`
 
 ### `app-limit-caps-default`
 
@@ -794,6 +707,58 @@ CRUD operations for OrgLimitCredit records.
 
 **Required create fields:** `defaultLimitId`, `amount`
 **Optional create fields (backend defaults):** `actorId`, `entityId`, `creditType`, `reason`
+
+### `app-limit-warning`
+
+CRUD operations for AppLimitWarning records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitWarning records |
+| `find-first` | Find first matching appLimitWarning record |
+| `get` | Get a appLimitWarning by id |
+| `create` | Create a new appLimitWarning |
+| `update` | Update an existing appLimitWarning |
+| `delete` | Delete a appLimitWarning |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `warningType` | String |
+| `thresholdValue` | BigInt |
+| `taskIdentifier` | String |
+
+**Required create fields:** `name`, `warningType`, `thresholdValue`, `taskIdentifier`
+
+### `org-limit-warning`
+
+CRUD operations for OrgLimitWarning records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitWarning records |
+| `find-first` | Find first matching orgLimitWarning record |
+| `get` | Get a orgLimitWarning by id |
+| `create` | Create a new orgLimitWarning |
+| `update` | Update an existing orgLimitWarning |
+| `delete` | Delete a orgLimitWarning |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `warningType` | String |
+| `thresholdValue` | BigInt |
+| `taskIdentifier` | String |
+| `entityId` | UUID |
+
+**Required create fields:** `name`, `warningType`, `thresholdValue`, `taskIdentifier`
+**Optional create fields (backend defaults):** `entityId`
 
 ### `org-chart-edge-grant`
 
@@ -1105,66 +1070,6 @@ CRUD operations for UsageSnapshot records.
 **Required create fields:** `databaseId`, `metricName`
 **Optional create fields (backend defaults):** `metricValue`, `dimensions`, `capturedAt`
 
-### `org-member-profile`
-
-CRUD operations for OrgMemberProfile records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgMemberProfile records |
-| `find-first` | Find first matching orgMemberProfile record |
-| `get` | Get a orgMemberProfile by id |
-| `create` | Create a new orgMemberProfile |
-| `update` | Update an existing orgMemberProfile |
-| `delete` | Delete a orgMemberProfile |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `membershipId` | UUID |
-| `entityId` | UUID |
-| `actorId` | UUID |
-| `displayName` | String |
-| `email` | String |
-| `title` | String |
-| `bio` | String |
-| `profilePicture` | Image |
-
-**Required create fields:** `membershipId`, `entityId`, `actorId`
-**Optional create fields (backend defaults):** `displayName`, `email`, `title`, `bio`, `profilePicture`
-
-### `app-level`
-
-CRUD operations for AppLevel records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLevel records |
-| `find-first` | Find first matching appLevel record |
-| `get` | Get a appLevel by id |
-| `create` | Create a new appLevel |
-| `update` | Update an existing appLevel |
-| `delete` | Delete a appLevel |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `description` | String |
-| `image` | Image |
-| `ownerId` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
-
 ### `app-limit`
 
 CRUD operations for AppLimit records.
@@ -1330,6 +1235,38 @@ CRUD operations for OrgLimit records.
 
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`
+
+### `org-member-profile`
+
+CRUD operations for OrgMemberProfile records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgMemberProfile records |
+| `find-first` | Find first matching orgMemberProfile record |
+| `get` | Get a orgMemberProfile by id |
+| `create` | Create a new orgMemberProfile |
+| `update` | Update an existing orgMemberProfile |
+| `delete` | Delete a orgMemberProfile |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `membershipId` | UUID |
+| `entityId` | UUID |
+| `actorId` | UUID |
+| `displayName` | String |
+| `email` | String |
+| `title` | String |
+| `bio` | String |
+| `profilePicture` | Image |
+
+**Required create fields:** `membershipId`, `entityId`, `actorId`
+**Optional create fields (backend defaults):** `displayName`, `email`, `title`, `bio`, `profilePicture`
 
 ### `app-membership`
 
@@ -1504,18 +1441,6 @@ orgPermissionsGetMask
   |----------|------|
   | `--ids` | UUID |
 
-### `steps-achieved`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--level` | String |
-  | `--roleId` | UUID |
-
 ### `app-permissions-get-mask-by-names`
 
 appPermissionsGetMaskByNames
@@ -1562,21 +1487,6 @@ Reads and enables pagination through a set of `OrgPermission`.
   | Argument | Type |
   |----------|------|
   | `--mask` | BitString |
-  | `--first` | Int |
-  | `--offset` | Int |
-  | `--after` | Cursor |
-
-### `steps-required`
-
-Reads and enables pagination through a set of `AppLevelRequirement`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--level` | String |
-  | `--roleId` | UUID |
   | `--first` | Int |
   | `--offset` | Int |
   | `--after` | Cursor |

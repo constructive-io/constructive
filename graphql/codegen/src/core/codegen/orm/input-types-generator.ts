@@ -1559,19 +1559,21 @@ function generateAllCrudInputTypes(
 // ============================================================================
 
 /**
- * Collect all input type names used by operations
+ * Collect all input type names used by operations and table field arguments.
+ *
+ * Scans both custom operation args and computed-field args (e.g.
+ * `requestBulkUploadUrls(files: [FooBulkUploadFileInput!]!)` on bucket
+ * tables) so that referenced Input types are registered for generation.
  */
 export function collectInputTypeNames(
   operations: Array<{ args: Argument[] }>,
+  tables?: Table[],
 ): Set<string> {
   const inputTypes = new Set<string>();
 
   function collectFromTypeRef(typeRef: Argument['type']) {
     const baseName = getTypeBaseName(typeRef);
-    if (baseName && baseName.endsWith('Input')) {
-      inputTypes.add(baseName);
-    }
-    if (baseName && baseName.endsWith('Filter')) {
+    if (baseName && (baseName.endsWith('Input') || baseName.endsWith('Filter'))) {
       inputTypes.add(baseName);
     }
   }
@@ -1579,6 +1581,17 @@ export function collectInputTypeNames(
   for (const op of operations) {
     for (const arg of op.args) {
       collectFromTypeRef(arg.type);
+    }
+  }
+
+  if (tables) {
+    for (const table of tables) {
+      for (const field of table.fields) {
+        if (!field.args) continue;
+        for (const arg of field.args) {
+          collectFromTypeRef(arg.type);
+        }
+      }
     }
   }
 
@@ -2057,6 +2070,7 @@ export function generateInputTypesFile(
 
   // 7. Custom input types from TypeRegistry
   // Also include any extra types referenced by plugin-injected filter fields
+  // and by table field arguments (e.g. bucket computed-field args)
   const mergedUsedInputTypes = new Set(usedInputTypes);
   if (hasTables) {
     const filterExtraTypes = collectFilterExtraInputTypes(
@@ -2064,6 +2078,10 @@ export function generateInputTypesFile(
       typeRegistry,
     );
     for (const typeName of filterExtraTypes) {
+      mergedUsedInputTypes.add(typeName);
+    }
+    const fieldArgTypes = collectInputTypeNames([], tablesList);
+    for (const typeName of fieldArgTypes) {
       mergedUsedInputTypes.add(typeName);
     }
   }

@@ -26,7 +26,7 @@ export const PresetAuthEmail: ModulePreset = {
   description:
     'Installs `user_auth_module` with exactly the table dependencies its insert trigger ' +
     'hard-requires: users, app-scoped memberships (plus their permissions/limits/levels ' +
-    'dependencies), emails, secrets, encrypted secrets, sessions, plus RLS. You get the ' +
+    'dependencies), emails, user state, user secrets, sessions, plus RLS. You get the ' +
     'standard password-based auth procedures (sign_up, sign_in, reset_password, ' +
     "verify_email, delete_account, ...) and that's it. Everything else in the module " +
     'catalog — SSO, passkeys, SMS, rate limits, orgs, invites — is deliberately omitted. ' +
@@ -52,8 +52,8 @@ export const PresetAuthEmail: ModulePreset = {
     'levels_module:app',
     'memberships_module:app',
     'sessions_module',
-    'secrets_module',
-    'encrypted_secrets_module',
+    'user_state_module',
+    'config_secrets_user_module',
     'emails_module',
     'rls_module',
     'user_auth_module'
@@ -65,8 +65,8 @@ export const PresetAuthEmail: ModulePreset = {
     'limits_module:app': 'Required by `memberships_module:app`: NOT NULL FK to caps table.',
     'levels_module:app': 'Required by `memberships_module:app`: NOT NULL FK to levels table.',
     emails_module: 'Required by the `user_auth_module` insert trigger (`RAISE EXCEPTION REQUIRES emails_module`).',
-    encrypted_secrets_module: 'Required for password hashing; referenced by `set_password`, `verify_password`, and reset flows.',
-    secrets_module: 'API-key storage (`create_api_key`, `revoke_api_key`, `my_api_keys`).'
+    config_secrets_user_module: 'Required for password hashing; referenced by `set_password`, `verify_password`, and reset flows.',
+    user_state_module: 'API-key storage (`create_api_key`, `revoke_api_key`, `my_api_keys`).'
   },
   omits_notes: {
     rate_limits_module: 'Omitted intentionally; throttle_* helpers are null-safe and the auth procs compile without it. Add later via `auth:hardened`.',

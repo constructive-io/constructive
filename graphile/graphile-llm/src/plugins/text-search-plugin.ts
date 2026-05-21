@@ -22,6 +22,10 @@
  *
  * If the embedder is not configured, the `text` field is still registered
  * (so the schema is stable) but will return a clear error at execution time.
+ *
+ * If the embedder returns null (e.g. quota exceeded when the metering
+ * plugin is loaded), the text field is silently removed — the query
+ * continues with text-only search as a graceful fallback.
  */
 
 import type { GraphileConfig } from 'graphile-config';
@@ -51,10 +55,13 @@ function hasVectorColumns(pgCodec: any): boolean {
 /**
  * Recursively walk a `where` argument object and embed any VectorNearbyInput
  * values that have `text` instead of `vector`.
+ *
+ * If the embedder returns null (e.g. quota exceeded), the text field is
+ * removed so the pgvector filter is skipped — graceful text-only fallback.
  */
 async function embedTextInWhere(
   obj: any,
-  embedder: EmbedderFunction,
+  embedder: (text: string) => Promise<number[] | null>,
 ): Promise<void> {
   if (!obj || typeof obj !== 'object') return;
 
@@ -70,6 +77,12 @@ async function embedTextInWhere(
         const startTime = Date.now();
         const vector = await embedder(value.text);
         const latencyMs = Date.now() - startTime;
+
+        if (vector === null) {
+          // Embedder returned null (e.g. quota exceeded) — skip vector search
+          delete value.text;
+          return;
+        }
 
         console.log(
           `[graphile-llm] Search embed: field=${key}, dims=${vector.length}, latency=${latencyMs}ms`
@@ -108,7 +121,7 @@ async function embedTextInWhere(
 export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
   return {
     name: 'LlmTextSearchPlugin',
-    version: '0.1.0',
+    version: '0.2.0',
     description:
       'Adds text-to-vector embedding support on VectorNearbyInput filter fields',
     after: [
@@ -171,7 +184,9 @@ export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
             return field;
           }
 
-          const embedder: EmbedderFunction | null = (build as any).llmEmbedder;
+          const embedder = (build as any).llmEmbedder as
+            | ((text: string) => Promise<number[] | null>)
+            | null;
           if (!embedder) return field;
 
           const defaultResolver = (obj: any) => obj[context.scope.fieldName];
@@ -196,7 +211,7 @@ export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
         },
 
         finalize(schema, build) {
-          const embedder: EmbedderFunction | null = (build as any).llmEmbedder;
+          const embedder = (build as any).llmEmbedder;
 
           if (!embedder) {
             console.log(

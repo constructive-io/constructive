@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.13.0...graphile-search@1.13.1) (2026-05-20)
+
+**Note:** Version bump only for package graphile-search
+
+# [1.13.0](https://github.com/constructive-io/constructive/compare/graphile-search@1.12.1...graphile-search@1.13.0) (2026-05-19)
+
+### Bug Fixes
+
+- update unit tests for expanded ChunksInfo type ([a38b3ed](https://github.com/constructive-io/constructive/commit/a38b3ed2dd7d8706adb6d9051bbde9898749a411))
+
+### Features
+
+- chunk-aware text search in tsvector, BM25, and trgm adapters ([#854](https://github.com/constructive-io/constructive/issues/854)) ([0118610](https://github.com/constructive-io/constructive/commit/0118610e7bdc38287522e99bf38c46e48123e69c))
+
+## [1.12.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.12.0...graphile-search@1.12.1) (2026-05-17)
+
+**Note:** Version bump only for package graphile-search
+
 # [1.12.0](https://github.com/constructive-io/constructive/compare/graphile-search@1.11.2...graphile-search@1.12.0) (2026-05-14)
 
 **Note:** Version bump only for package graphile-search

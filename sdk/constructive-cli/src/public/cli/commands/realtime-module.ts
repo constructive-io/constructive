@@ -25,8 +25,8 @@ const fieldSchema: FieldSchema = {
   listenerNodeTableId: 'uuid',
   sourceRegistryTableId: 'uuid',
   retentionHours: 'int',
-  lookaheadHours: 'int',
-  partitionInterval: 'string',
+  premake: 'int',
+  interval: 'string',
   notifyChannel: 'string',
 };
 const usage =
@@ -89,8 +89,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       listenerNodeTableId: true,
       sourceRegistryTableId: true,
       retentionHours: true,
-      lookaheadHours: true,
-      partitionInterval: true,
+      premake: true,
+      interval: true,
       notifyChannel: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -121,8 +121,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       listenerNodeTableId: true,
       sourceRegistryTableId: true,
       retentionHours: true,
-      lookaheadHours: true,
-      partitionInterval: true,
+      premake: true,
+      interval: true,
       notifyChannel: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -165,8 +165,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           listenerNodeTableId: true,
           sourceRegistryTableId: true,
           retentionHours: true,
-          lookaheadHours: true,
-          partitionInterval: true,
+          premake: true,
+          interval: true,
           notifyChannel: true,
         },
       })
@@ -240,15 +240,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'lookaheadHours',
-        message: 'lookaheadHours',
+        name: 'premake',
+        message: 'premake',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'partitionInterval',
-        message: 'partitionInterval',
+        name: 'interval',
+        message: 'interval',
         required: false,
         skipPrompt: true,
       },
@@ -277,8 +277,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           listenerNodeTableId: cleanedData.listenerNodeTableId,
           sourceRegistryTableId: cleanedData.sourceRegistryTableId,
           retentionHours: cleanedData.retentionHours,
-          lookaheadHours: cleanedData.lookaheadHours,
-          partitionInterval: cleanedData.partitionInterval,
+          premake: cleanedData.premake,
+          interval: cleanedData.interval,
           notifyChannel: cleanedData.notifyChannel,
         },
         select: {
@@ -291,8 +291,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           listenerNodeTableId: true,
           sourceRegistryTableId: true,
           retentionHours: true,
-          lookaheadHours: true,
-          partitionInterval: true,
+          premake: true,
+          interval: true,
           notifyChannel: true,
         },
       })
@@ -372,15 +372,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'lookaheadHours',
-        message: 'lookaheadHours',
+        name: 'premake',
+        message: 'premake',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'partitionInterval',
-        message: 'partitionInterval',
+        name: 'interval',
+        message: 'interval',
         required: false,
         skipPrompt: true,
       },
@@ -409,8 +409,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           listenerNodeTableId: cleanedData.listenerNodeTableId,
           sourceRegistryTableId: cleanedData.sourceRegistryTableId,
           retentionHours: cleanedData.retentionHours,
-          lookaheadHours: cleanedData.lookaheadHours,
-          partitionInterval: cleanedData.partitionInterval,
+          premake: cleanedData.premake,
+          interval: cleanedData.interval,
           notifyChannel: cleanedData.notifyChannel,
         },
         select: {
@@ -423,8 +423,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           listenerNodeTableId: true,
           sourceRegistryTableId: true,
           retentionHours: true,
-          lookaheadHours: true,
-          partitionInterval: true,
+          premake: true,
+          interval: true,
           notifyChannel: true,
         },
       })

@@ -9,6 +9,10 @@
  * Example:
  *   mutation { createArticle(input: { embeddingText: "Machine learning concepts" }) }
  *
+ * If the embedder returns null (e.g. quota exceeded when the metering plugin
+ * is loaded), the mutation throws an error — unlike search, mutations cannot
+ * silently skip writing a vector the user asked for.
+ *
  * This is the mutation counterpart to LlmTextSearchPlugin (which handles
  * filter/query-side text-to-vector). Together they let clients work entirely
  * with text/prompts instead of raw float vectors.
@@ -82,7 +86,7 @@ function getTextToVectorMapping(
 export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
   return {
     name: 'LlmTextMutationPlugin',
-    version: '0.1.0',
+    version: '0.2.0',
     description:
       'Adds text companion fields on mutation inputs for vector columns — ' +
       'text is embedded server-side before storing',
@@ -169,6 +173,8 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
          * Uses the same v4-style resolver wrapping pattern as graphile-upload-plugin
          * and graphile-bucket-provisioner-plugin. grafserv v5 supports this through
          * its backwards-compatibility layer.
+         *
+         * If the embedder returns null (e.g. quota exceeded), throws an error.
          */
         GraphQLObjectType_fields_field(field, build, context) {
           const {
@@ -193,7 +199,10 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             return field;
           }
 
-          const embedder: EmbedderFunction | null = (build as any).llmEmbedder;
+          const embedder = (build as any).llmEmbedder as
+            | ((text: string) => Promise<number[] | null>)
+            | null;
+
           const defaultResolver = (obj: any) => obj[fieldName];
           const { resolve: oldResolve = defaultResolver, ...rest } = field;
 
@@ -224,6 +233,13 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
                       const startTime = Date.now();
                       const vector = await embedder(value);
                       const latencyMs = Date.now() - startTime;
+
+                      if (vector === null) {
+                        throw new Error(
+                          `EMBED_QUOTA_EXCEEDED: Cannot embed ${key} — embedding quota exceeded. ` +
+                          'Upgrade your plan or wait for the next billing period.'
+                        );
+                      }
 
                       console.log(
                         `[graphile-llm] Mutation embed: field=${key}, dims=${vector.length}, latency=${latencyMs}ms`

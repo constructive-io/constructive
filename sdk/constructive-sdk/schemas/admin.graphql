@@ -45,7 +45,6 @@ type Query {
   ): OrgGetSubordinatesConnection
   appPermissionsGetMask(ids: [UUID]): BitString
   orgPermissionsGetMask(ids: [UUID]): BitString
-  stepsAchieved(level: String, roleId: UUID): Boolean
   appPermissionsGetMaskByNames(names: [String]): BitString
   orgPermissionsGetMaskByNames(names: [String]): BitString
 
@@ -82,24 +81,6 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): OrgPermissionConnection
-
-  """Reads and enables pagination through a set of `AppLevelRequirement`."""
-  stepsRequired(
-    level: String
-    roleId: UUID
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): AppLevelRequirementConnection
 
   """
   Reads and enables pagination through a set of `AppLimitCreditRedemption`.
@@ -363,64 +344,6 @@ type Query {
     """The method to use when ordering `AppOwnerGrant`."""
     orderBy: [AppOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppOwnerGrantConnection
-
-  """Reads and enables pagination through a set of `AppAchievement`."""
-  appAchievements(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppAchievementFilter
-
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppAchievementConnection
-
-  """Reads and enables pagination through a set of `AppStep`."""
-  appSteps(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppStepFilter
-
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppStepConnection
 
   """Reads and enables pagination through a set of `AppLimitCapsDefault`."""
   appLimitCapsDefaults(
@@ -714,8 +637,8 @@ type Query {
     orderBy: [AppLimitCreditCodeItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLimitCreditCodeItemConnection
 
-  """Reads and enables pagination through a set of `AppLevelRequirement`."""
-  appLevelRequirements(
+  """Reads and enables pagination through a set of `AppLimitWarning`."""
+  appLimitWarnings(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -737,11 +660,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: AppLevelRequirementFilter
+    where: AppLimitWarningFilter
 
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementConnection
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningConnection
 
   """Reads and enables pagination through a set of `AppLimitCredit`."""
   appLimitCredits(
@@ -771,6 +694,35 @@ type Query {
     """The method to use when ordering `AppLimitCredit`."""
     orderBy: [AppLimitCreditOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLimitCreditConnection
+
+  """Reads and enables pagination through a set of `OrgLimitWarning`."""
+  orgLimitWarnings(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitWarningFilter
+
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningConnection
 
   """Reads and enables pagination through a set of `OrgLimitCredit`."""
   orgLimitCredits(
@@ -1120,64 +1072,6 @@ type Query {
     orderBy: [UsageSnapshotOrderBy!] = [PRIMARY_KEY_ASC]
   ): UsageSnapshotConnection
 
-  """Reads and enables pagination through a set of `OrgMemberProfile`."""
-  orgMemberProfiles(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgMemberProfileFilter
-
-    """The method to use when ordering `OrgMemberProfile`."""
-    orderBy: [OrgMemberProfileOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgMemberProfileConnection
-
-  """Reads and enables pagination through a set of `AppLevel`."""
-  appLevels(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLevelFilter
-
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelConnection
-
   """Reads and enables pagination through a set of `AppLimit`."""
   appLimits(
     """Only read the first `n` values of the set."""
@@ -1322,6 +1216,35 @@ type Query {
     """The method to use when ordering `OrgLimit`."""
     orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgLimitConnection
+
+  """Reads and enables pagination through a set of `OrgMemberProfile`."""
+  orgMemberProfiles(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgMemberProfileFilter
+
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileConnection
 
   """Reads and enables pagination through a set of `AppMembership`."""
   appMemberships(
@@ -1606,65 +1529,6 @@ type OrgPermissionEdge {
   node: OrgPermission
 }
 
-"""A connection to a list of `AppLevelRequirement` values."""
-type AppLevelRequirementConnection {
-  """A list of `AppLevelRequirement` objects."""
-  nodes: [AppLevelRequirement]!
-
-  """
-  A list of edges which contains the `AppLevelRequirement` and cursor to aid in pagination.
-  """
-  edges: [AppLevelRequirementEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `AppLevelRequirement` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""Defines the specific requirements that must be met to achieve a level"""
-type AppLevelRequirement {
-  id: UUID!
-
-  """Name identifier of the requirement (matches step names)"""
-  name: String!
-
-  """Name of the level this requirement belongs to"""
-  level: String!
-
-  """Human-readable description of what this requirement entails"""
-  description: String
-
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int!
-
-  """Display ordering priority; lower values appear first"""
-  priority: Int!
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
-3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
-that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
-to unexpected results.
-"""
-scalar Datetime
-
-"""A `AppLevelRequirement` edge in the connection."""
-type AppLevelRequirementEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppLevelRequirement` at the end of the edge."""
-  node: AppLevelRequirement
-}
-
 """A connection to a list of `AppLimitCreditRedemption` values."""
 type AppLimitCreditRedemptionConnection {
   """A list of `AppLimitCreditRedemption` objects."""
@@ -1784,6 +1648,15 @@ type AppLimitCreditCode {
     orderBy: [AppLimitCreditRedemptionOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLimitCreditRedemptionConnection!
 }
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
 
 """A connection to a list of `AppLimitCreditCodeItem` values."""
 type AppLimitCreditCodeItemConnection {
@@ -3209,192 +3082,6 @@ enum AppOwnerGrantOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `AppAchievement` values."""
-type AppAchievementConnection {
-  """A list of `AppAchievement` objects."""
-  nodes: [AppAchievement]!
-
-  """
-  A list of edges which contains the `AppAchievement` and cursor to aid in pagination.
-  """
-  edges: [AppAchievementEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppAchievement` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually
-"""
-type AppAchievement {
-  id: UUID!
-  actorId: UUID!
-
-  """Name identifier of the level requirement being tracked"""
-  name: String!
-
-  """Cumulative count of completed steps toward this requirement"""
-  count: Int!
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `AppAchievement` edge in the connection."""
-type AppAchievementEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppAchievement` at the end of the edge."""
-  node: AppAchievement
-}
-
-"""
-A filter to be used against `AppAchievement` object types. All fields are combined with a logical ‘and.’
-"""
-input AppAchievementFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `count` field."""
-  count: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppAchievementFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppAchievementFilter!]
-
-  """Negates the expression."""
-  not: AppAchievementFilter
-}
-
-"""Methods to use when ordering `AppAchievement`."""
-enum AppAchievementOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  NAME_ASC
-  NAME_DESC
-  COUNT_ASC
-  COUNT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `AppStep` values."""
-type AppStepConnection {
-  """A list of `AppStep` objects."""
-  nodes: [AppStep]!
-
-  """
-  A list of edges which contains the `AppStep` and cursor to aid in pagination.
-  """
-  edges: [AppStepEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppStep` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Log of individual user actions toward level requirements; every single step ever taken is recorded here
-"""
-type AppStep {
-  id: UUID!
-  actorId: UUID!
-
-  """Name identifier of the level requirement this step fulfills"""
-  name: String!
-
-  """Number of units completed in this step action"""
-  count: Int!
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `AppStep` edge in the connection."""
-type AppStepEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppStep` at the end of the edge."""
-  node: AppStep
-}
-
-"""
-A filter to be used against `AppStep` object types. All fields are combined with a logical ‘and.’
-"""
-input AppStepFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `count` field."""
-  count: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppStepFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppStepFilter!]
-
-  """Negates the expression."""
-  not: AppStepFilter
-}
-
-"""Methods to use when ordering `AppStep`."""
-enum AppStepOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  NAME_ASC
-  NAME_DESC
-  COUNT_ASC
-  COUNT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
 """A connection to a list of `AppLimitCapsDefault` values."""
 type AppLimitCapsDefaultConnection {
   """A list of `AppLimitCapsDefault` objects."""
@@ -4323,46 +4010,88 @@ enum OrgLimitDefaultOrderBy {
   SOFT_MAX_DESC
 }
 
+"""A connection to a list of `AppLimitWarning` values."""
+type AppLimitWarningConnection {
+  """A list of `AppLimitWarning` objects."""
+  nodes: [AppLimitWarning]!
+
+  """
+  A list of edges which contains the `AppLimitWarning` and cursor to aid in pagination.
+  """
+  edges: [AppLimitWarningEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppLimitWarning` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
 """
-A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’
+Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
 """
-input AppLevelRequirementFilter {
+type AppLimitWarning {
+  id: UUID!
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String!
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
+}
+
+"""A `AppLimitWarning` edge in the connection."""
+type AppLimitWarningEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitWarning` at the end of the edge."""
+  node: AppLimitWarning
+}
+
+"""
+A filter to be used against `AppLimitWarning` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitWarningFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
   """Filter by the object’s `name` field."""
   name: StringFilter
 
-  """Filter by the object’s `level` field."""
-  level: StringFilter
+  """Filter by the object’s `warningType` field."""
+  warningType: StringFilter
 
-  """Filter by the object’s `description` field."""
-  description: StringFilter
+  """Filter by the object’s `thresholdValue` field."""
+  thresholdValue: BigIntFilter
 
-  """Filter by the object’s `requiredCount` field."""
-  requiredCount: IntFilter
-
-  """Filter by the object’s `priority` field."""
-  priority: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
+  """Filter by the object’s `taskIdentifier` field."""
+  taskIdentifier: StringFilter
 
   """Checks for all expressions in this list."""
-  and: [AppLevelRequirementFilter!]
+  and: [AppLimitWarningFilter!]
 
   """Checks for any expressions in this list."""
-  or: [AppLevelRequirementFilter!]
+  or: [AppLimitWarningFilter!]
 
   """Negates the expression."""
-  not: AppLevelRequirementFilter
+  not: AppLimitWarningFilter
 }
 
-"""Methods to use when ordering `AppLevelRequirement`."""
-enum AppLevelRequirementOrderBy {
+"""Methods to use when ordering `AppLimitWarning`."""
+enum AppLimitWarningOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -4370,18 +4099,117 @@ enum AppLevelRequirementOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
-  LEVEL_ASC
-  LEVEL_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  REQUIRED_COUNT_ASC
-  REQUIRED_COUNT_DESC
-  PRIORITY_ASC
-  PRIORITY_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  WARNING_TYPE_ASC
+  WARNING_TYPE_DESC
+  THRESHOLD_VALUE_ASC
+  THRESHOLD_VALUE_DESC
+  TASK_IDENTIFIER_ASC
+  TASK_IDENTIFIER_DESC
+}
+
+"""A connection to a list of `OrgLimitWarning` values."""
+type OrgLimitWarningConnection {
+  """A list of `OrgLimitWarning` objects."""
+  nodes: [OrgLimitWarning]!
+
+  """
+  A list of edges which contains the `OrgLimitWarning` and cursor to aid in pagination.
+  """
+  edges: [OrgLimitWarningEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgLimitWarning` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
+"""
+type OrgLimitWarning {
+  id: UUID!
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String!
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
+
+  """Per-entity override (NULL = scope default for all entities)"""
+  entityId: UUID
+}
+
+"""A `OrgLimitWarning` edge in the connection."""
+type OrgLimitWarningEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgLimitWarning` at the end of the edge."""
+  node: OrgLimitWarning
+}
+
+"""
+A filter to be used against `OrgLimitWarning` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgLimitWarningFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `warningType` field."""
+  warningType: StringFilter
+
+  """Filter by the object’s `thresholdValue` field."""
+  thresholdValue: BigIntFilter
+
+  """Filter by the object’s `taskIdentifier` field."""
+  taskIdentifier: StringFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgLimitWarningFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgLimitWarningFilter!]
+
+  """Negates the expression."""
+  not: OrgLimitWarningFilter
+}
+
+"""Methods to use when ordering `OrgLimitWarning`."""
+enum OrgLimitWarningOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  WARNING_TYPE_ASC
+  WARNING_TYPE_DESC
+  THRESHOLD_VALUE_ASC
+  THRESHOLD_VALUE_DESC
+  TASK_IDENTIFIER_ASC
+  TASK_IDENTIFIER_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
 }
 
 """A connection to a list of `OrgChartEdgeGrant` values."""
@@ -5644,450 +5472,6 @@ enum UsageSnapshotOrderBy {
   ID_DESC
 }
 
-"""A connection to a list of `OrgMemberProfile` values."""
-type OrgMemberProfileConnection {
-  """A list of `OrgMemberProfile` objects."""
-  nodes: [OrgMemberProfile]!
-
-  """
-  A list of edges which contains the `OrgMemberProfile` and cursor to aid in pagination.
-  """
-  edges: [OrgMemberProfileEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `OrgMemberProfile` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""
-Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
-"""
-type OrgMemberProfile {
-  id: UUID!
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """References the membership this profile belongs to (1:1)"""
-  membershipId: UUID!
-
-  """References the entity this profile belongs to (used for RLS lookups)"""
-  entityId: UUID!
-
-  """References the user who owns this profile (for self-edit RLS)"""
-  actorId: UUID!
-
-  """Display name shown to other entity members"""
-  displayName: String
-
-  """
-  Email address visible to other entity members (auto-populated from verified primary email)
-  """
-  email: String
-
-  """Job title or role description visible to other entity members"""
-  title: String
-
-  """Short biography visible to other entity members"""
-  bio: String
-
-  """Profile picture visible to other entity members"""
-  profilePicture: ConstructiveInternalTypeImage
-
-  """
-  Reads a single `OrgMembership` that is related to this `OrgMemberProfile`.
-  """
-  membership: OrgMembership
-}
-
-scalar ConstructiveInternalTypeImage
-
-"""
-Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
-"""
-type OrgMembership {
-  id: UUID!
-  createdAt: Datetime
-  updatedAt: Datetime
-  createdBy: UUID
-  updatedBy: UUID
-
-  """Whether this membership has been approved by an admin"""
-  isApproved: Boolean!
-
-  """Whether this member has been banned from the entity"""
-  isBanned: Boolean!
-
-  """Whether this membership is temporarily disabled"""
-  isDisabled: Boolean!
-
-  """
-  Computed field indicating the membership is approved, verified, not banned, and not disabled
-  """
-  isActive: Boolean!
-
-  """
-  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
-  """
-  isExternal: Boolean!
-
-  """Whether the actor is the owner of this entity"""
-  isOwner: Boolean!
-
-  """Whether the actor has admin privileges on this entity"""
-  isAdmin: Boolean!
-
-  """
-  Aggregated permission bitmask combining profile-based and directly granted permissions
-  """
-  permissions: BitString!
-
-  """
-  Bitmask of permissions directly granted to this member (not from profiles)
-  """
-  granted: BitString!
-
-  """References the user who holds this membership"""
-  actorId: UUID!
-
-  """References the entity (org or group) this membership belongs to"""
-  entityId: UUID!
-
-  """Whether this member has read-only access (blocks mutations when true)"""
-  isReadOnly: Boolean!
-  profileId: UUID
-
-  """
-  Reads a single `OrgMemberProfile` that is related to this `OrgMembership`.
-  """
-  orgMemberProfileByMembershipId: OrgMemberProfile
-}
-
-"""A `OrgMemberProfile` edge in the connection."""
-type OrgMemberProfileEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgMemberProfile` at the end of the edge."""
-  node: OrgMemberProfile
-}
-
-"""
-A filter to be used against `OrgMemberProfile` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgMemberProfileFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Filter by the object’s `membershipId` field."""
-  membershipId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `displayName` field."""
-  displayName: StringFilter
-
-  """Filter by the object’s `email` field."""
-  email: StringFilter
-
-  """Filter by the object’s `title` field."""
-  title: StringFilter
-
-  """Filter by the object’s `bio` field."""
-  bio: StringFilter
-
-  """Filter by the object’s `profilePicture` field."""
-  profilePicture: ConstructiveInternalTypeImageFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgMemberProfileFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgMemberProfileFilter!]
-
-  """Negates the expression."""
-  not: OrgMemberProfileFilter
-
-  """Filter by the object’s `membership` relation."""
-  membership: OrgMembershipFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeImageFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: ConstructiveInternalTypeImage
-
-  """Not equal to the specified value."""
-  notEqualTo: ConstructiveInternalTypeImage
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: ConstructiveInternalTypeImage
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: ConstructiveInternalTypeImage
-
-  """Included in the specified list."""
-  in: [ConstructiveInternalTypeImage!]
-
-  """Not included in the specified list."""
-  notIn: [ConstructiveInternalTypeImage!]
-
-  """Less than the specified value."""
-  lessThan: ConstructiveInternalTypeImage
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Greater than the specified value."""
-  greaterThan: ConstructiveInternalTypeImage
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Contains the specified JSON."""
-  contains: ConstructiveInternalTypeImage
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: ConstructiveInternalTypeImage
-}
-
-"""
-A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgMembershipFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
-
-  """Filter by the object’s `updatedBy` field."""
-  updatedBy: UUIDFilter
-
-  """Filter by the object’s `isApproved` field."""
-  isApproved: BooleanFilter
-
-  """Filter by the object’s `isBanned` field."""
-  isBanned: BooleanFilter
-
-  """Filter by the object’s `isDisabled` field."""
-  isDisabled: BooleanFilter
-
-  """Filter by the object’s `isActive` field."""
-  isActive: BooleanFilter
-
-  """Filter by the object’s `isExternal` field."""
-  isExternal: BooleanFilter
-
-  """Filter by the object’s `isOwner` field."""
-  isOwner: BooleanFilter
-
-  """Filter by the object’s `isAdmin` field."""
-  isAdmin: BooleanFilter
-
-  """Filter by the object’s `permissions` field."""
-  permissions: BitStringFilter
-
-  """Filter by the object’s `granted` field."""
-  granted: BitStringFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `isReadOnly` field."""
-  isReadOnly: BooleanFilter
-
-  """Filter by the object’s `profileId` field."""
-  profileId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgMembershipFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgMembershipFilter!]
-
-  """Negates the expression."""
-  not: OrgMembershipFilter
-
-  """Filter by the object’s `orgMemberProfileByMembershipId` relation."""
-  orgMemberProfileByMembershipId: OrgMemberProfileFilter
-
-  """A related `orgMemberProfileByMembershipId` exists."""
-  orgMemberProfileByMembershipIdExists: Boolean
-}
-
-"""Methods to use when ordering `OrgMemberProfile`."""
-enum OrgMemberProfileOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  MEMBERSHIP_ID_ASC
-  MEMBERSHIP_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  DISPLAY_NAME_ASC
-  DISPLAY_NAME_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  TITLE_ASC
-  TITLE_DESC
-  BIO_ASC
-  BIO_DESC
-  PROFILE_PICTURE_ASC
-  PROFILE_PICTURE_DESC
-}
-
-"""A connection to a list of `AppLevel` values."""
-type AppLevelConnection {
-  """A list of `AppLevel` objects."""
-  nodes: [AppLevel]!
-
-  """
-  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
-  """
-  edges: [AppLevelEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppLevel` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Defines available levels that users can achieve by completing requirements
-"""
-type AppLevel {
-  id: UUID!
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `AppLevel` edge in the connection."""
-type AppLevelEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppLevel` at the end of the edge."""
-  node: AppLevel
-}
-
-"""
-A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
-"""
-input AppLevelFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `image` field."""
-  image: ConstructiveInternalTypeImageFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppLevelFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppLevelFilter!]
-
-  """Negates the expression."""
-  not: AppLevelFilter
-}
-
-"""Methods to use when ordering `AppLevel`."""
-enum AppLevelOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  IMAGE_ASC
-  IMAGE_DESC
-  OWNER_ID_ASC
-  OWNER_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
 """A connection to a list of `AppLimit` values."""
 type AppLimitConnection {
   """A list of `AppLimit` objects."""
@@ -7102,6 +6486,347 @@ enum OrgLimitOrderBy {
   ENTITY_ID_DESC
 }
 
+"""A connection to a list of `OrgMemberProfile` values."""
+type OrgMemberProfileConnection {
+  """A list of `OrgMemberProfile` objects."""
+  nodes: [OrgMemberProfile]!
+
+  """
+  A list of edges which contains the `OrgMemberProfile` and cursor to aid in pagination.
+  """
+  edges: [OrgMemberProfileEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgMemberProfile` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
+"""
+type OrgMemberProfile {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """References the membership this profile belongs to (1:1)"""
+  membershipId: UUID!
+
+  """References the entity this profile belongs to (used for RLS lookups)"""
+  entityId: UUID!
+
+  """References the user who owns this profile (for self-edit RLS)"""
+  actorId: UUID!
+
+  """Display name shown to other entity members"""
+  displayName: String
+
+  """
+  Email address visible to other entity members (auto-populated from verified primary email)
+  """
+  email: String
+
+  """Job title or role description visible to other entity members"""
+  title: String
+
+  """Short biography visible to other entity members"""
+  bio: String
+
+  """Profile picture visible to other entity members"""
+  profilePicture: ConstructiveInternalTypeImage
+
+  """
+  Reads a single `OrgMembership` that is related to this `OrgMemberProfile`.
+  """
+  membership: OrgMembership
+}
+
+scalar ConstructiveInternalTypeImage
+
+"""
+Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
+"""
+type OrgMembership {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """Whether this membership has been approved by an admin"""
+  isApproved: Boolean!
+
+  """Whether this member has been banned from the entity"""
+  isBanned: Boolean!
+
+  """Whether this membership is temporarily disabled"""
+  isDisabled: Boolean!
+
+  """
+  Computed field indicating the membership is approved, verified, not banned, and not disabled
+  """
+  isActive: Boolean!
+
+  """
+  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
+  """
+  isExternal: Boolean!
+
+  """Whether the actor is the owner of this entity"""
+  isOwner: Boolean!
+
+  """Whether the actor has admin privileges on this entity"""
+  isAdmin: Boolean!
+
+  """
+  Aggregated permission bitmask combining profile-based and directly granted permissions
+  """
+  permissions: BitString!
+
+  """
+  Bitmask of permissions directly granted to this member (not from profiles)
+  """
+  granted: BitString!
+
+  """References the user who holds this membership"""
+  actorId: UUID!
+
+  """References the entity (org or group) this membership belongs to"""
+  entityId: UUID!
+
+  """Whether this member has read-only access (blocks mutations when true)"""
+  isReadOnly: Boolean!
+  profileId: UUID
+
+  """
+  Reads a single `OrgMemberProfile` that is related to this `OrgMembership`.
+  """
+  orgMemberProfileByMembershipId: OrgMemberProfile
+}
+
+"""A `OrgMemberProfile` edge in the connection."""
+type OrgMemberProfileEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgMemberProfile` at the end of the edge."""
+  node: OrgMemberProfile
+}
+
+"""
+A filter to be used against `OrgMemberProfile` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgMemberProfileFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `membershipId` field."""
+  membershipId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `displayName` field."""
+  displayName: StringFilter
+
+  """Filter by the object’s `email` field."""
+  email: StringFilter
+
+  """Filter by the object’s `title` field."""
+  title: StringFilter
+
+  """Filter by the object’s `bio` field."""
+  bio: StringFilter
+
+  """Filter by the object’s `profilePicture` field."""
+  profilePicture: ConstructiveInternalTypeImageFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgMemberProfileFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgMemberProfileFilter!]
+
+  """Negates the expression."""
+  not: OrgMemberProfileFilter
+
+  """Filter by the object’s `membership` relation."""
+  membership: OrgMembershipFilter
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeImageFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: ConstructiveInternalTypeImage
+
+  """Not equal to the specified value."""
+  notEqualTo: ConstructiveInternalTypeImage
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ConstructiveInternalTypeImage
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ConstructiveInternalTypeImage
+
+  """Included in the specified list."""
+  in: [ConstructiveInternalTypeImage!]
+
+  """Not included in the specified list."""
+  notIn: [ConstructiveInternalTypeImage!]
+
+  """Less than the specified value."""
+  lessThan: ConstructiveInternalTypeImage
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Greater than the specified value."""
+  greaterThan: ConstructiveInternalTypeImage
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Contains the specified JSON."""
+  contains: ConstructiveInternalTypeImage
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: ConstructiveInternalTypeImage
+}
+
+"""
+A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgMembershipFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `isApproved` field."""
+  isApproved: BooleanFilter
+
+  """Filter by the object’s `isBanned` field."""
+  isBanned: BooleanFilter
+
+  """Filter by the object’s `isDisabled` field."""
+  isDisabled: BooleanFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isExternal` field."""
+  isExternal: BooleanFilter
+
+  """Filter by the object’s `isOwner` field."""
+  isOwner: BooleanFilter
+
+  """Filter by the object’s `isAdmin` field."""
+  isAdmin: BooleanFilter
+
+  """Filter by the object’s `permissions` field."""
+  permissions: BitStringFilter
+
+  """Filter by the object’s `granted` field."""
+  granted: BitStringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `isReadOnly` field."""
+  isReadOnly: BooleanFilter
+
+  """Filter by the object’s `profileId` field."""
+  profileId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgMembershipFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgMembershipFilter!]
+
+  """Negates the expression."""
+  not: OrgMembershipFilter
+
+  """Filter by the object’s `orgMemberProfileByMembershipId` relation."""
+  orgMemberProfileByMembershipId: OrgMemberProfileFilter
+
+  """A related `orgMemberProfileByMembershipId` exists."""
+  orgMemberProfileByMembershipIdExists: Boolean
+}
+
+"""Methods to use when ordering `OrgMemberProfile`."""
+enum OrgMemberProfileOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  MEMBERSHIP_ID_ASC
+  MEMBERSHIP_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  DISPLAY_NAME_ASC
+  DISPLAY_NAME_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  TITLE_ASC
+  TITLE_DESC
+  BIO_ASC
+  BIO_DESC
+  PROFILE_PICTURE_ASC
+  PROFILE_PICTURE_DESC
+}
+
 """A connection to a list of `AppMembership` values."""
 type AppMembershipConnection {
   """A list of `AppMembership` objects."""
@@ -7759,22 +7484,6 @@ type Mutation {
     input: CreateAppOwnerGrantInput!
   ): CreateAppOwnerGrantPayload
 
-  """Creates a single `AppAchievement`."""
-  createAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppAchievementInput!
-  ): CreateAppAchievementPayload
-
-  """Creates a single `AppStep`."""
-  createAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppStepInput!
-  ): CreateAppStepPayload
-
   """Creates a single `AppLimitCapsDefault`."""
   createAppLimitCapsDefault(
     """
@@ -7855,13 +7564,13 @@ type Mutation {
     input: CreateAppLimitCreditCodeItemInput!
   ): CreateAppLimitCreditCodeItemPayload
 
-  """Creates a single `AppLevelRequirement`."""
-  createAppLevelRequirement(
+  """Creates a single `AppLimitWarning`."""
+  createAppLimitWarning(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateAppLevelRequirementInput!
-  ): CreateAppLevelRequirementPayload
+    input: CreateAppLimitWarningInput!
+  ): CreateAppLimitWarningPayload
 
   """Creates a single `AppLimitCredit`."""
   createAppLimitCredit(
@@ -7870,6 +7579,14 @@ type Mutation {
     """
     input: CreateAppLimitCreditInput!
   ): CreateAppLimitCreditPayload
+
+  """Creates a single `OrgLimitWarning`."""
+  createOrgLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitWarningInput!
+  ): CreateOrgLimitWarningPayload
 
   """Creates a single `OrgLimitCredit`."""
   createOrgLimitCredit(
@@ -7967,22 +7684,6 @@ type Mutation {
     input: CreateUsageSnapshotInput!
   ): CreateUsageSnapshotPayload
 
-  """Creates a single `OrgMemberProfile`."""
-  createOrgMemberProfile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgMemberProfileInput!
-  ): CreateOrgMemberProfilePayload
-
-  """Creates a single `AppLevel`."""
-  createAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLevelInput!
-  ): CreateAppLevelPayload
-
   """Creates a single `AppLimit`."""
   createAppLimit(
     """
@@ -8022,6 +7723,14 @@ type Mutation {
     """
     input: CreateOrgLimitInput!
   ): CreateOrgLimitPayload
+
+  """Creates a single `OrgMemberProfile`."""
+  createOrgMemberProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgMemberProfileInput!
+  ): CreateOrgMemberProfilePayload
 
   """Creates a single `AppMembership`."""
   createAppMembership(
@@ -8125,22 +7834,6 @@ type Mutation {
     input: UpdateAppOwnerGrantInput!
   ): UpdateAppOwnerGrantPayload
 
-  """Updates a single `AppAchievement` using a unique key and a patch."""
-  updateAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppAchievementInput!
-  ): UpdateAppAchievementPayload
-
-  """Updates a single `AppStep` using a unique key and a patch."""
-  updateAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppStepInput!
-  ): UpdateAppStepPayload
-
   """Updates a single `AppLimitCapsDefault` using a unique key and a patch."""
   updateAppLimitCapsDefault(
     """
@@ -8223,13 +7916,13 @@ type Mutation {
     input: UpdateAppLimitCreditCodeItemInput!
   ): UpdateAppLimitCreditCodeItemPayload
 
-  """Updates a single `AppLevelRequirement` using a unique key and a patch."""
-  updateAppLevelRequirement(
+  """Updates a single `AppLimitWarning` using a unique key and a patch."""
+  updateAppLimitWarning(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateAppLevelRequirementInput!
-  ): UpdateAppLevelRequirementPayload
+    input: UpdateAppLimitWarningInput!
+  ): UpdateAppLimitWarningPayload
 
   """Updates a single `AppLimitCredit` using a unique key and a patch."""
   updateAppLimitCredit(
@@ -8238,6 +7931,14 @@ type Mutation {
     """
     input: UpdateAppLimitCreditInput!
   ): UpdateAppLimitCreditPayload
+
+  """Updates a single `OrgLimitWarning` using a unique key and a patch."""
+  updateOrgLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitWarningInput!
+  ): UpdateOrgLimitWarningPayload
 
   """Updates a single `OrgLimitCredit` using a unique key and a patch."""
   updateOrgLimitCredit(
@@ -8323,22 +8024,6 @@ type Mutation {
     input: UpdateUsageSnapshotInput!
   ): UpdateUsageSnapshotPayload
 
-  """Updates a single `OrgMemberProfile` using a unique key and a patch."""
-  updateOrgMemberProfile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgMemberProfileInput!
-  ): UpdateOrgMemberProfilePayload
-
-  """Updates a single `AppLevel` using a unique key and a patch."""
-  updateAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLevelInput!
-  ): UpdateAppLevelPayload
-
   """Updates a single `AppLimit` using a unique key and a patch."""
   updateAppLimit(
     """
@@ -8380,6 +8065,14 @@ type Mutation {
     """
     input: UpdateOrgLimitInput!
   ): UpdateOrgLimitPayload
+
+  """Updates a single `OrgMemberProfile` using a unique key and a patch."""
+  updateOrgMemberProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgMemberProfileInput!
+  ): UpdateOrgMemberProfilePayload
 
   """Updates a single `AppMembership` using a unique key and a patch."""
   updateAppMembership(
@@ -8477,22 +8170,6 @@ type Mutation {
     input: DeleteAppOwnerGrantInput!
   ): DeleteAppOwnerGrantPayload
 
-  """Deletes a single `AppAchievement` using a unique key."""
-  deleteAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppAchievementInput!
-  ): DeleteAppAchievementPayload
-
-  """Deletes a single `AppStep` using a unique key."""
-  deleteAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppStepInput!
-  ): DeleteAppStepPayload
-
   """Deletes a single `AppLimitCapsDefault` using a unique key."""
   deleteAppLimitCapsDefault(
     """
@@ -8573,13 +8250,13 @@ type Mutation {
     input: DeleteAppLimitCreditCodeItemInput!
   ): DeleteAppLimitCreditCodeItemPayload
 
-  """Deletes a single `AppLevelRequirement` using a unique key."""
-  deleteAppLevelRequirement(
+  """Deletes a single `AppLimitWarning` using a unique key."""
+  deleteAppLimitWarning(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteAppLevelRequirementInput!
-  ): DeleteAppLevelRequirementPayload
+    input: DeleteAppLimitWarningInput!
+  ): DeleteAppLimitWarningPayload
 
   """Deletes a single `AppLimitCredit` using a unique key."""
   deleteAppLimitCredit(
@@ -8588,6 +8265,14 @@ type Mutation {
     """
     input: DeleteAppLimitCreditInput!
   ): DeleteAppLimitCreditPayload
+
+  """Deletes a single `OrgLimitWarning` using a unique key."""
+  deleteOrgLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitWarningInput!
+  ): DeleteOrgLimitWarningPayload
 
   """Deletes a single `OrgLimitCredit` using a unique key."""
   deleteOrgLimitCredit(
@@ -8669,22 +8354,6 @@ type Mutation {
     input: DeleteUsageSnapshotInput!
   ): DeleteUsageSnapshotPayload
 
-  """Deletes a single `OrgMemberProfile` using a unique key."""
-  deleteOrgMemberProfile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgMemberProfileInput!
-  ): DeleteOrgMemberProfilePayload
-
-  """Deletes a single `AppLevel` using a unique key."""
-  deleteAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLevelInput!
-  ): DeleteAppLevelPayload
-
   """Deletes a single `AppLimit` using a unique key."""
   deleteAppLimit(
     """
@@ -8724,6 +8393,14 @@ type Mutation {
     """
     input: DeleteOrgLimitInput!
   ): DeleteOrgLimitPayload
+
+  """Deletes a single `OrgMemberProfile` using a unique key."""
+  deleteOrgMemberProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgMemberProfileInput!
+  ): DeleteOrgMemberProfilePayload
 
   """Deletes a single `AppMembership` using a unique key."""
   deleteAppMembership(
@@ -9261,104 +8938,6 @@ input AppOwnerGrantInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `AppAchievement` mutation."""
-type CreateAppAchievementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` that was created by this mutation."""
-  appAchievement: AppAchievement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppAchievement`. May be used by Relay 1."""
-  appAchievementEdge(
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppAchievementEdge
-}
-
-"""All input for the create `AppAchievement` mutation."""
-input CreateAppAchievementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` to be created by this mutation."""
-  appAchievement: AppAchievementInput!
-}
-
-"""An input for mutations affecting `AppAchievement`"""
-input AppAchievementInput {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement being tracked"""
-  name: String!
-
-  """Cumulative count of completed steps toward this requirement"""
-  count: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `AppStep` mutation."""
-type CreateAppStepPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppStep` that was created by this mutation."""
-  appStep: AppStep
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppStep`. May be used by Relay 1."""
-  appStepEdge(
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppStepEdge
-}
-
-"""All input for the create `AppStep` mutation."""
-input CreateAppStepInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppStep` to be created by this mutation."""
-  appStep: AppStepInput!
-}
-
-"""An input for mutations affecting `AppStep`"""
-input AppStepInput {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement this step fulfills"""
-  name: String!
-
-  """Number of units completed in this step action"""
-  count: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `AppLimitCapsDefault` mutation."""
 type CreateAppLimitCapsDefaultPayload {
   """
@@ -9877,61 +9456,60 @@ input AppLimitCreditCodeItemInput {
   creditType: String
 }
 
-"""The output of our create `AppLevelRequirement` mutation."""
-type CreateAppLevelRequirementPayload {
+"""The output of our create `AppLimitWarning` mutation."""
+type CreateAppLimitWarningPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` that was created by this mutation."""
-  appLevelRequirement: AppLevelRequirement
+  """The `AppLimitWarning` that was created by this mutation."""
+  appLimitWarning: AppLimitWarning
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
+  """An edge for our `AppLimitWarning`. May be used by Relay 1."""
+  appLimitWarningEdge(
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningEdge
 }
 
-"""All input for the create `AppLevelRequirement` mutation."""
-input CreateAppLevelRequirementInput {
+"""All input for the create `AppLimitWarning` mutation."""
+input CreateAppLimitWarningInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` to be created by this mutation."""
-  appLevelRequirement: AppLevelRequirementInput!
+  """The `AppLimitWarning` to be created by this mutation."""
+  appLimitWarning: AppLimitWarningInput!
 }
 
-"""An input for mutations affecting `AppLevelRequirement`"""
-input AppLevelRequirementInput {
+"""An input for mutations affecting `AppLimitWarning`"""
+input AppLimitWarningInput {
   id: UUID
 
-  """Name identifier of the requirement (matches step names)"""
+  """Limit name this warning applies to (must match a default_limits entry)"""
   name: String!
 
-  """Name of the level this requirement belongs to"""
-  level: String!
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
 
-  """Human-readable description of what this requirement entails"""
-  description: String
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
 
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int
-
-  """Display ordering priority; lower values appear first"""
-  priority: Int
-  createdAt: Datetime
-  updatedAt: Datetime
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
 }
 
 """The output of our create `AppLimitCredit` mutation."""
@@ -9989,6 +9567,65 @@ input AppLimitCreditInput {
 
   """Optional reason for the credit grant (promo code, admin grant, etc.)"""
   reason: String
+}
+
+"""The output of our create `OrgLimitWarning` mutation."""
+type CreateOrgLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` that was created by this mutation."""
+  orgLimitWarning: OrgLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitWarning`. May be used by Relay 1."""
+  orgLimitWarningEdge(
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningEdge
+}
+
+"""All input for the create `OrgLimitWarning` mutation."""
+input CreateOrgLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` to be created by this mutation."""
+  orgLimitWarning: OrgLimitWarningInput!
+}
+
+"""An input for mutations affecting `OrgLimitWarning`"""
+input OrgLimitWarningInput {
+  id: UUID
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String!
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
+
+  """Per-entity override (NULL = scope default for all entities)"""
+  entityId: UUID
 }
 
 """The output of our create `OrgLimitCredit` mutation."""
@@ -10672,128 +10309,6 @@ input UsageSnapshotInput {
   id: UUID
 }
 
-"""The output of our create `OrgMemberProfile` mutation."""
-type CreateOrgMemberProfilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgMemberProfile` that was created by this mutation."""
-  orgMemberProfile: OrgMemberProfile
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
-  orgMemberProfileEdge(
-    """The method to use when ordering `OrgMemberProfile`."""
-    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgMemberProfileEdge
-}
-
-"""All input for the create `OrgMemberProfile` mutation."""
-input CreateOrgMemberProfileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgMemberProfile` to be created by this mutation."""
-  orgMemberProfile: OrgMemberProfileInput!
-}
-
-"""An input for mutations affecting `OrgMemberProfile`"""
-input OrgMemberProfileInput {
-  id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """References the membership this profile belongs to (1:1)"""
-  membershipId: UUID!
-
-  """References the entity this profile belongs to (used for RLS lookups)"""
-  entityId: UUID!
-
-  """References the user who owns this profile (for self-edit RLS)"""
-  actorId: UUID!
-
-  """Display name shown to other entity members"""
-  displayName: String
-
-  """
-  Email address visible to other entity members (auto-populated from verified primary email)
-  """
-  email: String
-
-  """Job title or role description visible to other entity members"""
-  title: String
-
-  """Short biography visible to other entity members"""
-  bio: String
-
-  """Profile picture visible to other entity members"""
-  profilePicture: ConstructiveInternalTypeImage
-}
-
-"""The output of our create `AppLevel` mutation."""
-type CreateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was created by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the create `AppLevel` mutation."""
-input CreateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` to be created by this mutation."""
-  appLevel: AppLevelInput!
-}
-
-"""An input for mutations affecting `AppLevel`"""
-input AppLevelInput {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `AppLimit` mutation."""
 type CreateAppLimitPayload {
   """
@@ -11201,6 +10716,74 @@ input OrgLimitInput {
   """
   periodCredits: BigInt
   entityId: UUID!
+}
+
+"""The output of our create `OrgMemberProfile` mutation."""
+type CreateOrgMemberProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` that was created by this mutation."""
+  orgMemberProfile: OrgMemberProfile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
+  orgMemberProfileEdge(
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileEdge
+}
+
+"""All input for the create `OrgMemberProfile` mutation."""
+input CreateOrgMemberProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` to be created by this mutation."""
+  orgMemberProfile: OrgMemberProfileInput!
+}
+
+"""An input for mutations affecting `OrgMemberProfile`"""
+input OrgMemberProfileInput {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """References the membership this profile belongs to (1:1)"""
+  membershipId: UUID!
+
+  """References the entity this profile belongs to (used for RLS lookups)"""
+  entityId: UUID!
+
+  """References the user who owns this profile (for self-edit RLS)"""
+  actorId: UUID!
+
+  """Display name shown to other entity members"""
+  displayName: String
+
+  """
+  Email address visible to other entity members (auto-populated from verified primary email)
+  """
+  email: String
+
+  """Job title or role description visible to other entity members"""
+  title: String
+
+  """Short biography visible to other entity members"""
+  bio: String
+
+  """Profile picture visible to other entity members"""
+  profilePicture: ConstructiveInternalTypeImage
 }
 
 """The output of our create `AppMembership` mutation."""
@@ -11949,114 +11532,6 @@ input AppOwnerGrantPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `AppAchievement` mutation."""
-type UpdateAppAchievementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` that was updated by this mutation."""
-  appAchievement: AppAchievement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppAchievement`. May be used by Relay 1."""
-  appAchievementEdge(
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppAchievementEdge
-}
-
-"""All input for the `updateAppAchievement` mutation."""
-input UpdateAppAchievementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppAchievement` being updated.
-  """
-  appAchievementPatch: AppAchievementPatch!
-}
-
-"""
-Represents an update to a `AppAchievement`. Fields that are set will be updated.
-"""
-input AppAchievementPatch {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement being tracked"""
-  name: String
-
-  """Cumulative count of completed steps toward this requirement"""
-  count: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `AppStep` mutation."""
-type UpdateAppStepPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppStep` that was updated by this mutation."""
-  appStep: AppStep
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppStep`. May be used by Relay 1."""
-  appStepEdge(
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppStepEdge
-}
-
-"""All input for the `updateAppStep` mutation."""
-input UpdateAppStepInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppStep` being updated.
-  """
-  appStepPatch: AppStepPatch!
-}
-
-"""
-Represents an update to a `AppStep`. Fields that are set will be updated.
-"""
-input AppStepPatch {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement this step fulfills"""
-  name: String
-
-  """Number of units completed in this step action"""
-  count: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our update `AppLimitCapsDefault` mutation."""
 type UpdateAppLimitCapsDefaultPayload {
   """
@@ -12629,31 +12104,31 @@ input AppLimitCreditCodeItemPatch {
   creditType: String
 }
 
-"""The output of our update `AppLevelRequirement` mutation."""
-type UpdateAppLevelRequirementPayload {
+"""The output of our update `AppLimitWarning` mutation."""
+type UpdateAppLimitWarningPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` that was updated by this mutation."""
-  appLevelRequirement: AppLevelRequirement
+  """The `AppLimitWarning` that was updated by this mutation."""
+  appLimitWarning: AppLimitWarning
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
+  """An edge for our `AppLimitWarning`. May be used by Relay 1."""
+  appLimitWarningEdge(
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningEdge
 }
 
-"""All input for the `updateAppLevelRequirement` mutation."""
-input UpdateAppLevelRequirementInput {
+"""All input for the `updateAppLimitWarning` mutation."""
+input UpdateAppLimitWarningInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -12662,33 +12137,32 @@ input UpdateAppLevelRequirementInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `AppLevelRequirement` being updated.
+  An object where the defined keys will be set on the `AppLimitWarning` being updated.
   """
-  appLevelRequirementPatch: AppLevelRequirementPatch!
+  appLimitWarningPatch: AppLimitWarningPatch!
 }
 
 """
-Represents an update to a `AppLevelRequirement`. Fields that are set will be updated.
+Represents an update to a `AppLimitWarning`. Fields that are set will be updated.
 """
-input AppLevelRequirementPatch {
+input AppLimitWarningPatch {
   id: UUID
 
-  """Name identifier of the requirement (matches step names)"""
+  """Limit name this warning applies to (must match a default_limits entry)"""
   name: String
 
-  """Name of the level this requirement belongs to"""
-  level: String
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String
 
-  """Human-readable description of what this requirement entails"""
-  description: String
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt
 
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int
-
-  """Display ordering priority; lower values appear first"""
-  priority: Int
-  createdAt: Datetime
-  updatedAt: Datetime
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String
 }
 
 """The output of our update `AppLimitCredit` mutation."""
@@ -12751,6 +12225,70 @@ input AppLimitCreditPatch {
 
   """Optional reason for the credit grant (promo code, admin grant, etc.)"""
   reason: String
+}
+
+"""The output of our update `OrgLimitWarning` mutation."""
+type UpdateOrgLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` that was updated by this mutation."""
+  orgLimitWarning: OrgLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitWarning`. May be used by Relay 1."""
+  orgLimitWarningEdge(
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningEdge
+}
+
+"""All input for the `updateOrgLimitWarning` mutation."""
+input UpdateOrgLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimitWarning` being updated.
+  """
+  orgLimitWarningPatch: OrgLimitWarningPatch!
+}
+
+"""
+Represents an update to a `OrgLimitWarning`. Fields that are set will be updated.
+"""
+input OrgLimitWarningPatch {
+  id: UUID
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String
+
+  """Per-entity override (NULL = scope default for all entities)"""
+  entityId: UUID
 }
 
 """The output of our update `OrgLimitCredit` mutation."""
@@ -13362,147 +12900,6 @@ input UsageSnapshotPatch {
   id: UUID
 }
 
-"""The output of our update `OrgMemberProfile` mutation."""
-type UpdateOrgMemberProfilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgMemberProfile` that was updated by this mutation."""
-  orgMemberProfile: OrgMemberProfile
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
-  orgMemberProfileEdge(
-    """The method to use when ordering `OrgMemberProfile`."""
-    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgMemberProfileEdge
-}
-
-"""All input for the `updateOrgMemberProfile` mutation."""
-input UpdateOrgMemberProfileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgMemberProfile` being updated.
-  """
-  orgMemberProfilePatch: OrgMemberProfilePatch!
-}
-
-"""
-Represents an update to a `OrgMemberProfile`. Fields that are set will be updated.
-"""
-input OrgMemberProfilePatch {
-  id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """References the membership this profile belongs to (1:1)"""
-  membershipId: UUID
-
-  """References the entity this profile belongs to (used for RLS lookups)"""
-  entityId: UUID
-
-  """References the user who owns this profile (for self-edit RLS)"""
-  actorId: UUID
-
-  """Display name shown to other entity members"""
-  displayName: String
-
-  """
-  Email address visible to other entity members (auto-populated from verified primary email)
-  """
-  email: String
-
-  """Job title or role description visible to other entity members"""
-  title: String
-
-  """Short biography visible to other entity members"""
-  bio: String
-
-  """Profile picture visible to other entity members"""
-  profilePicture: ConstructiveInternalTypeImage
-
-  """Upload for Profile picture visible to other entity members"""
-  profilePictureUpload: Upload
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
-"""The output of our update `AppLevel` mutation."""
-type UpdateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was updated by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `updateAppLevel` mutation."""
-input UpdateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppLevel` being updated.
-  """
-  appLevelPatch: AppLevelPatch!
-}
-
-"""
-Represents an update to a `AppLevel`. Fields that are set will be updated.
-"""
-input AppLevelPatch {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Upload for Badge or icon image associated with this level"""
-  imageUpload: Upload
-}
-
 """The output of our update `AppLimit` mutation."""
 type UpdateAppLimitPayload {
   """
@@ -13936,6 +13333,85 @@ input OrgLimitPatch {
   periodCredits: BigInt
   entityId: UUID
 }
+
+"""The output of our update `OrgMemberProfile` mutation."""
+type UpdateOrgMemberProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` that was updated by this mutation."""
+  orgMemberProfile: OrgMemberProfile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
+  orgMemberProfileEdge(
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileEdge
+}
+
+"""All input for the `updateOrgMemberProfile` mutation."""
+input UpdateOrgMemberProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgMemberProfile` being updated.
+  """
+  orgMemberProfilePatch: OrgMemberProfilePatch!
+}
+
+"""
+Represents an update to a `OrgMemberProfile`. Fields that are set will be updated.
+"""
+input OrgMemberProfilePatch {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """References the membership this profile belongs to (1:1)"""
+  membershipId: UUID
+
+  """References the entity this profile belongs to (used for RLS lookups)"""
+  entityId: UUID
+
+  """References the user who owns this profile (for self-edit RLS)"""
+  actorId: UUID
+
+  """Display name shown to other entity members"""
+  displayName: String
+
+  """
+  Email address visible to other entity members (auto-populated from verified primary email)
+  """
+  email: String
+
+  """Job title or role description visible to other entity members"""
+  title: String
+
+  """Short biography visible to other entity members"""
+  bio: String
+
+  """Profile picture visible to other entity members"""
+  profilePicture: ConstructiveInternalTypeImage
+
+  """Upload for Profile picture visible to other entity members"""
+  profilePictureUpload: Upload
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 """The output of our update `AppMembership` mutation."""
 type UpdateAppMembershipPayload {
@@ -14502,72 +13978,6 @@ input DeleteAppOwnerGrantInput {
   id: UUID!
 }
 
-"""The output of our delete `AppAchievement` mutation."""
-type DeleteAppAchievementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` that was deleted by this mutation."""
-  appAchievement: AppAchievement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppAchievement`. May be used by Relay 1."""
-  appAchievementEdge(
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppAchievementEdge
-}
-
-"""All input for the `deleteAppAchievement` mutation."""
-input DeleteAppAchievementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppStep` mutation."""
-type DeleteAppStepPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppStep` that was deleted by this mutation."""
-  appStep: AppStep
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppStep`. May be used by Relay 1."""
-  appStepEdge(
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppStepEdge
-}
-
-"""All input for the `deleteAppStep` mutation."""
-input DeleteAppStepInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `AppLimitCapsDefault` mutation."""
 type DeleteAppLimitCapsDefaultPayload {
   """
@@ -14902,31 +14312,31 @@ input DeleteAppLimitCreditCodeItemInput {
   id: UUID!
 }
 
-"""The output of our delete `AppLevelRequirement` mutation."""
-type DeleteAppLevelRequirementPayload {
+"""The output of our delete `AppLimitWarning` mutation."""
+type DeleteAppLimitWarningPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` that was deleted by this mutation."""
-  appLevelRequirement: AppLevelRequirement
+  """The `AppLimitWarning` that was deleted by this mutation."""
+  appLimitWarning: AppLimitWarning
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
+  """An edge for our `AppLimitWarning`. May be used by Relay 1."""
+  appLimitWarningEdge(
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningEdge
 }
 
-"""All input for the `deleteAppLevelRequirement` mutation."""
-input DeleteAppLevelRequirementInput {
+"""All input for the `deleteAppLimitWarning` mutation."""
+input DeleteAppLimitWarningInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -14960,6 +14370,39 @@ type DeleteAppLimitCreditPayload {
 
 """All input for the `deleteAppLimitCredit` mutation."""
 input DeleteAppLimitCreditInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgLimitWarning` mutation."""
+type DeleteOrgLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` that was deleted by this mutation."""
+  orgLimitWarning: OrgLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitWarning`. May be used by Relay 1."""
+  orgLimitWarningEdge(
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningEdge
+}
+
+"""All input for the `deleteOrgLimitWarning` mutation."""
+input DeleteOrgLimitWarningInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -15298,72 +14741,6 @@ input DeleteUsageSnapshotInput {
   id: UUID!
 }
 
-"""The output of our delete `OrgMemberProfile` mutation."""
-type DeleteOrgMemberProfilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgMemberProfile` that was deleted by this mutation."""
-  orgMemberProfile: OrgMemberProfile
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
-  orgMemberProfileEdge(
-    """The method to use when ordering `OrgMemberProfile`."""
-    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgMemberProfileEdge
-}
-
-"""All input for the `deleteOrgMemberProfile` mutation."""
-input DeleteOrgMemberProfileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppLevel` mutation."""
-type DeleteAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was deleted by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `deleteAppLevel` mutation."""
-input DeleteAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `AppLimit` mutation."""
 type DeleteAppLimitPayload {
   """
@@ -15521,6 +14898,39 @@ type DeleteOrgLimitPayload {
 
 """All input for the `deleteOrgLimit` mutation."""
 input DeleteOrgLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgMemberProfile` mutation."""
+type DeleteOrgMemberProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` that was deleted by this mutation."""
+  orgMemberProfile: OrgMemberProfile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
+  orgMemberProfileEdge(
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileEdge
+}
+
+"""All input for the `deleteOrgMemberProfile` mutation."""
+input DeleteOrgMemberProfileInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.

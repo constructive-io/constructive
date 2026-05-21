@@ -7,8 +7,8 @@ React Query hooks for Partition data operations
 ## Usage
 
 ```typescript
-usePartitionsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyIds: true, interval: true, retention: true, lookahead: true, namingPattern: true, createdAt: true, updatedAt: true } } })
-usePartitionQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyIds: true, interval: true, retention: true, lookahead: true, namingPattern: true, createdAt: true, updatedAt: true } } })
+usePartitionsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } } })
+usePartitionQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } } })
 useCreatePartitionMutation({ selection: { fields: { id: true } } })
 useUpdatePartitionMutation({ selection: { fields: { id: true } } })
 useDeletePartitionMutation({})
@@ -20,7 +20,7 @@ useDeletePartitionMutation({})
 
 ```typescript
 const { data, isLoading } = usePartitionsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyIds: true, interval: true, retention: true, lookahead: true, namingPattern: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePartitionsQuery({
 const { mutate } = useCreatePartitionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyIds: '<UUID>', interval: '<String>', retention: '<String>', lookahead: '<Int>', namingPattern: '<String>' });
+mutate({ databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', premake: '<Int>', namingPattern: '<String>' });
 ```

@@ -3,10 +3,16 @@
  *
  * Detects text/varchar columns and generates trigram similarity scoring.
  * Wraps the same SQL logic as graphile-trgm but as a SearchAdapter.
+ *
+ * Supports chunk-aware querying via @hasChunks smart tag: when the parent
+ * table has chunks with a trigram index, the adapter includes a lateral
+ * subquery to find the best-matching chunk and returns
+ * GREATEST(parent_similarity, chunk_similarity).
  */
 
 import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
+import { getChunksInfo, type ChunksInfo } from './chunks';
 
 function isTextCodec(codec: any): boolean {
   const name = codec?.name;
@@ -82,7 +88,13 @@ export function createTrgmAdapter(
         codec.attributes as Record<string, any>
       )) {
         if (isTextCodec(attribute.codec)) {
-          columns.push({ attributeName });
+          // Store chunks info if available and chunks have trigram search
+          const chunksInfo = getChunksInfo(codec);
+          const hasChunkTrgm = chunksInfo?.searchIndexes.includes('trigram');
+          columns.push({
+            attributeName,
+            adapterData: hasChunkTrgm ? chunksInfo : undefined,
+          });
         }
       }
       return columns;
@@ -136,13 +148,48 @@ export function createTrgmAdapter(
     ): FilterApplyResult | null {
       if (filterValue == null) return null;
 
-      const { value, threshold } = filterValue;
+      const { value, threshold, includeChunks } = filterValue;
       if (!value || typeof value !== 'string' || value.trim().length === 0) return null;
 
       const th = threshold != null ? threshold : defaultThreshold;
       const columnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
       const similarityExpr = sql`similarity(${columnExpr}, ${sql.value(value)})`;
 
+      // Check for chunk-aware querying
+      const chunksInfo = column.adapterData as ChunksInfo | undefined;
+      if (chunksInfo && chunksInfo.searchIndexes.includes('trigram') && (includeChunks !== false)) {
+        const chunksTableRef = chunksInfo.chunksSchema
+          ? sql`${sql.identifier(chunksInfo.chunksSchema)}.${sql.identifier(chunksInfo.chunksTableName)}`
+          : sql`${sql.identifier(chunksInfo.chunksTableName)}`;
+        const parentFk = sql.identifier(chunksInfo.parentFkField);
+        const chunkContentField = sql.identifier(chunksInfo.contentField);
+        const parentId = sql`${alias}.${sql.identifier(chunksInfo.parentPkField)}`;
+        const chunksAlias = sql.identifier('__trgm_chunks');
+
+        // Subquery: MAX(similarity) across chunks (higher = better for trgm)
+        const chunkSimilaritySubquery = sql`(
+          SELECT MAX(similarity(${chunksAlias}.${chunkContentField}, ${sql.value(value)}))
+          FROM ${chunksTableRef} AS ${chunksAlias}
+          WHERE ${chunksAlias}.${parentFk} = ${parentId}
+            AND similarity(${chunksAlias}.${chunkContentField}, ${sql.value(value)}) > ${sql.value(th)}
+        )`;
+
+        // Combined: GREATEST of parent similarity and best chunk similarity
+        const combinedSimilarityExpr = sql`GREATEST(
+          COALESCE(${similarityExpr}, 0::real),
+          COALESCE(${chunkSimilaritySubquery}, 0::real)
+        )`;
+
+        // WHERE: parent matches OR any chunk matches
+        const whereClause = sql`(${similarityExpr} > ${sql.value(th)} OR ${chunkSimilaritySubquery} IS NOT NULL)`;
+
+        return {
+          whereClause,
+          scoreExpression: combinedSimilarityExpr,
+        };
+      }
+
+      // Standard (non-chunk) query
       return {
         whereClause: sql`${similarityExpr} > ${sql.value(th)}`,
         scoreExpression: similarityExpr,

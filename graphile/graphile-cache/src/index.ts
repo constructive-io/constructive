@@ -31,3 +31,6 @@ export {
 
 // Factory for creating PostGraphile v5 instances
 export { createGraphileInstance } from './create-instance';
+
+// Generic module config cache for plugin lookups
+export { ModuleConfigCache, ModuleConfigCacheOptions } from './module-config-cache';

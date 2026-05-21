@@ -12,8 +12,8 @@ csdk partition list --where.<field>.<op> <value> --orderBy <values>
 csdk partition list --limit 10 --after <cursor>
 csdk partition find-first --where.<field>.<op> <value>
 csdk partition get --id <UUID>
-csdk partition create --databaseId <UUID> --tableId <UUID> --strategy <String> --partitionKeyIds <UUID> [--interval <String>] [--retention <String>] [--lookahead <Int>] [--namingPattern <String>]
-csdk partition update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--strategy <String>] [--partitionKeyIds <UUID>] [--interval <String>] [--retention <String>] [--lookahead <Int>] [--namingPattern <String>]
+csdk partition create --databaseId <UUID> --tableId <UUID> --strategy <String> --partitionKeyId <UUID> [--interval <String>] [--retention <String>] [--premake <Int>] [--namingPattern <String>]
+csdk partition update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--strategy <String>] [--partitionKeyId <UUID>] [--interval <String>] [--retention <String>] [--premake <Int>] [--namingPattern <String>]
 csdk partition delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk partition list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a partition
 
 ```bash
-csdk partition create --databaseId <UUID> --tableId <UUID> --strategy <String> --partitionKeyIds <UUID> [--interval <String>] [--retention <String>] [--lookahead <Int>] [--namingPattern <String>]
+csdk partition create --databaseId <UUID> --tableId <UUID> --strategy <String> --partitionKeyId <UUID> [--interval <String>] [--retention <String>] [--premake <Int>] [--namingPattern <String>]
 ```
 
 ### Get a partition by id

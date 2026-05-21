@@ -1003,3 +1003,95 @@ describe('edge cases', () => {
     );
   });
 });
+
+// ============================================================================
+// Tests - Table Field Argument Input Types (Bucket-style computed fields)
+// ============================================================================
+
+describe('table field argument input types', () => {
+  it('emits Input types referenced only by table-field args', () => {
+    const bucketTable = createTable({
+      name: 'FooBucket',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        {
+          name: 'requestBulkUploadUrls',
+          type: { gqlType: 'String', isArray: true } as FieldType,
+          args: [
+            {
+              name: 'files',
+              type: createNonNull(
+                createList(
+                  createNonNull(
+                    createTypeRef('INPUT_OBJECT', 'FooBulkUploadFileInput'),
+                  ),
+                ),
+              ),
+              isRequired: true,
+            },
+          ],
+        },
+      ],
+    });
+
+    const registry = createTypeRegistry({
+      FooBulkUploadFileInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'FooBulkUploadFileInput',
+        inputFields: [
+          {
+            name: 'fileName',
+            type: createNonNull(createTypeRef('SCALAR', 'String')),
+          },
+          {
+            name: 'contentType',
+            type: createTypeRef('SCALAR', 'String'),
+          },
+          {
+            name: 'sizeBytes',
+            type: createNonNull(createTypeRef('SCALAR', 'Int')),
+          },
+        ],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [bucketTable]);
+
+    expect(result.content).toContain(
+      'export interface FooBulkUploadFileInput {',
+    );
+    expect(result.content).toContain('fileName: string;');
+    expect(result.content).toContain('contentType?: string;');
+    expect(result.content).toContain('sizeBytes: number;');
+  });
+
+  it('collectInputTypeNames discovers field-arg types when tables provided', () => {
+    const bucketTable = createTable({
+      name: 'FooBucket',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        {
+          name: 'requestBulkUploadUrls',
+          type: { gqlType: 'String', isArray: true } as FieldType,
+          args: [
+            {
+              name: 'files',
+              type: createNonNull(
+                createTypeRef('INPUT_OBJECT', 'FooBulkUploadFileInput'),
+              ),
+              isRequired: true,
+            },
+          ],
+        },
+      ],
+    });
+
+    // Without tables: only collects from operations
+    const withoutTables = collectInputTypeNames([]);
+    expect(withoutTables.has('FooBulkUploadFileInput')).toBe(false);
+
+    // With tables: also collects from field args
+    const withTables = collectInputTypeNames([], [bucketTable]);
+    expect(withTables.has('FooBulkUploadFileInput')).toBe(true);
+  });
+});

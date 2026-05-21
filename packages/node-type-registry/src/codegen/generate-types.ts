@@ -789,12 +789,26 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
     exportInterface('BlueprintStorageConfig', [
       addJSDoc(
         optionalProp(
+          'scope',
+          t.tsUnionType([
+            t.tsLiteralType(t.stringLiteral('app')),
+            t.tsLiteralType(t.stringLiteral('org'))
+          ])
+        ),
+        'Storage scope. "app" (default) creates app-level storage (no owner_id). "org" creates per-org/user storage (owner_id = org entity id, buckets seeded per-entity via AFTER INSERT trigger). Only "app" and "org" are allowed — child entity types get storage via entity_types[].storage.'
+      ),
+      addJSDoc(
+        optionalProp('storage_key', t.tsStringKeyword()),
+        'Discriminator for multi-module storage. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{storage_key}_buckets. Max 16 chars, lowercase snake_case.'
+      ),
+      addJSDoc(
+        optionalProp(
           'buckets',
           t.tsArrayType(
             t.tsTypeReference(t.identifier('BlueprintBucketSeed'))
           )
         ),
-        'Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. Only used for app-level storage (not entity-scoped).'
+        'Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning.'
       ),
       addJSDoc(
         optionalProp('upload_url_expiry_seconds', t.tsNumberKeyword()),
@@ -840,7 +854,103 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
         'Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults.'
       )
     ]),
-    'Storage configuration for an entity type. Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions.'
+    'Storage configuration with optional scope. When used at the top level of a blueprint, the scope field controls whether storage is app-level (\"app\", default) or org-level (\"org\"). Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions.'
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Achievement types
+// ---------------------------------------------------------------------------
+
+function buildBlueprintAchievementRequirement(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintAchievementRequirement', [
+      addJSDoc(
+        requiredProp('event_name', t.tsStringKeyword()),
+        'Name identifier matching an event_type or step name.'
+      ),
+      addJSDoc(
+        requiredProp('count', t.tsNumberKeyword()),
+        'Number of events needed to satisfy this requirement.'
+      ),
+      addJSDoc(
+        optionalProp('description', t.tsStringKeyword()),
+        'Human-readable description of what this requirement entails.'
+      )
+    ]),
+    'A requirement entry within a blueprint achievement. Defines what events must occur to earn the achievement.'
+  );
+}
+
+function buildBlueprintAchievementReward(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintAchievementReward', [
+      addJSDoc(
+        requiredProp(
+          'reward_type',
+          t.tsUnionType([
+            t.tsLiteralType(t.stringLiteral('limit_credit')),
+            t.tsLiteralType(t.stringLiteral('meter_credit'))
+          ])
+        ),
+        'Type of reward: limit_credit (grants limit credits) or meter_credit (grants meter credits).'
+      ),
+      addJSDoc(
+        requiredProp('target_name', t.tsStringKeyword()),
+        'Target limit name or meter slug for the credit grant.'
+      ),
+      addJSDoc(
+        requiredProp('amount', t.tsNumberKeyword()),
+        'Number of credits to grant.'
+      ),
+      addJSDoc(
+        optionalProp('credit_type', t.tsStringKeyword()),
+        'Credit type: permanent, expiring, etc. Defaults to "permanent".'
+      )
+    ]),
+    'A reward entry within a blueprint achievement. Defines credits granted when the achievement is earned.'
+  );
+}
+
+function buildBlueprintAchievement(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintAchievement', [
+      addJSDoc(
+        requiredProp('name', t.tsStringKeyword()),
+        'Unique name for the achievement level.'
+      ),
+      addJSDoc(
+        optionalProp('description', t.tsStringKeyword()),
+        'Human-readable description of this achievement.'
+      ),
+      addJSDoc(
+        optionalProp('priority', t.tsNumberKeyword()),
+        'Display ordering priority; lower values appear first. Defaults to 100.'
+      ),
+      addJSDoc(
+        requiredProp(
+          'requirements',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintAchievementRequirement'))
+          )
+        ),
+        'Requirements that must be met to earn this achievement.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'rewards',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintAchievementReward'))
+          )
+        ),
+        'Rewards granted when the achievement is earned.'
+      ),
+      addJSDoc(
+        optionalProp('entity_prefix', t.tsStringKeyword()),
+        'Entity prefix to scope this achievement to (e.g., "org", "app"). Used to resolve the correct events_module. Defaults to "app".'
+      )
+    ]),
+    'An achievement entry for the blueprint achievements[] section. Creates a level with requirements and optional rewards in the events_module. Requires events_module to be provisioned (e.g., via entity_types[].has_levels = true or modules includes events_module).'
   );
 }
 
@@ -893,8 +1003,8 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintEntityType', [
       addJSDoc(
-        requiredProp('name', t.tsStringKeyword()),
-        'Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database.'
+        optionalProp('name', t.tsStringKeyword()),
+        'Entity type name (e.g., "data_room", "channel", "department"). Required when creating a new entity type. Omit when extending an existing entity type (e.g., prefix: "org") — the entry will add storage/config to the existing type without creating a new one.'
       ),
       addJSDoc(
         requiredProp('prefix', t.tsStringKeyword()),
@@ -928,13 +1038,14 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
         optionalProp('has_levels', t.tsBooleanKeyword()),
         'Whether to provision a levels module for this entity type. Defaults to false.'
       ),
-      addJSDoc(
-        optionalProp('has_storage', t.tsBooleanKeyword()),
-        'Whether to provision a storage module (buckets, files tables) for this entity type. Defaults to false.'
-      ),
+
       addJSDoc(
         optionalProp('has_invites', t.tsBooleanKeyword()),
         'Whether to provision entity-scoped invite tables ({prefix}_invites, {prefix}_claimed_invites) and a submit_{prefix}_invite_code() function. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('has_invite_achievements', t.tsBooleanKeyword()),
+        "Whether to auto-attach an EventTracker to the claimed_invites table for invite-based achievements. Requires has_invites=true AND has_levels=true. When true, records 'invite_claimed' events credited to the sender (inviter) on each claimed invite. Defaults to false."
       ),
       addJSDoc(
         optionalProp('skip_entity_policies', t.tsBooleanKeyword()),
@@ -950,12 +1061,14 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp(
           'storage',
-          t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          )
         ),
-        'Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS).'
+        'Storage module configuration array. Each entry provisions a separate storage module with its own tables, RLS, and settings. When non-empty, has_storage is derived as true. Each entry may specify a storage_key for multi-module support (defaults to "default").'
       )
     ]),
-    'An entity type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
+    'An entity type entry for Phase 0 of construct_blueprint(). When name is provided, provisions a new entity type with its own entity table, membership modules, and security policies via entity_type_provision. When name is omitted and only prefix is given, extends an existing entity type (e.g., the built-in "org") with additional capabilities like storage — without creating a new entity type.'
   );
 }
 
@@ -1087,9 +1200,20 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp(
           'storage',
-          t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+          )
         ),
-        'App-level storage configuration. Creates a storage_module (membership_type = NULL), seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). Use provisions for per-table policy overrides. For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead.'
+        'Top-level storage configuration array. Each entry has an optional scope ("app" or "org"). App-scoped (default) creates storage_module with membership_type = NULL. Org-scoped creates per-org/user storage with owner_id and AFTER INSERT bucket seeding. When infra is installed, a private "functions" bucket is auto-injected into org-scoped entries. For child entity type storage, use entity_types[].storage instead.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'achievements',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintAchievement'))
+          )
+        ),
+        'Achievement definitions. Each entry creates a level with requirements and optional rewards in the events_module. Requires events_module to be provisioned (e.g., via entity_types[].has_levels = true or modules includes events_module).'
       )
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
@@ -1168,6 +1292,9 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintTableUniqueConstraint());
   statements.push(buildBlueprintBucketSeed());
   statements.push(buildBlueprintStorageConfig());
+  statements.push(buildBlueprintAchievementRequirement());
+  statements.push(buildBlueprintAchievementReward());
+  statements.push(buildBlueprintAchievement());
   statements.push(buildBlueprintEntityTableProvision());
   statements.push(buildBlueprintEntityType());
 

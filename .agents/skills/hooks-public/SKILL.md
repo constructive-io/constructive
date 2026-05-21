@@ -1,13 +1,13 @@
 ---
 name: hooks-public
-description: React Query hooks for the public API — provides typed query and mutation hooks for 149 tables and 71 custom operations
+description: React Query hooks for the public API — provides typed query and mutation hooks for 148 tables and 69 custom operations
 ---
 
 # hooks-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the public API — provides typed query and mutation hooks for 149 tables and 71 custom operations
+React Query hooks for the public API — provides typed query and mutation hooks for 148 tables and 69 custom operations
 
 ## Usage
 
@@ -44,7 +44,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-permission](references/app-permission.md)
 - [org-permission](references/org-permission.md)
 - [object](references/object.md)
-- [app-level-requirement](references/app-level-requirement.md)
 - [database](references/database.md)
 - [schema](references/schema.md)
 - [table](references/table.md)
@@ -95,14 +94,14 @@ See the `references/` directory for detailed per-entity API documentation:
 - [emails-module](references/emails-module.md)
 - [encrypted-secrets-module](references/encrypted-secrets-module.md)
 - [invites-module](references/invites-module.md)
-- [levels-module](references/levels-module.md)
+- [events-module](references/events-module.md)
 - [limits-module](references/limits-module.md)
 - [membership-types-module](references/membership-types-module.md)
 - [memberships-module](references/memberships-module.md)
 - [permissions-module](references/permissions-module.md)
 - [phone-numbers-module](references/phone-numbers-module.md)
 - [profiles-module](references/profiles-module.md)
-- [secrets-module](references/secrets-module.md)
+- [user-state-module](references/user-state-module.md)
 - [sessions-module](references/sessions-module.md)
 - [user-auth-module](references/user-auth-module.md)
 - [users-module](references/users-module.md)
@@ -134,9 +133,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit](references/org-limit.md)
 - [org-limit-credit](references/org-limit-credit.md)
 - [org-limit-aggregate](references/org-limit-aggregate.md)
-- [app-step](references/app-step.md)
-- [app-achievement](references/app-achievement.md)
-- [app-level](references/app-level.md)
+- [org-limit-warning](references/org-limit-warning.md)
 - [email](references/email.md)
 - [phone-number](references/phone-number.md)
 - [crypto-address](references/crypto-address.md)
@@ -165,6 +162,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [node-type-registry](references/node-type-registry.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
+- [app-limit-warning](references/app-limit-warning.md)
 - [user-connected-account](references/user-connected-account.md)
 - [commit](references/commit.md)
 - [pubkey-setting](references/pubkey-setting.md)
@@ -176,6 +174,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-limit-event](references/app-limit-event.md)
 - [org-limit-event](references/org-limit-event.md)
 - [rls-module](references/rls-module.md)
+- [rate-limit-meters-module](references/rate-limit-meters-module.md)
 - [plans-module](references/plans-module.md)
 - [sql-action](references/sql-action.md)
 - [database-setting](references/database-setting.md)
@@ -193,7 +192,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [require-step-up](references/require-step-up.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)
-- [steps-achieved](references/steps-achieved.md)
 - [rev-parse](references/rev-parse.md)
 - [resolve-blueprint-field](references/resolve-blueprint-field.md)
 - [org-is-manager-of](references/org-is-manager-of.md)
@@ -207,7 +205,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [get-all-objects-from-root](references/get-all-objects-from-root.md)
 - [get-path-objects-from-root](references/get-path-objects-from-root.md)
 - [get-object-at-path](references/get-object-at-path.md)
-- [steps-required](references/steps-required.md)
 - [current-user](references/current-user.md)
 - [send-account-deletion-email](references/send-account-deletion-email.md)
 - [sign-out](references/sign-out.md)

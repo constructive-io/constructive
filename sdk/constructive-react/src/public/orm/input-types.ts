@@ -288,22 +288,6 @@ export interface Object {
   frzn?: boolean | null;
   createdAt?: string | null;
 }
-/** Defines the specific requirements that must be met to achieve a level */
-export interface AppLevelRequirement {
-  id: string;
-  /** Name identifier of the requirement (matches step names) */
-  name?: string | null;
-  /** Name of the level this requirement belongs to */
-  level?: string | null;
-  /** Human-readable description of what this requirement entails */
-  description?: string | null;
-  /** Number of steps needed to satisfy this requirement */
-  requiredCount?: number | null;
-  /** Display ordering priority; lower values appear first */
-  priority?: number | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
 export interface Database {
   id: string;
   ownerId?: string | null;
@@ -601,8 +585,11 @@ export interface EmbeddingChunk {
   chunkOverlap?: number | null;
   chunkStrategy?: string | null;
   metadataFields?: Record<string, unknown> | null;
+  searchIndexes?: Record<string, unknown> | null;
   enqueueChunkingJob?: boolean | null;
   chunkingTaskName?: string | null;
+  embeddingModel?: string | null;
+  embeddingProvider?: string | null;
   parentFkFieldId?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -795,8 +782,8 @@ export interface RealtimeModule {
   listenerNodeTableId?: string | null;
   sourceRegistryTableId?: string | null;
   retentionHours?: number | null;
-  lookaheadHours?: number | null;
-  partitionInterval?: string | null;
+  premake?: number | null;
+  interval?: string | null;
   notifyChannel?: string | null;
 }
 export interface SchemaGrant {
@@ -954,10 +941,10 @@ export interface Partition {
   databaseId?: string | null;
   tableId?: string | null;
   strategy?: string | null;
-  partitionKeyIds?: string[] | null;
+  partitionKeyId?: string | null;
   interval?: string | null;
   retention?: string | null;
-  lookahead?: number | null;
+  premake?: number | null;
   namingPattern?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -1139,29 +1126,42 @@ export interface InvitesModule {
   membershipType?: number | null;
   entityTableId?: string | null;
 }
-export interface LevelsModule {
+export interface EventsModule {
   id: string;
   databaseId?: string | null;
   schemaId?: string | null;
   privateSchemaId?: string | null;
-  stepsTableId?: string | null;
-  stepsTableName?: string | null;
-  achievementsTableId?: string | null;
-  achievementsTableName?: string | null;
+  eventsTableId?: string | null;
+  eventsTableName?: string | null;
+  eventAggregatesTableId?: string | null;
+  eventAggregatesTableName?: string | null;
+  eventTypesTableId?: string | null;
+  eventTypesTableName?: string | null;
   levelsTableId?: string | null;
   levelsTableName?: string | null;
   levelRequirementsTableId?: string | null;
   levelRequirementsTableName?: string | null;
-  completedStep?: string | null;
-  incompletedStep?: string | null;
-  tgAchievement?: string | null;
-  tgAchievementToggle?: string | null;
-  tgAchievementToggleBoolean?: string | null;
-  tgAchievementBoolean?: string | null;
-  upsertAchievement?: string | null;
-  tgUpdateAchievements?: string | null;
+  levelGrantsTableId?: string | null;
+  levelGrantsTableName?: string | null;
+  achievementRewardsTableId?: string | null;
+  achievementRewardsTableName?: string | null;
+  recordEvent?: string | null;
+  removeEvent?: string | null;
+  tgEvent?: string | null;
+  tgEventToggle?: string | null;
+  tgEventToggleBool?: string | null;
+  tgEventBool?: string | null;
+  upsertAggregate?: string | null;
+  tgUpdateAggregates?: string | null;
+  pruneEvents?: string | null;
   stepsRequired?: string | null;
   levelAchieved?: string | null;
+  tgCheckAchievements?: string | null;
+  grantAchievement?: string | null;
+  tgAchievementReward?: string | null;
+  interval?: string | null;
+  retention?: string | null;
+  premake?: number | null;
   prefix?: string | null;
   membershipType?: number | null;
   entityTableId?: string | null;
@@ -1192,6 +1192,10 @@ export interface LimitsModule {
   limitCapsDefaultsTableId?: string | null;
   capCheckTrigger?: string | null;
   resolveCapFunction?: string | null;
+  limitWarningsTableId?: string | null;
+  limitWarningStateTableId?: string | null;
+  limitCheckSoftFunction?: string | null;
+  limitAggregateCheckSoftFunction?: string | null;
   prefix?: string | null;
   membershipType?: number | null;
   entityTableId?: string | null;
@@ -1290,7 +1294,7 @@ export interface ProfilesModule {
   membershipsTableId?: string | null;
   prefix?: string | null;
 }
-export interface SecretsModule {
+export interface UserStateModule {
   id: string;
   databaseId?: string | null;
   schemaId?: string | null;
@@ -1543,7 +1547,7 @@ export interface EntityTypeProvision {
    */
   hasProfiles?: boolean | null;
   /**
-   * Whether to provision levels_module for this type. Defaults to false.
+   * Whether to provision events_module for this type. Defaults to false.
    *      Levels provide gamification/achievement tracking for members.
    *      When true, creates level steps, achievements, and level tables with security.
    */
@@ -1565,6 +1569,16 @@ export interface EntityTypeProvision {
    *      ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
    */
   hasInvites?: boolean | null;
+  /**
+   * Whether to auto-attach an EventTracker to the claimed_invites table for invite-based
+   *      achievements. Defaults to false. Requires has_invites=true AND has_levels=true.
+   *      When true, the trigger calls event_tracker() on the claimed_invites table with
+   *      event_name='invite_claimed', actor_field='sender_id', events=['INSERT'],
+   *      crediting the SENDER (inviter) when someone claims their invite code.
+   *      Developers can then define achievements in the blueprint achievements[] section
+   *      that reference the 'invite_claimed' event (e.g., "Invite 5 friends" = count: 5).
+   */
+  hasInviteAchievements?: boolean | null;
   /**
    * Optional jsonb object for storage module configuration and initial bucket seeding.
    *      Only used when has_storage = true; ignored otherwise. NULL = use defaults.
@@ -2059,41 +2073,19 @@ export interface OrgLimitAggregate {
   /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
   reserved?: string | null;
 }
-/** Log of individual user actions toward level requirements; every single step ever taken is recorded here */
-export interface AppStep {
+/** Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. */
+export interface OrgLimitWarning {
   id: string;
-  actorId?: string | null;
-  /** Name identifier of the level requirement this step fulfills */
+  /** Limit name this warning applies to (must match a default_limits entry) */
   name?: string | null;
-  /** Number of units completed in this step action */
-  count?: number | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-/** Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually */
-export interface AppAchievement {
-  id: string;
-  actorId?: string | null;
-  /** Name identifier of the level requirement being tracked */
-  name?: string | null;
-  /** Cumulative count of completed steps toward this requirement */
-  count?: number | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-/** Defines available levels that users can achieve by completing requirements */
-export interface AppLevel {
-  id: string;
-  /** Unique name of the level */
-  name?: string | null;
-  /** Human-readable description of what this level represents */
-  description?: string | null;
-  /** Badge or icon image associated with this level */
-  image?: ConstructiveInternalTypeImage | null;
-  /** Optional owner (actor) who created or manages this level */
-  ownerId?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType?: string | null;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue?: string | null;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier?: string | null;
+  /** Per-entity override (NULL = scope default for all entities) */
+  entityId?: string | null;
 }
 /** User email addresses with verification and primary-email management */
 export interface Email {
@@ -2476,6 +2468,18 @@ export interface OrgLimitDefault {
   /** Default soft limit threshold for warnings; NULL means no soft limit */
   softMax?: string | null;
 }
+/** Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. */
+export interface AppLimitWarning {
+  id: string;
+  /** Limit name this warning applies to (must match a default_limits entry) */
+  name?: string | null;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType?: string | null;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue?: string | null;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier?: string | null;
+}
 export interface UserConnectedAccount {
   id: string;
   ownerId?: string | null;
@@ -2652,6 +2656,20 @@ export interface RlsModule {
   authenticateStrict?: string | null;
   currentRole?: string | null;
   currentRoleId?: string | null;
+}
+export interface RateLimitMetersModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  rateLimitStateTableId?: string | null;
+  rateLimitStateTableName?: string | null;
+  rateLimitOverridesTableId?: string | null;
+  rateLimitOverridesTableName?: string | null;
+  rateWindowLimitsTableId?: string | null;
+  rateWindowLimitsTableName?: string | null;
+  checkRateLimitFunction?: string | null;
+  prefix?: string | null;
 }
 export interface PlansModule {
   id: string;
@@ -2918,7 +2936,6 @@ export interface GetAllRecordRelations {}
 export interface AppPermissionRelations {}
 export interface OrgPermissionRelations {}
 export interface ObjectRelations {}
-export interface AppLevelRequirementRelations {}
 export interface DatabaseRelations {
   owner?: User | null;
   databaseSetting?: DatabaseSetting | null;
@@ -2932,6 +2949,7 @@ export interface DatabaseRelations {
   plansModule?: PlansModule | null;
   billingModule?: BillingModule | null;
   billingProviderModule?: BillingProviderModule | null;
+  rateLimitMetersModule?: RateLimitMetersModule | null;
   schemas?: ConnectionResult<Schema>;
   tables?: ConnectionResult<Table>;
   checkConstraints?: ConnectionResult<CheckConstraint>;
@@ -2975,14 +2993,14 @@ export interface DatabaseRelations {
   emailsModules?: ConnectionResult<EmailsModule>;
   encryptedSecretsModules?: ConnectionResult<EncryptedSecretsModule>;
   invitesModules?: ConnectionResult<InvitesModule>;
-  levelsModules?: ConnectionResult<LevelsModule>;
+  eventsModules?: ConnectionResult<EventsModule>;
   limitsModules?: ConnectionResult<LimitsModule>;
   membershipTypesModules?: ConnectionResult<MembershipTypesModule>;
   membershipsModules?: ConnectionResult<MembershipsModule>;
   permissionsModules?: ConnectionResult<PermissionsModule>;
   phoneNumbersModules?: ConnectionResult<PhoneNumbersModule>;
   profilesModules?: ConnectionResult<ProfilesModule>;
-  secretsModules?: ConnectionResult<SecretsModule>;
+  userStateModules?: ConnectionResult<UserStateModule>;
   sessionsModules?: ConnectionResult<SessionsModule>;
   userAuthModules?: ConnectionResult<UserAuthModule>;
   usersModules?: ConnectionResult<UsersModule>;
@@ -3209,6 +3227,7 @@ export interface DatabaseTransferRelations {
 }
 export interface PartitionRelations {
   database?: Database | null;
+  partitionKey?: Field | null;
   table?: Table | null;
 }
 export interface ApiRelations {
@@ -3289,16 +3308,19 @@ export interface InvitesModuleRelations {
   schema?: Schema | null;
   usersTable?: Table | null;
 }
-export interface LevelsModuleRelations {
-  achievementsTable?: Table | null;
+export interface EventsModuleRelations {
+  achievementRewardsTable?: Table | null;
   actorTable?: Table | null;
   database?: Database | null;
   entityTable?: Table | null;
+  eventAggregatesTable?: Table | null;
+  eventTypesTable?: Table | null;
+  eventsTable?: Table | null;
+  levelGrantsTable?: Table | null;
   levelRequirementsTable?: Table | null;
   levelsTable?: Table | null;
   privateSchema?: Schema | null;
   schema?: Schema | null;
-  stepsTable?: Table | null;
 }
 export interface LimitsModuleRelations {
   actorTable?: Table | null;
@@ -3313,6 +3335,8 @@ export interface LimitsModuleRelations {
   limitCapsDefaultsTable?: Table | null;
   limitCapsTable?: Table | null;
   limitCreditsTable?: Table | null;
+  limitWarningStateTable?: Table | null;
+  limitWarningsTable?: Table | null;
   privateSchema?: Schema | null;
   schema?: Schema | null;
   table?: Table | null;
@@ -3370,7 +3394,7 @@ export interface ProfilesModuleRelations {
   schema?: Schema | null;
   table?: Table | null;
 }
-export interface SecretsModuleRelations {
+export interface UserStateModuleRelations {
   database?: Database | null;
   schema?: Schema | null;
   table?: Table | null;
@@ -3540,14 +3564,8 @@ export interface OrgLimitCreditRelations {
 export interface OrgLimitAggregateRelations {
   entity?: User | null;
 }
-export interface AppStepRelations {
-  actor?: User | null;
-}
-export interface AppAchievementRelations {
-  actor?: User | null;
-}
-export interface AppLevelRelations {
-  owner?: User | null;
+export interface OrgLimitWarningRelations {
+  entity?: User | null;
 }
 export interface EmailRelations {
   owner?: User | null;
@@ -3624,6 +3642,7 @@ export interface AppLimitDefaultRelations {
 export interface OrgLimitDefaultRelations {
   orgLimitCreditsByDefaultLimitId?: ConnectionResult<OrgLimitCredit>;
 }
+export interface AppLimitWarningRelations {}
 export interface UserConnectedAccountRelations {}
 export interface CommitRelations {}
 export interface PubkeySettingRelations {
@@ -3666,6 +3685,14 @@ export interface RlsModuleRelations {
   sessionCredentialsTable?: Table | null;
   sessionsTable?: Table | null;
   usersTable?: Table | null;
+}
+export interface RateLimitMetersModuleRelations {
+  database?: Database | null;
+  privateSchema?: Schema | null;
+  rateLimitOverridesTableByRateLimitOverridesTableId?: Table | null;
+  rateLimitStateTableByRateLimitStateTableId?: Table | null;
+  rateWindowLimitsTableByRateWindowLimitsTableId?: Table | null;
+  schema?: Schema | null;
 }
 export interface PlansModuleRelations {
   database?: Database | null;
@@ -3732,9 +3759,7 @@ export interface UserRelations {
   orgLimitCreditsByActorId?: ConnectionResult<OrgLimitCredit>;
   orgLimitCreditsByEntityId?: ConnectionResult<OrgLimitCredit>;
   orgLimitAggregatesByEntityId?: ConnectionResult<OrgLimitAggregate>;
-  appStepsByActorId?: ConnectionResult<AppStep>;
-  appAchievementsByActorId?: ConnectionResult<AppAchievement>;
-  ownedAppLevels?: ConnectionResult<AppLevel>;
+  orgLimitWarningsByEntityId?: ConnectionResult<OrgLimitWarning>;
   ownedEmails?: ConnectionResult<Email>;
   ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
   ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
@@ -3804,7 +3829,6 @@ export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type AppPermissionWithRelations = AppPermission & AppPermissionRelations;
 export type OrgPermissionWithRelations = OrgPermission & OrgPermissionRelations;
 export type ObjectWithRelations = Object & ObjectRelations;
-export type AppLevelRequirementWithRelations = AppLevelRequirement & AppLevelRequirementRelations;
 export type DatabaseWithRelations = Database & DatabaseRelations;
 export type SchemaWithRelations = Schema & SchemaRelations;
 export type TableWithRelations = Table & TableRelations;
@@ -3864,7 +3888,7 @@ export type EmailsModuleWithRelations = EmailsModule & EmailsModuleRelations;
 export type EncryptedSecretsModuleWithRelations = EncryptedSecretsModule &
   EncryptedSecretsModuleRelations;
 export type InvitesModuleWithRelations = InvitesModule & InvitesModuleRelations;
-export type LevelsModuleWithRelations = LevelsModule & LevelsModuleRelations;
+export type EventsModuleWithRelations = EventsModule & EventsModuleRelations;
 export type LimitsModuleWithRelations = LimitsModule & LimitsModuleRelations;
 export type MembershipTypesModuleWithRelations = MembershipTypesModule &
   MembershipTypesModuleRelations;
@@ -3872,7 +3896,7 @@ export type MembershipsModuleWithRelations = MembershipsModule & MembershipsModu
 export type PermissionsModuleWithRelations = PermissionsModule & PermissionsModuleRelations;
 export type PhoneNumbersModuleWithRelations = PhoneNumbersModule & PhoneNumbersModuleRelations;
 export type ProfilesModuleWithRelations = ProfilesModule & ProfilesModuleRelations;
-export type SecretsModuleWithRelations = SecretsModule & SecretsModuleRelations;
+export type UserStateModuleWithRelations = UserStateModule & UserStateModuleRelations;
 export type SessionsModuleWithRelations = SessionsModule & SessionsModuleRelations;
 export type UserAuthModuleWithRelations = UserAuthModule & UserAuthModuleRelations;
 export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
@@ -3910,9 +3934,7 @@ export type AppLimitCreditRedemptionWithRelations = AppLimitCreditRedemption &
 export type OrgLimitWithRelations = OrgLimit & OrgLimitRelations;
 export type OrgLimitCreditWithRelations = OrgLimitCredit & OrgLimitCreditRelations;
 export type OrgLimitAggregateWithRelations = OrgLimitAggregate & OrgLimitAggregateRelations;
-export type AppStepWithRelations = AppStep & AppStepRelations;
-export type AppAchievementWithRelations = AppAchievement & AppAchievementRelations;
-export type AppLevelWithRelations = AppLevel & AppLevelRelations;
+export type OrgLimitWarningWithRelations = OrgLimitWarning & OrgLimitWarningRelations;
 export type EmailWithRelations = Email & EmailRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
@@ -3942,6 +3964,7 @@ export type DevicesModuleWithRelations = DevicesModule & DevicesModuleRelations;
 export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
+export type AppLimitWarningWithRelations = AppLimitWarning & AppLimitWarningRelations;
 export type UserConnectedAccountWithRelations = UserConnectedAccount &
   UserConnectedAccountRelations;
 export type CommitWithRelations = Commit & CommitRelations;
@@ -3956,6 +3979,8 @@ export type RlsSettingWithRelations = RlsSetting & RlsSettingRelations;
 export type AppLimitEventWithRelations = AppLimitEvent & AppLimitEventRelations;
 export type OrgLimitEventWithRelations = OrgLimitEvent & OrgLimitEventRelations;
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
+export type RateLimitMetersModuleWithRelations = RateLimitMetersModule &
+  RateLimitMetersModuleRelations;
 export type PlansModuleWithRelations = PlansModule & PlansModuleRelations;
 export type SqlActionWithRelations = SqlAction & SqlActionRelations;
 export type DatabaseSettingWithRelations = DatabaseSetting & DatabaseSettingRelations;
@@ -4006,16 +4031,6 @@ export type ObjectSelect = {
   frzn?: boolean;
   createdAt?: boolean;
 };
-export type AppLevelRequirementSelect = {
-  id?: boolean;
-  name?: boolean;
-  level?: boolean;
-  description?: boolean;
-  requiredCount?: boolean;
-  priority?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-};
 export type DatabaseSelect = {
   id?: boolean;
   ownerId?: boolean;
@@ -4060,6 +4075,9 @@ export type DatabaseSelect = {
   };
   billingProviderModule?: {
     select: BillingProviderModuleSelect;
+  };
+  rateLimitMetersModule?: {
+    select: RateLimitMetersModuleSelect;
   };
   schemas?: {
     select: SchemaSelect;
@@ -4319,11 +4337,11 @@ export type DatabaseSelect = {
     filter?: InvitesModuleFilter;
     orderBy?: InvitesModuleOrderBy[];
   };
-  levelsModules?: {
-    select: LevelsModuleSelect;
+  eventsModules?: {
+    select: EventsModuleSelect;
     first?: number;
-    filter?: LevelsModuleFilter;
-    orderBy?: LevelsModuleOrderBy[];
+    filter?: EventsModuleFilter;
+    orderBy?: EventsModuleOrderBy[];
   };
   limitsModules?: {
     select: LimitsModuleSelect;
@@ -4361,11 +4379,11 @@ export type DatabaseSelect = {
     filter?: ProfilesModuleFilter;
     orderBy?: ProfilesModuleOrderBy[];
   };
-  secretsModules?: {
-    select: SecretsModuleSelect;
+  userStateModules?: {
+    select: UserStateModuleSelect;
     first?: number;
-    filter?: SecretsModuleFilter;
-    orderBy?: SecretsModuleOrderBy[];
+    filter?: UserStateModuleFilter;
+    orderBy?: UserStateModuleOrderBy[];
   };
   sessionsModules?: {
     select: SessionsModuleSelect;
@@ -5125,8 +5143,11 @@ export type EmbeddingChunkSelect = {
   chunkOverlap?: boolean;
   chunkStrategy?: boolean;
   metadataFields?: boolean;
+  searchIndexes?: boolean;
   enqueueChunkingJob?: boolean;
   chunkingTaskName?: boolean;
+  embeddingModel?: boolean;
+  embeddingProvider?: boolean;
   parentFkFieldId?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -5253,8 +5274,8 @@ export type RealtimeModuleSelect = {
   listenerNodeTableId?: boolean;
   sourceRegistryTableId?: boolean;
   retentionHours?: boolean;
-  lookaheadHours?: boolean;
-  partitionInterval?: boolean;
+  premake?: boolean;
+  interval?: boolean;
   notifyChannel?: boolean;
   changeLogTable?: {
     select: TableSelect;
@@ -5470,15 +5491,18 @@ export type PartitionSelect = {
   databaseId?: boolean;
   tableId?: boolean;
   strategy?: boolean;
-  partitionKeyIds?: boolean;
+  partitionKeyId?: boolean;
   interval?: boolean;
   retention?: boolean;
-  lookahead?: boolean;
+  premake?: boolean;
   namingPattern?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   database?: {
     select: DatabaseSelect;
+  };
+  partitionKey?: {
+    select: FieldSelect;
   };
   table?: {
     select: TableSelect;
@@ -5803,34 +5827,47 @@ export type InvitesModuleSelect = {
     select: TableSelect;
   };
 };
-export type LevelsModuleSelect = {
+export type EventsModuleSelect = {
   id?: boolean;
   databaseId?: boolean;
   schemaId?: boolean;
   privateSchemaId?: boolean;
-  stepsTableId?: boolean;
-  stepsTableName?: boolean;
-  achievementsTableId?: boolean;
-  achievementsTableName?: boolean;
+  eventsTableId?: boolean;
+  eventsTableName?: boolean;
+  eventAggregatesTableId?: boolean;
+  eventAggregatesTableName?: boolean;
+  eventTypesTableId?: boolean;
+  eventTypesTableName?: boolean;
   levelsTableId?: boolean;
   levelsTableName?: boolean;
   levelRequirementsTableId?: boolean;
   levelRequirementsTableName?: boolean;
-  completedStep?: boolean;
-  incompletedStep?: boolean;
-  tgAchievement?: boolean;
-  tgAchievementToggle?: boolean;
-  tgAchievementToggleBoolean?: boolean;
-  tgAchievementBoolean?: boolean;
-  upsertAchievement?: boolean;
-  tgUpdateAchievements?: boolean;
+  levelGrantsTableId?: boolean;
+  levelGrantsTableName?: boolean;
+  achievementRewardsTableId?: boolean;
+  achievementRewardsTableName?: boolean;
+  recordEvent?: boolean;
+  removeEvent?: boolean;
+  tgEvent?: boolean;
+  tgEventToggle?: boolean;
+  tgEventToggleBool?: boolean;
+  tgEventBool?: boolean;
+  upsertAggregate?: boolean;
+  tgUpdateAggregates?: boolean;
+  pruneEvents?: boolean;
   stepsRequired?: boolean;
   levelAchieved?: boolean;
+  tgCheckAchievements?: boolean;
+  grantAchievement?: boolean;
+  tgAchievementReward?: boolean;
+  interval?: boolean;
+  retention?: boolean;
+  premake?: boolean;
   prefix?: boolean;
   membershipType?: boolean;
   entityTableId?: boolean;
   actorTableId?: boolean;
-  achievementsTable?: {
+  achievementRewardsTable?: {
     select: TableSelect;
   };
   actorTable?: {
@@ -5840,6 +5877,18 @@ export type LevelsModuleSelect = {
     select: DatabaseSelect;
   };
   entityTable?: {
+    select: TableSelect;
+  };
+  eventAggregatesTable?: {
+    select: TableSelect;
+  };
+  eventTypesTable?: {
+    select: TableSelect;
+  };
+  eventsTable?: {
+    select: TableSelect;
+  };
+  levelGrantsTable?: {
     select: TableSelect;
   };
   levelRequirementsTable?: {
@@ -5853,9 +5902,6 @@ export type LevelsModuleSelect = {
   };
   schema?: {
     select: SchemaSelect;
-  };
-  stepsTable?: {
-    select: TableSelect;
   };
 };
 export type LimitsModuleSelect = {
@@ -5883,6 +5929,10 @@ export type LimitsModuleSelect = {
   limitCapsDefaultsTableId?: boolean;
   capCheckTrigger?: boolean;
   resolveCapFunction?: boolean;
+  limitWarningsTableId?: boolean;
+  limitWarningStateTableId?: boolean;
+  limitCheckSoftFunction?: boolean;
+  limitAggregateCheckSoftFunction?: boolean;
   prefix?: boolean;
   membershipType?: boolean;
   entityTableId?: boolean;
@@ -5921,6 +5971,12 @@ export type LimitsModuleSelect = {
     select: TableSelect;
   };
   limitCreditsTable?: {
+    select: TableSelect;
+  };
+  limitWarningStateTable?: {
+    select: TableSelect;
+  };
+  limitWarningsTable?: {
     select: TableSelect;
   };
   privateSchema?: {
@@ -6155,7 +6211,7 @@ export type ProfilesModuleSelect = {
     select: TableSelect;
   };
 };
-export type SecretsModuleSelect = {
+export type UserStateModuleSelect = {
   id?: boolean;
   databaseId?: boolean;
   schemaId?: boolean;
@@ -6430,6 +6486,7 @@ export type EntityTypeProvisionSelect = {
   hasLevels?: boolean;
   hasStorage?: boolean;
   hasInvites?: boolean;
+  hasInviteAchievements?: boolean;
   storageConfig?: boolean;
   skipEntityPolicies?: boolean;
   tableProvision?: boolean;
@@ -6900,37 +6957,14 @@ export type OrgLimitAggregateSelect = {
     select: UserSelect;
   };
 };
-export type AppStepSelect = {
-  id?: boolean;
-  actorId?: boolean;
-  name?: boolean;
-  count?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  actor?: {
-    select: UserSelect;
-  };
-};
-export type AppAchievementSelect = {
-  id?: boolean;
-  actorId?: boolean;
-  name?: boolean;
-  count?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  actor?: {
-    select: UserSelect;
-  };
-};
-export type AppLevelSelect = {
+export type OrgLimitWarningSelect = {
   id?: boolean;
   name?: boolean;
-  description?: boolean;
-  image?: boolean;
-  ownerId?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  owner?: {
+  warningType?: boolean;
+  thresholdValue?: boolean;
+  taskIdentifier?: boolean;
+  entityId?: boolean;
+  entity?: {
     select: UserSelect;
   };
 };
@@ -7290,6 +7324,13 @@ export type OrgLimitDefaultSelect = {
     orderBy?: OrgLimitCreditOrderBy[];
   };
 };
+export type AppLimitWarningSelect = {
+  id?: boolean;
+  name?: boolean;
+  warningType?: boolean;
+  thresholdValue?: boolean;
+  taskIdentifier?: boolean;
+};
 export type UserConnectedAccountSelect = {
   id?: boolean;
   ownerId?: boolean;
@@ -7485,6 +7526,38 @@ export type RlsModuleSelect = {
   };
   usersTable?: {
     select: TableSelect;
+  };
+};
+export type RateLimitMetersModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  privateSchemaId?: boolean;
+  rateLimitStateTableId?: boolean;
+  rateLimitStateTableName?: boolean;
+  rateLimitOverridesTableId?: boolean;
+  rateLimitOverridesTableName?: boolean;
+  rateWindowLimitsTableId?: boolean;
+  rateWindowLimitsTableName?: boolean;
+  checkRateLimitFunction?: boolean;
+  prefix?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  privateSchema?: {
+    select: SchemaSelect;
+  };
+  rateLimitOverridesTableByRateLimitOverridesTableId?: {
+    select: TableSelect;
+  };
+  rateLimitStateTableByRateLimitStateTableId?: {
+    select: TableSelect;
+  };
+  rateWindowLimitsTableByRateWindowLimitsTableId?: {
+    select: TableSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
   };
 };
 export type PlansModuleSelect = {
@@ -7855,23 +7928,11 @@ export type UserSelect = {
     filter?: OrgLimitAggregateFilter;
     orderBy?: OrgLimitAggregateOrderBy[];
   };
-  appStepsByActorId?: {
-    select: AppStepSelect;
+  orgLimitWarningsByEntityId?: {
+    select: OrgLimitWarningSelect;
     first?: number;
-    filter?: AppStepFilter;
-    orderBy?: AppStepOrderBy[];
-  };
-  appAchievementsByActorId?: {
-    select: AppAchievementSelect;
-    first?: number;
-    filter?: AppAchievementFilter;
-    orderBy?: AppAchievementOrderBy[];
-  };
-  ownedAppLevels?: {
-    select: AppLevelSelect;
-    first?: number;
-    filter?: AppLevelFilter;
-    orderBy?: AppLevelOrderBy[];
+    filter?: OrgLimitWarningFilter;
+    orderBy?: OrgLimitWarningOrderBy[];
   };
   ownedEmails?: {
     select: EmailSelect;
@@ -8253,30 +8314,6 @@ export interface ObjectFilter {
   /** Negates the expression. */
   not?: ObjectFilter;
 }
-export interface AppLevelRequirementFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `level` field. */
-  level?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `requiredCount` field. */
-  requiredCount?: IntFilter;
-  /** Filter by the object’s `priority` field. */
-  priority?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLevelRequirementFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLevelRequirementFilter[];
-  /** Negates the expression. */
-  not?: AppLevelRequirementFilter;
-}
 export interface DatabaseFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -8492,10 +8529,10 @@ export interface DatabaseFilter {
   invitesModules?: DatabaseToManyInvitesModuleFilter;
   /** `invitesModules` exist. */
   invitesModulesExist?: boolean;
-  /** Filter by the object’s `levelsModules` relation. */
-  levelsModules?: DatabaseToManyLevelsModuleFilter;
-  /** `levelsModules` exist. */
-  levelsModulesExist?: boolean;
+  /** Filter by the object’s `eventsModules` relation. */
+  eventsModules?: DatabaseToManyEventsModuleFilter;
+  /** `eventsModules` exist. */
+  eventsModulesExist?: boolean;
   /** Filter by the object’s `limitsModules` relation. */
   limitsModules?: DatabaseToManyLimitsModuleFilter;
   /** `limitsModules` exist. */
@@ -8524,10 +8561,10 @@ export interface DatabaseFilter {
   rlsModule?: RlsModuleFilter;
   /** A related `rlsModule` exists. */
   rlsModuleExists?: boolean;
-  /** Filter by the object’s `secretsModules` relation. */
-  secretsModules?: DatabaseToManySecretsModuleFilter;
-  /** `secretsModules` exist. */
-  secretsModulesExist?: boolean;
+  /** Filter by the object’s `userStateModules` relation. */
+  userStateModules?: DatabaseToManyUserStateModuleFilter;
+  /** `userStateModules` exist. */
+  userStateModulesExist?: boolean;
   /** Filter by the object’s `sessionsModules` relation. */
   sessionsModules?: DatabaseToManySessionsModuleFilter;
   /** `sessionsModules` exist. */
@@ -8612,6 +8649,10 @@ export interface DatabaseFilter {
   realtimeModules?: DatabaseToManyRealtimeModuleFilter;
   /** `realtimeModules` exist. */
   realtimeModulesExist?: boolean;
+  /** Filter by the object’s `rateLimitMetersModule` relation. */
+  rateLimitMetersModule?: RateLimitMetersModuleFilter;
+  /** A related `rateLimitMetersModule` exists. */
+  rateLimitMetersModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -9508,10 +9549,16 @@ export interface EmbeddingChunkFilter {
   chunkStrategy?: StringFilter;
   /** Filter by the object’s `metadataFields` field. */
   metadataFields?: JSONFilter;
+  /** Filter by the object’s `searchIndexes` field. */
+  searchIndexes?: JSONFilter;
   /** Filter by the object’s `enqueueChunkingJob` field. */
   enqueueChunkingJob?: BooleanFilter;
   /** Filter by the object’s `chunkingTaskName` field. */
   chunkingTaskName?: StringFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringFilter;
+  /** Filter by the object’s `embeddingProvider` field. */
+  embeddingProvider?: StringFilter;
   /** Filter by the object’s `parentFkFieldId` field. */
   parentFkFieldId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -9714,10 +9761,10 @@ export interface RealtimeModuleFilter {
   sourceRegistryTableId?: UUIDFilter;
   /** Filter by the object’s `retentionHours` field. */
   retentionHours?: IntFilter;
-  /** Filter by the object’s `lookaheadHours` field. */
-  lookaheadHours?: IntFilter;
-  /** Filter by the object’s `partitionInterval` field. */
-  partitionInterval?: StringFilter;
+  /** Filter by the object’s `premake` field. */
+  premake?: IntFilter;
+  /** Filter by the object’s `interval` field. */
+  interval?: StringFilter;
   /** Filter by the object’s `notifyChannel` field. */
   notifyChannel?: StringFilter;
   /** Checks for all expressions in this list. */
@@ -10074,14 +10121,14 @@ export interface PartitionFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `strategy` field. */
   strategy?: StringFilter;
-  /** Filter by the object’s `partitionKeyIds` field. */
-  partitionKeyIds?: UUIDListFilter;
+  /** Filter by the object’s `partitionKeyId` field. */
+  partitionKeyId?: UUIDFilter;
   /** Filter by the object’s `interval` field. */
   interval?: StringFilter;
   /** Filter by the object’s `retention` field. */
   retention?: StringFilter;
-  /** Filter by the object’s `lookahead` field. */
-  lookahead?: IntFilter;
+  /** Filter by the object’s `premake` field. */
+  premake?: IntFilter;
   /** Filter by the object’s `namingPattern` field. */
   namingPattern?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -10096,6 +10143,8 @@ export interface PartitionFilter {
   not?: PartitionFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
+  /** Filter by the object’s `partitionKey` relation. */
+  partitionKey?: FieldFilter;
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
 }
@@ -10543,7 +10592,7 @@ export interface InvitesModuleFilter {
   /** Filter by the object’s `usersTable` relation. */
   usersTable?: TableFilter;
 }
-export interface LevelsModuleFilter {
+export interface EventsModuleFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -10552,14 +10601,18 @@ export interface LevelsModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `stepsTableId` field. */
-  stepsTableId?: UUIDFilter;
-  /** Filter by the object’s `stepsTableName` field. */
-  stepsTableName?: StringFilter;
-  /** Filter by the object’s `achievementsTableId` field. */
-  achievementsTableId?: UUIDFilter;
-  /** Filter by the object’s `achievementsTableName` field. */
-  achievementsTableName?: StringFilter;
+  /** Filter by the object’s `eventsTableId` field. */
+  eventsTableId?: UUIDFilter;
+  /** Filter by the object’s `eventsTableName` field. */
+  eventsTableName?: StringFilter;
+  /** Filter by the object’s `eventAggregatesTableId` field. */
+  eventAggregatesTableId?: UUIDFilter;
+  /** Filter by the object’s `eventAggregatesTableName` field. */
+  eventAggregatesTableName?: StringFilter;
+  /** Filter by the object’s `eventTypesTableId` field. */
+  eventTypesTableId?: UUIDFilter;
+  /** Filter by the object’s `eventTypesTableName` field. */
+  eventTypesTableName?: StringFilter;
   /** Filter by the object’s `levelsTableId` field. */
   levelsTableId?: UUIDFilter;
   /** Filter by the object’s `levelsTableName` field. */
@@ -10568,26 +10621,48 @@ export interface LevelsModuleFilter {
   levelRequirementsTableId?: UUIDFilter;
   /** Filter by the object’s `levelRequirementsTableName` field. */
   levelRequirementsTableName?: StringFilter;
-  /** Filter by the object’s `completedStep` field. */
-  completedStep?: StringFilter;
-  /** Filter by the object’s `incompletedStep` field. */
-  incompletedStep?: StringFilter;
-  /** Filter by the object’s `tgAchievement` field. */
-  tgAchievement?: StringFilter;
-  /** Filter by the object’s `tgAchievementToggle` field. */
-  tgAchievementToggle?: StringFilter;
-  /** Filter by the object’s `tgAchievementToggleBoolean` field. */
-  tgAchievementToggleBoolean?: StringFilter;
-  /** Filter by the object’s `tgAchievementBoolean` field. */
-  tgAchievementBoolean?: StringFilter;
-  /** Filter by the object’s `upsertAchievement` field. */
-  upsertAchievement?: StringFilter;
-  /** Filter by the object’s `tgUpdateAchievements` field. */
-  tgUpdateAchievements?: StringFilter;
+  /** Filter by the object’s `levelGrantsTableId` field. */
+  levelGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelGrantsTableName` field. */
+  levelGrantsTableName?: StringFilter;
+  /** Filter by the object’s `achievementRewardsTableId` field. */
+  achievementRewardsTableId?: UUIDFilter;
+  /** Filter by the object’s `achievementRewardsTableName` field. */
+  achievementRewardsTableName?: StringFilter;
+  /** Filter by the object’s `recordEvent` field. */
+  recordEvent?: StringFilter;
+  /** Filter by the object’s `removeEvent` field. */
+  removeEvent?: StringFilter;
+  /** Filter by the object’s `tgEvent` field. */
+  tgEvent?: StringFilter;
+  /** Filter by the object’s `tgEventToggle` field. */
+  tgEventToggle?: StringFilter;
+  /** Filter by the object’s `tgEventToggleBool` field. */
+  tgEventToggleBool?: StringFilter;
+  /** Filter by the object’s `tgEventBool` field. */
+  tgEventBool?: StringFilter;
+  /** Filter by the object’s `upsertAggregate` field. */
+  upsertAggregate?: StringFilter;
+  /** Filter by the object’s `tgUpdateAggregates` field. */
+  tgUpdateAggregates?: StringFilter;
+  /** Filter by the object’s `pruneEvents` field. */
+  pruneEvents?: StringFilter;
   /** Filter by the object’s `stepsRequired` field. */
   stepsRequired?: StringFilter;
   /** Filter by the object’s `levelAchieved` field. */
   levelAchieved?: StringFilter;
+  /** Filter by the object’s `tgCheckAchievements` field. */
+  tgCheckAchievements?: StringFilter;
+  /** Filter by the object’s `grantAchievement` field. */
+  grantAchievement?: StringFilter;
+  /** Filter by the object’s `tgAchievementReward` field. */
+  tgAchievementReward?: StringFilter;
+  /** Filter by the object’s `interval` field. */
+  interval?: StringFilter;
+  /** Filter by the object’s `retention` field. */
+  retention?: StringFilter;
+  /** Filter by the object’s `premake` field. */
+  premake?: IntFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `membershipType` field. */
@@ -10597,13 +10672,13 @@ export interface LevelsModuleFilter {
   /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
   /** Checks for all expressions in this list. */
-  and?: LevelsModuleFilter[];
+  and?: EventsModuleFilter[];
   /** Checks for any expressions in this list. */
-  or?: LevelsModuleFilter[];
+  or?: EventsModuleFilter[];
   /** Negates the expression. */
-  not?: LevelsModuleFilter;
-  /** Filter by the object’s `achievementsTable` relation. */
-  achievementsTable?: TableFilter;
+  not?: EventsModuleFilter;
+  /** Filter by the object’s `achievementRewardsTable` relation. */
+  achievementRewardsTable?: TableFilter;
   /** Filter by the object’s `actorTable` relation. */
   actorTable?: TableFilter;
   /** Filter by the object’s `database` relation. */
@@ -10612,6 +10687,14 @@ export interface LevelsModuleFilter {
   entityTable?: TableFilter;
   /** A related `entityTable` exists. */
   entityTableExists?: boolean;
+  /** Filter by the object’s `eventAggregatesTable` relation. */
+  eventAggregatesTable?: TableFilter;
+  /** Filter by the object’s `eventTypesTable` relation. */
+  eventTypesTable?: TableFilter;
+  /** Filter by the object’s `eventsTable` relation. */
+  eventsTable?: TableFilter;
+  /** Filter by the object’s `levelGrantsTable` relation. */
+  levelGrantsTable?: TableFilter;
   /** Filter by the object’s `levelRequirementsTable` relation. */
   levelRequirementsTable?: TableFilter;
   /** Filter by the object’s `levelsTable` relation. */
@@ -10620,8 +10703,6 @@ export interface LevelsModuleFilter {
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
-  /** Filter by the object’s `stepsTable` relation. */
-  stepsTable?: TableFilter;
 }
 export interface LimitsModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -10672,6 +10753,14 @@ export interface LimitsModuleFilter {
   capCheckTrigger?: StringFilter;
   /** Filter by the object’s `resolveCapFunction` field. */
   resolveCapFunction?: StringFilter;
+  /** Filter by the object’s `limitWarningsTableId` field. */
+  limitWarningsTableId?: UUIDFilter;
+  /** Filter by the object’s `limitWarningStateTableId` field. */
+  limitWarningStateTableId?: UUIDFilter;
+  /** Filter by the object’s `limitCheckSoftFunction` field. */
+  limitCheckSoftFunction?: StringFilter;
+  /** Filter by the object’s `limitAggregateCheckSoftFunction` field. */
+  limitAggregateCheckSoftFunction?: StringFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `membershipType` field. */
@@ -10728,6 +10817,14 @@ export interface LimitsModuleFilter {
   limitCreditsTable?: TableFilter;
   /** A related `limitCreditsTable` exists. */
   limitCreditsTableExists?: boolean;
+  /** Filter by the object’s `limitWarningStateTable` relation. */
+  limitWarningStateTable?: TableFilter;
+  /** A related `limitWarningStateTable` exists. */
+  limitWarningStateTableExists?: boolean;
+  /** Filter by the object’s `limitWarningsTable` relation. */
+  limitWarningsTable?: TableFilter;
+  /** A related `limitWarningsTable` exists. */
+  limitWarningsTableExists?: boolean;
   /** Filter by the object’s `privateSchema` relation. */
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
@@ -11037,7 +11134,7 @@ export interface ProfilesModuleFilter {
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
 }
-export interface SecretsModuleFilter {
+export interface UserStateModuleFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -11049,11 +11146,11 @@ export interface SecretsModuleFilter {
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
   /** Checks for all expressions in this list. */
-  and?: SecretsModuleFilter[];
+  and?: UserStateModuleFilter[];
   /** Checks for any expressions in this list. */
-  or?: SecretsModuleFilter[];
+  or?: UserStateModuleFilter[];
   /** Negates the expression. */
-  not?: SecretsModuleFilter;
+  not?: UserStateModuleFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `schema` relation. */
@@ -11468,6 +11565,8 @@ export interface EntityTypeProvisionFilter {
   hasStorage?: BooleanFilter;
   /** Filter by the object’s `hasInvites` field. */
   hasInvites?: BooleanFilter;
+  /** Filter by the object’s `hasInviteAchievements` field. */
+  hasInviteAchievements?: BooleanFilter;
   /** Filter by the object’s `storageConfig` field. */
   storageConfig?: JSONFilter;
   /** Filter by the object’s `skipEntityPolicies` field. */
@@ -12267,75 +12366,29 @@ export interface OrgLimitAggregateFilter {
   /** Filter by the object’s `entity` relation. */
   entity?: UserFilter;
 }
-export interface AppStepFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `count` field. */
-  count?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppStepFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppStepFilter[];
-  /** Negates the expression. */
-  not?: AppStepFilter;
-  /** Filter by the object’s `actor` relation. */
-  actor?: UserFilter;
-}
-export interface AppAchievementFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `count` field. */
-  count?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppAchievementFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppAchievementFilter[];
-  /** Negates the expression. */
-  not?: AppAchievementFilter;
-  /** Filter by the object’s `actor` relation. */
-  actor?: UserFilter;
-}
-export interface AppLevelFilter {
+export interface OrgLimitWarningFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `image` field. */
-  image?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `warningType` field. */
+  warningType?: StringFilter;
+  /** Filter by the object’s `thresholdValue` field. */
+  thresholdValue?: BigIntFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
   /** Checks for all expressions in this list. */
-  and?: AppLevelFilter[];
+  and?: OrgLimitWarningFilter[];
   /** Checks for any expressions in this list. */
-  or?: AppLevelFilter[];
+  or?: OrgLimitWarningFilter[];
   /** Negates the expression. */
-  not?: AppLevelFilter;
-  /** Filter by the object’s `owner` relation. */
-  owner?: UserFilter;
-  /** A related `owner` exists. */
-  ownerExists?: boolean;
+  not?: OrgLimitWarningFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** A related `entity` exists. */
+  entityExists?: boolean;
 }
 export interface EmailFilter {
   /** Filter by the object’s `id` field. */
@@ -13013,6 +13066,24 @@ export interface OrgLimitDefaultFilter {
   /** `orgLimitCreditsByDefaultLimitId` exist. */
   orgLimitCreditsByDefaultLimitIdExist?: boolean;
 }
+export interface AppLimitWarningFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `warningType` field. */
+  warningType?: StringFilter;
+  /** Filter by the object’s `thresholdValue` field. */
+  thresholdValue?: BigIntFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitWarningFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitWarningFilter[];
+  /** Negates the expression. */
+  not?: AppLimitWarningFilter;
+}
 export interface UserConnectedAccountFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -13368,6 +13439,54 @@ export interface RlsModuleFilter {
   sessionsTable?: TableFilter;
   /** Filter by the object’s `usersTable` relation. */
   usersTable?: TableFilter;
+}
+export interface RateLimitMetersModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitStateTableId` field. */
+  rateLimitStateTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitStateTableName` field. */
+  rateLimitStateTableName?: StringFilter;
+  /** Filter by the object’s `rateLimitOverridesTableId` field. */
+  rateLimitOverridesTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitOverridesTableName` field. */
+  rateLimitOverridesTableName?: StringFilter;
+  /** Filter by the object’s `rateWindowLimitsTableId` field. */
+  rateWindowLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateWindowLimitsTableName` field. */
+  rateWindowLimitsTableName?: StringFilter;
+  /** Filter by the object’s `checkRateLimitFunction` field. */
+  checkRateLimitFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RateLimitMetersModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RateLimitMetersModuleFilter[];
+  /** Negates the expression. */
+  not?: RateLimitMetersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `rateLimitOverridesTableByRateLimitOverridesTableId` relation. */
+  rateLimitOverridesTableByRateLimitOverridesTableId?: TableFilter;
+  /** A related `rateLimitOverridesTableByRateLimitOverridesTableId` exists. */
+  rateLimitOverridesTableByRateLimitOverridesTableIdExists?: boolean;
+  /** Filter by the object’s `rateLimitStateTableByRateLimitStateTableId` relation. */
+  rateLimitStateTableByRateLimitStateTableId?: TableFilter;
+  /** Filter by the object’s `rateWindowLimitsTableByRateWindowLimitsTableId` relation. */
+  rateWindowLimitsTableByRateWindowLimitsTableId?: TableFilter;
+  /** A related `rateWindowLimitsTableByRateWindowLimitsTableId` exists. */
+  rateWindowLimitsTableByRateWindowLimitsTableIdExists?: boolean;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface PlansModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -13760,18 +13879,10 @@ export interface UserFilter {
   orgLimitAggregatesByEntityId?: UserToManyOrgLimitAggregateFilter;
   /** `orgLimitAggregatesByEntityId` exist. */
   orgLimitAggregatesByEntityIdExist?: boolean;
-  /** Filter by the object’s `appStepsByActorId` relation. */
-  appStepsByActorId?: UserToManyAppStepFilter;
-  /** `appStepsByActorId` exist. */
-  appStepsByActorIdExist?: boolean;
-  /** Filter by the object’s `appAchievementsByActorId` relation. */
-  appAchievementsByActorId?: UserToManyAppAchievementFilter;
-  /** `appAchievementsByActorId` exist. */
-  appAchievementsByActorIdExist?: boolean;
-  /** Filter by the object’s `ownedAppLevels` relation. */
-  ownedAppLevels?: UserToManyAppLevelFilter;
-  /** `ownedAppLevels` exist. */
-  ownedAppLevelsExist?: boolean;
+  /** Filter by the object’s `orgLimitWarningsByEntityId` relation. */
+  orgLimitWarningsByEntityId?: UserToManyOrgLimitWarningFilter;
+  /** `orgLimitWarningsByEntityId` exist. */
+  orgLimitWarningsByEntityIdExist?: boolean;
   /** Filter by the object’s `ownedEmails` relation. */
   ownedEmails?: UserToManyEmailFilter;
   /** `ownedEmails` exist. */
@@ -14229,26 +14340,6 @@ export type ObjectOrderBy =
   | 'FRZN_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
-export type AppLevelRequirementOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'LEVEL_ASC'
-  | 'LEVEL_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'REQUIRED_COUNT_ASC'
-  | 'REQUIRED_COUNT_DESC'
-  | 'PRIORITY_ASC'
-  | 'PRIORITY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 export type DatabaseOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -14837,10 +14928,16 @@ export type EmbeddingChunkOrderBy =
   | 'CHUNK_STRATEGY_DESC'
   | 'METADATA_FIELDS_ASC'
   | 'METADATA_FIELDS_DESC'
+  | 'SEARCH_INDEXES_ASC'
+  | 'SEARCH_INDEXES_DESC'
   | 'ENQUEUE_CHUNKING_JOB_ASC'
   | 'ENQUEUE_CHUNKING_JOB_DESC'
   | 'CHUNKING_TASK_NAME_ASC'
   | 'CHUNKING_TASK_NAME_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_PROVIDER_ASC'
+  | 'EMBEDDING_PROVIDER_DESC'
   | 'PARENT_FK_FIELD_ID_ASC'
   | 'PARENT_FK_FIELD_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -14979,10 +15076,10 @@ export type RealtimeModuleOrderBy =
   | 'SOURCE_REGISTRY_TABLE_ID_DESC'
   | 'RETENTION_HOURS_ASC'
   | 'RETENTION_HOURS_DESC'
-  | 'LOOKAHEAD_HOURS_ASC'
-  | 'LOOKAHEAD_HOURS_DESC'
-  | 'PARTITION_INTERVAL_ASC'
-  | 'PARTITION_INTERVAL_DESC'
+  | 'PREMAKE_ASC'
+  | 'PREMAKE_DESC'
+  | 'INTERVAL_ASC'
+  | 'INTERVAL_DESC'
   | 'NOTIFY_CHANNEL_ASC'
   | 'NOTIFY_CHANNEL_DESC';
 export type SchemaGrantOrderBy =
@@ -15215,14 +15312,14 @@ export type PartitionOrderBy =
   | 'TABLE_ID_DESC'
   | 'STRATEGY_ASC'
   | 'STRATEGY_DESC'
-  | 'PARTITION_KEY_IDS_ASC'
-  | 'PARTITION_KEY_IDS_DESC'
+  | 'PARTITION_KEY_ID_ASC'
+  | 'PARTITION_KEY_ID_DESC'
   | 'INTERVAL_ASC'
   | 'INTERVAL_DESC'
   | 'RETENTION_ASC'
   | 'RETENTION_DESC'
-  | 'LOOKAHEAD_ASC'
-  | 'LOOKAHEAD_DESC'
+  | 'PREMAKE_ASC'
+  | 'PREMAKE_DESC'
   | 'NAMING_PATTERN_ASC'
   | 'NAMING_PATTERN_DESC'
   | 'CREATED_AT_ASC'
@@ -15495,7 +15592,7 @@ export type InvitesModuleOrderBy =
   | 'MEMBERSHIP_TYPE_DESC'
   | 'ENTITY_TABLE_ID_ASC'
   | 'ENTITY_TABLE_ID_DESC';
-export type LevelsModuleOrderBy =
+export type EventsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -15507,14 +15604,18 @@ export type LevelsModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'PRIVATE_SCHEMA_ID_ASC'
   | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'STEPS_TABLE_ID_ASC'
-  | 'STEPS_TABLE_ID_DESC'
-  | 'STEPS_TABLE_NAME_ASC'
-  | 'STEPS_TABLE_NAME_DESC'
-  | 'ACHIEVEMENTS_TABLE_ID_ASC'
-  | 'ACHIEVEMENTS_TABLE_ID_DESC'
-  | 'ACHIEVEMENTS_TABLE_NAME_ASC'
-  | 'ACHIEVEMENTS_TABLE_NAME_DESC'
+  | 'EVENTS_TABLE_ID_ASC'
+  | 'EVENTS_TABLE_ID_DESC'
+  | 'EVENTS_TABLE_NAME_ASC'
+  | 'EVENTS_TABLE_NAME_DESC'
+  | 'EVENT_AGGREGATES_TABLE_ID_ASC'
+  | 'EVENT_AGGREGATES_TABLE_ID_DESC'
+  | 'EVENT_AGGREGATES_TABLE_NAME_ASC'
+  | 'EVENT_AGGREGATES_TABLE_NAME_DESC'
+  | 'EVENT_TYPES_TABLE_ID_ASC'
+  | 'EVENT_TYPES_TABLE_ID_DESC'
+  | 'EVENT_TYPES_TABLE_NAME_ASC'
+  | 'EVENT_TYPES_TABLE_NAME_DESC'
   | 'LEVELS_TABLE_ID_ASC'
   | 'LEVELS_TABLE_ID_DESC'
   | 'LEVELS_TABLE_NAME_ASC'
@@ -15523,26 +15624,48 @@ export type LevelsModuleOrderBy =
   | 'LEVEL_REQUIREMENTS_TABLE_ID_DESC'
   | 'LEVEL_REQUIREMENTS_TABLE_NAME_ASC'
   | 'LEVEL_REQUIREMENTS_TABLE_NAME_DESC'
-  | 'COMPLETED_STEP_ASC'
-  | 'COMPLETED_STEP_DESC'
-  | 'INCOMPLETED_STEP_ASC'
-  | 'INCOMPLETED_STEP_DESC'
-  | 'TG_ACHIEVEMENT_ASC'
-  | 'TG_ACHIEVEMENT_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_DESC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_ASC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_DESC'
-  | 'UPSERT_ACHIEVEMENT_ASC'
-  | 'UPSERT_ACHIEVEMENT_DESC'
-  | 'TG_UPDATE_ACHIEVEMENTS_ASC'
-  | 'TG_UPDATE_ACHIEVEMENTS_DESC'
+  | 'LEVEL_GRANTS_TABLE_ID_ASC'
+  | 'LEVEL_GRANTS_TABLE_ID_DESC'
+  | 'LEVEL_GRANTS_TABLE_NAME_ASC'
+  | 'LEVEL_GRANTS_TABLE_NAME_DESC'
+  | 'ACHIEVEMENT_REWARDS_TABLE_ID_ASC'
+  | 'ACHIEVEMENT_REWARDS_TABLE_ID_DESC'
+  | 'ACHIEVEMENT_REWARDS_TABLE_NAME_ASC'
+  | 'ACHIEVEMENT_REWARDS_TABLE_NAME_DESC'
+  | 'RECORD_EVENT_ASC'
+  | 'RECORD_EVENT_DESC'
+  | 'REMOVE_EVENT_ASC'
+  | 'REMOVE_EVENT_DESC'
+  | 'TG_EVENT_ASC'
+  | 'TG_EVENT_DESC'
+  | 'TG_EVENT_TOGGLE_ASC'
+  | 'TG_EVENT_TOGGLE_DESC'
+  | 'TG_EVENT_TOGGLE_BOOL_ASC'
+  | 'TG_EVENT_TOGGLE_BOOL_DESC'
+  | 'TG_EVENT_BOOL_ASC'
+  | 'TG_EVENT_BOOL_DESC'
+  | 'UPSERT_AGGREGATE_ASC'
+  | 'UPSERT_AGGREGATE_DESC'
+  | 'TG_UPDATE_AGGREGATES_ASC'
+  | 'TG_UPDATE_AGGREGATES_DESC'
+  | 'PRUNE_EVENTS_ASC'
+  | 'PRUNE_EVENTS_DESC'
   | 'STEPS_REQUIRED_ASC'
   | 'STEPS_REQUIRED_DESC'
   | 'LEVEL_ACHIEVED_ASC'
   | 'LEVEL_ACHIEVED_DESC'
+  | 'TG_CHECK_ACHIEVEMENTS_ASC'
+  | 'TG_CHECK_ACHIEVEMENTS_DESC'
+  | 'GRANT_ACHIEVEMENT_ASC'
+  | 'GRANT_ACHIEVEMENT_DESC'
+  | 'TG_ACHIEVEMENT_REWARD_ASC'
+  | 'TG_ACHIEVEMENT_REWARD_DESC'
+  | 'INTERVAL_ASC'
+  | 'INTERVAL_DESC'
+  | 'RETENTION_ASC'
+  | 'RETENTION_DESC'
+  | 'PREMAKE_ASC'
+  | 'PREMAKE_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
   | 'MEMBERSHIP_TYPE_ASC'
@@ -15603,6 +15726,14 @@ export type LimitsModuleOrderBy =
   | 'CAP_CHECK_TRIGGER_DESC'
   | 'RESOLVE_CAP_FUNCTION_ASC'
   | 'RESOLVE_CAP_FUNCTION_DESC'
+  | 'LIMIT_WARNINGS_TABLE_ID_ASC'
+  | 'LIMIT_WARNINGS_TABLE_ID_DESC'
+  | 'LIMIT_WARNING_STATE_TABLE_ID_ASC'
+  | 'LIMIT_WARNING_STATE_TABLE_ID_DESC'
+  | 'LIMIT_CHECK_SOFT_FUNCTION_ASC'
+  | 'LIMIT_CHECK_SOFT_FUNCTION_DESC'
+  | 'LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_ASC'
+  | 'LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC'
   | 'MEMBERSHIP_TYPE_ASC'
@@ -15797,7 +15928,7 @@ export type ProfilesModuleOrderBy =
   | 'MEMBERSHIPS_TABLE_ID_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC';
-export type SecretsModuleOrderBy =
+export type UserStateModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -16109,6 +16240,8 @@ export type EntityTypeProvisionOrderBy =
   | 'HAS_STORAGE_DESC'
   | 'HAS_INVITES_ASC'
   | 'HAS_INVITES_DESC'
+  | 'HAS_INVITE_ACHIEVEMENTS_ASC'
+  | 'HAS_INVITE_ACHIEVEMENTS_DESC'
   | 'STORAGE_CONFIG_ASC'
   | 'STORAGE_CONFIG_DESC'
   | 'SKIP_ENTITY_POLICIES_ASC'
@@ -16633,39 +16766,7 @@ export type OrgLimitAggregateOrderBy =
   | 'PERIOD_CREDITS_DESC'
   | 'RESERVED_ASC'
   | 'RESERVED_DESC';
-export type AppStepOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'COUNT_ASC'
-  | 'COUNT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppAchievementOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'COUNT_ASC'
-  | 'COUNT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type AppLevelOrderBy =
+export type OrgLimitWarningOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -16673,16 +16774,14 @@ export type AppLevelOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'WARNING_TYPE_ASC'
+  | 'WARNING_TYPE_DESC'
+  | 'THRESHOLD_VALUE_ASC'
+  | 'THRESHOLD_VALUE_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 export type EmailOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -17163,6 +17262,20 @@ export type OrgLimitDefaultOrderBy =
   | 'MAX_DESC'
   | 'SOFT_MAX_ASC'
   | 'SOFT_MAX_DESC';
+export type AppLimitWarningOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'WARNING_TYPE_ASC'
+  | 'WARNING_TYPE_DESC'
+  | 'THRESHOLD_VALUE_ASC'
+  | 'THRESHOLD_VALUE_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC';
 export type UserConnectedAccountOrderBy =
   | 'NATURAL'
   | 'ID_ASC'
@@ -17389,6 +17502,34 @@ export type RlsModuleOrderBy =
   | 'CURRENT_ROLE_DESC'
   | 'CURRENT_ROLE_ID_ASC'
   | 'CURRENT_ROLE_ID_DESC';
+export type RateLimitMetersModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'RATE_LIMIT_STATE_TABLE_ID_ASC'
+  | 'RATE_LIMIT_STATE_TABLE_ID_DESC'
+  | 'RATE_LIMIT_STATE_TABLE_NAME_ASC'
+  | 'RATE_LIMIT_STATE_TABLE_NAME_DESC'
+  | 'RATE_LIMIT_OVERRIDES_TABLE_ID_ASC'
+  | 'RATE_LIMIT_OVERRIDES_TABLE_ID_DESC'
+  | 'RATE_LIMIT_OVERRIDES_TABLE_NAME_ASC'
+  | 'RATE_LIMIT_OVERRIDES_TABLE_NAME_DESC'
+  | 'RATE_WINDOW_LIMITS_TABLE_ID_ASC'
+  | 'RATE_WINDOW_LIMITS_TABLE_ID_DESC'
+  | 'RATE_WINDOW_LIMITS_TABLE_NAME_ASC'
+  | 'RATE_WINDOW_LIMITS_TABLE_NAME_DESC'
+  | 'CHECK_RATE_LIMIT_FUNCTION_ASC'
+  | 'CHECK_RATE_LIMIT_FUNCTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC';
 export type PlansModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -17893,32 +18034,6 @@ export interface UpdateObjectInput {
   objectPatch: ObjectPatch;
 }
 export interface DeleteObjectInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateAppLevelRequirementInput {
-  clientMutationId?: string;
-  appLevelRequirement: {
-    name: string;
-    level: string;
-    description?: string;
-    requiredCount?: number;
-    priority?: number;
-  };
-}
-export interface AppLevelRequirementPatch {
-  name?: string | null;
-  level?: string | null;
-  description?: string | null;
-  requiredCount?: number | null;
-  priority?: number | null;
-}
-export interface UpdateAppLevelRequirementInput {
-  clientMutationId?: string;
-  id: string;
-  appLevelRequirementPatch: AppLevelRequirementPatch;
-}
-export interface DeleteAppLevelRequirementInput {
   clientMutationId?: string;
   id: string;
 }
@@ -18619,8 +18734,11 @@ export interface CreateEmbeddingChunkInput {
     chunkOverlap?: number;
     chunkStrategy?: string;
     metadataFields?: Record<string, unknown>;
+    searchIndexes?: Record<string, unknown>;
     enqueueChunkingJob?: boolean;
     chunkingTaskName?: string;
+    embeddingModel?: string;
+    embeddingProvider?: string;
     parentFkFieldId?: string;
   };
 }
@@ -18637,8 +18755,11 @@ export interface EmbeddingChunkPatch {
   chunkOverlap?: number | null;
   chunkStrategy?: string | null;
   metadataFields?: Record<string, unknown> | null;
+  searchIndexes?: Record<string, unknown> | null;
   enqueueChunkingJob?: boolean | null;
   chunkingTaskName?: string | null;
+  embeddingModel?: string | null;
+  embeddingProvider?: string | null;
   parentFkFieldId?: string | null;
 }
 export interface UpdateEmbeddingChunkInput {
@@ -18811,8 +18932,8 @@ export interface CreateRealtimeModuleInput {
     listenerNodeTableId?: string;
     sourceRegistryTableId?: string;
     retentionHours?: number;
-    lookaheadHours?: number;
-    partitionInterval?: string;
+    premake?: number;
+    interval?: string;
     notifyChannel?: string;
   };
 }
@@ -18825,8 +18946,8 @@ export interface RealtimeModulePatch {
   listenerNodeTableId?: string | null;
   sourceRegistryTableId?: string | null;
   retentionHours?: number | null;
-  lookaheadHours?: number | null;
-  partitionInterval?: string | null;
+  premake?: number | null;
+  interval?: string | null;
   notifyChannel?: string | null;
 }
 export interface UpdateRealtimeModuleInput {
@@ -19181,10 +19302,10 @@ export interface CreatePartitionInput {
     databaseId: string;
     tableId: string;
     strategy: string;
-    partitionKeyIds: string[];
+    partitionKeyId: string;
     interval?: string;
     retention?: string;
-    lookahead?: number;
+    premake?: number;
     namingPattern?: string;
   };
 }
@@ -19192,10 +19313,10 @@ export interface PartitionPatch {
   databaseId?: string | null;
   tableId?: string | null;
   strategy?: string | null;
-  partitionKeyIds?: string[] | null;
+  partitionKeyId?: string | null;
   interval?: string | null;
   retention?: string | null;
-  lookahead?: number | null;
+  premake?: number | null;
   namingPattern?: string | null;
 }
 export interface UpdatePartitionInput {
@@ -19598,69 +19719,95 @@ export interface DeleteInvitesModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateLevelsModuleInput {
+export interface CreateEventsModuleInput {
   clientMutationId?: string;
-  levelsModule: {
+  eventsModule: {
     databaseId: string;
     schemaId?: string;
     privateSchemaId?: string;
-    stepsTableId?: string;
-    stepsTableName?: string;
-    achievementsTableId?: string;
-    achievementsTableName?: string;
+    eventsTableId?: string;
+    eventsTableName?: string;
+    eventAggregatesTableId?: string;
+    eventAggregatesTableName?: string;
+    eventTypesTableId?: string;
+    eventTypesTableName?: string;
     levelsTableId?: string;
     levelsTableName?: string;
     levelRequirementsTableId?: string;
     levelRequirementsTableName?: string;
-    completedStep?: string;
-    incompletedStep?: string;
-    tgAchievement?: string;
-    tgAchievementToggle?: string;
-    tgAchievementToggleBoolean?: string;
-    tgAchievementBoolean?: string;
-    upsertAchievement?: string;
-    tgUpdateAchievements?: string;
+    levelGrantsTableId?: string;
+    levelGrantsTableName?: string;
+    achievementRewardsTableId?: string;
+    achievementRewardsTableName?: string;
+    recordEvent?: string;
+    removeEvent?: string;
+    tgEvent?: string;
+    tgEventToggle?: string;
+    tgEventToggleBool?: string;
+    tgEventBool?: string;
+    upsertAggregate?: string;
+    tgUpdateAggregates?: string;
+    pruneEvents?: string;
     stepsRequired?: string;
     levelAchieved?: string;
+    tgCheckAchievements?: string;
+    grantAchievement?: string;
+    tgAchievementReward?: string;
+    interval?: string;
+    retention?: string;
+    premake?: number;
     prefix?: string;
     membershipType: number;
     entityTableId?: string;
     actorTableId?: string;
   };
 }
-export interface LevelsModulePatch {
+export interface EventsModulePatch {
   databaseId?: string | null;
   schemaId?: string | null;
   privateSchemaId?: string | null;
-  stepsTableId?: string | null;
-  stepsTableName?: string | null;
-  achievementsTableId?: string | null;
-  achievementsTableName?: string | null;
+  eventsTableId?: string | null;
+  eventsTableName?: string | null;
+  eventAggregatesTableId?: string | null;
+  eventAggregatesTableName?: string | null;
+  eventTypesTableId?: string | null;
+  eventTypesTableName?: string | null;
   levelsTableId?: string | null;
   levelsTableName?: string | null;
   levelRequirementsTableId?: string | null;
   levelRequirementsTableName?: string | null;
-  completedStep?: string | null;
-  incompletedStep?: string | null;
-  tgAchievement?: string | null;
-  tgAchievementToggle?: string | null;
-  tgAchievementToggleBoolean?: string | null;
-  tgAchievementBoolean?: string | null;
-  upsertAchievement?: string | null;
-  tgUpdateAchievements?: string | null;
+  levelGrantsTableId?: string | null;
+  levelGrantsTableName?: string | null;
+  achievementRewardsTableId?: string | null;
+  achievementRewardsTableName?: string | null;
+  recordEvent?: string | null;
+  removeEvent?: string | null;
+  tgEvent?: string | null;
+  tgEventToggle?: string | null;
+  tgEventToggleBool?: string | null;
+  tgEventBool?: string | null;
+  upsertAggregate?: string | null;
+  tgUpdateAggregates?: string | null;
+  pruneEvents?: string | null;
   stepsRequired?: string | null;
   levelAchieved?: string | null;
+  tgCheckAchievements?: string | null;
+  grantAchievement?: string | null;
+  tgAchievementReward?: string | null;
+  interval?: string | null;
+  retention?: string | null;
+  premake?: number | null;
   prefix?: string | null;
   membershipType?: number | null;
   entityTableId?: string | null;
   actorTableId?: string | null;
 }
-export interface UpdateLevelsModuleInput {
+export interface UpdateEventsModuleInput {
   clientMutationId?: string;
   id: string;
-  levelsModulePatch: LevelsModulePatch;
+  eventsModulePatch: EventsModulePatch;
 }
-export interface DeleteLevelsModuleInput {
+export interface DeleteEventsModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -19690,6 +19837,10 @@ export interface CreateLimitsModuleInput {
     limitCapsDefaultsTableId?: string;
     capCheckTrigger?: string;
     resolveCapFunction?: string;
+    limitWarningsTableId?: string;
+    limitWarningStateTableId?: string;
+    limitCheckSoftFunction?: string;
+    limitAggregateCheckSoftFunction?: string;
     prefix?: string;
     membershipType: number;
     entityTableId?: string;
@@ -19720,6 +19871,10 @@ export interface LimitsModulePatch {
   limitCapsDefaultsTableId?: string | null;
   capCheckTrigger?: string | null;
   resolveCapFunction?: string | null;
+  limitWarningsTableId?: string | null;
+  limitWarningStateTableId?: string | null;
+  limitCheckSoftFunction?: string | null;
+  limitAggregateCheckSoftFunction?: string | null;
   prefix?: string | null;
   membershipType?: number | null;
   entityTableId?: string | null;
@@ -19970,27 +20125,27 @@ export interface DeleteProfilesModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateSecretsModuleInput {
+export interface CreateUserStateModuleInput {
   clientMutationId?: string;
-  secretsModule: {
+  userStateModule: {
     databaseId: string;
     schemaId?: string;
     tableId?: string;
     tableName?: string;
   };
 }
-export interface SecretsModulePatch {
+export interface UserStateModulePatch {
   databaseId?: string | null;
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
 }
-export interface UpdateSecretsModuleInput {
+export interface UpdateUserStateModuleInput {
   clientMutationId?: string;
   id: string;
-  secretsModulePatch: SecretsModulePatch;
+  userStateModulePatch: UserStateModulePatch;
 }
-export interface DeleteSecretsModuleInput {
+export interface DeleteUserStateModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -20335,6 +20490,7 @@ export interface CreateEntityTypeProvisionInput {
     hasLevels?: boolean;
     hasStorage?: boolean;
     hasInvites?: boolean;
+    hasInviteAchievements?: boolean;
     storageConfig?: Record<string, unknown>;
     skipEntityPolicies?: boolean;
     tableProvision?: Record<string, unknown>;
@@ -20362,6 +20518,7 @@ export interface EntityTypeProvisionPatch {
   hasLevels?: boolean | null;
   hasStorage?: boolean | null;
   hasInvites?: boolean | null;
+  hasInviteAchievements?: boolean | null;
   storageConfig?: Record<string, unknown> | null;
   skipEntityPolicies?: boolean | null;
   tableProvision?: Record<string, unknown> | null;
@@ -21073,72 +21230,29 @@ export interface DeleteOrgLimitAggregateInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAppStepInput {
+export interface CreateOrgLimitWarningInput {
   clientMutationId?: string;
-  appStep: {
-    actorId?: string;
+  orgLimitWarning: {
     name: string;
-    count?: number;
+    warningType: string;
+    thresholdValue: string;
+    taskIdentifier: string;
+    entityId?: string;
   };
 }
-export interface AppStepPatch {
-  actorId?: string | null;
+export interface OrgLimitWarningPatch {
   name?: string | null;
-  count?: number | null;
+  warningType?: string | null;
+  thresholdValue?: string | null;
+  taskIdentifier?: string | null;
+  entityId?: string | null;
 }
-export interface UpdateAppStepInput {
+export interface UpdateOrgLimitWarningInput {
   clientMutationId?: string;
   id: string;
-  appStepPatch: AppStepPatch;
+  orgLimitWarningPatch: OrgLimitWarningPatch;
 }
-export interface DeleteAppStepInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateAppAchievementInput {
-  clientMutationId?: string;
-  appAchievement: {
-    actorId?: string;
-    name: string;
-    count?: number;
-  };
-}
-export interface AppAchievementPatch {
-  actorId?: string | null;
-  name?: string | null;
-  count?: number | null;
-}
-export interface UpdateAppAchievementInput {
-  clientMutationId?: string;
-  id: string;
-  appAchievementPatch: AppAchievementPatch;
-}
-export interface DeleteAppAchievementInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateAppLevelInput {
-  clientMutationId?: string;
-  appLevel: {
-    name: string;
-    description?: string;
-    image?: ConstructiveInternalTypeImage;
-    ownerId?: string;
-  };
-}
-export interface AppLevelPatch {
-  name?: string | null;
-  description?: string | null;
-  image?: ConstructiveInternalTypeImage | null;
-  ownerId?: string | null;
-  imageUpload?: File | null;
-}
-export interface UpdateAppLevelInput {
-  clientMutationId?: string;
-  id: string;
-  appLevelPatch: AppLevelPatch;
-}
-export interface DeleteAppLevelInput {
+export interface DeleteOrgLimitWarningInput {
   clientMutationId?: string;
   id: string;
 }
@@ -21862,6 +21976,30 @@ export interface DeleteOrgLimitDefaultInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateAppLimitWarningInput {
+  clientMutationId?: string;
+  appLimitWarning: {
+    name: string;
+    warningType: string;
+    thresholdValue: string;
+    taskIdentifier: string;
+  };
+}
+export interface AppLimitWarningPatch {
+  name?: string | null;
+  warningType?: string | null;
+  thresholdValue?: string | null;
+  taskIdentifier?: string | null;
+}
+export interface UpdateAppLimitWarningInput {
+  clientMutationId?: string;
+  id: string;
+  appLimitWarningPatch: AppLimitWarningPatch;
+}
+export interface DeleteAppLimitWarningInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateUserConnectedAccountInput {
   clientMutationId?: string;
   userConnectedAccount: {
@@ -22193,6 +22331,44 @@ export interface UpdateRlsModuleInput {
   rlsModulePatch: RlsModulePatch;
 }
 export interface DeleteRlsModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateRateLimitMetersModuleInput {
+  clientMutationId?: string;
+  rateLimitMetersModule: {
+    databaseId: string;
+    schemaId?: string;
+    privateSchemaId?: string;
+    rateLimitStateTableId?: string;
+    rateLimitStateTableName?: string;
+    rateLimitOverridesTableId?: string;
+    rateLimitOverridesTableName?: string;
+    rateWindowLimitsTableId?: string;
+    rateWindowLimitsTableName?: string;
+    checkRateLimitFunction?: string;
+    prefix?: string;
+  };
+}
+export interface RateLimitMetersModulePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  rateLimitStateTableId?: string | null;
+  rateLimitStateTableName?: string | null;
+  rateLimitOverridesTableId?: string | null;
+  rateLimitOverridesTableName?: string | null;
+  rateWindowLimitsTableId?: string | null;
+  rateWindowLimitsTableName?: string | null;
+  checkRateLimitFunction?: string | null;
+  prefix?: string | null;
+}
+export interface UpdateRateLimitMetersModuleInput {
+  clientMutationId?: string;
+  id: string;
+  rateLimitMetersModulePatch: RateLimitMetersModulePatch;
+}
+export interface DeleteRateLimitMetersModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -22703,14 +22879,14 @@ export const connectionFieldsMap = {
     emailsModules: 'EmailsModule',
     encryptedSecretsModules: 'EncryptedSecretsModule',
     invitesModules: 'InvitesModule',
-    levelsModules: 'LevelsModule',
+    eventsModules: 'EventsModule',
     limitsModules: 'LimitsModule',
     membershipTypesModules: 'MembershipTypesModule',
     membershipsModules: 'MembershipsModule',
     permissionsModules: 'PermissionsModule',
     phoneNumbersModules: 'PhoneNumbersModule',
     profilesModules: 'ProfilesModule',
-    secretsModules: 'SecretsModule',
+    userStateModules: 'UserStateModule',
     sessionsModules: 'SessionsModule',
     userAuthModules: 'UserAuthModule',
     usersModules: 'UsersModule',
@@ -22851,9 +23027,7 @@ export const connectionFieldsMap = {
     orgLimitCreditsByActorId: 'OrgLimitCredit',
     orgLimitCreditsByEntityId: 'OrgLimitCredit',
     orgLimitAggregatesByEntityId: 'OrgLimitAggregate',
-    appStepsByActorId: 'AppStep',
-    appAchievementsByActorId: 'AppAchievement',
-    ownedAppLevels: 'AppLevel',
+    orgLimitWarningsByEntityId: 'OrgLimitWarning',
     ownedEmails: 'Email',
     ownedPhoneNumbers: 'PhoneNumber',
     ownedCryptoAddresses: 'CryptoAddress',
@@ -23583,14 +23757,14 @@ export interface DatabaseToManyInvitesModuleFilter {
   /** Filters to entities where no related entity matches. */
   none?: InvitesModuleFilter;
 }
-/** A filter to be used against many `LevelsModule` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyLevelsModuleFilter {
+/** A filter to be used against many `EventsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEventsModuleFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: LevelsModuleFilter;
+  some?: EventsModuleFilter;
   /** Filters to entities where every related entity matches. */
-  every?: LevelsModuleFilter;
+  every?: EventsModuleFilter;
   /** Filters to entities where no related entity matches. */
-  none?: LevelsModuleFilter;
+  none?: EventsModuleFilter;
 }
 /** A filter to be used against many `LimitsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyLimitsModuleFilter {
@@ -23646,14 +23820,14 @@ export interface DatabaseToManyProfilesModuleFilter {
   /** Filters to entities where no related entity matches. */
   none?: ProfilesModuleFilter;
 }
-/** A filter to be used against many `SecretsModule` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManySecretsModuleFilter {
+/** A filter to be used against many `UserStateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyUserStateModuleFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: SecretsModuleFilter;
+  some?: UserStateModuleFilter;
   /** Filters to entities where every related entity matches. */
-  every?: SecretsModuleFilter;
+  every?: UserStateModuleFilter;
   /** Filters to entities where no related entity matches. */
-  none?: SecretsModuleFilter;
+  none?: UserStateModuleFilter;
 }
 /** A filter to be used against many `SessionsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManySessionsModuleFilter {
@@ -25062,32 +25236,14 @@ export interface UserToManyOrgLimitAggregateFilter {
   /** Filters to entities where no related entity matches. */
   none?: OrgLimitAggregateFilter;
 }
-/** A filter to be used against many `AppStep` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyAppStepFilter {
+/** A filter to be used against many `OrgLimitWarning` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgLimitWarningFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: AppStepFilter;
+  some?: OrgLimitWarningFilter;
   /** Filters to entities where every related entity matches. */
-  every?: AppStepFilter;
+  every?: OrgLimitWarningFilter;
   /** Filters to entities where no related entity matches. */
-  none?: AppStepFilter;
-}
-/** A filter to be used against many `AppAchievement` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyAppAchievementFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppAchievementFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AppAchievementFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AppAchievementFilter;
-}
-/** A filter to be used against many `AppLevel` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyAppLevelFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppLevelFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AppLevelFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AppLevelFilter;
+  none?: OrgLimitWarningFilter;
 }
 /** A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyEmailFilter {
@@ -26174,10 +26330,16 @@ export interface EmbeddingChunkFilter {
   chunkStrategy?: StringFilter;
   /** Filter by the object’s `metadataFields` field. */
   metadataFields?: JSONFilter;
+  /** Filter by the object’s `searchIndexes` field. */
+  searchIndexes?: JSONFilter;
   /** Filter by the object’s `enqueueChunkingJob` field. */
   enqueueChunkingJob?: BooleanFilter;
   /** Filter by the object’s `chunkingTaskName` field. */
   chunkingTaskName?: StringFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringFilter;
+  /** Filter by the object’s `embeddingProvider` field. */
+  embeddingProvider?: StringFilter;
   /** Filter by the object’s `parentFkFieldId` field. */
   parentFkFieldId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -26326,14 +26488,14 @@ export interface PartitionFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `strategy` field. */
   strategy?: StringFilter;
-  /** Filter by the object’s `partitionKeyIds` field. */
-  partitionKeyIds?: UUIDListFilter;
+  /** Filter by the object’s `partitionKeyId` field. */
+  partitionKeyId?: UUIDFilter;
   /** Filter by the object’s `interval` field. */
   interval?: StringFilter;
   /** Filter by the object’s `retention` field. */
   retention?: StringFilter;
-  /** Filter by the object’s `lookahead` field. */
-  lookahead?: IntFilter;
+  /** Filter by the object’s `premake` field. */
+  premake?: IntFilter;
   /** Filter by the object’s `namingPattern` field. */
   namingPattern?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -26348,6 +26510,8 @@ export interface PartitionFilter {
   not?: PartitionFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
+  /** Filter by the object’s `partitionKey` relation. */
+  partitionKey?: FieldFilter;
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
 }
@@ -26972,8 +27136,8 @@ export interface InvitesModuleFilter {
   /** Filter by the object’s `usersTable` relation. */
   usersTable?: TableFilter;
 }
-/** A filter to be used against `LevelsModule` object types. All fields are combined with a logical ‘and.’ */
-export interface LevelsModuleFilter {
+/** A filter to be used against `EventsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface EventsModuleFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -26982,14 +27146,18 @@ export interface LevelsModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `stepsTableId` field. */
-  stepsTableId?: UUIDFilter;
-  /** Filter by the object’s `stepsTableName` field. */
-  stepsTableName?: StringFilter;
-  /** Filter by the object’s `achievementsTableId` field. */
-  achievementsTableId?: UUIDFilter;
-  /** Filter by the object’s `achievementsTableName` field. */
-  achievementsTableName?: StringFilter;
+  /** Filter by the object’s `eventsTableId` field. */
+  eventsTableId?: UUIDFilter;
+  /** Filter by the object’s `eventsTableName` field. */
+  eventsTableName?: StringFilter;
+  /** Filter by the object’s `eventAggregatesTableId` field. */
+  eventAggregatesTableId?: UUIDFilter;
+  /** Filter by the object’s `eventAggregatesTableName` field. */
+  eventAggregatesTableName?: StringFilter;
+  /** Filter by the object’s `eventTypesTableId` field. */
+  eventTypesTableId?: UUIDFilter;
+  /** Filter by the object’s `eventTypesTableName` field. */
+  eventTypesTableName?: StringFilter;
   /** Filter by the object’s `levelsTableId` field. */
   levelsTableId?: UUIDFilter;
   /** Filter by the object’s `levelsTableName` field. */
@@ -26998,26 +27166,48 @@ export interface LevelsModuleFilter {
   levelRequirementsTableId?: UUIDFilter;
   /** Filter by the object’s `levelRequirementsTableName` field. */
   levelRequirementsTableName?: StringFilter;
-  /** Filter by the object’s `completedStep` field. */
-  completedStep?: StringFilter;
-  /** Filter by the object’s `incompletedStep` field. */
-  incompletedStep?: StringFilter;
-  /** Filter by the object’s `tgAchievement` field. */
-  tgAchievement?: StringFilter;
-  /** Filter by the object’s `tgAchievementToggle` field. */
-  tgAchievementToggle?: StringFilter;
-  /** Filter by the object’s `tgAchievementToggleBoolean` field. */
-  tgAchievementToggleBoolean?: StringFilter;
-  /** Filter by the object’s `tgAchievementBoolean` field. */
-  tgAchievementBoolean?: StringFilter;
-  /** Filter by the object’s `upsertAchievement` field. */
-  upsertAchievement?: StringFilter;
-  /** Filter by the object’s `tgUpdateAchievements` field. */
-  tgUpdateAchievements?: StringFilter;
+  /** Filter by the object’s `levelGrantsTableId` field. */
+  levelGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelGrantsTableName` field. */
+  levelGrantsTableName?: StringFilter;
+  /** Filter by the object’s `achievementRewardsTableId` field. */
+  achievementRewardsTableId?: UUIDFilter;
+  /** Filter by the object’s `achievementRewardsTableName` field. */
+  achievementRewardsTableName?: StringFilter;
+  /** Filter by the object’s `recordEvent` field. */
+  recordEvent?: StringFilter;
+  /** Filter by the object’s `removeEvent` field. */
+  removeEvent?: StringFilter;
+  /** Filter by the object’s `tgEvent` field. */
+  tgEvent?: StringFilter;
+  /** Filter by the object’s `tgEventToggle` field. */
+  tgEventToggle?: StringFilter;
+  /** Filter by the object’s `tgEventToggleBool` field. */
+  tgEventToggleBool?: StringFilter;
+  /** Filter by the object’s `tgEventBool` field. */
+  tgEventBool?: StringFilter;
+  /** Filter by the object’s `upsertAggregate` field. */
+  upsertAggregate?: StringFilter;
+  /** Filter by the object’s `tgUpdateAggregates` field. */
+  tgUpdateAggregates?: StringFilter;
+  /** Filter by the object’s `pruneEvents` field. */
+  pruneEvents?: StringFilter;
   /** Filter by the object’s `stepsRequired` field. */
   stepsRequired?: StringFilter;
   /** Filter by the object’s `levelAchieved` field. */
   levelAchieved?: StringFilter;
+  /** Filter by the object’s `tgCheckAchievements` field. */
+  tgCheckAchievements?: StringFilter;
+  /** Filter by the object’s `grantAchievement` field. */
+  grantAchievement?: StringFilter;
+  /** Filter by the object’s `tgAchievementReward` field. */
+  tgAchievementReward?: StringFilter;
+  /** Filter by the object’s `interval` field. */
+  interval?: StringFilter;
+  /** Filter by the object’s `retention` field. */
+  retention?: StringFilter;
+  /** Filter by the object’s `premake` field. */
+  premake?: IntFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `membershipType` field. */
@@ -27027,13 +27217,13 @@ export interface LevelsModuleFilter {
   /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
   /** Checks for all expressions in this list. */
-  and?: LevelsModuleFilter[];
+  and?: EventsModuleFilter[];
   /** Checks for any expressions in this list. */
-  or?: LevelsModuleFilter[];
+  or?: EventsModuleFilter[];
   /** Negates the expression. */
-  not?: LevelsModuleFilter;
-  /** Filter by the object’s `achievementsTable` relation. */
-  achievementsTable?: TableFilter;
+  not?: EventsModuleFilter;
+  /** Filter by the object’s `achievementRewardsTable` relation. */
+  achievementRewardsTable?: TableFilter;
   /** Filter by the object’s `actorTable` relation. */
   actorTable?: TableFilter;
   /** Filter by the object’s `database` relation. */
@@ -27042,6 +27232,14 @@ export interface LevelsModuleFilter {
   entityTable?: TableFilter;
   /** A related `entityTable` exists. */
   entityTableExists?: boolean;
+  /** Filter by the object’s `eventAggregatesTable` relation. */
+  eventAggregatesTable?: TableFilter;
+  /** Filter by the object’s `eventTypesTable` relation. */
+  eventTypesTable?: TableFilter;
+  /** Filter by the object’s `eventsTable` relation. */
+  eventsTable?: TableFilter;
+  /** Filter by the object’s `levelGrantsTable` relation. */
+  levelGrantsTable?: TableFilter;
   /** Filter by the object’s `levelRequirementsTable` relation. */
   levelRequirementsTable?: TableFilter;
   /** Filter by the object’s `levelsTable` relation. */
@@ -27050,8 +27248,6 @@ export interface LevelsModuleFilter {
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
-  /** Filter by the object’s `stepsTable` relation. */
-  stepsTable?: TableFilter;
 }
 /** A filter to be used against `LimitsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface LimitsModuleFilter {
@@ -27103,6 +27299,14 @@ export interface LimitsModuleFilter {
   capCheckTrigger?: StringFilter;
   /** Filter by the object’s `resolveCapFunction` field. */
   resolveCapFunction?: StringFilter;
+  /** Filter by the object’s `limitWarningsTableId` field. */
+  limitWarningsTableId?: UUIDFilter;
+  /** Filter by the object’s `limitWarningStateTableId` field. */
+  limitWarningStateTableId?: UUIDFilter;
+  /** Filter by the object’s `limitCheckSoftFunction` field. */
+  limitCheckSoftFunction?: StringFilter;
+  /** Filter by the object’s `limitAggregateCheckSoftFunction` field. */
+  limitAggregateCheckSoftFunction?: StringFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
   /** Filter by the object’s `membershipType` field. */
@@ -27159,6 +27363,14 @@ export interface LimitsModuleFilter {
   limitCreditsTable?: TableFilter;
   /** A related `limitCreditsTable` exists. */
   limitCreditsTableExists?: boolean;
+  /** Filter by the object’s `limitWarningStateTable` relation. */
+  limitWarningStateTable?: TableFilter;
+  /** A related `limitWarningStateTable` exists. */
+  limitWarningStateTableExists?: boolean;
+  /** Filter by the object’s `limitWarningsTable` relation. */
+  limitWarningsTable?: TableFilter;
+  /** A related `limitWarningsTable` exists. */
+  limitWarningsTableExists?: boolean;
   /** Filter by the object’s `privateSchema` relation. */
   privateSchema?: SchemaFilter;
   /** Filter by the object’s `schema` relation. */
@@ -27473,8 +27685,8 @@ export interface ProfilesModuleFilter {
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
 }
-/** A filter to be used against `SecretsModule` object types. All fields are combined with a logical ‘and.’ */
-export interface SecretsModuleFilter {
+/** A filter to be used against `UserStateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface UserStateModuleFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -27486,11 +27698,11 @@ export interface SecretsModuleFilter {
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
   /** Checks for all expressions in this list. */
-  and?: SecretsModuleFilter[];
+  and?: UserStateModuleFilter[];
   /** Checks for any expressions in this list. */
-  or?: SecretsModuleFilter[];
+  or?: UserStateModuleFilter[];
   /** Negates the expression. */
-  not?: SecretsModuleFilter;
+  not?: UserStateModuleFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `schema` relation. */
@@ -27952,6 +28164,8 @@ export interface EntityTypeProvisionFilter {
   hasStorage?: BooleanFilter;
   /** Filter by the object’s `hasInvites` field. */
   hasInvites?: BooleanFilter;
+  /** Filter by the object’s `hasInviteAchievements` field. */
+  hasInviteAchievements?: BooleanFilter;
   /** Filter by the object’s `storageConfig` field. */
   storageConfig?: JSONFilter;
   /** Filter by the object’s `skipEntityPolicies` field. */
@@ -28228,10 +28442,10 @@ export interface RealtimeModuleFilter {
   sourceRegistryTableId?: UUIDFilter;
   /** Filter by the object’s `retentionHours` field. */
   retentionHours?: IntFilter;
-  /** Filter by the object’s `lookaheadHours` field. */
-  lookaheadHours?: IntFilter;
-  /** Filter by the object’s `partitionInterval` field. */
-  partitionInterval?: StringFilter;
+  /** Filter by the object’s `premake` field. */
+  premake?: IntFilter;
+  /** Filter by the object’s `interval` field. */
+  interval?: StringFilter;
   /** Filter by the object’s `notifyChannel` field. */
   notifyChannel?: StringFilter;
   /** Checks for all expressions in this list. */
@@ -28756,10 +28970,10 @@ export interface DatabaseFilter {
   invitesModules?: DatabaseToManyInvitesModuleFilter;
   /** `invitesModules` exist. */
   invitesModulesExist?: boolean;
-  /** Filter by the object’s `levelsModules` relation. */
-  levelsModules?: DatabaseToManyLevelsModuleFilter;
-  /** `levelsModules` exist. */
-  levelsModulesExist?: boolean;
+  /** Filter by the object’s `eventsModules` relation. */
+  eventsModules?: DatabaseToManyEventsModuleFilter;
+  /** `eventsModules` exist. */
+  eventsModulesExist?: boolean;
   /** Filter by the object’s `limitsModules` relation. */
   limitsModules?: DatabaseToManyLimitsModuleFilter;
   /** `limitsModules` exist. */
@@ -28788,10 +29002,10 @@ export interface DatabaseFilter {
   rlsModule?: RlsModuleFilter;
   /** A related `rlsModule` exists. */
   rlsModuleExists?: boolean;
-  /** Filter by the object’s `secretsModules` relation. */
-  secretsModules?: DatabaseToManySecretsModuleFilter;
-  /** `secretsModules` exist. */
-  secretsModulesExist?: boolean;
+  /** Filter by the object’s `userStateModules` relation. */
+  userStateModules?: DatabaseToManyUserStateModuleFilter;
+  /** `userStateModules` exist. */
+  userStateModulesExist?: boolean;
   /** Filter by the object’s `sessionsModules` relation. */
   sessionsModules?: DatabaseToManySessionsModuleFilter;
   /** `sessionsModules` exist. */
@@ -28876,6 +29090,10 @@ export interface DatabaseFilter {
   realtimeModules?: DatabaseToManyRealtimeModuleFilter;
   /** `realtimeModules` exist. */
   realtimeModulesExist?: boolean;
+  /** Filter by the object’s `rateLimitMetersModule` relation. */
+  rateLimitMetersModule?: RateLimitMetersModuleFilter;
+  /** A related `rateLimitMetersModule` exists. */
+  rateLimitMetersModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -29364,78 +29582,30 @@ export interface OrgLimitAggregateFilter {
   /** Filter by the object’s `entity` relation. */
   entity?: UserFilter;
 }
-/** A filter to be used against `AppStep` object types. All fields are combined with a logical ‘and.’ */
-export interface AppStepFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `count` field. */
-  count?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppStepFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppStepFilter[];
-  /** Negates the expression. */
-  not?: AppStepFilter;
-  /** Filter by the object’s `actor` relation. */
-  actor?: UserFilter;
-}
-/** A filter to be used against `AppAchievement` object types. All fields are combined with a logical ‘and.’ */
-export interface AppAchievementFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `count` field. */
-  count?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppAchievementFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppAchievementFilter[];
-  /** Negates the expression. */
-  not?: AppAchievementFilter;
-  /** Filter by the object’s `actor` relation. */
-  actor?: UserFilter;
-}
-/** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLevelFilter {
+/** A filter to be used against `OrgLimitWarning` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitWarningFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `image` field. */
-  image?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `warningType` field. */
+  warningType?: StringFilter;
+  /** Filter by the object’s `thresholdValue` field. */
+  thresholdValue?: BigIntFilter;
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
   /** Checks for all expressions in this list. */
-  and?: AppLevelFilter[];
+  and?: OrgLimitWarningFilter[];
   /** Checks for any expressions in this list. */
-  or?: AppLevelFilter[];
+  or?: OrgLimitWarningFilter[];
   /** Negates the expression. */
-  not?: AppLevelFilter;
-  /** Filter by the object’s `owner` relation. */
-  owner?: UserFilter;
-  /** A related `owner` exists. */
-  ownerExists?: boolean;
+  not?: OrgLimitWarningFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** A related `entity` exists. */
+  entityExists?: boolean;
 }
 /** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
 export interface EmailFilter {
@@ -30295,18 +30465,10 @@ export interface UserFilter {
   orgLimitAggregatesByEntityId?: UserToManyOrgLimitAggregateFilter;
   /** `orgLimitAggregatesByEntityId` exist. */
   orgLimitAggregatesByEntityIdExist?: boolean;
-  /** Filter by the object’s `appStepsByActorId` relation. */
-  appStepsByActorId?: UserToManyAppStepFilter;
-  /** `appStepsByActorId` exist. */
-  appStepsByActorIdExist?: boolean;
-  /** Filter by the object’s `appAchievementsByActorId` relation. */
-  appAchievementsByActorId?: UserToManyAppAchievementFilter;
-  /** `appAchievementsByActorId` exist. */
-  appAchievementsByActorIdExist?: boolean;
-  /** Filter by the object’s `ownedAppLevels` relation. */
-  ownedAppLevels?: UserToManyAppLevelFilter;
-  /** `ownedAppLevels` exist. */
-  ownedAppLevelsExist?: boolean;
+  /** Filter by the object’s `orgLimitWarningsByEntityId` relation. */
+  orgLimitWarningsByEntityId?: UserToManyOrgLimitWarningFilter;
+  /** `orgLimitWarningsByEntityId` exist. */
+  orgLimitWarningsByEntityIdExist?: boolean;
   /** Filter by the object’s `ownedEmails` relation. */
   ownedEmails?: UserToManyEmailFilter;
   /** `ownedEmails` exist. */
@@ -31055,6 +31217,55 @@ export interface BillingProviderModuleFilter {
   /** A related `subscriptionsTable` exists. */
   subscriptionsTableExists?: boolean;
 }
+/** A filter to be used against `RateLimitMetersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface RateLimitMetersModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitStateTableId` field. */
+  rateLimitStateTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitStateTableName` field. */
+  rateLimitStateTableName?: StringFilter;
+  /** Filter by the object’s `rateLimitOverridesTableId` field. */
+  rateLimitOverridesTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitOverridesTableName` field. */
+  rateLimitOverridesTableName?: StringFilter;
+  /** Filter by the object’s `rateWindowLimitsTableId` field. */
+  rateWindowLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateWindowLimitsTableName` field. */
+  rateWindowLimitsTableName?: StringFilter;
+  /** Filter by the object’s `checkRateLimitFunction` field. */
+  checkRateLimitFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RateLimitMetersModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RateLimitMetersModuleFilter[];
+  /** Negates the expression. */
+  not?: RateLimitMetersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `rateLimitOverridesTableByRateLimitOverridesTableId` relation. */
+  rateLimitOverridesTableByRateLimitOverridesTableId?: TableFilter;
+  /** A related `rateLimitOverridesTableByRateLimitOverridesTableId` exists. */
+  rateLimitOverridesTableByRateLimitOverridesTableIdExists?: boolean;
+  /** Filter by the object’s `rateLimitStateTableByRateLimitStateTableId` relation. */
+  rateLimitStateTableByRateLimitStateTableId?: TableFilter;
+  /** Filter by the object’s `rateWindowLimitsTableByRateWindowLimitsTableId` relation. */
+  rateWindowLimitsTableByRateWindowLimitsTableId?: TableFilter;
+  /** A related `rateWindowLimitsTableByRateWindowLimitsTableId` exists. */
+  rateWindowLimitsTableByRateWindowLimitsTableIdExists?: boolean;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
 /** A filter to be used against BitString fields. All fields are combined with a logical ‘and.’ */
 export interface BitStringFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
@@ -31306,25 +31517,6 @@ export type ObjectConnectionSelect = {
   };
   edges?: {
     select: ObjectEdgeSelect;
-  };
-  pageInfo?: {
-    select: PageInfoSelect;
-  };
-  totalCount?: boolean;
-};
-/** A connection to a list of `AppLevelRequirement` values. */
-export interface AppLevelRequirementConnection {
-  nodes: AppLevelRequirement[];
-  edges: AppLevelRequirementEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-export type AppLevelRequirementConnectionSelect = {
-  nodes?: {
-    select: AppLevelRequirementSelect;
-  };
-  edges?: {
-    select: AppLevelRequirementEdgeSelect;
   };
   pageInfo?: {
     select: PageInfoSelect;
@@ -31870,51 +32062,6 @@ export type DeleteObjectPayloadSelect = {
   };
   objectEdge?: {
     select: ObjectEdgeSelect;
-  };
-};
-export interface CreateAppLevelRequirementPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevelRequirement` that was created by this mutation. */
-  appLevelRequirement?: AppLevelRequirement | null;
-  appLevelRequirementEdge?: AppLevelRequirementEdge | null;
-}
-export type CreateAppLevelRequirementPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevelRequirement?: {
-    select: AppLevelRequirementSelect;
-  };
-  appLevelRequirementEdge?: {
-    select: AppLevelRequirementEdgeSelect;
-  };
-};
-export interface UpdateAppLevelRequirementPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevelRequirement` that was updated by this mutation. */
-  appLevelRequirement?: AppLevelRequirement | null;
-  appLevelRequirementEdge?: AppLevelRequirementEdge | null;
-}
-export type UpdateAppLevelRequirementPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevelRequirement?: {
-    select: AppLevelRequirementSelect;
-  };
-  appLevelRequirementEdge?: {
-    select: AppLevelRequirementEdgeSelect;
-  };
-};
-export interface DeleteAppLevelRequirementPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevelRequirement` that was deleted by this mutation. */
-  appLevelRequirement?: AppLevelRequirement | null;
-  appLevelRequirementEdge?: AppLevelRequirementEdge | null;
-}
-export type DeleteAppLevelRequirementPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevelRequirement?: {
-    select: AppLevelRequirementSelect;
-  };
-  appLevelRequirementEdge?: {
-    select: AppLevelRequirementEdgeSelect;
   };
 };
 export interface CreateDatabasePayload {
@@ -34167,49 +34314,49 @@ export type DeleteInvitesModulePayloadSelect = {
     select: InvitesModuleEdgeSelect;
   };
 };
-export interface CreateLevelsModulePayload {
+export interface CreateEventsModulePayload {
   clientMutationId?: string | null;
-  /** The `LevelsModule` that was created by this mutation. */
-  levelsModule?: LevelsModule | null;
-  levelsModuleEdge?: LevelsModuleEdge | null;
+  /** The `EventsModule` that was created by this mutation. */
+  eventsModule?: EventsModule | null;
+  eventsModuleEdge?: EventsModuleEdge | null;
 }
-export type CreateLevelsModulePayloadSelect = {
+export type CreateEventsModulePayloadSelect = {
   clientMutationId?: boolean;
-  levelsModule?: {
-    select: LevelsModuleSelect;
+  eventsModule?: {
+    select: EventsModuleSelect;
   };
-  levelsModuleEdge?: {
-    select: LevelsModuleEdgeSelect;
+  eventsModuleEdge?: {
+    select: EventsModuleEdgeSelect;
   };
 };
-export interface UpdateLevelsModulePayload {
+export interface UpdateEventsModulePayload {
   clientMutationId?: string | null;
-  /** The `LevelsModule` that was updated by this mutation. */
-  levelsModule?: LevelsModule | null;
-  levelsModuleEdge?: LevelsModuleEdge | null;
+  /** The `EventsModule` that was updated by this mutation. */
+  eventsModule?: EventsModule | null;
+  eventsModuleEdge?: EventsModuleEdge | null;
 }
-export type UpdateLevelsModulePayloadSelect = {
+export type UpdateEventsModulePayloadSelect = {
   clientMutationId?: boolean;
-  levelsModule?: {
-    select: LevelsModuleSelect;
+  eventsModule?: {
+    select: EventsModuleSelect;
   };
-  levelsModuleEdge?: {
-    select: LevelsModuleEdgeSelect;
+  eventsModuleEdge?: {
+    select: EventsModuleEdgeSelect;
   };
 };
-export interface DeleteLevelsModulePayload {
+export interface DeleteEventsModulePayload {
   clientMutationId?: string | null;
-  /** The `LevelsModule` that was deleted by this mutation. */
-  levelsModule?: LevelsModule | null;
-  levelsModuleEdge?: LevelsModuleEdge | null;
+  /** The `EventsModule` that was deleted by this mutation. */
+  eventsModule?: EventsModule | null;
+  eventsModuleEdge?: EventsModuleEdge | null;
 }
-export type DeleteLevelsModulePayloadSelect = {
+export type DeleteEventsModulePayloadSelect = {
   clientMutationId?: boolean;
-  levelsModule?: {
-    select: LevelsModuleSelect;
+  eventsModule?: {
+    select: EventsModuleSelect;
   };
-  levelsModuleEdge?: {
-    select: LevelsModuleEdgeSelect;
+  eventsModuleEdge?: {
+    select: EventsModuleEdgeSelect;
   };
 };
 export interface CreateLimitsModulePayload {
@@ -34482,49 +34629,49 @@ export type DeleteProfilesModulePayloadSelect = {
     select: ProfilesModuleEdgeSelect;
   };
 };
-export interface CreateSecretsModulePayload {
+export interface CreateUserStateModulePayload {
   clientMutationId?: string | null;
-  /** The `SecretsModule` that was created by this mutation. */
-  secretsModule?: SecretsModule | null;
-  secretsModuleEdge?: SecretsModuleEdge | null;
+  /** The `UserStateModule` that was created by this mutation. */
+  userStateModule?: UserStateModule | null;
+  userStateModuleEdge?: UserStateModuleEdge | null;
 }
-export type CreateSecretsModulePayloadSelect = {
+export type CreateUserStateModulePayloadSelect = {
   clientMutationId?: boolean;
-  secretsModule?: {
-    select: SecretsModuleSelect;
+  userStateModule?: {
+    select: UserStateModuleSelect;
   };
-  secretsModuleEdge?: {
-    select: SecretsModuleEdgeSelect;
+  userStateModuleEdge?: {
+    select: UserStateModuleEdgeSelect;
   };
 };
-export interface UpdateSecretsModulePayload {
+export interface UpdateUserStateModulePayload {
   clientMutationId?: string | null;
-  /** The `SecretsModule` that was updated by this mutation. */
-  secretsModule?: SecretsModule | null;
-  secretsModuleEdge?: SecretsModuleEdge | null;
+  /** The `UserStateModule` that was updated by this mutation. */
+  userStateModule?: UserStateModule | null;
+  userStateModuleEdge?: UserStateModuleEdge | null;
 }
-export type UpdateSecretsModulePayloadSelect = {
+export type UpdateUserStateModulePayloadSelect = {
   clientMutationId?: boolean;
-  secretsModule?: {
-    select: SecretsModuleSelect;
+  userStateModule?: {
+    select: UserStateModuleSelect;
   };
-  secretsModuleEdge?: {
-    select: SecretsModuleEdgeSelect;
+  userStateModuleEdge?: {
+    select: UserStateModuleEdgeSelect;
   };
 };
-export interface DeleteSecretsModulePayload {
+export interface DeleteUserStateModulePayload {
   clientMutationId?: string | null;
-  /** The `SecretsModule` that was deleted by this mutation. */
-  secretsModule?: SecretsModule | null;
-  secretsModuleEdge?: SecretsModuleEdge | null;
+  /** The `UserStateModule` that was deleted by this mutation. */
+  userStateModule?: UserStateModule | null;
+  userStateModuleEdge?: UserStateModuleEdge | null;
 }
-export type DeleteSecretsModulePayloadSelect = {
+export type DeleteUserStateModulePayloadSelect = {
   clientMutationId?: boolean;
-  secretsModule?: {
-    select: SecretsModuleSelect;
+  userStateModule?: {
+    select: UserStateModuleSelect;
   };
-  secretsModuleEdge?: {
-    select: SecretsModuleEdgeSelect;
+  userStateModuleEdge?: {
+    select: UserStateModuleEdgeSelect;
   };
 };
 export interface CreateSessionsModulePayload {
@@ -35922,139 +36069,49 @@ export type DeleteOrgLimitAggregatePayloadSelect = {
     select: OrgLimitAggregateEdgeSelect;
   };
 };
-export interface CreateAppStepPayload {
+export interface CreateOrgLimitWarningPayload {
   clientMutationId?: string | null;
-  /** The `AppStep` that was created by this mutation. */
-  appStep?: AppStep | null;
-  appStepEdge?: AppStepEdge | null;
+  /** The `OrgLimitWarning` that was created by this mutation. */
+  orgLimitWarning?: OrgLimitWarning | null;
+  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
 }
-export type CreateAppStepPayloadSelect = {
+export type CreateOrgLimitWarningPayloadSelect = {
   clientMutationId?: boolean;
-  appStep?: {
-    select: AppStepSelect;
+  orgLimitWarning?: {
+    select: OrgLimitWarningSelect;
   };
-  appStepEdge?: {
-    select: AppStepEdgeSelect;
+  orgLimitWarningEdge?: {
+    select: OrgLimitWarningEdgeSelect;
   };
 };
-export interface UpdateAppStepPayload {
+export interface UpdateOrgLimitWarningPayload {
   clientMutationId?: string | null;
-  /** The `AppStep` that was updated by this mutation. */
-  appStep?: AppStep | null;
-  appStepEdge?: AppStepEdge | null;
+  /** The `OrgLimitWarning` that was updated by this mutation. */
+  orgLimitWarning?: OrgLimitWarning | null;
+  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
 }
-export type UpdateAppStepPayloadSelect = {
+export type UpdateOrgLimitWarningPayloadSelect = {
   clientMutationId?: boolean;
-  appStep?: {
-    select: AppStepSelect;
+  orgLimitWarning?: {
+    select: OrgLimitWarningSelect;
   };
-  appStepEdge?: {
-    select: AppStepEdgeSelect;
+  orgLimitWarningEdge?: {
+    select: OrgLimitWarningEdgeSelect;
   };
 };
-export interface DeleteAppStepPayload {
+export interface DeleteOrgLimitWarningPayload {
   clientMutationId?: string | null;
-  /** The `AppStep` that was deleted by this mutation. */
-  appStep?: AppStep | null;
-  appStepEdge?: AppStepEdge | null;
+  /** The `OrgLimitWarning` that was deleted by this mutation. */
+  orgLimitWarning?: OrgLimitWarning | null;
+  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
 }
-export type DeleteAppStepPayloadSelect = {
+export type DeleteOrgLimitWarningPayloadSelect = {
   clientMutationId?: boolean;
-  appStep?: {
-    select: AppStepSelect;
+  orgLimitWarning?: {
+    select: OrgLimitWarningSelect;
   };
-  appStepEdge?: {
-    select: AppStepEdgeSelect;
-  };
-};
-export interface CreateAppAchievementPayload {
-  clientMutationId?: string | null;
-  /** The `AppAchievement` that was created by this mutation. */
-  appAchievement?: AppAchievement | null;
-  appAchievementEdge?: AppAchievementEdge | null;
-}
-export type CreateAppAchievementPayloadSelect = {
-  clientMutationId?: boolean;
-  appAchievement?: {
-    select: AppAchievementSelect;
-  };
-  appAchievementEdge?: {
-    select: AppAchievementEdgeSelect;
-  };
-};
-export interface UpdateAppAchievementPayload {
-  clientMutationId?: string | null;
-  /** The `AppAchievement` that was updated by this mutation. */
-  appAchievement?: AppAchievement | null;
-  appAchievementEdge?: AppAchievementEdge | null;
-}
-export type UpdateAppAchievementPayloadSelect = {
-  clientMutationId?: boolean;
-  appAchievement?: {
-    select: AppAchievementSelect;
-  };
-  appAchievementEdge?: {
-    select: AppAchievementEdgeSelect;
-  };
-};
-export interface DeleteAppAchievementPayload {
-  clientMutationId?: string | null;
-  /** The `AppAchievement` that was deleted by this mutation. */
-  appAchievement?: AppAchievement | null;
-  appAchievementEdge?: AppAchievementEdge | null;
-}
-export type DeleteAppAchievementPayloadSelect = {
-  clientMutationId?: boolean;
-  appAchievement?: {
-    select: AppAchievementSelect;
-  };
-  appAchievementEdge?: {
-    select: AppAchievementEdgeSelect;
-  };
-};
-export interface CreateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was created by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type CreateAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
-export interface UpdateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was updated by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type UpdateAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
-export interface DeleteAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was deleted by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type DeleteAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
+  orgLimitWarningEdge?: {
+    select: OrgLimitWarningEdgeSelect;
   };
 };
 export interface CreateEmailPayload {
@@ -37249,6 +37306,51 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
     select: OrgLimitDefaultEdgeSelect;
   };
 };
+export interface CreateAppLimitWarningPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitWarning` that was created by this mutation. */
+  appLimitWarning?: AppLimitWarning | null;
+  appLimitWarningEdge?: AppLimitWarningEdge | null;
+}
+export type CreateAppLimitWarningPayloadSelect = {
+  clientMutationId?: boolean;
+  appLimitWarning?: {
+    select: AppLimitWarningSelect;
+  };
+  appLimitWarningEdge?: {
+    select: AppLimitWarningEdgeSelect;
+  };
+};
+export interface UpdateAppLimitWarningPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitWarning` that was updated by this mutation. */
+  appLimitWarning?: AppLimitWarning | null;
+  appLimitWarningEdge?: AppLimitWarningEdge | null;
+}
+export type UpdateAppLimitWarningPayloadSelect = {
+  clientMutationId?: boolean;
+  appLimitWarning?: {
+    select: AppLimitWarningSelect;
+  };
+  appLimitWarningEdge?: {
+    select: AppLimitWarningEdgeSelect;
+  };
+};
+export interface DeleteAppLimitWarningPayload {
+  clientMutationId?: string | null;
+  /** The `AppLimitWarning` that was deleted by this mutation. */
+  appLimitWarning?: AppLimitWarning | null;
+  appLimitWarningEdge?: AppLimitWarningEdge | null;
+}
+export type DeleteAppLimitWarningPayloadSelect = {
+  clientMutationId?: boolean;
+  appLimitWarning?: {
+    select: AppLimitWarningSelect;
+  };
+  appLimitWarningEdge?: {
+    select: AppLimitWarningEdgeSelect;
+  };
+};
 export interface CreateUserConnectedAccountPayload {
   clientMutationId?: string | null;
   /** The `UserConnectedAccount` that was created by this mutation. */
@@ -37640,6 +37742,51 @@ export type DeleteRlsModulePayloadSelect = {
   };
   rlsModuleEdge?: {
     select: RlsModuleEdgeSelect;
+  };
+};
+export interface CreateRateLimitMetersModulePayload {
+  clientMutationId?: string | null;
+  /** The `RateLimitMetersModule` that was created by this mutation. */
+  rateLimitMetersModule?: RateLimitMetersModule | null;
+  rateLimitMetersModuleEdge?: RateLimitMetersModuleEdge | null;
+}
+export type CreateRateLimitMetersModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rateLimitMetersModule?: {
+    select: RateLimitMetersModuleSelect;
+  };
+  rateLimitMetersModuleEdge?: {
+    select: RateLimitMetersModuleEdgeSelect;
+  };
+};
+export interface UpdateRateLimitMetersModulePayload {
+  clientMutationId?: string | null;
+  /** The `RateLimitMetersModule` that was updated by this mutation. */
+  rateLimitMetersModule?: RateLimitMetersModule | null;
+  rateLimitMetersModuleEdge?: RateLimitMetersModuleEdge | null;
+}
+export type UpdateRateLimitMetersModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rateLimitMetersModule?: {
+    select: RateLimitMetersModuleSelect;
+  };
+  rateLimitMetersModuleEdge?: {
+    select: RateLimitMetersModuleEdgeSelect;
+  };
+};
+export interface DeleteRateLimitMetersModulePayload {
+  clientMutationId?: string | null;
+  /** The `RateLimitMetersModule` that was deleted by this mutation. */
+  rateLimitMetersModule?: RateLimitMetersModule | null;
+  rateLimitMetersModuleEdge?: RateLimitMetersModuleEdge | null;
+}
+export type DeleteRateLimitMetersModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rateLimitMetersModule?: {
+    select: RateLimitMetersModuleSelect;
+  };
+  rateLimitMetersModuleEdge?: {
+    select: RateLimitMetersModuleEdgeSelect;
   };
 };
 export interface CreatePlansModulePayload {
@@ -38120,18 +38267,6 @@ export type ObjectEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: ObjectSelect;
-  };
-};
-/** A `AppLevelRequirement` edge in the connection. */
-export interface AppLevelRequirementEdge {
-  cursor?: string | null;
-  /** The `AppLevelRequirement` at the end of the edge. */
-  node?: AppLevelRequirement | null;
-}
-export type AppLevelRequirementEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AppLevelRequirementSelect;
   };
 };
 export interface BootstrapUserRecord {
@@ -38854,16 +38989,16 @@ export type InvitesModuleEdgeSelect = {
     select: InvitesModuleSelect;
   };
 };
-/** A `LevelsModule` edge in the connection. */
-export interface LevelsModuleEdge {
+/** A `EventsModule` edge in the connection. */
+export interface EventsModuleEdge {
   cursor?: string | null;
-  /** The `LevelsModule` at the end of the edge. */
-  node?: LevelsModule | null;
+  /** The `EventsModule` at the end of the edge. */
+  node?: EventsModule | null;
 }
-export type LevelsModuleEdgeSelect = {
+export type EventsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: LevelsModuleSelect;
+    select: EventsModuleSelect;
   };
 };
 /** A `LimitsModule` edge in the connection. */
@@ -38938,16 +39073,16 @@ export type ProfilesModuleEdgeSelect = {
     select: ProfilesModuleSelect;
   };
 };
-/** A `SecretsModule` edge in the connection. */
-export interface SecretsModuleEdge {
+/** A `UserStateModule` edge in the connection. */
+export interface UserStateModuleEdge {
   cursor?: string | null;
-  /** The `SecretsModule` at the end of the edge. */
-  node?: SecretsModule | null;
+  /** The `UserStateModule` at the end of the edge. */
+  node?: UserStateModule | null;
 }
-export type SecretsModuleEdgeSelect = {
+export type UserStateModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: SecretsModuleSelect;
+    select: UserStateModuleSelect;
   };
 };
 /** A `SessionsModule` edge in the connection. */
@@ -39322,40 +39457,16 @@ export type OrgLimitAggregateEdgeSelect = {
     select: OrgLimitAggregateSelect;
   };
 };
-/** A `AppStep` edge in the connection. */
-export interface AppStepEdge {
+/** A `OrgLimitWarning` edge in the connection. */
+export interface OrgLimitWarningEdge {
   cursor?: string | null;
-  /** The `AppStep` at the end of the edge. */
-  node?: AppStep | null;
+  /** The `OrgLimitWarning` at the end of the edge. */
+  node?: OrgLimitWarning | null;
 }
-export type AppStepEdgeSelect = {
+export type OrgLimitWarningEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: AppStepSelect;
-  };
-};
-/** A `AppAchievement` edge in the connection. */
-export interface AppAchievementEdge {
-  cursor?: string | null;
-  /** The `AppAchievement` at the end of the edge. */
-  node?: AppAchievement | null;
-}
-export type AppAchievementEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AppAchievementSelect;
-  };
-};
-/** A `AppLevel` edge in the connection. */
-export interface AppLevelEdge {
-  cursor?: string | null;
-  /** The `AppLevel` at the end of the edge. */
-  node?: AppLevel | null;
-}
-export type AppLevelEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AppLevelSelect;
+    select: OrgLimitWarningSelect;
   };
 };
 /** A `Email` edge in the connection. */
@@ -39670,6 +39781,18 @@ export type OrgLimitDefaultEdgeSelect = {
     select: OrgLimitDefaultSelect;
   };
 };
+/** A `AppLimitWarning` edge in the connection. */
+export interface AppLimitWarningEdge {
+  cursor?: string | null;
+  /** The `AppLimitWarning` at the end of the edge. */
+  node?: AppLimitWarning | null;
+}
+export type AppLimitWarningEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AppLimitWarningSelect;
+  };
+};
 /** A `Commit` edge in the connection. */
 export interface CommitEdge {
   cursor?: string | null;
@@ -39764,6 +39887,18 @@ export type RlsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: RlsModuleSelect;
+  };
+};
+/** A `RateLimitMetersModule` edge in the connection. */
+export interface RateLimitMetersModuleEdge {
+  cursor?: string | null;
+  /** The `RateLimitMetersModule` at the end of the edge. */
+  node?: RateLimitMetersModule | null;
+}
+export type RateLimitMetersModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: RateLimitMetersModuleSelect;
   };
 };
 /** A `PlansModule` edge in the connection. */

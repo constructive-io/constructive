@@ -1207,9 +1207,13 @@ export interface BlueprintBucketSeed {
   /** CORS allowed origins for this bucket. */
   allowed_origins?: string[];
 }
-/** Storage configuration for an entity type. Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions. */
+/** Storage configuration with optional scope. When used at the top level of a blueprint, the scope field controls whether storage is app-level ("app", default) or org-level ("org"). Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions. */
 export interface BlueprintStorageConfig {
-  /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. Only used for app-level storage (not entity-scoped). */
+  /** Storage scope. "app" (default) creates app-level storage (no owner_id). "org" creates per-org/user storage (owner_id = org entity id, buckets seeded per-entity via AFTER INSERT trigger). Only "app" and "org" are allowed — child entity types get storage via entity_types[].storage. */
+  scope?: 'app' | 'org';
+  /** Discriminator for multi-module storage. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{storage_key}_buckets. Max 16 chars, lowercase snake_case. */
+  storage_key?: string;
+  /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. */
   buckets?: BlueprintBucketSeed[];
   /** Override for presigned upload URL expiry time in seconds. */
   upload_url_expiry_seconds?: number;
@@ -1229,6 +1233,41 @@ export interface BlueprintStorageConfig {
     buckets?: BlueprintEntityTableProvision;
   };
 }
+/** A requirement entry within a blueprint achievement. Defines what events must occur to earn the achievement. */
+export interface BlueprintAchievementRequirement {
+  /** Name identifier matching an event_type or step name. */
+  event_name: string;
+  /** Number of events needed to satisfy this requirement. */
+  count: number;
+  /** Human-readable description of what this requirement entails. */
+  description?: string;
+}
+/** A reward entry within a blueprint achievement. Defines credits granted when the achievement is earned. */
+export interface BlueprintAchievementReward {
+  /** Type of reward: limit_credit (grants limit credits) or meter_credit (grants meter credits). */
+  reward_type: 'limit_credit' | 'meter_credit';
+  /** Target limit name or meter slug for the credit grant. */
+  target_name: string;
+  /** Number of credits to grant. */
+  amount: number;
+  /** Credit type: permanent, expiring, etc. Defaults to "permanent". */
+  credit_type?: string;
+}
+/** An achievement entry for the blueprint achievements[] section. Creates a level with requirements and optional rewards in the events_module. Requires events_module to be provisioned (e.g., via entity_types[].has_levels = true or modules includes events_module). */
+export interface BlueprintAchievement {
+  /** Unique name for the achievement level. */
+  name: string;
+  /** Human-readable description of this achievement. */
+  description?: string;
+  /** Display ordering priority; lower values appear first. Defaults to 100. */
+  priority?: number;
+  /** Requirements that must be met to earn this achievement. */
+  requirements: BlueprintAchievementRequirement[];
+  /** Rewards granted when the achievement is earned. */
+  rewards?: BlueprintAchievementReward[];
+  /** Entity prefix to scope this achievement to (e.g., "org", "app"). Used to resolve the correct events_module. Defaults to "app". */
+  entity_prefix?: string;
+}
 /** Override object for the entity table created by a BlueprintEntityType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
 export interface BlueprintEntityTableProvision {
   /** Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true. */
@@ -1245,10 +1284,10 @@ export interface BlueprintEntityTableProvision {
   /** RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op). */
   policies?: BlueprintPolicy[];
 }
-/** An entity type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision. */
+/** An entity type entry for Phase 0 of construct_blueprint(). When name is provided, provisions a new entity type with its own entity table, membership modules, and security policies via entity_type_provision. When name is omitted and only prefix is given, extends an existing entity type (e.g., the built-in "org") with additional capabilities like storage — without creating a new entity type. */
 export interface BlueprintEntityType {
-  /** Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database. */
-  name: string;
+  /** Entity type name (e.g., "data_room", "channel", "department"). Required when creating a new entity type. Omit when extending an existing entity type (e.g., prefix: "org") — the entry will add storage/config to the existing type without creating a new one. */
+  name?: string;
   /** Short prefix for generated objects (e.g., "dr", "ch", "dept"). Used in table/trigger naming. */
   prefix: string;
   /** Human-readable description of this entity type. */
@@ -1265,16 +1304,17 @@ export interface BlueprintEntityType {
   has_profiles?: boolean;
   /** Whether to provision a levels module for this entity type. Defaults to false. */
   has_levels?: boolean;
-  /** Whether to provision a storage module (buckets, files tables) for this entity type. Defaults to false. */
-  has_storage?: boolean;
+
   /** Whether to provision entity-scoped invite tables ({prefix}_invites, {prefix}_claimed_invites) and a submit_{prefix}_invite_code() function. Defaults to false. */
   has_invites?: boolean;
+  /** Whether to auto-attach an EventTracker to the claimed_invites table for invite-based achievements. Requires has_invites=true AND has_levels=true. When true, records 'invite_claimed' events credited to the sender (inviter) on each claimed invite. Defaults to false. */
+  has_invite_achievements?: boolean;
   /** Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false. */
   skip_entity_policies?: boolean;
   /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
   table_provision?: BlueprintEntityTableProvision;
-  /** Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). */
-  storage?: BlueprintStorageConfig;
+  /** Storage configuration (array-only). A non-empty array enables storage provisioning. Each entry creates a separate storage module with its own tables ({prefix}_{storage_key}_buckets/files). Controls RLS policies, bucket seeding, and module-level settings. */
+  storage?: BlueprintStorageConfig[];
 }
 /**
  * ===========================================================================
@@ -1557,6 +1597,8 @@ export interface BlueprintDefinition {
   unique_constraints?: BlueprintUniqueConstraint[];
   /** Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security. */
   entity_types?: BlueprintEntityType[];
-  /** App-level storage configuration. Creates a storage_module (membership_type = NULL), seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). Use provisions for per-table policy overrides. For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead. */
-  storage?: BlueprintStorageConfig;
+  /** Top-level storage configuration array. Each entry has an optional scope ("app" or "org"). App-scoped (default) creates storage_module with membership_type = NULL. Org-scoped creates per-org/user storage with owner_id and AFTER INSERT bucket seeding. When infra is installed, a private "functions" bucket is auto-injected into org-scoped entries. For child entity type storage, use entity_types[].storage instead. */
+  storage?: BlueprintStorageConfig[];
+  /** Achievement definitions. Each entry creates a level with requirements and optional rewards in the events_module. Requires events_module to be provisioned (e.g., via entity_types[].has_levels = true or modules includes events_module). */
+  achievements?: BlueprintAchievement[];
 }

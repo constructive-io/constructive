@@ -176,9 +176,9 @@ export const exportGraphQLMeta = async ({
     queryAndParse('invites_module'),
     queryAndParse('emails_module'),
     queryAndParse('sessions_module'),
-    queryAndParse('secrets_module'),
+    queryAndParse('user_state_module'),
     queryAndParse('profiles_module'),
-    queryAndParse('encrypted_secrets_module'),
+    queryAndParse('config_secrets_user_module'),
     queryAndParse('connected_accounts_module'),
     queryAndParse('phone_numbers_module'),
     queryAndParse('crypto_addresses_module'),
@@ -202,6 +202,7 @@ export const exportGraphQLMeta = async ({
     queryAndParse('plans_module'),
     queryAndParse('realtime_module'),
     queryAndParse('session_secrets_module'),
+    queryAndParse('config_secrets_org_module'),
     queryAndParse('webauthn_auth_module'),
     queryAndParse('webauthn_credentials_module')
   ]);

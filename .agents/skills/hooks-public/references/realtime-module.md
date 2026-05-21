@@ -7,8 +7,8 @@ React Query hooks for RealtimeModule data operations
 ## Usage
 
 ```typescript
-useRealtimeModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, lookaheadHours: true, partitionInterval: true, notifyChannel: true } } })
-useRealtimeModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, lookaheadHours: true, partitionInterval: true, notifyChannel: true } } })
+useRealtimeModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, premake: true, interval: true, notifyChannel: true } } })
+useRealtimeModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, premake: true, interval: true, notifyChannel: true } } })
 useCreateRealtimeModuleMutation({ selection: { fields: { id: true } } })
 useUpdateRealtimeModuleMutation({ selection: { fields: { id: true } } })
 useDeleteRealtimeModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteRealtimeModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useRealtimeModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, lookaheadHours: true, partitionInterval: true, notifyChannel: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, premake: true, interval: true, notifyChannel: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useRealtimeModulesQuery({
 const { mutate } = useCreateRealtimeModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', lookaheadHours: '<Int>', partitionInterval: '<String>', notifyChannel: '<String>' });
+mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', premake: '<Int>', interval: '<String>', notifyChannel: '<String>' });
 ```

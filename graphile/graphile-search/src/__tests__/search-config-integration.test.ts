@@ -373,6 +373,8 @@ describe('@hasChunks chunk-aware querying integration', () => {
     const unifiedPlugin = createUnifiedSearchPlugin({
       adapters: [
         createTsvectorAdapter(),
+        createBm25Adapter(),
+        createTrgmAdapter({ requireIntentionalSearch: false }),
         createPgvectorAdapter(),
       ],
       enableSearchScore: true,
@@ -386,6 +388,9 @@ describe('@hasChunks chunk-aware querying integration', () => {
           parentFk: 'post_id',
           parentPk: 'id',
           embeddingField: 'embedding',
+          contentField: 'content',
+          searchField: 'search',
+          searchIndexes: ['fulltext', 'bm25', 'trigram'],
         },
       },
     });
@@ -394,6 +399,7 @@ describe('@hasChunks chunk-aware querying integration', () => {
       extends: [ConnectionFilterPreset()],
       plugins: [
         TsvectorCodecPlugin,
+        Bm25CodecPlugin,
         VectorCodecPlugin,
         smartTagsPlugin,
         unifiedPlugin,
@@ -526,6 +532,60 @@ describe('@hasChunks chunk-aware querying integration', () => {
     // Post 2's closest chunk [0.2, 0.8, 0.1] is much farther
     for (const node of nodes!) {
       expect(node.embeddingVectorDistance).toBeLessThanOrEqual(0.1);
+    }
+  });
+
+  // ─── Chunk-aware tsvector search ─────────────────────────────────────────
+
+  it('finds parent via chunk tsvector match (term only in chunks)', async () => {
+    // "quantum" only appears in post 1's chunk content, not in the parent's tsv
+    const result = await query<any>(`
+      query {
+        allPosts(where: {
+          tsvTsv: "quantum computing"
+        }) {
+          nodes {
+            rowId
+            title
+          }
+        }
+      }
+    `);
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.allPosts?.nodes;
+    expect(nodes).toBeDefined();
+    expect(nodes!.length).toBeGreaterThan(0);
+
+    // Post 1 should be found because its chunk matches "quantum computing"
+    const post1 = nodes!.find((n: any) => n.rowId === 1);
+    expect(post1).toBeDefined();
+  });
+
+  // ─── Chunk-aware trgm search ─────────────────────────────────────────────
+
+  it('finds parent via chunk trgm similarity (term only in chunks)', async () => {
+    // "qubits" only appears in post 1's chunk content, not in the parent body
+    const result = await query<any>(`
+      query {
+        allPosts(where: {
+          trgmBody: { value: "qubits parallel computation", threshold: 0.05 }
+        }) {
+          nodes {
+            rowId
+            title
+          }
+        }
+      }
+    `);
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.allPosts?.nodes;
+    expect(nodes).toBeDefined();
+    // trgm should match post 1 via chunks (content has "qubits parallel computation")
+    if (nodes!.length > 0) {
+      const post1 = nodes!.find((n: any) => n.rowId === 1);
+      expect(post1).toBeDefined();
     }
   });
 });

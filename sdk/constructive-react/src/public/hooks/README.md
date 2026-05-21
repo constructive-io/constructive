@@ -53,11 +53,6 @@ function App() {
 | `useCreateObjectMutation` | Mutation | Create a object |
 | `useUpdateObjectMutation` | Mutation | Update a object |
 | `useDeleteObjectMutation` | Mutation | Delete a object |
-| `useAppLevelRequirementsQuery` | Query | Defines the specific requirements that must be met to achieve a level |
-| `useAppLevelRequirementQuery` | Query | Defines the specific requirements that must be met to achieve a level |
-| `useCreateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
-| `useUpdateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
-| `useDeleteAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
 | `useDatabasesQuery` | Query | List all databases |
 | `useDatabaseQuery` | Query | Get one database |
 | `useCreateDatabaseMutation` | Mutation | Create a database |
@@ -343,11 +338,11 @@ function App() {
 | `useCreateInvitesModuleMutation` | Mutation | Create a invitesModule |
 | `useUpdateInvitesModuleMutation` | Mutation | Update a invitesModule |
 | `useDeleteInvitesModuleMutation` | Mutation | Delete a invitesModule |
-| `useLevelsModulesQuery` | Query | List all levelsModules |
-| `useLevelsModuleQuery` | Query | Get one levelsModule |
-| `useCreateLevelsModuleMutation` | Mutation | Create a levelsModule |
-| `useUpdateLevelsModuleMutation` | Mutation | Update a levelsModule |
-| `useDeleteLevelsModuleMutation` | Mutation | Delete a levelsModule |
+| `useEventsModulesQuery` | Query | List all eventsModules |
+| `useEventsModuleQuery` | Query | Get one eventsModule |
+| `useCreateEventsModuleMutation` | Mutation | Create a eventsModule |
+| `useUpdateEventsModuleMutation` | Mutation | Update a eventsModule |
+| `useDeleteEventsModuleMutation` | Mutation | Delete a eventsModule |
 | `useLimitsModulesQuery` | Query | List all limitsModules |
 | `useLimitsModuleQuery` | Query | Get one limitsModule |
 | `useCreateLimitsModuleMutation` | Mutation | Create a limitsModule |
@@ -378,11 +373,11 @@ function App() {
 | `useCreateProfilesModuleMutation` | Mutation | Create a profilesModule |
 | `useUpdateProfilesModuleMutation` | Mutation | Update a profilesModule |
 | `useDeleteProfilesModuleMutation` | Mutation | Delete a profilesModule |
-| `useSecretsModulesQuery` | Query | List all secretsModules |
-| `useSecretsModuleQuery` | Query | Get one secretsModule |
-| `useCreateSecretsModuleMutation` | Mutation | Create a secretsModule |
-| `useUpdateSecretsModuleMutation` | Mutation | Update a secretsModule |
-| `useDeleteSecretsModuleMutation` | Mutation | Delete a secretsModule |
+| `useUserStateModulesQuery` | Query | List all userStateModules |
+| `useUserStateModuleQuery` | Query | Get one userStateModule |
+| `useCreateUserStateModuleMutation` | Mutation | Create a userStateModule |
+| `useUpdateUserStateModuleMutation` | Mutation | Update a userStateModule |
+| `useDeleteUserStateModuleMutation` | Mutation | Delete a userStateModule |
 | `useSessionsModulesQuery` | Query | List all sessionsModules |
 | `useSessionsModuleQuery` | Query | Get one sessionsModule |
 | `useCreateSessionsModuleMutation` | Mutation | Create a sessionsModule |
@@ -573,21 +568,11 @@ function App() {
 | `useCreateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
 | `useUpdateOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
 | `useDeleteOrgLimitAggregateMutation` | Mutation | Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown) |
-| `useAppStepsQuery` | Query | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useAppStepQuery` | Query | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useCreateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useUpdateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useDeleteAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useAppAchievementsQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useAppAchievementQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useCreateAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useUpdateAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useDeleteAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
-| `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
-| `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useOrgLimitWarningsQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useOrgLimitWarningQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useCreateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useUpdateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useDeleteOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useEmailsQuery` | Query | User email addresses with verification and primary-email management |
 | `useEmailQuery` | Query | User email addresses with verification and primary-email management |
 | `useCreateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
@@ -725,6 +710,11 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useAppLimitWarningsQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useAppLimitWarningQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useCreateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useUpdateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useDeleteAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useUserConnectedAccountsQuery` | Query | List all userConnectedAccounts |
 | `useUserConnectedAccountQuery` | Query | Get one userConnectedAccount |
 | `useCreateUserConnectedAccountMutation` | Mutation | Create a userConnectedAccount |
@@ -774,6 +764,11 @@ function App() {
 | `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
 | `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
 | `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
+| `useRateLimitMetersModulesQuery` | Query | List all rateLimitMetersModules |
+| `useRateLimitMetersModuleQuery` | Query | Get one rateLimitMetersModule |
+| `useCreateRateLimitMetersModuleMutation` | Mutation | Create a rateLimitMetersModule |
+| `useUpdateRateLimitMetersModuleMutation` | Mutation | Update a rateLimitMetersModule |
+| `useDeleteRateLimitMetersModuleMutation` | Mutation | Delete a rateLimitMetersModule |
 | `usePlansModulesQuery` | Query | List all plansModules |
 | `usePlansModuleQuery` | Query | Get one plansModule |
 | `useCreatePlansModuleMutation` | Mutation | Create a plansModule |
@@ -835,7 +830,6 @@ function App() {
 | `useRequireStepUpQuery` | Query | requireStepUp |
 | `useAppPermissionsGetPaddedMaskQuery` | Query | appPermissionsGetPaddedMask |
 | `useOrgPermissionsGetPaddedMaskQuery` | Query | orgPermissionsGetPaddedMask |
-| `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useRevParseQuery` | Query | revParse |
 | `useResolveBlueprintFieldQuery` | Query | Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this. |
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
@@ -849,7 +843,6 @@ function App() {
 | `useGetAllObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
 | `useGetPathObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
 | `useGetObjectAtPathQuery` | Query | getObjectAtPath |
-| `useStepsRequiredQuery` | Query | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `useCurrentUserQuery` | Query | currentUser |
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useSignOutMutation` | Mutation | signOut |
@@ -869,7 +862,7 @@ function App() {
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useFreezeObjectsMutation` | Mutation | freezeObjects |
 | `useInitEmptyRepoMutation` | Mutation | initEmptyRepo |
-| `useConstructBlueprintMutation` | Mutation | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Seven phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
+| `useConstructBlueprintMutation` | Mutation | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (0.5) app-level storage, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
 | `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
@@ -897,7 +890,7 @@ Parameters:
   - owner_id: UUID of the owner user (required)
   - include_invites: Include invite system (default: true)
   - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include levels/achievements (default: false)
+  - include_levels: Include events/analytics (default: false)
   - bitlen: Bit length for permission masks (default: 64)
   - tokens_expiration: Token expiration interval (default: 30 days)
 
@@ -1028,27 +1021,6 @@ const { mutate: create } = useCreateObjectMutation({
   selection: { fields: { id: true } },
 });
 create({ hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
-```
-
-### AppLevelRequirement
-
-```typescript
-// List all appLevelRequirements
-const { data, isLoading } = useAppLevelRequirementsQuery({
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appLevelRequirement
-const { data: item } = useAppLevelRequirementQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appLevelRequirement
-const { mutate: create } = useCreateAppLevelRequirementMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', level: '<String>', description: '<String>', requiredCount: '<Int>', priority: '<Int>' });
 ```
 
 ### Database
@@ -1434,20 +1406,20 @@ create({ databaseId: '<UUID>', viewId: '<UUID>', name: '<String>', event: '<Stri
 ```typescript
 // List all embeddingChunks
 const { data, isLoading } = useEmbeddingChunksQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, embeddingFieldId: true, chunksTableId: true, chunksTableName: true, contentFieldName: true, dimensions: true, metric: true, chunkSize: true, chunkOverlap: true, chunkStrategy: true, metadataFields: true, enqueueChunkingJob: true, chunkingTaskName: true, parentFkFieldId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, embeddingFieldId: true, chunksTableId: true, chunksTableName: true, contentFieldName: true, dimensions: true, metric: true, chunkSize: true, chunkOverlap: true, chunkStrategy: true, metadataFields: true, searchIndexes: true, enqueueChunkingJob: true, chunkingTaskName: true, embeddingModel: true, embeddingProvider: true, parentFkFieldId: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one embeddingChunk
 const { data: item } = useEmbeddingChunkQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, embeddingFieldId: true, chunksTableId: true, chunksTableName: true, contentFieldName: true, dimensions: true, metric: true, chunkSize: true, chunkOverlap: true, chunkStrategy: true, metadataFields: true, enqueueChunkingJob: true, chunkingTaskName: true, parentFkFieldId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, embeddingFieldId: true, chunksTableId: true, chunksTableName: true, contentFieldName: true, dimensions: true, metric: true, chunkSize: true, chunkOverlap: true, chunkStrategy: true, metadataFields: true, searchIndexes: true, enqueueChunkingJob: true, chunkingTaskName: true, embeddingModel: true, embeddingProvider: true, parentFkFieldId: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a embeddingChunk
 const { mutate: create } = useCreateEmbeddingChunkMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', embeddingFieldId: '<UUID>', chunksTableId: '<UUID>', chunksTableName: '<String>', contentFieldName: '<String>', dimensions: '<Int>', metric: '<String>', chunkSize: '<Int>', chunkOverlap: '<Int>', chunkStrategy: '<String>', metadataFields: '<JSON>', enqueueChunkingJob: '<Boolean>', chunkingTaskName: '<String>', parentFkFieldId: '<UUID>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', embeddingFieldId: '<UUID>', chunksTableId: '<UUID>', chunksTableName: '<String>', contentFieldName: '<String>', dimensions: '<Int>', metric: '<String>', chunkSize: '<Int>', chunkOverlap: '<Int>', chunkStrategy: '<String>', metadataFields: '<JSON>', searchIndexes: '<JSON>', enqueueChunkingJob: '<Boolean>', chunkingTaskName: '<String>', embeddingModel: '<String>', embeddingProvider: '<String>', parentFkFieldId: '<UUID>' });
 ```
 
 ### SecureTableProvision
@@ -1539,20 +1511,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', ta
 ```typescript
 // List all realtimeModules
 const { data, isLoading } = useRealtimeModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, lookaheadHours: true, partitionInterval: true, notifyChannel: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, premake: true, interval: true, notifyChannel: true } },
 });
 
 // Get one realtimeModule
 const { data: item } = useRealtimeModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, lookaheadHours: true, partitionInterval: true, notifyChannel: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, subscriptionsSchemaId: true, changeLogTableId: true, listenerNodeTableId: true, sourceRegistryTableId: true, retentionHours: true, premake: true, interval: true, notifyChannel: true } },
 });
 
 // Create a realtimeModule
 const { mutate: create } = useCreateRealtimeModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', lookaheadHours: '<Int>', partitionInterval: '<String>', notifyChannel: '<String>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', subscriptionsSchemaId: '<UUID>', changeLogTableId: '<UUID>', listenerNodeTableId: '<UUID>', sourceRegistryTableId: '<UUID>', retentionHours: '<Int>', premake: '<Int>', interval: '<String>', notifyChannel: '<String>' });
 ```
 
 ### SchemaGrant
@@ -1833,20 +1805,20 @@ create({ databaseId: '<UUID>', targetOwnerId: '<UUID>', sourceApproved: '<Boolea
 ```typescript
 // List all partitions
 const { data, isLoading } = usePartitionsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyIds: true, interval: true, retention: true, lookahead: true, namingPattern: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one partition
 const { data: item } = usePartitionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyIds: true, interval: true, retention: true, lookahead: true, namingPattern: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, strategy: true, partitionKeyId: true, interval: true, retention: true, premake: true, namingPattern: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a partition
 const { mutate: create } = useCreatePartitionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyIds: '<UUID>', interval: '<String>', retention: '<String>', lookahead: '<Int>', namingPattern: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', premake: '<Int>', namingPattern: '<String>' });
 ```
 
 ### Api
@@ -2101,25 +2073,25 @@ const { mutate: create } = useCreateInvitesModuleMutation({
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', emailsTableId: '<UUID>', usersTableId: '<UUID>', invitesTableId: '<UUID>', claimedInvitesTableId: '<UUID>', invitesTableName: '<String>', claimedInvitesTableName: '<String>', submitInviteCodeFunction: '<String>', prefix: '<String>', membershipType: '<Int>', entityTableId: '<UUID>' });
 ```
 
-### LevelsModule
+### EventsModule
 
 ```typescript
-// List all levelsModules
-const { data, isLoading } = useLevelsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+// List all eventsModules
+const { data, isLoading } = useEventsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, eventsTableId: true, eventsTableName: true, eventAggregatesTableId: true, eventAggregatesTableName: true, eventTypesTableId: true, eventTypesTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, levelGrantsTableId: true, levelGrantsTableName: true, achievementRewardsTableId: true, achievementRewardsTableName: true, recordEvent: true, removeEvent: true, tgEvent: true, tgEventToggle: true, tgEventToggleBool: true, tgEventBool: true, upsertAggregate: true, tgUpdateAggregates: true, pruneEvents: true, stepsRequired: true, levelAchieved: true, tgCheckAchievements: true, grantAchievement: true, tgAchievementReward: true, interval: true, retention: true, premake: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
 });
 
-// Get one levelsModule
-const { data: item } = useLevelsModuleQuery({
+// Get one eventsModule
+const { data: item } = useEventsModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, eventsTableId: true, eventsTableName: true, eventAggregatesTableId: true, eventAggregatesTableName: true, eventTypesTableId: true, eventTypesTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, levelGrantsTableId: true, levelGrantsTableName: true, achievementRewardsTableId: true, achievementRewardsTableName: true, recordEvent: true, removeEvent: true, tgEvent: true, tgEventToggle: true, tgEventToggleBool: true, tgEventBool: true, upsertAggregate: true, tgUpdateAggregates: true, pruneEvents: true, stepsRequired: true, levelAchieved: true, tgCheckAchievements: true, grantAchievement: true, tgAchievementReward: true, interval: true, retention: true, premake: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
 });
 
-// Create a levelsModule
-const { mutate: create } = useCreateLevelsModuleMutation({
+// Create a eventsModule
+const { mutate: create } = useCreateEventsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', stepsTableId: '<UUID>', stepsTableName: '<String>', achievementsTableId: '<UUID>', achievementsTableName: '<String>', levelsTableId: '<UUID>', levelsTableName: '<String>', levelRequirementsTableId: '<UUID>', levelRequirementsTableName: '<String>', completedStep: '<String>', incompletedStep: '<String>', tgAchievement: '<String>', tgAchievementToggle: '<String>', tgAchievementToggleBoolean: '<String>', tgAchievementBoolean: '<String>', upsertAchievement: '<String>', tgUpdateAchievements: '<String>', stepsRequired: '<String>', levelAchieved: '<String>', prefix: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', actorTableId: '<UUID>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', eventsTableId: '<UUID>', eventsTableName: '<String>', eventAggregatesTableId: '<UUID>', eventAggregatesTableName: '<String>', eventTypesTableId: '<UUID>', eventTypesTableName: '<String>', levelsTableId: '<UUID>', levelsTableName: '<String>', levelRequirementsTableId: '<UUID>', levelRequirementsTableName: '<String>', levelGrantsTableId: '<UUID>', levelGrantsTableName: '<String>', achievementRewardsTableId: '<UUID>', achievementRewardsTableName: '<String>', recordEvent: '<String>', removeEvent: '<String>', tgEvent: '<String>', tgEventToggle: '<String>', tgEventToggleBool: '<String>', tgEventBool: '<String>', upsertAggregate: '<String>', tgUpdateAggregates: '<String>', pruneEvents: '<String>', stepsRequired: '<String>', levelAchieved: '<String>', tgCheckAchievements: '<String>', grantAchievement: '<String>', tgAchievementReward: '<String>', interval: '<String>', retention: '<String>', premake: '<Int>', prefix: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', actorTableId: '<UUID>' });
 ```
 
 ### LimitsModule
@@ -2127,20 +2099,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', st
 ```typescript
 // List all limitsModules
 const { data, isLoading } = useLimitsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, limitCreditsTableId: true, eventsTableId: true, creditCodesTableId: true, creditCodeItemsTableId: true, creditRedemptionsTableId: true, aggregateTableId: true, limitCapsTableId: true, limitCapsDefaultsTableId: true, capCheckTrigger: true, resolveCapFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, limitCreditsTableId: true, eventsTableId: true, creditCodesTableId: true, creditCodeItemsTableId: true, creditRedemptionsTableId: true, aggregateTableId: true, limitCapsTableId: true, limitCapsDefaultsTableId: true, capCheckTrigger: true, resolveCapFunction: true, limitWarningsTableId: true, limitWarningStateTableId: true, limitCheckSoftFunction: true, limitAggregateCheckSoftFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
 });
 
 // Get one limitsModule
 const { data: item } = useLimitsModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, limitCreditsTableId: true, eventsTableId: true, creditCodesTableId: true, creditCodeItemsTableId: true, creditRedemptionsTableId: true, aggregateTableId: true, limitCapsTableId: true, limitCapsDefaultsTableId: true, capCheckTrigger: true, resolveCapFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, limitCreditsTableId: true, eventsTableId: true, creditCodesTableId: true, creditCodeItemsTableId: true, creditRedemptionsTableId: true, aggregateTableId: true, limitCapsTableId: true, limitCapsDefaultsTableId: true, capCheckTrigger: true, resolveCapFunction: true, limitWarningsTableId: true, limitWarningStateTableId: true, limitCheckSoftFunction: true, limitAggregateCheckSoftFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
 });
 
 // Create a limitsModule
 const { mutate: create } = useCreateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', defaultTableId: '<UUID>', defaultTableName: '<String>', limitIncrementFunction: '<String>', limitDecrementFunction: '<String>', limitIncrementTrigger: '<String>', limitDecrementTrigger: '<String>', limitUpdateTrigger: '<String>', limitCheckFunction: '<String>', limitCreditsTableId: '<UUID>', eventsTableId: '<UUID>', creditCodesTableId: '<UUID>', creditCodeItemsTableId: '<UUID>', creditRedemptionsTableId: '<UUID>', aggregateTableId: '<UUID>', limitCapsTableId: '<UUID>', limitCapsDefaultsTableId: '<UUID>', capCheckTrigger: '<String>', resolveCapFunction: '<String>', prefix: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', actorTableId: '<UUID>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', defaultTableId: '<UUID>', defaultTableName: '<String>', limitIncrementFunction: '<String>', limitDecrementFunction: '<String>', limitIncrementTrigger: '<String>', limitDecrementTrigger: '<String>', limitUpdateTrigger: '<String>', limitCheckFunction: '<String>', limitCreditsTableId: '<UUID>', eventsTableId: '<UUID>', creditCodesTableId: '<UUID>', creditCodeItemsTableId: '<UUID>', creditRedemptionsTableId: '<UUID>', aggregateTableId: '<UUID>', limitCapsTableId: '<UUID>', limitCapsDefaultsTableId: '<UUID>', capCheckTrigger: '<String>', resolveCapFunction: '<String>', limitWarningsTableId: '<UUID>', limitWarningStateTableId: '<UUID>', limitCheckSoftFunction: '<String>', limitAggregateCheckSoftFunction: '<String>', prefix: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', actorTableId: '<UUID>' });
 ```
 
 ### MembershipTypesModule
@@ -2248,22 +2220,22 @@ const { mutate: create } = useCreateProfilesModuleMutation({
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', profilePermissionsTableId: '<UUID>', profilePermissionsTableName: '<String>', profileGrantsTableId: '<UUID>', profileGrantsTableName: '<String>', profileDefinitionGrantsTableId: '<UUID>', profileDefinitionGrantsTableName: '<String>', profileTemplatesTableId: '<UUID>', profileTemplatesTableName: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', actorTableId: '<UUID>', permissionsTableId: '<UUID>', membershipsTableId: '<UUID>', prefix: '<String>' });
 ```
 
-### SecretsModule
+### UserStateModule
 
 ```typescript
-// List all secretsModules
-const { data, isLoading } = useSecretsModulesQuery({
+// List all userStateModules
+const { data, isLoading } = useUserStateModulesQuery({
   selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
 });
 
-// Get one secretsModule
-const { data: item } = useSecretsModuleQuery({
+// Get one userStateModule
+const { data: item } = useUserStateModuleQuery({
   id: '<UUID>',
   selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
 });
 
-// Create a secretsModule
-const { mutate: create } = useCreateSecretsModuleMutation({
+// Create a userStateModule
+const { mutate: create } = useCreateUserStateModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
@@ -2421,20 +2393,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bu
 ```typescript
 // List all entityTypeProvisions
 const { data, isLoading } = useEntityTypeProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outPathSharesTableId: true, outInvitesModuleId: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, hasInviteAchievements: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outPathSharesTableId: true, outInvitesModuleId: true } },
 });
 
 // Get one entityTypeProvision
 const { data: item } = useEntityTypeProvisionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outPathSharesTableId: true, outInvitesModuleId: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, hasInvites: true, hasInviteAchievements: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true, outPathSharesTableId: true, outInvitesModuleId: true } },
 });
 
 // Create a entityTypeProvision
 const { mutate: create } = useCreateEntityTypeProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', name: '<String>', prefix: '<String>', description: '<String>', parentEntity: '<String>', tableName: '<String>', isVisible: '<Boolean>', hasLimits: '<Boolean>', hasProfiles: '<Boolean>', hasLevels: '<Boolean>', hasStorage: '<Boolean>', hasInvites: '<Boolean>', storageConfig: '<JSON>', skipEntityPolicies: '<Boolean>', tableProvision: '<JSON>', outMembershipType: '<Int>', outEntityTableId: '<UUID>', outEntityTableName: '<String>', outInstalledModules: '<String>', outStorageModuleId: '<UUID>', outBucketsTableId: '<UUID>', outFilesTableId: '<UUID>', outPathSharesTableId: '<UUID>', outInvitesModuleId: '<UUID>' });
+create({ databaseId: '<UUID>', name: '<String>', prefix: '<String>', description: '<String>', parentEntity: '<String>', tableName: '<String>', isVisible: '<Boolean>', hasLimits: '<Boolean>', hasProfiles: '<Boolean>', hasLevels: '<Boolean>', hasStorage: '<Boolean>', hasInvites: '<Boolean>', hasInviteAchievements: '<Boolean>', storageConfig: '<JSON>', skipEntityPolicies: '<Boolean>', tableProvision: '<JSON>', outMembershipType: '<Int>', outEntityTableId: '<UUID>', outEntityTableName: '<String>', outInstalledModules: '<String>', outStorageModuleId: '<UUID>', outBucketsTableId: '<UUID>', outFilesTableId: '<UUID>', outPathSharesTableId: '<UUID>', outInvitesModuleId: '<UUID>' });
 ```
 
 ### WebauthnCredentialsModule
@@ -2920,67 +2892,25 @@ const { mutate: create } = useCreateOrgLimitAggregateMutation({
 create({ name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', reserved: '<BigInt>' });
 ```
 
-### AppStep
+### OrgLimitWarning
 
 ```typescript
-// List all appSteps
-const { data, isLoading } = useAppStepsQuery({
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
+// List all orgLimitWarnings
+const { data, isLoading } = useOrgLimitWarningsQuery({
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true, entityId: true } },
 });
 
-// Get one appStep
-const { data: item } = useAppStepQuery({
+// Get one orgLimitWarning
+const { data: item } = useOrgLimitWarningQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true, entityId: true } },
 });
 
-// Create a appStep
-const { mutate: create } = useCreateAppStepMutation({
+// Create a orgLimitWarning
+const { mutate: create } = useCreateOrgLimitWarningMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
-```
-
-### AppAchievement
-
-```typescript
-// List all appAchievements
-const { data, isLoading } = useAppAchievementsQuery({
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appAchievement
-const { data: item } = useAppAchievementQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appAchievement
-const { mutate: create } = useCreateAppAchievementMutation({
-  selection: { fields: { id: true } },
-});
-create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
-```
-
-### AppLevel
-
-```typescript
-// List all appLevels
-const { data, isLoading } = useAppLevelsQuery({
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appLevel
-const { data: item } = useAppLevelQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appLevel
-const { mutate: create } = useCreateAppLevelMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', description: '<String>', image: '<Image>', ownerId: '<UUID>' });
+create({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>', entityId: '<UUID>' });
 ```
 
 ### Email
@@ -3565,6 +3495,27 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
 create({ name: '<String>', max: '<BigInt>', softMax: '<BigInt>' });
 ```
 
+### AppLimitWarning
+
+```typescript
+// List all appLimitWarnings
+const { data, isLoading } = useAppLimitWarningsQuery({
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
+});
+
+// Get one appLimitWarning
+const { data: item } = useAppLimitWarningQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
+});
+
+// Create a appLimitWarning
+const { mutate: create } = useCreateAppLimitWarningMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>' });
+```
+
 ### UserConnectedAccount
 
 ```typescript
@@ -3782,6 +3733,27 @@ const { mutate: create } = useCreateRlsModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>' });
+```
+
+### RateLimitMetersModule
+
+```typescript
+// List all rateLimitMetersModules
+const { data, isLoading } = useRateLimitMetersModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, rateLimitStateTableId: true, rateLimitStateTableName: true, rateLimitOverridesTableId: true, rateLimitOverridesTableName: true, rateWindowLimitsTableId: true, rateWindowLimitsTableName: true, checkRateLimitFunction: true, prefix: true } },
+});
+
+// Get one rateLimitMetersModule
+const { data: item } = useRateLimitMetersModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, rateLimitStateTableId: true, rateLimitStateTableName: true, rateLimitOverridesTableId: true, rateLimitOverridesTableName: true, rateWindowLimitsTableId: true, rateWindowLimitsTableName: true, checkRateLimitFunction: true, prefix: true } },
+});
+
+// Create a rateLimitMetersModule
+const { mutate: create } = useCreateRateLimitMetersModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', rateLimitStateTableId: '<UUID>', rateLimitStateTableName: '<String>', rateLimitOverridesTableId: '<UUID>', rateLimitOverridesTableName: '<String>', rateWindowLimitsTableId: '<UUID>', rateWindowLimitsTableName: '<String>', checkRateLimitFunction: '<String>', prefix: '<String>' });
 ```
 
 ### PlansModule
@@ -4071,18 +4043,6 @@ orgPermissionsGetPaddedMask
   |----------|------|
   | `mask` | BitString |
 
-### `useStepsAchievedQuery`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `level` | String |
-  | `roleId` | UUID |
-
 ### `useRevParseQuery`
 
 revParse
@@ -4254,21 +4214,6 @@ getObjectAtPath
   | `storeId` | UUID |
   | `path` | [String] |
   | `refname` | String |
-
-### `useStepsRequiredQuery`
-
-Reads and enables pagination through a set of `AppLevelRequirement`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `level` | String |
-  | `roleId` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
 
 ### `useCurrentUserQuery`
 
@@ -4477,7 +4422,7 @@ initEmptyRepo
 
 ### `useConstructBlueprintMutation`
 
-Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Seven phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
+Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (0.5) app-level storage, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
 
 - **Type:** mutation
 - **Arguments:**
@@ -4715,7 +4660,7 @@ Parameters:
   - owner_id: UUID of the owner user (required)
   - include_invites: Include invite system (default: true)
   - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include levels/achievements (default: false)
+  - include_levels: Include events/analytics (default: false)
   - bitlen: Bit length for permission masks (default: 64)
   - tokens_expiration: Token expiration interval (default: 30 days)
 

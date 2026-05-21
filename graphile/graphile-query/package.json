@@ -1,6 +1,6 @@
 {
   "name": "graphile-query",
-  "version": "4.18.2",
+  "version": "4.18.5",
   "author": "Constructive <developers@constructive.io>",
   "description": "Execute GraphQL queries against PostGraphile v5 schemas",
   "main": "index.js",

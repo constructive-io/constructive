@@ -16,3 +16,6 @@ export type { TrgmAdapterOptions } from './trgm';
 
 export { createPgvectorAdapter } from './pgvector';
 export type { PgvectorAdapterOptions } from './pgvector';
+
+export { getChunksInfo } from './chunks';
+export type { ChunksInfo } from './chunks';

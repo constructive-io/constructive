@@ -2,7 +2,8 @@
  * LlmModulePlugin
  *
  * Detects and loads the `llm_module` configuration from `services_public.api_modules`.
- * Makes the resolved embedder available to other plugins via the build context.
+ * Makes the resolved embedder and chat completer available to other plugins
+ * via the build context.
  *
  * This plugin is the foundation that enables per-database LLM configuration.
  * When an API has an `llm_module` configured, the embedder is resolved and
@@ -14,11 +15,16 @@
  *   2. `defaultEmbedder` from preset options (dev/testing fallback)
  *   3. Environment variables (EMBEDDER_PROVIDER, EMBEDDER_MODEL, EMBEDDER_BASE_URL)
  *   4. null — LLM features are disabled
+ *
+ * This plugin is intentionally pure — no billing or metering logic.
+ * The optional LlmMeteringPlugin wraps the embedder with billing integration
+ * if loaded (it runs after this plugin and before the consumer plugins).
  */
 
 import type { GraphileConfig } from 'graphile-config';
 import { buildEmbedder, buildEmbedderFromEnv } from '../embedder';
 import { buildChatCompleter, buildChatCompleterFromEnv } from '../chat';
+import { getLlmEnvOptions } from '../env';
 import type { EmbedderFunction, ChatFunction, GraphileLlmOptions } from '../types';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
@@ -30,6 +36,10 @@ declare global {
       llmEmbedder: EmbedderFunction | null;
       /** The resolved chat completion function, or null if not configured */
       llmChatCompleter: ChatFunction | null;
+      /** The embedding model name (used as billing meter slug) */
+      llmEmbeddingModel: string | null;
+      /** The chat model name (used as billing meter slug) */
+      llmChatModel: string | null;
     }
   }
   namespace GraphileConfig {
@@ -49,7 +59,7 @@ export function createLlmModulePlugin(
 
   return {
     name: 'LlmModulePlugin',
-    version: '0.1.0',
+    version: '0.2.0',
     description:
       'Resolves LLM embedder and chat completer configuration and makes them available to other plugins',
 
@@ -111,7 +121,9 @@ export function createLlmModulePlugin(
           return build.extend(build, {
             llmEmbedder: embedder,
             llmChatCompleter: chat,
-          }, 'LlmModulePlugin adding llmEmbedder and llmChatCompleter to build');
+            llmEmbeddingModel: defaultEmbedder?.model ?? getLlmEnvOptions().embedding.model,
+            llmChatModel: defaultChatCompleter?.model ?? getLlmEnvOptions().chat.model,
+          }, 'LlmModulePlugin adding llmEmbedder, llmChatCompleter, and model names to build');
         },
       },
     },

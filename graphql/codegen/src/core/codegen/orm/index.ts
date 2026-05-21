@@ -117,7 +117,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
       ...(customOperations?.queries ?? []),
       ...(customOperations?.mutations ?? []),
     ];
-    const usedInputTypes = collectInputTypeNames(allOps);
+    const usedInputTypes = collectInputTypeNames(allOps, tables);
     const usedPayloadTypes = collectPayloadTypeNames(allOps);
 
     // Also include payload types for table CRUD mutations (they reference Edge types)

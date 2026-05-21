@@ -48,16 +48,6 @@ export interface Object {
   frzn: boolean | null;
   createdAt: string | null;
 }
-export interface AppLevelRequirement {
-  id: string | null;
-  name: string | null;
-  level: string | null;
-  description: string | null;
-  requiredCount: number | null;
-  priority: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface Database {
   id: string | null;
   ownerId: string | null;
@@ -351,8 +341,11 @@ export interface EmbeddingChunk {
   chunkOverlap: number | null;
   chunkStrategy: string | null;
   metadataFields: unknown | null;
+  searchIndexes: unknown | null;
   enqueueChunkingJob: boolean | null;
   chunkingTaskName: string | null;
+  embeddingModel: string | null;
+  embeddingProvider: string | null;
   parentFkFieldId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -422,8 +415,8 @@ export interface RealtimeModule {
   listenerNodeTableId: string | null;
   sourceRegistryTableId: string | null;
   retentionHours: number | null;
-  lookaheadHours: number | null;
-  partitionInterval: string | null;
+  premake: number | null;
+  interval: string | null;
   notifyChannel: string | null;
 }
 export interface SchemaGrant {
@@ -540,10 +533,10 @@ export interface Partition {
   databaseId: string | null;
   tableId: string | null;
   strategy: string | null;
-  partitionKeyIds: string[] | null;
+  partitionKeyId: string | null;
   interval: string | null;
   retention: string | null;
-  lookahead: number | null;
+  premake: number | null;
   namingPattern: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -681,29 +674,42 @@ export interface InvitesModule {
   membershipType: number | null;
   entityTableId: string | null;
 }
-export interface LevelsModule {
+export interface EventsModule {
   id: string | null;
   databaseId: string | null;
   schemaId: string | null;
   privateSchemaId: string | null;
-  stepsTableId: string | null;
-  stepsTableName: string | null;
-  achievementsTableId: string | null;
-  achievementsTableName: string | null;
+  eventsTableId: string | null;
+  eventsTableName: string | null;
+  eventAggregatesTableId: string | null;
+  eventAggregatesTableName: string | null;
+  eventTypesTableId: string | null;
+  eventTypesTableName: string | null;
   levelsTableId: string | null;
   levelsTableName: string | null;
   levelRequirementsTableId: string | null;
   levelRequirementsTableName: string | null;
-  completedStep: string | null;
-  incompletedStep: string | null;
-  tgAchievement: string | null;
-  tgAchievementToggle: string | null;
-  tgAchievementToggleBoolean: string | null;
-  tgAchievementBoolean: string | null;
-  upsertAchievement: string | null;
-  tgUpdateAchievements: string | null;
+  levelGrantsTableId: string | null;
+  levelGrantsTableName: string | null;
+  achievementRewardsTableId: string | null;
+  achievementRewardsTableName: string | null;
+  recordEvent: string | null;
+  removeEvent: string | null;
+  tgEvent: string | null;
+  tgEventToggle: string | null;
+  tgEventToggleBool: string | null;
+  tgEventBool: string | null;
+  upsertAggregate: string | null;
+  tgUpdateAggregates: string | null;
+  pruneEvents: string | null;
   stepsRequired: string | null;
   levelAchieved: string | null;
+  tgCheckAchievements: string | null;
+  grantAchievement: string | null;
+  tgAchievementReward: string | null;
+  interval: string | null;
+  retention: string | null;
+  premake: number | null;
   prefix: string | null;
   membershipType: number | null;
   entityTableId: string | null;
@@ -734,6 +740,10 @@ export interface LimitsModule {
   limitCapsDefaultsTableId: string | null;
   capCheckTrigger: string | null;
   resolveCapFunction: string | null;
+  limitWarningsTableId: string | null;
+  limitWarningStateTableId: string | null;
+  limitCheckSoftFunction: string | null;
+  limitAggregateCheckSoftFunction: string | null;
   prefix: string | null;
   membershipType: number | null;
   entityTableId: string | null;
@@ -832,7 +842,7 @@ export interface ProfilesModule {
   membershipsTableId: string | null;
   prefix: string | null;
 }
-export interface SecretsModule {
+export interface UserStateModule {
   id: string | null;
   databaseId: string | null;
   schemaId: string | null;
@@ -987,6 +997,7 @@ export interface EntityTypeProvision {
   hasLevels: boolean | null;
   hasStorage: boolean | null;
   hasInvites: boolean | null;
+  hasInviteAchievements: boolean | null;
   storageConfig: unknown | null;
   skipEntityPolicies: boolean | null;
   tableProvision: unknown | null;
@@ -1250,30 +1261,13 @@ export interface OrgLimitAggregate {
   periodCredits: string | null;
   reserved: string | null;
 }
-export interface AppStep {
-  id: string | null;
-  actorId: string | null;
-  name: string | null;
-  count: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface AppAchievement {
-  id: string | null;
-  actorId: string | null;
-  name: string | null;
-  count: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface AppLevel {
+export interface OrgLimitWarning {
   id: string | null;
   name: string | null;
-  description: string | null;
-  image: ConstructiveInternalTypeImage | null;
-  ownerId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
+  warningType: string | null;
+  thresholdValue: string | null;
+  taskIdentifier: string | null;
+  entityId: string | null;
 }
 export interface Email {
   id: string | null;
@@ -1517,6 +1511,13 @@ export interface OrgLimitDefault {
   max: string | null;
   softMax: string | null;
 }
+export interface AppLimitWarning {
+  id: string | null;
+  name: string | null;
+  warningType: string | null;
+  thresholdValue: string | null;
+  taskIdentifier: string | null;
+}
 export interface UserConnectedAccount {
   id: string | null;
   ownerId: string | null;
@@ -1632,6 +1633,20 @@ export interface RlsModule {
   authenticateStrict: string | null;
   currentRole: string | null;
   currentRoleId: string | null;
+}
+export interface RateLimitMetersModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  rateLimitStateTableId: string | null;
+  rateLimitStateTableName: string | null;
+  rateLimitOverridesTableId: string | null;
+  rateLimitOverridesTableName: string | null;
+  rateWindowLimitsTableId: string | null;
+  rateWindowLimitsTableName: string | null;
+  checkRateLimitFunction: string | null;
+  prefix: string | null;
 }
 export interface PlansModule {
   id: string | null;

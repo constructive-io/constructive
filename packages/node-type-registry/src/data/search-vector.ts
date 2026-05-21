@@ -52,6 +52,21 @@ export const SearchVector: NodeTypeDefinition = {
         },
         description: 'Column names that feed the embedding. Used by stale trigger to detect content changes.'
       },
+
+      // ── Model config (optional — flows into job payload) ──────────
+      embedding_model: {
+        type: 'string',
+        description:
+          'Embedding model identifier (e.g. "nomic-embed-text", "text-embedding-3-small"). ' +
+          'Included in the job payload so the worker knows which model to use. ' +
+          'When null, the worker falls back to runtime config (llm_module / env vars).'
+      },
+      embedding_provider: {
+        type: 'string',
+        description:
+          'Embedding provider name (e.g. "ollama", "openai"). ' +
+          'When null, the worker falls back to runtime config.'
+      },
       enqueue_job: {
         type: 'boolean',
         description: 'Auto-create trigger that enqueues embedding generation jobs',

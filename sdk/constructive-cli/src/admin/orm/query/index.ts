@@ -6,11 +6,7 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
-import type {
-  AppPermissionConnection,
-  OrgPermissionConnection,
-  AppLevelRequirementConnection,
-} from '../input-types';
+import type { AppPermissionConnection, OrgPermissionConnection } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface AppPermissionsGetPaddedMaskVariables {
   mask?: string;
@@ -29,10 +25,6 @@ export interface AppPermissionsGetMaskVariables {
 }
 export interface OrgPermissionsGetMaskVariables {
   ids?: string[];
-}
-export interface StepsAchievedVariables {
-  level?: string;
-  roleId?: string;
 }
 export interface AppPermissionsGetMaskByNamesVariables {
   names?: string[];
@@ -54,19 +46,6 @@ export interface AppPermissionsGetByMaskVariables {
 }
 export interface OrgPermissionsGetByMaskVariables {
   mask?: string;
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-}
-export interface StepsRequiredVariables {
-  level?: string;
-  roleId?: string;
   /** Only read the first `n` values of the set. */
   first?: number;
   /**
@@ -236,39 +215,6 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    stepsAchieved: (
-      args: StepsAchievedVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        stepsAchieved: boolean | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'StepsAchieved',
-        fieldName: 'stepsAchieved',
-        ...buildCustomDocument(
-          'query',
-          'StepsAchieved',
-          'stepsAchieved',
-          options?.select,
-          args,
-          [
-            {
-              name: 'level',
-              type: 'String',
-            },
-            {
-              name: 'roleId',
-              type: 'UUID',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
     appPermissionsGetMaskByNames: (
       args: AppPermissionsGetMaskByNamesVariables,
       options?: {
@@ -391,51 +337,6 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'mask',
               type: 'BitString',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    stepsRequired: (
-      args: StepsRequiredVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        stepsRequired: AppLevelRequirementConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'StepsRequired',
-        fieldName: 'stepsRequired',
-        ...buildCustomDocument(
-          'query',
-          'StepsRequired',
-          'stepsRequired',
-          options?.select,
-          args,
-          [
-            {
-              name: 'level',
-              type: 'String',
-            },
-            {
-              name: 'roleId',
-              type: 'UUID',
             },
             {
               name: 'first',

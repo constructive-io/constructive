@@ -46,11 +46,6 @@ function App() {
 | `useCreateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useUpdateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useDeleteOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useAppLevelRequirementsQuery` | Query | Defines the specific requirements that must be met to achieve a level |
-| `useAppLevelRequirementQuery` | Query | Defines the specific requirements that must be met to achieve a level |
-| `useCreateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
-| `useUpdateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
-| `useDeleteAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
 | `useAppLimitCreditRedemptionsQuery` | Query | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
 | `useAppLimitCreditRedemptionQuery` | Query | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
 | `useCreateAppLimitCreditRedemptionMutation` | Mutation | Append-only ledger of code redemptions; AFTER INSERT trigger validates and cascades to limit_credits |
@@ -96,16 +91,6 @@ function App() {
 | `useCreateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
-| `useAppAchievementsQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useAppAchievementQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useCreateAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useUpdateAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useDeleteAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
-| `useAppStepsQuery` | Query | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useAppStepQuery` | Query | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useCreateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useUpdateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useDeleteAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
 | `useAppLimitCapsDefaultsQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
 | `useAppLimitCapsDefaultQuery` | Query | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
 | `useCreateAppLimitCapsDefaultMutation` | Mutation | Default cap values for static configuration limits (max file size, feature flags, etc.). Not metered — just read by consumers. |
@@ -156,6 +141,16 @@ function App() {
 | `useCreateOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
 | `useUpdateOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
 | `useDeleteOrgLimitCreditMutation` | Mutation | Append-only ledger of credit grants that automatically update limit ceilings |
+| `useAppLimitWarningsQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useAppLimitWarningQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useCreateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useUpdateAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useDeleteAppLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useOrgLimitWarningsQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useOrgLimitWarningQuery` | Query | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useCreateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useUpdateOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
+| `useDeleteOrgLimitWarningMutation` | Mutation | Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it. |
 | `useOrgChartEdgeGrantsQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useOrgChartEdgeGrantQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useCreateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
@@ -205,16 +200,6 @@ function App() {
 | `useCreateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
 | `useUpdateUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
 | `useDeleteUsageSnapshotMutation` | Mutation | Periodic snapshot of a single metric for a database. Collected by the snapshot_usage() cron job in constructive-limits. Each row records one metric measurement (e.g. reads, writes, storage_bytes) at a point in time, with optional dimensions for sub-metric breakdowns. |
-| `useOrgMemberProfilesQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
-| `useOrgMemberProfileQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
-| `useCreateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
-| `useUpdateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
-| `useDeleteOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
-| `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
-| `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
-| `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useAppLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useAppLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
@@ -240,6 +225,11 @@ function App() {
 | `useCreateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useUpdateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useDeleteOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useOrgMemberProfilesQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useOrgMemberProfileQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useCreateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useUpdateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useDeleteOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
@@ -260,12 +250,10 @@ function App() {
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
 | `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
-| `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
 | `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
 | `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
 | `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
-| `useStepsRequiredQuery` | Query | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `useSubmitAppInviteCodeMutation` | Mutation | submitAppInviteCode |
 | `useSubmitOrgInviteCodeMutation` | Mutation | submitOrgInviteCode |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
@@ -345,27 +333,6 @@ const { mutate: create } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' });
-```
-
-### AppLevelRequirement
-
-```typescript
-// List all appLevelRequirements
-const { data, isLoading } = useAppLevelRequirementsQuery({
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appLevelRequirement
-const { data: item } = useAppLevelRequirementQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appLevelRequirement
-const { mutate: create } = useCreateAppLevelRequirementMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', level: '<String>', description: '<String>', requiredCount: '<Int>', priority: '<Int>' });
 ```
 
 ### AppLimitCreditRedemption
@@ -555,48 +522,6 @@ const { mutate: create } = useCreateAppOwnerGrantMutation({
   selection: { fields: { id: true } },
 });
 create({ isGrant: '<Boolean>', actorId: '<UUID>', grantorId: '<UUID>' });
-```
-
-### AppAchievement
-
-```typescript
-// List all appAchievements
-const { data, isLoading } = useAppAchievementsQuery({
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appAchievement
-const { data: item } = useAppAchievementQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appAchievement
-const { mutate: create } = useCreateAppAchievementMutation({
-  selection: { fields: { id: true } },
-});
-create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
-```
-
-### AppStep
-
-```typescript
-// List all appSteps
-const { data, isLoading } = useAppStepsQuery({
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appStep
-const { data: item } = useAppStepQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appStep
-const { mutate: create } = useCreateAppStepMutation({
-  selection: { fields: { id: true } },
-});
-create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
 ```
 
 ### AppLimitCapsDefault
@@ -807,6 +732,48 @@ const { mutate: create } = useCreateOrgLimitCreditMutation({
   selection: { fields: { id: true } },
 });
 create({ defaultLimitId: '<UUID>', actorId: '<UUID>', entityId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' });
+```
+
+### AppLimitWarning
+
+```typescript
+// List all appLimitWarnings
+const { data, isLoading } = useAppLimitWarningsQuery({
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
+});
+
+// Get one appLimitWarning
+const { data: item } = useAppLimitWarningQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true } },
+});
+
+// Create a appLimitWarning
+const { mutate: create } = useCreateAppLimitWarningMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>' });
+```
+
+### OrgLimitWarning
+
+```typescript
+// List all orgLimitWarnings
+const { data, isLoading } = useOrgLimitWarningsQuery({
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true, entityId: true } },
+});
+
+// Get one orgLimitWarning
+const { data: item } = useOrgLimitWarningQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, warningType: true, thresholdValue: true, taskIdentifier: true, entityId: true } },
+});
+
+// Create a orgLimitWarning
+const { mutate: create } = useCreateOrgLimitWarningMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>', entityId: '<UUID>' });
 ```
 
 ### OrgChartEdgeGrant
@@ -1028,48 +995,6 @@ const { mutate: create } = useCreateUsageSnapshotMutation({
 create({ databaseId: '<UUID>', metricName: '<String>', metricValue: '<BigInt>', dimensions: '<JSON>', capturedAt: '<Datetime>' });
 ```
 
-### OrgMemberProfile
-
-```typescript
-// List all orgMemberProfiles
-const { data, isLoading } = useOrgMemberProfilesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
-});
-
-// Get one orgMemberProfile
-const { data: item } = useOrgMemberProfileQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
-});
-
-// Create a orgMemberProfile
-const { mutate: create } = useCreateOrgMemberProfileMutation({
-  selection: { fields: { id: true } },
-});
-create({ membershipId: '<UUID>', entityId: '<UUID>', actorId: '<UUID>', displayName: '<String>', email: '<String>', title: '<String>', bio: '<String>', profilePicture: '<Image>' });
-```
-
-### AppLevel
-
-```typescript
-// List all appLevels
-const { data, isLoading } = useAppLevelsQuery({
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appLevel
-const { data: item } = useAppLevelQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appLevel
-const { mutate: create } = useCreateAppLevelMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', description: '<String>', image: '<Image>', ownerId: '<UUID>' });
-```
-
 ### AppLimit
 
 ```typescript
@@ -1173,6 +1098,27 @@ const { mutate: create } = useCreateOrgLimitMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', actorId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', entityId: '<UUID>' });
+```
+
+### OrgMemberProfile
+
+```typescript
+// List all orgMemberProfiles
+const { data, isLoading } = useOrgMemberProfilesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
+});
+
+// Get one orgMemberProfile
+const { data: item } = useOrgMemberProfileQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
+});
+
+// Create a orgMemberProfile
+const { mutate: create } = useCreateOrgMemberProfileMutation({
+  selection: { fields: { id: true } },
+});
+create({ membershipId: '<UUID>', entityId: '<UUID>', actorId: '<UUID>', displayName: '<String>', email: '<String>', title: '<String>', bio: '<String>', profilePicture: '<Image>' });
 ```
 
 ### AppMembership
@@ -1298,18 +1244,6 @@ orgPermissionsGetMask
   |----------|------|
   | `ids` | [UUID] |
 
-### `useStepsAchievedQuery`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `level` | String |
-  | `roleId` | UUID |
-
 ### `useAppPermissionsGetMaskByNamesQuery`
 
 appPermissionsGetMaskByNames
@@ -1356,21 +1290,6 @@ Reads and enables pagination through a set of `OrgPermission`.
   | Argument | Type |
   |----------|------|
   | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-### `useStepsRequiredQuery`
-
-Reads and enables pagination through a set of `AppLevelRequirement`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `level` | String |
-  | `roleId` | UUID |
   | `first` | Int |
   | `offset` | Int |
   | `after` | Cursor |

@@ -20,9 +20,9 @@ export const PresetB2bStorage: ModulePreset = {
     'hierarchy), plus `storage_module` for file uploads. The storage module creates ' +
     '`app_buckets` and `app_files` tables with full RLS: AuthzPublishable for public reads, ' +
     'AuthzAppMembership for member access, AuthzDirectOwner for uploader-only modify/delete. ' +
-    'Entity-type provisioning with `has_storage=true` adds per-scope storage tables ' +
-    'automatically. Choose this when your B2B app needs file uploads, avatars, attachments, ' +
-    'or any object storage tied to workspaces.',
+    'Entity-type provisioning with a non-empty `storage` array adds per-scope storage tables ' +
+    'automatically (multiple modules per entity via storage_key). Choose this when your B2B ' +
+    'app needs file uploads, avatars, attachments, or any object storage tied to workspaces.',
   good_for: [
     'B2B SaaS with file uploads (documents, avatars, attachments)',
     'Apps where storage is scoped to orgs/workspaces',
@@ -44,8 +44,8 @@ export const PresetB2bStorage: ModulePreset = {
     'memberships_module:app',
     'memberships_module:org',
     'sessions_module',
-    'secrets_module',
-    'encrypted_secrets_module',
+    'user_state_module',
+    'config_secrets_user_module',
     'emails_module',
     'rls_module',
     'user_auth_module',
@@ -65,7 +65,7 @@ export const PresetB2bStorage: ModulePreset = {
     'devices_module'
   ],
   includes_notes: {
-    storage_module: 'File upload infrastructure: app_buckets + app_files tables with RLS. Entity-type storage scopes layered on top via `has_storage=true`.',
+    storage_module: 'File upload infrastructure: app_buckets + app_files tables with RLS. Entity-type storage scopes layered on top via the `storage` array (array-only format, supports multiple modules per entity via storage_key).',
     devices_module: 'Device tracking and trusted-device MFA bypass.'
   },
   omits_notes: {

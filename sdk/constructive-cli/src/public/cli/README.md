@@ -32,7 +32,6 @@ csdk auth set-token <your-token>
 | `app-permission` | appPermission CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
 | `object` | object CRUD operations |
-| `app-level-requirement` | appLevelRequirement CRUD operations |
 | `database` | database CRUD operations |
 | `schema` | schema CRUD operations |
 | `table` | table CRUD operations |
@@ -83,14 +82,14 @@ csdk auth set-token <your-token>
 | `emails-module` | emailsModule CRUD operations |
 | `encrypted-secrets-module` | encryptedSecretsModule CRUD operations |
 | `invites-module` | invitesModule CRUD operations |
-| `levels-module` | levelsModule CRUD operations |
+| `events-module` | eventsModule CRUD operations |
 | `limits-module` | limitsModule CRUD operations |
 | `membership-types-module` | membershipTypesModule CRUD operations |
 | `memberships-module` | membershipsModule CRUD operations |
 | `permissions-module` | permissionsModule CRUD operations |
 | `phone-numbers-module` | phoneNumbersModule CRUD operations |
 | `profiles-module` | profilesModule CRUD operations |
-| `secrets-module` | secretsModule CRUD operations |
+| `user-state-module` | userStateModule CRUD operations |
 | `sessions-module` | sessionsModule CRUD operations |
 | `user-auth-module` | userAuthModule CRUD operations |
 | `users-module` | usersModule CRUD operations |
@@ -122,9 +121,7 @@ csdk auth set-token <your-token>
 | `org-limit` | orgLimit CRUD operations |
 | `org-limit-credit` | orgLimitCredit CRUD operations |
 | `org-limit-aggregate` | orgLimitAggregate CRUD operations |
-| `app-step` | appStep CRUD operations |
-| `app-achievement` | appAchievement CRUD operations |
-| `app-level` | appLevel CRUD operations |
+| `org-limit-warning` | orgLimitWarning CRUD operations |
 | `email` | email CRUD operations |
 | `phone-number` | phoneNumber CRUD operations |
 | `crypto-address` | cryptoAddress CRUD operations |
@@ -153,6 +150,7 @@ csdk auth set-token <your-token>
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
+| `app-limit-warning` | appLimitWarning CRUD operations |
 | `user-connected-account` | userConnectedAccount CRUD operations |
 | `commit` | commit CRUD operations |
 | `pubkey-setting` | pubkeySetting CRUD operations |
@@ -164,6 +162,7 @@ csdk auth set-token <your-token>
 | `app-limit-event` | appLimitEvent CRUD operations |
 | `org-limit-event` | orgLimitEvent CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
+| `rate-limit-meters-module` | rateLimitMetersModule CRUD operations |
 | `plans-module` | plansModule CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
 | `database-setting` | databaseSetting CRUD operations |
@@ -181,7 +180,6 @@ csdk auth set-token <your-token>
 | `require-step-up` | requireStepUp |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
-| `steps-achieved` | stepsAchieved |
 | `rev-parse` | revParse |
 | `resolve-blueprint-field` | Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this. |
 | `org-is-manager-of` | orgIsManagerOf |
@@ -195,7 +193,6 @@ csdk auth set-token <your-token>
 | `get-all-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-path-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-object-at-path` | getObjectAtPath |
-| `steps-required` | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `current-user` | currentUser |
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `sign-out` | signOut |
@@ -215,7 +212,7 @@ csdk auth set-token <your-token>
 | `verify-email` | verifyEmail |
 | `freeze-objects` | freezeObjects |
 | `init-empty-repo` | initEmptyRepo |
-| `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Seven phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
+| `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (0.5) app-level storage, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
 | `provision-new-user` | provisionNewUser |
 | `reset-password` | resetPassword |
 | `remove-node-at-path` | removeNodeAtPath |
@@ -243,7 +240,7 @@ Parameters:
   - owner_id: UUID of the owner user (required)
   - include_invites: Include invite system (default: true)
   - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include levels/achievements (default: false)
+  - include_levels: Include events/analytics (default: false)
   - bitlen: Bit length for permission masks (default: 64)
   - tokens_expiration: Token expiration interval (default: 30 days)
 
@@ -451,35 +448,6 @@ CRUD operations for Object records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
-
-### `app-level-requirement`
-
-CRUD operations for AppLevelRequirement records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLevelRequirement records |
-| `find-first` | Find first matching appLevelRequirement record |
-| `get` | Get a appLevelRequirement by id |
-| `create` | Create a new appLevelRequirement |
-| `update` | Update an existing appLevelRequirement |
-| `delete` | Delete a appLevelRequirement |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `level` | String |
-| `description` | String |
-| `requiredCount` | Int |
-| `priority` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`, `level`
-**Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
 ### `database`
 
@@ -1131,14 +1099,17 @@ CRUD operations for EmbeddingChunk records.
 | `chunkOverlap` | Int |
 | `chunkStrategy` | String |
 | `metadataFields` | JSON |
+| `searchIndexes` | JSON |
 | `enqueueChunkingJob` | Boolean |
 | `chunkingTaskName` | String |
+| `embeddingModel` | String |
+| `embeddingProvider` | String |
 | `parentFkFieldId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`
-**Optional create fields (backend defaults):** `databaseId`, `embeddingFieldId`, `chunksTableId`, `chunksTableName`, `contentFieldName`, `dimensions`, `metric`, `chunkSize`, `chunkOverlap`, `chunkStrategy`, `metadataFields`, `enqueueChunkingJob`, `chunkingTaskName`, `parentFkFieldId`
+**Optional create fields (backend defaults):** `databaseId`, `embeddingFieldId`, `chunksTableId`, `chunksTableName`, `contentFieldName`, `dimensions`, `metric`, `chunkSize`, `chunkOverlap`, `chunkStrategy`, `metadataFields`, `searchIndexes`, `enqueueChunkingJob`, `chunkingTaskName`, `embeddingModel`, `embeddingProvider`, `parentFkFieldId`
 
 ### `secure-table-provision`
 
@@ -1297,12 +1268,12 @@ CRUD operations for RealtimeModule records.
 | `listenerNodeTableId` | UUID |
 | `sourceRegistryTableId` | UUID |
 | `retentionHours` | Int |
-| `lookaheadHours` | Int |
-| `partitionInterval` | String |
+| `premake` | Int |
+| `interval` | String |
 | `notifyChannel` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `subscriptionsSchemaId`, `changeLogTableId`, `listenerNodeTableId`, `sourceRegistryTableId`, `retentionHours`, `lookaheadHours`, `partitionInterval`, `notifyChannel`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `subscriptionsSchemaId`, `changeLogTableId`, `listenerNodeTableId`, `sourceRegistryTableId`, `retentionHours`, `premake`, `interval`, `notifyChannel`
 
 ### `schema-grant`
 
@@ -1676,16 +1647,16 @@ CRUD operations for Partition records.
 | `databaseId` | UUID |
 | `tableId` | UUID |
 | `strategy` | String |
-| `partitionKeyIds` | UUID |
+| `partitionKeyId` | UUID |
 | `interval` | String |
 | `retention` | String |
-| `lookahead` | Int |
+| `premake` | Int |
 | `namingPattern` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `databaseId`, `tableId`, `strategy`, `partitionKeyIds`
-**Optional create fields (backend defaults):** `interval`, `retention`, `lookahead`, `namingPattern`
+**Required create fields:** `databaseId`, `tableId`, `strategy`, `partitionKeyId`
+**Optional create fields (backend defaults):** `interval`, `retention`, `premake`, `namingPattern`
 
 ### `api`
 
@@ -2047,18 +2018,18 @@ CRUD operations for InvitesModule records.
 **Required create fields:** `databaseId`, `membershipType`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `emailsTableId`, `usersTableId`, `invitesTableId`, `claimedInvitesTableId`, `invitesTableName`, `claimedInvitesTableName`, `submitInviteCodeFunction`, `prefix`, `entityTableId`
 
-### `levels-module`
+### `events-module`
 
-CRUD operations for LevelsModule records.
+CRUD operations for EventsModule records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all levelsModule records |
-| `find-first` | Find first matching levelsModule record |
-| `get` | Get a levelsModule by id |
-| `create` | Create a new levelsModule |
-| `update` | Update an existing levelsModule |
-| `delete` | Delete a levelsModule |
+| `list` | List all eventsModule records |
+| `find-first` | Find first matching eventsModule record |
+| `get` | Get a eventsModule by id |
+| `create` | Create a new eventsModule |
+| `update` | Update an existing eventsModule |
+| `delete` | Delete a eventsModule |
 
 **Fields:**
 
@@ -2068,31 +2039,44 @@ CRUD operations for LevelsModule records.
 | `databaseId` | UUID |
 | `schemaId` | UUID |
 | `privateSchemaId` | UUID |
-| `stepsTableId` | UUID |
-| `stepsTableName` | String |
-| `achievementsTableId` | UUID |
-| `achievementsTableName` | String |
+| `eventsTableId` | UUID |
+| `eventsTableName` | String |
+| `eventAggregatesTableId` | UUID |
+| `eventAggregatesTableName` | String |
+| `eventTypesTableId` | UUID |
+| `eventTypesTableName` | String |
 | `levelsTableId` | UUID |
 | `levelsTableName` | String |
 | `levelRequirementsTableId` | UUID |
 | `levelRequirementsTableName` | String |
-| `completedStep` | String |
-| `incompletedStep` | String |
-| `tgAchievement` | String |
-| `tgAchievementToggle` | String |
-| `tgAchievementToggleBoolean` | String |
-| `tgAchievementBoolean` | String |
-| `upsertAchievement` | String |
-| `tgUpdateAchievements` | String |
+| `levelGrantsTableId` | UUID |
+| `levelGrantsTableName` | String |
+| `achievementRewardsTableId` | UUID |
+| `achievementRewardsTableName` | String |
+| `recordEvent` | String |
+| `removeEvent` | String |
+| `tgEvent` | String |
+| `tgEventToggle` | String |
+| `tgEventToggleBool` | String |
+| `tgEventBool` | String |
+| `upsertAggregate` | String |
+| `tgUpdateAggregates` | String |
+| `pruneEvents` | String |
 | `stepsRequired` | String |
 | `levelAchieved` | String |
+| `tgCheckAchievements` | String |
+| `grantAchievement` | String |
+| `tgAchievementReward` | String |
+| `interval` | String |
+| `retention` | String |
+| `premake` | Int |
 | `prefix` | String |
 | `membershipType` | Int |
 | `entityTableId` | UUID |
 | `actorTableId` | UUID |
 
 **Required create fields:** `databaseId`, `membershipType`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `stepsTableId`, `stepsTableName`, `achievementsTableId`, `achievementsTableName`, `levelsTableId`, `levelsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `completedStep`, `incompletedStep`, `tgAchievement`, `tgAchievementToggle`, `tgAchievementToggleBoolean`, `tgAchievementBoolean`, `upsertAchievement`, `tgUpdateAchievements`, `stepsRequired`, `levelAchieved`, `prefix`, `entityTableId`, `actorTableId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `eventsTableId`, `eventsTableName`, `eventAggregatesTableId`, `eventAggregatesTableName`, `eventTypesTableId`, `eventTypesTableName`, `levelsTableId`, `levelsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `levelGrantsTableId`, `levelGrantsTableName`, `achievementRewardsTableId`, `achievementRewardsTableName`, `recordEvent`, `removeEvent`, `tgEvent`, `tgEventToggle`, `tgEventToggleBool`, `tgEventBool`, `upsertAggregate`, `tgUpdateAggregates`, `pruneEvents`, `stepsRequired`, `levelAchieved`, `tgCheckAchievements`, `grantAchievement`, `tgAchievementReward`, `interval`, `retention`, `premake`, `prefix`, `entityTableId`, `actorTableId`
 
 ### `limits-module`
 
@@ -2135,13 +2119,17 @@ CRUD operations for LimitsModule records.
 | `limitCapsDefaultsTableId` | UUID |
 | `capCheckTrigger` | String |
 | `resolveCapFunction` | String |
+| `limitWarningsTableId` | UUID |
+| `limitWarningStateTableId` | UUID |
+| `limitCheckSoftFunction` | String |
+| `limitAggregateCheckSoftFunction` | String |
 | `prefix` | String |
 | `membershipType` | Int |
 | `entityTableId` | UUID |
 | `actorTableId` | UUID |
 
 **Required create fields:** `databaseId`, `membershipType`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `limitCreditsTableId`, `eventsTableId`, `creditCodesTableId`, `creditCodeItemsTableId`, `creditRedemptionsTableId`, `aggregateTableId`, `limitCapsTableId`, `limitCapsDefaultsTableId`, `capCheckTrigger`, `resolveCapFunction`, `prefix`, `entityTableId`, `actorTableId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `limitCreditsTableId`, `eventsTableId`, `creditCodesTableId`, `creditCodeItemsTableId`, `creditRedemptionsTableId`, `aggregateTableId`, `limitCapsTableId`, `limitCapsDefaultsTableId`, `capCheckTrigger`, `resolveCapFunction`, `limitWarningsTableId`, `limitWarningStateTableId`, `limitCheckSoftFunction`, `limitAggregateCheckSoftFunction`, `prefix`, `entityTableId`, `actorTableId`
 
 ### `membership-types-module`
 
@@ -2331,18 +2319,18 @@ CRUD operations for ProfilesModule records.
 **Required create fields:** `databaseId`, `membershipType`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `profilePermissionsTableId`, `profilePermissionsTableName`, `profileGrantsTableId`, `profileGrantsTableName`, `profileDefinitionGrantsTableId`, `profileDefinitionGrantsTableName`, `profileTemplatesTableId`, `profileTemplatesTableName`, `entityTableId`, `actorTableId`, `permissionsTableId`, `membershipsTableId`, `prefix`
 
-### `secrets-module`
+### `user-state-module`
 
-CRUD operations for SecretsModule records.
+CRUD operations for UserStateModule records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all secretsModule records |
-| `find-first` | Find first matching secretsModule record |
-| `get` | Get a secretsModule by id |
-| `create` | Create a new secretsModule |
-| `update` | Update an existing secretsModule |
-| `delete` | Delete a secretsModule |
+| `list` | List all userStateModule records |
+| `find-first` | Find first matching userStateModule record |
+| `get` | Get a userStateModule by id |
+| `create` | Create a new userStateModule |
+| `update` | Update an existing userStateModule |
+| `delete` | Delete a userStateModule |
 
 **Fields:**
 
@@ -2654,6 +2642,7 @@ CRUD operations for EntityTypeProvision records.
 | `hasLevels` | Boolean |
 | `hasStorage` | Boolean |
 | `hasInvites` | Boolean |
+| `hasInviteAchievements` | Boolean |
 | `storageConfig` | JSON |
 | `skipEntityPolicies` | Boolean |
 | `tableProvision` | JSON |
@@ -2668,7 +2657,7 @@ CRUD operations for EntityTypeProvision records.
 | `outInvitesModuleId` | UUID |
 
 **Required create fields:** `databaseId`, `name`, `prefix`
-**Optional create fields (backend defaults):** `description`, `parentEntity`, `tableName`, `isVisible`, `hasLimits`, `hasProfiles`, `hasLevels`, `hasStorage`, `hasInvites`, `storageConfig`, `skipEntityPolicies`, `tableProvision`, `outMembershipType`, `outEntityTableId`, `outEntityTableName`, `outInstalledModules`, `outStorageModuleId`, `outBucketsTableId`, `outFilesTableId`, `outPathSharesTableId`, `outInvitesModuleId`
+**Optional create fields (backend defaults):** `description`, `parentEntity`, `tableName`, `isVisible`, `hasLimits`, `hasProfiles`, `hasLevels`, `hasStorage`, `hasInvites`, `hasInviteAchievements`, `storageConfig`, `skipEntityPolicies`, `tableProvision`, `outMembershipType`, `outEntityTableId`, `outEntityTableName`, `outInstalledModules`, `outStorageModuleId`, `outBucketsTableId`, `outFilesTableId`, `outPathSharesTableId`, `outInvitesModuleId`
 
 ### `webauthn-credentials-module`
 
@@ -3356,72 +3345,18 @@ CRUD operations for OrgLimitAggregate records.
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `name`, `num`, `max`, `softMax`, `windowStart`, `windowDuration`, `planMax`, `purchasedCredits`, `periodCredits`, `reserved`
 
-### `app-step`
+### `org-limit-warning`
 
-CRUD operations for AppStep records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appStep records |
-| `find-first` | Find first matching appStep record |
-| `get` | Get a appStep by id |
-| `create` | Create a new appStep |
-| `update` | Update an existing appStep |
-| `delete` | Delete a appStep |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `actorId` | UUID |
-| `name` | String |
-| `count` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `actorId`, `count`
-
-### `app-achievement`
-
-CRUD operations for AppAchievement records.
+CRUD operations for OrgLimitWarning records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all appAchievement records |
-| `find-first` | Find first matching appAchievement record |
-| `get` | Get a appAchievement by id |
-| `create` | Create a new appAchievement |
-| `update` | Update an existing appAchievement |
-| `delete` | Delete a appAchievement |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `actorId` | UUID |
-| `name` | String |
-| `count` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `actorId`, `count`
-
-### `app-level`
-
-CRUD operations for AppLevel records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLevel records |
-| `find-first` | Find first matching appLevel record |
-| `get` | Get a appLevel by id |
-| `create` | Create a new appLevel |
-| `update` | Update an existing appLevel |
-| `delete` | Delete a appLevel |
+| `list` | List all orgLimitWarning records |
+| `find-first` | Find first matching orgLimitWarning record |
+| `get` | Get a orgLimitWarning by id |
+| `create` | Create a new orgLimitWarning |
+| `update` | Update an existing orgLimitWarning |
+| `delete` | Delete a orgLimitWarning |
 
 **Fields:**
 
@@ -3429,14 +3364,13 @@ CRUD operations for AppLevel records.
 |-------|------|
 | `id` | UUID |
 | `name` | String |
-| `description` | String |
-| `image` | Image |
-| `ownerId` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
+| `warningType` | String |
+| `thresholdValue` | BigInt |
+| `taskIdentifier` | String |
+| `entityId` | UUID |
 
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
+**Required create fields:** `name`, `warningType`, `thresholdValue`, `taskIdentifier`
+**Optional create fields (backend defaults):** `entityId`
 
 ### `email`
 
@@ -4206,6 +4140,31 @@ CRUD operations for OrgLimitDefault records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`, `softMax`
 
+### `app-limit-warning`
+
+CRUD operations for AppLimitWarning records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitWarning records |
+| `find-first` | Find first matching appLimitWarning record |
+| `get` | Get a appLimitWarning by id |
+| `create` | Create a new appLimitWarning |
+| `update` | Update an existing appLimitWarning |
+| `delete` | Delete a appLimitWarning |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `warningType` | String |
+| `thresholdValue` | BigInt |
+| `taskIdentifier` | String |
+
+**Required create fields:** `name`, `warningType`, `thresholdValue`, `taskIdentifier`
+
 ### `user-connected-account`
 
 CRUD operations for UserConnectedAccount records.
@@ -4526,6 +4485,39 @@ CRUD operations for RlsModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
+
+### `rate-limit-meters-module`
+
+CRUD operations for RateLimitMetersModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all rateLimitMetersModule records |
+| `find-first` | Find first matching rateLimitMetersModule record |
+| `get` | Get a rateLimitMetersModule by id |
+| `create` | Create a new rateLimitMetersModule |
+| `update` | Update an existing rateLimitMetersModule |
+| `delete` | Delete a rateLimitMetersModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `rateLimitStateTableId` | UUID |
+| `rateLimitStateTableName` | String |
+| `rateLimitOverridesTableId` | UUID |
+| `rateLimitOverridesTableName` | String |
+| `rateWindowLimitsTableId` | UUID |
+| `rateWindowLimitsTableName` | String |
+| `checkRateLimitFunction` | String |
+| `prefix` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `rateLimitStateTableId`, `rateLimitStateTableName`, `rateLimitOverridesTableId`, `rateLimitOverridesTableName`, `rateWindowLimitsTableId`, `rateWindowLimitsTableName`, `checkRateLimitFunction`, `prefix`
 
 ### `plans-module`
 
@@ -5004,18 +4996,6 @@ orgPermissionsGetPaddedMask
   |----------|------|
   | `--mask` | BitString |
 
-### `steps-achieved`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--level` | String |
-  | `--roleId` | UUID |
-
 ### `rev-parse`
 
 revParse
@@ -5187,21 +5167,6 @@ getObjectAtPath
   | `--storeId` | UUID |
   | `--path` | String |
   | `--refname` | String |
-
-### `steps-required`
-
-Reads and enables pagination through a set of `AppLevelRequirement`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--level` | String |
-  | `--roleId` | UUID |
-  | `--first` | Int |
-  | `--offset` | Int |
-  | `--after` | Cursor |
 
 ### `current-user`
 
@@ -5431,7 +5396,7 @@ initEmptyRepo
 
 ### `construct-blueprint`
 
-Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Seven phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
+Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (0.5) app-level storage, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
 
 - **Type:** mutation
 - **Arguments:**
@@ -5773,7 +5738,7 @@ Parameters:
   - owner_id: UUID of the owner user (required)
   - include_invites: Include invite system (default: true)
   - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include levels/achievements (default: false)
+  - include_levels: Include events/analytics (default: false)
   - bitlen: Bit length for permission masks (default: 64)
   - tokens_expiration: Token expiration interval (default: 30 days)
 

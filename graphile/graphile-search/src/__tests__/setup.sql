@@ -128,12 +128,22 @@ CREATE INDEX idx_posts_embedding ON unified_search_test.posts
 CREATE TABLE unified_search_test.posts_chunks (
   id serial PRIMARY KEY,
   post_id integer NOT NULL REFERENCES unified_search_test.posts(id),
-  chunk_text text NOT NULL,
+  content text NOT NULL,
+  search tsvector NOT NULL,
   embedding vector(3) NOT NULL
 );
 
 CREATE INDEX idx_posts_chunks_embedding ON unified_search_test.posts_chunks
   USING ivfflat(embedding vector_cosine_ops) WITH (lists = 1);
+CREATE INDEX idx_posts_chunks_search ON unified_search_test.posts_chunks USING gin(search);
+
+-- BM25 index on content column for chunk-aware BM25 tests
+CREATE INDEX posts_chunks_content_bm25_idx ON unified_search_test.posts_chunks
+  USING bm25(content) WITH (text_config='english');
+
+-- pg_trgm GIN index on content column for chunk-aware trgm tests
+CREATE INDEX idx_posts_chunks_content_trgm ON unified_search_test.posts_chunks
+  USING gin(content gin_trgm_ops);
 
 -- Seed posts: parent embeddings are approximate; chunks have more specific embeddings
 INSERT INTO unified_search_test.posts (id, title, body, tsv, embedding) VALUES
@@ -149,10 +159,19 @@ INSERT INTO unified_search_test.posts (id, title, body, tsv, embedding) VALUES
 SELECT setval('unified_search_test.posts_id_seq', 2);
 
 -- Chunks for post 1: one chunk very close to [1,0,0], one moderately close
-INSERT INTO unified_search_test.posts_chunks (id, post_id, chunk_text, embedding) VALUES
-  (1, 1, 'First chunk about vectors and similarity',     '[0.95, 0.05, 0]'),
-  (2, 1, 'Second chunk about search algorithms',          '[0.3, 0.7, 0]'),
-  (3, 2, 'First chunk about document chunking strategies', '[0.1, 0.1, 0.9]'),
-  (4, 2, 'Second chunk about retrieval methods',           '[0.2, 0.8, 0.1]');
+-- content/search fields have text that matches "quantum computing" (unique to chunks)
+INSERT INTO unified_search_test.posts_chunks (id, post_id, content, search, embedding) VALUES
+  (1, 1, 'Quantum computing uses qubits for parallel computation with vectors',
+   to_tsvector('english', 'quantum computing qubits parallel computation vectors'),
+   '[0.95, 0.05, 0]'),
+  (2, 1, 'Search algorithms use heuristics to find optimal solutions in graphs',
+   to_tsvector('english', 'search algorithms heuristics optimal solutions graphs'),
+   '[0.3, 0.7, 0]'),
+  (3, 2, 'Document chunking strategies improve information retrieval precision',
+   to_tsvector('english', 'document chunking strategies information retrieval precision'),
+   '[0.1, 0.1, 0.9]'),
+  (4, 2, 'Retrieval augmented generation combines search with language models',
+   to_tsvector('english', 'retrieval augmented generation search language models'),
+   '[0.2, 0.8, 0.1]');
 
 SELECT setval('unified_search_test.posts_chunks_id_seq', 4);

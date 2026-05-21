@@ -74,15 +74,6 @@ export const objectMutationKeys = {
   /** Delete object mutation key */ delete: (id: string | number) =>
     ['mutation', 'object', 'delete', id] as const,
 } as const;
-export const appLevelRequirementMutationKeys = {
-  /** All appLevelRequirement mutation keys */ all: ['mutation', 'applevelrequirement'] as const,
-  /** Create appLevelRequirement mutation key */ create: () =>
-    ['mutation', 'applevelrequirement', 'create'] as const,
-  /** Update appLevelRequirement mutation key */ update: (id: string | number) =>
-    ['mutation', 'applevelrequirement', 'update', id] as const,
-  /** Delete appLevelRequirement mutation key */ delete: (id: string | number) =>
-    ['mutation', 'applevelrequirement', 'delete', id] as const,
-} as const;
 export const databaseMutationKeys = {
   /** All database mutation keys */ all: ['mutation', 'database'] as const,
   /** Create database mutation key */ create: () => ['mutation', 'database', 'create'] as const,
@@ -524,14 +515,14 @@ export const invitesModuleMutationKeys = {
   /** Delete invitesModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'invitesmodule', 'delete', id] as const,
 } as const;
-export const levelsModuleMutationKeys = {
-  /** All levelsModule mutation keys */ all: ['mutation', 'levelsmodule'] as const,
-  /** Create levelsModule mutation key */ create: () =>
-    ['mutation', 'levelsmodule', 'create'] as const,
-  /** Update levelsModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'levelsmodule', 'update', id] as const,
-  /** Delete levelsModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'levelsmodule', 'delete', id] as const,
+export const eventsModuleMutationKeys = {
+  /** All eventsModule mutation keys */ all: ['mutation', 'eventsmodule'] as const,
+  /** Create eventsModule mutation key */ create: () =>
+    ['mutation', 'eventsmodule', 'create'] as const,
+  /** Update eventsModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'eventsmodule', 'update', id] as const,
+  /** Delete eventsModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'eventsmodule', 'delete', id] as const,
 } as const;
 export const limitsModuleMutationKeys = {
   /** All limitsModule mutation keys */ all: ['mutation', 'limitsmodule'] as const,
@@ -590,14 +581,14 @@ export const profilesModuleMutationKeys = {
   /** Delete profilesModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'profilesmodule', 'delete', id] as const,
 } as const;
-export const secretsModuleMutationKeys = {
-  /** All secretsModule mutation keys */ all: ['mutation', 'secretsmodule'] as const,
-  /** Create secretsModule mutation key */ create: () =>
-    ['mutation', 'secretsmodule', 'create'] as const,
-  /** Update secretsModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'secretsmodule', 'update', id] as const,
-  /** Delete secretsModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'secretsmodule', 'delete', id] as const,
+export const userStateModuleMutationKeys = {
+  /** All userStateModule mutation keys */ all: ['mutation', 'userstatemodule'] as const,
+  /** Create userStateModule mutation key */ create: () =>
+    ['mutation', 'userstatemodule', 'create'] as const,
+  /** Update userStateModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'userstatemodule', 'update', id] as const,
+  /** Delete userStateModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'userstatemodule', 'delete', id] as const,
 } as const;
 export const sessionsModuleMutationKeys = {
   /** All sessionsModule mutation keys */ all: ['mutation', 'sessionsmodule'] as const,
@@ -887,30 +878,14 @@ export const orgLimitAggregateMutationKeys = {
   /** Delete orgLimitAggregate mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitaggregate', 'delete', id] as const,
 } as const;
-export const appStepMutationKeys = {
-  /** All appStep mutation keys */ all: ['mutation', 'appstep'] as const,
-  /** Create appStep mutation key */ create: () => ['mutation', 'appstep', 'create'] as const,
-  /** Update appStep mutation key */ update: (id: string | number) =>
-    ['mutation', 'appstep', 'update', id] as const,
-  /** Delete appStep mutation key */ delete: (id: string | number) =>
-    ['mutation', 'appstep', 'delete', id] as const,
-} as const;
-export const appAchievementMutationKeys = {
-  /** All appAchievement mutation keys */ all: ['mutation', 'appachievement'] as const,
-  /** Create appAchievement mutation key */ create: () =>
-    ['mutation', 'appachievement', 'create'] as const,
-  /** Update appAchievement mutation key */ update: (id: string | number) =>
-    ['mutation', 'appachievement', 'update', id] as const,
-  /** Delete appAchievement mutation key */ delete: (id: string | number) =>
-    ['mutation', 'appachievement', 'delete', id] as const,
-} as const;
-export const appLevelMutationKeys = {
-  /** All appLevel mutation keys */ all: ['mutation', 'applevel'] as const,
-  /** Create appLevel mutation key */ create: () => ['mutation', 'applevel', 'create'] as const,
-  /** Update appLevel mutation key */ update: (id: string | number) =>
-    ['mutation', 'applevel', 'update', id] as const,
-  /** Delete appLevel mutation key */ delete: (id: string | number) =>
-    ['mutation', 'applevel', 'delete', id] as const,
+export const orgLimitWarningMutationKeys = {
+  /** All orgLimitWarning mutation keys */ all: ['mutation', 'orglimitwarning'] as const,
+  /** Create orgLimitWarning mutation key */ create: () =>
+    ['mutation', 'orglimitwarning', 'create'] as const,
+  /** Update orgLimitWarning mutation key */ update: (id: string | number) =>
+    ['mutation', 'orglimitwarning', 'update', id] as const,
+  /** Delete orgLimitWarning mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orglimitwarning', 'delete', id] as const,
 } as const;
 export const emailMutationKeys = {
   /** All email mutation keys */ all: ['mutation', 'email'] as const,
@@ -1156,6 +1131,15 @@ export const orgLimitDefaultMutationKeys = {
   /** Delete orgLimitDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitdefault', 'delete', id] as const,
 } as const;
+export const appLimitWarningMutationKeys = {
+  /** All appLimitWarning mutation keys */ all: ['mutation', 'applimitwarning'] as const,
+  /** Create appLimitWarning mutation key */ create: () =>
+    ['mutation', 'applimitwarning', 'create'] as const,
+  /** Update appLimitWarning mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitwarning', 'update', id] as const,
+  /** Delete appLimitWarning mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitwarning', 'delete', id] as const,
+} as const;
 export const userConnectedAccountMutationKeys = {
   /** All userConnectedAccount mutation keys */ all: ['mutation', 'userconnectedaccount'] as const,
   /** Create userConnectedAccount mutation key */ create: () =>
@@ -1251,6 +1235,18 @@ export const rlsModuleMutationKeys = {
     ['mutation', 'rlsmodule', 'update', id] as const,
   /** Delete rlsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'rlsmodule', 'delete', id] as const,
+} as const;
+export const rateLimitMetersModuleMutationKeys = {
+  /** All rateLimitMetersModule mutation keys */ all: [
+    'mutation',
+    'ratelimitmetersmodule',
+  ] as const,
+  /** Create rateLimitMetersModule mutation key */ create: () =>
+    ['mutation', 'ratelimitmetersmodule', 'create'] as const,
+  /** Update rateLimitMetersModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'ratelimitmetersmodule', 'update', id] as const,
+  /** Delete rateLimitMetersModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'ratelimitmetersmodule', 'delete', id] as const,
 } as const;
 export const plansModuleMutationKeys = {
   /** All plansModule mutation keys */ all: ['mutation', 'plansmodule'] as const,
@@ -1590,7 +1586,6 @@ export const mutationKeys = {
   appPermission: appPermissionMutationKeys,
   orgPermission: orgPermissionMutationKeys,
   object: objectMutationKeys,
-  appLevelRequirement: appLevelRequirementMutationKeys,
   database: databaseMutationKeys,
   schema: schemaMutationKeys,
   table: tableMutationKeys,
@@ -1641,14 +1636,14 @@ export const mutationKeys = {
   emailsModule: emailsModuleMutationKeys,
   encryptedSecretsModule: encryptedSecretsModuleMutationKeys,
   invitesModule: invitesModuleMutationKeys,
-  levelsModule: levelsModuleMutationKeys,
+  eventsModule: eventsModuleMutationKeys,
   limitsModule: limitsModuleMutationKeys,
   membershipTypesModule: membershipTypesModuleMutationKeys,
   membershipsModule: membershipsModuleMutationKeys,
   permissionsModule: permissionsModuleMutationKeys,
   phoneNumbersModule: phoneNumbersModuleMutationKeys,
   profilesModule: profilesModuleMutationKeys,
-  secretsModule: secretsModuleMutationKeys,
+  userStateModule: userStateModuleMutationKeys,
   sessionsModule: sessionsModuleMutationKeys,
   userAuthModule: userAuthModuleMutationKeys,
   usersModule: usersModuleMutationKeys,
@@ -1680,9 +1675,7 @@ export const mutationKeys = {
   orgLimit: orgLimitMutationKeys,
   orgLimitCredit: orgLimitCreditMutationKeys,
   orgLimitAggregate: orgLimitAggregateMutationKeys,
-  appStep: appStepMutationKeys,
-  appAchievement: appAchievementMutationKeys,
-  appLevel: appLevelMutationKeys,
+  orgLimitWarning: orgLimitWarningMutationKeys,
   email: emailMutationKeys,
   phoneNumber: phoneNumberMutationKeys,
   cryptoAddress: cryptoAddressMutationKeys,
@@ -1711,6 +1704,7 @@ export const mutationKeys = {
   nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   appLimitDefault: appLimitDefaultMutationKeys,
   orgLimitDefault: orgLimitDefaultMutationKeys,
+  appLimitWarning: appLimitWarningMutationKeys,
   userConnectedAccount: userConnectedAccountMutationKeys,
   commit: commitMutationKeys,
   pubkeySetting: pubkeySettingMutationKeys,
@@ -1722,6 +1716,7 @@ export const mutationKeys = {
   appLimitEvent: appLimitEventMutationKeys,
   orgLimitEvent: orgLimitEventMutationKeys,
   rlsModule: rlsModuleMutationKeys,
+  rateLimitMetersModule: rateLimitMetersModuleMutationKeys,
   plansModule: plansModuleMutationKeys,
   sqlAction: sqlActionMutationKeys,
   databaseSetting: databaseSettingMutationKeys,

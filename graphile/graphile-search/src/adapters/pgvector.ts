@@ -8,6 +8,7 @@
 
 import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
+import { getChunksInfo, type ChunksInfo } from './chunks';
 
 /**
  * Build a distance expression for the given metric.
@@ -32,66 +33,6 @@ function buildDistanceExpr(
 
 function isVectorCodec(codec: any): boolean {
   return codec?.name === 'vector';
-}
-
-/**
- * Chunks table info detected from @hasChunks smart tag.
- */
-interface ChunksInfo {
-  chunksSchema: string | null;
-  chunksTableName: string;
-  parentFkField: string;
-  parentPkField: string;
-  embeddingField: string;
-}
-
-/**
- * Read @hasChunks smart tag from codec extensions.
- * The tag value is a JSON object like:
- * {
- *   "chunksTable": "documents_chunks",
- *   "chunksSchema": "app_private",    // optional, defaults to parent table's schema
- *   "parentFk": "document_id",         // optional, defaults to "parent_id"
- *   "parentPk": "id",                  // optional, defaults to "id"
- *   "embeddingField": "embedding"       // optional, defaults to "embedding"
- * }
- */
-function getChunksInfo(codec: any): ChunksInfo | undefined {
-  const tags = codec?.extensions?.tags;
-  if (!tags) return undefined;
-  const raw = tags.hasChunks;
-  if (!raw) return undefined;
-
-  let parsed: any;
-  if (typeof raw === 'string') {
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      // If it's just "true" or a plain string, use convention-based defaults
-      return undefined;
-    }
-  } else if (typeof raw === 'object') {
-    parsed = raw;
-  } else if (raw === true) {
-    return undefined; // boolean true = no metadata, can't resolve
-  } else {
-    return undefined;
-  }
-
-  if (!parsed.chunksTable) return undefined;
-
-  // Resolve schema: explicit chunksSchema > parent codec schema > null
-  const chunksSchema = parsed.chunksSchema
-    || codec?.extensions?.pg?.schemaName
-    || null;
-
-  return {
-    chunksSchema,
-    chunksTableName: parsed.chunksTable,
-    parentFkField: parsed.parentFk || 'parent_id',
-    parentPkField: parsed.parentPk || 'id',
-    embeddingField: parsed.embeddingField || 'embedding',
-  };
 }
 
 export interface PgvectorAdapterOptions {

@@ -1023,11 +1023,16 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         const installs = matches.map((conf) => {
           const fullConf = resolve(conf);
           const extDir = dirname(fullConf);
-          const relativeDir = extDir.split('node_modules/')[1];
+          const parts = extDir.split('node_modules/');
+          const relativeDir = parts[parts.length - 1];
           const dstDir = path.join(skitchExtDir, relativeDir);
           return { src: extDir, dst: dstDir, pkg: relativeDir };
         });
-  
+
+        // Sort deepest paths first so nested node_modules deps are
+        // extracted before their parent directories are moved.
+        installs.sort((a, b) => b.src.split('/').length - a.src.split('/').length);
+
         for (const { src, dst, pkg } of installs) {
           if (fs.existsSync(dst)) {
             fs.rmSync(dst, { recursive: true, force: true });

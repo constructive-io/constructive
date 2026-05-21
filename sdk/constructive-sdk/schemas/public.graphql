@@ -6,7 +6,6 @@ type Query {
   requireStepUp(stepUpType: String): Boolean
   appPermissionsGetPaddedMask(mask: BitString): BitString
   orgPermissionsGetPaddedMask(mask: BitString): BitString
-  stepsAchieved(level: String, roleId: UUID): Boolean
   revParse(dbId: UUID, storeId: UUID, refname: String): UUID
 
   """
@@ -154,24 +153,6 @@ type Query {
     after: Cursor
   ): ObjectConnection
   getObjectAtPath(dbId: UUID, storeId: UUID, path: [String], refname: String): Object
-
-  """Reads and enables pagination through a set of `AppLevelRequirement`."""
-  stepsRequired(
-    level: String
-    roleId: UUID
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): AppLevelRequirementConnection
   currentUser: User
 
   """Reads and enables pagination through a set of `DefaultIdsModule`."""
@@ -584,8 +565,8 @@ type Query {
     orderBy: [MembershipTypesModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): MembershipTypesModuleConnection
 
-  """Reads and enables pagination through a set of `SecretsModule`."""
-  secretsModules(
+  """Reads and enables pagination through a set of `UserStateModule`."""
+  userStateModules(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -607,11 +588,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: SecretsModuleFilter
+    where: UserStateModuleFilter
 
-    """The method to use when ordering `SecretsModule`."""
-    orderBy: [SecretsModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): SecretsModuleConnection
+    """The method to use when ordering `UserStateModule`."""
+    orderBy: [UserStateModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UserStateModuleConnection
 
   """Reads and enables pagination through a set of `AppPermissionDefault`."""
   appPermissionDefaults(
@@ -933,64 +914,6 @@ type Query {
     """The method to use when ordering `AppOwnerGrant`."""
     orderBy: [AppOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppOwnerGrantConnection
-
-  """Reads and enables pagination through a set of `AppAchievement`."""
-  appAchievements(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppAchievementFilter
-
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppAchievementConnection
-
-  """Reads and enables pagination through a set of `AppStep`."""
-  appSteps(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppStepFilter
-
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppStepConnection
 
   """Reads and enables pagination through a set of `OrgPermissionDefault`."""
   orgPermissionDefaults(
@@ -1694,6 +1617,35 @@ type Query {
     orderBy: [AppLimitCreditCodeItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLimitCreditCodeItemConnection
 
+  """Reads and enables pagination through a set of `AppLimitWarning`."""
+  appLimitWarnings(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitWarningFilter
+
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningConnection
+
   """Reads and enables pagination through a set of `UserConnectedAccount`."""
   userConnectedAccounts(
     """Only read the first `n` values of the set."""
@@ -1868,6 +1820,35 @@ type Query {
     orderBy: [AppLimitCreditOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLimitCreditConnection
 
+  """Reads and enables pagination through a set of `OrgLimitWarning`."""
+  orgLimitWarnings(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitWarningFilter
+
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningConnection
+
   """Reads and enables pagination through a set of `OrgLimitCredit`."""
   orgLimitCredits(
     """Only read the first `n` values of the set."""
@@ -1954,35 +1935,6 @@ type Query {
     """The method to use when ordering `SiteMetadatum`."""
     orderBy: [SiteMetadatumOrderBy!] = [PRIMARY_KEY_ASC]
   ): SiteMetadatumConnection
-
-  """Reads and enables pagination through a set of `AppLevelRequirement`."""
-  appLevelRequirements(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLevelRequirementFilter
-
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementConnection
 
   """Reads and enables pagination through a set of `FullTextSearch`."""
   fullTextSearches(
@@ -2767,35 +2719,6 @@ type Query {
     orderBy: [OrgGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgGrantConnection
 
-  """Reads and enables pagination through a set of `AppLevel`."""
-  appLevels(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLevelFilter
-
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelConnection
-
   """Reads and enables pagination through a set of `Blueprint`."""
   blueprints(
     """Only read the first `n` values of the set."""
@@ -2855,6 +2778,35 @@ type Query {
     """The method to use when ordering `DenormalizedTableField`."""
     orderBy: [DenormalizedTableFieldOrderBy!] = [PRIMARY_KEY_ASC]
   ): DenormalizedTableFieldConnection
+
+  """Reads and enables pagination through a set of `RateLimitMetersModule`."""
+  rateLimitMetersModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RateLimitMetersModuleFilter
+
+    """The method to use when ordering `RateLimitMetersModule`."""
+    orderBy: [RateLimitMetersModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RateLimitMetersModuleConnection
 
   """Reads and enables pagination through a set of `RealtimeModule`."""
   realtimeModules(
@@ -3815,35 +3767,6 @@ type Query {
     orderBy: [PolicyOrderBy!] = [PRIMARY_KEY_ASC]
   ): PolicyConnection
 
-  """Reads and enables pagination through a set of `EmbeddingChunk`."""
-  embeddingChunks(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: EmbeddingChunkFilter
-
-    """The method to use when ordering `EmbeddingChunk`."""
-    orderBy: [EmbeddingChunkOrderBy!] = [PRIMARY_KEY_ASC]
-  ): EmbeddingChunkConnection
-
   """Reads and enables pagination through a set of `WebauthnSetting`."""
   webauthnSettings(
     """Only read the first `n` values of the set."""
@@ -4134,6 +4057,35 @@ type Query {
     orderBy: [OrgMembershipOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMembershipConnection
 
+  """Reads and enables pagination through a set of `EmbeddingChunk`."""
+  embeddingChunks(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmbeddingChunkFilter
+
+    """The method to use when ordering `EmbeddingChunk`."""
+    orderBy: [EmbeddingChunkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): EmbeddingChunkConnection
+
   """Reads and enables pagination through a set of `ForeignKeyConstraint`."""
   foreignKeyConstraints(
     """Only read the first `n` values of the set."""
@@ -4220,35 +4172,6 @@ type Query {
     """The method to use when ordering `EntityTypeProvision`."""
     orderBy: [EntityTypeProvisionOrderBy!] = [PRIMARY_KEY_ASC]
   ): EntityTypeProvisionConnection
-
-  """Reads and enables pagination through a set of `LevelsModule`."""
-  levelsModules(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: LevelsModuleFilter
-
-    """The method to use when ordering `LevelsModule`."""
-    orderBy: [LevelsModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): LevelsModuleConnection
 
   """Reads and enables pagination through a set of `UserAuthModule`."""
   userAuthModules(
@@ -4423,6 +4346,35 @@ type Query {
     """The method to use when ordering `MembershipsModule`."""
     orderBy: [MembershipsModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): MembershipsModuleConnection
+
+  """Reads and enables pagination through a set of `EventsModule`."""
+  eventsModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EventsModuleFilter
+
+    """The method to use when ordering `EventsModule`."""
+    orderBy: [EventsModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): EventsModuleConnection
 
   """
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
@@ -4703,56 +4655,6 @@ type ObjectEdge {
 
   """The `Object` at the end of the edge."""
   node: Object
-}
-
-"""A connection to a list of `AppLevelRequirement` values."""
-type AppLevelRequirementConnection {
-  """A list of `AppLevelRequirement` objects."""
-  nodes: [AppLevelRequirement]!
-
-  """
-  A list of edges which contains the `AppLevelRequirement` and cursor to aid in pagination.
-  """
-  edges: [AppLevelRequirementEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `AppLevelRequirement` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""Defines the specific requirements that must be met to achieve a level"""
-type AppLevelRequirement {
-  id: UUID!
-
-  """Name identifier of the requirement (matches step names)"""
-  name: String!
-
-  """Name of the level this requirement belongs to"""
-  level: String!
-
-  """Human-readable description of what this requirement entails"""
-  description: String
-
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int!
-
-  """Display ordering priority; lower values appear first"""
-  priority: Int!
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `AppLevelRequirement` edge in the connection."""
-type AppLevelRequirementEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppLevelRequirement` at the end of the edge."""
-  node: AppLevelRequirement
 }
 
 type User {
@@ -5850,8 +5752,8 @@ type User {
     orderBy: [OrgLimitAggregateOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgLimitAggregateConnection!
 
-  """Reads and enables pagination through a set of `AppStep`."""
-  appStepsByActorId(
+  """Reads and enables pagination through a set of `OrgLimitWarning`."""
+  orgLimitWarningsByEntityId(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -5873,69 +5775,11 @@ type User {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: AppStepFilter
+    where: OrgLimitWarningFilter
 
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppStepConnection!
-
-  """Reads and enables pagination through a set of `AppAchievement`."""
-  appAchievementsByActorId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppAchievementFilter
-
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppAchievementConnection!
-
-  """Reads and enables pagination through a set of `AppLevel`."""
-  ownedAppLevels(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLevelFilter
-
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelConnection!
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningConnection!
 
   """Reads and enables pagination through a set of `Email`."""
   ownedEmails(
@@ -7780,8 +7624,8 @@ type Database {
     orderBy: [InvitesModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): InvitesModuleConnection!
 
-  """Reads and enables pagination through a set of `LevelsModule`."""
-  levelsModules(
+  """Reads and enables pagination through a set of `EventsModule`."""
+  eventsModules(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -7803,11 +7647,11 @@ type Database {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: LevelsModuleFilter
+    where: EventsModuleFilter
 
-    """The method to use when ordering `LevelsModule`."""
-    orderBy: [LevelsModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): LevelsModuleConnection!
+    """The method to use when ordering `EventsModule`."""
+    orderBy: [EventsModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): EventsModuleConnection!
 
   """Reads and enables pagination through a set of `LimitsModule`."""
   limitsModules(
@@ -7986,8 +7830,8 @@ type Database {
   """Reads a single `RlsModule` that is related to this `Database`."""
   rlsModule: RlsModule
 
-  """Reads and enables pagination through a set of `SecretsModule`."""
-  secretsModules(
+  """Reads and enables pagination through a set of `UserStateModule`."""
+  userStateModules(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -8009,11 +7853,11 @@ type Database {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: SecretsModuleFilter
+    where: UserStateModuleFilter
 
-    """The method to use when ordering `SecretsModule`."""
-    orderBy: [SecretsModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): SecretsModuleConnection!
+    """The method to use when ordering `UserStateModule`."""
+    orderBy: [UserStateModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UserStateModuleConnection!
 
   """Reads and enables pagination through a set of `SessionsModule`."""
   sessionsModules(
@@ -8473,6 +8317,11 @@ type Database {
     """The method to use when ordering `RealtimeModule`."""
     orderBy: [RealtimeModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): RealtimeModuleConnection!
+
+  """
+  Reads a single `RateLimitMetersModule` that is related to this `Database`.
+  """
+  rateLimitMetersModule: RateLimitMetersModule
 
   """
   Reads and enables pagination through a set of `DatabaseProvisionModule`.
@@ -10633,11 +10482,11 @@ input DatabaseFilter {
   """`invitesModules` exist."""
   invitesModulesExist: Boolean
 
-  """Filter by the object’s `levelsModules` relation."""
-  levelsModules: DatabaseToManyLevelsModuleFilter
+  """Filter by the object’s `eventsModules` relation."""
+  eventsModules: DatabaseToManyEventsModuleFilter
 
-  """`levelsModules` exist."""
-  levelsModulesExist: Boolean
+  """`eventsModules` exist."""
+  eventsModulesExist: Boolean
 
   """Filter by the object’s `limitsModules` relation."""
   limitsModules: DatabaseToManyLimitsModuleFilter
@@ -10681,11 +10530,11 @@ input DatabaseFilter {
   """A related `rlsModule` exists."""
   rlsModuleExists: Boolean
 
-  """Filter by the object’s `secretsModules` relation."""
-  secretsModules: DatabaseToManySecretsModuleFilter
+  """Filter by the object’s `userStateModules` relation."""
+  userStateModules: DatabaseToManyUserStateModuleFilter
 
-  """`secretsModules` exist."""
-  secretsModulesExist: Boolean
+  """`userStateModules` exist."""
+  userStateModulesExist: Boolean
 
   """Filter by the object’s `sessionsModules` relation."""
   sessionsModules: DatabaseToManySessionsModuleFilter
@@ -10812,6 +10661,12 @@ input DatabaseFilter {
 
   """`realtimeModules` exist."""
   realtimeModulesExist: Boolean
+
+  """Filter by the object’s `rateLimitMetersModule` relation."""
+  rateLimitMetersModule: RateLimitMetersModuleFilter
+
+  """A related `rateLimitMetersModule` exists."""
+  rateLimitMetersModuleExists: Boolean
 
   """Filter by the object’s `databaseProvisionModules` relation."""
   databaseProvisionModules: DatabaseToManyDatabaseProvisionModuleFilter
@@ -11100,23 +10955,11 @@ input UserFilter {
   """`orgLimitAggregatesByEntityId` exist."""
   orgLimitAggregatesByEntityIdExist: Boolean
 
-  """Filter by the object’s `appStepsByActorId` relation."""
-  appStepsByActorId: UserToManyAppStepFilter
+  """Filter by the object’s `orgLimitWarningsByEntityId` relation."""
+  orgLimitWarningsByEntityId: UserToManyOrgLimitWarningFilter
 
-  """`appStepsByActorId` exist."""
-  appStepsByActorIdExist: Boolean
-
-  """Filter by the object’s `appAchievementsByActorId` relation."""
-  appAchievementsByActorId: UserToManyAppAchievementFilter
-
-  """`appAchievementsByActorId` exist."""
-  appAchievementsByActorIdExist: Boolean
-
-  """Filter by the object’s `ownedAppLevels` relation."""
-  ownedAppLevels: UserToManyAppLevelFilter
-
-  """`ownedAppLevels` exist."""
-  ownedAppLevelsExist: Boolean
+  """`orgLimitWarningsByEntityId` exist."""
+  orgLimitWarningsByEntityIdExist: Boolean
 
   """Filter by the object’s `ownedEmails` relation."""
   ownedEmails: UserToManyEmailFilter
@@ -13194,156 +13037,55 @@ input OrgLimitAggregateFilter {
 }
 
 """
-A filter to be used against many `AppStep` object types. All fields are combined with a logical ‘and.’
+A filter to be used against many `OrgLimitWarning` object types. All fields are combined with a logical ‘and.’
 """
-input UserToManyAppStepFilter {
+input UserToManyOrgLimitWarningFilter {
   """Filters to entities where at least one related entity matches."""
-  some: AppStepFilter
+  some: OrgLimitWarningFilter
 
   """Filters to entities where every related entity matches."""
-  every: AppStepFilter
+  every: OrgLimitWarningFilter
 
   """Filters to entities where no related entity matches."""
-  none: AppStepFilter
+  none: OrgLimitWarningFilter
 }
 
 """
-A filter to be used against `AppStep` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `OrgLimitWarning` object types. All fields are combined with a logical ‘and.’
 """
-input AppStepFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `count` field."""
-  count: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppStepFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppStepFilter!]
-
-  """Negates the expression."""
-  not: AppStepFilter
-
-  """Filter by the object’s `actor` relation."""
-  actor: UserFilter
-}
-
-"""
-A filter to be used against many `AppAchievement` object types. All fields are combined with a logical ‘and.’
-"""
-input UserToManyAppAchievementFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: AppAchievementFilter
-
-  """Filters to entities where every related entity matches."""
-  every: AppAchievementFilter
-
-  """Filters to entities where no related entity matches."""
-  none: AppAchievementFilter
-}
-
-"""
-A filter to be used against `AppAchievement` object types. All fields are combined with a logical ‘and.’
-"""
-input AppAchievementFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `count` field."""
-  count: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppAchievementFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppAchievementFilter!]
-
-  """Negates the expression."""
-  not: AppAchievementFilter
-
-  """Filter by the object’s `actor` relation."""
-  actor: UserFilter
-}
-
-"""
-A filter to be used against many `AppLevel` object types. All fields are combined with a logical ‘and.’
-"""
-input UserToManyAppLevelFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: AppLevelFilter
-
-  """Filters to entities where every related entity matches."""
-  every: AppLevelFilter
-
-  """Filters to entities where no related entity matches."""
-  none: AppLevelFilter
-}
-
-"""
-A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
-"""
-input AppLevelFilter {
+input OrgLimitWarningFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
   """Filter by the object’s `name` field."""
   name: StringFilter
 
-  """Filter by the object’s `description` field."""
-  description: StringFilter
+  """Filter by the object’s `warningType` field."""
+  warningType: StringFilter
 
-  """Filter by the object’s `image` field."""
-  image: ConstructiveInternalTypeImageFilter
+  """Filter by the object’s `thresholdValue` field."""
+  thresholdValue: BigIntFilter
 
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
+  """Filter by the object’s `taskIdentifier` field."""
+  taskIdentifier: StringFilter
 
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
 
   """Checks for all expressions in this list."""
-  and: [AppLevelFilter!]
+  and: [OrgLimitWarningFilter!]
 
   """Checks for any expressions in this list."""
-  or: [AppLevelFilter!]
+  or: [OrgLimitWarningFilter!]
 
   """Negates the expression."""
-  not: AppLevelFilter
+  not: OrgLimitWarningFilter
 
-  """Filter by the object’s `owner` relation."""
-  owner: UserFilter
+  """Filter by the object’s `entity` relation."""
+  entity: UserFilter
 
-  """A related `owner` exists."""
-  ownerExists: Boolean
+  """A related `entity` exists."""
+  entityExists: Boolean
 }
 
 """
@@ -16126,11 +15868,20 @@ input EmbeddingChunkFilter {
   """Filter by the object’s `metadataFields` field."""
   metadataFields: JSONFilter
 
+  """Filter by the object’s `searchIndexes` field."""
+  searchIndexes: JSONFilter
+
   """Filter by the object’s `enqueueChunkingJob` field."""
   enqueueChunkingJob: BooleanFilter
 
   """Filter by the object’s `chunkingTaskName` field."""
   chunkingTaskName: StringFilter
+
+  """Filter by the object’s `embeddingModel` field."""
+  embeddingModel: StringFilter
+
+  """Filter by the object’s `embeddingProvider` field."""
+  embeddingProvider: StringFilter
 
   """Filter by the object’s `parentFkFieldId` field."""
   parentFkFieldId: UUIDFilter
@@ -16205,8 +15956,8 @@ input PartitionFilter {
   """Filter by the object’s `strategy` field."""
   strategy: StringFilter
 
-  """Filter by the object’s `partitionKeyIds` field."""
-  partitionKeyIds: UUIDListFilter
+  """Filter by the object’s `partitionKeyId` field."""
+  partitionKeyId: UUIDFilter
 
   """Filter by the object’s `interval` field."""
   interval: StringFilter
@@ -16214,8 +15965,8 @@ input PartitionFilter {
   """Filter by the object’s `retention` field."""
   retention: StringFilter
 
-  """Filter by the object’s `lookahead` field."""
-  lookahead: IntFilter
+  """Filter by the object’s `premake` field."""
+  premake: IntFilter
 
   """Filter by the object’s `namingPattern` field."""
   namingPattern: StringFilter
@@ -16237,6 +15988,9 @@ input PartitionFilter {
 
   """Filter by the object’s `database` relation."""
   database: DatabaseFilter
+
+  """Filter by the object’s `partitionKey` relation."""
+  partitionKey: FieldFilter
 
   """Filter by the object’s `table` relation."""
   table: TableFilter
@@ -16645,11 +16399,11 @@ input RealtimeModuleFilter {
   """Filter by the object’s `retentionHours` field."""
   retentionHours: IntFilter
 
-  """Filter by the object’s `lookaheadHours` field."""
-  lookaheadHours: IntFilter
+  """Filter by the object’s `premake` field."""
+  premake: IntFilter
 
-  """Filter by the object’s `partitionInterval` field."""
-  partitionInterval: StringFilter
+  """Filter by the object’s `interval` field."""
+  interval: StringFilter
 
   """Filter by the object’s `notifyChannel` field."""
   notifyChannel: StringFilter
@@ -19469,23 +19223,23 @@ input InvitesModuleFilter {
 }
 
 """
-A filter to be used against many `LevelsModule` object types. All fields are combined with a logical ‘and.’
+A filter to be used against many `EventsModule` object types. All fields are combined with a logical ‘and.’
 """
-input DatabaseToManyLevelsModuleFilter {
+input DatabaseToManyEventsModuleFilter {
   """Filters to entities where at least one related entity matches."""
-  some: LevelsModuleFilter
+  some: EventsModuleFilter
 
   """Filters to entities where every related entity matches."""
-  every: LevelsModuleFilter
+  every: EventsModuleFilter
 
   """Filters to entities where no related entity matches."""
-  none: LevelsModuleFilter
+  none: EventsModuleFilter
 }
 
 """
-A filter to be used against `LevelsModule` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `EventsModule` object types. All fields are combined with a logical ‘and.’
 """
-input LevelsModuleFilter {
+input EventsModuleFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -19498,17 +19252,23 @@ input LevelsModuleFilter {
   """Filter by the object’s `privateSchemaId` field."""
   privateSchemaId: UUIDFilter
 
-  """Filter by the object’s `stepsTableId` field."""
-  stepsTableId: UUIDFilter
+  """Filter by the object’s `eventsTableId` field."""
+  eventsTableId: UUIDFilter
 
-  """Filter by the object’s `stepsTableName` field."""
-  stepsTableName: StringFilter
+  """Filter by the object’s `eventsTableName` field."""
+  eventsTableName: StringFilter
 
-  """Filter by the object’s `achievementsTableId` field."""
-  achievementsTableId: UUIDFilter
+  """Filter by the object’s `eventAggregatesTableId` field."""
+  eventAggregatesTableId: UUIDFilter
 
-  """Filter by the object’s `achievementsTableName` field."""
-  achievementsTableName: StringFilter
+  """Filter by the object’s `eventAggregatesTableName` field."""
+  eventAggregatesTableName: StringFilter
+
+  """Filter by the object’s `eventTypesTableId` field."""
+  eventTypesTableId: UUIDFilter
+
+  """Filter by the object’s `eventTypesTableName` field."""
+  eventTypesTableName: StringFilter
 
   """Filter by the object’s `levelsTableId` field."""
   levelsTableId: UUIDFilter
@@ -19522,35 +19282,68 @@ input LevelsModuleFilter {
   """Filter by the object’s `levelRequirementsTableName` field."""
   levelRequirementsTableName: StringFilter
 
-  """Filter by the object’s `completedStep` field."""
-  completedStep: StringFilter
+  """Filter by the object’s `levelGrantsTableId` field."""
+  levelGrantsTableId: UUIDFilter
 
-  """Filter by the object’s `incompletedStep` field."""
-  incompletedStep: StringFilter
+  """Filter by the object’s `levelGrantsTableName` field."""
+  levelGrantsTableName: StringFilter
 
-  """Filter by the object’s `tgAchievement` field."""
-  tgAchievement: StringFilter
+  """Filter by the object’s `achievementRewardsTableId` field."""
+  achievementRewardsTableId: UUIDFilter
 
-  """Filter by the object’s `tgAchievementToggle` field."""
-  tgAchievementToggle: StringFilter
+  """Filter by the object’s `achievementRewardsTableName` field."""
+  achievementRewardsTableName: StringFilter
 
-  """Filter by the object’s `tgAchievementToggleBoolean` field."""
-  tgAchievementToggleBoolean: StringFilter
+  """Filter by the object’s `recordEvent` field."""
+  recordEvent: StringFilter
 
-  """Filter by the object’s `tgAchievementBoolean` field."""
-  tgAchievementBoolean: StringFilter
+  """Filter by the object’s `removeEvent` field."""
+  removeEvent: StringFilter
 
-  """Filter by the object’s `upsertAchievement` field."""
-  upsertAchievement: StringFilter
+  """Filter by the object’s `tgEvent` field."""
+  tgEvent: StringFilter
 
-  """Filter by the object’s `tgUpdateAchievements` field."""
-  tgUpdateAchievements: StringFilter
+  """Filter by the object’s `tgEventToggle` field."""
+  tgEventToggle: StringFilter
+
+  """Filter by the object’s `tgEventToggleBool` field."""
+  tgEventToggleBool: StringFilter
+
+  """Filter by the object’s `tgEventBool` field."""
+  tgEventBool: StringFilter
+
+  """Filter by the object’s `upsertAggregate` field."""
+  upsertAggregate: StringFilter
+
+  """Filter by the object’s `tgUpdateAggregates` field."""
+  tgUpdateAggregates: StringFilter
+
+  """Filter by the object’s `pruneEvents` field."""
+  pruneEvents: StringFilter
 
   """Filter by the object’s `stepsRequired` field."""
   stepsRequired: StringFilter
 
   """Filter by the object’s `levelAchieved` field."""
   levelAchieved: StringFilter
+
+  """Filter by the object’s `tgCheckAchievements` field."""
+  tgCheckAchievements: StringFilter
+
+  """Filter by the object’s `grantAchievement` field."""
+  grantAchievement: StringFilter
+
+  """Filter by the object’s `tgAchievementReward` field."""
+  tgAchievementReward: StringFilter
+
+  """Filter by the object’s `interval` field."""
+  interval: StringFilter
+
+  """Filter by the object’s `retention` field."""
+  retention: StringFilter
+
+  """Filter by the object’s `premake` field."""
+  premake: IntFilter
 
   """Filter by the object’s `prefix` field."""
   prefix: StringFilter
@@ -19565,16 +19358,16 @@ input LevelsModuleFilter {
   actorTableId: UUIDFilter
 
   """Checks for all expressions in this list."""
-  and: [LevelsModuleFilter!]
+  and: [EventsModuleFilter!]
 
   """Checks for any expressions in this list."""
-  or: [LevelsModuleFilter!]
+  or: [EventsModuleFilter!]
 
   """Negates the expression."""
-  not: LevelsModuleFilter
+  not: EventsModuleFilter
 
-  """Filter by the object’s `achievementsTable` relation."""
-  achievementsTable: TableFilter
+  """Filter by the object’s `achievementRewardsTable` relation."""
+  achievementRewardsTable: TableFilter
 
   """Filter by the object’s `actorTable` relation."""
   actorTable: TableFilter
@@ -19588,6 +19381,18 @@ input LevelsModuleFilter {
   """A related `entityTable` exists."""
   entityTableExists: Boolean
 
+  """Filter by the object’s `eventAggregatesTable` relation."""
+  eventAggregatesTable: TableFilter
+
+  """Filter by the object’s `eventTypesTable` relation."""
+  eventTypesTable: TableFilter
+
+  """Filter by the object’s `eventsTable` relation."""
+  eventsTable: TableFilter
+
+  """Filter by the object’s `levelGrantsTable` relation."""
+  levelGrantsTable: TableFilter
+
   """Filter by the object’s `levelRequirementsTable` relation."""
   levelRequirementsTable: TableFilter
 
@@ -19599,9 +19404,6 @@ input LevelsModuleFilter {
 
   """Filter by the object’s `schema` relation."""
   schema: SchemaFilter
-
-  """Filter by the object’s `stepsTable` relation."""
-  stepsTable: TableFilter
 }
 
 """
@@ -19694,6 +19496,18 @@ input LimitsModuleFilter {
   """Filter by the object’s `resolveCapFunction` field."""
   resolveCapFunction: StringFilter
 
+  """Filter by the object’s `limitWarningsTableId` field."""
+  limitWarningsTableId: UUIDFilter
+
+  """Filter by the object’s `limitWarningStateTableId` field."""
+  limitWarningStateTableId: UUIDFilter
+
+  """Filter by the object’s `limitCheckSoftFunction` field."""
+  limitCheckSoftFunction: StringFilter
+
+  """Filter by the object’s `limitAggregateCheckSoftFunction` field."""
+  limitAggregateCheckSoftFunction: StringFilter
+
   """Filter by the object’s `prefix` field."""
   prefix: StringFilter
 
@@ -19777,6 +19591,18 @@ input LimitsModuleFilter {
 
   """A related `limitCreditsTable` exists."""
   limitCreditsTableExists: Boolean
+
+  """Filter by the object’s `limitWarningStateTable` relation."""
+  limitWarningStateTable: TableFilter
+
+  """A related `limitWarningStateTable` exists."""
+  limitWarningStateTableExists: Boolean
+
+  """Filter by the object’s `limitWarningsTable` relation."""
+  limitWarningsTable: TableFilter
+
+  """A related `limitWarningsTable` exists."""
+  limitWarningsTableExists: Boolean
 
   """Filter by the object’s `privateSchema` relation."""
   privateSchema: SchemaFilter
@@ -20387,23 +20213,23 @@ input RlsModuleFilter {
 }
 
 """
-A filter to be used against many `SecretsModule` object types. All fields are combined with a logical ‘and.’
+A filter to be used against many `UserStateModule` object types. All fields are combined with a logical ‘and.’
 """
-input DatabaseToManySecretsModuleFilter {
+input DatabaseToManyUserStateModuleFilter {
   """Filters to entities where at least one related entity matches."""
-  some: SecretsModuleFilter
+  some: UserStateModuleFilter
 
   """Filters to entities where every related entity matches."""
-  every: SecretsModuleFilter
+  every: UserStateModuleFilter
 
   """Filters to entities where no related entity matches."""
-  none: SecretsModuleFilter
+  none: UserStateModuleFilter
 }
 
 """
-A filter to be used against `SecretsModule` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `UserStateModule` object types. All fields are combined with a logical ‘and.’
 """
-input SecretsModuleFilter {
+input UserStateModuleFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -20420,13 +20246,13 @@ input SecretsModuleFilter {
   tableName: StringFilter
 
   """Checks for all expressions in this list."""
-  and: [SecretsModuleFilter!]
+  and: [UserStateModuleFilter!]
 
   """Checks for any expressions in this list."""
-  or: [SecretsModuleFilter!]
+  or: [UserStateModuleFilter!]
 
   """Negates the expression."""
-  not: SecretsModuleFilter
+  not: UserStateModuleFilter
 
   """Filter by the object’s `database` relation."""
   database: DatabaseFilter
@@ -21335,6 +21161,9 @@ input EntityTypeProvisionFilter {
   """Filter by the object’s `hasInvites` field."""
   hasInvites: BooleanFilter
 
+  """Filter by the object’s `hasInviteAchievements` field."""
+  hasInviteAchievements: BooleanFilter
+
   """Filter by the object’s `storageConfig` field."""
   storageConfig: JSONFilter
 
@@ -22111,6 +21940,86 @@ input DatabaseToManyRealtimeModuleFilter {
 
   """Filters to entities where no related entity matches."""
   none: RealtimeModuleFilter
+}
+
+"""
+A filter to be used against `RateLimitMetersModule` object types. All fields are combined with a logical ‘and.’
+"""
+input RateLimitMetersModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `rateLimitStateTableId` field."""
+  rateLimitStateTableId: UUIDFilter
+
+  """Filter by the object’s `rateLimitStateTableName` field."""
+  rateLimitStateTableName: StringFilter
+
+  """Filter by the object’s `rateLimitOverridesTableId` field."""
+  rateLimitOverridesTableId: UUIDFilter
+
+  """Filter by the object’s `rateLimitOverridesTableName` field."""
+  rateLimitOverridesTableName: StringFilter
+
+  """Filter by the object’s `rateWindowLimitsTableId` field."""
+  rateWindowLimitsTableId: UUIDFilter
+
+  """Filter by the object’s `rateWindowLimitsTableName` field."""
+  rateWindowLimitsTableName: StringFilter
+
+  """Filter by the object’s `checkRateLimitFunction` field."""
+  checkRateLimitFunction: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [RateLimitMetersModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [RateLimitMetersModuleFilter!]
+
+  """Negates the expression."""
+  not: RateLimitMetersModuleFilter
+
+  """Filter by the object’s `database` relation."""
+  database: DatabaseFilter
+
+  """Filter by the object’s `privateSchema` relation."""
+  privateSchema: SchemaFilter
+
+  """
+  Filter by the object’s `rateLimitOverridesTableByRateLimitOverridesTableId` relation.
+  """
+  rateLimitOverridesTableByRateLimitOverridesTableId: TableFilter
+
+  """A related `rateLimitOverridesTableByRateLimitOverridesTableId` exists."""
+  rateLimitOverridesTableByRateLimitOverridesTableIdExists: Boolean
+
+  """
+  Filter by the object’s `rateLimitStateTableByRateLimitStateTableId` relation.
+  """
+  rateLimitStateTableByRateLimitStateTableId: TableFilter
+
+  """
+  Filter by the object’s `rateWindowLimitsTableByRateWindowLimitsTableId` relation.
+  """
+  rateWindowLimitsTableByRateWindowLimitsTableId: TableFilter
+
+  """A related `rateWindowLimitsTableByRateWindowLimitsTableId` exists."""
+  rateWindowLimitsTableByRateWindowLimitsTableIdExists: Boolean
+
+  """Filter by the object’s `schema` relation."""
+  schema: SchemaFilter
 }
 
 """
@@ -23575,8 +23484,11 @@ type EmbeddingChunk {
   chunkOverlap: Int!
   chunkStrategy: String!
   metadataFields: JSON
+  searchIndexes: JSON!
   enqueueChunkingJob: Boolean!
   chunkingTaskName: String!
+  embeddingModel: String
+  embeddingProvider: String
   parentFkFieldId: UUID
   createdAt: Datetime
   updatedAt: Datetime
@@ -23637,10 +23549,16 @@ enum EmbeddingChunkOrderBy {
   CHUNK_STRATEGY_DESC
   METADATA_FIELDS_ASC
   METADATA_FIELDS_DESC
+  SEARCH_INDEXES_ASC
+  SEARCH_INDEXES_DESC
   ENQUEUE_CHUNKING_JOB_ASC
   ENQUEUE_CHUNKING_JOB_DESC
   CHUNKING_TASK_NAME_ASC
   CHUNKING_TASK_NAME_DESC
+  EMBEDDING_MODEL_ASC
+  EMBEDDING_MODEL_DESC
+  EMBEDDING_PROVIDER_ASC
+  EMBEDDING_PROVIDER_DESC
   PARENT_FK_FIELD_ID_ASC
   PARENT_FK_FIELD_ID_DESC
   CREATED_AT_ASC
@@ -23654,16 +23572,19 @@ type Partition {
   databaseId: UUID!
   tableId: UUID!
   strategy: String!
-  partitionKeyIds: [UUID]!
+  partitionKeyId: UUID!
   interval: String
   retention: String
-  lookahead: Int!
+  premake: Int!
   namingPattern: String!
   createdAt: Datetime!
   updatedAt: Datetime!
 
   """Reads a single `Database` that is related to this `Partition`."""
   database: Database
+
+  """Reads a single `Field` that is related to this `Partition`."""
+  partitionKey: Field
 
   """Reads a single `Table` that is related to this `Partition`."""
   table: Table
@@ -24255,8 +24176,8 @@ type RealtimeModule {
   listenerNodeTableId: UUID!
   sourceRegistryTableId: UUID!
   retentionHours: Int!
-  lookaheadHours: Int!
-  partitionInterval: String!
+  premake: Int!
+  interval: String!
   notifyChannel: String
 
   """Reads a single `Table` that is related to this `RealtimeModule`."""
@@ -24313,10 +24234,10 @@ enum RealtimeModuleOrderBy {
   SOURCE_REGISTRY_TABLE_ID_DESC
   RETENTION_HOURS_ASC
   RETENTION_HOURS_DESC
-  LOOKAHEAD_HOURS_ASC
-  LOOKAHEAD_HOURS_DESC
-  PARTITION_INTERVAL_ASC
-  PARTITION_INTERVAL_DESC
+  PREMAKE_ASC
+  PREMAKE_DESC
+  INTERVAL_ASC
+  INTERVAL_DESC
   NOTIFY_CHANNEL_ASC
   NOTIFY_CHANNEL_DESC
 }
@@ -25773,14 +25694,14 @@ enum PartitionOrderBy {
   TABLE_ID_DESC
   STRATEGY_ASC
   STRATEGY_DESC
-  PARTITION_KEY_IDS_ASC
-  PARTITION_KEY_IDS_DESC
+  PARTITION_KEY_ID_ASC
+  PARTITION_KEY_ID_DESC
   INTERVAL_ASC
   INTERVAL_DESC
   RETENTION_ASC
   RETENTION_DESC
-  LOOKAHEAD_ASC
-  LOOKAHEAD_DESC
+  PREMAKE_ASC
+  PREMAKE_DESC
   NAMING_PATTERN_ASC
   NAMING_PATTERN_DESC
   CREATED_AT_ASC
@@ -26953,90 +26874,112 @@ enum InvitesModuleOrderBy {
   ENTITY_TABLE_ID_DESC
 }
 
-"""A connection to a list of `LevelsModule` values."""
-type LevelsModuleConnection {
-  """A list of `LevelsModule` objects."""
-  nodes: [LevelsModule]!
+"""A connection to a list of `EventsModule` values."""
+type EventsModuleConnection {
+  """A list of `EventsModule` objects."""
+  nodes: [EventsModule]!
 
   """
-  A list of edges which contains the `LevelsModule` and cursor to aid in pagination.
+  A list of edges which contains the `EventsModule` and cursor to aid in pagination.
   """
-  edges: [LevelsModuleEdge]!
+  edges: [EventsModuleEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `LevelsModule` you could get from the connection."""
+  """The count of *all* `EventsModule` you could get from the connection."""
   totalCount: Int!
 }
 
-type LevelsModule {
+type EventsModule {
   id: UUID!
   databaseId: UUID!
   schemaId: UUID!
   privateSchemaId: UUID!
-  stepsTableId: UUID!
-  stepsTableName: String!
-  achievementsTableId: UUID!
-  achievementsTableName: String!
+  eventsTableId: UUID!
+  eventsTableName: String!
+  eventAggregatesTableId: UUID!
+  eventAggregatesTableName: String!
+  eventTypesTableId: UUID!
+  eventTypesTableName: String!
   levelsTableId: UUID!
   levelsTableName: String!
   levelRequirementsTableId: UUID!
   levelRequirementsTableName: String!
-  completedStep: String!
-  incompletedStep: String!
-  tgAchievement: String!
-  tgAchievementToggle: String!
-  tgAchievementToggleBoolean: String!
-  tgAchievementBoolean: String!
-  upsertAchievement: String!
-  tgUpdateAchievements: String!
+  levelGrantsTableId: UUID!
+  levelGrantsTableName: String!
+  achievementRewardsTableId: UUID!
+  achievementRewardsTableName: String!
+  recordEvent: String!
+  removeEvent: String!
+  tgEvent: String!
+  tgEventToggle: String!
+  tgEventToggleBool: String!
+  tgEventBool: String!
+  upsertAggregate: String!
+  tgUpdateAggregates: String!
+  pruneEvents: String!
   stepsRequired: String!
   levelAchieved: String!
+  tgCheckAchievements: String!
+  grantAchievement: String!
+  tgAchievementReward: String!
+  interval: String!
+  retention: String
+  premake: Int!
   prefix: String
   membershipType: Int!
   entityTableId: UUID
   actorTableId: UUID!
 
-  """Reads a single `Table` that is related to this `LevelsModule`."""
-  achievementsTable: Table
+  """Reads a single `Table` that is related to this `EventsModule`."""
+  achievementRewardsTable: Table
 
-  """Reads a single `Table` that is related to this `LevelsModule`."""
+  """Reads a single `Table` that is related to this `EventsModule`."""
   actorTable: Table
 
-  """Reads a single `Database` that is related to this `LevelsModule`."""
+  """Reads a single `Database` that is related to this `EventsModule`."""
   database: Database
 
-  """Reads a single `Table` that is related to this `LevelsModule`."""
+  """Reads a single `Table` that is related to this `EventsModule`."""
   entityTable: Table
 
-  """Reads a single `Table` that is related to this `LevelsModule`."""
+  """Reads a single `Table` that is related to this `EventsModule`."""
+  eventAggregatesTable: Table
+
+  """Reads a single `Table` that is related to this `EventsModule`."""
+  eventTypesTable: Table
+
+  """Reads a single `Table` that is related to this `EventsModule`."""
+  eventsTable: Table
+
+  """Reads a single `Table` that is related to this `EventsModule`."""
+  levelGrantsTable: Table
+
+  """Reads a single `Table` that is related to this `EventsModule`."""
   levelRequirementsTable: Table
 
-  """Reads a single `Table` that is related to this `LevelsModule`."""
+  """Reads a single `Table` that is related to this `EventsModule`."""
   levelsTable: Table
 
-  """Reads a single `Schema` that is related to this `LevelsModule`."""
+  """Reads a single `Schema` that is related to this `EventsModule`."""
   privateSchema: Schema
 
-  """Reads a single `Schema` that is related to this `LevelsModule`."""
+  """Reads a single `Schema` that is related to this `EventsModule`."""
   schema: Schema
-
-  """Reads a single `Table` that is related to this `LevelsModule`."""
-  stepsTable: Table
 }
 
-"""A `LevelsModule` edge in the connection."""
-type LevelsModuleEdge {
+"""A `EventsModule` edge in the connection."""
+type EventsModuleEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `LevelsModule` at the end of the edge."""
-  node: LevelsModule
+  """The `EventsModule` at the end of the edge."""
+  node: EventsModule
 }
 
-"""Methods to use when ordering `LevelsModule`."""
-enum LevelsModuleOrderBy {
+"""Methods to use when ordering `EventsModule`."""
+enum EventsModuleOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -27048,14 +26991,18 @@ enum LevelsModuleOrderBy {
   SCHEMA_ID_DESC
   PRIVATE_SCHEMA_ID_ASC
   PRIVATE_SCHEMA_ID_DESC
-  STEPS_TABLE_ID_ASC
-  STEPS_TABLE_ID_DESC
-  STEPS_TABLE_NAME_ASC
-  STEPS_TABLE_NAME_DESC
-  ACHIEVEMENTS_TABLE_ID_ASC
-  ACHIEVEMENTS_TABLE_ID_DESC
-  ACHIEVEMENTS_TABLE_NAME_ASC
-  ACHIEVEMENTS_TABLE_NAME_DESC
+  EVENTS_TABLE_ID_ASC
+  EVENTS_TABLE_ID_DESC
+  EVENTS_TABLE_NAME_ASC
+  EVENTS_TABLE_NAME_DESC
+  EVENT_AGGREGATES_TABLE_ID_ASC
+  EVENT_AGGREGATES_TABLE_ID_DESC
+  EVENT_AGGREGATES_TABLE_NAME_ASC
+  EVENT_AGGREGATES_TABLE_NAME_DESC
+  EVENT_TYPES_TABLE_ID_ASC
+  EVENT_TYPES_TABLE_ID_DESC
+  EVENT_TYPES_TABLE_NAME_ASC
+  EVENT_TYPES_TABLE_NAME_DESC
   LEVELS_TABLE_ID_ASC
   LEVELS_TABLE_ID_DESC
   LEVELS_TABLE_NAME_ASC
@@ -27064,26 +27011,48 @@ enum LevelsModuleOrderBy {
   LEVEL_REQUIREMENTS_TABLE_ID_DESC
   LEVEL_REQUIREMENTS_TABLE_NAME_ASC
   LEVEL_REQUIREMENTS_TABLE_NAME_DESC
-  COMPLETED_STEP_ASC
-  COMPLETED_STEP_DESC
-  INCOMPLETED_STEP_ASC
-  INCOMPLETED_STEP_DESC
-  TG_ACHIEVEMENT_ASC
-  TG_ACHIEVEMENT_DESC
-  TG_ACHIEVEMENT_TOGGLE_ASC
-  TG_ACHIEVEMENT_TOGGLE_DESC
-  TG_ACHIEVEMENT_TOGGLE_BOOLEAN_ASC
-  TG_ACHIEVEMENT_TOGGLE_BOOLEAN_DESC
-  TG_ACHIEVEMENT_BOOLEAN_ASC
-  TG_ACHIEVEMENT_BOOLEAN_DESC
-  UPSERT_ACHIEVEMENT_ASC
-  UPSERT_ACHIEVEMENT_DESC
-  TG_UPDATE_ACHIEVEMENTS_ASC
-  TG_UPDATE_ACHIEVEMENTS_DESC
+  LEVEL_GRANTS_TABLE_ID_ASC
+  LEVEL_GRANTS_TABLE_ID_DESC
+  LEVEL_GRANTS_TABLE_NAME_ASC
+  LEVEL_GRANTS_TABLE_NAME_DESC
+  ACHIEVEMENT_REWARDS_TABLE_ID_ASC
+  ACHIEVEMENT_REWARDS_TABLE_ID_DESC
+  ACHIEVEMENT_REWARDS_TABLE_NAME_ASC
+  ACHIEVEMENT_REWARDS_TABLE_NAME_DESC
+  RECORD_EVENT_ASC
+  RECORD_EVENT_DESC
+  REMOVE_EVENT_ASC
+  REMOVE_EVENT_DESC
+  TG_EVENT_ASC
+  TG_EVENT_DESC
+  TG_EVENT_TOGGLE_ASC
+  TG_EVENT_TOGGLE_DESC
+  TG_EVENT_TOGGLE_BOOL_ASC
+  TG_EVENT_TOGGLE_BOOL_DESC
+  TG_EVENT_BOOL_ASC
+  TG_EVENT_BOOL_DESC
+  UPSERT_AGGREGATE_ASC
+  UPSERT_AGGREGATE_DESC
+  TG_UPDATE_AGGREGATES_ASC
+  TG_UPDATE_AGGREGATES_DESC
+  PRUNE_EVENTS_ASC
+  PRUNE_EVENTS_DESC
   STEPS_REQUIRED_ASC
   STEPS_REQUIRED_DESC
   LEVEL_ACHIEVED_ASC
   LEVEL_ACHIEVED_DESC
+  TG_CHECK_ACHIEVEMENTS_ASC
+  TG_CHECK_ACHIEVEMENTS_DESC
+  GRANT_ACHIEVEMENT_ASC
+  GRANT_ACHIEVEMENT_DESC
+  TG_ACHIEVEMENT_REWARD_ASC
+  TG_ACHIEVEMENT_REWARD_DESC
+  INTERVAL_ASC
+  INTERVAL_DESC
+  RETENTION_ASC
+  RETENTION_DESC
+  PREMAKE_ASC
+  PREMAKE_DESC
   PREFIX_ASC
   PREFIX_DESC
   MEMBERSHIP_TYPE_ASC
@@ -27136,6 +27105,10 @@ type LimitsModule {
   limitCapsDefaultsTableId: UUID
   capCheckTrigger: String!
   resolveCapFunction: String!
+  limitWarningsTableId: UUID
+  limitWarningStateTableId: UUID
+  limitCheckSoftFunction: String!
+  limitAggregateCheckSoftFunction: String!
   prefix: String
   membershipType: Int!
   entityTableId: UUID
@@ -27176,6 +27149,12 @@ type LimitsModule {
 
   """Reads a single `Table` that is related to this `LimitsModule`."""
   limitCreditsTable: Table
+
+  """Reads a single `Table` that is related to this `LimitsModule`."""
+  limitWarningStateTable: Table
+
+  """Reads a single `Table` that is related to this `LimitsModule`."""
+  limitWarningsTable: Table
 
   """Reads a single `Schema` that is related to this `LimitsModule`."""
   privateSchema: Schema
@@ -27249,6 +27228,14 @@ enum LimitsModuleOrderBy {
   CAP_CHECK_TRIGGER_DESC
   RESOLVE_CAP_FUNCTION_ASC
   RESOLVE_CAP_FUNCTION_DESC
+  LIMIT_WARNINGS_TABLE_ID_ASC
+  LIMIT_WARNINGS_TABLE_ID_DESC
+  LIMIT_WARNING_STATE_TABLE_ID_ASC
+  LIMIT_WARNING_STATE_TABLE_ID_DESC
+  LIMIT_CHECK_SOFT_FUNCTION_ASC
+  LIMIT_CHECK_SOFT_FUNCTION_DESC
+  LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_ASC
+  LIMIT_AGGREGATE_CHECK_SOFT_FUNCTION_DESC
   PREFIX_ASC
   PREFIX_DESC
   MEMBERSHIP_TYPE_ASC
@@ -27865,51 +27852,53 @@ type RlsModule {
   usersTable: Table
 }
 
-"""A connection to a list of `SecretsModule` values."""
-type SecretsModuleConnection {
-  """A list of `SecretsModule` objects."""
-  nodes: [SecretsModule]!
+"""A connection to a list of `UserStateModule` values."""
+type UserStateModuleConnection {
+  """A list of `UserStateModule` objects."""
+  nodes: [UserStateModule]!
 
   """
-  A list of edges which contains the `SecretsModule` and cursor to aid in pagination.
+  A list of edges which contains the `UserStateModule` and cursor to aid in pagination.
   """
-  edges: [SecretsModuleEdge]!
+  edges: [UserStateModuleEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `SecretsModule` you could get from the connection."""
+  """
+  The count of *all* `UserStateModule` you could get from the connection.
+  """
   totalCount: Int!
 }
 
-type SecretsModule {
+type UserStateModule {
   id: UUID!
   databaseId: UUID!
   schemaId: UUID!
   tableId: UUID!
   tableName: String!
 
-  """Reads a single `Database` that is related to this `SecretsModule`."""
+  """Reads a single `Database` that is related to this `UserStateModule`."""
   database: Database
 
-  """Reads a single `Schema` that is related to this `SecretsModule`."""
+  """Reads a single `Schema` that is related to this `UserStateModule`."""
   schema: Schema
 
-  """Reads a single `Table` that is related to this `SecretsModule`."""
+  """Reads a single `Table` that is related to this `UserStateModule`."""
   table: Table
 }
 
-"""A `SecretsModule` edge in the connection."""
-type SecretsModuleEdge {
+"""A `UserStateModule` edge in the connection."""
+type UserStateModuleEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `SecretsModule` at the end of the edge."""
-  node: SecretsModule
+  """The `UserStateModule` at the end of the edge."""
+  node: UserStateModule
 }
 
-"""Methods to use when ordering `SecretsModule`."""
-enum SecretsModuleOrderBy {
+"""Methods to use when ordering `UserStateModule`."""
+enum UserStateModuleOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -29040,7 +29029,7 @@ type EntityTypeProvision {
   hasProfiles: Boolean!
 
   """
-  Whether to provision levels_module for this type. Defaults to false.
+  Whether to provision events_module for this type. Defaults to false.
        Levels provide gamification/achievement tracking for members.
        When true, creates level steps, achievements, and level tables with security.
   """
@@ -29064,6 +29053,17 @@ type EntityTypeProvision {
        ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
   """
   hasInvites: Boolean!
+
+  """
+  Whether to auto-attach an EventTracker to the claimed_invites table for invite-based
+       achievements. Defaults to false. Requires has_invites=true AND has_levels=true.
+       When true, the trigger calls event_tracker() on the claimed_invites table with
+       event_name='invite_claimed', actor_field='sender_id', events=['INSERT'],
+       crediting the SENDER (inviter) when someone claims their invite code.
+       Developers can then define achievements in the blueprint achievements[] section
+       that reference the 'invite_claimed' event (e.g., "Invite 5 friends" = count: 5).
+  """
+  hasInviteAchievements: Boolean!
 
   """
   Optional jsonb object for storage module configuration and initial bucket seeding.
@@ -29239,6 +29239,8 @@ enum EntityTypeProvisionOrderBy {
   HAS_STORAGE_DESC
   HAS_INVITES_ASC
   HAS_INVITES_DESC
+  HAS_INVITE_ACHIEVEMENTS_ASC
+  HAS_INVITE_ACHIEVEMENTS_DESC
   STORAGE_CONFIG_ASC
   STORAGE_CONFIG_DESC
   SKIP_ENTITY_POLICIES_ASC
@@ -29792,6 +29794,51 @@ type BillingProviderModule {
   Reads a single `Table` that is related to this `BillingProviderModule`.
   """
   subscriptionsTable: Table
+}
+
+type RateLimitMetersModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  privateSchemaId: UUID!
+  rateLimitStateTableId: UUID!
+  rateLimitStateTableName: String!
+  rateLimitOverridesTableId: UUID
+  rateLimitOverridesTableName: String!
+  rateWindowLimitsTableId: UUID
+  rateWindowLimitsTableName: String!
+  checkRateLimitFunction: String!
+  prefix: String
+
+  """
+  Reads a single `Database` that is related to this `RateLimitMetersModule`.
+  """
+  database: Database
+
+  """
+  Reads a single `Schema` that is related to this `RateLimitMetersModule`.
+  """
+  privateSchema: Schema
+
+  """
+  Reads a single `Table` that is related to this `RateLimitMetersModule`.
+  """
+  rateLimitOverridesTableByRateLimitOverridesTableId: Table
+
+  """
+  Reads a single `Table` that is related to this `RateLimitMetersModule`.
+  """
+  rateLimitStateTableByRateLimitStateTableId: Table
+
+  """
+  Reads a single `Table` that is related to this `RateLimitMetersModule`.
+  """
+  rateWindowLimitsTableByRateWindowLimitsTableId: Table
+
+  """
+  Reads a single `Schema` that is related to this `RateLimitMetersModule`.
+  """
+  schema: Schema
 }
 
 """A connection to a list of `DatabaseProvisionModule` values."""
@@ -31860,186 +31907,65 @@ enum OrgLimitAggregateOrderBy {
   RESERVED_DESC
 }
 
-"""A connection to a list of `AppStep` values."""
-type AppStepConnection {
-  """A list of `AppStep` objects."""
-  nodes: [AppStep]!
+"""A connection to a list of `OrgLimitWarning` values."""
+type OrgLimitWarningConnection {
+  """A list of `OrgLimitWarning` objects."""
+  nodes: [OrgLimitWarning]!
 
   """
-  A list of edges which contains the `AppStep` and cursor to aid in pagination.
+  A list of edges which contains the `OrgLimitWarning` and cursor to aid in pagination.
   """
-  edges: [AppStepEdge]!
+  edges: [OrgLimitWarningEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `AppStep` you could get from the connection."""
+  """
+  The count of *all* `OrgLimitWarning` you could get from the connection.
+  """
   totalCount: Int!
 }
 
 """
-Log of individual user actions toward level requirements; every single step ever taken is recorded here
+Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
 """
-type AppStep {
+type OrgLimitWarning {
   id: UUID!
-  actorId: UUID!
 
-  """Name identifier of the level requirement this step fulfills"""
+  """Limit name this warning applies to (must match a default_limits entry)"""
   name: String!
 
-  """Number of units completed in this step action"""
-  count: Int!
-  createdAt: Datetime
-  updatedAt: Datetime
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
 
-  """Reads a single `User` that is related to this `AppStep`."""
-  actor: User
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
+
+  """Per-entity override (NULL = scope default for all entities)"""
+  entityId: UUID
+
+  """Reads a single `User` that is related to this `OrgLimitWarning`."""
+  entity: User
 }
 
-"""A `AppStep` edge in the connection."""
-type AppStepEdge {
+"""A `OrgLimitWarning` edge in the connection."""
+type OrgLimitWarningEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `AppStep` at the end of the edge."""
-  node: AppStep
+  """The `OrgLimitWarning` at the end of the edge."""
+  node: OrgLimitWarning
 }
 
-"""Methods to use when ordering `AppStep`."""
-enum AppStepOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  NAME_ASC
-  NAME_DESC
-  COUNT_ASC
-  COUNT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `AppAchievement` values."""
-type AppAchievementConnection {
-  """A list of `AppAchievement` objects."""
-  nodes: [AppAchievement]!
-
-  """
-  A list of edges which contains the `AppAchievement` and cursor to aid in pagination.
-  """
-  edges: [AppAchievementEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppAchievement` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually
-"""
-type AppAchievement {
-  id: UUID!
-  actorId: UUID!
-
-  """Name identifier of the level requirement being tracked"""
-  name: String!
-
-  """Cumulative count of completed steps toward this requirement"""
-  count: Int!
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single `User` that is related to this `AppAchievement`."""
-  actor: User
-}
-
-"""A `AppAchievement` edge in the connection."""
-type AppAchievementEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppAchievement` at the end of the edge."""
-  node: AppAchievement
-}
-
-"""Methods to use when ordering `AppAchievement`."""
-enum AppAchievementOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  NAME_ASC
-  NAME_DESC
-  COUNT_ASC
-  COUNT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `AppLevel` values."""
-type AppLevelConnection {
-  """A list of `AppLevel` objects."""
-  nodes: [AppLevel]!
-
-  """
-  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
-  """
-  edges: [AppLevelEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppLevel` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Defines available levels that users can achieve by completing requirements
-"""
-type AppLevel {
-  id: UUID!
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single `User` that is related to this `AppLevel`."""
-  owner: User
-}
-
-"""A `AppLevel` edge in the connection."""
-type AppLevelEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppLevel` at the end of the edge."""
-  node: AppLevel
-}
-
-"""Methods to use when ordering `AppLevel`."""
-enum AppLevelOrderBy {
+"""Methods to use when ordering `OrgLimitWarning`."""
+enum OrgLimitWarningOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -32047,16 +31973,14 @@ enum AppLevelOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  IMAGE_ASC
-  IMAGE_DESC
-  OWNER_ID_ASC
-  OWNER_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  WARNING_TYPE_ASC
+  WARNING_TYPE_DESC
+  THRESHOLD_VALUE_ASC
+  THRESHOLD_VALUE_DESC
+  TASK_IDENTIFIER_ASC
+  TASK_IDENTIFIER_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
 }
 
 """A connection to a list of `Email` values."""
@@ -34498,6 +34422,103 @@ enum OrgLimitDefaultOrderBy {
   SOFT_MAX_DESC
 }
 
+"""A connection to a list of `AppLimitWarning` values."""
+type AppLimitWarningConnection {
+  """A list of `AppLimitWarning` objects."""
+  nodes: [AppLimitWarning]!
+
+  """
+  A list of edges which contains the `AppLimitWarning` and cursor to aid in pagination.
+  """
+  edges: [AppLimitWarningEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppLimitWarning` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Warning configuration for soft limits. Each row defines a warning threshold and the job task to enqueue when usage approaches it.
+"""
+type AppLimitWarning {
+  id: UUID!
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String!
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
+}
+
+"""A `AppLimitWarning` edge in the connection."""
+type AppLimitWarningEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLimitWarning` at the end of the edge."""
+  node: AppLimitWarning
+}
+
+"""
+A filter to be used against `AppLimitWarning` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLimitWarningFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `warningType` field."""
+  warningType: StringFilter
+
+  """Filter by the object’s `thresholdValue` field."""
+  thresholdValue: BigIntFilter
+
+  """Filter by the object’s `taskIdentifier` field."""
+  taskIdentifier: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLimitWarningFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLimitWarningFilter!]
+
+  """Negates the expression."""
+  not: AppLimitWarningFilter
+}
+
+"""Methods to use when ordering `AppLimitWarning`."""
+enum AppLimitWarningOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  WARNING_TYPE_ASC
+  WARNING_TYPE_DESC
+  THRESHOLD_VALUE_ASC
+  THRESHOLD_VALUE_DESC
+  TASK_IDENTIFIER_ASC
+  TASK_IDENTIFIER_DESC
+}
+
 """A connection to a list of `UserConnectedAccount` values."""
 type UserConnectedAccountConnection {
   """A list of `UserConnectedAccount` objects."""
@@ -34650,67 +34671,6 @@ enum ObjectOrderBy {
   FRZN_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-}
-
-"""
-A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’
-"""
-input AppLevelRequirementFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `level` field."""
-  level: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `requiredCount` field."""
-  requiredCount: IntFilter
-
-  """Filter by the object’s `priority` field."""
-  priority: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppLevelRequirementFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppLevelRequirementFilter!]
-
-  """Negates the expression."""
-  not: AppLevelRequirementFilter
-}
-
-"""Methods to use when ordering `AppLevelRequirement`."""
-enum AppLevelRequirementOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  LEVEL_ASC
-  LEVEL_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  REQUIRED_COUNT_ASC
-  REQUIRED_COUNT_DESC
-  PRIORITY_ASC
-  PRIORITY_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
 }
 
 """A connection to a list of `Commit` values."""
@@ -35543,6 +35503,65 @@ enum RlsModuleOrderBy {
   CURRENT_ROLE_DESC
   CURRENT_ROLE_ID_ASC
   CURRENT_ROLE_ID_DESC
+}
+
+"""A connection to a list of `RateLimitMetersModule` values."""
+type RateLimitMetersModuleConnection {
+  """A list of `RateLimitMetersModule` objects."""
+  nodes: [RateLimitMetersModule]!
+
+  """
+  A list of edges which contains the `RateLimitMetersModule` and cursor to aid in pagination.
+  """
+  edges: [RateLimitMetersModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RateLimitMetersModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RateLimitMetersModule` edge in the connection."""
+type RateLimitMetersModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RateLimitMetersModule` at the end of the edge."""
+  node: RateLimitMetersModule
+}
+
+"""Methods to use when ordering `RateLimitMetersModule`."""
+enum RateLimitMetersModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  RATE_LIMIT_STATE_TABLE_ID_ASC
+  RATE_LIMIT_STATE_TABLE_ID_DESC
+  RATE_LIMIT_STATE_TABLE_NAME_ASC
+  RATE_LIMIT_STATE_TABLE_NAME_DESC
+  RATE_LIMIT_OVERRIDES_TABLE_ID_ASC
+  RATE_LIMIT_OVERRIDES_TABLE_ID_DESC
+  RATE_LIMIT_OVERRIDES_TABLE_NAME_ASC
+  RATE_LIMIT_OVERRIDES_TABLE_NAME_DESC
+  RATE_WINDOW_LIMITS_TABLE_ID_ASC
+  RATE_WINDOW_LIMITS_TABLE_ID_DESC
+  RATE_WINDOW_LIMITS_TABLE_NAME_ASC
+  RATE_WINDOW_LIMITS_TABLE_NAME_DESC
+  CHECK_RATE_LIMIT_FUNCTION_ASC
+  CHECK_RATE_LIMIT_FUNCTION_DESC
+  PREFIX_ASC
+  PREFIX_DESC
 }
 
 """A connection to a list of `PlansModule` values."""
@@ -36645,7 +36664,7 @@ type Mutation {
   ): InitEmptyRepoPayload
 
   """
-  Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Seven phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
+  Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (0.5) app-level storage, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
   """
   constructBlueprint(
     """
@@ -36802,7 +36821,7 @@ type Mutation {
     input: SignInCrossOriginInput!
   ): SignInCrossOriginPayload
 
-  "Creates a new user database with all required modules, permissions, and RLS policies.\n\nParameters:\n  - database_name: Name for the new database (required)\n  - owner_id: UUID of the owner user (required)\n  - include_invites: Include invite system (default: true)\n  - include_groups: Include group-level memberships (default: false)\n  - include_levels: Include levels/achievements (default: false)\n  - bitlen: Bit length for permission masks (default: 64)\n  - tokens_expiration: Token expiration interval (default: 30 days)\n\nReturns the database_id UUID of the newly created database.\n\nExample usage:\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups\n"
+  "Creates a new user database with all required modules, permissions, and RLS policies.\n\nParameters:\n  - database_name: Name for the new database (required)\n  - owner_id: UUID of the owner user (required)\n  - include_invites: Include invite system (default: true)\n  - include_groups: Include group-level memberships (default: false)\n  - include_levels: Include events/analytics (default: false)\n  - bitlen: Bit length for permission masks (default: 64)\n  - tokens_expiration: Token expiration interval (default: 30 days)\n\nReturns the database_id UUID of the newly created database.\n\nExample usage:\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups\n"
   createUserDatabase(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -36974,13 +36993,13 @@ type Mutation {
     input: CreateMembershipTypesModuleInput!
   ): CreateMembershipTypesModulePayload
 
-  """Creates a single `SecretsModule`."""
-  createSecretsModule(
+  """Creates a single `UserStateModule`."""
+  createUserStateModule(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateSecretsModuleInput!
-  ): CreateSecretsModulePayload
+    input: CreateUserStateModuleInput!
+  ): CreateUserStateModulePayload
 
   """Creates a single `AppPermissionDefault`."""
   createAppPermissionDefault(
@@ -37069,22 +37088,6 @@ type Mutation {
     """
     input: CreateAppOwnerGrantInput!
   ): CreateAppOwnerGrantPayload
-
-  """Creates a single `AppAchievement`."""
-  createAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppAchievementInput!
-  ): CreateAppAchievementPayload
-
-  """Creates a single `AppStep`."""
-  createAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppStepInput!
-  ): CreateAppStepPayload
 
   """Creates a single `OrgPermissionDefault`."""
   createOrgPermissionDefault(
@@ -37278,6 +37281,14 @@ type Mutation {
     input: CreateAppLimitCreditCodeItemInput!
   ): CreateAppLimitCreditCodeItemPayload
 
+  """Creates a single `AppLimitWarning`."""
+  createAppLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitWarningInput!
+  ): CreateAppLimitWarningPayload
+
   """Creates a single `UserConnectedAccount`."""
   createUserConnectedAccount(
     """
@@ -37326,6 +37337,14 @@ type Mutation {
     input: CreateAppLimitCreditInput!
   ): CreateAppLimitCreditPayload
 
+  """Creates a single `OrgLimitWarning`."""
+  createOrgLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitWarningInput!
+  ): CreateOrgLimitWarningPayload
+
   """Creates a single `OrgLimitCredit`."""
   createOrgLimitCredit(
     """
@@ -37349,14 +37368,6 @@ type Mutation {
     """
     input: CreateSiteMetadatumInput!
   ): CreateSiteMetadatumPayload
-
-  """Creates a single `AppLevelRequirement`."""
-  createAppLevelRequirement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLevelRequirementInput!
-  ): CreateAppLevelRequirementPayload
 
   """Creates a single `FullTextSearch`."""
   createFullTextSearch(
@@ -37574,14 +37585,6 @@ type Mutation {
     input: CreateOrgGrantInput!
   ): CreateOrgGrantPayload
 
-  """Creates a single `AppLevel`."""
-  createAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLevelInput!
-  ): CreateAppLevelPayload
-
   """Creates a single `Blueprint`."""
   createBlueprint(
     """
@@ -37597,6 +37600,14 @@ type Mutation {
     """
     input: CreateDenormalizedTableFieldInput!
   ): CreateDenormalizedTableFieldPayload
+
+  """Creates a single `RateLimitMetersModule`."""
+  createRateLimitMetersModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRateLimitMetersModuleInput!
+  ): CreateRateLimitMetersModulePayload
 
   """Creates a single `RealtimeModule`."""
   createRealtimeModule(
@@ -37862,14 +37873,6 @@ type Mutation {
     input: CreatePolicyInput!
   ): CreatePolicyPayload
 
-  """Creates a single `EmbeddingChunk`."""
-  createEmbeddingChunk(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateEmbeddingChunkInput!
-  ): CreateEmbeddingChunkPayload
-
   """Creates a single `WebauthnSetting`."""
   createWebauthnSetting(
     """
@@ -37950,6 +37953,14 @@ type Mutation {
     input: CreateOrgMembershipInput!
   ): CreateOrgMembershipPayload
 
+  """Creates a single `EmbeddingChunk`."""
+  createEmbeddingChunk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateEmbeddingChunkInput!
+  ): CreateEmbeddingChunkPayload
+
   """Creates a single `ForeignKeyConstraint`."""
   createForeignKeyConstraint(
     """
@@ -37973,14 +37984,6 @@ type Mutation {
     """
     input: CreateEntityTypeProvisionInput!
   ): CreateEntityTypeProvisionPayload
-
-  """Creates a single `LevelsModule`."""
-  createLevelsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateLevelsModuleInput!
-  ): CreateLevelsModulePayload
 
   """Creates a single `UserAuthModule`."""
   createUserAuthModule(
@@ -38029,6 +38032,14 @@ type Mutation {
     """
     input: CreateMembershipsModuleInput!
   ): CreateMembershipsModulePayload
+
+  """Creates a single `EventsModule`."""
+  createEventsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateEventsModuleInput!
+  ): CreateEventsModulePayload
 
   """Updates a single `DefaultIdsModule` using a unique key and a patch."""
   updateDefaultIdsModule(
@@ -38140,13 +38151,13 @@ type Mutation {
     input: UpdateMembershipTypesModuleInput!
   ): UpdateMembershipTypesModulePayload
 
-  """Updates a single `SecretsModule` using a unique key and a patch."""
-  updateSecretsModule(
+  """Updates a single `UserStateModule` using a unique key and a patch."""
+  updateUserStateModule(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateSecretsModuleInput!
-  ): UpdateSecretsModulePayload
+    input: UpdateUserStateModuleInput!
+  ): UpdateUserStateModulePayload
 
   """
   Updates a single `AppPermissionDefault` using a unique key and a patch.
@@ -38241,22 +38252,6 @@ type Mutation {
     """
     input: UpdateAppOwnerGrantInput!
   ): UpdateAppOwnerGrantPayload
-
-  """Updates a single `AppAchievement` using a unique key and a patch."""
-  updateAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppAchievementInput!
-  ): UpdateAppAchievementPayload
-
-  """Updates a single `AppStep` using a unique key and a patch."""
-  updateAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppStepInput!
-  ): UpdateAppStepPayload
 
   """
   Updates a single `OrgPermissionDefault` using a unique key and a patch.
@@ -38450,6 +38445,14 @@ type Mutation {
     input: UpdateAppLimitCreditCodeItemInput!
   ): UpdateAppLimitCreditCodeItemPayload
 
+  """Updates a single `AppLimitWarning` using a unique key and a patch."""
+  updateAppLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitWarningInput!
+  ): UpdateAppLimitWarningPayload
+
   """Updates a single `Database` using a unique key and a patch."""
   updateDatabase(
     """
@@ -38492,6 +38495,14 @@ type Mutation {
     input: UpdateAppLimitCreditInput!
   ): UpdateAppLimitCreditPayload
 
+  """Updates a single `OrgLimitWarning` using a unique key and a patch."""
+  updateOrgLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitWarningInput!
+  ): UpdateOrgLimitWarningPayload
+
   """Updates a single `OrgLimitCredit` using a unique key and a patch."""
   updateOrgLimitCredit(
     """
@@ -38515,14 +38526,6 @@ type Mutation {
     """
     input: UpdateSiteMetadatumInput!
   ): UpdateSiteMetadatumPayload
-
-  """Updates a single `AppLevelRequirement` using a unique key and a patch."""
-  updateAppLevelRequirement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLevelRequirementInput!
-  ): UpdateAppLevelRequirementPayload
 
   """Updates a single `FullTextSearch` using a unique key and a patch."""
   updateFullTextSearch(
@@ -38730,14 +38733,6 @@ type Mutation {
     input: UpdateOrgGrantInput!
   ): UpdateOrgGrantPayload
 
-  """Updates a single `AppLevel` using a unique key and a patch."""
-  updateAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLevelInput!
-  ): UpdateAppLevelPayload
-
   """Updates a single `Blueprint` using a unique key and a patch."""
   updateBlueprint(
     """
@@ -38755,6 +38750,16 @@ type Mutation {
     """
     input: UpdateDenormalizedTableFieldInput!
   ): UpdateDenormalizedTableFieldPayload
+
+  """
+  Updates a single `RateLimitMetersModule` using a unique key and a patch.
+  """
+  updateRateLimitMetersModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRateLimitMetersModuleInput!
+  ): UpdateRateLimitMetersModulePayload
 
   """Updates a single `RealtimeModule` using a unique key and a patch."""
   updateRealtimeModule(
@@ -39012,14 +39017,6 @@ type Mutation {
     input: UpdatePolicyInput!
   ): UpdatePolicyPayload
 
-  """Updates a single `EmbeddingChunk` using a unique key and a patch."""
-  updateEmbeddingChunk(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateEmbeddingChunkInput!
-  ): UpdateEmbeddingChunkPayload
-
   """Updates a single `WebauthnSetting` using a unique key and a patch."""
   updateWebauthnSetting(
     """
@@ -39102,6 +39099,14 @@ type Mutation {
     input: UpdateOrgMembershipInput!
   ): UpdateOrgMembershipPayload
 
+  """Updates a single `EmbeddingChunk` using a unique key and a patch."""
+  updateEmbeddingChunk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateEmbeddingChunkInput!
+  ): UpdateEmbeddingChunkPayload
+
   """
   Updates a single `ForeignKeyConstraint` using a unique key and a patch.
   """
@@ -39127,14 +39132,6 @@ type Mutation {
     """
     input: UpdateEntityTypeProvisionInput!
   ): UpdateEntityTypeProvisionPayload
-
-  """Updates a single `LevelsModule` using a unique key and a patch."""
-  updateLevelsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateLevelsModuleInput!
-  ): UpdateLevelsModulePayload
 
   """Updates a single `UserAuthModule` using a unique key and a patch."""
   updateUserAuthModule(
@@ -39183,6 +39180,14 @@ type Mutation {
     """
     input: UpdateMembershipsModuleInput!
   ): UpdateMembershipsModulePayload
+
+  """Updates a single `EventsModule` using a unique key and a patch."""
+  updateEventsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateEventsModuleInput!
+  ): UpdateEventsModulePayload
 
   """Deletes a single `DefaultIdsModule` using a unique key."""
   deleteDefaultIdsModule(
@@ -39288,13 +39293,13 @@ type Mutation {
     input: DeleteMembershipTypesModuleInput!
   ): DeleteMembershipTypesModulePayload
 
-  """Deletes a single `SecretsModule` using a unique key."""
-  deleteSecretsModule(
+  """Deletes a single `UserStateModule` using a unique key."""
+  deleteUserStateModule(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteSecretsModuleInput!
-  ): DeleteSecretsModulePayload
+    input: DeleteUserStateModuleInput!
+  ): DeleteUserStateModulePayload
 
   """Deletes a single `AppPermissionDefault` using a unique key."""
   deleteAppPermissionDefault(
@@ -39383,22 +39388,6 @@ type Mutation {
     """
     input: DeleteAppOwnerGrantInput!
   ): DeleteAppOwnerGrantPayload
-
-  """Deletes a single `AppAchievement` using a unique key."""
-  deleteAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppAchievementInput!
-  ): DeleteAppAchievementPayload
-
-  """Deletes a single `AppStep` using a unique key."""
-  deleteAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppStepInput!
-  ): DeleteAppStepPayload
 
   """Deletes a single `OrgPermissionDefault` using a unique key."""
   deleteOrgPermissionDefault(
@@ -39584,6 +39573,14 @@ type Mutation {
     input: DeleteAppLimitCreditCodeItemInput!
   ): DeleteAppLimitCreditCodeItemPayload
 
+  """Deletes a single `AppLimitWarning` using a unique key."""
+  deleteAppLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitWarningInput!
+  ): DeleteAppLimitWarningPayload
+
   """Deletes a single `Database` using a unique key."""
   deleteDatabase(
     """
@@ -39624,6 +39621,14 @@ type Mutation {
     input: DeleteAppLimitCreditInput!
   ): DeleteAppLimitCreditPayload
 
+  """Deletes a single `OrgLimitWarning` using a unique key."""
+  deleteOrgLimitWarning(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitWarningInput!
+  ): DeleteOrgLimitWarningPayload
+
   """Deletes a single `OrgLimitCredit` using a unique key."""
   deleteOrgLimitCredit(
     """
@@ -39647,14 +39652,6 @@ type Mutation {
     """
     input: DeleteSiteMetadatumInput!
   ): DeleteSiteMetadatumPayload
-
-  """Deletes a single `AppLevelRequirement` using a unique key."""
-  deleteAppLevelRequirement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLevelRequirementInput!
-  ): DeleteAppLevelRequirementPayload
 
   """Deletes a single `FullTextSearch` using a unique key."""
   deleteFullTextSearch(
@@ -39856,14 +39853,6 @@ type Mutation {
     input: DeleteOrgGrantInput!
   ): DeleteOrgGrantPayload
 
-  """Deletes a single `AppLevel` using a unique key."""
-  deleteAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLevelInput!
-  ): DeleteAppLevelPayload
-
   """Deletes a single `Blueprint` using a unique key."""
   deleteBlueprint(
     """
@@ -39879,6 +39868,14 @@ type Mutation {
     """
     input: DeleteDenormalizedTableFieldInput!
   ): DeleteDenormalizedTableFieldPayload
+
+  """Deletes a single `RateLimitMetersModule` using a unique key."""
+  deleteRateLimitMetersModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRateLimitMetersModuleInput!
+  ): DeleteRateLimitMetersModulePayload
 
   """Deletes a single `RealtimeModule` using a unique key."""
   deleteRealtimeModule(
@@ -40128,14 +40125,6 @@ type Mutation {
     input: DeletePolicyInput!
   ): DeletePolicyPayload
 
-  """Deletes a single `EmbeddingChunk` using a unique key."""
-  deleteEmbeddingChunk(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteEmbeddingChunkInput!
-  ): DeleteEmbeddingChunkPayload
-
   """Deletes a single `WebauthnSetting` using a unique key."""
   deleteWebauthnSetting(
     """
@@ -40216,6 +40205,14 @@ type Mutation {
     input: DeleteOrgMembershipInput!
   ): DeleteOrgMembershipPayload
 
+  """Deletes a single `EmbeddingChunk` using a unique key."""
+  deleteEmbeddingChunk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteEmbeddingChunkInput!
+  ): DeleteEmbeddingChunkPayload
+
   """Deletes a single `ForeignKeyConstraint` using a unique key."""
   deleteForeignKeyConstraint(
     """
@@ -40239,14 +40236,6 @@ type Mutation {
     """
     input: DeleteEntityTypeProvisionInput!
   ): DeleteEntityTypeProvisionPayload
-
-  """Deletes a single `LevelsModule` using a unique key."""
-  deleteLevelsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteLevelsModuleInput!
-  ): DeleteLevelsModulePayload
 
   """Deletes a single `UserAuthModule` using a unique key."""
   deleteUserAuthModule(
@@ -40295,6 +40284,14 @@ type Mutation {
     """
     input: DeleteMembershipsModuleInput!
   ): DeleteMembershipsModulePayload
+
+  """Deletes a single `EventsModule` using a unique key."""
+  deleteEventsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteEventsModuleInput!
+  ): DeleteEventsModulePayload
 
   """
   Provision an S3 bucket for a logical bucket in the database.
@@ -42329,43 +42326,43 @@ input MembershipTypesModuleInput {
   tableName: String
 }
 
-"""The output of our create `SecretsModule` mutation."""
-type CreateSecretsModulePayload {
+"""The output of our create `UserStateModule` mutation."""
+type CreateUserStateModulePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `SecretsModule` that was created by this mutation."""
-  secretsModule: SecretsModule
+  """The `UserStateModule` that was created by this mutation."""
+  userStateModule: UserStateModule
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `SecretsModule`. May be used by Relay 1."""
-  secretsModuleEdge(
-    """The method to use when ordering `SecretsModule`."""
-    orderBy: [SecretsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SecretsModuleEdge
+  """An edge for our `UserStateModule`. May be used by Relay 1."""
+  userStateModuleEdge(
+    """The method to use when ordering `UserStateModule`."""
+    orderBy: [UserStateModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserStateModuleEdge
 }
 
-"""All input for the create `SecretsModule` mutation."""
-input CreateSecretsModuleInput {
+"""All input for the create `UserStateModule` mutation."""
+input CreateUserStateModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `SecretsModule` to be created by this mutation."""
-  secretsModule: SecretsModuleInput!
+  """The `UserStateModule` to be created by this mutation."""
+  userStateModule: UserStateModuleInput!
 }
 
-"""An input for mutations affecting `SecretsModule`"""
-input SecretsModuleInput {
+"""An input for mutations affecting `UserStateModule`"""
+input UserStateModuleInput {
   id: UUID
   databaseId: UUID!
   schemaId: UUID
@@ -42907,104 +42904,6 @@ input AppOwnerGrantInput {
   """The member receiving or losing the ownership grant"""
   actorId: UUID!
   grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `AppAchievement` mutation."""
-type CreateAppAchievementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` that was created by this mutation."""
-  appAchievement: AppAchievement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppAchievement`. May be used by Relay 1."""
-  appAchievementEdge(
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppAchievementEdge
-}
-
-"""All input for the create `AppAchievement` mutation."""
-input CreateAppAchievementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` to be created by this mutation."""
-  appAchievement: AppAchievementInput!
-}
-
-"""An input for mutations affecting `AppAchievement`"""
-input AppAchievementInput {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement being tracked"""
-  name: String!
-
-  """Cumulative count of completed steps toward this requirement"""
-  count: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `AppStep` mutation."""
-type CreateAppStepPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppStep` that was created by this mutation."""
-  appStep: AppStep
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppStep`. May be used by Relay 1."""
-  appStepEdge(
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppStepEdge
-}
-
-"""All input for the create `AppStep` mutation."""
-input CreateAppStepInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppStep` to be created by this mutation."""
-  appStep: AppStepInput!
-}
-
-"""An input for mutations affecting `AppStep`"""
-input AppStepInput {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement this step fulfills"""
-  name: String!
-
-  """Number of units completed in this step action"""
-  count: Int
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -44198,6 +44097,62 @@ input AppLimitCreditCodeItemInput {
   creditType: String
 }
 
+"""The output of our create `AppLimitWarning` mutation."""
+type CreateAppLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitWarning` that was created by this mutation."""
+  appLimitWarning: AppLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitWarning`. May be used by Relay 1."""
+  appLimitWarningEdge(
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningEdge
+}
+
+"""All input for the create `AppLimitWarning` mutation."""
+input CreateAppLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitWarning` to be created by this mutation."""
+  appLimitWarning: AppLimitWarningInput!
+}
+
+"""An input for mutations affecting `AppLimitWarning`"""
+input AppLimitWarningInput {
+  id: UUID
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String!
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
+}
+
 """The output of our create `UserConnectedAccount` mutation."""
 type CreateUserConnectedAccountPayload {
   """
@@ -44515,6 +44470,65 @@ input AppLimitCreditInput {
   reason: String
 }
 
+"""The output of our create `OrgLimitWarning` mutation."""
+type CreateOrgLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` that was created by this mutation."""
+  orgLimitWarning: OrgLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitWarning`. May be used by Relay 1."""
+  orgLimitWarningEdge(
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningEdge
+}
+
+"""All input for the create `OrgLimitWarning` mutation."""
+input CreateOrgLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` to be created by this mutation."""
+  orgLimitWarning: OrgLimitWarningInput!
+}
+
+"""An input for mutations affecting `OrgLimitWarning`"""
+input OrgLimitWarningInput {
+  id: UUID
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String!
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String!
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt!
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String!
+
+  """Per-entity override (NULL = scope default for all entities)"""
+  entityId: UUID
+}
+
 """The output of our create `OrgLimitCredit` mutation."""
 type CreateOrgLimitCreditPayload {
   """
@@ -44675,63 +44689,6 @@ input SiteMetadatumInput {
 
   """Open Graph image for social media previews"""
   ogImage: ConstructiveInternalTypeImage
-}
-
-"""The output of our create `AppLevelRequirement` mutation."""
-type CreateAppLevelRequirementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevelRequirement` that was created by this mutation."""
-  appLevelRequirement: AppLevelRequirement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
-}
-
-"""All input for the create `AppLevelRequirement` mutation."""
-input CreateAppLevelRequirementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppLevelRequirement` to be created by this mutation."""
-  appLevelRequirement: AppLevelRequirementInput!
-}
-
-"""An input for mutations affecting `AppLevelRequirement`"""
-input AppLevelRequirementInput {
-  id: UUID
-
-  """Name identifier of the requirement (matches step names)"""
-  name: String!
-
-  """Name of the level this requirement belongs to"""
-  level: String!
-
-  """Human-readable description of what this requirement entails"""
-  description: String
-
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int
-
-  """Display ordering priority; lower values appear first"""
-  priority: Int
-  createdAt: Datetime
-  updatedAt: Datetime
 }
 
 """The output of our create `FullTextSearch` mutation."""
@@ -46087,10 +46044,10 @@ input PartitionInput {
   databaseId: UUID!
   tableId: UUID!
   strategy: String!
-  partitionKeyIds: [UUID]!
+  partitionKeyId: UUID!
   interval: String
   retention: String
-  lookahead: Int
+  premake: Int
   namingPattern: String
   createdAt: Datetime
   updatedAt: Datetime
@@ -46334,60 +46291,6 @@ input OrgGrantInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `AppLevel` mutation."""
-type CreateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was created by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the create `AppLevel` mutation."""
-input CreateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` to be created by this mutation."""
-  appLevel: AppLevelInput!
-}
-
-"""An input for mutations affecting `AppLevel`"""
-input AppLevelInput {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `Blueprint` mutation."""
 type CreateBlueprintPayload {
   """
@@ -46523,6 +46426,57 @@ input DenormalizedTableFieldInput {
   funcOrder: Int
 }
 
+"""The output of our create `RateLimitMetersModule` mutation."""
+type CreateRateLimitMetersModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RateLimitMetersModule` that was created by this mutation."""
+  rateLimitMetersModule: RateLimitMetersModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RateLimitMetersModule`. May be used by Relay 1."""
+  rateLimitMetersModuleEdge(
+    """The method to use when ordering `RateLimitMetersModule`."""
+    orderBy: [RateLimitMetersModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RateLimitMetersModuleEdge
+}
+
+"""All input for the create `RateLimitMetersModule` mutation."""
+input CreateRateLimitMetersModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RateLimitMetersModule` to be created by this mutation."""
+  rateLimitMetersModule: RateLimitMetersModuleInput!
+}
+
+"""An input for mutations affecting `RateLimitMetersModule`"""
+input RateLimitMetersModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  rateLimitStateTableId: UUID
+  rateLimitStateTableName: String
+  rateLimitOverridesTableId: UUID
+  rateLimitOverridesTableName: String
+  rateWindowLimitsTableId: UUID
+  rateWindowLimitsTableName: String
+  checkRateLimitFunction: String
+  prefix: String
+}
+
 """The output of our create `RealtimeModule` mutation."""
 type CreateRealtimeModulePayload {
   """
@@ -46569,8 +46523,8 @@ input RealtimeModuleInput {
   listenerNodeTableId: UUID
   sourceRegistryTableId: UUID
   retentionHours: Int
-  lookaheadHours: Int
-  partitionInterval: String
+  premake: Int
+  interval: String
   notifyChannel: String
 }
 
@@ -48626,63 +48580,6 @@ input PolicyInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `EmbeddingChunk` mutation."""
-type CreateEmbeddingChunkPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `EmbeddingChunk` that was created by this mutation."""
-  embeddingChunk: EmbeddingChunk
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `EmbeddingChunk`. May be used by Relay 1."""
-  embeddingChunkEdge(
-    """The method to use when ordering `EmbeddingChunk`."""
-    orderBy: [EmbeddingChunkOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): EmbeddingChunkEdge
-}
-
-"""All input for the create `EmbeddingChunk` mutation."""
-input CreateEmbeddingChunkInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `EmbeddingChunk` to be created by this mutation."""
-  embeddingChunk: EmbeddingChunkInput!
-}
-
-"""An input for mutations affecting `EmbeddingChunk`"""
-input EmbeddingChunkInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  embeddingFieldId: UUID
-  chunksTableId: UUID
-  chunksTableName: String
-  contentFieldName: String
-  dimensions: Int
-  metric: String
-  chunkSize: Int
-  chunkOverlap: Int
-  chunkStrategy: String
-  metadataFields: JSON
-  enqueueChunkingJob: Boolean
-  chunkingTaskName: String
-  parentFkFieldId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `WebauthnSetting` mutation."""
 type CreateWebauthnSettingPayload {
   """
@@ -49450,6 +49347,66 @@ input OrgMembershipInput {
   profileId: UUID
 }
 
+"""The output of our create `EmbeddingChunk` mutation."""
+type CreateEmbeddingChunkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmbeddingChunk` that was created by this mutation."""
+  embeddingChunk: EmbeddingChunk
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `EmbeddingChunk`. May be used by Relay 1."""
+  embeddingChunkEdge(
+    """The method to use when ordering `EmbeddingChunk`."""
+    orderBy: [EmbeddingChunkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmbeddingChunkEdge
+}
+
+"""All input for the create `EmbeddingChunk` mutation."""
+input CreateEmbeddingChunkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `EmbeddingChunk` to be created by this mutation."""
+  embeddingChunk: EmbeddingChunkInput!
+}
+
+"""An input for mutations affecting `EmbeddingChunk`"""
+input EmbeddingChunkInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  embeddingFieldId: UUID
+  chunksTableId: UUID
+  chunksTableName: String
+  contentFieldName: String
+  dimensions: Int
+  metric: String
+  chunkSize: Int
+  chunkOverlap: Int
+  chunkStrategy: String
+  metadataFields: JSON
+  searchIndexes: JSON
+  enqueueChunkingJob: Boolean
+  chunkingTaskName: String
+  embeddingModel: String
+  embeddingProvider: String
+  parentFkFieldId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our create `ForeignKeyConstraint` mutation."""
 type CreateForeignKeyConstraintPayload {
   """
@@ -49816,7 +49773,7 @@ input EntityTypeProvisionInput {
   hasProfiles: Boolean
 
   """
-  Whether to provision levels_module for this type. Defaults to false.
+  Whether to provision events_module for this type. Defaults to false.
        Levels provide gamification/achievement tracking for members.
        When true, creates level steps, achievements, and level tables with security.
   """
@@ -49840,6 +49797,17 @@ input EntityTypeProvisionInput {
        ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
   """
   hasInvites: Boolean
+
+  """
+  Whether to auto-attach an EventTracker to the claimed_invites table for invite-based
+       achievements. Defaults to false. Requires has_invites=true AND has_levels=true.
+       When true, the trigger calls event_tracker() on the claimed_invites table with
+       event_name='invite_claimed', actor_field='sender_id', events=['INSERT'],
+       crediting the SENDER (inviter) when someone claims their invite code.
+       Developers can then define achievements in the blueprint achievements[] section
+       that reference the 'invite_claimed' event (e.g., "Invite 5 friends" = count: 5).
+  """
+  hasInviteAchievements: Boolean
 
   """
   Optional jsonb object for storage module configuration and initial bucket seeding.
@@ -49968,71 +49936,6 @@ input EntityTypeProvisionInput {
        (i.e. the invites_module row was created in a previous run).
   """
   outInvitesModuleId: UUID
-}
-
-"""The output of our create `LevelsModule` mutation."""
-type CreateLevelsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `LevelsModule` that was created by this mutation."""
-  levelsModule: LevelsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `LevelsModule`. May be used by Relay 1."""
-  levelsModuleEdge(
-    """The method to use when ordering `LevelsModule`."""
-    orderBy: [LevelsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): LevelsModuleEdge
-}
-
-"""All input for the create `LevelsModule` mutation."""
-input CreateLevelsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `LevelsModule` to be created by this mutation."""
-  levelsModule: LevelsModuleInput!
-}
-
-"""An input for mutations affecting `LevelsModule`"""
-input LevelsModuleInput {
-  id: UUID
-  databaseId: UUID!
-  schemaId: UUID
-  privateSchemaId: UUID
-  stepsTableId: UUID
-  stepsTableName: String
-  achievementsTableId: UUID
-  achievementsTableName: String
-  levelsTableId: UUID
-  levelsTableName: String
-  levelRequirementsTableId: UUID
-  levelRequirementsTableName: String
-  completedStep: String
-  incompletedStep: String
-  tgAchievement: String
-  tgAchievementToggle: String
-  tgAchievementToggleBoolean: String
-  tgAchievementBoolean: String
-  upsertAchievement: String
-  tgUpdateAchievements: String
-  stepsRequired: String
-  levelAchieved: String
-  prefix: String
-  membershipType: Int!
-  entityTableId: UUID
-  actorTableId: UUID
 }
 
 """The output of our create `UserAuthModule` mutation."""
@@ -50286,6 +50189,10 @@ input LimitsModuleInput {
   limitCapsDefaultsTableId: UUID
   capCheckTrigger: String
   resolveCapFunction: String
+  limitWarningsTableId: UUID
+  limitWarningStateTableId: UUID
+  limitCheckSoftFunction: String
+  limitAggregateCheckSoftFunction: String
   prefix: String
   membershipType: Int!
   entityTableId: UUID
@@ -50435,6 +50342,84 @@ input MembershipsModuleInput {
   entityIdsByPerm: String
   entityIdsFunction: String
   memberProfilesTableId: UUID
+}
+
+"""The output of our create `EventsModule` mutation."""
+type CreateEventsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EventsModule` that was created by this mutation."""
+  eventsModule: EventsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `EventsModule`. May be used by Relay 1."""
+  eventsModuleEdge(
+    """The method to use when ordering `EventsModule`."""
+    orderBy: [EventsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EventsModuleEdge
+}
+
+"""All input for the create `EventsModule` mutation."""
+input CreateEventsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `EventsModule` to be created by this mutation."""
+  eventsModule: EventsModuleInput!
+}
+
+"""An input for mutations affecting `EventsModule`"""
+input EventsModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  eventsTableId: UUID
+  eventsTableName: String
+  eventAggregatesTableId: UUID
+  eventAggregatesTableName: String
+  eventTypesTableId: UUID
+  eventTypesTableName: String
+  levelsTableId: UUID
+  levelsTableName: String
+  levelRequirementsTableId: UUID
+  levelRequirementsTableName: String
+  levelGrantsTableId: UUID
+  levelGrantsTableName: String
+  achievementRewardsTableId: UUID
+  achievementRewardsTableName: String
+  recordEvent: String
+  removeEvent: String
+  tgEvent: String
+  tgEventToggle: String
+  tgEventToggleBool: String
+  tgEventBool: String
+  upsertAggregate: String
+  tgUpdateAggregates: String
+  pruneEvents: String
+  stepsRequired: String
+  levelAchieved: String
+  tgCheckAchievements: String
+  grantAchievement: String
+  tgAchievementReward: String
+  interval: String
+  retention: String
+  premake: Int
+  prefix: String
+  membershipType: Int!
+  entityTableId: UUID
+  actorTableId: UUID
 }
 
 """The output of our update `DefaultIdsModule` mutation."""
@@ -51112,31 +51097,31 @@ input MembershipTypesModulePatch {
   tableName: String
 }
 
-"""The output of our update `SecretsModule` mutation."""
-type UpdateSecretsModulePayload {
+"""The output of our update `UserStateModule` mutation."""
+type UpdateUserStateModulePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `SecretsModule` that was updated by this mutation."""
-  secretsModule: SecretsModule
+  """The `UserStateModule` that was updated by this mutation."""
+  userStateModule: UserStateModule
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `SecretsModule`. May be used by Relay 1."""
-  secretsModuleEdge(
-    """The method to use when ordering `SecretsModule`."""
-    orderBy: [SecretsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SecretsModuleEdge
+  """An edge for our `UserStateModule`. May be used by Relay 1."""
+  userStateModuleEdge(
+    """The method to use when ordering `UserStateModule`."""
+    orderBy: [UserStateModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserStateModuleEdge
 }
 
-"""All input for the `updateSecretsModule` mutation."""
-input UpdateSecretsModuleInput {
+"""All input for the `updateUserStateModule` mutation."""
+input UpdateUserStateModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -51145,15 +51130,15 @@ input UpdateSecretsModuleInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `SecretsModule` being updated.
+  An object where the defined keys will be set on the `UserStateModule` being updated.
   """
-  secretsModulePatch: SecretsModulePatch!
+  userStateModulePatch: UserStateModulePatch!
 }
 
 """
-Represents an update to a `SecretsModule`. Fields that are set will be updated.
+Represents an update to a `UserStateModule`. Fields that are set will be updated.
 """
-input SecretsModulePatch {
+input UserStateModulePatch {
   id: UUID
   databaseId: UUID
   schemaId: UUID
@@ -51754,114 +51739,6 @@ input AppOwnerGrantPatch {
   """The member receiving or losing the ownership grant"""
   actorId: UUID
   grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `AppAchievement` mutation."""
-type UpdateAppAchievementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` that was updated by this mutation."""
-  appAchievement: AppAchievement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppAchievement`. May be used by Relay 1."""
-  appAchievementEdge(
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppAchievementEdge
-}
-
-"""All input for the `updateAppAchievement` mutation."""
-input UpdateAppAchievementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppAchievement` being updated.
-  """
-  appAchievementPatch: AppAchievementPatch!
-}
-
-"""
-Represents an update to a `AppAchievement`. Fields that are set will be updated.
-"""
-input AppAchievementPatch {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement being tracked"""
-  name: String
-
-  """Cumulative count of completed steps toward this requirement"""
-  count: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `AppStep` mutation."""
-type UpdateAppStepPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppStep` that was updated by this mutation."""
-  appStep: AppStep
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppStep`. May be used by Relay 1."""
-  appStepEdge(
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppStepEdge
-}
-
-"""All input for the `updateAppStep` mutation."""
-input UpdateAppStepInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppStep` being updated.
-  """
-  appStepPatch: AppStepPatch!
-}
-
-"""
-Represents an update to a `AppStep`. Fields that are set will be updated.
-"""
-input AppStepPatch {
-  id: UUID
-  actorId: UUID
-
-  """Name identifier of the level requirement this step fulfills"""
-  name: String
-
-  """Number of units completed in this step action"""
-  count: Int
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -53138,6 +53015,67 @@ input AppLimitCreditCodeItemPatch {
   creditType: String
 }
 
+"""The output of our update `AppLimitWarning` mutation."""
+type UpdateAppLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitWarning` that was updated by this mutation."""
+  appLimitWarning: AppLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitWarning`. May be used by Relay 1."""
+  appLimitWarningEdge(
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningEdge
+}
+
+"""All input for the `updateAppLimitWarning` mutation."""
+input UpdateAppLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitWarning` being updated.
+  """
+  appLimitWarningPatch: AppLimitWarningPatch!
+}
+
+"""
+Represents an update to a `AppLimitWarning`. Fields that are set will be updated.
+"""
+input AppLimitWarningPatch {
+  id: UUID
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String
+}
+
 """The output of our update `Database` mutation."""
 type UpdateDatabasePayload {
   """
@@ -53439,6 +53377,70 @@ input AppLimitCreditPatch {
   reason: String
 }
 
+"""The output of our update `OrgLimitWarning` mutation."""
+type UpdateOrgLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` that was updated by this mutation."""
+  orgLimitWarning: OrgLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitWarning`. May be used by Relay 1."""
+  orgLimitWarningEdge(
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningEdge
+}
+
+"""All input for the `updateOrgLimitWarning` mutation."""
+input UpdateOrgLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimitWarning` being updated.
+  """
+  orgLimitWarningPatch: OrgLimitWarningPatch!
+}
+
+"""
+Represents an update to a `OrgLimitWarning`. Fields that are set will be updated.
+"""
+input OrgLimitWarningPatch {
+  id: UUID
+
+  """Limit name this warning applies to (must match a default_limits entry)"""
+  name: String
+
+  """Threshold type: absolute (fixed count) or percentage (of max)"""
+  warningType: String
+
+  """
+  Threshold value — either an absolute count or a percentage (1-100) depending on warning_type
+  """
+  thresholdValue: BigInt
+
+  """
+  Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit)
+  """
+  taskIdentifier: String
+
+  """Per-entity override (NULL = scope default for all entities)"""
+  entityId: UUID
+}
+
 """The output of our update `OrgLimitCredit` mutation."""
 type UpdateOrgLimitCreditPayload {
   """
@@ -53624,68 +53626,6 @@ input SiteMetadatumPatch {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
-
-"""The output of our update `AppLevelRequirement` mutation."""
-type UpdateAppLevelRequirementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevelRequirement` that was updated by this mutation."""
-  appLevelRequirement: AppLevelRequirement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
-}
-
-"""All input for the `updateAppLevelRequirement` mutation."""
-input UpdateAppLevelRequirementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppLevelRequirement` being updated.
-  """
-  appLevelRequirementPatch: AppLevelRequirementPatch!
-}
-
-"""
-Represents an update to a `AppLevelRequirement`. Fields that are set will be updated.
-"""
-input AppLevelRequirementPatch {
-  id: UUID
-
-  """Name identifier of the requirement (matches step names)"""
-  name: String
-
-  """Name of the level this requirement belongs to"""
-  level: String
-
-  """Human-readable description of what this requirement entails"""
-  description: String
-
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int
-
-  """Display ordering priority; lower values appear first"""
-  priority: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
 
 """The output of our update `FullTextSearch` mutation."""
 type UpdateFullTextSearchPayload {
@@ -55034,10 +54974,10 @@ input PartitionPatch {
   databaseId: UUID
   tableId: UUID
   strategy: String
-  partitionKeyIds: [UUID]
+  partitionKeyId: UUID
   interval: String
   retention: String
-  lookahead: Int
+  premake: Int
   namingPattern: String
   createdAt: Datetime
   updatedAt: Datetime
@@ -55303,68 +55243,6 @@ input OrgGrantPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `AppLevel` mutation."""
-type UpdateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was updated by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `updateAppLevel` mutation."""
-input UpdateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppLevel` being updated.
-  """
-  appLevelPatch: AppLevelPatch!
-}
-
-"""
-Represents an update to a `AppLevel`. Fields that are set will be updated.
-"""
-input AppLevelPatch {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Upload for Badge or icon image associated with this level"""
-  imageUpload: Upload
-}
-
 """The output of our update `Blueprint` mutation."""
 type UpdateBlueprintPayload {
   """
@@ -55512,6 +55390,62 @@ input DenormalizedTableFieldPatch {
   funcOrder: Int
 }
 
+"""The output of our update `RateLimitMetersModule` mutation."""
+type UpdateRateLimitMetersModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RateLimitMetersModule` that was updated by this mutation."""
+  rateLimitMetersModule: RateLimitMetersModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RateLimitMetersModule`. May be used by Relay 1."""
+  rateLimitMetersModuleEdge(
+    """The method to use when ordering `RateLimitMetersModule`."""
+    orderBy: [RateLimitMetersModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RateLimitMetersModuleEdge
+}
+
+"""All input for the `updateRateLimitMetersModule` mutation."""
+input UpdateRateLimitMetersModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `RateLimitMetersModule` being updated.
+  """
+  rateLimitMetersModulePatch: RateLimitMetersModulePatch!
+}
+
+"""
+Represents an update to a `RateLimitMetersModule`. Fields that are set will be updated.
+"""
+input RateLimitMetersModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  rateLimitStateTableId: UUID
+  rateLimitStateTableName: String
+  rateLimitOverridesTableId: UUID
+  rateLimitOverridesTableName: String
+  rateWindowLimitsTableId: UUID
+  rateWindowLimitsTableName: String
+  checkRateLimitFunction: String
+  prefix: String
+}
+
 """The output of our update `RealtimeModule` mutation."""
 type UpdateRealtimeModulePayload {
   """
@@ -55563,8 +55497,8 @@ input RealtimeModulePatch {
   listenerNodeTableId: UUID
   sourceRegistryTableId: UUID
   retentionHours: Int
-  lookaheadHours: Int
-  partitionInterval: String
+  premake: Int
+  interval: String
   notifyChannel: String
 }
 
@@ -57699,68 +57633,6 @@ input PolicyPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `EmbeddingChunk` mutation."""
-type UpdateEmbeddingChunkPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `EmbeddingChunk` that was updated by this mutation."""
-  embeddingChunk: EmbeddingChunk
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `EmbeddingChunk`. May be used by Relay 1."""
-  embeddingChunkEdge(
-    """The method to use when ordering `EmbeddingChunk`."""
-    orderBy: [EmbeddingChunkOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): EmbeddingChunkEdge
-}
-
-"""All input for the `updateEmbeddingChunk` mutation."""
-input UpdateEmbeddingChunkInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `EmbeddingChunk` being updated.
-  """
-  embeddingChunkPatch: EmbeddingChunkPatch!
-}
-
-"""
-Represents an update to a `EmbeddingChunk`. Fields that are set will be updated.
-"""
-input EmbeddingChunkPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  embeddingFieldId: UUID
-  chunksTableId: UUID
-  chunksTableName: String
-  contentFieldName: String
-  dimensions: Int
-  metric: String
-  chunkSize: Int
-  chunkOverlap: Int
-  chunkStrategy: String
-  metadataFields: JSON
-  enqueueChunkingJob: Boolean
-  chunkingTaskName: String
-  parentFkFieldId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our update `WebauthnSetting` mutation."""
 type UpdateWebauthnSettingPayload {
   """
@@ -58582,6 +58454,71 @@ input OrgMembershipPatch {
   profileId: UUID
 }
 
+"""The output of our update `EmbeddingChunk` mutation."""
+type UpdateEmbeddingChunkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmbeddingChunk` that was updated by this mutation."""
+  embeddingChunk: EmbeddingChunk
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `EmbeddingChunk`. May be used by Relay 1."""
+  embeddingChunkEdge(
+    """The method to use when ordering `EmbeddingChunk`."""
+    orderBy: [EmbeddingChunkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmbeddingChunkEdge
+}
+
+"""All input for the `updateEmbeddingChunk` mutation."""
+input UpdateEmbeddingChunkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `EmbeddingChunk` being updated.
+  """
+  embeddingChunkPatch: EmbeddingChunkPatch!
+}
+
+"""
+Represents an update to a `EmbeddingChunk`. Fields that are set will be updated.
+"""
+input EmbeddingChunkPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  embeddingFieldId: UUID
+  chunksTableId: UUID
+  chunksTableName: String
+  contentFieldName: String
+  dimensions: Int
+  metric: String
+  chunkSize: Int
+  chunkOverlap: Int
+  chunkStrategy: String
+  metadataFields: JSON
+  searchIndexes: JSON
+  enqueueChunkingJob: Boolean
+  chunkingTaskName: String
+  embeddingModel: String
+  embeddingProvider: String
+  parentFkFieldId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our update `ForeignKeyConstraint` mutation."""
 type UpdateForeignKeyConstraintPayload {
   """
@@ -58967,7 +58904,7 @@ input EntityTypeProvisionPatch {
   hasProfiles: Boolean
 
   """
-  Whether to provision levels_module for this type. Defaults to false.
+  Whether to provision events_module for this type. Defaults to false.
        Levels provide gamification/achievement tracking for members.
        When true, creates level steps, achievements, and level tables with security.
   """
@@ -58991,6 +58928,17 @@ input EntityTypeProvisionPatch {
        ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
   """
   hasInvites: Boolean
+
+  """
+  Whether to auto-attach an EventTracker to the claimed_invites table for invite-based
+       achievements. Defaults to false. Requires has_invites=true AND has_levels=true.
+       When true, the trigger calls event_tracker() on the claimed_invites table with
+       event_name='invite_claimed', actor_field='sender_id', events=['INSERT'],
+       crediting the SENDER (inviter) when someone claims their invite code.
+       Developers can then define achievements in the blueprint achievements[] section
+       that reference the 'invite_claimed' event (e.g., "Invite 5 friends" = count: 5).
+  """
+  hasInviteAchievements: Boolean
 
   """
   Optional jsonb object for storage module configuration and initial bucket seeding.
@@ -59119,76 +59067,6 @@ input EntityTypeProvisionPatch {
        (i.e. the invites_module row was created in a previous run).
   """
   outInvitesModuleId: UUID
-}
-
-"""The output of our update `LevelsModule` mutation."""
-type UpdateLevelsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `LevelsModule` that was updated by this mutation."""
-  levelsModule: LevelsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `LevelsModule`. May be used by Relay 1."""
-  levelsModuleEdge(
-    """The method to use when ordering `LevelsModule`."""
-    orderBy: [LevelsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): LevelsModuleEdge
-}
-
-"""All input for the `updateLevelsModule` mutation."""
-input UpdateLevelsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `LevelsModule` being updated.
-  """
-  levelsModulePatch: LevelsModulePatch!
-}
-
-"""
-Represents an update to a `LevelsModule`. Fields that are set will be updated.
-"""
-input LevelsModulePatch {
-  id: UUID
-  databaseId: UUID
-  schemaId: UUID
-  privateSchemaId: UUID
-  stepsTableId: UUID
-  stepsTableName: String
-  achievementsTableId: UUID
-  achievementsTableName: String
-  levelsTableId: UUID
-  levelsTableName: String
-  levelRequirementsTableId: UUID
-  levelRequirementsTableName: String
-  completedStep: String
-  incompletedStep: String
-  tgAchievement: String
-  tgAchievementToggle: String
-  tgAchievementToggleBoolean: String
-  tgAchievementBoolean: String
-  upsertAchievement: String
-  tgUpdateAchievements: String
-  stepsRequired: String
-  levelAchieved: String
-  prefix: String
-  membershipType: Int
-  entityTableId: UUID
-  actorTableId: UUID
 }
 
 """The output of our update `UserAuthModule` mutation."""
@@ -59462,6 +59340,10 @@ input LimitsModulePatch {
   limitCapsDefaultsTableId: UUID
   capCheckTrigger: String
   resolveCapFunction: String
+  limitWarningsTableId: UUID
+  limitWarningStateTableId: UUID
+  limitCheckSoftFunction: String
+  limitAggregateCheckSoftFunction: String
   prefix: String
   membershipType: Int
   entityTableId: UUID
@@ -59621,6 +59503,89 @@ input MembershipsModulePatch {
   entityIdsByPerm: String
   entityIdsFunction: String
   memberProfilesTableId: UUID
+}
+
+"""The output of our update `EventsModule` mutation."""
+type UpdateEventsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EventsModule` that was updated by this mutation."""
+  eventsModule: EventsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `EventsModule`. May be used by Relay 1."""
+  eventsModuleEdge(
+    """The method to use when ordering `EventsModule`."""
+    orderBy: [EventsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EventsModuleEdge
+}
+
+"""All input for the `updateEventsModule` mutation."""
+input UpdateEventsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `EventsModule` being updated.
+  """
+  eventsModulePatch: EventsModulePatch!
+}
+
+"""
+Represents an update to a `EventsModule`. Fields that are set will be updated.
+"""
+input EventsModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  eventsTableId: UUID
+  eventsTableName: String
+  eventAggregatesTableId: UUID
+  eventAggregatesTableName: String
+  eventTypesTableId: UUID
+  eventTypesTableName: String
+  levelsTableId: UUID
+  levelsTableName: String
+  levelRequirementsTableId: UUID
+  levelRequirementsTableName: String
+  levelGrantsTableId: UUID
+  levelGrantsTableName: String
+  achievementRewardsTableId: UUID
+  achievementRewardsTableName: String
+  recordEvent: String
+  removeEvent: String
+  tgEvent: String
+  tgEventToggle: String
+  tgEventToggleBool: String
+  tgEventBool: String
+  upsertAggregate: String
+  tgUpdateAggregates: String
+  pruneEvents: String
+  stepsRequired: String
+  levelAchieved: String
+  tgCheckAchievements: String
+  grantAchievement: String
+  tgAchievementReward: String
+  interval: String
+  retention: String
+  premake: Int
+  prefix: String
+  membershipType: Int
+  entityTableId: UUID
+  actorTableId: UUID
 }
 
 """The output of our delete `DefaultIdsModule` mutation."""
@@ -60063,31 +60028,31 @@ input DeleteMembershipTypesModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `SecretsModule` mutation."""
-type DeleteSecretsModulePayload {
+"""The output of our delete `UserStateModule` mutation."""
+type DeleteUserStateModulePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `SecretsModule` that was deleted by this mutation."""
-  secretsModule: SecretsModule
+  """The `UserStateModule` that was deleted by this mutation."""
+  userStateModule: UserStateModule
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `SecretsModule`. May be used by Relay 1."""
-  secretsModuleEdge(
-    """The method to use when ordering `SecretsModule`."""
-    orderBy: [SecretsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SecretsModuleEdge
+  """An edge for our `UserStateModule`. May be used by Relay 1."""
+  userStateModuleEdge(
+    """The method to use when ordering `UserStateModule`."""
+    orderBy: [UserStateModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserStateModuleEdge
 }
 
-"""All input for the `deleteSecretsModule` mutation."""
-input DeleteSecretsModuleInput {
+"""All input for the `deleteUserStateModule` mutation."""
+input DeleteUserStateModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -60455,72 +60420,6 @@ type DeleteAppOwnerGrantPayload {
 
 """All input for the `deleteAppOwnerGrant` mutation."""
 input DeleteAppOwnerGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppAchievement` mutation."""
-type DeleteAppAchievementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppAchievement` that was deleted by this mutation."""
-  appAchievement: AppAchievement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppAchievement`. May be used by Relay 1."""
-  appAchievementEdge(
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppAchievementEdge
-}
-
-"""All input for the `deleteAppAchievement` mutation."""
-input DeleteAppAchievementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppStep` mutation."""
-type DeleteAppStepPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppStep` that was deleted by this mutation."""
-  appStep: AppStep
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppStep`. May be used by Relay 1."""
-  appStepEdge(
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppStepEdge
-}
-
-"""All input for the `deleteAppStep` mutation."""
-input DeleteAppStepInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -61294,6 +61193,39 @@ input DeleteAppLimitCreditCodeItemInput {
   id: UUID!
 }
 
+"""The output of our delete `AppLimitWarning` mutation."""
+type DeleteAppLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitWarning` that was deleted by this mutation."""
+  appLimitWarning: AppLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitWarning`. May be used by Relay 1."""
+  appLimitWarningEdge(
+    """The method to use when ordering `AppLimitWarning`."""
+    orderBy: [AppLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitWarningEdge
+}
+
+"""All input for the `deleteAppLimitWarning` mutation."""
+input DeleteAppLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `Database` mutation."""
 type DeleteDatabasePayload {
   """
@@ -61459,6 +61391,39 @@ input DeleteAppLimitCreditInput {
   id: UUID!
 }
 
+"""The output of our delete `OrgLimitWarning` mutation."""
+type DeleteOrgLimitWarningPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitWarning` that was deleted by this mutation."""
+  orgLimitWarning: OrgLimitWarning
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitWarning`. May be used by Relay 1."""
+  orgLimitWarningEdge(
+    """The method to use when ordering `OrgLimitWarning`."""
+    orderBy: [OrgLimitWarningOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitWarningEdge
+}
+
+"""All input for the `deleteOrgLimitWarning` mutation."""
+input DeleteOrgLimitWarningInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `OrgLimitCredit` mutation."""
 type DeleteOrgLimitCreditPayload {
   """
@@ -61558,39 +61523,6 @@ input DeleteSiteMetadatumInput {
   clientMutationId: String
 
   """Unique identifier for this metadata record"""
-  id: UUID!
-}
-
-"""The output of our delete `AppLevelRequirement` mutation."""
-type DeleteAppLevelRequirementPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevelRequirement` that was deleted by this mutation."""
-  appLevelRequirement: AppLevelRequirement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
-}
-
-"""All input for the `deleteAppLevelRequirement` mutation."""
-input DeleteAppLevelRequirementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
   id: UUID!
 }
 
@@ -62432,39 +62364,6 @@ input DeleteOrgGrantInput {
   id: UUID!
 }
 
-"""The output of our delete `AppLevel` mutation."""
-type DeleteAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was deleted by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `deleteAppLevel` mutation."""
-input DeleteAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `Blueprint` mutation."""
 type DeleteBlueprintPayload {
   """
@@ -62525,6 +62424,39 @@ type DeleteDenormalizedTableFieldPayload {
 
 """All input for the `deleteDenormalizedTableField` mutation."""
 input DeleteDenormalizedTableFieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `RateLimitMetersModule` mutation."""
+type DeleteRateLimitMetersModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RateLimitMetersModule` that was deleted by this mutation."""
+  rateLimitMetersModule: RateLimitMetersModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RateLimitMetersModule`. May be used by Relay 1."""
+  rateLimitMetersModuleEdge(
+    """The method to use when ordering `RateLimitMetersModule`."""
+    orderBy: [RateLimitMetersModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RateLimitMetersModuleEdge
+}
+
+"""All input for the `deleteRateLimitMetersModule` mutation."""
+input DeleteRateLimitMetersModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -63566,39 +63498,6 @@ input DeletePolicyInput {
   id: UUID!
 }
 
-"""The output of our delete `EmbeddingChunk` mutation."""
-type DeleteEmbeddingChunkPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `EmbeddingChunk` that was deleted by this mutation."""
-  embeddingChunk: EmbeddingChunk
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `EmbeddingChunk`. May be used by Relay 1."""
-  embeddingChunkEdge(
-    """The method to use when ordering `EmbeddingChunk`."""
-    orderBy: [EmbeddingChunkOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): EmbeddingChunkEdge
-}
-
-"""All input for the `deleteEmbeddingChunk` mutation."""
-input DeleteEmbeddingChunkInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `WebauthnSetting` mutation."""
 type DeleteWebauthnSettingPayload {
   """
@@ -63933,6 +63832,39 @@ input DeleteOrgMembershipInput {
   id: UUID!
 }
 
+"""The output of our delete `EmbeddingChunk` mutation."""
+type DeleteEmbeddingChunkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EmbeddingChunk` that was deleted by this mutation."""
+  embeddingChunk: EmbeddingChunk
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `EmbeddingChunk`. May be used by Relay 1."""
+  embeddingChunkEdge(
+    """The method to use when ordering `EmbeddingChunk`."""
+    orderBy: [EmbeddingChunkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EmbeddingChunkEdge
+}
+
+"""All input for the `deleteEmbeddingChunk` mutation."""
+input DeleteEmbeddingChunkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `ForeignKeyConstraint` mutation."""
 type DeleteForeignKeyConstraintPayload {
   """
@@ -64033,39 +63965,6 @@ input DeleteEntityTypeProvisionInput {
   clientMutationId: String
 
   """Unique identifier for this provision row."""
-  id: UUID!
-}
-
-"""The output of our delete `LevelsModule` mutation."""
-type DeleteLevelsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `LevelsModule` that was deleted by this mutation."""
-  levelsModule: LevelsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `LevelsModule`. May be used by Relay 1."""
-  levelsModuleEdge(
-    """The method to use when ordering `LevelsModule`."""
-    orderBy: [LevelsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): LevelsModuleEdge
-}
-
-"""All input for the `deleteLevelsModule` mutation."""
-input DeleteLevelsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
   id: UUID!
 }
 
@@ -64259,6 +64158,39 @@ type DeleteMembershipsModulePayload {
 
 """All input for the `deleteMembershipsModule` mutation."""
 input DeleteMembershipsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `EventsModule` mutation."""
+type DeleteEventsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EventsModule` that was deleted by this mutation."""
+  eventsModule: EventsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `EventsModule`. May be used by Relay 1."""
+  eventsModuleEdge(
+    """The method to use when ordering `EventsModule`."""
+    orderBy: [EventsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EventsModuleEdge
+}
+
+"""All input for the `deleteEventsModule` mutation."""
+input DeleteEventsModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.

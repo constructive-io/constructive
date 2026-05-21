@@ -331,9 +331,6 @@ importers:
       '@agentic-kit/ollama':
         specifier: ^1.0.3
         version: 1.0.3(encoding@0.1.13)
-      '@constructive-io/graphql-env':
-        specifier: workspace:^
-        version: link:../../graphql/env/dist
       '@dataplan/pg':
         specifier: 1.0.0
         version: 1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0)
@@ -346,6 +343,9 @@ importers:
       graphile-build-pg:
         specifier: 5.0.0
         version: 5.0.0(@dataplan/pg@1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0))(grafast@1.0.0(graphql@16.13.0))(graphile-build@5.0.0(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0)(tamedevil@0.1.0)
+      graphile-cache:
+        specifier: workspace:^
+        version: link:../graphile-cache/dist
       graphile-config:
         specifier: 1.0.0
         version: 1.0.0
@@ -1458,6 +1458,9 @@ importers:
 
   graphql/server:
     dependencies:
+      '@agentic-kit/ollama':
+        specifier: ^1.0.3
+        version: 1.0.3(encoding@0.1.13)
       '@constructive-io/csrf':
         specifier: workspace:^
         version: link:../../packages/csrf/dist
@@ -1508,7 +1511,7 @@ importers:
         version: 5.2.1
       express-rate-limit:
         specifier: ^8.5.1
-        version: 8.5.1(express@5.2.1)
+        version: 8.5.2(express@5.2.1)
       gql-ast:
         specifier: workspace:^
         version: link:../gql-ast/dist
@@ -1530,6 +1533,9 @@ importers:
       graphile-config:
         specifier: 1.0.0
         version: 1.0.0
+      graphile-llm:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-llm/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
@@ -7213,8 +7219,8 @@ packages:
   exponential-backoff@3.1.3:
     resolution: {integrity: sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA==}
 
-  express-rate-limit@8.5.1:
-    resolution: {integrity: sha512-5O6KYmyJEpuPJV5hNTXKbAHWRqrzyu+OI3vUnSd2kXFubIVpG7ezpgxQy76Zo5GQZtrQBg86hF+CM/NX+cioiQ==}
+  express-rate-limit@8.5.2:
+    resolution: {integrity: sha512-5Kb34ipNX694DH48vN9irak1Qx30nb0PLYHXfJgw4YEjiC3ZEmZJhwOp+VfiCYwFzvFTdB9QkArYS5kXa2cx2A==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>= 4.11'
@@ -10990,7 +10996,7 @@ snapshots:
       '@babel/helpers': 7.28.6
       '@babel/parser': 7.29.0
       '@babel/template': 7.28.6
-      '@babel/traverse': 7.28.6(supports-color@5.5.0)
+      '@babel/traverse': 7.28.6
       '@babel/types': 7.29.0
       '@jridgewell/remapping': 2.3.5
       convert-source-map: 2.0.0
@@ -11045,7 +11051,7 @@ snapshots:
 
   '@babel/helper-module-imports@7.28.6(supports-color@5.5.0)':
     dependencies:
-      '@babel/traverse': 7.28.6(supports-color@5.5.0)
+      '@babel/traverse': 7.29.0(supports-color@5.5.0)
       '@babel/types': 7.29.0
     transitivePeerDependencies:
       - supports-color
@@ -11055,7 +11061,7 @@ snapshots:
       '@babel/core': 7.28.6
       '@babel/helper-module-imports': 7.28.6(supports-color@5.5.0)
       '@babel/helper-validator-identifier': 7.28.5
-      '@babel/traverse': 7.28.6(supports-color@5.5.0)
+      '@babel/traverse': 7.28.6
     transitivePeerDependencies:
       - supports-color
 
@@ -11064,7 +11070,7 @@ snapshots:
       '@babel/core': 7.29.0
       '@babel/helper-module-imports': 7.28.6(supports-color@5.5.0)
       '@babel/helper-validator-identifier': 7.28.5
-      '@babel/traverse': 7.28.6(supports-color@5.5.0)
+      '@babel/traverse': 7.28.6
     transitivePeerDependencies:
       - supports-color
 
@@ -11208,7 +11214,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/traverse@7.28.6(supports-color@5.5.0)':
+  '@babel/traverse@7.28.6':
     dependencies:
       '@babel/code-frame': 7.28.6
       '@babel/generator': 7.29.1
@@ -15149,7 +15155,7 @@ snapshots:
 
   exponential-backoff@3.1.3: {}
 
-  express-rate-limit@8.5.1(express@5.2.1):
+  express-rate-limit@8.5.2(express@5.2.1):
     dependencies:
       express: 5.2.1
       ip-address: 10.2.0
@@ -15925,7 +15931,7 @@ snapshots:
       cli-cursor: 3.1.0
       cli-width: 3.0.0
       figures: 3.2.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       mute-stream: 0.0.8
       ora: 5.4.1
       run-async: 2.4.1
@@ -16956,7 +16962,7 @@ snapshots:
 
   minimatch@8.0.7:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimatch@9.0.1:
     dependencies:

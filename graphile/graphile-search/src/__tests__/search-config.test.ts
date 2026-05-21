@@ -64,6 +64,9 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
           parentFkField: 'document_id',
           parentPkField: 'id',
           embeddingField: 'embedding',
+          contentField: 'content',
+          searchField: null,
+          searchIndexes: [],
         },
       });
     });
@@ -96,6 +99,9 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
           parentFkField: 'doc_id',
           parentPkField: 'doc_uuid',
           embeddingField: 'vec',
+          contentField: 'content',
+          searchField: null,
+          searchIndexes: [],
         },
       });
     });
@@ -121,6 +127,9 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
           parentFkField: 'parent_id',
           parentPkField: 'id',
           embeddingField: 'embedding',
+          contentField: 'content',
+          searchField: null,
+          searchIndexes: [],
         },
       });
     });
@@ -147,6 +156,9 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
           parentFkField: 'parent_id',
           parentPkField: 'id',
           embeddingField: 'embedding',
+          contentField: 'content',
+          searchField: null,
+          searchIndexes: [],
         },
       });
     });

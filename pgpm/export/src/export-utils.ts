@@ -29,7 +29,6 @@ export const DB_REQUIRED_EXTENSIONS = [
   'ltree',
   'metaschema-schema',
   'pgpm-inflection',
-  'pgpm-uuid',
   'pgpm-utils',
   'pgpm-database-jobs',
   'pgpm-jwt-claims',
@@ -37,7 +36,8 @@ export const DB_REQUIRED_EXTENSIONS = [
   'pgpm-base32',
   'pgpm-totp',
   'pgpm-types',
-  'pgpm-ltree-helpers'
+  'pgpm-ltree-helpers',
+  'pgpm-partman'
 ] as const;
 
 /**
@@ -162,16 +162,16 @@ export const META_TABLE_ORDER = [
   'memberships_module',
   'permissions_module',
   'limits_module',
-  'levels_module',
+  'events_module',
   'users_module',
   'hierarchy_module',
   'membership_types_module',
   'invites_module',
   'emails_module',
   'sessions_module',
-  'secrets_module',
+  'user_state_module',
   'profiles_module',
-  'encrypted_secrets_module',
+  'config_secrets_user_module',
   'connected_accounts_module',
   'phone_numbers_module',
   'crypto_addresses_module',
@@ -182,7 +182,8 @@ export const META_TABLE_ORDER = [
   'uuid_module',
   'default_ids_module',
   'denormalized_table_field',
-  'table_template_module',
+  // NOTE: blueprint_template, blueprint, and blueprint_construction are intentionally
+  // excluded from the export flow — they are runtime-only tables not exported as metadata.
   'relation_provision',
   'entity_type_provision',
   'rate_limits_module',
@@ -195,8 +196,11 @@ export const META_TABLE_ORDER = [
   'plans_module',
   'realtime_module',
   'session_secrets_module',
+  'config_secrets_org_module',
   'webauthn_auth_module',
-  'webauthn_credentials_module'
+  'webauthn_credentials_module',
+  'inference_log_module',
+  'rate_limit_meters_module'
 ] as const;
 
 // =============================================================================
@@ -723,8 +727,8 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       sign_in_function: 'text',
       sign_up_function: 'text',
       sign_out_function: 'text',
-      sign_in_one_time_token_function: 'text',
-      one_time_token_function: 'text',
+      sign_in_cross_origin_function: 'text',
+      request_cross_origin_token_function: 'text',
       extend_token_expires: 'text',
       send_account_deletion_email_function: 'text',
       delete_account_function: 'text',
@@ -821,32 +825,45 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       actor_table_id: 'uuid'
     }
   },
-  levels_module: {
+  events_module: {
     schema: 'metaschema_modules_public',
-    table: 'levels_module',
+    table: 'events_module',
     fields: {
       id: 'uuid',
       database_id: 'uuid',
       schema_id: 'uuid',
       private_schema_id: 'uuid',
-      steps_table_id: 'uuid',
-      steps_table_name: 'text',
-      achievements_table_id: 'uuid',
-      achievements_table_name: 'text',
+      events_table_id: 'uuid',
+      events_table_name: 'text',
+      event_aggregates_table_id: 'uuid',
+      event_aggregates_table_name: 'text',
+      event_types_table_id: 'uuid',
+      event_types_table_name: 'text',
       levels_table_id: 'uuid',
       levels_table_name: 'text',
       level_requirements_table_id: 'uuid',
       level_requirements_table_name: 'text',
-      completed_step: 'text',
-      incompleted_step: 'text',
-      tg_achievement: 'text',
-      tg_achievement_toggle: 'text',
-      tg_achievement_toggle_boolean: 'text',
-      tg_achievement_boolean: 'text',
-      upsert_achievement: 'text',
-      tg_update_achievements: 'text',
+      level_grants_table_id: 'uuid',
+      level_grants_table_name: 'text',
+      achievement_rewards_table_id: 'uuid',
+      achievement_rewards_table_name: 'text',
+      record_event: 'text',
+      remove_event: 'text',
+      tg_event: 'text',
+      tg_event_toggle: 'text',
+      tg_event_toggle_bool: 'text',
+      tg_event_bool: 'text',
+      upsert_aggregate: 'text',
+      tg_update_aggregates: 'text',
+      prune_events: 'text',
       steps_required: 'text',
       level_achieved: 'text',
+      tg_check_achievements: 'text',
+      grant_achievement: 'text',
+      tg_achievement_reward: 'text',
+      interval: 'text',
+      retention: 'text',
+      premake: 'int',
       prefix: 'text',
       membership_type: 'int',
       entity_table_id: 'uuid',
@@ -952,9 +969,9 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       auth_settings_table: 'text'
     }
   },
-  secrets_module: {
+  user_state_module: {
     schema: 'metaschema_modules_public',
-    table: 'secrets_module',
+    table: 'user_state_module',
     fields: {
       id: 'uuid',
       database_id: 'uuid',
@@ -987,9 +1004,9 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       prefix: 'text'
     }
   },
-  encrypted_secrets_module: {
+  config_secrets_user_module: {
     schema: 'metaschema_modules_public',
-    table: 'encrypted_secrets_module',
+    table: 'config_secrets_user_module',
     fields: {
       id: 'uuid',
       database_id: 'uuid',
@@ -1086,21 +1103,7 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       fields: 'uuid[]'
     }
   },
-  table_template_module: {
-    schema: 'metaschema_modules_public',
-    table: 'table_template_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      schema_id: 'uuid',
-      private_schema_id: 'uuid',
-      table_id: 'uuid',
-      owner_table_id: 'uuid',
-      table_name: 'text',
-      node_type: 'text',
-      data: 'jsonb'
-    }
-  },
+  // NOTE: table_template_module has been removed from pgpm-modules (superseded by blueprints)
   secure_table_provision: {
     schema: 'metaschema_modules_public',
     table: 'secure_table_provision',
@@ -1409,6 +1412,17 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       sessions_table_id: 'uuid'
     }
   },
+  config_secrets_org_module: {
+    schema: 'metaschema_modules_public',
+    table: 'config_secrets_org_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text'
+    }
+  },
   webauthn_auth_module: {
     schema: 'metaschema_modules_public',
     table: 'webauthn_auth_module',
@@ -1442,6 +1456,42 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       table_id: 'uuid',
       owner_table_id: 'uuid',
       table_name: 'text'
+    }
+  },
+  inference_log_module: {
+    schema: 'metaschema_modules_public',
+    table: 'inference_log_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      inference_log_table_id: 'uuid',
+      inference_log_table_name: 'text',
+      usage_daily_table_id: 'uuid',
+      usage_daily_table_name: 'text',
+      interval: 'text',
+      retention: 'text',
+      premake: 'int',
+      prefix: 'text'
+    }
+  },
+  rate_limit_meters_module: {
+    schema: 'metaschema_modules_public',
+    table: 'rate_limit_meters_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      rate_limit_state_table_id: 'uuid',
+      rate_limit_state_table_name: 'text',
+      rate_limit_overrides_table_id: 'uuid',
+      rate_limit_overrides_table_name: 'text',
+      rate_window_limits_table_id: 'uuid',
+      rate_window_limits_table_name: 'text',
+      check_rate_limit_function: 'text',
+      prefix: 'text'
     }
   },
   spatial_relation: {
