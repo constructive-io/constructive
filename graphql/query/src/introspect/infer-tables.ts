@@ -25,6 +25,7 @@ import type {
 } from '../types/introspection';
 import { getBaseTypeName, isList, isNonNull, unwrapType } from '../types/introspection';
 import type {
+  Argument,
   BelongsToRelation,
   Field,
   FieldArgument,
@@ -37,6 +38,7 @@ import type {
   TableConstraints,
   TableInflection,
   TableQueryNames,
+  TableSubscription,
   TypeRef,
 } from '../types/schema';
 
@@ -143,6 +145,14 @@ export function inferTablesFromIntrospection(
   const mutationFields = mutationType
     ? getTypeFields(typeMap.get(mutationType.name))
     : [];
+  const subscriptionFields = schema.subscriptionType
+    ? getTypeFields(typeMap.get(schema.subscriptionType.name))
+    : [];
+  const subscriptionsByEntity = buildSubscriptionMap(
+    subscriptionFields,
+    typeMap,
+    entityNames,
+  );
 
   // Step 1: Build Table for each inferred entity
   const tables: Table[] = [];
@@ -160,6 +170,7 @@ export function inferTablesFromIntrospection(
       mutationFields,
       entityToConnection,
       connectionToEntity,
+      subscriptionsByEntity,
       commentsEnabled,
     );
 
@@ -276,6 +287,7 @@ function buildCleanTable(
   mutationFields: IntrospectionField[],
   entityToConnection: Map<string, string>,
   connectionToEntity: Map<string, string>,
+  subscriptionsByEntity: Map<string, TableSubscription>,
   commentsEnabled: boolean,
 ): BuildCleanTableResult {
   // Extract scalar fields from entity type
@@ -306,6 +318,7 @@ function buildCleanTable(
 
   // Infer the patch field name from UpdateXxxInput (e.g., "userPatch")
   const patchFieldName = inferPatchFieldName(entityName, typeMap, mutationOps);
+  const subscription = subscriptionsByEntity.get(entityName);
 
   // Build inflection map from discovered types
   const inflection = buildInflection(entityName, typeMap, entityToConnection);
@@ -340,9 +353,85 @@ function buildCleanTable(
       inflection,
       query,
       constraints,
+      ...(subscription ? { subscription } : {}),
       ...(smartTags ? { smartTags } : {}),
     },
     hasRealOperation,
+  };
+}
+
+// ============================================================================
+// Subscription Inference
+// ============================================================================
+
+function buildSubscriptionMap(
+  subscriptionFields: IntrospectionField[],
+  typeMap: Map<string, IntrospectionType>,
+  entityNames: Set<string>,
+): Map<string, TableSubscription> {
+  const result = new Map<string, TableSubscription>();
+  if (subscriptionFields.length === 0) return result;
+
+  for (const field of subscriptionFields) {
+    const payloadTypeName = getBaseTypeName(field.type);
+    if (!payloadTypeName) continue;
+
+    const payloadType = typeMap.get(payloadTypeName);
+    if (!payloadType?.fields || payloadType.kind !== 'OBJECT') continue;
+
+    let matchedEntityName: string | null = null;
+    let rowFieldName: string | null = null;
+
+    for (const payloadField of payloadType.fields) {
+      const rowTypeName = getBaseTypeName(payloadField.type);
+      if (!rowTypeName) continue;
+      if (entityNames.has(rowTypeName)) {
+        matchedEntityName = rowTypeName;
+        rowFieldName = payloadField.name;
+        break;
+      }
+    }
+
+    if (!matchedEntityName || !rowFieldName) continue;
+
+    const payloadMetaFields = payloadType.fields
+      .filter((payloadField) => payloadField.name !== rowFieldName)
+      .filter((payloadField) => {
+        const typeName = getBaseTypeName(payloadField.type);
+        const fieldType = typeName ? typeMap.get(typeName) : undefined;
+        return fieldType?.kind !== 'OBJECT';
+      })
+      .map((payloadField) => payloadField.name);
+
+    if (result.has(matchedEntityName)) {
+      const existing = result.get(matchedEntityName)!;
+      throw new Error(
+        `[infer-tables] entity "${matchedEntityName}" is referenced by multiple subscription fields: ` +
+        `"${existing.fieldName}" and "${field.name}". Each entity may have at most one subscription field. ` +
+        `If multiple subscriptions targeting the same entity are intentional, the SDK generator does not currently support that — please open an issue.`,
+      );
+    }
+
+    result.set(matchedEntityName, {
+      fieldName: field.name,
+      payloadTypeName,
+      rowFieldName,
+      payloadMetaFields,
+      args: field.args.map(introspectionInputValueToArgument),
+    });
+  }
+
+  return result;
+}
+
+function introspectionInputValueToArgument(
+  input: IntrospectionInputValue,
+): Argument {
+  return {
+    name: input.name,
+    type: introspectionTypeRefToTypeRef(input.type),
+    ...(input.defaultValue != null ? { defaultValue: input.defaultValue } : {}),
+    ...(input.description ? { description: input.description } : {}),
   };
 }
 

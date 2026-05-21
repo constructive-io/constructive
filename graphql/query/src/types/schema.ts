@@ -20,6 +20,28 @@ export interface Table {
   constraints?: TableConstraints;
   /** Smart tags parsed from PostGraphile @-prefixed comment directives */
   smartTags?: Record<string, string | true>;
+  /** Realtime subscription metadata when the GraphQL schema exposes one for this table */
+  subscription?: TableSubscription;
+}
+
+/**
+ * GraphQL subscription field metadata for a table.
+ *
+ * Derived from introspection by matching the subscription payload's row field
+ * to the table entity type. Code generators use this as the only gate for
+ * emitting realtime ORM and React hooks.
+ */
+export interface TableSubscription {
+  /** Root Subscription field name, e.g. "onContactChanged" */
+  fieldName: string;
+  /** Payload object type name, e.g. "ContactSubscriptionPayload" */
+  payloadTypeName: string;
+  /** Row field inside the payload, e.g. "contact" */
+  rowFieldName: string;
+  /** Scalar metadata fields inside the payload, e.g. event/rowId/overflow */
+  payloadMetaFields: string[];
+  /** Arguments accepted by the root subscription field */
+  args: Argument[];
 }
 
 /**
