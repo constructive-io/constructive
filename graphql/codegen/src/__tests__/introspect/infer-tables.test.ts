@@ -90,6 +90,7 @@ function createIntrospection(
   types: TypeDef[],
   queryFields: FieldDef[] = [],
   mutationFields: FieldDef[] = [],
+  subscriptionFields: FieldDef[] = [],
 ): IntrospectionQueryResponse {
   const makeField = (f: FieldDef): IntrospectionField => ({
     name: f.name,
@@ -140,6 +141,20 @@ function createIntrospection(
           },
         ]
       : []),
+    ...(subscriptionFields.length > 0
+      ? [
+          {
+            name: 'Subscription',
+            kind: 'OBJECT' as const,
+            fields: subscriptionFields.map(makeField),
+            inputFields: null,
+            enumValues: null,
+            interfaces: [],
+            possibleTypes: null,
+            description: null,
+          },
+        ]
+      : []),
     ...types.map(
       (t): IntrospectionType => ({
         name: t.name,
@@ -171,7 +186,8 @@ function createIntrospection(
     __schema: {
       queryType: { name: 'Query' },
       mutationType: mutationFields.length > 0 ? { name: 'Mutation' } : null,
-      subscriptionType: null,
+      subscriptionType:
+        subscriptionFields.length > 0 ? { name: 'Subscription' } : null,
       types: allTypes,
       directives: [],
     },
@@ -1147,4 +1163,219 @@ describe('Edge Cases', () => {
     // Should detect the actual type from schema
     expect(tables[0].inflection?.orderByType).toBe('StatusesOrderBy');
   });
+
+  it('attaches subscription metadata by payload row type identity', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'Contact',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'id', type: nonNull(scalar('UUID')) },
+            { name: 'email', type: scalar('String') },
+          ],
+        },
+        {
+          name: 'ContactsConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('Contact')) }],
+        },
+        {
+          name: 'ContactSubscriptionPayload',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'event', type: nonNull(scalar('String')) },
+            { name: 'rowId', type: scalar('UUID') },
+            { name: 'overflow', type: nonNull(scalar('Boolean')) },
+            { name: 'renamedRowCarrier', type: object('Contact') },
+          ],
+        },
+      ],
+      [{ name: 'contacts', type: object('ContactsConnection') }],
+      [],
+      [
+        {
+          name: 'tenantScopedContactEvents',
+          type: object('ContactSubscriptionPayload'),
+          args: [{ name: 'ids', type: list(nonNull(scalar('UUID'))) }],
+        },
+      ],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables).toHaveLength(1);
+    expect(tables[0].subscription).toEqual({
+      fieldName: 'tenantScopedContactEvents',
+      payloadTypeName: 'ContactSubscriptionPayload',
+      rowFieldName: 'renamedRowCarrier',
+      payloadMetaFields: ['event', 'rowId', 'overflow'],
+      args: [
+        {
+          name: 'ids',
+          type: {
+            kind: 'LIST',
+            name: null,
+            ofType: {
+              kind: 'NON_NULL',
+              name: null,
+              ofType: { kind: 'SCALAR', name: 'UUID' },
+            },
+          },
+        },
+      ],
+    });
+  });
+
+  it('throws when two subscription fields target the same entity', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'Contact',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'id', type: nonNull(scalar('UUID')) },
+            { name: 'email', type: scalar('String') },
+          ],
+        },
+        {
+          name: 'ContactsConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('Contact')) }],
+        },
+        {
+          name: 'ContactSubscriptionPayload',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'event', type: nonNull(scalar('String')) },
+            { name: 'rowId', type: scalar('UUID') },
+            { name: 'overflow', type: nonNull(scalar('Boolean')) },
+            { name: 'contact', type: object('Contact') },
+          ],
+        },
+        {
+          name: 'ContactDeltaPayload',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'event', type: nonNull(scalar('String')) },
+            { name: 'rowId', type: scalar('UUID') },
+            { name: 'overflow', type: nonNull(scalar('Boolean')) },
+            { name: 'contact', type: object('Contact') },
+          ],
+        },
+      ],
+      [{ name: 'contacts', type: object('ContactsConnection') }],
+      [],
+      [
+        {
+          name: 'onContactChanged',
+          type: object('ContactSubscriptionPayload'),
+        },
+        {
+          name: 'onContactDelta',
+          type: object('ContactDeltaPayload'),
+        },
+      ],
+    );
+
+    expect(() => inferTablesFromIntrospection(introspection)).toThrow(
+      /multiple subscription fields/i,
+    );
+    expect(() => inferTablesFromIntrospection(introspection)).toThrow(
+      /onContactChanged/,
+    );
+    expect(() => inferTablesFromIntrospection(introspection)).toThrow(
+      /onContactDelta/,
+    );
+    expect(() => inferTablesFromIntrospection(introspection)).toThrow(
+      /Contact/,
+    );
+  });
+
+  it('does not attach subscription metadata when payload has no entity row field', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'Contact',
+          kind: 'OBJECT',
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
+        {
+          name: 'ContactsConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('Contact')) }],
+        },
+        {
+          name: 'ContactSubscriptionPayload',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'event', type: nonNull(scalar('String')) },
+            { name: 'overflow', type: nonNull(scalar('Boolean')) },
+          ],
+        },
+      ],
+      [{ name: 'contacts', type: object('ContactsConnection') }],
+      [],
+      [
+        {
+          name: 'onContactChanged',
+          type: object('ContactSubscriptionPayload'),
+        },
+      ],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables).toHaveLength(1);
+    expect(tables[0].subscription).toBeUndefined();
+  });
+});
+
+// ============================================================================
+// Tests - Subscription Contract
+// ============================================================================
+
+describe('Subscription Contract', () => {
+  it('all tables have subscription=undefined when schema has no subscriptionType', () => {
+    // createIntrospection with no subscriptionFields (4th arg omitted) sets subscriptionType: null
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'Contact',
+          kind: 'OBJECT',
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
+        {
+          name: 'ContactsConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('Contact')) }],
+        },
+        {
+          name: 'User',
+          kind: 'OBJECT',
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
+        {
+          name: 'UsersConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('User')) }],
+        },
+      ],
+      [
+        { name: 'contacts', type: object('ContactsConnection') },
+        { name: 'users', type: object('UsersConnection') },
+      ],
+      // No mutation fields, no subscription fields — subscriptionType will be null
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables.length).toBeGreaterThan(0);
+    for (const table of tables) {
+      expect(table.subscription).toBeUndefined();
+    }
+  });
+
+  // The multi-subscription throw test (also covers A2 from round-1 follow-ups)
+  // is defined above in the Edge Cases describe block.
 });

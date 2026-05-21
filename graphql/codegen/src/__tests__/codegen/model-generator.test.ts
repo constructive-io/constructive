@@ -39,6 +39,7 @@ function createTable(
     query: partial.query,
     inflection: partial.inflection,
     constraints: partial.constraints,
+    subscription: partial.subscription,
   };
 }
 
@@ -98,6 +99,53 @@ describe('model-generator', () => {
     expect(result.content).toContain('create');
     expect(result.content).not.toContain('update(');
     expect(result.content).not.toContain('delete(');
+  });
+
+  it('generates typed subscribe method when subscription metadata exists', () => {
+    const table = createTable({
+      name: 'Contact',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'email', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'contacts',
+        one: 'contact',
+        create: 'createContact',
+        update: 'updateContact',
+        delete: 'deleteContact',
+      },
+      subscription: {
+        fieldName: 'onContactChanged',
+        payloadTypeName: 'ContactSubscriptionPayload',
+        rowFieldName: 'contact',
+        payloadMetaFields: ['event', 'rowId', 'overflow'],
+        args: [
+          {
+            name: 'ids',
+            type: {
+              kind: 'LIST',
+              name: null,
+              ofType: {
+                kind: 'NON_NULL',
+                name: null,
+                ofType: { kind: 'SCALAR', name: 'UUID' },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = generateModelFile(table, false);
+
+    expect(result.content).toContain('subscribe<S extends ContactSelect>');
+    expect(result.content).toContain('buildSubscriptionDocument');
+    expect(result.content).toContain('"onContactChanged"');
+    expect(result.content).toContain('ids?: string[]');
+    expect(result.content).toContain('SubscriptionEvent<InferSelectResult<ContactWithRelations, S>>');
+    expect(result.content).toContain('this.client.subscribe<InferSelectResult<ContactWithRelations, S>>');
+    expect(result.content).toMatchSnapshot();
   });
 
   it('handles custom query/mutation names', () => {

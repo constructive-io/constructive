@@ -11,24 +11,13 @@ import { useState, useEffect } from "react";
 import { getClient } from "../client";
 import type { ConnectionState } from "../../orm/client";
 export type { ConnectionState } from "../../orm/client";
-/**
- * Hook to observe the WebSocket connection state.
- * 
- * Returns the current connection state of the realtime WebSocket.
- * Returns 'disconnected' if realtime is not configured.
- * 
- * @example
- * \`\`\`tsx
- * const state = useConnectionState();
- * // state: 'disconnected' | 'connecting' | 'connected' | 'reconnecting'
- * \`\`\`
- */
+/** Hook to observe the WebSocket connection state. */
 export function useConnectionState(): ConnectionState {
-  const [state, setState] = useState<ConnectionState>(() => getClient().getConnectionState());
+  const [state, setState] = useState<ConnectionState>(() => getClient().realtime.connectionState);
   useEffect(() => {
     const client = getClient();
-    if (!client.isRealtimeEnabled) return;
-    const unsubscribe = client.onConnectionStateChange(setState);
+    if (!client.realtime.isEnabled) return;
+    const unsubscribe = client.realtime.onConnectionStateChange(setState);
     return () => unsubscribe();
   }, []);
   return state;
@@ -54,62 +43,53 @@ exports[`Subscription Hook Generator generateSubscriptionHook generates subscrip
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { QueryClient } from "@tanstack/react-query";
 import { getClient } from "../client";
-import type { SubscriptionEvent, SubscriptionFieldMeta, Unsubscribe } from "../../orm/client";
-import type { Contact } from "../../orm/input-types";
+import type { SubscriptionEvent } from "../../orm/client";
+import type { ContactSelect, ContactWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
 import { contactKeys } from "../query-keys";
 export type { SubscriptionEvent, Unsubscribe } from "../../orm/client";
-const SUBSCRIPTION_DOCUMENT = "subscription OnContactChanged {\\n  onContactChanged {\\n    event\\n    contact { __typename }\\n    timestamp\\n  }\\n}";
-const FIELD_META: SubscriptionFieldMeta = {
-  fieldName: "onContactChanged",
-  tableName: "contact",
-  dataFieldName: "contact"
-};
-export interface ContactSubscriptionOptions {
-  onEvent: (event: SubscriptionEvent<Contact>) => void;
+export type { ContactSelect, ContactWithRelations } from "../../orm/input-types";
+export type ContactSubscriptionOptions<S extends ContactSelect> = {
+  select: S;
+  ids?: string[];
+  onEvent: (event: SubscriptionEvent<InferSelectResult<ContactWithRelations, S>>) => void;
   onError?: (error: Error) => void;
+  onComplete?: () => void;
   enabled?: boolean;
   invalidateQueries?: boolean;
-}
+} & StrictSelect<S, ContactSelect>;
 /**
  * Subscription hook for Contact realtime events
  * 
- * Subscribes to realtime changes on the server and automatically
- * invalidates React Query cache when events are received.
- * 
- * @example
- * \`\`\`tsx
- * useContactSubscription({
- *   onEvent: (event) => {
- *     console.log(event.operation, event.data);
- *   },
- * });
- * \`\`\`
+ * Delegates to getClient().contact.subscribe().
  */
-export function useContactSubscription(options: ContactSubscriptionOptions): void {
+export function useContactSubscription<S extends ContactSelect>(options: ContactSubscriptionOptions<S>): void {
   const queryClient = useQueryClient();
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const subscribeKey = useMemo(() => JSON.stringify({
+    select: options.select,
+    ids: options.ids
+  }), [options.select, options.ids]);
   useEffect(() => {
     if (options.enabled === false) return;
     const client = getClient();
-    if (!client.isRealtimeEnabled) return;
-    const unsubscribe = client.subscribe(FIELD_META, SUBSCRIPTION_DOCUMENT, {}, {
-      onEvent: event => {
+    const unsubscribe = client.contact.subscribe<S>({
+      ...options,
+      onEvent: (event: SubscriptionEvent<InferSelectResult<ContactWithRelations, S>>) => {
         optionsRef.current.onEvent(event);
         if (optionsRef.current.invalidateQueries !== false) queryClient.invalidateQueries({
           queryKey: contactKeys.all
         });
       },
-      onError: err => {
-        optionsRef.current?.onError(err);
-      }
+      onError: (error: Error) => optionsRef.current.onError?.(error),
+      onComplete: () => optionsRef.current.onComplete?.()
     });
     return () => unsubscribe();
-  }, [options.enabled, queryClient]);
+  }, [options.enabled, subscribeKey, queryClient]);
 }
 "
 `;
@@ -121,62 +101,53 @@ exports[`Subscription Hook Generator generateSubscriptionHook generates subscrip
  * DO NOT EDIT - changes will be overwritten
  */
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { QueryClient } from "@tanstack/react-query";
 import { getClient } from "../client";
-import type { SubscriptionEvent, SubscriptionFieldMeta, Unsubscribe } from "../../orm/client";
-import type { Project } from "../../orm/input-types";
+import type { SubscriptionEvent } from "../../orm/client";
+import type { ProjectSelect, ProjectWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
 import { projectKeys } from "../query-keys";
 export type { SubscriptionEvent, Unsubscribe } from "../../orm/client";
-const SUBSCRIPTION_DOCUMENT = "subscription OnProjectChanged {\\n  onProjectChanged {\\n    event\\n    project { __typename }\\n    timestamp\\n  }\\n}";
-const FIELD_META: SubscriptionFieldMeta = {
-  fieldName: "onProjectChanged",
-  tableName: "project",
-  dataFieldName: "project"
-};
-export interface ProjectSubscriptionOptions {
-  onEvent: (event: SubscriptionEvent<Project>) => void;
+export type { ProjectSelect, ProjectWithRelations } from "../../orm/input-types";
+export type ProjectSubscriptionOptions<S extends ProjectSelect> = {
+  select: S;
+  ids?: string[];
+  onEvent: (event: SubscriptionEvent<InferSelectResult<ProjectWithRelations, S>>) => void;
   onError?: (error: Error) => void;
+  onComplete?: () => void;
   enabled?: boolean;
   invalidateQueries?: boolean;
-}
+} & StrictSelect<S, ProjectSelect>;
 /**
  * Subscription hook for Project realtime events
  * 
- * Subscribes to realtime changes on the server and automatically
- * invalidates React Query cache when events are received.
- * 
- * @example
- * \`\`\`tsx
- * useProjectSubscription({
- *   onEvent: (event) => {
- *     console.log(event.operation, event.data);
- *   },
- * });
- * \`\`\`
+ * Delegates to getClient().project.subscribe().
  */
-export function useProjectSubscription(options: ProjectSubscriptionOptions): void {
+export function useProjectSubscription<S extends ProjectSelect>(options: ProjectSubscriptionOptions<S>): void {
   const queryClient = useQueryClient();
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const subscribeKey = useMemo(() => JSON.stringify({
+    select: options.select,
+    ids: options.ids
+  }), [options.select, options.ids]);
   useEffect(() => {
     if (options.enabled === false) return;
     const client = getClient();
-    if (!client.isRealtimeEnabled) return;
-    const unsubscribe = client.subscribe(FIELD_META, SUBSCRIPTION_DOCUMENT, {}, {
-      onEvent: event => {
+    const unsubscribe = client.project.subscribe<S>({
+      ...options,
+      onEvent: (event: SubscriptionEvent<InferSelectResult<ProjectWithRelations, S>>) => {
         optionsRef.current.onEvent(event);
         if (optionsRef.current.invalidateQueries !== false) queryClient.invalidateQueries({
           queryKey: projectKeys.all
         });
       },
-      onError: err => {
-        optionsRef.current?.onError(err);
-      }
+      onError: (error: Error) => optionsRef.current.onError?.(error),
+      onComplete: () => optionsRef.current.onComplete?.()
     });
     return () => unsubscribe();
-  }, [options.enabled, queryClient]);
+  }, [options.enabled, subscribeKey, queryClient]);
 }
 "
 `;

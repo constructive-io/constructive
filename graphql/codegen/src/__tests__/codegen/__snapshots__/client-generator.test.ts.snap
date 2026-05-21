@@ -7,10 +7,10 @@ exports[`client-generator generateCreateClientFile generates createClient factor
  * DO NOT EDIT - changes will be overwritten
  */
 import { OrmClient } from "./client";
-import type { OrmClientConfig } from "./client";
+import type { OrmClientConfig, ConnectionStateListener } from "./client";
 import { UserModel } from "./models/user";
 import { PostModel } from "./models/post";
-export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from "./client";
+export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter, ConnectionState, ConnectionStateListener, RealtimeConfig, SubscriptionEvent, SubscriptionOperation, Unsubscribe, WsClient } from "./client";
 export { GraphQLRequestError } from "./client";
 export { QueryBuilder } from "./query-builder";
 export * from "./select-types";
@@ -42,7 +42,20 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     user: new UserModel(client),
-    post: new PostModel(client)
+    post: new PostModel(client),
+    realtime: {
+      get connectionState() {
+        return client.connectionState;
+      },
+      get isEnabled() {
+        return client.isEnabled;
+      },
+      get activeSubscriptionCount() {
+        return client.activeSubscriptionCount;
+      },
+      onConnectionStateChange: (listener: ConnectionStateListener) => client.onConnectionStateChange(listener),
+      close: () => client.close()
+    }
   };
 }"
 `;
@@ -54,11 +67,11 @@ exports[`client-generator generateCreateClientFile includes custom query/mutatio
  * DO NOT EDIT - changes will be overwritten
  */
 import { OrmClient } from "./client";
-import type { OrmClientConfig } from "./client";
+import type { OrmClientConfig, ConnectionStateListener } from "./client";
 import { UserModel } from "./models/user";
 import { createQueryOperations } from "./query";
 import { createMutationOperations } from "./mutation";
-export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from "./client";
+export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter, ConnectionState, ConnectionStateListener, RealtimeConfig, SubscriptionEvent, SubscriptionOperation, Unsubscribe, WsClient } from "./client";
 export { GraphQLRequestError } from "./client";
 export { QueryBuilder } from "./query-builder";
 export * from "./select-types";
@@ -93,7 +106,20 @@ export function createClient(config: OrmClientConfig) {
   return {
     user: new UserModel(client),
     query: createQueryOperations(client),
-    mutation: createMutationOperations(client)
+    mutation: createMutationOperations(client),
+    realtime: {
+      get connectionState() {
+        return client.connectionState;
+      },
+      get isEnabled() {
+        return client.isEnabled;
+      },
+      get activeSubscriptionCount() {
+        return client.activeSubscriptionCount;
+      },
+      onConnectionStateChange: (listener: ConnectionStateListener) => client.onConnectionStateChange(listener),
+      close: () => client.close()
+    }
   };
 }"
 `;
@@ -115,7 +141,6 @@ import type {
   ConnectionState,
   ConnectionStateListener,
   RealtimeConfig,
-  SubscribeOptions,
   SubscriptionEvent,
   SubscriptionFieldMeta,
   Unsubscribe,
@@ -139,7 +164,7 @@ export type {
   Unsubscribe,
   WsClient,
 } from './realtime';
-export { RealtimeManager } from './realtime';
+export { RealtimeManager, subscribeAsAsyncIterable } from './realtime';
 
 /**
  * Default adapter that uses fetch for HTTP requests.
@@ -336,9 +361,9 @@ export class OrmClient {
     return this.adapter.getEndpoint?.() ?? '';
   }
 
-  /** Get current WebSocket connection state */
-  getConnectionState(): ConnectionState {
-    return this.realtimeManager?.getConnectionState() ?? 'disconnected';
+  /** Current WebSocket connection state */
+  get connectionState(): ConnectionState {
+    return this.realtimeManager?.connectionState ?? { status: 'idle' };
   }
 
   /** Register a listener for WebSocket connection state changes */
@@ -350,18 +375,18 @@ export class OrmClient {
   }
 
   /** Number of active subscriptions */
-  getActiveSubscriptionCount(): number {
-    return this.realtimeManager?.getActiveSubscriptionCount() ?? 0;
+  get activeSubscriptionCount(): number {
+    return this.realtimeManager?.activeSubscriptionCount ?? 0;
   }
 
   /** Whether realtime is configured */
-  get isRealtimeEnabled(): boolean {
+  get isEnabled(): boolean {
     return this.realtimeManager !== undefined;
   }
 
-  /** Dispose the realtime manager (close WebSocket) */
-  dispose(): void {
-    this.realtimeManager?.dispose();
+  /** Close the realtime manager (terminate WebSocket) */
+  close(): void {
+    this.realtimeManager?.close();
   }
 }
 "

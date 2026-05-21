@@ -8,6 +8,7 @@
  */
 import { generateSubscriptionsBarrel } from '../../core/codegen/barrel';
 import { generate } from '../../core/codegen/index';
+import { generateOrm } from '../../core/codegen/orm';
 import {
   generateAllSubscriptionHooks,
   generateConnectionStateHook,
@@ -18,7 +19,7 @@ import {
   getSubscriptionFileName,
   getSubscriptionHookName,
 } from '../../core/codegen/utils';
-import type { FieldType, Relations, Table } from '../../types/schema';
+import type { FieldType, Relations, Table, TypeRef } from '../../types/schema';
 
 const fieldTypes = {
   uuid: { gqlType: 'UUID', isArray: false } as FieldType,
@@ -44,8 +45,22 @@ function createTable(partial: Partial<Table> & { name: string }): Table {
     inflection: partial.inflection,
     constraints: partial.constraints,
     smartTags: partial.smartTags,
+    subscription: partial.subscription,
   };
 }
+
+const idsArg = {
+  name: 'ids',
+  type: {
+    kind: 'LIST',
+    name: null,
+    ofType: {
+      kind: 'NON_NULL',
+      name: null,
+      ofType: { kind: 'SCALAR', name: 'UUID' },
+    },
+  } as TypeRef,
+};
 
 const contactTable = createTable({
   name: 'Contact',
@@ -81,7 +96,13 @@ const contactTableWithRealtime = createTable({
     update: 'updateContact',
     delete: 'deleteContact',
   },
-  smartTags: { '@realtime': true },
+  subscription: {
+    fieldName: 'onContactChanged',
+    payloadTypeName: 'ContactSubscriptionPayload',
+    rowFieldName: 'contact',
+    payloadMetaFields: ['event', 'rowId', 'overflow'],
+    args: [idsArg],
+  },
 });
 
 const projectTable = createTable({
@@ -116,7 +137,13 @@ const projectTableWithRealtime = createTable({
     update: 'updateProject',
     delete: 'deleteProject',
   },
-  smartTags: { '@realtime': true },
+  subscription: {
+    fieldName: 'onProjectChanged',
+    payloadTypeName: 'ProjectSubscriptionPayload',
+    rowFieldName: 'project',
+    payloadMetaFields: ['event', 'rowId', 'overflow'],
+    args: [idsArg],
+  },
 });
 
 describe('Subscription naming utils', () => {
@@ -144,61 +171,68 @@ describe('Subscription naming utils', () => {
 describe('Subscription Hook Generator', () => {
   describe('generateSubscriptionHook', () => {
     it('generates subscription hook for Contact table', () => {
-      const result = generateSubscriptionHook(contactTable);
+      const result = generateSubscriptionHook(contactTableWithRealtime);
       expect(result.fileName).toBe('useContactSubscription.ts');
       expect(result.content).toMatchSnapshot();
     });
 
     it('generates subscription hook for Project table', () => {
-      const result = generateSubscriptionHook(projectTable);
+      const result = generateSubscriptionHook(projectTableWithRealtime);
       expect(result.fileName).toBe('useProjectSubscription.ts');
       expect(result.content).toMatchSnapshot();
     });
 
-    it('includes subscription document with correct field name', () => {
-      const result = generateSubscriptionHook(contactTable);
-      expect(result.content).toContain('onContactChanged');
-      expect(result.content).toContain('SUBSCRIPTION_DOCUMENT');
+    it('delegates to the ORM model subscribe method', () => {
+      const result = generateSubscriptionHook(contactTableWithRealtime);
+      expect(result.content).toContain('client.contact.subscribe');
+      expect(result.content).not.toContain('SUBSCRIPTION_DOCUMENT');
+      expect(result.content).not.toContain('FIELD_META');
     });
 
-    it('includes field metadata constant', () => {
-      const result = generateSubscriptionHook(contactTable);
-      expect(result.content).toContain('FIELD_META');
-      expect(result.content).toContain('"onContactChanged"');
-      expect(result.content).toContain('"contact"');
+    it('requires select and ids through typed options', () => {
+      const result = generateSubscriptionHook(contactTableWithRealtime);
+      expect(result.content).toContain('select: S');
+      expect(result.content).toContain('ids?: string[]');
+      expect(result.content).toContain('StrictSelect<S, ContactSelect>');
     });
 
     it('imports from ORM client for types', () => {
-      const result = generateSubscriptionHook(contactTable);
+      const result = generateSubscriptionHook(contactTableWithRealtime);
       expect(result.content).toContain('../../orm/client');
       expect(result.content).toContain('SubscriptionEvent');
       expect(result.content).toContain('Unsubscribe');
     });
 
     it('imports query keys for cache invalidation', () => {
-      const result = generateSubscriptionHook(contactTable);
+      const result = generateSubscriptionHook(contactTableWithRealtime);
       expect(result.content).toContain('contactKeys');
       expect(result.content).toContain('invalidateQueries');
     });
 
     it('exports options interface', () => {
-      const result = generateSubscriptionHook(contactTable);
+      const result = generateSubscriptionHook(contactTableWithRealtime);
       expect(result.content).toContain('ContactSubscriptionOptions');
     });
 
     it('includes useEffect for subscription lifecycle', () => {
-      const result = generateSubscriptionHook(contactTable);
+      const result = generateSubscriptionHook(contactTableWithRealtime);
       expect(result.content).toContain('useEffect');
       expect(result.content).toContain('useRef');
     });
 
-    it('checks isRealtimeEnabled before subscribing', () => {
-      const result = generateSubscriptionHook(contactTable);
-      expect(result.content).toContain('isRealtimeEnabled');
+    it('does not reach into internal client realtime methods', () => {
+      const result = generateSubscriptionHook(contactTableWithRealtime);
+      expect(result.content).not.toContain('client.subscribe');
+      expect(result.content).not.toContain('isRealtimeEnabled');
+    });
+
+    it('forwards onComplete callback from options to ORM subscribe', () => {
+      const result = generateSubscriptionHook(contactTableWithRealtime);
+      expect(result.content).toContain('onComplete');
     });
 
     it('re-exports SubscriptionEvent type', () => {
-      const result = generateSubscriptionHook(contactTable);
+      const result = generateSubscriptionHook(contactTableWithRealtime);
       // Should re-export for consumer convenience
       expect(result.content).toContain('SubscriptionEvent');
     });
@@ -207,8 +241,8 @@ describe('Subscription Hook Generator', () => {
   describe('generateAllSubscriptionHooks', () => {
     it('generates hooks for all tables', () => {
       const results = generateAllSubscriptionHooks([
-        contactTable,
-        projectTable,
+        contactTableWithRealtime,
+        projectTableWithRealtime,
       ]);
       expect(results).toHaveLength(2);
       expect(results[0].fileName).toBe('useContactSubscription.ts');
@@ -245,7 +279,7 @@ describe('Connection State Hook Generator', () => {
     it('calls getClient for connection state', () => {
       const result = generateConnectionStateHook();
       expect(result.content).toContain('getClient');
-      expect(result.content).toContain('getConnectionState');
+      expect(result.content).toContain('connectionState');
     });
 
     it('subscribes to connection state changes', () => {
@@ -253,9 +287,9 @@ describe('Connection State Hook Generator', () => {
       expect(result.content).toContain('onConnectionStateChange');
     });
 
-    it('checks isRealtimeEnabled', () => {
+    it('checks realtime namespace isEnabled', () => {
       const result = generateConnectionStateHook();
-      expect(result.content).toContain('isRealtimeEnabled');
+      expect(result.content).toContain('realtime.isEnabled');
     });
 
     it('re-exports ConnectionState type', () => {
@@ -283,7 +317,7 @@ describe('Subscription Barrel Generator', () => {
   });
 });
 
-describe('Smart Tag Gating', () => {
+describe('Subscription Metadata Gating', () => {
   const minConfig = {
     tables: { include: [], exclude: [], systemExclude: [] },
     queries: { include: [], exclude: [], systemExclude: [] },
@@ -292,7 +326,7 @@ describe('Smart Tag Gating', () => {
     reactQuery: true,
   } as any;
 
-  it('does not generate subscription hooks when no tables have @realtime', () => {
+  it('does not generate subscription hooks when no tables have subscription metadata', () => {
     const result = generate({
       tables: [contactTable, projectTable],
       config: minConfig,
@@ -302,7 +336,7 @@ describe('Smart Tag Gating', () => {
     expect(subFiles).toHaveLength(0);
   });
 
-  it('generates subscription hooks only for tables with @realtime', () => {
+  it('generates subscription hooks only for tables with subscription metadata', () => {
     const result = generate({
       tables: [contactTableWithRealtime, projectTable],
       config: minConfig,
@@ -315,7 +349,7 @@ describe('Smart Tag Gating', () => {
     expect(subFiles.some((f) => f.path === 'subscriptions/index.ts')).toBe(true);
   });
 
-  it('generates subscription hooks for all @realtime tables', () => {
+  it('generates subscription hooks for all tables with subscription metadata', () => {
     const result = generate({
       tables: [contactTableWithRealtime, projectTableWithRealtime],
       config: minConfig,
@@ -326,7 +360,7 @@ describe('Smart Tag Gating', () => {
     expect(subFiles.some((f) => f.path.includes('useProjectSubscription'))).toBe(true);
   });
 
-  it('does not emit useConnectionState or barrel when no @realtime tables', () => {
+  it('does not emit useConnectionState or barrel when no subscription metadata exists', () => {
     const result = generate({
       tables: [contactTable],
       config: minConfig,
@@ -337,12 +371,30 @@ describe('Smart Tag Gating', () => {
     expect(mainBarrel?.content).not.toContain('./subscriptions');
   });
 
-  it('emits subscriptions barrel in main index when @realtime tables exist', () => {
+  it('emits subscriptions barrel in main index when subscription metadata exists', () => {
     const result = generate({
       tables: [contactTableWithRealtime],
       config: minConfig,
     });
     const mainBarrel = result.files.find((f) => f.path === 'index.ts');
     expect(mainBarrel?.content).toContain('./subscriptions');
+  });
+
+  it('emits no subscription hooks when reactQuery is disabled', () => {
+    const result = generate({
+      tables: [contactTableWithRealtime],
+      config: { ...minConfig, reactQuery: false, reactQueryEnabled: false },
+    });
+    expect(result.files.find((f) => f.path.includes('subscriptions/'))).toBeUndefined();
+    expect(result.files.find((f) => f.path.includes('useConnectionState'))).toBeUndefined();
+  });
+
+  it('emits ORM subscribe() regardless of reactQuery flag', () => {
+    const orm = generateOrm({
+      tables: [contactTableWithRealtime],
+      config: { ...minConfig, reactQuery: false },
+    });
+    const contactModel = orm.files.find((f) => f.path.includes('models/contact'));
+    expect(contactModel?.content).toContain('subscribe<S extends ContactSelect>');
   });
 });
