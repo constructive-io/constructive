@@ -8,6 +8,10 @@
 import generate from '@babel/generator';
 import * as t from '@babel/types';
 
+import type { TypeRef } from '../../types/schema';
+import { scalarToTsType } from './scalars';
+import { getTypeBaseName, isTypeList } from './type-resolver';
+
 // Re-export for convenience
 export { generate, t };
 
@@ -77,6 +81,19 @@ export function addLineComment<T extends t.Node>(node: T, text: string): T {
 /**
  * Create an 'as const' assertion - common pattern worth abstracting
  */
+/**
+ * Map a TypeScript primitive name (as emitted by `scalarToTsType`) to a Babel TSType node.
+ * Recognised primitives: `string`, `number`, `boolean`, `unknown`. Anything else is
+ * emitted as a type reference (covers `File`, `Date`, custom type names, etc.).
+ */
+export function tsTypeFromPrimitive(typeName: string): t.TSType {
+  if (typeName === 'string') return t.tsStringKeyword();
+  if (typeName === 'number') return t.tsNumberKeyword();
+  if (typeName === 'boolean') return t.tsBooleanKeyword();
+  if (typeName === 'unknown') return t.tsUnknownKeyword();
+  return t.tsTypeReference(t.identifier(typeName));
+}
+
 export function asConst(expression: t.Expression): t.TSAsExpression {
   return t.tsAsExpression(expression, t.tsTypeReference(t.identifier('const')));
 }
@@ -102,6 +119,16 @@ export function typedParam(
   param.typeAnnotation = t.tsTypeAnnotation(typeAnnotation);
   param.optional = optional;
   return param;
+}
+
+/**
+ * Convert a GraphQL TypeRef into a Babel TS type node.
+ * Handles scalar mapping, unknown fallback, and list-wrapping.
+ */
+export function typeRefToBabelType(typeRef: TypeRef): t.TSType {
+  const baseName = getTypeBaseName(typeRef) ?? 'unknown';
+  const tsType = tsTypeFromPrimitive(scalarToTsType(baseName, { unknownScalar: 'name' }));
+  return isTypeList(typeRef) ? t.tsArrayType(tsType) : tsType;
 }
 
 /**

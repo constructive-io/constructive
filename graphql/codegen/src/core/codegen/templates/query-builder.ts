@@ -105,6 +105,8 @@ export class QueryBuilder<TResult> {
 
 const OP_QUERY = 'query' as unknown as import('graphql').OperationTypeNode;
 const OP_MUTATION = 'mutation' as unknown as import('graphql').OperationTypeNode;
+const OP_SUBSCRIPTION =
+  'subscription' as unknown as import('graphql').OperationTypeNode;
 const ENUM_VALUE_KIND = 'EnumValue' as unknown as EnumValueNode['kind'];
 
 // ============================================================================
@@ -759,6 +761,77 @@ export function buildCustomDocument<TSelect, TArgs>(
     document: print(document),
     variables: (args ?? {}) as Record<string, unknown>,
   };
+}
+
+export function buildSubscriptionDocument<TSelect>(
+  operationName: string,
+  subscriptionField: string,
+  rowField: string,
+  payloadMetaFields: string[],
+  select: TSelect,
+  args: Record<string, unknown>,
+  argTypes: Array<{ name: string; type: string }>,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+): { document: string; variables: Record<string, unknown> } {
+  const selections = buildSelections(
+    select as Record<string, unknown>,
+    connectionFieldsMap,
+    operationName,
+  );
+  if (selections.length === 0) {
+    throw new Error(
+      `[buildSubscriptionDocument] subscription "${operationName}" requires a non-empty select. Pass at least one field in args.select.`,
+    );
+  }
+  const variableDefinitions: VariableDefinitionNode[] = [];
+  const subscriptionArgs: ArgumentNode[] = [];
+  const variables: Record<string, unknown> = {};
+
+  for (const argType of argTypes) {
+    addVariable(
+      {
+        varName: argType.name,
+        typeName: argType.type,
+        value: args[argType.name],
+      },
+      variableDefinitions,
+      subscriptionArgs,
+      variables,
+    );
+  }
+
+  const payloadSelections: FieldNode[] = [
+    ...payloadMetaFields.map((name) => t.field({ name })),
+    t.field({
+      name: rowField,
+      selectionSet: t.selectionSet({ selections }),
+    }),
+  ];
+
+  const document = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: OP_SUBSCRIPTION,
+        name: operationName + 'Subscription',
+        variableDefinitions: variableDefinitions.length
+          ? variableDefinitions
+          : undefined,
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: subscriptionField,
+              args: subscriptionArgs.length ? subscriptionArgs : undefined,
+              selectionSet: t.selectionSet({
+                selections: payloadSelections,
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+
+  return { document: print(document), variables };
 }
 
 function isCustomSelectionWrapper(

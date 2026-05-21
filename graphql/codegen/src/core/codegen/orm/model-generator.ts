@@ -9,7 +9,8 @@ import * as t from '@babel/types';
 import { singularize } from 'inflekt';
 
 import type { Table } from '../../../types/schema';
-import { asConst, generateCode } from '../babel-ast';
+import { asConst, generateCode, tsTypeFromPrimitive, typedParam, typeRefToBabelType } from '../babel-ast';
+import { formatTypeRef } from '../docs-utils';
 import {
   getCreateInputTypeName,
   getCreateMutationName,
@@ -139,13 +140,6 @@ function createTypeParam(
   return t.tsTypeParameterDeclaration([param]);
 }
 
-function tsTypeFromPrimitive(typeName: string): t.TSType {
-  if (typeName === 'string') return t.tsStringKeyword();
-  if (typeName === 'number') return t.tsNumberKeyword();
-  if (typeName === 'boolean') return t.tsBooleanKeyword();
-  return t.tsTypeReference(t.identifier(typeName));
-}
-
 /** Build a required `select: S` property for overload signatures */
 function requiredSelectProp(): t.TSPropertySignature {
   const prop = t.tsPropertySignature(
@@ -205,6 +199,18 @@ export function generateModelFile(
   const statements: t.Statement[] = [];
 
   statements.push(createImportDeclaration('../client', ['OrmClient']));
+  if (table.subscription) {
+    statements.push(
+      createImportDeclaration(
+        '../client',
+        ['SubscriptionEvent', 'SubscriptionFieldMeta', 'Unsubscribe'],
+        true,
+      ),
+    );
+    statements.push(
+      createImportDeclaration('../client', ['subscribeAsAsyncIterable']),
+    );
+  }
   const m2nRels = table.relations.manyToMany.filter(
     (r) => r.junctionLeftKeyFields?.length && r.junctionRightKeyFields?.length,
   );
@@ -234,6 +240,7 @@ export function generateModelFile(
     ...(bulkUpsertMutationName ? ['buildBulkUpsertDocument'] : []),
     ...(bulkUpdateMutationName ? ['buildBulkUpdateDocument'] : []),
     ...(bulkDeleteMutationName ? ['buildBulkDeleteDocument'] : []),
+    ...(table.subscription ? ['buildSubscriptionDocument'] : []),
   ];
   statements.push(
     createImportDeclaration('../query-builder', queryBuilderImports),
@@ -256,13 +263,11 @@ export function generateModelFile(
     ),
   );
   const inputTypeImports = [
-    typeName,
     relationTypeName,
     selectTypeName,
     whereTypeName,
     orderByTypeName,
     createInputTypeName,
-    updateInputTypeName,
     patchTypeName,
   ];
   statements.push(
@@ -1491,6 +1496,263 @@ export function generateModelFile(
 
       classBody.push(
         t.classMethod('method', t.identifier(`remove${relSingular}`), params, t.blockStatement(body)),
+      );
+    }
+  }
+
+  // ── subscribe ─────────────────────────────────────────────────────────
+  if (table.subscription) {
+    const subscription = table.subscription;
+    const selectedResultType = t.tsTypeReference(
+      t.identifier('InferSelectResult'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(t.identifier(relationTypeName)),
+        sRef(),
+      ]),
+    );
+
+    const subscribeProps: t.TSPropertySignature[] = [
+      requiredSelectProp(),
+      ...subscription.args.map((arg) => {
+        const prop = t.tsPropertySignature(
+          t.identifier(arg.name),
+          t.tsTypeAnnotation(typeRefToBabelType(arg.type)),
+        );
+        prop.optional = arg.type.kind !== 'NON_NULL';
+        return prop;
+      }),
+      t.tsPropertySignature(
+        t.identifier('onEvent'),
+        t.tsTypeAnnotation(
+          t.tsFunctionType(
+            null,
+            [
+              typedParam('event', t.tsTypeReference(
+                t.identifier('SubscriptionEvent'),
+                t.tsTypeParameterInstantiation([selectedResultType]),
+              )),
+            ],
+            t.tsTypeAnnotation(t.tsVoidKeyword()),
+          ),
+        ),
+      ),
+      (() => {
+        const prop = t.tsPropertySignature(
+          t.identifier('onError'),
+          t.tsTypeAnnotation(
+            t.tsFunctionType(
+              null,
+              [typedParam('error', t.tsTypeReference(t.identifier('Error')))],
+              t.tsTypeAnnotation(t.tsVoidKeyword()),
+            ),
+          ),
+        );
+        prop.optional = true;
+        return prop;
+      })(),
+      (() => {
+        const prop = t.tsPropertySignature(
+          t.identifier('onComplete'),
+          t.tsTypeAnnotation(
+            t.tsFunctionType(
+              null,
+              [],
+              t.tsTypeAnnotation(t.tsVoidKeyword()),
+            ),
+          ),
+        );
+        prop.optional = true;
+        return prop;
+      })(),
+    ];
+
+    const argsParam = t.identifier('args');
+    argsParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsIntersectionType([
+        t.tsTypeLiteral(subscribeProps),
+        strictSelectGuard(selectTypeName),
+      ]),
+    );
+
+    const metaId = t.identifier('meta');
+    metaId.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier('SubscriptionFieldMeta')),
+    );
+    const metaDecl = t.variableDeclaration('const', [
+      t.variableDeclarator(
+        metaId,
+        t.objectExpression([
+          t.objectProperty(t.identifier('fieldName'), t.stringLiteral(subscription.fieldName)),
+          t.objectProperty(t.identifier('tableName'), t.stringLiteral(singularName)),
+          t.objectProperty(t.identifier('dataFieldName'), t.stringLiteral(subscription.rowFieldName)),
+        ]),
+      ),
+    ]);
+
+    const destructureDecl = t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.objectPattern([
+          t.objectProperty(t.identifier('document'), t.identifier('document'), false, true),
+          t.objectProperty(t.identifier('variables'), t.identifier('variables'), false, true),
+        ]),
+        t.callExpression(t.identifier('buildSubscriptionDocument'), [
+          t.stringLiteral(typeName),
+          t.stringLiteral(subscription.fieldName),
+          t.stringLiteral(subscription.rowFieldName),
+          t.arrayExpression(
+            subscription.payloadMetaFields.map((field) => t.stringLiteral(field)),
+          ),
+          t.memberExpression(t.identifier('args'), t.identifier('select')),
+          t.objectExpression(
+            subscription.args.map((arg) =>
+              t.objectProperty(
+                t.identifier(arg.name),
+                t.memberExpression(t.identifier('args'), t.identifier(arg.name)),
+              ),
+            ),
+          ),
+          t.arrayExpression(
+            subscription.args.map((arg) =>
+              t.objectExpression([
+                t.objectProperty(t.identifier('name'), t.stringLiteral(arg.name)),
+                t.objectProperty(
+                  t.identifier('type'),
+                  t.stringLiteral(formatTypeRef(arg.type)),
+                ),
+              ]),
+            ),
+          ),
+          t.identifier('connectionFieldsMap'),
+        ]),
+      ),
+    ]);
+
+    const subscribeCall = t.callExpression(
+      t.memberExpression(
+        t.memberExpression(t.thisExpression(), t.identifier('client')),
+        t.identifier('subscribe'),
+      ),
+      [
+        t.identifier('meta'),
+        t.identifier('document'),
+        t.identifier('variables'),
+        t.objectExpression([
+          t.objectProperty(
+            t.identifier('onEvent'),
+            t.memberExpression(t.identifier('args'), t.identifier('onEvent')),
+          ),
+          t.objectProperty(
+            t.identifier('onError'),
+            t.memberExpression(t.identifier('args'), t.identifier('onError')),
+          ),
+          t.objectProperty(
+            t.identifier('onComplete'),
+            t.memberExpression(t.identifier('args'), t.identifier('onComplete')),
+          ),
+        ]),
+      ],
+    );
+    subscribeCall.typeParameters = t.tsTypeParameterInstantiation([
+      selectedResultType,
+    ]);
+
+    classBody.push(
+      createClassMethod(
+        'subscribe',
+        createTypeParam(selectTypeName),
+        [argsParam],
+        t.tsTypeAnnotation(t.tsTypeReference(t.identifier('Unsubscribe'))),
+        [metaDecl, destructureDecl, t.returnStatement(subscribeCall)],
+      ),
+    );
+
+    // ── events (AsyncIterableIterator adapter) ─────────────────────────────
+    {
+      // Build the args type for events(): same subscription args + select + optional signal
+      const eventsProps: t.TSPropertySignature[] = [
+        requiredSelectProp(),
+        ...subscription.args.map((arg) => {
+          const prop = t.tsPropertySignature(
+            t.identifier(arg.name),
+            t.tsTypeAnnotation(typeRefToBabelType(arg.type)),
+          );
+          prop.optional = arg.type.kind !== 'NON_NULL';
+          return prop;
+        }),
+        (() => {
+          const prop = t.tsPropertySignature(
+            t.identifier('signal'),
+            t.tsTypeAnnotation(t.tsTypeReference(t.identifier('AbortSignal'))),
+          );
+          prop.optional = true;
+          return prop;
+        })(),
+      ];
+
+      const eventsArgsParam = t.identifier('args');
+      eventsArgsParam.typeAnnotation = t.tsTypeAnnotation(
+        t.tsIntersectionType([
+          t.tsTypeLiteral(eventsProps),
+          strictSelectGuard(selectTypeName),
+        ]),
+      );
+
+      // Return type: AsyncIterableIterator<SubscriptionEvent<InferSelectResult<XxxWithRelations, S>>>
+      const eventsReturnType = t.tsTypeAnnotation(
+        t.tsTypeReference(
+          t.identifier('AsyncIterableIterator'),
+          t.tsTypeParameterInstantiation([
+            t.tsTypeReference(
+              t.identifier('SubscriptionEvent'),
+              t.tsTypeParameterInstantiation([
+                t.tsTypeReference(
+                  t.identifier('InferSelectResult'),
+                  t.tsTypeParameterInstantiation([
+                    t.tsTypeReference(t.identifier(relationTypeName)),
+                    sRef(),
+                  ]),
+                ),
+              ]),
+            ),
+          ]),
+        ),
+      );
+
+      // Body: return subscribeAsAsyncIterable((callbacks) => this.subscribe({ ...args, ...callbacks }), args.signal)
+      const callbacksParam = t.identifier('callbacks');
+      const spreadArgsCallbacks = t.arrowFunctionExpression(
+        [callbacksParam],
+        t.callExpression(
+          t.memberExpression(t.thisExpression(), t.identifier('subscribe')),
+          [
+            t.objectExpression([
+              t.spreadElement(t.identifier('args')),
+              t.spreadElement(t.identifier('callbacks')),
+            ]),
+          ],
+        ),
+      );
+      // Cast the spread arrow to the S-bound form to preserve generic inference
+      const eventsBody: t.Statement[] = [
+        t.returnStatement(
+          t.callExpression(
+            t.identifier('subscribeAsAsyncIterable'),
+            [
+              spreadArgsCallbacks,
+              t.memberExpression(t.identifier('args'), t.identifier('signal')),
+            ],
+          ),
+        ),
+      ];
+
+      classBody.push(
+        createClassMethod(
+          'events',
+          createTypeParam(selectTypeName),
+          [eventsArgsParam],
+          eventsReturnType,
+          eventsBody,
+        ),
       );
     }
   }

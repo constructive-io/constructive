@@ -17,6 +17,7 @@ export type {
   TableConstraints,
   TableInflection,
   TableQueryNames,
+  TableSubscription,
 } from './schema';
 
 // Query types

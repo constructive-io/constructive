@@ -299,10 +299,11 @@ export function generate(options: GenerateOptions): GenerateResult {
   }
 
   // 8b. Generate subscription hooks (subscriptions/*.ts)
-  // Only generate for tables with the @realtime smart tag
-  const realtimeTables = tables.filter(
-    (t) => t.smartTags?.['@realtime'] !== undefined,
-  );
+  // Only generate for tables whose live schema exposes a subscription field,
+  // and only when React Query is enabled (subscription hooks are RQ hooks).
+  const realtimeTables = reactQueryEnabled
+    ? tables.filter((t) => t.subscription !== undefined)
+    : [];
   const subscriptionHooks = generateAllSubscriptionHooks(realtimeTables);
   for (const hook of subscriptionHooks) {
     files.push({
@@ -311,7 +312,7 @@ export function generate(options: GenerateOptions): GenerateResult {
     });
   }
 
-  // 8c. Generate connection state hook + barrel only if any table has @realtime
+  // 8c. Generate connection state hook + barrel only if any subscription exists
   const hasSubscriptions = subscriptionHooks.length > 0;
   if (hasSubscriptions) {
     const connectionStateHook = generateConnectionStateHook();

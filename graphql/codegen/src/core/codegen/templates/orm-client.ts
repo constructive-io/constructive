@@ -19,7 +19,6 @@ import type {
   ConnectionState,
   ConnectionStateListener,
   RealtimeConfig,
-  SubscribeOptions,
   SubscriptionEvent,
   SubscriptionFieldMeta,
   Unsubscribe,
@@ -43,7 +42,7 @@ export type {
   Unsubscribe,
   WsClient,
 } from './realtime';
-export { RealtimeManager } from './realtime';
+export { RealtimeManager, subscribeAsAsyncIterable } from './realtime';
 
 /**
  * Default adapter that uses fetch for HTTP requests.
@@ -240,9 +239,9 @@ export class OrmClient {
     return this.adapter.getEndpoint?.() ?? '';
   }
 
-  /** Get current WebSocket connection state */
-  getConnectionState(): ConnectionState {
-    return this.realtimeManager?.getConnectionState() ?? 'disconnected';
+  /** Current WebSocket connection state */
+  get connectionState(): ConnectionState {
+    return this.realtimeManager?.connectionState ?? { status: 'idle' };
   }
 
   /** Register a listener for WebSocket connection state changes */
@@ -254,17 +253,17 @@ export class OrmClient {
   }
 
   /** Number of active subscriptions */
-  getActiveSubscriptionCount(): number {
-    return this.realtimeManager?.getActiveSubscriptionCount() ?? 0;
+  get activeSubscriptionCount(): number {
+    return this.realtimeManager?.activeSubscriptionCount ?? 0;
   }
 
   /** Whether realtime is configured */
-  get isRealtimeEnabled(): boolean {
+  get isEnabled(): boolean {
     return this.realtimeManager !== undefined;
   }
 
-  /** Dispose the realtime manager (close WebSocket) */
-  dispose(): void {
-    this.realtimeManager?.dispose();
+  /** Close the realtime manager (terminate WebSocket) */
+  close(): void {
+    this.realtimeManager?.close();
   }
 }

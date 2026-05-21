@@ -160,6 +160,7 @@ export function getSubscriptionFileName(table: Table): string {
  * e.g., "onContactChanged"
  */
 export function getSubscriptionFieldName(table: Table): string {
+  if (table.subscription) return table.subscription.fieldName;
   const { singularName } = getTableNames(table);
   return `on${ucFirst(singularName)}Changed`;
 }

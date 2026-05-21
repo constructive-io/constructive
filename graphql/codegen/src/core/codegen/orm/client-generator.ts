@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import type { Table } from '../../../types/schema';
-import { commentBlock, generateCode } from '../babel-ast';
+import { commentBlock, generateCode, typedParam } from '../babel-ast';
 import { getGeneratedFileHeader, getTableNames, lcFirst } from '../utils';
 
 export interface GeneratedClientFile {
@@ -144,7 +144,11 @@ export function generateCreateClientFile(
   // Import OrmClient (value) and OrmClientConfig (type) separately
   statements.push(createImportDeclaration('./client', ['OrmClient']));
   statements.push(
-    createImportDeclaration('./client', ['OrmClientConfig'], true),
+    createImportDeclaration(
+      './client',
+      ['OrmClientConfig', 'ConnectionStateListener'],
+      true,
+    ),
   );
 
   // Import models
@@ -189,6 +193,34 @@ export function generateCreateClientFile(
       t.exportSpecifier(
         t.identifier('GraphQLAdapter'),
         t.identifier('GraphQLAdapter'),
+      ),
+      t.exportSpecifier(
+        t.identifier('ConnectionState'),
+        t.identifier('ConnectionState'),
+      ),
+      t.exportSpecifier(
+        t.identifier('ConnectionStateListener'),
+        t.identifier('ConnectionStateListener'),
+      ),
+      t.exportSpecifier(
+        t.identifier('RealtimeConfig'),
+        t.identifier('RealtimeConfig'),
+      ),
+      t.exportSpecifier(
+        t.identifier('SubscriptionEvent'),
+        t.identifier('SubscriptionEvent'),
+      ),
+      t.exportSpecifier(
+        t.identifier('SubscriptionOperation'),
+        t.identifier('SubscriptionOperation'),
+      ),
+      t.exportSpecifier(
+        t.identifier('Unsubscribe'),
+        t.identifier('Unsubscribe'),
+      ),
+      t.exportSpecifier(
+        t.identifier('WsClient'),
+        t.identifier('WsClient'),
       ),
     ],
     t.stringLiteral('./client'),
@@ -295,6 +327,78 @@ export function generateCreateClientFile(
       ),
     );
   }
+
+  returnProperties.push(
+    t.objectProperty(
+      t.identifier('realtime'),
+      t.objectExpression([
+        t.objectMethod(
+          'get',
+          t.identifier('connectionState'),
+          [],
+          t.blockStatement([
+            t.returnStatement(
+              t.memberExpression(
+                t.identifier('client'),
+                t.identifier('connectionState'),
+              ),
+            ),
+          ]),
+        ),
+        t.objectMethod(
+          'get',
+          t.identifier('isEnabled'),
+          [],
+          t.blockStatement([
+            t.returnStatement(
+              t.memberExpression(
+                t.identifier('client'),
+                t.identifier('isEnabled'),
+              ),
+            ),
+          ]),
+        ),
+        t.objectMethod(
+          'get',
+          t.identifier('activeSubscriptionCount'),
+          [],
+          t.blockStatement([
+            t.returnStatement(
+              t.memberExpression(
+                t.identifier('client'),
+                t.identifier('activeSubscriptionCount'),
+              ),
+            ),
+          ]),
+        ),
+        t.objectProperty(
+          t.identifier('onConnectionStateChange'),
+          t.arrowFunctionExpression(
+            [
+              typedParam('listener', t.tsTypeReference(t.identifier('ConnectionStateListener'))),
+            ],
+            t.callExpression(
+              t.memberExpression(
+                t.identifier('client'),
+                t.identifier('onConnectionStateChange'),
+              ),
+              [t.identifier('listener')],
+            ),
+          ),
+        ),
+        t.objectProperty(
+          t.identifier('close'),
+          t.arrowFunctionExpression(
+            [],
+            t.callExpression(
+              t.memberExpression(t.identifier('client'), t.identifier('close')),
+              [],
+            ),
+          ),
+        ),
+      ]),
+    ),
+  );
 
   // Build the createClient function body
   const clientDecl = t.variableDeclaration('const', [
