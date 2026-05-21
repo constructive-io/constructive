@@ -372,11 +372,11 @@ jobs:
         ports:
           - 11434:11434
         options: >-
-          --health-cmd "curl -f http://localhost:11434/ || exit 1"
-          --health-interval 15s
-          --health-timeout 10s
+          --health-cmd "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
+          --health-interval 10s
+          --health-timeout 5s
           --health-retries 10
-          --health-start-period 30s
+          --health-start-period 10s
 
     steps:
       - name: Download workspace
