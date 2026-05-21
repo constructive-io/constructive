@@ -1,0 +1,35 @@
+{
+  "name": "@constructive-io/graphile-realtime-codegen-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "E2E harness for generated ORM realtime client against a real PostGraphile + graphql-ws server",
+  "author": "Constructive <developers@constructive.io>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "lint": "eslint . --fix",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@constructive-io/graphql-codegen": "workspace:^",
+    "@constructive-io/graphql-query": "workspace:^",
+    "@tanstack/react-query": "^5.90.21",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-test-renderer": "^19.0.0",
+    "@types/ws": "^8.18.1",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
+    "graphile-realtime-test": "workspace:^",
+    "graphql-ws": "^6.0.8",
+    "jest": "^30.3.0",
+    "pgsql-test": "workspace:^",
+    "react": "^19.2.4",
+    "react-test-renderer": "^19.2.4",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.9.3",
+    "ws": "^8.20.0"
+  }
+}

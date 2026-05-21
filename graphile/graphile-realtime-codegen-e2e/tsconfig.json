@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "isolatedModules": false,
+    "jsx": "react"
+  },
+  "include": [
+    "__tests__/**/*.ts",
+    "jest.setup.ts"
+  ],
+  "exclude": ["dist", "node_modules", "**/*.spec.*"]
+}
