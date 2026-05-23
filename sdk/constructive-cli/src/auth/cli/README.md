@@ -30,7 +30,7 @@ csdk auth set-token <your-token>
 | `phone-number` | phoneNumber CRUD operations |
 | `crypto-address` | cryptoAddress CRUD operations |
 | `webauthn-credential` | webauthnCredential CRUD operations |
-| `audit-log` | auditLog CRUD operations |
+| `audit-log-auth` | auditLogAuth CRUD operations |
 | `identity-provider` | identityProvider CRUD operations |
 | `role-type` | roleType CRUD operations |
 | `user-connected-account` | userConnectedAccount CRUD operations |
@@ -55,10 +55,10 @@ csdk auth set-token <your-token>
 | `reset-password` | resetPassword |
 | `sign-in-cross-origin` | signInCrossOrigin |
 | `sign-up` | signUp |
-| `request-cross-origin-token` | requestCrossOriginToken |
 | `sign-in` | signIn |
 | `extend-token-expires` | extendTokenExpires |
 | `create-api-key` | createApiKey |
+| `request-cross-origin-token` | requestCrossOriginToken |
 | `forgot-password` | forgotPassword |
 | `send-verification-email` | sendVerificationEmail |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
@@ -230,23 +230,24 @@ CRUD operations for WebauthnCredential records.
 **Required create fields:** `credentialId`, `publicKey`, `webauthnUserId`, `credentialDeviceType`
 **Optional create fields (backend defaults):** `ownerId`, `signCount`, `transports`, `backupEligible`, `backupState`, `name`, `lastUsedAt`
 
-### `audit-log`
+### `audit-log-auth`
 
-CRUD operations for AuditLog records.
+CRUD operations for AuditLogAuth records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all auditLog records |
-| `find-first` | Find first matching auditLog record |
-| `get` | Get a auditLog by id |
-| `create` | Create a new auditLog |
-| `update` | Update an existing auditLog |
-| `delete` | Delete a auditLog |
+| `list` | List all auditLogAuth records |
+| `find-first` | Find first matching auditLogAuth record |
+| `get` | Get a auditLogAuth by id |
+| `create` | Create a new auditLogAuth |
+| `update` | Update an existing auditLogAuth |
+| `delete` | Delete a auditLogAuth |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
+| `createdAt` | Datetime |
 | `id` | UUID |
 | `event` | String |
 | `actorId` | UUID |
@@ -254,7 +255,6 @@ CRUD operations for AuditLog records.
 | `userAgent` | String |
 | `ipAddress` | InternetAddress |
 | `success` | Boolean |
-| `createdAt` | Datetime |
 
 **Required create fields:** `event`, `success`
 **Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
@@ -623,21 +623,6 @@ signUp
   | `--input.csrfToken` | String |
   | `--input.deviceToken` | String |
 
-### `request-cross-origin-token`
-
-requestCrossOriginToken
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | String |
-  | `--input.password` | String |
-  | `--input.origin` | Origin |
-  | `--input.rememberMe` | Boolean |
-
 ### `sign-in`
 
 signIn
@@ -681,6 +666,21 @@ createApiKey
   | `--input.accessLevel` | String |
   | `--input.mfaLevel` | String |
   | `--input.expiresIn` | IntervalInput |
+
+### `request-cross-origin-token`
+
+requestCrossOriginToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.origin` | Origin |
+  | `--input.rememberMe` | Boolean |
 
 ### `forgot-password`
 

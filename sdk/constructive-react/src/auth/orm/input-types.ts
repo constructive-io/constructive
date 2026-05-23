@@ -310,8 +310,10 @@ export interface WebauthnCredential {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
-/** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
-export interface AuditLog {
+/** Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
+export interface AuditLogAuth {
+  createdAt?: string | null;
+  /** Unique identifier for each audit event (uuidv7 provides temporal ordering) */
   id: string;
   /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
   event?: string | null;
@@ -325,8 +327,6 @@ export interface AuditLog {
   ipAddress?: string | null;
   /** Whether the authentication attempt succeeded */
   success?: boolean | null;
-  /** Timestamp when the audit event was recorded */
-  createdAt?: string | null;
 }
 export interface IdentityProvider {
   slug?: string | null;
@@ -390,7 +390,7 @@ export interface CryptoAddressRelations {
 export interface WebauthnCredentialRelations {
   owner?: User | null;
 }
-export interface AuditLogRelations {
+export interface AuditLogAuthRelations {
   actor?: User | null;
 }
 export interface IdentityProviderRelations {}
@@ -402,14 +402,14 @@ export interface UserRelations {
   ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
   ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
   ownedWebauthnCredentials?: ConnectionResult<WebauthnCredential>;
-  auditLogsByActorId?: ConnectionResult<AuditLog>;
+  auditLogAuthsByActorId?: ConnectionResult<AuditLogAuth>;
 }
 // ============ Entity Types With Relations ============
 export type EmailWithRelations = Email & EmailRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
 export type WebauthnCredentialWithRelations = WebauthnCredential & WebauthnCredentialRelations;
-export type AuditLogWithRelations = AuditLog & AuditLogRelations;
+export type AuditLogAuthWithRelations = AuditLogAuth & AuditLogAuthRelations;
 export type IdentityProviderWithRelations = IdentityProvider & IdentityProviderRelations;
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
 export type UserConnectedAccountWithRelations = UserConnectedAccount &
@@ -475,7 +475,8 @@ export type WebauthnCredentialSelect = {
     select: UserSelect;
   };
 };
-export type AuditLogSelect = {
+export type AuditLogAuthSelect = {
+  createdAt?: boolean;
   id?: boolean;
   event?: boolean;
   actorId?: boolean;
@@ -483,7 +484,6 @@ export type AuditLogSelect = {
   userAgent?: boolean;
   ipAddress?: boolean;
   success?: boolean;
-  createdAt?: boolean;
   actor?: {
     select: UserSelect;
   };
@@ -548,11 +548,11 @@ export type UserSelect = {
     filter?: WebauthnCredentialFilter;
     orderBy?: WebauthnCredentialOrderBy[];
   };
-  auditLogsByActorId?: {
-    select: AuditLogSelect;
+  auditLogAuthsByActorId?: {
+    select: AuditLogAuthSelect;
     first?: number;
-    filter?: AuditLogFilter;
-    orderBy?: AuditLogOrderBy[];
+    filter?: AuditLogAuthFilter;
+    orderBy?: AuditLogAuthOrderBy[];
   };
 };
 // ============ Table Filter Types ============
@@ -674,7 +674,9 @@ export interface WebauthnCredentialFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-export interface AuditLogFilter {
+export interface AuditLogAuthFilter {
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `event` field. */
@@ -689,14 +691,12 @@ export interface AuditLogFilter {
   ipAddress?: InternetAddressFilter;
   /** Filter by the object’s `success` field. */
   success?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: AuditLogFilter[];
+  and?: AuditLogAuthFilter[];
   /** Checks for any expressions in this list. */
-  or?: AuditLogFilter[];
+  or?: AuditLogAuthFilter[];
   /** Negates the expression. */
-  not?: AuditLogFilter;
+  not?: AuditLogAuthFilter;
   /** Filter by the object’s `actor` relation. */
   actor?: UserFilter;
   /** A related `actor` exists. */
@@ -797,10 +797,10 @@ export interface UserFilter {
   ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
   /** `ownedWebauthnCredentials` exist. */
   ownedWebauthnCredentialsExist?: boolean;
-  /** Filter by the object’s `auditLogsByActorId` relation. */
-  auditLogsByActorId?: UserToManyAuditLogFilter;
-  /** `auditLogsByActorId` exist. */
-  auditLogsByActorIdExist?: boolean;
+  /** Filter by the object’s `auditLogAuthsByActorId` relation. */
+  auditLogAuthsByActorId?: UserToManyAuditLogAuthFilter;
+  /** `auditLogAuthsByActorId` exist. */
+  auditLogAuthsByActorIdExist?: boolean;
   /** TSV search on the `search_tsv` column. */
   tsvSearchTsv?: string;
   /** TRGM search on the `display_name` column. */
@@ -908,10 +908,12 @@ export type WebauthnCredentialOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type AuditLogOrderBy =
+export type AuditLogAuthOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EVENT_ASC'
@@ -925,9 +927,7 @@ export type AuditLogOrderBy =
   | 'IP_ADDRESS_ASC'
   | 'IP_ADDRESS_DESC'
   | 'SUCCESS_ASC'
-  | 'SUCCESS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
+  | 'SUCCESS_DESC';
 export type IdentityProviderOrderBy =
   | 'NATURAL'
   | 'SLUG_ASC'
@@ -1111,9 +1111,9 @@ export interface DeleteWebauthnCredentialInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAuditLogInput {
+export interface CreateAuditLogAuthInput {
   clientMutationId?: string;
-  auditLog: {
+  auditLogAuth: {
     event: string;
     actorId?: string;
     origin?: ConstructiveInternalTypeOrigin;
@@ -1122,7 +1122,7 @@ export interface CreateAuditLogInput {
     success: boolean;
   };
 }
-export interface AuditLogPatch {
+export interface AuditLogAuthPatch {
   event?: string | null;
   actorId?: string | null;
   origin?: ConstructiveInternalTypeOrigin | null;
@@ -1130,12 +1130,12 @@ export interface AuditLogPatch {
   ipAddress?: string | null;
   success?: boolean | null;
 }
-export interface UpdateAuditLogInput {
+export interface UpdateAuditLogAuthInput {
   clientMutationId?: string;
   id: string;
-  auditLogPatch: AuditLogPatch;
+  auditLogAuthPatch: AuditLogAuthPatch;
 }
-export interface DeleteAuditLogInput {
+export interface DeleteAuditLogAuthInput {
   clientMutationId?: string;
   id: string;
 }
@@ -1241,7 +1241,7 @@ export const connectionFieldsMap = {
     ownedPhoneNumbers: 'PhoneNumber',
     ownedCryptoAddresses: 'CryptoAddress',
     ownedWebauthnCredentials: 'WebauthnCredential',
-    auditLogsByActorId: 'AuditLog',
+    auditLogAuthsByActorId: 'AuditLogAuth',
   },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
@@ -1315,13 +1315,6 @@ export interface SignUpInput {
   csrfToken?: string;
   deviceToken?: string;
 }
-export interface RequestCrossOriginTokenInput {
-  clientMutationId?: string;
-  email?: string;
-  password?: string;
-  origin?: ConstructiveInternalTypeOrigin;
-  rememberMe?: boolean;
-}
 export interface SignInInput {
   clientMutationId?: string;
   email?: string;
@@ -1341,6 +1334,13 @@ export interface CreateApiKeyInput {
   accessLevel?: string;
   mfaLevel?: string;
   expiresIn?: IntervalInput;
+}
+export interface RequestCrossOriginTokenInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+  origin?: ConstructiveInternalTypeOrigin;
+  rememberMe?: boolean;
 }
 export interface ForgotPasswordInput {
   clientMutationId?: string;
@@ -1682,14 +1682,14 @@ export interface UserToManyWebauthnCredentialFilter {
   /** Filters to entities where no related entity matches. */
   none?: WebauthnCredentialFilter;
 }
-/** A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyAuditLogFilter {
+/** A filter to be used against many `AuditLogAuth` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAuditLogAuthFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: AuditLogFilter;
+  some?: AuditLogAuthFilter;
   /** Filters to entities where every related entity matches. */
-  every?: AuditLogFilter;
+  every?: AuditLogAuthFilter;
   /** Filters to entities where no related entity matches. */
-  none?: AuditLogFilter;
+  none?: AuditLogAuthFilter;
 }
 /** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
 export interface TrgmSearchInput {
@@ -1839,8 +1839,10 @@ export interface WebauthnCredentialFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-/** A filter to be used against `AuditLog` object types. All fields are combined with a logical ‘and.’ */
-export interface AuditLogFilter {
+/** A filter to be used against `AuditLogAuth` object types. All fields are combined with a logical ‘and.’ */
+export interface AuditLogAuthFilter {
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `event` field. */
@@ -1855,14 +1857,12 @@ export interface AuditLogFilter {
   ipAddress?: InternetAddressFilter;
   /** Filter by the object’s `success` field. */
   success?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: AuditLogFilter[];
+  and?: AuditLogAuthFilter[];
   /** Checks for any expressions in this list. */
-  or?: AuditLogFilter[];
+  or?: AuditLogAuthFilter[];
   /** Negates the expression. */
-  not?: AuditLogFilter;
+  not?: AuditLogAuthFilter;
   /** Filter by the object’s `actor` relation. */
   actor?: UserFilter;
   /** A related `actor` exists. */
@@ -2062,10 +2062,10 @@ export interface UserFilter {
   ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
   /** `ownedWebauthnCredentials` exist. */
   ownedWebauthnCredentialsExist?: boolean;
-  /** Filter by the object’s `auditLogsByActorId` relation. */
-  auditLogsByActorId?: UserToManyAuditLogFilter;
-  /** `auditLogsByActorId` exist. */
-  auditLogsByActorIdExist?: boolean;
+  /** Filter by the object’s `auditLogAuthsByActorId` relation. */
+  auditLogAuthsByActorId?: UserToManyAuditLogAuthFilter;
+  /** `auditLogAuthsByActorId` exist. */
+  auditLogAuthsByActorIdExist?: boolean;
   /** TSV search on the `search_tsv` column. */
   tsvSearchTsv?: string;
   /** TRGM search on the `display_name` column. */
@@ -2355,14 +2355,6 @@ export type SignUpPayloadSelect = {
     select: SignUpRecordSelect;
   };
 };
-export interface RequestCrossOriginTokenPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type RequestCrossOriginTokenPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
 export interface SignInPayload {
   clientMutationId?: string | null;
   result?: SignInRecord | null;
@@ -2392,6 +2384,14 @@ export type CreateApiKeyPayloadSelect = {
   result?: {
     select: CreateApiKeyRecordSelect;
   };
+};
+export interface RequestCrossOriginTokenPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type RequestCrossOriginTokenPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface ForgotPasswordPayload {
   clientMutationId?: string | null;
@@ -2609,49 +2609,49 @@ export type DeleteWebauthnCredentialPayloadSelect = {
     select: WebauthnCredentialEdgeSelect;
   };
 };
-export interface CreateAuditLogPayload {
+export interface CreateAuditLogAuthPayload {
   clientMutationId?: string | null;
-  /** The `AuditLog` that was created by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
+  /** The `AuditLogAuth` that was created by this mutation. */
+  auditLogAuth?: AuditLogAuth | null;
+  auditLogAuthEdge?: AuditLogAuthEdge | null;
 }
-export type CreateAuditLogPayloadSelect = {
+export type CreateAuditLogAuthPayloadSelect = {
   clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
+  auditLogAuth?: {
+    select: AuditLogAuthSelect;
   };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
+  auditLogAuthEdge?: {
+    select: AuditLogAuthEdgeSelect;
   };
 };
-export interface UpdateAuditLogPayload {
+export interface UpdateAuditLogAuthPayload {
   clientMutationId?: string | null;
-  /** The `AuditLog` that was updated by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
+  /** The `AuditLogAuth` that was updated by this mutation. */
+  auditLogAuth?: AuditLogAuth | null;
+  auditLogAuthEdge?: AuditLogAuthEdge | null;
 }
-export type UpdateAuditLogPayloadSelect = {
+export type UpdateAuditLogAuthPayloadSelect = {
   clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
+  auditLogAuth?: {
+    select: AuditLogAuthSelect;
   };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
+  auditLogAuthEdge?: {
+    select: AuditLogAuthEdgeSelect;
   };
 };
-export interface DeleteAuditLogPayload {
+export interface DeleteAuditLogAuthPayload {
   clientMutationId?: string | null;
-  /** The `AuditLog` that was deleted by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
+  /** The `AuditLogAuth` that was deleted by this mutation. */
+  auditLogAuth?: AuditLogAuth | null;
+  auditLogAuthEdge?: AuditLogAuthEdge | null;
 }
-export type DeleteAuditLogPayloadSelect = {
+export type DeleteAuditLogAuthPayloadSelect = {
   clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
+  auditLogAuth?: {
+    select: AuditLogAuthSelect;
   };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
+  auditLogAuthEdge?: {
+    select: AuditLogAuthEdgeSelect;
   };
 };
 export interface CreateIdentityProviderPayload {
@@ -2886,16 +2886,16 @@ export type WebauthnCredentialEdgeSelect = {
     select: WebauthnCredentialSelect;
   };
 };
-/** A `AuditLog` edge in the connection. */
-export interface AuditLogEdge {
+/** A `AuditLogAuth` edge in the connection. */
+export interface AuditLogAuthEdge {
   cursor?: string | null;
-  /** The `AuditLog` at the end of the edge. */
-  node?: AuditLog | null;
+  /** The `AuditLogAuth` at the end of the edge. */
+  node?: AuditLogAuth | null;
 }
-export type AuditLogEdgeSelect = {
+export type AuditLogAuthEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: AuditLogSelect;
+    select: AuditLogAuthSelect;
   };
 };
 /** A `RoleType` edge in the connection. */

@@ -15,42 +15,41 @@ import appLimitCreditCodeItemCmd from './commands/app-limit-credit-code-item';
 import appLimitCreditCmd from './commands/app-limit-credit';
 import orgMemberCmd from './commands/org-member';
 import appPermissionDefaultCmd from './commands/app-permission-default';
-import appLimitCreditCodeCmd from './commands/app-limit-credit-code';
-import orgPermissionDefaultCmd from './commands/org-permission-default';
 import appAdminGrantCmd from './commands/app-admin-grant';
 import appOwnerGrantCmd from './commands/app-owner-grant';
+import orgPermissionDefaultCmd from './commands/org-permission-default';
+import appMembershipDefaultCmd from './commands/app-membership-default';
+import orgAdminGrantCmd from './commands/org-admin-grant';
+import orgMembershipDefaultCmd from './commands/org-membership-default';
+import orgOwnerGrantCmd from './commands/org-owner-grant';
 import appLimitCapsDefaultCmd from './commands/app-limit-caps-default';
 import orgLimitCapsDefaultCmd from './commands/org-limit-caps-default';
 import appLimitCapCmd from './commands/app-limit-cap';
 import orgLimitCapCmd from './commands/org-limit-cap';
-import orgAdminGrantCmd from './commands/org-admin-grant';
-import orgOwnerGrantCmd from './commands/org-owner-grant';
-import membershipTypeCmd from './commands/membership-type';
+import orgChartEdgeCmd from './commands/org-chart-edge';
 import appLimitDefaultCmd from './commands/app-limit-default';
 import orgLimitDefaultCmd from './commands/org-limit-default';
 import orgLimitCreditCmd from './commands/org-limit-credit';
+import appLimitCreditCodeCmd from './commands/app-limit-credit-code';
 import appLimitWarningCmd from './commands/app-limit-warning';
-import orgLimitWarningCmd from './commands/org-limit-warning';
 import orgChartEdgeGrantCmd from './commands/org-chart-edge-grant';
 import appClaimedInviteCmd from './commands/app-claimed-invite';
+import orgLimitWarningCmd from './commands/org-limit-warning';
+import membershipTypeCmd from './commands/membership-type';
 import appGrantCmd from './commands/app-grant';
-import appMembershipDefaultCmd from './commands/app-membership-default';
-import orgMembershipDefaultCmd from './commands/org-membership-default';
 import orgClaimedInviteCmd from './commands/org-claimed-invite';
+import orgGrantCmd from './commands/org-grant';
 import appLimitEventCmd from './commands/app-limit-event';
 import orgLimitEventCmd from './commands/org-limit-event';
-import orgGrantCmd from './commands/org-grant';
-import orgChartEdgeCmd from './commands/org-chart-edge';
-import usageSnapshotCmd from './commands/usage-snapshot';
-import appLimitCmd from './commands/app-limit';
-import appInviteCmd from './commands/app-invite';
 import orgMembershipSettingCmd from './commands/org-membership-setting';
+import appMembershipCmd from './commands/app-membership';
+import appLimitCmd from './commands/app-limit';
+import orgMembershipCmd from './commands/org-membership';
+import orgMemberProfileCmd from './commands/org-member-profile';
 import orgLimitAggregateCmd from './commands/org-limit-aggregate';
 import orgLimitCmd from './commands/org-limit';
-import orgMemberProfileCmd from './commands/org-member-profile';
-import appMembershipCmd from './commands/app-membership';
+import appInviteCmd from './commands/app-invite';
 import orgInviteCmd from './commands/org-invite';
-import orgMembershipCmd from './commands/org-membership';
 import appPermissionsGetPaddedMaskCmd from './commands/app-permissions-get-padded-mask';
 import orgPermissionsGetPaddedMaskCmd from './commands/org-permissions-get-padded-mask';
 import orgIsManagerOfCmd from './commands/org-is-manager-of';
@@ -82,42 +81,41 @@ const createCommandMap: () => Record<
   'app-limit-credit': appLimitCreditCmd,
   'org-member': orgMemberCmd,
   'app-permission-default': appPermissionDefaultCmd,
-  'app-limit-credit-code': appLimitCreditCodeCmd,
-  'org-permission-default': orgPermissionDefaultCmd,
   'app-admin-grant': appAdminGrantCmd,
   'app-owner-grant': appOwnerGrantCmd,
+  'org-permission-default': orgPermissionDefaultCmd,
+  'app-membership-default': appMembershipDefaultCmd,
+  'org-admin-grant': orgAdminGrantCmd,
+  'org-membership-default': orgMembershipDefaultCmd,
+  'org-owner-grant': orgOwnerGrantCmd,
   'app-limit-caps-default': appLimitCapsDefaultCmd,
   'org-limit-caps-default': orgLimitCapsDefaultCmd,
   'app-limit-cap': appLimitCapCmd,
   'org-limit-cap': orgLimitCapCmd,
-  'org-admin-grant': orgAdminGrantCmd,
-  'org-owner-grant': orgOwnerGrantCmd,
-  'membership-type': membershipTypeCmd,
+  'org-chart-edge': orgChartEdgeCmd,
   'app-limit-default': appLimitDefaultCmd,
   'org-limit-default': orgLimitDefaultCmd,
   'org-limit-credit': orgLimitCreditCmd,
+  'app-limit-credit-code': appLimitCreditCodeCmd,
   'app-limit-warning': appLimitWarningCmd,
-  'org-limit-warning': orgLimitWarningCmd,
   'org-chart-edge-grant': orgChartEdgeGrantCmd,
   'app-claimed-invite': appClaimedInviteCmd,
+  'org-limit-warning': orgLimitWarningCmd,
+  'membership-type': membershipTypeCmd,
   'app-grant': appGrantCmd,
-  'app-membership-default': appMembershipDefaultCmd,
-  'org-membership-default': orgMembershipDefaultCmd,
   'org-claimed-invite': orgClaimedInviteCmd,
+  'org-grant': orgGrantCmd,
   'app-limit-event': appLimitEventCmd,
   'org-limit-event': orgLimitEventCmd,
-  'org-grant': orgGrantCmd,
-  'org-chart-edge': orgChartEdgeCmd,
-  'usage-snapshot': usageSnapshotCmd,
-  'app-limit': appLimitCmd,
-  'app-invite': appInviteCmd,
   'org-membership-setting': orgMembershipSettingCmd,
+  'app-membership': appMembershipCmd,
+  'app-limit': appLimitCmd,
+  'org-membership': orgMembershipCmd,
+  'org-member-profile': orgMemberProfileCmd,
   'org-limit-aggregate': orgLimitAggregateCmd,
   'org-limit': orgLimitCmd,
-  'org-member-profile': orgMemberProfileCmd,
-  'app-membership': appMembershipCmd,
+  'app-invite': appInviteCmd,
   'org-invite': orgInviteCmd,
-  'org-membership': orgMembershipCmd,
   'app-permissions-get-padded-mask': appPermissionsGetPaddedMaskCmd,
   'org-permissions-get-padded-mask': orgPermissionsGetPaddedMaskCmd,
   'org-is-manager-of': orgIsManagerOfCmd,
@@ -132,7 +130,7 @@ const createCommandMap: () => Record<
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-limit-credit-redemption appLimitCreditRedemption CRUD operations\n  app-limit-credit-code-item appLimitCreditCodeItem CRUD operations\n  app-limit-credit     appLimitCredit CRUD operations\n  org-member           orgMember CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  app-limit-credit-code appLimitCreditCode CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-limit-caps-default appLimitCapsDefault CRUD operations\n  org-limit-caps-default orgLimitCapsDefault CRUD operations\n  app-limit-cap        appLimitCap CRUD operations\n  org-limit-cap        orgLimitCap CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  membership-type      membershipType CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-limit-credit     orgLimitCredit CRUD operations\n  app-limit-warning    appLimitWarning CRUD operations\n  org-limit-warning    orgLimitWarning CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  app-claimed-invite   appClaimedInvite CRUD operations\n  app-grant            appGrant CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  app-limit-event      appLimitEvent CRUD operations\n  org-limit-event      orgLimitEvent CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  usage-snapshot       usageSnapshot CRUD operations\n  app-limit            appLimit CRUD operations\n  app-invite           appInvite CRUD operations\n  org-membership-setting orgMembershipSetting CRUD operations\n  org-limit-aggregate  orgLimitAggregate CRUD operations\n  org-limit            orgLimit CRUD operations\n  org-member-profile   orgMemberProfile CRUD operations\n  app-membership       appMembership CRUD operations\n  org-invite           orgInvite CRUD operations\n  org-membership       orgMembership CRUD operations\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  submit-app-invite-code submitAppInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-limit-credit-redemption appLimitCreditRedemption CRUD operations\n  app-limit-credit-code-item appLimitCreditCodeItem CRUD operations\n  app-limit-credit     appLimitCredit CRUD operations\n  org-member           orgMember CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  app-limit-caps-default appLimitCapsDefault CRUD operations\n  org-limit-caps-default orgLimitCapsDefault CRUD operations\n  app-limit-cap        appLimitCap CRUD operations\n  org-limit-cap        orgLimitCap CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-limit-credit     orgLimitCredit CRUD operations\n  app-limit-credit-code appLimitCreditCode CRUD operations\n  app-limit-warning    appLimitWarning CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  app-claimed-invite   appClaimedInvite CRUD operations\n  org-limit-warning    orgLimitWarning CRUD operations\n  membership-type      membershipType CRUD operations\n  app-grant            appGrant CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  org-grant            orgGrant CRUD operations\n  app-limit-event      appLimitEvent CRUD operations\n  org-limit-event      orgLimitEvent CRUD operations\n  org-membership-setting orgMembershipSetting CRUD operations\n  app-membership       appMembership CRUD operations\n  app-limit            appLimit CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-member-profile   orgMemberProfile CRUD operations\n  org-limit-aggregate  orgLimitAggregate CRUD operations\n  org-limit            orgLimit CRUD operations\n  app-invite           appInvite CRUD operations\n  org-invite           orgInvite CRUD operations\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  submit-app-invite-code submitAppInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

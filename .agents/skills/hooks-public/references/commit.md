@@ -7,8 +7,8 @@ A commit records changes to the repository.
 ## Usage
 
 ```typescript
-useCommitsQuery({ selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
-useCommitQuery({ id: '<UUID>', selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
+useCommitsQuery({ selection: { fields: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
+useCommitQuery({ id: '<UUID>', selection: { fields: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
 useCreateCommitMutation({ selection: { fields: { id: true } } })
 useUpdateCommitMutation({ selection: { fields: { id: true } } })
 useDeleteCommitMutation({})
@@ -20,7 +20,7 @@ useDeleteCommitMutation({})
 
 ```typescript
 const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useCommitsQuery({
 const { mutate } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-mutate({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
+mutate({ message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
 ```

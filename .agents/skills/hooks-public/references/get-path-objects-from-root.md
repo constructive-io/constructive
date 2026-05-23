@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `Object`.
 ## Usage
 
 ```typescript
-useGetPathObjectsFromRootQuery({ databaseId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
+useGetPathObjectsFromRootQuery({ sId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useGetPathObjectsFromRootQuery({ databaseId: '<UUID>', id: '<UUID>', path: '<Str
 ### Use useGetPathObjectsFromRootQuery
 
 ```typescript
-const { data, isLoading } = useGetPathObjectsFromRootQuery({ databaseId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
+const { data, isLoading } = useGetPathObjectsFromRootQuery({ sId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
 ```

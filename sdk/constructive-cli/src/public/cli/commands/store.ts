@@ -18,7 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
-  databaseId: 'uuid',
+  scopeId: 'uuid',
   hash: 'uuid',
   createdAt: 'string',
 };
@@ -75,7 +75,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       id: true,
       name: true,
-      databaseId: true,
+      scopeId: true,
       hash: true,
       createdAt: true,
     };
@@ -100,7 +100,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       id: true,
       name: true,
-      databaseId: true,
+      scopeId: true,
       hash: true,
       createdAt: true,
     };
@@ -137,7 +137,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           id: true,
           name: true,
-          databaseId: true,
+          scopeId: true,
           hash: true,
           createdAt: true,
         },
@@ -163,8 +163,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: true,
       },
       {
@@ -182,13 +182,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           name: cleanedData.name,
-          databaseId: cleanedData.databaseId,
+          scopeId: cleanedData.scopeId,
           hash: cleanedData.hash,
         },
         select: {
           id: true,
           name: true,
-          databaseId: true,
+          scopeId: true,
           hash: true,
           createdAt: true,
         },
@@ -220,8 +220,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: false,
       },
       {
@@ -242,13 +242,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           name: cleanedData.name,
-          databaseId: cleanedData.databaseId,
+          scopeId: cleanedData.scopeId,
           hash: cleanedData.hash,
         },
         select: {
           id: true,
           name: true,
-          databaseId: true,
+          scopeId: true,
           hash: true,
           createdAt: true,
         },

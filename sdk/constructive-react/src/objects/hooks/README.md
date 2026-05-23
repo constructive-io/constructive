@@ -93,20 +93,20 @@ create({ path: '<String>', data: '<JSON>' });
 ```typescript
 // List all objects
 const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+  selection: { fields: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
 });
 
 // Get one object
 const { data: item } = useObjectQuery({
   id: '<UUID>',
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+  selection: { fields: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
 });
 
 // Create a object
 const { mutate: create } = useCreateObjectMutation({
   selection: { fields: { id: true } },
 });
-create({ hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
+create({ hashUuid: '<UUID>', scopeId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
 ```
 
 ### Ref
@@ -114,20 +114,20 @@ create({ hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<Stri
 ```typescript
 // List all refs
 const { data, isLoading } = useRefsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, storeId: true, commitId: true } },
 });
 
 // Get one ref
 const { data: item } = useRefQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, storeId: true, commitId: true } },
 });
 
 // Create a ref
 const { mutate: create } = useCreateRefMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' });
+create({ name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' });
 ```
 
 ### Store
@@ -135,20 +135,20 @@ create({ name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<
 ```typescript
 // List all stores
 const { data, isLoading } = useStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, hash: true, createdAt: true } },
 });
 
 // Get one store
 const { data: item } = useStoreQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, scopeId: true, hash: true, createdAt: true } },
 });
 
 // Create a store
 const { mutate: create } = useCreateStoreMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
+create({ name: '<String>', scopeId: '<UUID>', hash: '<UUID>' });
 ```
 
 ### Commit
@@ -156,20 +156,20 @@ create({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
 ```typescript
 // List all commits
 const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
 });
 
 // Get one commit
 const { data: item } = useCommitQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, scopeId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
 });
 
 // Create a commit
 const { mutate: create } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
+create({ message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
 ```
 
 ## Custom Operation Hooks
@@ -183,7 +183,7 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
+  | `sId` | UUID |
   | `storeId` | UUID |
   | `refname` | String |
 
@@ -196,7 +196,7 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
+  | `sId` | UUID |
   | `id` | UUID |
   | `first` | Int |
   | `offset` | Int |
@@ -211,7 +211,7 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
+  | `sId` | UUID |
   | `id` | UUID |
   | `path` | [String] |
   | `first` | Int |
@@ -227,7 +227,7 @@ getObjectAtPath
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
+  | `sId` | UUID |
   | `storeId` | UUID |
   | `path` | [String] |
   | `refname` | String |

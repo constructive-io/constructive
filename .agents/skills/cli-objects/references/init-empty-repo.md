@@ -7,7 +7,7 @@ Execute the initEmptyRepo mutation
 ## Usage
 
 ```bash
-csdk init-empty-repo --input.clientMutationId <String> --input.dbId <UUID> --input.storeId <UUID>
+csdk init-empty-repo --input.clientMutationId <String> --input.sId <UUID> --input.storeId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk init-empty-repo --input.clientMutationId <String> --input.dbId <UUID> --inp
 ### Run initEmptyRepo
 
 ```bash
-csdk init-empty-repo --input.clientMutationId <String> --input.dbId <UUID> --input.storeId <UUID>
+csdk init-empty-repo --input.clientMutationId <String> --input.sId <UUID> --input.storeId <UUID>
 ```

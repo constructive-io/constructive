@@ -55,14 +55,14 @@ export const webauthnCredentialKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...webauthnCredentialKeys.details(), id] as const,
 } as const;
-export const auditLogKeys = {
-  /** All auditLog queries */ all: ['auditlog'] as const,
-  /** List query keys */ lists: () => [...auditLogKeys.all, 'list'] as const,
+export const auditLogAuthKeys = {
+  /** All auditLogAuth queries */ all: ['auditlogauth'] as const,
+  /** List query keys */ lists: () => [...auditLogAuthKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...auditLogKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...auditLogKeys.all, 'detail'] as const,
+    [...auditLogAuthKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...auditLogAuthKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...auditLogKeys.details(), id] as const,
+    [...auditLogAuthKeys.details(), id] as const,
 } as const;
 export const identityProviderKeys = {
   /** All identityProvider queries */ all: ['identityprovider'] as const,
@@ -140,7 +140,7 @@ export const queryKeys = {
   phoneNumber: phoneNumberKeys,
   cryptoAddress: cryptoAddressKeys,
   webauthnCredential: webauthnCredentialKeys,
-  auditLog: auditLogKeys,
+  auditLogAuth: auditLogAuthKeys,
   identityProvider: identityProviderKeys,
   roleType: roleTypeKeys,
   userConnectedAccount: userConnectedAccountKeys,

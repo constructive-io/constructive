@@ -7,8 +7,8 @@ React Query hooks for Object data operations
 ## Usage
 
 ```typescript
-useObjectsQuery({ selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } } })
-useObjectQuery({ id: '<UUID>', selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } } })
+useObjectsQuery({ selection: { fields: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } } })
+useObjectQuery({ id: '<UUID>', selection: { fields: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } } })
 useCreateObjectMutation({ selection: { fields: { id: true } } })
 useUpdateObjectMutation({ selection: { fields: { id: true } } })
 useDeleteObjectMutation({})
@@ -20,7 +20,7 @@ useDeleteObjectMutation({})
 
 ```typescript
 const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+  selection: { fields: { hashUuid: true, id: true, scopeId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useObjectsQuery({
 const { mutate } = useCreateObjectMutation({
   selection: { fields: { id: true } },
 });
-mutate({ hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
+mutate({ hashUuid: '<UUID>', scopeId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
 ```

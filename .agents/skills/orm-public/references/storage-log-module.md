@@ -1,0 +1,34 @@
+# storageLogModule
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+ORM operations for StorageLogModule records
+
+## Usage
+
+```typescript
+db.storageLogModule.findMany({ select: { id: true } }).execute()
+db.storageLogModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
+db.storageLogModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', storageLogTableId: '<UUID>', storageLogTableName: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>', interval: '<String>', retention: '<String>', premake: '<Int>', scope: '<String>', actorFkTableId: '<UUID>', entityFkTableId: '<UUID>', prefix: '<String>' }, select: { id: true } }).execute()
+db.storageLogModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.storageLogModule.delete({ where: { id: '<UUID>' } }).execute()
+```
+
+## Examples
+
+### List all storageLogModule records
+
+```typescript
+const items = await db.storageLogModule.findMany({
+  select: { id: true, databaseId: true }
+}).execute();
+```
+
+### Create a storageLogModule
+
+```typescript
+const item = await db.storageLogModule.create({
+  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', storageLogTableId: '<UUID>', storageLogTableName: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>', interval: '<String>', retention: '<String>', premake: '<Int>', scope: '<String>', actorFkTableId: '<UUID>', entityFkTableId: '<UUID>', prefix: '<String>' },
+  select: { id: true }
+}).execute();
+```
