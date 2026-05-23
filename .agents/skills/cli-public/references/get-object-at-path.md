@@ -7,7 +7,7 @@ Execute the getObjectAtPath query
 ## Usage
 
 ```bash
-csdk get-object-at-path --dbId <UUID> --storeId <UUID> --path <String> --refname <String>
+csdk get-object-at-path --sId <UUID> --storeId <UUID> --path <String> --refname <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk get-object-at-path --dbId <UUID> --storeId <UUID> --path <String> --refname
 ### Run getObjectAtPath
 
 ```bash
-csdk get-object-at-path --dbId <UUID> --storeId <UUID> --path <String> --refname <String>
+csdk get-object-at-path --sId <UUID> --storeId <UUID> --path <String> --refname <String>
 ```

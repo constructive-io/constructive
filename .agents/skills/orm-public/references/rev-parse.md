@@ -7,7 +7,7 @@ Execute the revParse query
 ## Usage
 
 ```typescript
-db.query.revParse({ dbId: '<UUID>', storeId: '<UUID>', refname: '<String>' }).execute()
+db.query.revParse({ sId: '<UUID>', storeId: '<UUID>', refname: '<String>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.revParse({ dbId: '<UUID>', storeId: '<UUID>', refname: '<String>' }).ex
 ### Run revParse
 
 ```typescript
-const result = await db.query.revParse({ dbId: '<UUID>', storeId: '<UUID>', refname: '<String>' }).execute();
+const result = await db.query.revParse({ sId: '<UUID>', storeId: '<UUID>', refname: '<String>' }).execute();
 ```

@@ -104,6 +104,46 @@ export class AppLimitEventModel {
       }),
     });
   }
+  findOne<S extends AppLimitEventSelect>(
+    args: {
+      id: string;
+      select: S;
+    } & StrictSelect<S, AppLimitEventSelect>
+  ): QueryBuilder<{
+    appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S> | null;
+  }> {
+    const { document, variables } = buildFindManyDocument(
+      'AppLimitEvent',
+      'appLimitEvents',
+      args.select,
+      {
+        where: {
+          id: {
+            equalTo: args.id,
+          },
+        },
+        first: 1,
+      },
+      'AppLimitEventFilter',
+      'AppLimitEventOrderBy',
+      connectionFieldsMap
+    );
+    return new QueryBuilder({
+      client: this.client,
+      operation: 'query',
+      operationName: 'AppLimitEvent',
+      fieldName: 'appLimitEvent',
+      document,
+      variables,
+      transform: (data: {
+        appLimitEvents?: {
+          nodes?: InferSelectResult<AppLimitEventWithRelations, S>[];
+        };
+      }) => ({
+        appLimitEvent: data.appLimitEvents?.nodes?.[0] ?? null,
+      }),
+    });
+  }
   create<S extends AppLimitEventSelect>(
     args: CreateArgs<S, CreateAppLimitEventInput['appLimitEvent']> & {
       select: S;
@@ -127,6 +167,76 @@ export class AppLimitEventModel {
       operation: 'mutation',
       operationName: 'AppLimitEvent',
       fieldName: 'createAppLimitEvent',
+      document,
+      variables,
+    });
+  }
+  update<S extends AppLimitEventSelect>(
+    args: UpdateArgs<
+      S,
+      {
+        id: string;
+      },
+      AppLimitEventPatch
+    > & {
+      select: S;
+    } & StrictSelect<S, AppLimitEventSelect>
+  ): QueryBuilder<{
+    updateAppLimitEvent: {
+      appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S>;
+    };
+  }> {
+    const { document, variables } = buildUpdateByPkDocument(
+      'AppLimitEvent',
+      'updateAppLimitEvent',
+      'appLimitEvent',
+      args.select,
+      args.where.id,
+      args.data,
+      'UpdateAppLimitEventInput',
+      'id',
+      'appLimitEventPatch',
+      connectionFieldsMap
+    );
+    return new QueryBuilder({
+      client: this.client,
+      operation: 'mutation',
+      operationName: 'AppLimitEvent',
+      fieldName: 'updateAppLimitEvent',
+      document,
+      variables,
+    });
+  }
+  delete<S extends AppLimitEventSelect>(
+    args: DeleteArgs<
+      {
+        id: string;
+      },
+      S
+    > & {
+      select: S;
+    } & StrictSelect<S, AppLimitEventSelect>
+  ): QueryBuilder<{
+    deleteAppLimitEvent: {
+      appLimitEvent: InferSelectResult<AppLimitEventWithRelations, S>;
+    };
+  }> {
+    const { document, variables } = buildDeleteByPkDocument(
+      'AppLimitEvent',
+      'deleteAppLimitEvent',
+      'appLimitEvent',
+      {
+        id: args.where.id,
+      },
+      'DeleteAppLimitEventInput',
+      args.select,
+      connectionFieldsMap
+    );
+    return new QueryBuilder({
+      client: this.client,
+      operation: 'mutation',
+      operationName: 'AppLimitEvent',
+      fieldName: 'deleteAppLimitEvent',
       document,
       variables,
     });

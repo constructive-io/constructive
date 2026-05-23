@@ -18,7 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   hashUuid: 'uuid',
   id: 'uuid',
-  databaseId: 'uuid',
+  scopeId: 'uuid',
   kids: 'uuid',
   ktree: 'string',
   data: 'json',
@@ -77,7 +77,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       id: true,
-      databaseId: true,
+      scopeId: true,
       kids: true,
       ktree: true,
       data: true,
@@ -104,7 +104,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       id: true,
-      databaseId: true,
+      scopeId: true,
       kids: true,
       ktree: true,
       data: true,
@@ -143,7 +143,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           id: true,
-          databaseId: true,
+          scopeId: true,
           kids: true,
           ktree: true,
           data: true,
@@ -166,8 +166,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: true,
       },
       {
@@ -205,7 +205,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.object
       .create({
         data: {
-          databaseId: cleanedData.databaseId,
+          scopeId: cleanedData.scopeId,
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
           data: cleanedData.data,
@@ -213,7 +213,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           id: true,
-          databaseId: true,
+          scopeId: true,
           kids: true,
           ktree: true,
           data: true,
@@ -242,8 +242,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'scopeId',
+        message: 'scopeId',
         required: false,
       },
       {
@@ -284,7 +284,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
+          scopeId: cleanedData.scopeId,
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
           data: cleanedData.data,
@@ -292,7 +292,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           id: true,
-          databaseId: true,
+          scopeId: true,
           kids: true,
           ktree: true,
           data: true,

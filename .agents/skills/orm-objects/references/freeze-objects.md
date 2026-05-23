@@ -7,7 +7,7 @@ Execute the freezeObjects mutation
 ## Usage
 
 ```typescript
-db.mutation.freezeObjects({ input: { databaseId: '<UUID>', id: '<UUID>' } }).execute()
+db.mutation.freezeObjects({ input: { sId: '<UUID>', id: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.freezeObjects({ input: { databaseId: '<UUID>', id: '<UUID>' } }).exe
 ### Run freezeObjects
 
 ```typescript
-const result = await db.mutation.freezeObjects({ input: { databaseId: '<UUID>', id: '<UUID>' } }).execute();
+const result = await db.mutation.freezeObjects({ input: { sId: '<UUID>', id: '<UUID>' } }).execute();
 ```

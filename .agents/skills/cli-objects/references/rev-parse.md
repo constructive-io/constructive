@@ -7,7 +7,7 @@ Execute the revParse query
 ## Usage
 
 ```bash
-csdk rev-parse --dbId <UUID> --storeId <UUID> --refname <String>
+csdk rev-parse --sId <UUID> --storeId <UUID> --refname <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk rev-parse --dbId <UUID> --storeId <UUID> --refname <String>
 ### Run revParse
 
 ```bash
-csdk rev-parse --dbId <UUID> --storeId <UUID> --refname <String>
+csdk rev-parse --sId <UUID> --storeId <UUID> --refname <String>
 ```

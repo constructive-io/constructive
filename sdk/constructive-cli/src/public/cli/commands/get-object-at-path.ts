@@ -21,8 +21,8 @@ export default async (
     const answers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'dbId',
-        message: 'dbId',
+        name: 'sId',
+        message: 'sId',
       },
       {
         type: 'text',

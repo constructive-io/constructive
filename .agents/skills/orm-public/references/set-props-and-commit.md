@@ -7,7 +7,7 @@ Execute the setPropsAndCommit mutation
 ## Usage
 
 ```typescript
-db.mutation.setPropsAndCommit({ input: { dbId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute()
+db.mutation.setPropsAndCommit({ input: { sId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.setPropsAndCommit({ input: { dbId: '<UUID>', storeId: '<UUID>', refn
 ### Run setPropsAndCommit
 
 ```typescript
-const result = await db.mutation.setPropsAndCommit({ input: { dbId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute();
+const result = await db.mutation.setPropsAndCommit({ input: { sId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute();
 ```

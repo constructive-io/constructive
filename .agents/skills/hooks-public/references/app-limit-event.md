@@ -7,8 +7,11 @@ Append-only log of limit events for historical reporting and audit
 ## Usage
 
 ```typescript
-useAppLimitEventsQuery({ selection: { fields: { name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } } })
+useAppLimitEventsQuery({ selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } } })
+useAppLimitEventQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } } })
 useCreateAppLimitEventMutation({ selection: { fields: { id: true } } })
+useUpdateAppLimitEventMutation({ selection: { fields: { id: true } } })
+useDeleteAppLimitEventMutation({})
 ```
 
 ## Examples
@@ -17,7 +20,7 @@ useCreateAppLimitEventMutation({ selection: { fields: { id: true } } })
 
 ```typescript
 const { data, isLoading } = useAppLimitEventsQuery({
-  selection: { fields: { name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
+  selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
 });
 ```
 

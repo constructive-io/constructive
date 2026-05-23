@@ -12,8 +12,8 @@ csdk ref list --where.<field>.<op> <value> --orderBy <values>
 csdk ref list --limit 10 --after <cursor>
 csdk ref find-first --where.<field>.<op> <value>
 csdk ref get --id <UUID>
-csdk ref create --name <String> --databaseId <UUID> --storeId <UUID> [--commitId <UUID>]
-csdk ref update --id <UUID> [--name <String>] [--databaseId <UUID>] [--storeId <UUID>] [--commitId <UUID>]
+csdk ref create --name <String> --scopeId <UUID> --storeId <UUID> [--commitId <UUID>]
+csdk ref update --id <UUID> [--name <String>] [--scopeId <UUID>] [--storeId <UUID>] [--commitId <UUID>]
 csdk ref delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk ref list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a ref
 
 ```bash
-csdk ref create --name <String> --databaseId <UUID> --storeId <UUID> [--commitId <UUID>]
+csdk ref create --name <String> --scopeId <UUID> --storeId <UUID> [--commitId <UUID>]
 ```
 
 ### Get a ref by id

@@ -12,8 +12,8 @@ csdk commit list --where.<field>.<op> <value> --orderBy <values>
 csdk commit list --limit 10 --after <cursor>
 csdk commit find-first --where.<field>.<op> <value>
 csdk commit get --id <UUID>
-csdk commit create --databaseId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
-csdk commit update --id <UUID> [--message <String>] [--databaseId <UUID>] [--storeId <UUID>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk commit create --scopeId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk commit update --id <UUID> [--message <String>] [--scopeId <UUID>] [--storeId <UUID>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
 csdk commit delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk commit list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a commit
 
 ```bash
-csdk commit create --databaseId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk commit create --scopeId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
 ```
 
 ### Get a commit by id

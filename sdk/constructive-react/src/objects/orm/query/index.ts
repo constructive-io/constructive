@@ -9,12 +9,12 @@ import type { InferSelectResult, StrictSelect } from '../select-types';
 import type { Object, ObjectSelect, ObjectConnection } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface RevParseVariables {
-  dbId?: string;
+  sId?: string;
   storeId?: string;
   refname?: string;
 }
 export interface GetAllObjectsFromRootVariables {
-  databaseId?: string;
+  sId?: string;
   id?: string;
   /** Only read the first `n` values of the set. */
   first?: number;
@@ -27,7 +27,7 @@ export interface GetAllObjectsFromRootVariables {
   after?: string;
 }
 export interface GetPathObjectsFromRootVariables {
-  databaseId?: string;
+  sId?: string;
   id?: string;
   path?: string[];
   /** Only read the first `n` values of the set. */
@@ -41,7 +41,7 @@ export interface GetPathObjectsFromRootVariables {
   after?: string;
 }
 export interface GetObjectAtPathVariables {
-  dbId?: string;
+  sId?: string;
   storeId?: string;
   path?: string[];
   refname?: string;
@@ -69,7 +69,7 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'dbId',
+              name: 'sId',
               type: 'UUID',
             },
             {
@@ -106,7 +106,7 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'databaseId',
+              name: 'sId',
               type: 'UUID',
             },
             {
@@ -151,7 +151,7 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'databaseId',
+              name: 'sId',
               type: 'UUID',
             },
             {
@@ -200,7 +200,7 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'dbId',
+              name: 'sId',
               type: 'UUID',
             },
             {

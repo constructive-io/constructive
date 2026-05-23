@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `Object`.
 ## Usage
 
 ```typescript
-useGetAllObjectsFromRootQuery({ databaseId: '<UUID>', id: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
+useGetAllObjectsFromRootQuery({ sId: '<UUID>', id: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useGetAllObjectsFromRootQuery({ databaseId: '<UUID>', id: '<UUID>', first: '<Int
 ### Use useGetAllObjectsFromRootQuery
 
 ```typescript
-const { data, isLoading } = useGetAllObjectsFromRootQuery({ databaseId: '<UUID>', id: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
+const { data, isLoading } = useGetAllObjectsFromRootQuery({ sId: '<UUID>', id: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
 ```

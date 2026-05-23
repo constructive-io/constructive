@@ -7,7 +7,7 @@ React Query mutation hook for removeNodeAtPath
 ## Usage
 
 ```typescript
-const { mutate } = useRemoveNodeAtPathMutation(); mutate({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>' } });
+const { mutate } = useRemoveNodeAtPathMutation(); mutate({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useRemoveNodeAtPathMutation(); mutate({ input: { dbId: '<UUID
 
 ```typescript
 const { mutate, isLoading } = useRemoveNodeAtPathMutation();
-mutate({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>' } });
+mutate({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>' } });
 ```

@@ -7,7 +7,7 @@ React Query mutation hook for initEmptyRepo
 ## Usage
 
 ```typescript
-const { mutate } = useInitEmptyRepoMutation(); mutate({ input: { dbId: '<UUID>', storeId: '<UUID>' } });
+const { mutate } = useInitEmptyRepoMutation(); mutate({ input: { sId: '<UUID>', storeId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useInitEmptyRepoMutation(); mutate({ input: { dbId: '<UUID>',
 
 ```typescript
 const { mutate, isLoading } = useInitEmptyRepoMutation();
-mutate({ input: { dbId: '<UUID>', storeId: '<UUID>' } });
+mutate({ input: { sId: '<UUID>', storeId: '<UUID>' } });
 ```

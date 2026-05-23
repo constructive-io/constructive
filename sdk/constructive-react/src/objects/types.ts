@@ -10,7 +10,7 @@ export interface GetAllRecord {
 export interface Object {
   hashUuid: string | null;
   id: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   kids: string[] | null;
   ktree: string[] | null;
   data: unknown | null;
@@ -20,21 +20,21 @@ export interface Object {
 export interface Ref {
   id: string | null;
   name: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   storeId: string | null;
   commitId: string | null;
 }
 export interface Store {
   id: string | null;
   name: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   hash: string | null;
   createdAt: string | null;
 }
 export interface Commit {
   id: string | null;
   message: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   storeId: string | null;
   parentIds: string[] | null;
   authorId: string | null;

@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `Object`.
 ## Usage
 
 ```bash
-csdk get-path-objects-from-root --databaseId <UUID> --id <UUID> --path <String> --first <Int> --offset <Int> --after <Cursor>
+csdk get-path-objects-from-root --sId <UUID> --id <UUID> --path <String> --first <Int> --offset <Int> --after <Cursor>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk get-path-objects-from-root --databaseId <UUID> --id <UUID> --path <String> 
 ### Run getPathObjectsFromRoot
 
 ```bash
-csdk get-path-objects-from-root --databaseId <UUID> --id <UUID> --path <String> --first <Int> --offset <Int> --after <Cursor>
+csdk get-path-objects-from-root --sId <UUID> --id <UUID> --path <String> --first <Int> --offset <Int> --after <Cursor>
 ```
