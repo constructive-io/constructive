@@ -54,6 +54,9 @@ export type {
   PublicKeyChallengeData,
   PubkeyChallengeSettings,
   RlsModule,
+  EncryptedSecretsConfig,
+  IdentityProvidersConfig,
+  UserAuthConfig,
   WebauthnSettings,
   WithPgClient,
 } from './types';
@@ -92,6 +95,9 @@ export {
   pubkeyLoader,
   rlsLoader,
   webauthnLoader,
+  encryptedSecretsLoader,
+  userAuthLoader,
+  identityProvidersLoader,
 } from './loaders';
 
 // Side-effect: Express type augmentation

@@ -151,6 +151,29 @@ export interface AgentChatConfig {
   taskTableName: string | null;
 }
 
+// ─── OAuth / Identity Types ─────────────────────────────────────────────────
+
+export interface EncryptedSecretsConfig {
+  schemaName: string;
+  tableName: string;
+}
+
+export interface UserAuthConfig {
+  schemaName: string;
+  signInFunction: string;
+  signUpFunction: string;
+  signOutFunction: string;
+  signInCrossOriginFunction: string | null;
+  requestCrossOriginTokenFunction: string | null;
+  extendTokenExpires: string;
+}
+
+export interface IdentityProvidersConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+}
+
 // ─── Module Types Map ───────────────────────────────────────────────────────
 
 /**
@@ -171,6 +194,9 @@ export interface BuiltinModuleMap {
   billing: BillingConfig;
   inferenceLog: InferenceLogConfig;
   agentChat: AgentChatConfig;
+  encryptedSecrets: EncryptedSecretsConfig;
+  userAuth: UserAuthConfig;
+  identityProviders: IdentityProvidersConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

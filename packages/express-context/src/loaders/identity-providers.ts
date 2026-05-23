@@ -1,0 +1,65 @@
+/**
+ * Identity Providers Module Loader
+ *
+ * Resolves the identity_providers_module config from metaschema_modules_public.
+ * Provides schema names where the identity_providers table lives, used by
+ * OAuth/SSO middleware to look up provider definitions (client_id, encrypted
+ * client_secret, scopes, etc.).
+ */
+
+import type { LoaderContext, ModuleLoader } from './types';
+import { createModuleLoader } from './create-loader';
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+export interface IdentityProvidersConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+}
+
+// ─── SQL ────────────────────────────────────────────────────────────────────
+
+const IDENTITY_PROVIDERS_MODULE_SQL = `
+  SELECT
+    s.schema_name,
+    ps.schema_name AS private_schema_name,
+    ipm.table_name
+  FROM metaschema_modules_public.identity_providers_module ipm
+  JOIN metaschema_public.schema s ON s.id = ipm.schema_id
+  JOIN metaschema_public.schema ps ON ps.id = ipm.private_schema_id
+  WHERE ipm.database_id = $1
+  LIMIT 1
+`;
+
+// ─── Row Types ──────────────────────────────────────────────────────────────
+
+interface IdentityProvidersModuleRow {
+  schema_name: string;
+  private_schema_name: string;
+  table_name: string;
+}
+
+// ─── Loader ─────────────────────────────────────────────────────────────────
+
+export const identityProvidersLoader: ModuleLoader<IdentityProvidersConfig> =
+  createModuleLoader<IdentityProvidersConfig>({
+    name: 'identityProviders',
+    ttlMs: 5 * 60_000,
+    async resolve(ctx: LoaderContext) {
+      const { tenantPool, databaseId } = ctx;
+
+      const result = await tenantPool.query<IdentityProvidersModuleRow>(
+        IDENTITY_PROVIDERS_MODULE_SQL,
+        [databaseId],
+      );
+      const row = result.rows[0];
+      if (!row) return undefined;
+
+      return {
+        schemaName: row.schema_name,
+        privateSchemaName: row.private_schema_name,
+        tableName: row.table_name,
+      };
+    },
+  });
