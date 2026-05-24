@@ -20,7 +20,7 @@ export const getPathObjectsFromRootQueryKey = customQueryKeys.getPathObjectsFrom
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useGetPathObjectsFromRootQuery({ variables: { databaseId, id, path, first, offset, after } });
+ * const { data, isLoading } = useGetPathObjectsFromRootQuery({ variables: { sId, id, path, first, offset, after } });
  *
  * if (data?.getPathObjectsFromRoot) {
  *   console.log(data.getPathObjectsFromRoot);
@@ -77,7 +77,7 @@ export function useGetPathObjectsFromRootQuery<
  *
  * @example
  * ```ts
- * const data = await fetchGetPathObjectsFromRootQuery({ variables: { databaseId, id, path, first, offset, after } });
+ * const data = await fetchGetPathObjectsFromRootQuery({ variables: { sId, id, path, first, offset, after } });
  * ```
  */
 export async function fetchGetPathObjectsFromRootQuery(params?: {
@@ -91,7 +91,7 @@ export async function fetchGetPathObjectsFromRootQuery(params?: {
  *
  * @example
  * ```ts
- * await prefetchGetPathObjectsFromRootQuery(queryClient, { variables: { databaseId, id, path, first, offset, after } });
+ * await prefetchGetPathObjectsFromRootQuery(queryClient, { variables: { sId, id, path, first, offset, after } });
  * ```
  */
 export async function prefetchGetPathObjectsFromRootQuery(

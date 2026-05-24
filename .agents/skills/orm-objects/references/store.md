@@ -9,7 +9,7 @@ A store represents an isolated object repository within a database.
 ```typescript
 db.store.findMany({ select: { id: true } }).execute()
 db.store.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.store.create({ data: { name: '<String>', databaseId: '<UUID>', hash: '<UUID>' }, select: { id: true } }).execute()
+db.store.create({ data: { name: '<String>', scopeId: '<UUID>', hash: '<UUID>' }, select: { id: true } }).execute()
 db.store.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
 db.store.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.store.findMany({
 
 ```typescript
 const item = await db.store.create({
-  data: { name: '<String>', databaseId: '<UUID>', hash: '<UUID>' },
+  data: { name: '<String>', scopeId: '<UUID>', hash: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

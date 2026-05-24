@@ -7,7 +7,7 @@ Execute the setDataAtPath mutation
 ## Usage
 
 ```typescript
-db.mutation.setDataAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute()
+db.mutation.setDataAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.setDataAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<Str
 ### Run setDataAtPath
 
 ```typescript
-const result = await db.mutation.setDataAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
+const result = await db.mutation.setDataAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
 ```

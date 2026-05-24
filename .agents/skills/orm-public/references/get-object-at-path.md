@@ -7,7 +7,7 @@ Execute the getObjectAtPath query
 ## Usage
 
 ```typescript
-db.query.getObjectAtPath({ dbId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' }).execute()
+db.query.getObjectAtPath({ sId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.getObjectAtPath({ dbId: '<UUID>', storeId: '<UUID>', path: '<String>', 
 ### Run getObjectAtPath
 
 ```typescript
-const result = await db.query.getObjectAtPath({ dbId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' }).execute();
+const result = await db.query.getObjectAtPath({ sId: '<UUID>', storeId: '<UUID>', path: '<String>', refname: '<String>' }).execute();
 ```

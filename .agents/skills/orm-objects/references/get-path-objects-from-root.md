@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `Object`.
 ## Usage
 
 ```typescript
-db.query.getPathObjectsFromRoot({ databaseId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute()
+db.query.getPathObjectsFromRoot({ sId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.getPathObjectsFromRoot({ databaseId: '<UUID>', id: '<UUID>', path: '<St
 ### Run getPathObjectsFromRoot
 
 ```typescript
-const result = await db.query.getPathObjectsFromRoot({ databaseId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
+const result = await db.query.getPathObjectsFromRoot({ sId: '<UUID>', id: '<UUID>', path: '<String>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
 ```

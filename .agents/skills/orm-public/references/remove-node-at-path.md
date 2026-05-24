@@ -7,7 +7,7 @@ Execute the removeNodeAtPath mutation
 ## Usage
 
 ```typescript
-db.mutation.removeNodeAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>' } }).execute()
+db.mutation.removeNodeAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.removeNodeAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<
 ### Run removeNodeAtPath
 
 ```typescript
-const result = await db.mutation.removeNodeAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>' } }).execute();
+const result = await db.mutation.removeNodeAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>' } }).execute();
 ```

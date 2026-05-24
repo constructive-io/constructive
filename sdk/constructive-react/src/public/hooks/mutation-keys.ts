@@ -48,6 +48,14 @@ export const getAllRecordMutationKeys = {
   /** Delete getAllRecord mutation key */ delete: (id: string | number) =>
     ['mutation', 'getallrecord', 'delete', id] as const,
 } as const;
+export const objectMutationKeys = {
+  /** All object mutation keys */ all: ['mutation', 'object'] as const,
+  /** Create object mutation key */ create: () => ['mutation', 'object', 'create'] as const,
+  /** Update object mutation key */ update: (id: string | number) =>
+    ['mutation', 'object', 'update', id] as const,
+  /** Delete object mutation key */ delete: (id: string | number) =>
+    ['mutation', 'object', 'delete', id] as const,
+} as const;
 export const appPermissionMutationKeys = {
   /** All appPermission mutation keys */ all: ['mutation', 'apppermission'] as const,
   /** Create appPermission mutation key */ create: () =>
@@ -65,14 +73,6 @@ export const orgPermissionMutationKeys = {
     ['mutation', 'orgpermission', 'update', id] as const,
   /** Delete orgPermission mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgpermission', 'delete', id] as const,
-} as const;
-export const objectMutationKeys = {
-  /** All object mutation keys */ all: ['mutation', 'object'] as const,
-  /** Create object mutation key */ create: () => ['mutation', 'object', 'create'] as const,
-  /** Update object mutation key */ update: (id: string | number) =>
-    ['mutation', 'object', 'update', id] as const,
-  /** Delete object mutation key */ delete: (id: string | number) =>
-    ['mutation', 'object', 'delete', id] as const,
 } as const;
 export const databaseMutationKeys = {
   /** All database mutation keys */ all: ['mutation', 'database'] as const,
@@ -280,6 +280,18 @@ export const realtimeModuleMutationKeys = {
     ['mutation', 'realtimemodule', 'update', id] as const,
   /** Delete realtimeModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'realtimemodule', 'delete', id] as const,
+} as const;
+export const configSecretsOrgModuleMutationKeys = {
+  /** All configSecretsOrgModule mutation keys */ all: [
+    'mutation',
+    'configsecretsorgmodule',
+  ] as const,
+  /** Create configSecretsOrgModule mutation key */ create: () =>
+    ['mutation', 'configsecretsorgmodule', 'create'] as const,
+  /** Update configSecretsOrgModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'configsecretsorgmodule', 'update', id] as const,
+  /** Delete configSecretsOrgModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'configsecretsorgmodule', 'delete', id] as const,
 } as const;
 export const schemaGrantMutationKeys = {
   /** All schemaGrant mutation keys */ all: ['mutation', 'schemagrant'] as const,
@@ -494,17 +506,17 @@ export const emailsModuleMutationKeys = {
   /** Delete emailsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'emailsmodule', 'delete', id] as const,
 } as const;
-export const encryptedSecretsModuleMutationKeys = {
-  /** All encryptedSecretsModule mutation keys */ all: [
+export const configSecretsUserModuleMutationKeys = {
+  /** All configSecretsUserModule mutation keys */ all: [
     'mutation',
-    'encryptedsecretsmodule',
+    'configsecretsusermodule',
   ] as const,
-  /** Create encryptedSecretsModule mutation key */ create: () =>
-    ['mutation', 'encryptedsecretsmodule', 'create'] as const,
-  /** Update encryptedSecretsModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'encryptedsecretsmodule', 'update', id] as const,
-  /** Delete encryptedSecretsModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'encryptedsecretsmodule', 'delete', id] as const,
+  /** Create configSecretsUserModule mutation key */ create: () =>
+    ['mutation', 'configsecretsusermodule', 'create'] as const,
+  /** Update configSecretsUserModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'configsecretsusermodule', 'update', id] as const,
+  /** Delete configSecretsUserModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'configsecretsusermodule', 'delete', id] as const,
 } as const;
 export const invitesModuleMutationKeys = {
   /** All invitesModule mutation keys */ all: ['mutation', 'invitesmodule'] as const,
@@ -693,6 +705,69 @@ export const notificationsModuleMutationKeys = {
     ['mutation', 'notificationsmodule', 'update', id] as const,
   /** Delete notificationsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'notificationsmodule', 'delete', id] as const,
+} as const;
+export const inferenceLogModuleMutationKeys = {
+  /** All inferenceLogModule mutation keys */ all: ['mutation', 'inferencelogmodule'] as const,
+  /** Create inferenceLogModule mutation key */ create: () =>
+    ['mutation', 'inferencelogmodule', 'create'] as const,
+  /** Update inferenceLogModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'inferencelogmodule', 'update', id] as const,
+  /** Delete inferenceLogModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'inferencelogmodule', 'delete', id] as const,
+} as const;
+export const computeLogModuleMutationKeys = {
+  /** All computeLogModule mutation keys */ all: ['mutation', 'computelogmodule'] as const,
+  /** Create computeLogModule mutation key */ create: () =>
+    ['mutation', 'computelogmodule', 'create'] as const,
+  /** Update computeLogModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'computelogmodule', 'update', id] as const,
+  /** Delete computeLogModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'computelogmodule', 'delete', id] as const,
+} as const;
+export const transferLogModuleMutationKeys = {
+  /** All transferLogModule mutation keys */ all: ['mutation', 'transferlogmodule'] as const,
+  /** Create transferLogModule mutation key */ create: () =>
+    ['mutation', 'transferlogmodule', 'create'] as const,
+  /** Update transferLogModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'transferlogmodule', 'update', id] as const,
+  /** Delete transferLogModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'transferlogmodule', 'delete', id] as const,
+} as const;
+export const storageLogModuleMutationKeys = {
+  /** All storageLogModule mutation keys */ all: ['mutation', 'storagelogmodule'] as const,
+  /** Create storageLogModule mutation key */ create: () =>
+    ['mutation', 'storagelogmodule', 'create'] as const,
+  /** Update storageLogModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'storagelogmodule', 'update', id] as const,
+  /** Delete storageLogModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'storagelogmodule', 'delete', id] as const,
+} as const;
+export const dbUsageModuleMutationKeys = {
+  /** All dbUsageModule mutation keys */ all: ['mutation', 'dbusagemodule'] as const,
+  /** Create dbUsageModule mutation key */ create: () =>
+    ['mutation', 'dbusagemodule', 'create'] as const,
+  /** Update dbUsageModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'dbusagemodule', 'update', id] as const,
+  /** Delete dbUsageModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'dbusagemodule', 'delete', id] as const,
+} as const;
+export const merkleStoreModuleMutationKeys = {
+  /** All merkleStoreModule mutation keys */ all: ['mutation', 'merklestoremodule'] as const,
+  /** Create merkleStoreModule mutation key */ create: () =>
+    ['mutation', 'merklestoremodule', 'create'] as const,
+  /** Update merkleStoreModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'merklestoremodule', 'update', id] as const,
+  /** Delete merkleStoreModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'merklestoremodule', 'delete', id] as const,
+} as const;
+export const graphModuleMutationKeys = {
+  /** All graphModule mutation keys */ all: ['mutation', 'graphmodule'] as const,
+  /** Create graphModule mutation key */ create: () =>
+    ['mutation', 'graphmodule', 'create'] as const,
+  /** Update graphModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'graphmodule', 'update', id] as const,
+  /** Delete graphModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'graphmodule', 'delete', id] as const,
 } as const;
 export const databaseProvisionModuleMutationKeys = {
   /** All databaseProvisionModule mutation keys */ all: [
@@ -956,47 +1031,14 @@ export const orgClaimedInviteMutationKeys = {
   /** Delete orgClaimedInvite mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgclaimedinvite', 'delete', id] as const,
 } as const;
-export const auditLogMutationKeys = {
-  /** All auditLog mutation keys */ all: ['mutation', 'auditlog'] as const,
-  /** Create auditLog mutation key */ create: () => ['mutation', 'auditlog', 'create'] as const,
-  /** Update auditLog mutation key */ update: (id: string | number) =>
-    ['mutation', 'auditlog', 'update', id] as const,
-  /** Delete auditLog mutation key */ delete: (id: string | number) =>
-    ['mutation', 'auditlog', 'delete', id] as const,
-} as const;
-export const agentThreadMutationKeys = {
-  /** All agentThread mutation keys */ all: ['mutation', 'agentthread'] as const,
-  /** Create agentThread mutation key */ create: () =>
-    ['mutation', 'agentthread', 'create'] as const,
-  /** Update agentThread mutation key */ update: (id: string | number) =>
-    ['mutation', 'agentthread', 'update', id] as const,
-  /** Delete agentThread mutation key */ delete: (id: string | number) =>
-    ['mutation', 'agentthread', 'delete', id] as const,
-} as const;
-export const agentMessageMutationKeys = {
-  /** All agentMessage mutation keys */ all: ['mutation', 'agentmessage'] as const,
-  /** Create agentMessage mutation key */ create: () =>
-    ['mutation', 'agentmessage', 'create'] as const,
-  /** Update agentMessage mutation key */ update: (id: string | number) =>
-    ['mutation', 'agentmessage', 'update', id] as const,
-  /** Delete agentMessage mutation key */ delete: (id: string | number) =>
-    ['mutation', 'agentmessage', 'delete', id] as const,
-} as const;
-export const agentTaskMutationKeys = {
-  /** All agentTask mutation keys */ all: ['mutation', 'agenttask'] as const,
-  /** Create agentTask mutation key */ create: () => ['mutation', 'agenttask', 'create'] as const,
-  /** Update agentTask mutation key */ update: (id: string | number) =>
-    ['mutation', 'agenttask', 'update', id] as const,
-  /** Delete agentTask mutation key */ delete: (id: string | number) =>
-    ['mutation', 'agenttask', 'delete', id] as const,
-} as const;
-export const roleTypeMutationKeys = {
-  /** All roleType mutation keys */ all: ['mutation', 'roletype'] as const,
-  /** Create roleType mutation key */ create: () => ['mutation', 'roletype', 'create'] as const,
-  /** Update roleType mutation key */ update: (id: string | number) =>
-    ['mutation', 'roletype', 'update', id] as const,
-  /** Delete roleType mutation key */ delete: (id: string | number) =>
-    ['mutation', 'roletype', 'delete', id] as const,
+export const auditLogAuthMutationKeys = {
+  /** All auditLogAuth mutation keys */ all: ['mutation', 'auditlogauth'] as const,
+  /** Create auditLogAuth mutation key */ create: () =>
+    ['mutation', 'auditlogauth', 'create'] as const,
+  /** Update auditLogAuth mutation key */ update: (id: string | number) =>
+    ['mutation', 'auditlogauth', 'update', id] as const,
+  /** Delete auditLogAuth mutation key */ delete: (id: string | number) =>
+    ['mutation', 'auditlogauth', 'delete', id] as const,
 } as const;
 export const identityProviderMutationKeys = {
   /** All identityProvider mutation keys */ all: ['mutation', 'identityprovider'] as const,
@@ -1032,14 +1074,58 @@ export const appPermissionDefaultMutationKeys = {
   /** Delete appPermissionDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'apppermissiondefault', 'delete', id] as const,
 } as const;
-export const appLimitCreditCodeMutationKeys = {
-  /** All appLimitCreditCode mutation keys */ all: ['mutation', 'applimitcreditcode'] as const,
-  /** Create appLimitCreditCode mutation key */ create: () =>
-    ['mutation', 'applimitcreditcode', 'create'] as const,
-  /** Update appLimitCreditCode mutation key */ update: (id: string | number) =>
-    ['mutation', 'applimitcreditcode', 'update', id] as const,
-  /** Delete appLimitCreditCode mutation key */ delete: (id: string | number) =>
-    ['mutation', 'applimitcreditcode', 'delete', id] as const,
+export const roleTypeMutationKeys = {
+  /** All roleType mutation keys */ all: ['mutation', 'roletype'] as const,
+  /** Create roleType mutation key */ create: () => ['mutation', 'roletype', 'create'] as const,
+  /** Update roleType mutation key */ update: (id: string | number) =>
+    ['mutation', 'roletype', 'update', id] as const,
+  /** Delete roleType mutation key */ delete: (id: string | number) =>
+    ['mutation', 'roletype', 'delete', id] as const,
+} as const;
+export const migrateFileMutationKeys = {
+  /** All migrateFile mutation keys */ all: ['mutation', 'migratefile'] as const,
+  /** Create migrateFile mutation key */ create: () =>
+    ['mutation', 'migratefile', 'create'] as const,
+  /** Update migrateFile mutation key */ update: (id: string | number) =>
+    ['mutation', 'migratefile', 'update', id] as const,
+  /** Delete migrateFile mutation key */ delete: (id: string | number) =>
+    ['mutation', 'migratefile', 'delete', id] as const,
+} as const;
+export const devicesModuleMutationKeys = {
+  /** All devicesModule mutation keys */ all: ['mutation', 'devicesmodule'] as const,
+  /** Create devicesModule mutation key */ create: () =>
+    ['mutation', 'devicesmodule', 'create'] as const,
+  /** Update devicesModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'devicesmodule', 'update', id] as const,
+  /** Delete devicesModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'devicesmodule', 'delete', id] as const,
+} as const;
+export const appMembershipDefaultMutationKeys = {
+  /** All appMembershipDefault mutation keys */ all: ['mutation', 'appmembershipdefault'] as const,
+  /** Create appMembershipDefault mutation key */ create: () =>
+    ['mutation', 'appmembershipdefault', 'create'] as const,
+  /** Update appMembershipDefault mutation key */ update: (id: string | number) =>
+    ['mutation', 'appmembershipdefault', 'update', id] as const,
+  /** Delete appMembershipDefault mutation key */ delete: (id: string | number) =>
+    ['mutation', 'appmembershipdefault', 'delete', id] as const,
+} as const;
+export const orgMembershipDefaultMutationKeys = {
+  /** All orgMembershipDefault mutation keys */ all: ['mutation', 'orgmembershipdefault'] as const,
+  /** Create orgMembershipDefault mutation key */ create: () =>
+    ['mutation', 'orgmembershipdefault', 'create'] as const,
+  /** Update orgMembershipDefault mutation key */ update: (id: string | number) =>
+    ['mutation', 'orgmembershipdefault', 'update', id] as const,
+  /** Delete orgMembershipDefault mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orgmembershipdefault', 'delete', id] as const,
+} as const;
+export const nodeTypeRegistryMutationKeys = {
+  /** All nodeTypeRegistry mutation keys */ all: ['mutation', 'nodetyperegistry'] as const,
+  /** Create nodeTypeRegistry mutation key */ create: () =>
+    ['mutation', 'nodetyperegistry', 'create'] as const,
+  /** Update nodeTypeRegistry mutation key */ update: (id: string | number) =>
+    ['mutation', 'nodetyperegistry', 'update', id] as const,
+  /** Delete nodeTypeRegistry mutation key */ delete: (id: string | number) =>
+    ['mutation', 'nodetyperegistry', 'delete', id] as const,
 } as const;
 export const appLimitCapsDefaultMutationKeys = {
   /** All appLimitCapsDefault mutation keys */ all: ['mutation', 'applimitcapsdefault'] as const,
@@ -1077,41 +1163,14 @@ export const orgLimitCapMutationKeys = {
   /** Delete orgLimitCap mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitcap', 'delete', id] as const,
 } as const;
-export const membershipTypeMutationKeys = {
-  /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
-  /** Create membershipType mutation key */ create: () =>
-    ['mutation', 'membershiptype', 'create'] as const,
-  /** Update membershipType mutation key */ update: (id: string | number) =>
-    ['mutation', 'membershiptype', 'update', id] as const,
-  /** Delete membershipType mutation key */ delete: (id: string | number) =>
-    ['mutation', 'membershiptype', 'delete', id] as const,
-} as const;
-export const migrateFileMutationKeys = {
-  /** All migrateFile mutation keys */ all: ['mutation', 'migratefile'] as const,
-  /** Create migrateFile mutation key */ create: () =>
-    ['mutation', 'migratefile', 'create'] as const,
-  /** Update migrateFile mutation key */ update: (id: string | number) =>
-    ['mutation', 'migratefile', 'update', id] as const,
-  /** Delete migrateFile mutation key */ delete: (id: string | number) =>
-    ['mutation', 'migratefile', 'delete', id] as const,
-} as const;
-export const devicesModuleMutationKeys = {
-  /** All devicesModule mutation keys */ all: ['mutation', 'devicesmodule'] as const,
-  /** Create devicesModule mutation key */ create: () =>
-    ['mutation', 'devicesmodule', 'create'] as const,
-  /** Update devicesModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'devicesmodule', 'update', id] as const,
-  /** Delete devicesModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'devicesmodule', 'delete', id] as const,
-} as const;
-export const nodeTypeRegistryMutationKeys = {
-  /** All nodeTypeRegistry mutation keys */ all: ['mutation', 'nodetyperegistry'] as const,
-  /** Create nodeTypeRegistry mutation key */ create: () =>
-    ['mutation', 'nodetyperegistry', 'create'] as const,
-  /** Update nodeTypeRegistry mutation key */ update: (id: string | number) =>
-    ['mutation', 'nodetyperegistry', 'update', id] as const,
-  /** Delete nodeTypeRegistry mutation key */ delete: (id: string | number) =>
-    ['mutation', 'nodetyperegistry', 'delete', id] as const,
+export const userConnectedAccountMutationKeys = {
+  /** All userConnectedAccount mutation keys */ all: ['mutation', 'userconnectedaccount'] as const,
+  /** Create userConnectedAccount mutation key */ create: () =>
+    ['mutation', 'userconnectedaccount', 'create'] as const,
+  /** Update userConnectedAccount mutation key */ update: (id: string | number) =>
+    ['mutation', 'userconnectedaccount', 'update', id] as const,
+  /** Delete userConnectedAccount mutation key */ delete: (id: string | number) =>
+    ['mutation', 'userconnectedaccount', 'delete', id] as const,
 } as const;
 export const appLimitDefaultMutationKeys = {
   /** All appLimitDefault mutation keys */ all: ['mutation', 'applimitdefault'] as const,
@@ -1131,6 +1190,15 @@ export const orgLimitDefaultMutationKeys = {
   /** Delete orgLimitDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitdefault', 'delete', id] as const,
 } as const;
+export const appLimitCreditCodeMutationKeys = {
+  /** All appLimitCreditCode mutation keys */ all: ['mutation', 'applimitcreditcode'] as const,
+  /** Create appLimitCreditCode mutation key */ create: () =>
+    ['mutation', 'applimitcreditcode', 'create'] as const,
+  /** Update appLimitCreditCode mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitcreditcode', 'update', id] as const,
+  /** Delete appLimitCreditCode mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitcreditcode', 'delete', id] as const,
+} as const;
 export const appLimitWarningMutationKeys = {
   /** All appLimitWarning mutation keys */ all: ['mutation', 'applimitwarning'] as const,
   /** Create appLimitWarning mutation key */ create: () =>
@@ -1139,15 +1207,6 @@ export const appLimitWarningMutationKeys = {
     ['mutation', 'applimitwarning', 'update', id] as const,
   /** Delete appLimitWarning mutation key */ delete: (id: string | number) =>
     ['mutation', 'applimitwarning', 'delete', id] as const,
-} as const;
-export const userConnectedAccountMutationKeys = {
-  /** All userConnectedAccount mutation keys */ all: ['mutation', 'userconnectedaccount'] as const,
-  /** Create userConnectedAccount mutation key */ create: () =>
-    ['mutation', 'userconnectedaccount', 'create'] as const,
-  /** Update userConnectedAccount mutation key */ update: (id: string | number) =>
-    ['mutation', 'userconnectedaccount', 'update', id] as const,
-  /** Delete userConnectedAccount mutation key */ delete: (id: string | number) =>
-    ['mutation', 'userconnectedaccount', 'delete', id] as const,
 } as const;
 export const commitMutationKeys = {
   /** All commit mutation keys */ all: ['mutation', 'commit'] as const,
@@ -1175,32 +1234,14 @@ export const rateLimitsModuleMutationKeys = {
   /** Delete rateLimitsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'ratelimitsmodule', 'delete', id] as const,
 } as const;
-export const usageSnapshotMutationKeys = {
-  /** All usageSnapshot mutation keys */ all: ['mutation', 'usagesnapshot'] as const,
-  /** Create usageSnapshot mutation key */ create: () =>
-    ['mutation', 'usagesnapshot', 'create'] as const,
-  /** Update usageSnapshot mutation key */ update: (id: string | number) =>
-    ['mutation', 'usagesnapshot', 'update', id] as const,
-  /** Delete usageSnapshot mutation key */ delete: (id: string | number) =>
-    ['mutation', 'usagesnapshot', 'delete', id] as const,
-} as const;
-export const appMembershipDefaultMutationKeys = {
-  /** All appMembershipDefault mutation keys */ all: ['mutation', 'appmembershipdefault'] as const,
-  /** Create appMembershipDefault mutation key */ create: () =>
-    ['mutation', 'appmembershipdefault', 'create'] as const,
-  /** Update appMembershipDefault mutation key */ update: (id: string | number) =>
-    ['mutation', 'appmembershipdefault', 'update', id] as const,
-  /** Delete appMembershipDefault mutation key */ delete: (id: string | number) =>
-    ['mutation', 'appmembershipdefault', 'delete', id] as const,
-} as const;
-export const orgMembershipDefaultMutationKeys = {
-  /** All orgMembershipDefault mutation keys */ all: ['mutation', 'orgmembershipdefault'] as const,
-  /** Create orgMembershipDefault mutation key */ create: () =>
-    ['mutation', 'orgmembershipdefault', 'create'] as const,
-  /** Update orgMembershipDefault mutation key */ update: (id: string | number) =>
-    ['mutation', 'orgmembershipdefault', 'update', id] as const,
-  /** Delete orgMembershipDefault mutation key */ delete: (id: string | number) =>
-    ['mutation', 'orgmembershipdefault', 'delete', id] as const,
+export const membershipTypeMutationKeys = {
+  /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
+  /** Create membershipType mutation key */ create: () =>
+    ['mutation', 'membershiptype', 'create'] as const,
+  /** Update membershipType mutation key */ update: (id: string | number) =>
+    ['mutation', 'membershiptype', 'update', id] as const,
+  /** Delete membershipType mutation key */ delete: (id: string | number) =>
+    ['mutation', 'membershiptype', 'delete', id] as const,
 } as const;
 export const rlsSettingMutationKeys = {
   /** All rlsSetting mutation keys */ all: ['mutation', 'rlssetting'] as const,
@@ -1210,24 +1251,6 @@ export const rlsSettingMutationKeys = {
   /** Delete rlsSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'rlssetting', 'delete', id] as const,
 } as const;
-export const appLimitEventMutationKeys = {
-  /** All appLimitEvent mutation keys */ all: ['mutation', 'applimitevent'] as const,
-  /** Create appLimitEvent mutation key */ create: () =>
-    ['mutation', 'applimitevent', 'create'] as const,
-  /** Update appLimitEvent mutation key */ update: (id: string | number) =>
-    ['mutation', 'applimitevent', 'update', id] as const,
-  /** Delete appLimitEvent mutation key */ delete: (id: string | number) =>
-    ['mutation', 'applimitevent', 'delete', id] as const,
-} as const;
-export const orgLimitEventMutationKeys = {
-  /** All orgLimitEvent mutation keys */ all: ['mutation', 'orglimitevent'] as const,
-  /** Create orgLimitEvent mutation key */ create: () =>
-    ['mutation', 'orglimitevent', 'create'] as const,
-  /** Update orgLimitEvent mutation key */ update: (id: string | number) =>
-    ['mutation', 'orglimitevent', 'update', id] as const,
-  /** Delete orgLimitEvent mutation key */ delete: (id: string | number) =>
-    ['mutation', 'orglimitevent', 'delete', id] as const,
-} as const;
 export const rlsModuleMutationKeys = {
   /** All rlsModule mutation keys */ all: ['mutation', 'rlsmodule'] as const,
   /** Create rlsModule mutation key */ create: () => ['mutation', 'rlsmodule', 'create'] as const,
@@ -1235,6 +1258,15 @@ export const rlsModuleMutationKeys = {
     ['mutation', 'rlsmodule', 'update', id] as const,
   /** Delete rlsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'rlsmodule', 'delete', id] as const,
+} as const;
+export const agentChatModuleMutationKeys = {
+  /** All agentChatModule mutation keys */ all: ['mutation', 'agentchatmodule'] as const,
+  /** Create agentChatModule mutation key */ create: () =>
+    ['mutation', 'agentchatmodule', 'create'] as const,
+  /** Update agentChatModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentchatmodule', 'update', id] as const,
+  /** Delete agentChatModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentchatmodule', 'delete', id] as const,
 } as const;
 export const rateLimitMetersModuleMutationKeys = {
   /** All rateLimitMetersModule mutation keys */ all: [
@@ -1265,6 +1297,24 @@ export const sqlActionMutationKeys = {
   /** Delete sqlAction mutation key */ delete: (id: string | number) =>
     ['mutation', 'sqlaction', 'delete', id] as const,
 } as const;
+export const appLimitEventMutationKeys = {
+  /** All appLimitEvent mutation keys */ all: ['mutation', 'applimitevent'] as const,
+  /** Create appLimitEvent mutation key */ create: () =>
+    ['mutation', 'applimitevent', 'create'] as const,
+  /** Update appLimitEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitevent', 'update', id] as const,
+  /** Delete appLimitEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitevent', 'delete', id] as const,
+} as const;
+export const orgLimitEventMutationKeys = {
+  /** All orgLimitEvent mutation keys */ all: ['mutation', 'orglimitevent'] as const,
+  /** Create orgLimitEvent mutation key */ create: () =>
+    ['mutation', 'orglimitevent', 'create'] as const,
+  /** Update orgLimitEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'orglimitevent', 'update', id] as const,
+  /** Delete orgLimitEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orglimitevent', 'delete', id] as const,
+} as const;
 export const databaseSettingMutationKeys = {
   /** All databaseSetting mutation keys */ all: ['mutation', 'databasesetting'] as const,
   /** Create databaseSetting mutation key */ create: () =>
@@ -1273,32 +1323,6 @@ export const databaseSettingMutationKeys = {
     ['mutation', 'databasesetting', 'update', id] as const,
   /** Delete databaseSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'databasesetting', 'delete', id] as const,
-} as const;
-export const billingModuleMutationKeys = {
-  /** All billingModule mutation keys */ all: ['mutation', 'billingmodule'] as const,
-  /** Create billingModule mutation key */ create: () =>
-    ['mutation', 'billingmodule', 'create'] as const,
-  /** Update billingModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'billingmodule', 'update', id] as const,
-  /** Delete billingModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'billingmodule', 'delete', id] as const,
-} as const;
-export const astMigrationMutationKeys = {
-  /** All astMigration mutation keys */ all: ['mutation', 'astmigration'] as const,
-  /** Create astMigration mutation key */ create: () =>
-    ['mutation', 'astmigration', 'create'] as const,
-  /** Update astMigration mutation key */ update: (id: string | number) =>
-    ['mutation', 'astmigration', 'update', id] as const,
-  /** Delete astMigration mutation key */ delete: (id: string | number) =>
-    ['mutation', 'astmigration', 'delete', id] as const,
-} as const;
-export const userMutationKeys = {
-  /** All user mutation keys */ all: ['mutation', 'user'] as const,
-  /** Create user mutation key */ create: () => ['mutation', 'user', 'create'] as const,
-  /** Update user mutation key */ update: (id: string | number) =>
-    ['mutation', 'user', 'update', id] as const,
-  /** Delete user mutation key */ delete: (id: string | number) =>
-    ['mutation', 'user', 'delete', id] as const,
 } as const;
 export const orgMembershipSettingMutationKeys = {
   /** All orgMembershipSetting mutation keys */ all: ['mutation', 'orgmembershipsetting'] as const,
@@ -1309,6 +1333,32 @@ export const orgMembershipSettingMutationKeys = {
   /** Delete orgMembershipSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgmembershipsetting', 'delete', id] as const,
 } as const;
+export const appMembershipMutationKeys = {
+  /** All appMembership mutation keys */ all: ['mutation', 'appmembership'] as const,
+  /** Create appMembership mutation key */ create: () =>
+    ['mutation', 'appmembership', 'create'] as const,
+  /** Update appMembership mutation key */ update: (id: string | number) =>
+    ['mutation', 'appmembership', 'update', id] as const,
+  /** Delete appMembership mutation key */ delete: (id: string | number) =>
+    ['mutation', 'appmembership', 'delete', id] as const,
+} as const;
+export const userMutationKeys = {
+  /** All user mutation keys */ all: ['mutation', 'user'] as const,
+  /** Create user mutation key */ create: () => ['mutation', 'user', 'create'] as const,
+  /** Update user mutation key */ update: (id: string | number) =>
+    ['mutation', 'user', 'update', id] as const,
+  /** Delete user mutation key */ delete: (id: string | number) =>
+    ['mutation', 'user', 'delete', id] as const,
+} as const;
+export const astMigrationMutationKeys = {
+  /** All astMigration mutation keys */ all: ['mutation', 'astmigration'] as const,
+  /** Create astMigration mutation key */ create: () =>
+    ['mutation', 'astmigration', 'create'] as const,
+  /** Update astMigration mutation key */ update: (id: string | number) =>
+    ['mutation', 'astmigration', 'update', id] as const,
+  /** Delete astMigration mutation key */ delete: (id: string | number) =>
+    ['mutation', 'astmigration', 'delete', id] as const,
+} as const;
 export const webauthnSettingMutationKeys = {
   /** All webauthnSetting mutation keys */ all: ['mutation', 'webauthnsetting'] as const,
   /** Create webauthnSetting mutation key */ create: () =>
@@ -1318,14 +1368,14 @@ export const webauthnSettingMutationKeys = {
   /** Delete webauthnSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'webauthnsetting', 'delete', id] as const,
 } as const;
-export const appMembershipMutationKeys = {
-  /** All appMembership mutation keys */ all: ['mutation', 'appmembership'] as const,
-  /** Create appMembership mutation key */ create: () =>
-    ['mutation', 'appmembership', 'create'] as const,
-  /** Update appMembership mutation key */ update: (id: string | number) =>
-    ['mutation', 'appmembership', 'update', id] as const,
-  /** Delete appMembership mutation key */ delete: (id: string | number) =>
-    ['mutation', 'appmembership', 'delete', id] as const,
+export const billingModuleMutationKeys = {
+  /** All billingModule mutation keys */ all: ['mutation', 'billingmodule'] as const,
+  /** Create billingModule mutation key */ create: () =>
+    ['mutation', 'billingmodule', 'create'] as const,
+  /** Update billingModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'billingmodule', 'update', id] as const,
+  /** Delete billingModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'billingmodule', 'delete', id] as const,
 } as const;
 export const billingProviderModuleMutationKeys = {
   /** All billingProviderModule mutation keys */ all: [
@@ -1454,10 +1504,18 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'provisionSpatialRelation', identifier] as const)
       : (['mutation', 'provisionSpatialRelation'] as const),
+  /** Mutation key for signInCrossOrigin */ signInCrossOrigin: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'signInCrossOrigin', identifier] as const)
+      : (['mutation', 'signInCrossOrigin'] as const),
   /** Mutation key for bootstrapUser */ bootstrapUser: (identifier?: string) =>
     identifier
       ? (['mutation', 'bootstrapUser', identifier] as const)
       : (['mutation', 'bootstrapUser'] as const),
+  /** Mutation key for signUp */ signUp: (identifier?: string) =>
+    identifier ? (['mutation', 'signUp', identifier] as const) : (['mutation', 'signUp'] as const),
+  /** Mutation key for signIn */ signIn: (identifier?: string) =>
+    identifier ? (['mutation', 'signIn', identifier] as const) : (['mutation', 'signIn'] as const),
   /** Mutation key for setFieldOrder */ setFieldOrder: (identifier?: string) =>
     identifier
       ? (['mutation', 'setFieldOrder', identifier] as const)
@@ -1516,10 +1574,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'applyRls', identifier] as const)
       : (['mutation', 'applyRls'] as const),
-  /** Mutation key for signInCrossOrigin */ signInCrossOrigin: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'signInCrossOrigin', identifier] as const)
-      : (['mutation', 'signInCrossOrigin'] as const),
   /** Mutation key for createUserDatabase */ createUserDatabase: (identifier?: string) =>
     identifier
       ? (['mutation', 'createUserDatabase', identifier] as const)
@@ -1532,6 +1586,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'createApiKey', identifier] as const)
       : (['mutation', 'createApiKey'] as const),
+  /** Mutation key for requestCrossOriginToken */ requestCrossOriginToken: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'requestCrossOriginToken', identifier] as const)
+      : (['mutation', 'requestCrossOriginToken'] as const),
+  /** Mutation key for provisionTable */ provisionTable: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'provisionTable', identifier] as const)
+      : (['mutation', 'provisionTable'] as const),
   /** Mutation key for sendVerificationEmail */ sendVerificationEmail: (identifier?: string) =>
     identifier
       ? (['mutation', 'sendVerificationEmail', identifier] as const)
@@ -1540,18 +1602,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'forgotPassword', identifier] as const)
       : (['mutation', 'forgotPassword'] as const),
-  /** Mutation key for signUp */ signUp: (identifier?: string) =>
-    identifier ? (['mutation', 'signUp', identifier] as const) : (['mutation', 'signUp'] as const),
-  /** Mutation key for requestCrossOriginToken */ requestCrossOriginToken: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'requestCrossOriginToken', identifier] as const)
-      : (['mutation', 'requestCrossOriginToken'] as const),
-  /** Mutation key for signIn */ signIn: (identifier?: string) =>
-    identifier ? (['mutation', 'signIn', identifier] as const) : (['mutation', 'signIn'] as const),
-  /** Mutation key for provisionTable */ provisionTable: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'provisionTable', identifier] as const)
-      : (['mutation', 'provisionTable'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
@@ -1583,9 +1633,9 @@ export const mutationKeys = {
   orgGetManagersRecord: orgGetManagersRecordMutationKeys,
   orgGetSubordinatesRecord: orgGetSubordinatesRecordMutationKeys,
   getAllRecord: getAllRecordMutationKeys,
+  object: objectMutationKeys,
   appPermission: appPermissionMutationKeys,
   orgPermission: orgPermissionMutationKeys,
-  object: objectMutationKeys,
   database: databaseMutationKeys,
   schema: schemaMutationKeys,
   table: tableMutationKeys,
@@ -1610,6 +1660,7 @@ export const mutationKeys = {
   sessionSecretsModule: sessionSecretsModuleMutationKeys,
   identityProvidersModule: identityProvidersModuleMutationKeys,
   realtimeModule: realtimeModuleMutationKeys,
+  configSecretsOrgModule: configSecretsOrgModuleMutationKeys,
   schemaGrant: schemaGrantMutationKeys,
   defaultPrivilege: defaultPrivilegeMutationKeys,
   enum: enumMutationKeys,
@@ -1634,7 +1685,7 @@ export const mutationKeys = {
   defaultIdsModule: defaultIdsModuleMutationKeys,
   denormalizedTableField: denormalizedTableFieldMutationKeys,
   emailsModule: emailsModuleMutationKeys,
-  encryptedSecretsModule: encryptedSecretsModuleMutationKeys,
+  configSecretsUserModule: configSecretsUserModuleMutationKeys,
   invitesModule: invitesModuleMutationKeys,
   eventsModule: eventsModuleMutationKeys,
   limitsModule: limitsModuleMutationKeys,
@@ -1655,6 +1706,13 @@ export const mutationKeys = {
   webauthnCredentialsModule: webauthnCredentialsModuleMutationKeys,
   webauthnAuthModule: webauthnAuthModuleMutationKeys,
   notificationsModule: notificationsModuleMutationKeys,
+  inferenceLogModule: inferenceLogModuleMutationKeys,
+  computeLogModule: computeLogModuleMutationKeys,
+  transferLogModule: transferLogModuleMutationKeys,
+  storageLogModule: storageLogModuleMutationKeys,
+  dbUsageModule: dbUsageModuleMutationKeys,
+  merkleStoreModule: merkleStoreModuleMutationKeys,
+  graphModule: graphModuleMutationKeys,
   databaseProvisionModule: databaseProvisionModuleMutationKeys,
   appAdminGrant: appAdminGrantMutationKeys,
   appOwnerGrant: appOwnerGrantMutationKeys,
@@ -1684,48 +1742,45 @@ export const mutationKeys = {
   appClaimedInvite: appClaimedInviteMutationKeys,
   orgInvite: orgInviteMutationKeys,
   orgClaimedInvite: orgClaimedInviteMutationKeys,
-  auditLog: auditLogMutationKeys,
-  agentThread: agentThreadMutationKeys,
-  agentMessage: agentMessageMutationKeys,
-  agentTask: agentTaskMutationKeys,
-  roleType: roleTypeMutationKeys,
+  auditLogAuth: auditLogAuthMutationKeys,
   identityProvider: identityProviderMutationKeys,
   ref: refMutationKeys,
   store: storeMutationKeys,
   appPermissionDefault: appPermissionDefaultMutationKeys,
-  appLimitCreditCode: appLimitCreditCodeMutationKeys,
+  roleType: roleTypeMutationKeys,
+  migrateFile: migrateFileMutationKeys,
+  devicesModule: devicesModuleMutationKeys,
+  appMembershipDefault: appMembershipDefaultMutationKeys,
+  orgMembershipDefault: orgMembershipDefaultMutationKeys,
+  nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   appLimitCapsDefault: appLimitCapsDefaultMutationKeys,
   orgLimitCapsDefault: orgLimitCapsDefaultMutationKeys,
   appLimitCap: appLimitCapMutationKeys,
   orgLimitCap: orgLimitCapMutationKeys,
-  membershipType: membershipTypeMutationKeys,
-  migrateFile: migrateFileMutationKeys,
-  devicesModule: devicesModuleMutationKeys,
-  nodeTypeRegistry: nodeTypeRegistryMutationKeys,
+  userConnectedAccount: userConnectedAccountMutationKeys,
   appLimitDefault: appLimitDefaultMutationKeys,
   orgLimitDefault: orgLimitDefaultMutationKeys,
+  appLimitCreditCode: appLimitCreditCodeMutationKeys,
   appLimitWarning: appLimitWarningMutationKeys,
-  userConnectedAccount: userConnectedAccountMutationKeys,
   commit: commitMutationKeys,
   pubkeySetting: pubkeySettingMutationKeys,
   rateLimitsModule: rateLimitsModuleMutationKeys,
-  usageSnapshot: usageSnapshotMutationKeys,
-  appMembershipDefault: appMembershipDefaultMutationKeys,
-  orgMembershipDefault: orgMembershipDefaultMutationKeys,
+  membershipType: membershipTypeMutationKeys,
   rlsSetting: rlsSettingMutationKeys,
-  appLimitEvent: appLimitEventMutationKeys,
-  orgLimitEvent: orgLimitEventMutationKeys,
   rlsModule: rlsModuleMutationKeys,
+  agentChatModule: agentChatModuleMutationKeys,
   rateLimitMetersModule: rateLimitMetersModuleMutationKeys,
   plansModule: plansModuleMutationKeys,
   sqlAction: sqlActionMutationKeys,
+  appLimitEvent: appLimitEventMutationKeys,
+  orgLimitEvent: orgLimitEventMutationKeys,
   databaseSetting: databaseSettingMutationKeys,
-  billingModule: billingModuleMutationKeys,
-  astMigration: astMigrationMutationKeys,
-  user: userMutationKeys,
   orgMembershipSetting: orgMembershipSettingMutationKeys,
-  webauthnSetting: webauthnSettingMutationKeys,
   appMembership: appMembershipMutationKeys,
+  user: userMutationKeys,
+  astMigration: astMigrationMutationKeys,
+  webauthnSetting: webauthnSettingMutationKeys,
+  billingModule: billingModuleMutationKeys,
   billingProviderModule: billingProviderModuleMutationKeys,
   hierarchyModule: hierarchyModuleMutationKeys,
   custom: customMutationKeys,

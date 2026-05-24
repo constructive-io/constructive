@@ -7,7 +7,7 @@ Execute the updateNodeAtPath mutation
 ## Usage
 
 ```bash
-csdk update-node-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk update-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk update-node-at-path --input.clientMutationId <String> --input.dbId <UUID> -
 ### Run updateNodeAtPath
 
 ```bash
-csdk update-node-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk update-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
 ```

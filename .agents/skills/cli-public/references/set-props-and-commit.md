@@ -7,7 +7,7 @@ Execute the setPropsAndCommit mutation
 ## Usage
 
 ```bash
-csdk set-props-and-commit --input.clientMutationId <String> --input.dbId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON>
+csdk set-props-and-commit --input.clientMutationId <String> --input.sId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk set-props-and-commit --input.clientMutationId <String> --input.dbId <UUID> 
 ### Run setPropsAndCommit
 
 ```bash
-csdk set-props-and-commit --input.clientMutationId <String> --input.dbId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON>
+csdk set-props-and-commit --input.clientMutationId <String> --input.sId <UUID> --input.storeId <UUID> --input.refname <String> --input.path <String> --input.data <JSON>
 ```

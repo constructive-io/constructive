@@ -37,8 +37,8 @@ export type RefOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
   | 'STORE_ID_ASC'
   | 'STORE_ID_DESC'
   | 'COMMIT_ID_ASC'
@@ -52,8 +52,8 @@ export type StoreOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
   | 'HASH_ASC'
   | 'HASH_DESC'
   | 'CREATED_AT_ASC'
@@ -67,8 +67,8 @@ export type CommitOrderBy =
   | 'ID_DESC'
   | 'MESSAGE_ASC'
   | 'MESSAGE_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
   | 'STORE_ID_ASC'
   | 'STORE_ID_DESC'
   | 'PARENT_IDS_ASC'
@@ -88,8 +88,8 @@ export type ObjectOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
   | 'KIDS_ASC'
   | 'KIDS_DESC'
   | 'KTREE_ASC'
@@ -106,8 +106,8 @@ export interface RefFilter {
   id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
   /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
   /** Filter by the object’s `commitId` field. */
@@ -125,8 +125,8 @@ export interface StoreFilter {
   id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
   /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -144,8 +144,8 @@ export interface CommitFilter {
   id?: UUIDFilter;
   /** Filter by the object’s `message` field. */
   message?: StringFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
   /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
   /** Filter by the object’s `parentIds` field. */
@@ -169,8 +169,8 @@ export interface CommitFilter {
 export interface ObjectFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
   /** Filter by the object’s `kids` field. */
   kids?: UUIDListFilter;
   /** Filter by the object’s `ktree` field. */
@@ -190,30 +190,30 @@ export interface ObjectFilter {
 }
 export interface FreezeObjectsInput {
   clientMutationId?: string;
-  databaseId?: string;
+  sId?: string;
   id?: string;
 }
 export interface InitEmptyRepoInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   storeId?: string;
 }
 export interface RemoveNodeAtPathInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   root?: string;
   path?: string[];
 }
 export interface SetDataAtPathInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   root?: string;
   path?: string[];
   data?: unknown;
 }
 export interface SetPropsAndCommitInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   storeId?: string;
   refname?: string;
   path?: string[];
@@ -221,7 +221,7 @@ export interface SetPropsAndCommitInput {
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   root?: string;
   path?: string[];
   data?: unknown;
@@ -230,7 +230,7 @@ export interface InsertNodeAtPathInput {
 }
 export interface UpdateNodeAtPathInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   root?: string;
   path?: string[];
   data?: unknown;
@@ -239,7 +239,7 @@ export interface UpdateNodeAtPathInput {
 }
 export interface SetAndCommitInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   storeId?: string;
   refname?: string;
   path?: string[];
@@ -258,7 +258,7 @@ export interface RefInput {
   id?: string;
   /** The name of the ref or branch */
   name: string;
-  databaseId: string;
+  scopeId: string;
   storeId: string;
   commitId?: string;
 }
@@ -273,8 +273,8 @@ export interface StoreInput {
   id?: string;
   /** The name of the store (e.g., metaschema, migrations). */
   name: string;
-  /** The database this store belongs to. */
-  databaseId: string;
+  /** The scope this store belongs to. */
+  scopeId: string;
   /** The current head tree_id for this store. */
   hash?: string;
   createdAt?: string;
@@ -290,8 +290,8 @@ export interface CommitInput {
   id?: string;
   /** The commit message */
   message?: string;
-  /** The repository identifier */
-  databaseId: string;
+  /** The scope identifier */
+  scopeId: string;
   storeId: string;
   /** Parent commits */
   parentIds?: string[];
@@ -311,7 +311,7 @@ export interface CreateObjectInput {
 /** An input for mutations affecting `Object` */
 export interface ObjectInput {
   id: string;
-  databaseId: string;
+  scopeId: string;
   kids?: string[];
   ktree?: string[];
   data?: unknown;
@@ -322,7 +322,7 @@ export interface UpdateRefInput {
   clientMutationId?: string;
   /** The primary unique identifier for the ref. */
   id: string;
-  databaseId: string;
+  scopeId: string;
   /** An object where the defined keys will be set on the `Ref` being updated. */
   refPatch: RefPatch;
 }
@@ -332,7 +332,7 @@ export interface RefPatch {
   id?: string;
   /** The name of the ref or branch */
   name?: string;
-  databaseId?: string;
+  scopeId?: string;
   storeId?: string;
   commitId?: string;
 }
@@ -349,8 +349,8 @@ export interface StorePatch {
   id?: string;
   /** The name of the store (e.g., metaschema, migrations). */
   name?: string;
-  /** The database this store belongs to. */
-  databaseId?: string;
+  /** The scope this store belongs to. */
+  scopeId?: string;
   /** The current head tree_id for this store. */
   hash?: string;
   createdAt?: string;
@@ -359,8 +359,8 @@ export interface UpdateCommitInput {
   clientMutationId?: string;
   /** The primary unique identifier for the commit. */
   id: string;
-  /** The repository identifier */
-  databaseId: string;
+  /** The scope identifier */
+  scopeId: string;
   /** An object where the defined keys will be set on the `Commit` being updated. */
   commitPatch: CommitPatch;
 }
@@ -370,8 +370,8 @@ export interface CommitPatch {
   id?: string;
   /** The commit message */
   message?: string;
-  /** The repository identifier */
-  databaseId?: string;
+  /** The scope identifier */
+  scopeId?: string;
   storeId?: string;
   /** Parent commits */
   parentIds?: string[];
@@ -386,14 +386,14 @@ export interface CommitPatch {
 export interface UpdateObjectInput {
   clientMutationId?: string;
   id: string;
-  databaseId: string;
+  scopeId: string;
   /** An object where the defined keys will be set on the `Object` being updated. */
   objectPatch: ObjectPatch;
 }
 /** Represents an update to a `Object`. Fields that are set will be updated. */
 export interface ObjectPatch {
   id?: string;
-  databaseId?: string;
+  scopeId?: string;
   kids?: string[];
   ktree?: string[];
   data?: unknown;
@@ -404,7 +404,7 @@ export interface DeleteRefInput {
   clientMutationId?: string;
   /** The primary unique identifier for the ref. */
   id: string;
-  databaseId: string;
+  scopeId: string;
 }
 export interface DeleteStoreInput {
   clientMutationId?: string;
@@ -415,13 +415,13 @@ export interface DeleteCommitInput {
   clientMutationId?: string;
   /** The primary unique identifier for the commit. */
   id: string;
-  /** The repository identifier */
-  databaseId: string;
+  /** The scope identifier */
+  scopeId: string;
 }
 export interface DeleteObjectInput {
   clientMutationId?: string;
   id: string;
-  databaseId: string;
+  scopeId: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */

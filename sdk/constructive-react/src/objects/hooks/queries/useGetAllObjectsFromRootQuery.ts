@@ -20,7 +20,7 @@ export const getAllObjectsFromRootQueryKey = customQueryKeys.getAllObjectsFromRo
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useGetAllObjectsFromRootQuery({ variables: { databaseId, id, first, offset, after } });
+ * const { data, isLoading } = useGetAllObjectsFromRootQuery({ variables: { sId, id, first, offset, after } });
  *
  * if (data?.getAllObjectsFromRoot) {
  *   console.log(data.getAllObjectsFromRoot);
@@ -77,7 +77,7 @@ export function useGetAllObjectsFromRootQuery<
  *
  * @example
  * ```ts
- * const data = await fetchGetAllObjectsFromRootQuery({ variables: { databaseId, id, first, offset, after } });
+ * const data = await fetchGetAllObjectsFromRootQuery({ variables: { sId, id, first, offset, after } });
  * ```
  */
 export async function fetchGetAllObjectsFromRootQuery(params?: {
@@ -91,7 +91,7 @@ export async function fetchGetAllObjectsFromRootQuery(params?: {
  *
  * @example
  * ```ts
- * await prefetchGetAllObjectsFromRootQuery(queryClient, { variables: { databaseId, id, first, offset, after } });
+ * await prefetchGetAllObjectsFromRootQuery(queryClient, { variables: { sId, id, first, offset, after } });
  * ```
  */
 export async function prefetchGetAllObjectsFromRootQuery(

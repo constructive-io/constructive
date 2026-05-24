@@ -7,7 +7,7 @@ Execute the setDataAtPath mutation
 ## Usage
 
 ```bash
-csdk set-data-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON>
+csdk set-data-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk set-data-at-path --input.clientMutationId <String> --input.dbId <UUID> --in
 ### Run setDataAtPath
 
 ```bash
-csdk set-data-at-path --input.clientMutationId <String> --input.dbId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON>
+csdk set-data-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON>
 ```

@@ -54,7 +54,8 @@ export interface WebauthnCredential {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface AuditLog {
+export interface AuditLogAuth {
+  createdAt: string | null;
   id: string | null;
   event: string | null;
   actorId: string | null;
@@ -62,7 +63,6 @@ export interface AuditLog {
   userAgent: string | null;
   ipAddress: string | null;
   success: boolean | null;
-  createdAt: string | null;
 }
 export interface IdentityProvider {
   slug: string | null;

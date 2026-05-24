@@ -7,8 +7,11 @@ Append-only log of limit events for historical reporting and audit
 ## Usage
 
 ```typescript
-useOrgLimitEventsQuery({ selection: { fields: { name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } } })
+useOrgLimitEventsQuery({ selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } } })
+useOrgLimitEventQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } } })
 useCreateOrgLimitEventMutation({ selection: { fields: { id: true } } })
+useUpdateOrgLimitEventMutation({ selection: { fields: { id: true } } })
+useDeleteOrgLimitEventMutation({})
 ```
 
 ## Examples
@@ -17,7 +20,7 @@ useCreateOrgLimitEventMutation({ selection: { fields: { id: true } } })
 
 ```typescript
 const { data, isLoading } = useOrgLimitEventsQuery({
-  selection: { fields: { name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
+  selection: { fields: { createdAt: true, id: true, name: true, actorId: true, entityId: true, eventType: true, delta: true, numBefore: true, numAfter: true, maxAtEvent: true, reason: true } },
 });
 ```
 

@@ -52,11 +52,11 @@ function App() {
 | `useCreateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
 | `useUpdateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
 | `useDeleteWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
-| `useAuditLogsQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
-| `useAuditLogQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
-| `useCreateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
-| `useUpdateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
-| `useDeleteAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useAuditLogAuthsQuery` | Query | Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useAuditLogAuthQuery` | Query | Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useCreateAuditLogAuthMutation` | Mutation | Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useUpdateAuditLogAuthMutation` | Mutation | Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useDeleteAuditLogAuthMutation` | Mutation | Partitioned append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useIdentityProvidersQuery` | Query | List all identityProviders |
 | `useCreateIdentityProviderMutation` | Mutation | Create a identityProvider |
 | `useRoleTypesQuery` | Query | List all roleTypes |
@@ -94,10 +94,10 @@ function App() {
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useSignUpMutation` | Mutation | signUp |
-| `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
 | `useSignInMutation` | Mutation | signIn |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useCreateApiKeyMutation` | Mutation | createApiKey |
+| `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
@@ -191,22 +191,22 @@ const { mutate: create } = useCreateWebauthnCredentialMutation({
 create({ ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', webauthnUserId: '<String>', transports: '<String>', credentialDeviceType: '<String>', backupEligible: '<Boolean>', backupState: '<Boolean>', name: '<String>', lastUsedAt: '<Datetime>' });
 ```
 
-### AuditLog
+### AuditLogAuth
 
 ```typescript
-// List all auditLogs
-const { data, isLoading } = useAuditLogsQuery({
-  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } },
+// List all auditLogAuths
+const { data, isLoading } = useAuditLogAuthsQuery({
+  selection: { fields: { createdAt: true, id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true } },
 });
 
-// Get one auditLog
-const { data: item } = useAuditLogQuery({
+// Get one auditLogAuth
+const { data: item } = useAuditLogAuthQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } },
+  selection: { fields: { createdAt: true, id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true } },
 });
 
-// Create a auditLog
-const { mutate: create } = useCreateAuditLogMutation({
+// Create a auditLogAuth
+const { mutate: create } = useCreateAuditLogAuthMutation({
   selection: { fields: { id: true } },
 });
 create({ event: '<String>', actorId: '<UUID>', origin: '<Origin>', userAgent: '<String>', ipAddress: '<InternetAddress>', success: '<Boolean>' });
@@ -496,17 +496,6 @@ signUp
   |----------|------|
   | `input` | SignUpInput (required) |
 
-### `useRequestCrossOriginTokenMutation`
-
-requestCrossOriginToken
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RequestCrossOriginTokenInput (required) |
-
 ### `useSignInMutation`
 
 signIn
@@ -539,6 +528,17 @@ createApiKey
   | Argument | Type |
   |----------|------|
   | `input` | CreateApiKeyInput (required) |
+
+### `useRequestCrossOriginTokenMutation`
+
+requestCrossOriginToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestCrossOriginTokenInput (required) |
 
 ### `useForgotPasswordMutation`
 

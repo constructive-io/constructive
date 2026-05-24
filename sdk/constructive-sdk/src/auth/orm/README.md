@@ -25,7 +25,7 @@ const db = createClient({
 | `phoneNumber` | findMany, findOne, create, update, delete |
 | `cryptoAddress` | findMany, findOne, create, update, delete |
 | `webauthnCredential` | findMany, findOne, create, update, delete |
-| `auditLog` | findMany, findOne, create, update, delete |
+| `auditLogAuth` | findMany, findOne, create, update, delete |
 | `identityProvider` | findMany, findOne, create, update, delete |
 | `roleType` | findMany, findOne, create, update, delete |
 | `userConnectedAccount` | findMany, findOne, create, update, delete |
@@ -184,14 +184,15 @@ const updated = await db.webauthnCredential.update({ where: { id: '<UUID>' }, da
 const deleted = await db.webauthnCredential.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.auditLog`
+### `db.auditLogAuth`
 
-CRUD operations for AuditLog records.
+CRUD operations for AuditLogAuth records.
 
 **Fields:**
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `createdAt` | Datetime | No |
 | `id` | UUID | No |
 | `event` | String | Yes |
 | `actorId` | UUID | Yes |
@@ -199,25 +200,24 @@ CRUD operations for AuditLog records.
 | `userAgent` | String | Yes |
 | `ipAddress` | InternetAddress | Yes |
 | `success` | Boolean | Yes |
-| `createdAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
-// List all auditLog records
-const items = await db.auditLog.findMany({ select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
+// List all auditLogAuth records
+const items = await db.auditLogAuth.findMany({ select: { createdAt: true, id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true } }).execute();
 
 // Get one by id
-const item = await db.auditLog.findOne({ id: '<UUID>', select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
+const item = await db.auditLogAuth.findOne({ id: '<UUID>', select: { createdAt: true, id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true } }).execute();
 
 // Create
-const created = await db.auditLog.create({ data: { event: '<String>', actorId: '<UUID>', origin: '<Origin>', userAgent: '<String>', ipAddress: '<InternetAddress>', success: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.auditLogAuth.create({ data: { event: '<String>', actorId: '<UUID>', origin: '<Origin>', userAgent: '<String>', ipAddress: '<InternetAddress>', success: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.auditLog.update({ where: { id: '<UUID>' }, data: { event: '<String>' }, select: { id: true } }).execute();
+const updated = await db.auditLogAuth.update({ where: { id: '<UUID>' }, data: { event: '<String>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.auditLog.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.auditLogAuth.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.identityProvider`
@@ -647,21 +647,6 @@ signUp
 const result = await db.mutation.signUp({ input: '<SignUpInput>' }).execute();
 ```
 
-### `db.mutation.requestCrossOriginToken`
-
-requestCrossOriginToken
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RequestCrossOriginTokenInput (required) |
-
-```typescript
-const result = await db.mutation.requestCrossOriginToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
-```
-
 ### `db.mutation.signIn`
 
 signIn
@@ -705,6 +690,21 @@ createApiKey
 
 ```typescript
 const result = await db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>' } }).execute();
+```
+
+### `db.mutation.requestCrossOriginToken`
+
+requestCrossOriginToken
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestCrossOriginTokenInput (required) |
+
+```typescript
+const result = await db.mutation.requestCrossOriginToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
 ```
 
 ### `db.mutation.forgotPassword`
