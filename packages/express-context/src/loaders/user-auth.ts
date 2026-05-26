@@ -13,6 +13,7 @@ import { createModuleLoader } from './create-loader';
 
 export interface UserAuthConfig {
   schemaName: string;
+  sessionCredentialsSchemaName: string;
   signInFunction: string;
   signUpFunction: string;
   signOutFunction: string;
@@ -26,6 +27,7 @@ export interface UserAuthConfig {
 const USER_AUTH_MODULE_SQL = `
   SELECT
     s.schema_name,
+    sc_schema.schema_name AS session_credentials_schema_name,
     uam.sign_in_function,
     uam.sign_up_function,
     uam.sign_out_function,
@@ -34,6 +36,8 @@ const USER_AUTH_MODULE_SQL = `
     uam.extend_token_expires
   FROM metaschema_modules_public.user_auth_module uam
   JOIN metaschema_public.schema s ON s.id = uam.schema_id
+  LEFT JOIN metaschema_public.table sc_table ON sc_table.id = uam.session_credentials_table_id
+  LEFT JOIN metaschema_public.schema sc_schema ON sc_schema.id = sc_table.schema_id
   WHERE uam.database_id = $1
   LIMIT 1
 `;
@@ -42,6 +46,7 @@ const USER_AUTH_MODULE_SQL = `
 
 interface UserAuthModuleRow {
   schema_name: string;
+  session_credentials_schema_name: string | null;
   sign_in_function: string;
   sign_up_function: string;
   sign_out_function: string;
@@ -68,6 +73,8 @@ export const userAuthLoader: ModuleLoader<UserAuthConfig> =
 
       return {
         schemaName: row.schema_name,
+        sessionCredentialsSchemaName:
+          row.session_credentials_schema_name || row.schema_name,
         signInFunction: row.sign_in_function,
         signUpFunction: row.sign_up_function,
         signOutFunction: row.sign_out_function,

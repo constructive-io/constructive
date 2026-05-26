@@ -173,6 +173,7 @@ export interface EncryptedSecretsConfig {
 
 export interface UserAuthConfig {
   schemaName: string;
+  sessionCredentialsSchemaName: string;
   signInFunction: string;
   signUpFunction: string;
   signOutFunction: string;
