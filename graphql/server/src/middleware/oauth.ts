@@ -232,7 +232,8 @@ async function getIdentityProvider(
   providerSlug: string,
 ): Promise<IdentityProviderConfig | null> {
   const { privateSchemaName, tableName } = modules.identityProviders;
-  const { schemaName: encryptedSchema } = modules.encryptedSecrets;
+  const { schemaName: encryptedSchema, tableName: encryptedTableName } =
+    modules.encryptedSecrets;
 
   const sql = `
     SELECT
@@ -241,13 +242,14 @@ async function getIdentityProvider(
       ip.display_name,
       ip.enabled,
       ip.client_id,
-      "${encryptedSchema}".get(ip.client_secret_id, 'oauth_client_secret') as client_secret,
+      convert_from(secrets.value, 'UTF8') as client_secret,
       ip.authorization_url,
       ip.token_url,
       ip.userinfo_url,
       ip.scopes,
       ip.pkce_enabled
     FROM "${privateSchemaName}"."${tableName}" ip
+    LEFT JOIN "${encryptedSchema}"."${encryptedTableName}" secrets ON secrets.id = ip.client_secret_id
     WHERE ip.slug = $1 AND ip.enabled = true
   `;
 
