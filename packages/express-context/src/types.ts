@@ -188,6 +188,12 @@ export interface IdentityProvidersConfig {
   tableName: string;
 }
 
+export interface ConnectedAccountsConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+}
+
 // ─── Module Types Map ───────────────────────────────────────────────────────
 
 /**
@@ -211,6 +217,7 @@ export interface BuiltinModuleMap {
   encryptedSecrets: EncryptedSecretsConfig;
   userAuth: UserAuthConfig;
   identityProviders: IdentityProvidersConfig;
+  connectedAccounts: ConnectedAccountsConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

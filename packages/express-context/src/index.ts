@@ -52,8 +52,10 @@ export type {
   GenericModuleData,
   InferenceLogConfig,
   PublicKeyChallengeData,
+  PgInterval,
   PubkeyChallengeSettings,
   RlsModule,
+  ConnectedAccountsConfig,
   EncryptedSecretsConfig,
   IdentityProvidersConfig,
   UserAuthConfig,
@@ -98,6 +100,7 @@ export {
   encryptedSecretsLoader,
   userAuthLoader,
   identityProvidersLoader,
+  connectedAccountsLoader,
 } from './loaders';
 
 // Side-effect: Express type augmentation

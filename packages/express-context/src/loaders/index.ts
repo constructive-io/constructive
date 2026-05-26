@@ -15,6 +15,7 @@
  *   - encryptedSecrets (metaschema_modules_public.config_secrets_org_module)
  *   - userAuth        (metaschema_modules_public.user_auth_module)
  *   - identityProviders (metaschema_modules_public.identity_providers_module)
+ *   - connectedAccounts (metaschema_modules_public.connected_accounts_module)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:
  *
@@ -53,6 +54,7 @@ export { agentChatLoader } from './agent-chat';
 export { encryptedSecretsLoader } from './encrypted-secrets';
 export { userAuthLoader } from './user-auth';
 export { identityProvidersLoader } from './identity-providers';
+export { connectedAccountsLoader } from './connected-accounts';
 
 /**
  * Convenience: create a registry pre-loaded with all built-in loaders.
@@ -70,6 +72,7 @@ import { agentChatLoader } from './agent-chat';
 import { encryptedSecretsLoader } from './encrypted-secrets';
 import { userAuthLoader } from './user-auth';
 import { identityProvidersLoader } from './identity-providers';
+import { connectedAccountsLoader } from './connected-accounts';
 
 export function createDefaultRegistry() {
   const registry = createLoaderRegistry();
@@ -85,5 +88,6 @@ export function createDefaultRegistry() {
   registry.register(encryptedSecretsLoader);
   registry.register(userAuthLoader);
   registry.register(identityProvidersLoader);
+  registry.register(connectedAccountsLoader);
   return registry;
 }
