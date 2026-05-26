@@ -86,16 +86,29 @@ export interface RlsModule {
   currentUserAgent: string;
 }
 
+export interface PgInterval {
+  years?: number;
+  months?: number;
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  milliseconds?: number;
+}
+
 export interface AuthSettings {
   cookieSecure?: boolean;
   cookieSamesite?: string;
   cookieDomain?: string | null;
   cookieHttponly?: boolean;
-  cookieMaxAge?: string | null;
+  cookieMaxAge?: string | PgInterval | null;
   cookiePath?: string;
-  rememberMeDuration?: string | null;
+  rememberMeDuration?: string | PgInterval | null;
   enableCaptcha?: boolean;
   captchaSiteKey?: string | null;
+  oauthStateMaxAge?: string | PgInterval | null;
+  oauthRequireVerifiedEmail?: boolean;
+  oauthErrorRedirectPath?: string | null;
 }
 
 export interface ApiStructure {

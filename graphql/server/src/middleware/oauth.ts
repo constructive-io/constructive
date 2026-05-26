@@ -46,6 +46,59 @@ const OAUTH_STATE_COOKIE = 'oauth_state';
 const DEFAULT_OAUTH_STATE_MAX_AGE = 10 * 60 * 1000; // 10 minutes
 const DEFAULT_ERROR_REDIRECT_PATH = '/auth/error';
 
+interface PgInterval {
+  years?: number;
+  months?: number;
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  milliseconds?: number;
+}
+
+/**
+ * Parse PostgreSQL interval to milliseconds.
+ * Handles: pg library object {minutes: 10}, string '10 minutes', '00:10:00'
+ */
+function parseIntervalToMs(
+  interval: string | PgInterval | null | undefined,
+): number {
+  if (!interval) return DEFAULT_OAUTH_STATE_MAX_AGE;
+
+  // Handle pg library interval object (e.g., {minutes: 10})
+  if (typeof interval === 'object') {
+    const ms =
+      (interval.days || 0) * 24 * 60 * 60 * 1000 +
+      (interval.hours || 0) * 60 * 60 * 1000 +
+      (interval.minutes || 0) * 60 * 1000 +
+      (interval.seconds || 0) * 1000 +
+      (interval.milliseconds || 0);
+    return ms || DEFAULT_OAUTH_STATE_MAX_AGE;
+  }
+
+  // Handle HH:MM:SS format (PostgreSQL default interval output)
+  const hhmmss = interval.match(/^(\d+):(\d+):(\d+)$/);
+  if (hhmmss) {
+    const hours = parseInt(hhmmss[1], 10);
+    const minutes = parseInt(hhmmss[2], 10);
+    const seconds = parseInt(hhmmss[3], 10);
+    return (hours * 3600 + minutes * 60 + seconds) * 1000;
+  }
+
+  // Handle "N unit" format (e.g., "10 minutes")
+  const match = interval.match(/^(\d+)\s*(second|minute|hour|day)s?$/i);
+  if (!match) return DEFAULT_OAUTH_STATE_MAX_AGE;
+  const value = parseInt(match[1], 10);
+  const unit = match[2].toLowerCase();
+  const multipliers: Record<string, number> = {
+    second: 1000,
+    minute: 60 * 1000,
+    hour: 60 * 60 * 1000,
+    day: 24 * 60 * 60 * 1000,
+  };
+  return value * (multipliers[unit] || 60 * 1000);
+}
+
 // =============================================================================
 // Signed State Utilities
 // =============================================================================
@@ -376,28 +429,32 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
       }
 
       const providerConfig = await getIdentityProvider(ctx, modules, provider);
+      const { authSettings } = modules;
+      const errorRedirectPath =
+        authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
+
       if (!providerConfig) {
         log.warn(`[oauth] Provider ${provider} not found or not configured`);
         return redirectToError(
           res,
           baseUrl,
-          DEFAULT_ERROR_REDIRECT_PATH,
+          errorRedirectPath,
           'PROVIDER_NOT_CONFIGURED',
           provider,
         );
       }
 
-      const stateMaxAge = DEFAULT_OAUTH_STATE_MAX_AGE;
+      const stateMaxAge = parseIntervalToMs(authSettings?.oauthStateMaxAge);
       const state = createSignedState(
         { redirect_uri: redirectUri, provider },
         stateMaxAge,
       );
 
       res.cookie(OAUTH_STATE_COOKIE, state, {
-        httpOnly: true,
-        secure: isProduction,
+        httpOnly: authSettings?.cookieHttponly ?? true,
+        secure: authSettings?.cookieSecure ?? isProduction,
         maxAge: stateMaxAge,
-        sameSite: 'lax',
+        sameSite: (authSettings?.cookieSamesite as 'lax' | 'strict' | 'none') ?? 'lax',
       });
 
       const client = createOAuthClientForProvider(providerConfig, baseUrl);
@@ -485,8 +542,9 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         );
       }
 
+      let modules: OAuthModules | null = null;
       try {
-        const modules = await resolveOAuthModules(ctx);
+        modules = await resolveOAuthModules(ctx);
         if (!modules) {
           log.error(
             `[oauth] Required modules not provisioned for ${provider}`,
@@ -500,6 +558,12 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           );
         }
 
+        const { authSettings } = modules;
+        const errorRedirectPath =
+          authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
+        const requireVerifiedEmail =
+          authSettings?.oauthRequireVerifiedEmail ?? true;
+
         const providerConfig = await getIdentityProvider(
           ctx,
           modules,
@@ -510,7 +574,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           return redirectToError(
             res,
             baseUrl,
-            DEFAULT_ERROR_REDIRECT_PATH,
+            errorRedirectPath,
             'PROVIDER_NOT_CONFIGURED',
             provider,
           );
@@ -591,7 +655,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
                 `[oauth] Account not found for ${profile.email}, attempting signup`,
               );
 
-              if (!emailVerified) {
+              if (requireVerifiedEmail && !emailVerified) {
                 log.warn(
                   `[oauth] Rejecting unverified email for signup: ${profile.email}`,
                 );
@@ -623,7 +687,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           return redirectToError(
             res,
             baseUrl,
-            DEFAULT_ERROR_REDIRECT_PATH,
+            errorRedirectPath,
             'EMAIL_NOT_VERIFIED',
             provider,
           );
@@ -677,13 +741,10 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         }
       } catch (error: any) {
         log.error(`[oauth] Callback failed for ${provider}:`, error);
-        redirectToError(
-          res,
-          baseUrl,
-          DEFAULT_ERROR_REDIRECT_PATH,
-          'CALLBACK_FAILED',
-          provider,
-        );
+        const fallbackPath =
+          modules?.authSettings?.oauthErrorRedirectPath ||
+          DEFAULT_ERROR_REDIRECT_PATH;
+        redirectToError(res, baseUrl, fallbackPath, 'CALLBACK_FAILED', provider);
       }
     },
   );
