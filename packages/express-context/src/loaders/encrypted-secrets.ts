@@ -2,8 +2,11 @@
  * Encrypted Secrets Module Loader
  *
  * Resolves the schema name for the app_secrets table from
- * metaschema_modules_public.config_secrets_org_module. Used by OAuth
- * and other modules that need to decrypt secrets stored in the tenant DB.
+ * metaschema_modules_public.config_secrets_user_module. The generator creates
+ * both user_secrets and app_secrets in the same schema, so we use the schema
+ * from config_secrets_user_module and hardcode table name to 'app_secrets'.
+ *
+ * Used by OAuth and other modules that need to decrypt secrets stored in the tenant DB.
  */
 
 import type { LoaderContext, ModuleLoader } from './types';
@@ -19,10 +22,8 @@ export interface EncryptedSecretsConfig {
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const ENCRYPTED_SECRETS_MODULE_SQL = `
-  SELECT
-    s.schema_name,
-    csm.table_name
-  FROM metaschema_modules_public.config_secrets_org_module csm
+  SELECT s.schema_name
+  FROM metaschema_modules_public.config_secrets_user_module csm
   JOIN metaschema_public.schema s ON s.id = csm.schema_id
   WHERE csm.database_id = $1
   LIMIT 1
@@ -39,7 +40,6 @@ export const encryptedSecretsLoader: ModuleLoader<EncryptedSecretsConfig> =
 
       const result = await tenantPool.query<{
         schema_name: string;
-        table_name: string;
       }>(ENCRYPTED_SECRETS_MODULE_SQL, [databaseId]);
 
       const row = result.rows[0];
@@ -47,7 +47,7 @@ export const encryptedSecretsLoader: ModuleLoader<EncryptedSecretsConfig> =
 
       return {
         schemaName: row.schema_name,
-        tableName: row.table_name,
+        tableName: 'app_secrets',
       };
     },
   });

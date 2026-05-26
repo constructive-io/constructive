@@ -12,7 +12,7 @@
  *   - pubkeyChallengeSettings (services_public.pubkey_settings)
  *   - webauthnSettings(services_public.webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
- *   - encryptedSecrets (metaschema_modules_public.config_secrets_org_module)
+ *   - encryptedSecrets (metaschema_modules_public.config_secrets_user_module → app_secrets)
  *   - userAuth        (metaschema_modules_public.user_auth_module)
  *   - identityProviders (metaschema_modules_public.identity_providers_module)
  *   - connectedAccounts (metaschema_modules_public.connected_accounts_module)
