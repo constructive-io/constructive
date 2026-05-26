@@ -739,7 +739,7 @@ function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
 /**
  * Build the BlueprintBucketSeed interface.
  *
- * Matches the bucket entries in storage_config.buckets[].
+ * Matches the bucket entries in storage.buckets[].
  */
 function buildBlueprintBucketSeed(): t.ExportNamedDeclaration {
   return addJSDoc(
@@ -775,14 +775,14 @@ function buildBlueprintBucketSeed(): t.ExportNamedDeclaration {
         'CORS allowed origins for this bucket.'
       )
     ]),
-    'A bucket seed entry for storage_config.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped).'
+    'A bucket seed entry for storage.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped).'
   );
 }
 
 /**
  * Build the BlueprintStorageConfig interface.
  *
- * Matches the jsonb shape accepted by storage_config on entity_type_provision.
+ * Matches the jsonb shape accepted by storage on entity_type_provision.
  */
 function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
   return addJSDoc(
@@ -954,6 +954,246 @@ function buildBlueprintAchievement(): t.ExportNamedDeclaration {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Module config types (namespace, function, agent, graph)
+// ---------------------------------------------------------------------------
+
+/**
+ * Build the BlueprintNamespaceConfig interface.
+ *
+ * Matches the jsonb shape accepted by namespaces on entity_type_provision
+ * and the top-level definition.namespaces[] array in construct_blueprint().
+ */
+function buildBlueprintNamespaceConfig(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintNamespaceConfig', [
+      addJSDoc(
+        optionalProp(
+          'scope',
+          t.tsUnionType([
+            t.tsLiteralType(t.stringLiteral('app')),
+            t.tsLiteralType(t.stringLiteral('org'))
+          ])
+        ),
+        'Namespace scope. "app" (default) creates app-level namespaces (membership_type = NULL). "org" creates per-org namespaces. Only used at the top level of a blueprint definition — entity-scoped namespaces inherit scope from the entity type.'
+      ),
+      addJSDoc(
+        optionalProp('key', t.tsStringKeyword()),
+        'Module discriminator for multi-module namespaces. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_namespaces.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'policies',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
+        ),
+        'RLS policy overrides for the namespaces table. NULL = apply defaults from apply_namespace_security().'
+      ),
+      addJSDoc(
+        optionalProp(
+          'provisions',
+          t.tsTypeLiteral([
+            optionalProp(
+              'namespaces',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'namespace_events',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            )
+          ])
+        ),
+        'Per-table overrides for namespace tables. Each key targets a specific table (namespaces, namespace_events) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision.'
+      )
+    ]),
+    'Namespace module configuration. When used at the top level of a blueprint, the scope field controls whether namespaces are app-level ("app", default) or org-level ("org"). When used inside entity_types[], scope is inherited from the entity type. Provisions a namespaces table with computed-name proxy, rename trigger, and entity-scoped RLS.'
+  );
+}
+
+/**
+ * Build the BlueprintFunctionConfig interface.
+ *
+ * Matches the jsonb shape accepted by functions on entity_type_provision
+ * and the top-level definition.functions[] array in construct_blueprint().
+ */
+function buildBlueprintFunctionConfig(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintFunctionConfig', [
+      addJSDoc(
+        optionalProp(
+          'scope',
+          t.tsUnionType([
+            t.tsLiteralType(t.stringLiteral('app')),
+            t.tsLiteralType(t.stringLiteral('org'))
+          ])
+        ),
+        'Function scope. "app" (default) creates app-level functions (membership_type = NULL). "org" creates per-org functions. Only used at the top level of a blueprint definition — entity-scoped functions inherit scope from the entity type.'
+      ),
+      addJSDoc(
+        optionalProp('key', t.tsStringKeyword()),
+        'Module discriminator for multi-module functions. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_function_definitions.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'policies',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
+        ),
+        'RLS policy overrides for the function tables. NULL = apply defaults from apply_function_security().'
+      ),
+      addJSDoc(
+        optionalProp(
+          'provisions',
+          t.tsTypeLiteral([
+            optionalProp(
+              'definitions',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'invocations',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'execution_logs',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            )
+          ])
+        ),
+        'Per-table overrides for function tables. Each key targets a specific table (definitions, invocations, execution_logs) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision.'
+      )
+    ]),
+    'Function module configuration. When used at the top level of a blueprint, the scope field controls whether functions are app-level ("app", default) or org-level ("org"). When used inside entity_types[], scope is inherited from the entity type. Provisions function_definitions, function_invocations (partitioned, 12-month retention), and function_execution_logs tables.'
+  );
+}
+
+/**
+ * Build the BlueprintAgentConfig interface.
+ *
+ * Matches the jsonb shape accepted by agents on entity_type_provision
+ * and the top-level definition.agents[] array in construct_blueprint().
+ */
+function buildBlueprintAgentConfig(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintAgentConfig', [
+      addJSDoc(
+        optionalProp(
+          'scope',
+          t.tsUnionType([
+            t.tsLiteralType(t.stringLiteral('app')),
+            t.tsLiteralType(t.stringLiteral('org'))
+          ])
+        ),
+        'Agent scope. "app" (default) creates app-level agent tables (membership_type = NULL). "org" creates per-org agent tables. Only used at the top level of a blueprint definition — entity-scoped agents inherit scope from the entity type.'
+      ),
+      addJSDoc(
+        optionalProp('key', t.tsStringKeyword()),
+        'Module discriminator for multi-module agents. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_agent_thread.'
+      ),
+      addJSDoc(
+        optionalProp('api_name', t.tsStringKeyword()),
+        'API name for the agent module. Used in GraphQL naming. Defaults to "agent".'
+      ),
+      addJSDoc(
+        optionalProp('has_knowledge', t.tsBooleanKeyword()),
+        'Whether to provision the agent_knowledge table with vector embeddings, tags, and trigger_phrases. Also inferred when a "knowledge" key is present. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'knowledge',
+          t.tsTypeLiteral([
+            optionalProp('dimensions', t.tsNumberKeyword()),
+            optionalProp('chunk_size', t.tsNumberKeyword()),
+            optionalProp('chunk_overlap', t.tsNumberKeyword()),
+            optionalProp(
+              'chunk_strategy',
+              t.tsUnionType([
+                t.tsLiteralType(t.stringLiteral('fixed')),
+                t.tsLiteralType(t.stringLiteral('sentence')),
+                t.tsLiteralType(t.stringLiteral('paragraph')),
+                t.tsLiteralType(t.stringLiteral('semantic'))
+              ])
+            ),
+            optionalProp('embedding_model', t.tsStringKeyword()),
+            optionalProp('embedding_provider', t.tsStringKeyword()),
+            optionalProp(
+              'search_indexes',
+              t.tsArrayType(
+                t.tsUnionType([
+                  t.tsLiteralType(t.stringLiteral('fulltext')),
+                  t.tsLiteralType(t.stringLiteral('bm25')),
+                  t.tsLiteralType(t.stringLiteral('trigram'))
+                ])
+              )
+            )
+          ])
+        ),
+        'Knowledge configuration overrides. Controls vector dimensions, chunking strategy, embedding model/provider, and text search indexes for the agent_knowledge table. Presence implies has_knowledge = true.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'policies',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
+        ),
+        'RLS policy overrides for the agent tables. NULL = apply defaults from apply_agent_security().'
+      ),
+      addJSDoc(
+        optionalProp(
+          'provisions',
+          t.tsTypeLiteral([
+            optionalProp(
+              'thread',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'message',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'task',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'prompt',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'knowledge',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            )
+          ])
+        ),
+        'Per-table overrides for agent tables. Each key targets a specific table (thread, message, task, prompt, knowledge) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision.'
+      )
+    ]),
+    'Agent module configuration. When used at the top level of a blueprint, the scope field controls whether agents are app-level ("app", default) or org-level ("org"). When used inside entity_types[], scope is inherited from the entity type. Provisions thread, message, task, prompt tables (and optionally knowledge with vector embeddings).'
+  );
+}
+
+/**
+ * Build the BlueprintGraphConfig interface.
+ *
+ * Matches the jsonb shape accepted by graphs on entity_type_provision.
+ * Graph module requires a merkle_store_module_id dependency, so
+ * entity_type_provision only registers permissions. The graph module itself
+ * must be provisioned separately with the merkle store dependency resolved.
+ */
+function buildBlueprintGraphConfig(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintGraphConfig', [
+      addJSDoc(
+        optionalProp('key', t.tsStringKeyword()),
+        'Module discriminator for multi-module graphs. Defaults to "default".'
+      ),
+      addJSDoc(
+        optionalProp(
+          'policies',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
+        ),
+        'RLS policy overrides for the graph tables. NULL = apply defaults from apply_graph_security().'
+      )
+    ]),
+    'Graph module configuration. Presence triggers permission registration (manage_graphs, execute_graphs). The graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers permissions here — the graph module itself must be provisioned separately.'
+  );
+}
+
 function buildBlueprintEntityTableProvision(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintEntityTableProvision', [
@@ -1065,7 +1305,43 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
             t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
           )
         ),
-        'Storage module configuration array. Each entry provisions a separate storage module with its own tables, RLS, and settings. When non-empty, has_storage is derived as true. Each entry may specify a storage_key for multi-module support (defaults to "default").'
+        'Storage module configuration array. Presence triggers provisioning (same inference model as namespaces, functions, agents). Each entry provisions a separate storage module with its own tables, RLS, and settings. Each entry may specify a storage_key for multi-module support (defaults to "default").'
+      ),
+      addJSDoc(
+        optionalProp(
+          'namespaces',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintNamespaceConfig'))
+          )
+        ),
+        'Namespace module configuration array. Presence triggers provisioning. Each entry provisions a namespace_module with its own tables, computed-name proxy, and entity-scoped RLS. Registers manage_namespaces permission bit. "[{}]" = provision one default namespace module.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'functions',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintFunctionConfig'))
+          )
+        ),
+        'Function module configuration array. Presence triggers provisioning. Each entry provisions function_definitions, function_invocations (partitioned), and function_execution_logs tables. Registers manage_functions + invoke_functions permission bits. "[{}]" = provision one default function module.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'agents',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintAgentConfig'))
+          )
+        ),
+        'Agent module configuration array. Presence triggers provisioning. Each entry provisions thread, message, task, prompt tables (and optionally knowledge with vector embeddings). "[{}]" = provision one default agent module.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'graphs',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintGraphConfig'))
+          )
+        ),
+        'Graph module configuration array. Presence triggers permission registration (manage_graphs, execute_graphs). Graph module requires a merkle_store_module_id dependency, so entity_type_provision only registers permissions here. "[{}]" = register default graph permissions.'
       )
     ]),
     'An entity type entry for Phase 0 of construct_blueprint(). When name is provided, provisions a new entity type with its own entity table, membership modules, and security policies via entity_type_provision. When name is omitted and only prefix is given, extends an existing entity type (e.g., the built-in "org") with additional capabilities like storage — without creating a new entity type.'
@@ -1214,6 +1490,33 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
           )
         ),
         'Achievement definitions. Each entry creates a level with requirements and optional rewards in the events_module. Requires events_module to be provisioned (e.g., via entity_types[].has_levels = true or modules includes events_module).'
+      ),
+      addJSDoc(
+        optionalProp(
+          'namespaces',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintNamespaceConfig'))
+          )
+        ),
+        'Top-level namespace configuration array (Phase 0.6). Each entry has an optional scope ("app" or "org"). App-scoped (default) creates namespace_module with membership_type = NULL. Org-scoped creates per-org namespaces. For entity-scoped namespaces, use entity_types[].namespaces instead.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'functions',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintFunctionConfig'))
+          )
+        ),
+        'Top-level function configuration array (Phase 0.6). Each entry has an optional scope ("app" or "org"). App-scoped (default) creates function_module with membership_type = NULL. Org-scoped creates per-org functions. For entity-scoped functions, use entity_types[].functions instead.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'agents',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintAgentConfig'))
+          )
+        ),
+        'Top-level agent configuration array (Phase 0.6). Each entry has an optional scope ("app" or "org"). App-scoped (default) creates agent_module with membership_type = NULL. Org-scoped creates per-org agents. For entity-scoped agents, use entity_types[].agents instead.'
       )
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
@@ -1263,7 +1566,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildTriggerConditionInterface());
 
   // -- Parameter interfaces grouped by category --
-  const categoryOrder = ['billing', 'check', 'data', 'limit', 'search', 'job', 'process', 'authz', 'relation', 'view'];
+  const categoryOrder = ['billing', 'check', 'data', 'event', 'limit', 'limit_enforce', 'limit_track', 'limit_warning', 'search', 'job', 'process', 'authz', 'relation', 'view'];
   for (const cat of categoryOrder) {
     const nts = categories.get(cat);
     if (!nts || nts.length === 0) continue;
@@ -1295,6 +1598,10 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintAchievementRequirement());
   statements.push(buildBlueprintAchievementReward());
   statements.push(buildBlueprintAchievement());
+  statements.push(buildBlueprintNamespaceConfig());
+  statements.push(buildBlueprintFunctionConfig());
+  statements.push(buildBlueprintAgentConfig());
+  statements.push(buildBlueprintGraphConfig());
   statements.push(buildBlueprintEntityTableProvision());
   statements.push(buildBlueprintEntityType());
 
