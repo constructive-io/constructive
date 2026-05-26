@@ -104,6 +104,29 @@ services:
     networks:
       - constructive-net
 
+  # Generate chunks function (text splitting + embeddings for knowledge tables)
+  generate-chunks:
+    container_name: generate-chunks
+    image: constructive:dev
+    entrypoint: ["node", "functions/generate-chunks/dist/index.js"]
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      # Postgres connection (same DB where knowledge tables live)
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGDATABASE: constructive
+      # Embedding provider (optional — chunks work without embeddings)
+      EMBEDDER_PROVIDER: "${EMBEDDER_PROVIDER:-ollama}"
+      EMBEDDER_MODEL: "${EMBEDDER_MODEL:-nomic-embed-text}"
+      EMBEDDER_BASE_URL: "${EMBEDDER_BASE_URL:-http://host.docker.internal:11434}"
+    ports:
+      - "8083:8080"
+    networks:
+      - constructive-net
+
   # Jobs runtime: callback server + worker + scheduler
   knative-job-service:
     container_name: knative-job-service
@@ -111,6 +134,7 @@ services:
     entrypoint: ["node", "jobs/knative-job-service/dist/run.js"]
     depends_on:
       - send-verification-link
+      - generate-chunks
     environment:
       NODE_ENV: development
 
@@ -124,7 +148,7 @@ services:
 
       # Worker configuration
       JOBS_SUPPORT_ANY: "false"
-      JOBS_SUPPORTED: "email:send_verification_link,email:send_email"
+      JOBS_SUPPORTED: "email:send_verification_link,email:send_email,chunk:generate_chunks"
       HOSTNAME: "knative-job-service-1"
 
       # Callback HTTP server (job completion callbacks)
@@ -137,7 +161,7 @@ services:
       INTERNAL_GATEWAY_URL: "http://send-verification-link:8080"
 
       # Development-only map from task identifier -> function URL
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_verification_link":"http://send-verification-link:8080","email:send_email":"http://send-email:8080"}'
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_verification_link":"http://send-verification-link:8080","email:send_email":"http://send-email:8080","chunk:generate_chunks":"http://generate-chunks:8080","generate_knowledge_chunks":"http://generate-chunks:8080"}'
 
     ports:
       - "8080:8080"
