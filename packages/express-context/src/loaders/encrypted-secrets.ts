@@ -1,8 +1,8 @@
 /**
  * Encrypted Secrets Module Loader
  *
- * Resolves the schema name for the encrypted_secrets table from
- * metaschema_modules_public.encrypted_secrets_module. Used by OAuth
+ * Resolves the schema name for the app_secrets table from
+ * metaschema_modules_public.config_secrets_org_module. Used by OAuth
  * and other modules that need to decrypt secrets stored in the tenant DB.
  */
 
@@ -21,10 +21,10 @@ export interface EncryptedSecretsConfig {
 const ENCRYPTED_SECRETS_MODULE_SQL = `
   SELECT
     s.schema_name,
-    esm.table_name
-  FROM metaschema_modules_public.encrypted_secrets_module esm
-  JOIN metaschema_public.schema s ON s.id = esm.schema_id
-  WHERE esm.database_id = $1
+    csm.table_name
+  FROM metaschema_modules_public.config_secrets_org_module csm
+  JOIN metaschema_public.schema s ON s.id = csm.schema_id
+  WHERE csm.database_id = $1
   LIMIT 1
 `;
 

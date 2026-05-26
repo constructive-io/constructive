@@ -12,7 +12,7 @@
  *   - pubkeyChallengeSettings (services_public.pubkey_settings)
  *   - webauthnSettings(services_public.webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
- *   - encryptedSecrets (metaschema_modules_public.encrypted_secrets_module)
+ *   - encryptedSecrets (metaschema_modules_public.config_secrets_org_module)
  *   - userAuth        (metaschema_modules_public.user_auth_module)
  *   - identityProviders (metaschema_modules_public.identity_providers_module)
  *
