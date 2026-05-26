@@ -25,6 +25,7 @@ import { getNodeEnv } from '@pgpmjs/env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type {
   AuthSettings,
+  ConnectedAccountsConfig,
   ConstructiveContext,
   EncryptedSecretsConfig,
   IdentityProvidersConfig,
@@ -172,24 +173,26 @@ interface OAuthModules {
   encryptedSecrets: EncryptedSecretsConfig;
   userAuth: UserAuthConfig;
   authSettings: AuthSettings | undefined;
+  connectedAccounts: ConnectedAccountsConfig | undefined;
 }
 
 async function resolveOAuthModules(
   ctx: ConstructiveContext,
 ): Promise<OAuthModules | null> {
-  const [identityProviders, encryptedSecrets, userAuth, authSettings] =
+  const [identityProviders, encryptedSecrets, userAuth, authSettings, connectedAccounts] =
     await Promise.all([
       ctx.useModule('identityProviders'),
       ctx.useModule('encryptedSecrets'),
       ctx.useModule('userAuth'),
       ctx.useModule('authSettings'),
+      ctx.useModule('connectedAccounts'),
     ]);
 
   if (!identityProviders || !encryptedSecrets || !userAuth) {
     return null;
   }
 
-  return { identityProviders, encryptedSecrets, userAuth, authSettings };
+  return { identityProviders, encryptedSecrets, userAuth, authSettings, connectedAccounts };
 }
 
 // =============================================================================
@@ -601,7 +604,39 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         }
 
         const userAgent = req.get('user-agent') || '';
-        const { userAuth } = modules;
+        const { identityProviders, connectedAccounts } = modules;
+        const authPrivateSchema = identityProviders.privateSchemaName;
+
+        // Check if identity exists using ctx.pool (bypasses RLS)
+        let identityExists = false;
+        if (connectedAccounts) {
+          const checkSql = `
+            SELECT 1 FROM "${connectedAccounts.privateSchemaName}"."${connectedAccounts.tableName}"
+            WHERE service = $1 AND identifier = $2
+            LIMIT 1
+          `;
+          const checkResult = await ctx.pool.query(checkSql, [
+            profile.provider,
+            profile.providerId,
+          ]);
+          identityExists = checkResult.rows.length > 0;
+        }
+
+        const emailVerified = isEmailVerified(profile);
+
+        // For signup, check email verification requirement before entering transaction
+        if (!identityExists && requireVerifiedEmail && !emailVerified) {
+          log.warn(
+            `[oauth] Rejecting unverified email for signup: ${profile.email}`,
+          );
+          return redirectToError(
+            res,
+            baseUrl,
+            errorRedirectPath,
+            'EMAIL_NOT_VERIFIED',
+            provider,
+          );
+        }
 
         // Use withPgClient to run sign_in/sign_up within a properly scoped
         // RLS transaction. pgSettings (role, claims, request_id) are applied
@@ -615,7 +650,6 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
               [userAgent, targetOrigin],
             );
 
-            const emailVerified = isEmailVerified(profile);
             const details = {
               provider: profile.provider,
               sub: profile.providerId,
@@ -626,15 +660,13 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
               raw_userinfo: profile.raw,
             };
 
-            // sign_in_identity lives in the userAuth schema, NOT assumed to
-            // be in the RLS privateSchema.
-            const signInSql = `
-              SELECT * FROM "${userAuth.schemaName}".sign_in_identity(
-                $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
-              )
-            `;
-
-            try {
+            if (identityExists) {
+              // Identity exists, sign in
+              const signInSql = `
+                SELECT * FROM "${authPrivateSchema}".sign_in_identity(
+                  $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
+                )
+              `;
               const signInResult = await client.query(signInSql, [
                 profile.provider,
                 profile.providerId,
@@ -644,31 +676,17 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
                 deviceToken,
               ]);
               return signInResult.rows[0] || {};
-            } catch (err: any) {
-              const errorMessage = err.message || '';
-
-              if (!errorMessage.includes('IDENTITY_ACCOUNT_NOT_FOUND')) {
-                throw err;
-              }
-
+            } else {
+              // Identity doesn't exist, sign up
               log.info(
                 `[oauth] Account not found for ${profile.email}, attempting signup`,
               );
 
-              if (requireVerifiedEmail && !emailVerified) {
-                log.warn(
-                  `[oauth] Rejecting unverified email for signup: ${profile.email}`,
-                );
-                return { _error: 'EMAIL_NOT_VERIFIED' } as any;
-              }
-
-              // sign_up_identity also lives in the userAuth schema
               const signUpSql = `
-                SELECT * FROM "${userAuth.schemaName}".sign_up_identity(
+                SELECT * FROM "${authPrivateSchema}".sign_up_identity(
                   $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
                 )
               `;
-
               const signUpResult = await client.query(signUpSql, [
                 profile.provider,
                 profile.providerId,
@@ -681,17 +699,6 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
             }
           },
         );
-
-        // Handle error sentinels from within the transaction
-        if ((result as any)._error === 'EMAIL_NOT_VERIFIED') {
-          return redirectToError(
-            res,
-            baseUrl,
-            errorRedirectPath,
-            'EMAIL_NOT_VERIFIED',
-            provider,
-          );
-        }
 
         // Handle MFA required
         if (result.mfa_required && result.mfa_challenge_token) {
