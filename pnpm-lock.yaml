@@ -142,6 +142,32 @@ importers:
         version: 29.4.11(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))(typescript@5.9.3)
     publishDirectory: dist
 
+  functions/invoke-function:
+    dependencies:
+      '@constructive-io/knative-job-fn':
+        specifier: workspace:^
+        version: link:../../jobs/knative-job-fn/dist
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../../pgpm/logger/dist
+      pg:
+        specifier: ^8.21.0
+        version: 8.21.0
+    devDependencies:
+      '@types/pg':
+        specifier: ^8.11.0
+        version: 8.20.0
+      jest:
+        specifier: ^30.4.2
+        version: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      ts-jest:
+        specifier: ^29.4.11
+        version: 29.4.11(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))(typescript@5.9.3)
+    publishDirectory: dist
+
   functions/send-email:
     dependencies:
       '@constructive-io/knative-job-fn':

@@ -127,6 +127,28 @@ services:
     networks:
       - constructive-net
 
+  # Invoke function handler (resolves schema, dispatches, updates invocation status)
+  invoke-function:
+    container_name: invoke-function
+    image: constructive:dev
+    entrypoint: ["node", "functions/invoke-function/dist/index.js"]
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      # Postgres connection (reads metaschema + function_module tables)
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGDATABASE: constructive
+      # Function dispatch routing (same as knative-job-service)
+      INTERNAL_GATEWAY_URL: "http://send-verification-link:8080"
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_verification_link":"http://send-verification-link:8080","email:send_email":"http://send-email:8080","chunk:generate_chunks":"http://generate-chunks:8080","generate_knowledge_chunks":"http://generate-chunks:8080"}'
+    ports:
+      - "8084:8080"
+    networks:
+      - constructive-net
+
   # Jobs runtime: callback server + worker + scheduler
   knative-job-service:
     container_name: knative-job-service
@@ -135,6 +157,7 @@ services:
     depends_on:
       - send-verification-link
       - generate-chunks
+      - invoke-function
     environment:
       NODE_ENV: development
 
@@ -148,7 +171,7 @@ services:
 
       # Worker configuration
       JOBS_SUPPORT_ANY: "false"
-      JOBS_SUPPORTED: "email:send_verification_link,email:send_email,chunk:generate_chunks"
+      JOBS_SUPPORTED: "email:send_verification_link,email:send_email,chunk:generate_chunks,function:invoke"
       HOSTNAME: "knative-job-service-1"
 
       # Callback HTTP server (job completion callbacks)
@@ -161,7 +184,7 @@ services:
       INTERNAL_GATEWAY_URL: "http://send-verification-link:8080"
 
       # Development-only map from task identifier -> function URL
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_verification_link":"http://send-verification-link:8080","email:send_email":"http://send-email:8080","chunk:generate_chunks":"http://generate-chunks:8080","generate_knowledge_chunks":"http://generate-chunks:8080"}'
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"email:send_verification_link":"http://send-verification-link:8080","email:send_email":"http://send-email:8080","chunk:generate_chunks":"http://generate-chunks:8080","generate_knowledge_chunks":"http://generate-chunks:8080","function:invoke":"http://invoke-function:8080"}'
 
     ports:
       - "8080:8080"
