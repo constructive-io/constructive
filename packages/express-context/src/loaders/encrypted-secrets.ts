@@ -1,12 +1,15 @@
 /**
  * Encrypted Secrets Module Loader
  *
- * Resolves the schema name for the app_secrets table from
- * metaschema_modules_public.config_secrets_user_module. The generator creates
- * both user_secrets and app_secrets in the same schema, so we use the schema
- * from config_secrets_user_module and hardcode table name to 'app_secrets'.
+ * Resolves the schema and table name for user_secrets from
+ * metaschema_modules_public.config_secrets_user_module.
  *
- * Used by OAuth and other modules that need to decrypt secrets stored in the tenant DB.
+ * Note: The generator creates both user_secrets and app_secrets tables:
+ *   - user_secrets: per-user/entity secrets (passwords, OAuth client_secret)
+ *   - app_secrets: app-level secrets (API keys, admin-only)
+ *
+ * OAuth uses user_secrets because identity_providers.client_secret_id points
+ * to user_secrets (see rotate_identity_provider_secret procedure).
  */
 
 import type { LoaderContext, ModuleLoader } from './types';
@@ -47,7 +50,7 @@ export const encryptedSecretsLoader: ModuleLoader<EncryptedSecretsConfig> =
 
       return {
         schemaName: row.schema_name,
-        tableName: 'app_secrets',
+        tableName: 'user_secrets',
       };
     },
   });
