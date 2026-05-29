@@ -7,13 +7,10 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  Object,
   User,
-  ObjectSelect,
   UserSelect,
   AppPermissionConnection,
   OrgPermissionConnection,
-  ObjectConnection,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface RequireStepUpVariables {
@@ -25,10 +22,9 @@ export interface AppPermissionsGetPaddedMaskVariables {
 export interface OrgPermissionsGetPaddedMaskVariables {
   mask?: string;
 }
-export interface RevParseVariables {
-  dbId?: string;
-  storeId?: string;
-  refname?: string;
+export interface ApplyRegistryDefaultsVariables {
+  nodeType?: string;
+  data?: unknown;
 }
 /**
  * Variables for resolveBlueprintField
@@ -38,6 +34,17 @@ export interface ResolveBlueprintFieldVariables {
   databaseId?: string;
   tableId?: string;
   fieldName?: string;
+}
+/**
+ * Variables for resolveBlueprintTable
+ * Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
+ */
+export interface ResolveBlueprintTableVariables {
+  databaseId?: string;
+  tableName?: string;
+  schemaName?: string;
+  tableMap?: unknown;
+  defaultSchemaId?: string;
 }
 export interface OrgIsManagerOfVariables {
   pEntityId?: string;
@@ -50,17 +57,6 @@ export interface AppPermissionsGetMaskVariables {
 }
 export interface OrgPermissionsGetMaskVariables {
   ids?: string[];
-}
-/**
- * Variables for resolveBlueprintTable
- * Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
- */
-export interface ResolveBlueprintTableVariables {
-  databaseId?: string;
-  tableName?: string;
-  schemaName?: string;
-  tableMap?: unknown;
-  defaultSchemaId?: string;
 }
 export interface AppPermissionsGetMaskByNamesVariables {
   names?: string[];
@@ -91,39 +87,6 @@ export interface OrgPermissionsGetByMaskVariables {
   offset?: number;
   /** Read all values in the set after (below) this cursor. */
   after?: string;
-}
-export interface GetAllObjectsFromRootVariables {
-  databaseId?: string;
-  id?: string;
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-}
-export interface GetPathObjectsFromRootVariables {
-  databaseId?: string;
-  id?: string;
-  path?: string[];
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-}
-export interface GetObjectAtPathVariables {
-  dbId?: string;
-  storeId?: string;
-  path?: string[];
-  refname?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -271,37 +234,33 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    revParse: (
-      args: RevParseVariables,
+    applyRegistryDefaults: (
+      args: ApplyRegistryDefaultsVariables,
       options?: {
         select?: Record<string, unknown>;
       }
     ) =>
       new QueryBuilder<{
-        revParse: string | null;
+        applyRegistryDefaults: unknown | null;
       }>({
         client,
         operation: 'query',
-        operationName: 'RevParse',
-        fieldName: 'revParse',
+        operationName: 'ApplyRegistryDefaults',
+        fieldName: 'applyRegistryDefaults',
         ...buildCustomDocument(
           'query',
-          'RevParse',
-          'revParse',
+          'ApplyRegistryDefaults',
+          'applyRegistryDefaults',
           options?.select,
           args,
           [
             {
-              name: 'dbId',
-              type: 'UUID',
-            },
-            {
-              name: 'storeId',
-              type: 'UUID',
-            },
-            {
-              name: 'refname',
+              name: 'nodeType',
               type: 'String',
+            },
+            {
+              name: 'data',
+              type: 'JSON',
             },
           ],
           connectionFieldsMap,
@@ -339,6 +298,51 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'fieldName',
               type: 'String',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    resolveBlueprintTable: (
+      args: ResolveBlueprintTableVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        resolveBlueprintTable: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ResolveBlueprintTable',
+        fieldName: 'resolveBlueprintTable',
+        ...buildCustomDocument(
+          'query',
+          'ResolveBlueprintTable',
+          'resolveBlueprintTable',
+          options?.select,
+          args,
+          [
+            {
+              name: 'databaseId',
+              type: 'UUID',
+            },
+            {
+              name: 'tableName',
+              type: 'String',
+            },
+            {
+              name: 'schemaName',
+              type: 'String',
+            },
+            {
+              name: 'tableMap',
+              type: 'JSON',
+            },
+            {
+              name: 'defaultSchemaId',
+              type: 'UUID',
             },
           ],
           connectionFieldsMap,
@@ -438,51 +442,6 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'ids',
               type: '[UUID]',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    resolveBlueprintTable: (
-      args: ResolveBlueprintTableVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        resolveBlueprintTable: string | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'ResolveBlueprintTable',
-        fieldName: 'resolveBlueprintTable',
-        ...buildCustomDocument(
-          'query',
-          'ResolveBlueprintTable',
-          'resolveBlueprintTable',
-          options?.select,
-          args,
-          [
-            {
-              name: 'databaseId',
-              type: 'UUID',
-            },
-            {
-              name: 'tableName',
-              type: 'String',
-            },
-            {
-              name: 'schemaName',
-              type: 'String',
-            },
-            {
-              name: 'tableMap',
-              type: 'JSON',
-            },
-            {
-              name: 'defaultSchemaId',
-              type: 'UUID',
             },
           ],
           connectionFieldsMap,
@@ -627,141 +586,6 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           undefined
-        ),
-      }),
-    getAllObjectsFromRoot: (
-      args: GetAllObjectsFromRootVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        getAllObjectsFromRoot: ObjectConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'GetAllObjectsFromRoot',
-        fieldName: 'getAllObjectsFromRoot',
-        ...buildCustomDocument(
-          'query',
-          'GetAllObjectsFromRoot',
-          'getAllObjectsFromRoot',
-          options?.select,
-          args,
-          [
-            {
-              name: 'databaseId',
-              type: 'UUID',
-            },
-            {
-              name: 'id',
-              type: 'UUID',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    getPathObjectsFromRoot: (
-      args: GetPathObjectsFromRootVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        getPathObjectsFromRoot: ObjectConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'GetPathObjectsFromRoot',
-        fieldName: 'getPathObjectsFromRoot',
-        ...buildCustomDocument(
-          'query',
-          'GetPathObjectsFromRoot',
-          'getPathObjectsFromRoot',
-          options?.select,
-          args,
-          [
-            {
-              name: 'databaseId',
-              type: 'UUID',
-            },
-            {
-              name: 'id',
-              type: 'UUID',
-            },
-            {
-              name: 'path',
-              type: '[String]',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    getObjectAtPath: <S extends ObjectSelect>(
-      args: GetObjectAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ObjectSelect>
-    ) =>
-      new QueryBuilder<{
-        getObjectAtPath: InferSelectResult<Object, S> | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'GetObjectAtPath',
-        fieldName: 'getObjectAtPath',
-        ...buildCustomDocument(
-          'query',
-          'GetObjectAtPath',
-          'getObjectAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'dbId',
-              type: 'UUID',
-            },
-            {
-              name: 'storeId',
-              type: 'UUID',
-            },
-            {
-              name: 'path',
-              type: '[String]',
-            },
-            {
-              name: 'refname',
-              type: 'String',
-            },
-          ],
-          connectionFieldsMap,
-          'Object'
         ),
       }),
     currentUser: <S extends UserSelect>(

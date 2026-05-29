@@ -28,6 +28,8 @@ const fieldSchema: FieldSchema = {
   purchasedCredits: 'int',
   periodCredits: 'int',
   entityId: 'uuid',
+  organizationId: 'uuid',
+  entityType: 'string',
 };
 const usage =
   '\norg-limit <command>\n\nCommands:\n  list                  List orgLimit records\n  find-first            Find first matching orgLimit record\n  get                   Get a orgLimit by ID\n  create                Create a new orgLimit\n  update                Update an existing orgLimit\n  delete                Delete a orgLimit\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -92,6 +94,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       purchasedCredits: true,
       periodCredits: true,
       entityId: true,
+      organizationId: true,
+      entityType: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy> & {
@@ -124,6 +128,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       purchasedCredits: true,
       periodCredits: true,
       entityId: true,
+      organizationId: true,
+      entityType: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy> & {
@@ -168,6 +174,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           purchasedCredits: true,
           periodCredits: true,
           entityId: true,
+          organizationId: true,
+          entityType: true,
         },
       })
       .execute();
@@ -258,6 +266,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'entityId',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'organizationId',
+        message: 'organizationId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'entityType',
+        message: 'entityType',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateOrgLimitInput['orgLimit'];
@@ -276,6 +298,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           purchasedCredits: cleanedData.purchasedCredits,
           periodCredits: cleanedData.periodCredits,
           entityId: cleanedData.entityId,
+          organizationId: cleanedData.organizationId,
+          entityType: cleanedData.entityType,
         },
         select: {
           id: true,
@@ -290,6 +314,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           purchasedCredits: true,
           periodCredits: true,
           entityId: true,
+          organizationId: true,
+          entityType: true,
         },
       })
       .execute();
@@ -386,6 +412,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'entityId',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'organizationId',
+        message: 'organizationId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'entityType',
+        message: 'entityType',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as OrgLimitPatch;
@@ -407,6 +447,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           purchasedCredits: cleanedData.purchasedCredits,
           periodCredits: cleanedData.periodCredits,
           entityId: cleanedData.entityId,
+          organizationId: cleanedData.organizationId,
+          entityType: cleanedData.entityType,
         },
         select: {
           id: true,
@@ -421,6 +463,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           purchasedCredits: true,
           periodCredits: true,
           entityId: true,
+          organizationId: true,
+          entityType: true,
         },
       })
       .execute();

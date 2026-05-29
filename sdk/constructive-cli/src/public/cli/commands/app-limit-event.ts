@@ -16,9 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
+  id: 'uuid',
   name: 'string',
   actorId: 'uuid',
   entityId: 'uuid',
+  organizationId: 'uuid',
+  entityType: 'string',
   eventType: 'string',
   delta: 'int',
   numBefore: 'int',
@@ -27,7 +31,7 @@ const fieldSchema: FieldSchema = {
   reason: 'string',
 };
 const usage =
-  '\napp-limit-event <command>\n\nCommands:\n  list                  List appLimitEvent records\n  find-first            Find first matching appLimitEvent record\n  create                Create a new appLimitEvent\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
+  '\napp-limit-event <command>\n\nCommands:\n  list                  List appLimitEvent records\n  find-first            Find first matching appLimitEvent record\n  get                   Get a appLimitEvent by ID\n  create                Create a new appLimitEvent\n  update                Update an existing appLimitEvent\n  delete                Delete a appLimitEvent\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -44,7 +48,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -61,8 +65,14 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
+    case 'get':
+      return handleGet(argv, prompter);
     case 'create':
       return handleCreate(argv, prompter);
+    case 'update':
+      return handleUpdate(argv, prompter);
+    case 'delete':
+      return handleDelete(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -71,9 +81,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      id: true,
       name: true,
       actorId: true,
       entityId: true,
+      organizationId: true,
+      entityType: true,
       eventType: true,
       delta: true,
       numBefore: true,
@@ -100,9 +114,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      id: true,
       name: true,
       actorId: true,
       entityId: true,
+      organizationId: true,
+      entityType: true,
       eventType: true,
       delta: true,
       numBefore: true,
@@ -120,6 +138,46 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
+  try {
+    const answers = await prompter.prompt(argv, [
+      {
+        type: 'text',
+        name: 'id',
+        message: 'id',
+        required: true,
+      },
+    ]);
+    const client = getClient();
+    const result = await client.appLimitEvent
+      .findOne({
+        id: answers.id as string,
+        select: {
+          createdAt: true,
+          id: true,
+          name: true,
+          actorId: true,
+          entityId: true,
+          organizationId: true,
+          entityType: true,
+          eventType: true,
+          delta: true,
+          numBefore: true,
+          numAfter: true,
+          maxAtEvent: true,
+          reason: true,
+        },
+      })
+      .execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Record not found.');
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -147,6 +205,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'entityId',
         message: 'entityId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'organizationId',
+        message: 'organizationId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'entityType',
+        message: 'entityType',
         required: false,
         skipPrompt: true,
       },
@@ -205,6 +277,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
+          organizationId: cleanedData.organizationId,
+          entityType: cleanedData.entityType,
           eventType: cleanedData.eventType,
           delta: cleanedData.delta,
           numBefore: cleanedData.numBefore,
@@ -213,9 +287,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           reason: cleanedData.reason,
         },
         select: {
+          createdAt: true,
+          id: true,
           name: true,
           actorId: true,
           entityId: true,
+          organizationId: true,
+          entityType: true,
           eventType: true,
           delta: true,
           numBefore: true,
@@ -228,6 +306,171 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to create record.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
+  try {
+    const rawAnswers = await prompter.prompt(argv, [
+      {
+        type: 'text',
+        name: 'id',
+        message: 'id',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'entityId',
+        message: 'entityId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'organizationId',
+        message: 'organizationId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'entityType',
+        message: 'entityType',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'eventType',
+        message: 'eventType',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'delta',
+        message: 'delta',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'numBefore',
+        message: 'numBefore',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'numAfter',
+        message: 'numAfter',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'maxAtEvent',
+        message: 'maxAtEvent',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'reason',
+        message: 'reason',
+        required: false,
+        skipPrompt: true,
+      },
+    ]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as AppLimitEventPatch;
+    const client = getClient();
+    const result = await client.appLimitEvent
+      .update({
+        where: {
+          id: answers.id as string,
+        },
+        data: {
+          name: cleanedData.name,
+          actorId: cleanedData.actorId,
+          entityId: cleanedData.entityId,
+          organizationId: cleanedData.organizationId,
+          entityType: cleanedData.entityType,
+          eventType: cleanedData.eventType,
+          delta: cleanedData.delta,
+          numBefore: cleanedData.numBefore,
+          numAfter: cleanedData.numAfter,
+          maxAtEvent: cleanedData.maxAtEvent,
+          reason: cleanedData.reason,
+        },
+        select: {
+          createdAt: true,
+          id: true,
+          name: true,
+          actorId: true,
+          entityId: true,
+          organizationId: true,
+          entityType: true,
+          eventType: true,
+          delta: true,
+          numBefore: true,
+          numAfter: true,
+          maxAtEvent: true,
+          reason: true,
+        },
+      })
+      .execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Failed to update record.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
+  try {
+    const rawAnswers = await prompter.prompt(argv, [
+      {
+        type: 'text',
+        name: 'id',
+        message: 'id',
+        required: true,
+      },
+    ]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const client = getClient();
+    const result = await client.appLimitEvent
+      .delete({
+        where: {
+          id: answers.id as string,
+        },
+        select: {
+          id: true,
+        },
+      })
+      .execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Failed to delete record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

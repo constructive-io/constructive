@@ -1,13 +1,13 @@
 ---
 name: cli-admin
-description: CLI tool (csdk) for the admin API — provides CRUD commands for 45 tables and 12 custom operations
+description: CLI tool (csdk) for the admin API — provides CRUD commands for 44 tables and 12 custom operations
 ---
 
 # cli-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the admin API — provides CRUD commands for 45 tables and 12 custom operations
+CLI tool (csdk) for the admin API — provides CRUD commands for 44 tables and 12 custom operations
 
 ## Usage
 
@@ -65,42 +65,41 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-limit-credit](references/app-limit-credit.md)
 - [org-member](references/org-member.md)
 - [app-permission-default](references/app-permission-default.md)
-- [app-limit-credit-code](references/app-limit-credit-code.md)
-- [org-permission-default](references/org-permission-default.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
+- [org-permission-default](references/org-permission-default.md)
+- [app-membership-default](references/app-membership-default.md)
+- [org-admin-grant](references/org-admin-grant.md)
+- [org-membership-default](references/org-membership-default.md)
+- [org-owner-grant](references/org-owner-grant.md)
 - [app-limit-caps-default](references/app-limit-caps-default.md)
 - [org-limit-caps-default](references/org-limit-caps-default.md)
 - [app-limit-cap](references/app-limit-cap.md)
 - [org-limit-cap](references/org-limit-cap.md)
-- [org-admin-grant](references/org-admin-grant.md)
-- [org-owner-grant](references/org-owner-grant.md)
-- [membership-type](references/membership-type.md)
+- [org-chart-edge](references/org-chart-edge.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
 - [org-limit-credit](references/org-limit-credit.md)
+- [app-limit-credit-code](references/app-limit-credit-code.md)
 - [app-limit-warning](references/app-limit-warning.md)
-- [org-limit-warning](references/org-limit-warning.md)
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [app-claimed-invite](references/app-claimed-invite.md)
+- [org-limit-warning](references/org-limit-warning.md)
+- [membership-type](references/membership-type.md)
 - [app-grant](references/app-grant.md)
-- [app-membership-default](references/app-membership-default.md)
-- [org-membership-default](references/org-membership-default.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
+- [org-grant](references/org-grant.md)
+- [org-membership-setting](references/org-membership-setting.md)
 - [app-limit-event](references/app-limit-event.md)
 - [org-limit-event](references/org-limit-event.md)
-- [org-grant](references/org-grant.md)
-- [org-chart-edge](references/org-chart-edge.md)
-- [usage-snapshot](references/usage-snapshot.md)
-- [app-limit](references/app-limit.md)
+- [app-membership](references/app-membership.md)
+- [org-membership](references/org-membership.md)
+- [org-member-profile](references/org-member-profile.md)
 - [app-invite](references/app-invite.md)
-- [org-membership-setting](references/org-membership-setting.md)
+- [app-limit](references/app-limit.md)
 - [org-limit-aggregate](references/org-limit-aggregate.md)
 - [org-limit](references/org-limit.md)
-- [org-member-profile](references/org-member-profile.md)
-- [app-membership](references/app-membership.md)
 - [org-invite](references/org-invite.md)
-- [org-membership](references/org-membership.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)
 - [org-is-manager-of](references/org-is-manager-of.md)

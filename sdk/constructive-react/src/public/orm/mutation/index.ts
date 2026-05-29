@@ -23,38 +23,30 @@ import type {
   ConfirmDeleteAccountInput,
   SetPasswordInput,
   VerifyEmailInput,
-  FreezeObjectsInput,
-  InitEmptyRepoInput,
   ConstructBlueprintInput,
   ProvisionNewUserInput,
   ResetPasswordInput,
-  RemoveNodeAtPathInput,
-  CopyTemplateToBlueprintInput,
-  ProvisionSpatialRelationInput,
-  BootstrapUserInput,
-  SetFieldOrderInput,
   ProvisionCheckConstraintInput,
   ProvisionUniqueConstraintInput,
   ProvisionFullTextSearchInput,
   ProvisionIndexInput,
-  SetDataAtPathInput,
-  SetPropsAndCommitInput,
-  ProvisionDatabaseWithUserInput,
-  InsertNodeAtPathInput,
-  UpdateNodeAtPathInput,
-  SetAndCommitInput,
-  ProvisionRelationInput,
-  ApplyRlsInput,
+  CopyTemplateToBlueprintInput,
+  ProvisionSpatialRelationInput,
   SignInCrossOriginInput,
+  BootstrapUserInput,
+  SignUpInput,
+  SignInInput,
+  ProvisionRelationInput,
+  SetFieldOrderInput,
+  ApplyRlsInput,
+  ProvisionDatabaseWithUserInput,
   CreateUserDatabaseInput,
   ExtendTokenExpiresInput,
   CreateApiKeyInput,
+  RequestCrossOriginTokenInput,
+  ProvisionTableInput,
   SendVerificationEmailInput,
   ForgotPasswordInput,
-  SignUpInput,
-  RequestCrossOriginTokenInput,
-  SignInInput,
-  ProvisionTableInput,
   ProvisionBucketInput,
   SendAccountDeletionEmailPayload,
   SignOutPayload,
@@ -72,38 +64,30 @@ import type {
   ConfirmDeleteAccountPayload,
   SetPasswordPayload,
   VerifyEmailPayload,
-  FreezeObjectsPayload,
-  InitEmptyRepoPayload,
   ConstructBlueprintPayload,
   ProvisionNewUserPayload,
   ResetPasswordPayload,
-  RemoveNodeAtPathPayload,
-  CopyTemplateToBlueprintPayload,
-  ProvisionSpatialRelationPayload,
-  BootstrapUserPayload,
-  SetFieldOrderPayload,
   ProvisionCheckConstraintPayload,
   ProvisionUniqueConstraintPayload,
   ProvisionFullTextSearchPayload,
   ProvisionIndexPayload,
-  SetDataAtPathPayload,
-  SetPropsAndCommitPayload,
-  ProvisionDatabaseWithUserPayload,
-  InsertNodeAtPathPayload,
-  UpdateNodeAtPathPayload,
-  SetAndCommitPayload,
-  ProvisionRelationPayload,
-  ApplyRlsPayload,
+  CopyTemplateToBlueprintPayload,
+  ProvisionSpatialRelationPayload,
   SignInCrossOriginPayload,
+  BootstrapUserPayload,
+  SignUpPayload,
+  SignInPayload,
+  ProvisionRelationPayload,
+  SetFieldOrderPayload,
+  ApplyRlsPayload,
+  ProvisionDatabaseWithUserPayload,
   CreateUserDatabasePayload,
   ExtendTokenExpiresPayload,
   CreateApiKeyPayload,
+  RequestCrossOriginTokenPayload,
+  ProvisionTablePayload,
   SendVerificationEmailPayload,
   ForgotPasswordPayload,
-  SignUpPayload,
-  RequestCrossOriginTokenPayload,
-  SignInPayload,
-  ProvisionTablePayload,
   ProvisionBucketPayload,
   SendAccountDeletionEmailPayloadSelect,
   SignOutPayloadSelect,
@@ -121,38 +105,30 @@ import type {
   ConfirmDeleteAccountPayloadSelect,
   SetPasswordPayloadSelect,
   VerifyEmailPayloadSelect,
-  FreezeObjectsPayloadSelect,
-  InitEmptyRepoPayloadSelect,
   ConstructBlueprintPayloadSelect,
   ProvisionNewUserPayloadSelect,
   ResetPasswordPayloadSelect,
-  RemoveNodeAtPathPayloadSelect,
-  CopyTemplateToBlueprintPayloadSelect,
-  ProvisionSpatialRelationPayloadSelect,
-  BootstrapUserPayloadSelect,
-  SetFieldOrderPayloadSelect,
   ProvisionCheckConstraintPayloadSelect,
   ProvisionUniqueConstraintPayloadSelect,
   ProvisionFullTextSearchPayloadSelect,
   ProvisionIndexPayloadSelect,
-  SetDataAtPathPayloadSelect,
-  SetPropsAndCommitPayloadSelect,
-  ProvisionDatabaseWithUserPayloadSelect,
-  InsertNodeAtPathPayloadSelect,
-  UpdateNodeAtPathPayloadSelect,
-  SetAndCommitPayloadSelect,
-  ProvisionRelationPayloadSelect,
-  ApplyRlsPayloadSelect,
+  CopyTemplateToBlueprintPayloadSelect,
+  ProvisionSpatialRelationPayloadSelect,
   SignInCrossOriginPayloadSelect,
+  BootstrapUserPayloadSelect,
+  SignUpPayloadSelect,
+  SignInPayloadSelect,
+  ProvisionRelationPayloadSelect,
+  SetFieldOrderPayloadSelect,
+  ApplyRlsPayloadSelect,
+  ProvisionDatabaseWithUserPayloadSelect,
   CreateUserDatabasePayloadSelect,
   ExtendTokenExpiresPayloadSelect,
   CreateApiKeyPayloadSelect,
+  RequestCrossOriginTokenPayloadSelect,
+  ProvisionTablePayloadSelect,
   SendVerificationEmailPayloadSelect,
   ForgotPasswordPayloadSelect,
-  SignUpPayloadSelect,
-  RequestCrossOriginTokenPayloadSelect,
-  SignInPayloadSelect,
-  ProvisionTablePayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -204,15 +180,9 @@ export interface SetPasswordVariables {
 export interface VerifyEmailVariables {
   input: VerifyEmailInput;
 }
-export interface FreezeObjectsVariables {
-  input: FreezeObjectsInput;
-}
-export interface InitEmptyRepoVariables {
-  input: InitEmptyRepoInput;
-}
 /**
  * Variables for constructBlueprint
- * Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (0.5) app-level storage, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
+ * Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
  */
 export interface ConstructBlueprintVariables {
   input: ConstructBlueprintInput;
@@ -222,29 +192,6 @@ export interface ProvisionNewUserVariables {
 }
 export interface ResetPasswordVariables {
   input: ResetPasswordInput;
-}
-export interface RemoveNodeAtPathVariables {
-  input: RemoveNodeAtPathInput;
-}
-/**
- * Variables for copyTemplateToBlueprint
- * Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
- */
-export interface CopyTemplateToBlueprintVariables {
-  input: CopyTemplateToBlueprintInput;
-}
-/**
- * Variables for provisionSpatialRelation
- * Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
- */
-export interface ProvisionSpatialRelationVariables {
-  input: ProvisionSpatialRelationInput;
-}
-export interface BootstrapUserVariables {
-  input: BootstrapUserInput;
-}
-export interface SetFieldOrderVariables {
-  input: SetFieldOrderInput;
 }
 /**
  * Variables for provisionCheckConstraint
@@ -274,23 +221,31 @@ export interface ProvisionFullTextSearchVariables {
 export interface ProvisionIndexVariables {
   input: ProvisionIndexInput;
 }
-export interface SetDataAtPathVariables {
-  input: SetDataAtPathInput;
+/**
+ * Variables for copyTemplateToBlueprint
+ * Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
+ */
+export interface CopyTemplateToBlueprintVariables {
+  input: CopyTemplateToBlueprintInput;
 }
-export interface SetPropsAndCommitVariables {
-  input: SetPropsAndCommitInput;
+/**
+ * Variables for provisionSpatialRelation
+ * Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
+ */
+export interface ProvisionSpatialRelationVariables {
+  input: ProvisionSpatialRelationInput;
 }
-export interface ProvisionDatabaseWithUserVariables {
-  input: ProvisionDatabaseWithUserInput;
+export interface SignInCrossOriginVariables {
+  input: SignInCrossOriginInput;
 }
-export interface InsertNodeAtPathVariables {
-  input: InsertNodeAtPathInput;
+export interface BootstrapUserVariables {
+  input: BootstrapUserInput;
 }
-export interface UpdateNodeAtPathVariables {
-  input: UpdateNodeAtPathInput;
+export interface SignUpVariables {
+  input: SignUpInput;
 }
-export interface SetAndCommitVariables {
-  input: SetAndCommitInput;
+export interface SignInVariables {
+  input: SignInInput;
 }
 /**
  * Variables for provisionRelation
@@ -299,11 +254,14 @@ export interface SetAndCommitVariables {
 export interface ProvisionRelationVariables {
   input: ProvisionRelationInput;
 }
+export interface SetFieldOrderVariables {
+  input: SetFieldOrderInput;
+}
 export interface ApplyRlsVariables {
   input: ApplyRlsInput;
 }
-export interface SignInCrossOriginVariables {
-  input: SignInCrossOriginInput;
+export interface ProvisionDatabaseWithUserVariables {
+  input: ProvisionDatabaseWithUserInput;
 }
 /**
  * Variables for createUserDatabase
@@ -333,20 +291,8 @@ export interface ExtendTokenExpiresVariables {
 export interface CreateApiKeyVariables {
   input: CreateApiKeyInput;
 }
-export interface SendVerificationEmailVariables {
-  input: SendVerificationEmailInput;
-}
-export interface ForgotPasswordVariables {
-  input: ForgotPasswordInput;
-}
-export interface SignUpVariables {
-  input: SignUpInput;
-}
 export interface RequestCrossOriginTokenVariables {
   input: RequestCrossOriginTokenInput;
-}
-export interface SignInVariables {
-  input: SignInInput;
 }
 /**
  * Variables for provisionTable
@@ -354,6 +300,12 @@ export interface SignInVariables {
  */
 export interface ProvisionTableVariables {
   input: ProvisionTableInput;
+}
+export interface SendVerificationEmailVariables {
+  input: SendVerificationEmailInput;
+}
+export interface ForgotPasswordVariables {
+  input: ForgotPasswordInput;
 }
 /**
  * Variables for provisionBucket
@@ -831,64 +783,6 @@ export function createMutationOperations(client: OrmClient) {
           'VerifyEmailPayload'
         ),
       }),
-    freezeObjects: <S extends FreezeObjectsPayloadSelect>(
-      args: FreezeObjectsVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, FreezeObjectsPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        freezeObjects: InferSelectResult<FreezeObjectsPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'FreezeObjects',
-        fieldName: 'freezeObjects',
-        ...buildCustomDocument(
-          'mutation',
-          'FreezeObjects',
-          'freezeObjects',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'FreezeObjectsInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'FreezeObjectsPayload'
-        ),
-      }),
-    initEmptyRepo: <S extends InitEmptyRepoPayloadSelect>(
-      args: InitEmptyRepoVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, InitEmptyRepoPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        initEmptyRepo: InferSelectResult<InitEmptyRepoPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'InitEmptyRepo',
-        fieldName: 'initEmptyRepo',
-        ...buildCustomDocument(
-          'mutation',
-          'InitEmptyRepo',
-          'initEmptyRepo',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'InitEmptyRepoInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'InitEmptyRepoPayload'
-        ),
-      }),
     constructBlueprint: <S extends ConstructBlueprintPayloadSelect>(
       args: ConstructBlueprintVariables,
       options: {
@@ -974,151 +868,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ResetPasswordPayload'
-        ),
-      }),
-    removeNodeAtPath: <S extends RemoveNodeAtPathPayloadSelect>(
-      args: RemoveNodeAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RemoveNodeAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        removeNodeAtPath: InferSelectResult<RemoveNodeAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RemoveNodeAtPath',
-        fieldName: 'removeNodeAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'RemoveNodeAtPath',
-          'removeNodeAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RemoveNodeAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RemoveNodeAtPathPayload'
-        ),
-      }),
-    copyTemplateToBlueprint: <S extends CopyTemplateToBlueprintPayloadSelect>(
-      args: CopyTemplateToBlueprintVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CopyTemplateToBlueprintPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        copyTemplateToBlueprint: InferSelectResult<CopyTemplateToBlueprintPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CopyTemplateToBlueprint',
-        fieldName: 'copyTemplateToBlueprint',
-        ...buildCustomDocument(
-          'mutation',
-          'CopyTemplateToBlueprint',
-          'copyTemplateToBlueprint',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CopyTemplateToBlueprintInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CopyTemplateToBlueprintPayload'
-        ),
-      }),
-    provisionSpatialRelation: <S extends ProvisionSpatialRelationPayloadSelect>(
-      args: ProvisionSpatialRelationVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionSpatialRelationPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionSpatialRelation: InferSelectResult<ProvisionSpatialRelationPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionSpatialRelation',
-        fieldName: 'provisionSpatialRelation',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionSpatialRelation',
-          'provisionSpatialRelation',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionSpatialRelationInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionSpatialRelationPayload'
-        ),
-      }),
-    bootstrapUser: <S extends BootstrapUserPayloadSelect>(
-      args: BootstrapUserVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, BootstrapUserPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        bootstrapUser: InferSelectResult<BootstrapUserPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'BootstrapUser',
-        fieldName: 'bootstrapUser',
-        ...buildCustomDocument(
-          'mutation',
-          'BootstrapUser',
-          'bootstrapUser',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'BootstrapUserInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'BootstrapUserPayload'
-        ),
-      }),
-    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
-      args: SetFieldOrderVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetFieldOrderPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetFieldOrder',
-        fieldName: 'setFieldOrder',
-        ...buildCustomDocument(
-          'mutation',
-          'SetFieldOrder',
-          'setFieldOrder',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetFieldOrderInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetFieldOrderPayload'
         ),
       }),
     provisionCheckConstraint: <S extends ProvisionCheckConstraintPayloadSelect>(
@@ -1237,178 +986,178 @@ export function createMutationOperations(client: OrmClient) {
           'ProvisionIndexPayload'
         ),
       }),
-    setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
-      args: SetDataAtPathVariables,
+    copyTemplateToBlueprint: <S extends CopyTemplateToBlueprintPayloadSelect>(
+      args: CopyTemplateToBlueprintVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SetDataAtPathPayloadSelect>
+      } & StrictSelect<S, CopyTemplateToBlueprintPayloadSelect>
     ) =>
       new QueryBuilder<{
-        setDataAtPath: InferSelectResult<SetDataAtPathPayload, S> | null;
+        copyTemplateToBlueprint: InferSelectResult<CopyTemplateToBlueprintPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SetDataAtPath',
-        fieldName: 'setDataAtPath',
+        operationName: 'CopyTemplateToBlueprint',
+        fieldName: 'copyTemplateToBlueprint',
         ...buildCustomDocument(
           'mutation',
-          'SetDataAtPath',
-          'setDataAtPath',
+          'CopyTemplateToBlueprint',
+          'copyTemplateToBlueprint',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SetDataAtPathInput!',
+              type: 'CopyTemplateToBlueprintInput!',
             },
           ],
           connectionFieldsMap,
-          'SetDataAtPathPayload'
+          'CopyTemplateToBlueprintPayload'
         ),
       }),
-    setPropsAndCommit: <S extends SetPropsAndCommitPayloadSelect>(
-      args: SetPropsAndCommitVariables,
+    provisionSpatialRelation: <S extends ProvisionSpatialRelationPayloadSelect>(
+      args: ProvisionSpatialRelationVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SetPropsAndCommitPayloadSelect>
+      } & StrictSelect<S, ProvisionSpatialRelationPayloadSelect>
     ) =>
       new QueryBuilder<{
-        setPropsAndCommit: InferSelectResult<SetPropsAndCommitPayload, S> | null;
+        provisionSpatialRelation: InferSelectResult<ProvisionSpatialRelationPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SetPropsAndCommit',
-        fieldName: 'setPropsAndCommit',
+        operationName: 'ProvisionSpatialRelation',
+        fieldName: 'provisionSpatialRelation',
         ...buildCustomDocument(
           'mutation',
-          'SetPropsAndCommit',
-          'setPropsAndCommit',
+          'ProvisionSpatialRelation',
+          'provisionSpatialRelation',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SetPropsAndCommitInput!',
+              type: 'ProvisionSpatialRelationInput!',
             },
           ],
           connectionFieldsMap,
-          'SetPropsAndCommitPayload'
+          'ProvisionSpatialRelationPayload'
         ),
       }),
-    provisionDatabaseWithUser: <S extends ProvisionDatabaseWithUserPayloadSelect>(
-      args: ProvisionDatabaseWithUserVariables,
+    signInCrossOrigin: <S extends SignInCrossOriginPayloadSelect>(
+      args: SignInCrossOriginVariables,
       options: {
         select: S;
-      } & StrictSelect<S, ProvisionDatabaseWithUserPayloadSelect>
+      } & StrictSelect<S, SignInCrossOriginPayloadSelect>
     ) =>
       new QueryBuilder<{
-        provisionDatabaseWithUser: InferSelectResult<ProvisionDatabaseWithUserPayload, S> | null;
+        signInCrossOrigin: InferSelectResult<SignInCrossOriginPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'ProvisionDatabaseWithUser',
-        fieldName: 'provisionDatabaseWithUser',
+        operationName: 'SignInCrossOrigin',
+        fieldName: 'signInCrossOrigin',
         ...buildCustomDocument(
           'mutation',
-          'ProvisionDatabaseWithUser',
-          'provisionDatabaseWithUser',
+          'SignInCrossOrigin',
+          'signInCrossOrigin',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'ProvisionDatabaseWithUserInput!',
+              type: 'SignInCrossOriginInput!',
             },
           ],
           connectionFieldsMap,
-          'ProvisionDatabaseWithUserPayload'
+          'SignInCrossOriginPayload'
         ),
       }),
-    insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
-      args: InsertNodeAtPathVariables,
+    bootstrapUser: <S extends BootstrapUserPayloadSelect>(
+      args: BootstrapUserVariables,
       options: {
         select: S;
-      } & StrictSelect<S, InsertNodeAtPathPayloadSelect>
+      } & StrictSelect<S, BootstrapUserPayloadSelect>
     ) =>
       new QueryBuilder<{
-        insertNodeAtPath: InferSelectResult<InsertNodeAtPathPayload, S> | null;
+        bootstrapUser: InferSelectResult<BootstrapUserPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'InsertNodeAtPath',
-        fieldName: 'insertNodeAtPath',
+        operationName: 'BootstrapUser',
+        fieldName: 'bootstrapUser',
         ...buildCustomDocument(
           'mutation',
-          'InsertNodeAtPath',
-          'insertNodeAtPath',
+          'BootstrapUser',
+          'bootstrapUser',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'InsertNodeAtPathInput!',
+              type: 'BootstrapUserInput!',
             },
           ],
           connectionFieldsMap,
-          'InsertNodeAtPathPayload'
+          'BootstrapUserPayload'
         ),
       }),
-    updateNodeAtPath: <S extends UpdateNodeAtPathPayloadSelect>(
-      args: UpdateNodeAtPathVariables,
+    signUp: <S extends SignUpPayloadSelect>(
+      args: SignUpVariables,
       options: {
         select: S;
-      } & StrictSelect<S, UpdateNodeAtPathPayloadSelect>
+      } & StrictSelect<S, SignUpPayloadSelect>
     ) =>
       new QueryBuilder<{
-        updateNodeAtPath: InferSelectResult<UpdateNodeAtPathPayload, S> | null;
+        signUp: InferSelectResult<SignUpPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'UpdateNodeAtPath',
-        fieldName: 'updateNodeAtPath',
+        operationName: 'SignUp',
+        fieldName: 'signUp',
         ...buildCustomDocument(
           'mutation',
-          'UpdateNodeAtPath',
-          'updateNodeAtPath',
+          'SignUp',
+          'signUp',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'UpdateNodeAtPathInput!',
+              type: 'SignUpInput!',
             },
           ],
           connectionFieldsMap,
-          'UpdateNodeAtPathPayload'
+          'SignUpPayload'
         ),
       }),
-    setAndCommit: <S extends SetAndCommitPayloadSelect>(
-      args: SetAndCommitVariables,
+    signIn: <S extends SignInPayloadSelect>(
+      args: SignInVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SetAndCommitPayloadSelect>
+      } & StrictSelect<S, SignInPayloadSelect>
     ) =>
       new QueryBuilder<{
-        setAndCommit: InferSelectResult<SetAndCommitPayload, S> | null;
+        signIn: InferSelectResult<SignInPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SetAndCommit',
-        fieldName: 'setAndCommit',
+        operationName: 'SignIn',
+        fieldName: 'signIn',
         ...buildCustomDocument(
           'mutation',
-          'SetAndCommit',
-          'setAndCommit',
+          'SignIn',
+          'signIn',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SetAndCommitInput!',
+              type: 'SignInInput!',
             },
           ],
           connectionFieldsMap,
-          'SetAndCommitPayload'
+          'SignInPayload'
         ),
       }),
     provisionRelation: <S extends ProvisionRelationPayloadSelect>(
@@ -1440,6 +1189,35 @@ export function createMutationOperations(client: OrmClient) {
           'ProvisionRelationPayload'
         ),
       }),
+    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
+      args: SetFieldOrderVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetFieldOrderPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetFieldOrder',
+        fieldName: 'setFieldOrder',
+        ...buildCustomDocument(
+          'mutation',
+          'SetFieldOrder',
+          'setFieldOrder',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetFieldOrderInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetFieldOrderPayload'
+        ),
+      }),
     applyRls: <S extends ApplyRlsPayloadSelect>(
       args: ApplyRlsVariables,
       options: {
@@ -1469,33 +1247,33 @@ export function createMutationOperations(client: OrmClient) {
           'ApplyRlsPayload'
         ),
       }),
-    signInCrossOrigin: <S extends SignInCrossOriginPayloadSelect>(
-      args: SignInCrossOriginVariables,
+    provisionDatabaseWithUser: <S extends ProvisionDatabaseWithUserPayloadSelect>(
+      args: ProvisionDatabaseWithUserVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SignInCrossOriginPayloadSelect>
+      } & StrictSelect<S, ProvisionDatabaseWithUserPayloadSelect>
     ) =>
       new QueryBuilder<{
-        signInCrossOrigin: InferSelectResult<SignInCrossOriginPayload, S> | null;
+        provisionDatabaseWithUser: InferSelectResult<ProvisionDatabaseWithUserPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SignInCrossOrigin',
-        fieldName: 'signInCrossOrigin',
+        operationName: 'ProvisionDatabaseWithUser',
+        fieldName: 'provisionDatabaseWithUser',
         ...buildCustomDocument(
           'mutation',
-          'SignInCrossOrigin',
-          'signInCrossOrigin',
+          'ProvisionDatabaseWithUser',
+          'provisionDatabaseWithUser',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SignInCrossOriginInput!',
+              type: 'ProvisionDatabaseWithUserInput!',
             },
           ],
           connectionFieldsMap,
-          'SignInCrossOriginPayload'
+          'ProvisionDatabaseWithUserPayload'
         ),
       }),
     createUserDatabase: <S extends CreateUserDatabasePayloadSelect>(
@@ -1585,6 +1363,64 @@ export function createMutationOperations(client: OrmClient) {
           'CreateApiKeyPayload'
         ),
       }),
+    requestCrossOriginToken: <S extends RequestCrossOriginTokenPayloadSelect>(
+      args: RequestCrossOriginTokenVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RequestCrossOriginTokenPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        requestCrossOriginToken: InferSelectResult<RequestCrossOriginTokenPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RequestCrossOriginToken',
+        fieldName: 'requestCrossOriginToken',
+        ...buildCustomDocument(
+          'mutation',
+          'RequestCrossOriginToken',
+          'requestCrossOriginToken',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RequestCrossOriginTokenInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RequestCrossOriginTokenPayload'
+        ),
+      }),
+    provisionTable: <S extends ProvisionTablePayloadSelect>(
+      args: ProvisionTableVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionTablePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionTable: InferSelectResult<ProvisionTablePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionTable',
+        fieldName: 'provisionTable',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionTable',
+          'provisionTable',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionTableInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionTablePayload'
+        ),
+      }),
     sendVerificationEmail: <S extends SendVerificationEmailPayloadSelect>(
       args: SendVerificationEmailVariables,
       options: {
@@ -1641,122 +1477,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ForgotPasswordPayload'
-        ),
-      }),
-    signUp: <S extends SignUpPayloadSelect>(
-      args: SignUpVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SignUpPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        signUp: InferSelectResult<SignUpPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SignUp',
-        fieldName: 'signUp',
-        ...buildCustomDocument(
-          'mutation',
-          'SignUp',
-          'signUp',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SignUpInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SignUpPayload'
-        ),
-      }),
-    requestCrossOriginToken: <S extends RequestCrossOriginTokenPayloadSelect>(
-      args: RequestCrossOriginTokenVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RequestCrossOriginTokenPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        requestCrossOriginToken: InferSelectResult<RequestCrossOriginTokenPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RequestCrossOriginToken',
-        fieldName: 'requestCrossOriginToken',
-        ...buildCustomDocument(
-          'mutation',
-          'RequestCrossOriginToken',
-          'requestCrossOriginToken',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RequestCrossOriginTokenInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RequestCrossOriginTokenPayload'
-        ),
-      }),
-    signIn: <S extends SignInPayloadSelect>(
-      args: SignInVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SignInPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        signIn: InferSelectResult<SignInPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SignIn',
-        fieldName: 'signIn',
-        ...buildCustomDocument(
-          'mutation',
-          'SignIn',
-          'signIn',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SignInInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SignInPayload'
-        ),
-      }),
-    provisionTable: <S extends ProvisionTablePayloadSelect>(
-      args: ProvisionTableVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionTablePayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionTable: InferSelectResult<ProvisionTablePayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionTable',
-        fieldName: 'provisionTable',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionTable',
-          'provisionTable',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionTableInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionTablePayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

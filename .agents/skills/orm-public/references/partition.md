@@ -9,7 +9,7 @@ ORM operations for Partition records
 ```typescript
 db.partition.findMany({ select: { id: true } }).execute()
 db.partition.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.partition.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', premake: '<Int>', namingPattern: '<String>' }, select: { id: true } }).execute()
+db.partition.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', retentionKeepTable: '<Boolean>', premake: '<Int>', namingPattern: '<String>', isParented: '<Boolean>' }, select: { id: true } }).execute()
 db.partition.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.partition.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.partition.findMany({
 
 ```typescript
 const item = await db.partition.create({
-  data: { databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', premake: '<Int>', namingPattern: '<String>' },
+  data: { databaseId: '<UUID>', tableId: '<UUID>', strategy: '<String>', partitionKeyId: '<UUID>', interval: '<String>', retention: '<String>', retentionKeepTable: '<Boolean>', premake: '<Int>', namingPattern: '<String>', isParented: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```
