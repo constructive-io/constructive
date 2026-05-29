@@ -6,7 +6,7 @@ export const DEVICE_TOKEN_COOKIE_NAME = 'constructive_device_token';
 
 const DEVICE_TOKEN_MAX_AGE = 90 * 24 * 60 * 60; // 90 days in seconds
 
-const parseIntervalToSeconds = (interval: string | PgInterval | null | undefined): number | null => {
+export const parseIntervalToSeconds = (interval: string | PgInterval | null | undefined): number | null => {
   if (!interval) return null;
   if (typeof interval === 'string') {
     const parsed = parseInt(interval, 10);

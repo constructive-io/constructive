@@ -25,10 +25,11 @@ import { getNodeEnv } from '@pgpmjs/env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type {
   AuthSettings,
-  ConnectedAccountsConfig,
   ConstructiveContext,
-  EncryptedSecretsConfig,
   IdentityProvidersConfig,
+  IdentityProviderConfigMap,
+  IdentityProviderFullConfig,
+  PgInterval,
   UserAuthConfig,
 } from '@constructive-io/express-context';
 
@@ -39,6 +40,7 @@ import {
   setSessionCookie,
   setDeviceTokenCookie,
   parseCookieValue,
+  parseIntervalToSeconds,
 } from './cookie';
 
 const log = new Logger('oauth');
@@ -47,57 +49,14 @@ const OAUTH_STATE_COOKIE = 'oauth_state';
 const DEFAULT_OAUTH_STATE_MAX_AGE = 10 * 60 * 1000; // 10 minutes
 const DEFAULT_ERROR_REDIRECT_PATH = '/auth/error';
 
-interface PgInterval {
-  years?: number;
-  months?: number;
-  days?: number;
-  hours?: number;
-  minutes?: number;
-  seconds?: number;
-  milliseconds?: number;
-}
-
 /**
- * Parse PostgreSQL interval to milliseconds.
- * Handles: pg library object {minutes: 10}, string '10 minutes', '00:10:00'
+ * Parse interval to milliseconds using shared utility.
  */
 function parseIntervalToMs(
   interval: string | PgInterval | null | undefined,
 ): number {
-  if (!interval) return DEFAULT_OAUTH_STATE_MAX_AGE;
-
-  // Handle pg library interval object (e.g., {minutes: 10})
-  if (typeof interval === 'object') {
-    const ms =
-      (interval.days || 0) * 24 * 60 * 60 * 1000 +
-      (interval.hours || 0) * 60 * 60 * 1000 +
-      (interval.minutes || 0) * 60 * 1000 +
-      (interval.seconds || 0) * 1000 +
-      (interval.milliseconds || 0);
-    return ms || DEFAULT_OAUTH_STATE_MAX_AGE;
-  }
-
-  // Handle HH:MM:SS format (PostgreSQL default interval output)
-  const hhmmss = interval.match(/^(\d+):(\d+):(\d+)$/);
-  if (hhmmss) {
-    const hours = parseInt(hhmmss[1], 10);
-    const minutes = parseInt(hhmmss[2], 10);
-    const seconds = parseInt(hhmmss[3], 10);
-    return (hours * 3600 + minutes * 60 + seconds) * 1000;
-  }
-
-  // Handle "N unit" format (e.g., "10 minutes")
-  const match = interval.match(/^(\d+)\s*(second|minute|hour|day)s?$/i);
-  if (!match) return DEFAULT_OAUTH_STATE_MAX_AGE;
-  const value = parseInt(match[1], 10);
-  const unit = match[2].toLowerCase();
-  const multipliers: Record<string, number> = {
-    second: 1000,
-    minute: 60 * 1000,
-    hour: 60 * 60 * 1000,
-    day: 24 * 60 * 60 * 1000,
-  };
-  return value * (multipliers[unit] || 60 * 1000);
+  const seconds = parseIntervalToSeconds(interval);
+  return seconds !== null ? seconds * 1000 : DEFAULT_OAUTH_STATE_MAX_AGE;
 }
 
 // =============================================================================
@@ -170,123 +129,42 @@ function verifySignedState(state: string): StatePayload | null {
 
 interface OAuthModules {
   identityProviders: IdentityProvidersConfig;
-  encryptedSecrets: EncryptedSecretsConfig;
+  identityProviderConfig: IdentityProviderConfigMap;
   userAuth: UserAuthConfig;
   authSettings: AuthSettings | undefined;
-  connectedAccounts: ConnectedAccountsConfig | undefined;
 }
 
 async function resolveOAuthModules(
   ctx: ConstructiveContext,
 ): Promise<OAuthModules | null> {
-  const [identityProviders, encryptedSecrets, userAuth, authSettings, connectedAccounts] =
+  const [identityProviders, identityProviderConfig, userAuth, authSettings] =
     await Promise.all([
       ctx.useModule('identityProviders'),
-      ctx.useModule('encryptedSecrets'),
+      ctx.useModule('identityProviderConfig'),
       ctx.useModule('userAuth'),
       ctx.useModule('authSettings'),
-      ctx.useModule('connectedAccounts'),
     ]);
 
-  if (!identityProviders || !encryptedSecrets || !userAuth) {
+  if (!identityProviders || !identityProviderConfig || !userAuth) {
     return null;
   }
 
-  return { identityProviders, encryptedSecrets, userAuth, authSettings, connectedAccounts };
+  return { identityProviders, identityProviderConfig, userAuth, authSettings };
 }
 
 // =============================================================================
-// Identity Provider Database Functions
+// OAuth Client Factory
 // =============================================================================
-
-interface IdentityProviderConfig {
-  slug: string;
-  kind: 'oauth2' | 'oidc';
-  display_name: string;
-  enabled: boolean;
-  client_id: string;
-  client_secret: string;
-  authorization_url: string | null;
-  token_url: string | null;
-  userinfo_url: string | null;
-  scopes: string[];
-  pkce_enabled: boolean;
-}
-
-async function getEnabledProviders(
-  ctx: ConstructiveContext,
-  modules: OAuthModules,
-): Promise<string[]> {
-  const { privateSchemaName, tableName } = modules.identityProviders;
-  const sql = `
-    SELECT slug FROM "${privateSchemaName}"."${tableName}"
-    WHERE enabled = true AND client_id IS NOT NULL AND client_secret_id IS NOT NULL
-  `;
-  const result = await ctx.pool.query(sql);
-  return result.rows.map((row: { slug: string }) => row.slug);
-}
-
-async function getIdentityProvider(
-  ctx: ConstructiveContext,
-  modules: OAuthModules,
-  providerSlug: string,
-): Promise<IdentityProviderConfig | null> {
-  const { privateSchemaName, tableName } = modules.identityProviders;
-  const { schemaName: encryptedSchema, tableName: encryptedTableName } =
-    modules.encryptedSecrets;
-
-  const sql = `
-    SELECT
-      ip.slug,
-      ip.kind,
-      ip.display_name,
-      ip.enabled,
-      ip.client_id,
-      convert_from(secrets.value, 'UTF8') as client_secret,
-      ip.authorization_url,
-      ip.token_url,
-      ip.userinfo_url,
-      ip.scopes,
-      ip.pkce_enabled
-    FROM "${privateSchemaName}"."${tableName}" ip
-    LEFT JOIN "${encryptedSchema}"."${encryptedTableName}" secrets ON secrets.id = ip.client_secret_id
-    WHERE ip.slug = $1 AND ip.enabled = true
-  `;
-
-  const result = await ctx.pool.query(sql, [providerSlug]);
-  if (result.rows.length === 0) {
-    return null;
-  }
-
-  const row = result.rows[0];
-  if (!row.client_id || !row.client_secret) {
-    return null;
-  }
-
-  return {
-    slug: row.slug,
-    kind: row.kind,
-    display_name: row.display_name,
-    enabled: row.enabled,
-    client_id: row.client_id,
-    client_secret: row.client_secret,
-    authorization_url: row.authorization_url,
-    token_url: row.token_url,
-    userinfo_url: row.userinfo_url,
-    scopes: row.scopes || [],
-    pkce_enabled: row.pkce_enabled ?? true,
-  };
-}
 
 function createOAuthClientForProvider(
-  providerConfig: IdentityProviderConfig,
+  providerConfig: IdentityProviderFullConfig,
   baseUrl: string,
 ): OAuthClient {
   return new OAuthClient({
     providers: {
       [providerConfig.slug]: {
-        clientId: providerConfig.client_id,
-        clientSecret: providerConfig.client_secret,
+        clientId: providerConfig.clientId,
+        clientSecret: providerConfig.clientSecret,
       },
     },
     baseUrl,
@@ -316,10 +194,10 @@ async function generateCrossOriginToken(
   accessToken: string,
 ): Promise<string> {
   const otToken = crypto.randomBytes(32).toString('base64url');
-  const { schemaName } = modules.userAuth;
+  const { sessionCredentialsSchemaName } = modules.userAuth;
 
   const sql = `
-    UPDATE "${schemaName}".session_credentials
+    UPDATE "${sessionCredentialsSchemaName}".session_credentials
     SET ot_token = $1
     WHERE secret_hash = digest($2::text, 'sha256')
     RETURNING id
@@ -389,7 +267,8 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
       if (!modules) {
         return res.json({ providers: [] });
       }
-      const providers = await getEnabledProviders(ctx, modules);
+      // Get all enabled provider slugs from the cached config map
+      const providers = Array.from(modules.identityProviderConfig.keys());
       res.json({ providers });
     } catch (error) {
       log.error('[oauth] Failed to fetch providers:', error);
@@ -433,11 +312,12 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         );
       }
 
-      const providerConfig = await getIdentityProvider(ctx, modules, provider);
-      const { authSettings } = modules;
+      const { authSettings, identityProviderConfig } = modules;
       const errorRedirectPath =
         authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
 
+      // Get provider config from cached map
+      const providerConfig = identityProviderConfig.get(provider);
       if (!providerConfig) {
         log.warn(`[oauth] Provider ${provider} not found or not configured`);
         return redirectToError(
@@ -563,17 +443,14 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           );
         }
 
-        const { authSettings } = modules;
+        const { authSettings, identityProviderConfig } = modules;
         const errorRedirectPath =
           authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
         const requireVerifiedEmail =
           authSettings?.oauthRequireVerifiedEmail ?? true;
 
-        const providerConfig = await getIdentityProvider(
-          ctx,
-          modules,
-          provider,
-        );
+        // Get provider config from cached map
+        const providerConfig = identityProviderConfig.get(provider);
         if (!providerConfig) {
           log.error(`[oauth] Provider ${provider} not found in database`);
           return redirectToError(
@@ -606,43 +483,17 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         }
 
         const userAgent = req.get('user-agent') || '';
-        const { identityProviders, connectedAccounts } = modules;
+        const { identityProviders } = modules;
         const authPrivateSchema = identityProviders.privateSchemaName;
-
-        // Check if identity exists using ctx.pool (bypasses RLS)
-        let identityExists = false;
-        if (connectedAccounts) {
-          const checkSql = `
-            SELECT 1 FROM "${connectedAccounts.privateSchemaName}"."${connectedAccounts.tableName}"
-            WHERE service = $1 AND identifier = $2
-            LIMIT 1
-          `;
-          const checkResult = await ctx.pool.query(checkSql, [
-            profile.provider,
-            profile.providerId,
-          ]);
-          identityExists = checkResult.rows.length > 0;
-        }
-
         const emailVerified = isEmailVerified(profile);
-
-        // For signup, check email verification requirement before entering transaction
-        if (!identityExists && requireVerifiedEmail && !emailVerified) {
-          log.warn(
-            `[oauth] Rejecting unverified email for signup: ${profile.email}`,
-          );
-          return redirectToError(
-            res,
-            baseUrl,
-            errorRedirectPath,
-            'EMAIL_NOT_VERIFIED',
-            provider,
-          );
-        }
 
         // Use withPgClient to run sign_in/sign_up within a properly scoped
         // RLS transaction. pgSettings (role, claims, request_id) are applied
-        // automatically via SET LOCAL, replacing the manual set_config calls.
+        // automatically via SET LOCAL.
+        //
+        // Pattern: try sign_in_identity first. If it throws IDENTITY_ACCOUNT_NOT_FOUND,
+        // fall back to sign_up_identity. This avoids a separate RLS-bypassing query
+        // to check identity existence.
         const result = await ctx.withPgClient<SignInIdentityResult>(
           async (client) => {
             // Set OAuth-specific JWT claims on this transaction
@@ -662,13 +513,13 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
               raw_userinfo: profile.raw,
             };
 
-            if (identityExists) {
-              // Identity exists, sign in
-              const signInSql = `
-                SELECT * FROM "${authPrivateSchema}".sign_in_identity(
-                  $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
-                )
-              `;
+            // Try sign_in_identity first
+            const signInSql = `
+              SELECT * FROM "${authPrivateSchema}".sign_in_identity(
+                $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
+              )
+            `;
+            try {
               const signInResult = await client.query(signInSql, [
                 profile.provider,
                 profile.providerId,
@@ -678,26 +529,34 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
                 deviceToken,
               ]);
               return signInResult.rows[0] || {};
-            } else {
-              // Identity doesn't exist, sign up
-              log.info(
-                `[oauth] Account not found for ${profile.email}, attempting signup`,
-              );
+            } catch (err: any) {
+              // If identity not found, try sign_up_identity
+              if (err.message?.includes('IDENTITY_ACCOUNT_NOT_FOUND')) {
+                log.info(
+                  `[oauth] Account not found for ${profile.email}, attempting signup`,
+                );
 
-              const signUpSql = `
-                SELECT * FROM "${authPrivateSchema}".sign_up_identity(
-                  $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
-                )
-              `;
-              const signUpResult = await client.query(signUpSql, [
-                profile.provider,
-                profile.providerId,
-                profile.email,
-                JSON.stringify(details),
-                true,
-                deviceToken,
-              ]);
-              return signUpResult.rows[0] || {};
+                // Check email verification requirement before signup
+                if (requireVerifiedEmail && !emailVerified) {
+                  throw new Error('EMAIL_NOT_VERIFIED');
+                }
+
+                const signUpSql = `
+                  SELECT * FROM "${authPrivateSchema}".sign_up_identity(
+                    $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
+                  )
+                `;
+                const signUpResult = await client.query(signUpSql, [
+                  profile.provider,
+                  profile.providerId,
+                  profile.email,
+                  JSON.stringify(details),
+                  true,
+                  deviceToken,
+                ]);
+                return signUpResult.rows[0] || {};
+              }
+              throw err;
             }
           },
         );
@@ -749,10 +608,25 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           return res.redirect(redirectUri);
         }
       } catch (error: any) {
-        log.error(`[oauth] Callback failed for ${provider}:`, error);
         const fallbackPath =
           modules?.authSettings?.oauthErrorRedirectPath ||
           DEFAULT_ERROR_REDIRECT_PATH;
+
+        // Handle specific error cases
+        if (error.message === 'EMAIL_NOT_VERIFIED') {
+          log.warn(
+            `[oauth] Rejecting unverified email for signup: ${provider}`,
+          );
+          return redirectToError(
+            res,
+            baseUrl,
+            fallbackPath,
+            'EMAIL_NOT_VERIFIED',
+            provider,
+          );
+        }
+
+        log.error(`[oauth] Callback failed for ${provider}:`, error);
         redirectToError(res, baseUrl, fallbackPath, 'CALLBACK_FAILED', provider);
       }
     },
