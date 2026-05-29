@@ -58,6 +58,8 @@ export type {
   ConnectedAccountsConfig,
   EncryptedSecretsConfig,
   IdentityProvidersConfig,
+  IdentityProviderFullConfig,
+  IdentityProviderConfigMap,
   UserAuthConfig,
   WebauthnSettings,
   WithPgClient,
@@ -100,6 +102,7 @@ export {
   encryptedSecretsLoader,
   userAuthLoader,
   identityProvidersLoader,
+  identityProviderConfigLoader,
   connectedAccountsLoader,
 } from './loaders';
 

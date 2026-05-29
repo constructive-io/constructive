@@ -188,6 +188,22 @@ export interface IdentityProvidersConfig {
   tableName: string;
 }
 
+export interface IdentityProviderFullConfig {
+  slug: string;
+  kind: 'oauth2' | 'oidc';
+  displayName: string;
+  enabled: boolean;
+  clientId: string;
+  clientSecret: string;
+  authorizationUrl: string | null;
+  tokenUrl: string | null;
+  userinfoUrl: string | null;
+  scopes: string[];
+  pkceEnabled: boolean;
+}
+
+export type IdentityProviderConfigMap = Map<string, IdentityProviderFullConfig>;
+
 export interface ConnectedAccountsConfig {
   schemaName: string;
   privateSchemaName: string;
@@ -217,6 +233,7 @@ export interface BuiltinModuleMap {
   encryptedSecrets: EncryptedSecretsConfig;
   userAuth: UserAuthConfig;
   identityProviders: IdentityProvidersConfig;
+  identityProviderConfig: IdentityProviderConfigMap;
   connectedAccounts: ConnectedAccountsConfig;
 }
 
