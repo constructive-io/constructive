@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-A ref is a data structure for pointing to a commit.
+Branch heads — mutable pointers into the commit chain
 
 ## Usage
 

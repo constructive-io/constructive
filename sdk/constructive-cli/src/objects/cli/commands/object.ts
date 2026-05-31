@@ -16,13 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  hashUuid: 'uuid',
   id: 'uuid',
   databaseId: 'uuid',
   kids: 'uuid',
   ktree: 'string',
   data: 'json',
-  frzn: 'boolean',
   createdAt: 'string',
 };
 const usage =
@@ -81,7 +79,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       kids: true,
       ktree: true,
       data: true,
-      frzn: true,
       createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -108,7 +105,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       kids: true,
       ktree: true,
       data: true,
-      frzn: true,
       createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -147,7 +143,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           kids: true,
           ktree: true,
           data: true,
-          frzn: true,
           createdAt: true,
         },
       })
@@ -191,13 +186,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'boolean',
-        name: 'frzn',
-        message: 'frzn',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateObjectInput['object'];
@@ -209,7 +197,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
           data: cleanedData.data,
-          frzn: cleanedData.frzn,
         },
         select: {
           id: true,
@@ -217,7 +204,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           kids: true,
           ktree: true,
           data: true,
-          frzn: true,
           createdAt: true,
         },
       })
@@ -267,13 +253,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'boolean',
-        name: 'frzn',
-        message: 'frzn',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as ObjectPatch;
@@ -288,7 +267,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
           data: cleanedData.data,
-          frzn: cleanedData.frzn,
         },
         select: {
           id: true,
@@ -296,7 +274,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           kids: true,
           ktree: true,
           data: true,
-          frzn: true,
           createdAt: true,
         },
       })

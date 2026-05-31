@@ -34,38 +34,29 @@ function App() {
 |------|------|-------------|
 | `useGetAllQuery` | Query | List all getAll |
 | `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
-| `useObjectsQuery` | Query | List all objects |
-| `useObjectQuery` | Query | Get one object |
-| `useCreateObjectMutation` | Mutation | Create a object |
-| `useUpdateObjectMutation` | Mutation | Update a object |
-| `useDeleteObjectMutation` | Mutation | Delete a object |
-| `useRefsQuery` | Query | A ref is a data structure for pointing to a commit. |
-| `useRefQuery` | Query | A ref is a data structure for pointing to a commit. |
-| `useCreateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
-| `useUpdateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
-| `useDeleteRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
-| `useStoresQuery` | Query | A store represents an isolated object repository within a database. |
-| `useStoreQuery` | Query | A store represents an isolated object repository within a database. |
-| `useCreateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
-| `useUpdateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
-| `useDeleteStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
-| `useCommitsQuery` | Query | A commit records changes to the repository. |
-| `useCommitQuery` | Query | A commit records changes to the repository. |
-| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useRevParseQuery` | Query | revParse |
-| `useGetAllObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
-| `useGetPathObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
-| `useGetObjectAtPathQuery` | Query | getObjectAtPath |
-| `useFreezeObjectsMutation` | Mutation | freezeObjects |
+| `useRefsQuery` | Query | Branch heads — mutable pointers into the commit chain |
+| `useRefQuery` | Query | Branch heads — mutable pointers into the commit chain |
+| `useCreateRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useUpdateRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useDeleteRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useStoresQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useStoreQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useCreateStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useUpdateStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useDeleteStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useCreateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useUpdateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useDeleteObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `useCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `useCreateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useUpdateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useDeleteCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useInitEmptyRepoMutation` | Mutation | initEmptyRepo |
-| `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
 | `useSetDataAtPathMutation` | Mutation | setDataAtPath |
-| `useSetPropsAndCommitMutation` | Mutation | setPropsAndCommit |
 | `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
-| `useUpdateNodeAtPathMutation` | Mutation | updateNodeAtPath |
-| `useSetAndCommitMutation` | Mutation | setAndCommit |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -86,27 +77,6 @@ const { mutate: create } = useCreateGetAllRecordMutation({
   selection: { fields: { id: true } },
 });
 create({ path: '<String>', data: '<JSON>' });
-```
-
-### Object
-
-```typescript
-// List all objects
-const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
-});
-
-// Get one object
-const { data: item } = useObjectQuery({
-  id: '<UUID>',
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
-});
-
-// Create a object
-const { mutate: create } = useCreateObjectMutation({
-  selection: { fields: { id: true } },
-});
-create({ hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
 ```
 
 ### Ref
@@ -151,6 +121,27 @@ const { mutate: create } = useCreateStoreMutation({
 create({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
 ```
 
+### Object
+
+```typescript
+// List all objects
+const { data, isLoading } = useObjectsQuery({
+  selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } },
+});
+
+// Get one object
+const { data: item } = useObjectQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } },
+});
+
+// Create a object
+const { mutate: create } = useCreateObjectMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>' });
+```
+
 ### Commit
 
 ```typescript
@@ -174,75 +165,6 @@ create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds
 
 ## Custom Operation Hooks
 
-### `useRevParseQuery`
-
-revParse
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `refname` | String |
-
-### `useGetAllObjectsFromRootQuery`
-
-Reads and enables pagination through a set of `Object`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-### `useGetPathObjectsFromRootQuery`
-
-Reads and enables pagination through a set of `Object`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `path` | [String] |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-### `useGetObjectAtPathQuery`
-
-getObjectAtPath
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `path` | [String] |
-  | `refname` | String |
-
-### `useFreezeObjectsMutation`
-
-freezeObjects
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | FreezeObjectsInput (required) |
-
 ### `useInitEmptyRepoMutation`
 
 initEmptyRepo
@@ -253,17 +175,6 @@ initEmptyRepo
   | Argument | Type |
   |----------|------|
   | `input` | InitEmptyRepoInput (required) |
-
-### `useRemoveNodeAtPathMutation`
-
-removeNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RemoveNodeAtPathInput (required) |
 
 ### `useSetDataAtPathMutation`
 
@@ -276,17 +187,6 @@ setDataAtPath
   |----------|------|
   | `input` | SetDataAtPathInput (required) |
 
-### `useSetPropsAndCommitMutation`
-
-setPropsAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetPropsAndCommitInput (required) |
-
 ### `useInsertNodeAtPathMutation`
 
 insertNodeAtPath
@@ -297,28 +197,6 @@ insertNodeAtPath
   | Argument | Type |
   |----------|------|
   | `input` | InsertNodeAtPathInput (required) |
-
-### `useUpdateNodeAtPathMutation`
-
-updateNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | UpdateNodeAtPathInput (required) |
-
-### `useSetAndCommitMutation`
-
-setAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetAndCommitInput (required) |
 
 ### `useProvisionBucketMutation`
 

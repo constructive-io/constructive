@@ -6,18 +6,16 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { GetAllRecordModel } from './models/getAllRecord';
-import { ObjectModel } from './models/object';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
+import { ObjectModel } from './models/object';
 import { CommitModel } from './models/commit';
-import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
-export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
  * Create an ORM client instance
@@ -46,11 +44,10 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     getAllRecord: new GetAllRecordModel(client),
-    object: new ObjectModel(client),
     ref: new RefModel(client),
     store: new StoreModel(client),
+    object: new ObjectModel(client),
     commit: new CommitModel(client),
-    query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };
 }

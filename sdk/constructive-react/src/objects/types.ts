@@ -7,16 +7,6 @@ export interface GetAllRecord {
   path: string[] | null;
   data: unknown | null;
 }
-export interface Object {
-  hashUuid: string | null;
-  id: string | null;
-  databaseId: string | null;
-  kids: string[] | null;
-  ktree: string[] | null;
-  data: unknown | null;
-  frzn: boolean | null;
-  createdAt: string | null;
-}
 export interface Ref {
   id: string | null;
   name: string | null;
@@ -29,6 +19,14 @@ export interface Store {
   name: string | null;
   databaseId: string | null;
   hash: string | null;
+  createdAt: string | null;
+}
+export interface Object {
+  id: string | null;
+  databaseId: string | null;
+  kids: string[] | null;
+  ktree: string[] | null;
+  data: unknown | null;
   createdAt: string | null;
 }
 export interface Commit {

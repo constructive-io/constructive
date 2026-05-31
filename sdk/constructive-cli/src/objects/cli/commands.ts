@@ -7,22 +7,13 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
 import getAllRecordCmd from './commands/get-all-record';
-import objectCmd from './commands/object';
 import refCmd from './commands/ref';
 import storeCmd from './commands/store';
+import objectCmd from './commands/object';
 import commitCmd from './commands/commit';
-import revParseCmd from './commands/rev-parse';
-import getAllObjectsFromRootCmd from './commands/get-all-objects-from-root';
-import getPathObjectsFromRootCmd from './commands/get-path-objects-from-root';
-import getObjectAtPathCmd from './commands/get-object-at-path';
-import freezeObjectsCmd from './commands/freeze-objects';
 import initEmptyRepoCmd from './commands/init-empty-repo';
-import removeNodeAtPathCmd from './commands/remove-node-at-path';
 import setDataAtPathCmd from './commands/set-data-at-path';
-import setPropsAndCommitCmd from './commands/set-props-and-commit';
 import insertNodeAtPathCmd from './commands/insert-node-at-path';
-import updateNodeAtPathCmd from './commands/update-node-at-path';
-import setAndCommitCmd from './commands/set-and-commit';
 import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
@@ -35,26 +26,17 @@ const createCommandMap: () => Record<
   context: contextCmd,
   auth: authCmd,
   'get-all-record': getAllRecordCmd,
-  object: objectCmd,
   ref: refCmd,
   store: storeCmd,
+  object: objectCmd,
   commit: commitCmd,
-  'rev-parse': revParseCmd,
-  'get-all-objects-from-root': getAllObjectsFromRootCmd,
-  'get-path-objects-from-root': getPathObjectsFromRootCmd,
-  'get-object-at-path': getObjectAtPathCmd,
-  'freeze-objects': freezeObjectsCmd,
   'init-empty-repo': initEmptyRepoCmd,
-  'remove-node-at-path': removeNodeAtPathCmd,
   'set-data-at-path': setDataAtPathCmd,
-  'set-props-and-commit': setPropsAndCommitCmd,
   'insert-node-at-path': insertNodeAtPathCmd,
-  'update-node-at-path': updateNodeAtPathCmd,
-  'set-and-commit': setAndCommitCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  get-all-record       getAllRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  commit               commit CRUD operations\n  rev-parse            revParse\n  get-all-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-path-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-object-at-path   getObjectAtPath\n  freeze-objects       freezeObjects\n  init-empty-repo      initEmptyRepo\n  remove-node-at-path  removeNodeAtPath\n  set-data-at-path     setDataAtPath\n  set-props-and-commit setPropsAndCommit\n  insert-node-at-path  insertNodeAtPath\n  update-node-at-path  updateNodeAtPath\n  set-and-commit       setAndCommit\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  get-all-record       getAllRecord CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  object               object CRUD operations\n  commit               commit CRUD operations\n  init-empty-repo      initEmptyRepo\n  set-data-at-path     setDataAtPath\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

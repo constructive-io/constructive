@@ -58,6 +58,23 @@ export type StoreOrderBy =
   | 'HASH_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
+/** Methods to use when ordering `Object`. */
+export type ObjectOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC';
 /** Methods to use when ordering `Commit`. */
 export type CommitOrderBy =
   | 'NATURAL'
@@ -81,25 +98,6 @@ export type CommitOrderBy =
   | 'TREE_ID_DESC'
   | 'DATE_ASC'
   | 'DATE_DESC';
-/** Methods to use when ordering `Object`. */
-export type ObjectOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'FRZN_ASC'
-  | 'FRZN_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
 /** A filter to be used against `Ref` object types. All fields are combined with a logical ‘and.’ */
 export interface RefFilter {
   /** Filter by the object’s `id` field. */
@@ -138,6 +136,27 @@ export interface StoreFilter {
   /** Negates the expression. */
   not?: StoreFilter;
 }
+/** A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’ */
+export interface ObjectFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ObjectFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ObjectFilter[];
+  /** Negates the expression. */
+  not?: ObjectFilter;
+}
 /** A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’ */
 export interface CommitFilter {
   /** Filter by the object’s `id` field. */
@@ -165,83 +184,22 @@ export interface CommitFilter {
   /** Negates the expression. */
   not?: CommitFilter;
 }
-/** A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’ */
-export interface ObjectFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `kids` field. */
-  kids?: UUIDListFilter;
-  /** Filter by the object’s `ktree` field. */
-  ktree?: StringListFilter;
-  /** Filter by the object’s `data` field. */
-  data?: JSONFilter;
-  /** Filter by the object’s `frzn` field. */
-  frzn?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: ObjectFilter[];
-  /** Checks for any expressions in this list. */
-  or?: ObjectFilter[];
-  /** Negates the expression. */
-  not?: ObjectFilter;
-}
-export interface FreezeObjectsInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  id?: string;
-}
 export interface InitEmptyRepoInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   storeId?: string;
-}
-export interface RemoveNodeAtPathInput {
-  clientMutationId?: string;
-  dbId?: string;
-  root?: string;
-  path?: string[];
 }
 export interface SetDataAtPathInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   root?: string;
-  path?: string[];
-  data?: unknown;
-}
-export interface SetPropsAndCommitInput {
-  clientMutationId?: string;
-  dbId?: string;
-  storeId?: string;
-  refname?: string;
   path?: string[];
   data?: unknown;
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
-  dbId?: string;
+  sId?: string;
   root?: string;
-  path?: string[];
-  data?: unknown;
-  kids?: string[];
-  ktree?: string[];
-}
-export interface UpdateNodeAtPathInput {
-  clientMutationId?: string;
-  dbId?: string;
-  root?: string;
-  path?: string[];
-  data?: unknown;
-  kids?: string[];
-  ktree?: string[];
-}
-export interface SetAndCommitInput {
-  clientMutationId?: string;
-  dbId?: string;
-  storeId?: string;
-  refname?: string;
   path?: string[];
   data?: unknown;
   kids?: string[];
@@ -254,12 +212,15 @@ export interface CreateRefInput {
 }
 /** An input for mutations affecting `Ref` */
 export interface RefInput {
-  /** The primary unique identifier for the ref. */
+  /** Unique ref identifier */
   id?: string;
-  /** The name of the ref or branch */
+  /** Ref name (e.g. HEAD, main) */
   name: string;
+  /** Database scope for multi-tenant isolation */
   databaseId: string;
+  /** Store this ref belongs to */
   storeId: string;
+  /** Commit this ref points to */
   commitId?: string;
 }
 export interface CreateStoreInput {
@@ -269,14 +230,35 @@ export interface CreateStoreInput {
 }
 /** An input for mutations affecting `Store` */
 export interface StoreInput {
-  /** The primary unique identifier for the store. */
+  /** Unique store identifier */
   id?: string;
-  /** The name of the store (e.g., metaschema, migrations). */
+  /** Human-readable store name */
   name: string;
-  /** The database this store belongs to. */
+  /** Database scope for multi-tenant isolation */
   databaseId: string;
-  /** The current head tree_id for this store. */
+  /** Current root object hash of this store */
   hash?: string;
+  /** Timestamp of store creation */
+  createdAt?: string;
+}
+export interface CreateObjectInput {
+  clientMutationId?: string;
+  /** The `Object` to be created by this mutation. */
+  object: ObjectInput;
+}
+/** An input for mutations affecting `Object` */
+export interface ObjectInput {
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Timestamp of object creation */
   createdAt?: string;
 }
 export interface CreateCommitInput {
@@ -286,141 +268,145 @@ export interface CreateCommitInput {
 }
 /** An input for mutations affecting `Commit` */
 export interface CommitInput {
-  /** The primary unique identifier for the commit. */
+  /** Unique commit identifier */
   id?: string;
-  /** The commit message */
+  /** Optional commit message */
   message?: string;
-  /** The repository identifier */
+  /** Database scope for multi-tenant isolation */
   databaseId: string;
+  /** Store this commit belongs to */
   storeId: string;
-  /** Parent commits */
+  /** Parent commit IDs (supports merge commits) */
   parentIds?: string[];
-  /** The author of the commit */
+  /** User who authored the changes */
   authorId?: string;
-  /** The committer of the commit */
+  /** User who committed (may differ from author) */
   committerId?: string;
-  /** The root of the tree */
+  /** Root object ID of the tree snapshot at this commit */
   treeId?: string;
+  /** Commit timestamp */
   date?: string;
-}
-export interface CreateObjectInput {
-  clientMutationId?: string;
-  /** The `Object` to be created by this mutation. */
-  object: ObjectInput;
-}
-/** An input for mutations affecting `Object` */
-export interface ObjectInput {
-  id: string;
-  databaseId: string;
-  kids?: string[];
-  ktree?: string[];
-  data?: unknown;
-  frzn?: boolean;
-  createdAt?: string;
 }
 export interface UpdateRefInput {
   clientMutationId?: string;
-  /** The primary unique identifier for the ref. */
+  /** Unique ref identifier */
   id: string;
+  /** Database scope for multi-tenant isolation */
   databaseId: string;
   /** An object where the defined keys will be set on the `Ref` being updated. */
   refPatch: RefPatch;
 }
 /** Represents an update to a `Ref`. Fields that are set will be updated. */
 export interface RefPatch {
-  /** The primary unique identifier for the ref. */
+  /** Unique ref identifier */
   id?: string;
-  /** The name of the ref or branch */
+  /** Ref name (e.g. HEAD, main) */
   name?: string;
+  /** Database scope for multi-tenant isolation */
   databaseId?: string;
+  /** Store this ref belongs to */
   storeId?: string;
+  /** Commit this ref points to */
   commitId?: string;
 }
 export interface UpdateStoreInput {
   clientMutationId?: string;
-  /** The primary unique identifier for the store. */
+  /** Unique store identifier */
   id: string;
   /** An object where the defined keys will be set on the `Store` being updated. */
   storePatch: StorePatch;
 }
 /** Represents an update to a `Store`. Fields that are set will be updated. */
 export interface StorePatch {
-  /** The primary unique identifier for the store. */
+  /** Unique store identifier */
   id?: string;
-  /** The name of the store (e.g., metaschema, migrations). */
+  /** Human-readable store name */
   name?: string;
-  /** The database this store belongs to. */
+  /** Database scope for multi-tenant isolation */
   databaseId?: string;
-  /** The current head tree_id for this store. */
+  /** Current root object hash of this store */
   hash?: string;
+  /** Timestamp of store creation */
   createdAt?: string;
-}
-export interface UpdateCommitInput {
-  clientMutationId?: string;
-  /** The primary unique identifier for the commit. */
-  id: string;
-  /** The repository identifier */
-  databaseId: string;
-  /** An object where the defined keys will be set on the `Commit` being updated. */
-  commitPatch: CommitPatch;
-}
-/** Represents an update to a `Commit`. Fields that are set will be updated. */
-export interface CommitPatch {
-  /** The primary unique identifier for the commit. */
-  id?: string;
-  /** The commit message */
-  message?: string;
-  /** The repository identifier */
-  databaseId?: string;
-  storeId?: string;
-  /** Parent commits */
-  parentIds?: string[];
-  /** The author of the commit */
-  authorId?: string;
-  /** The committer of the commit */
-  committerId?: string;
-  /** The root of the tree */
-  treeId?: string;
-  date?: string;
 }
 export interface UpdateObjectInput {
   clientMutationId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
   id: string;
+  /** Database scope for multi-tenant isolation */
   databaseId: string;
   /** An object where the defined keys will be set on the `Object` being updated. */
   objectPatch: ObjectPatch;
 }
 /** Represents an update to a `Object`. Fields that are set will be updated. */
 export interface ObjectPatch {
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
   id?: string;
+  /** Database scope for multi-tenant isolation */
   databaseId?: string;
+  /** Ordered array of child object IDs */
   kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
   ktree?: string[];
+  /** Payload data for this object node */
   data?: unknown;
-  frzn?: boolean;
+  /** Timestamp of object creation */
   createdAt?: string;
+}
+export interface UpdateCommitInput {
+  clientMutationId?: string;
+  /** Unique commit identifier */
+  id: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+  /** An object where the defined keys will be set on the `Commit` being updated. */
+  commitPatch: CommitPatch;
+}
+/** Represents an update to a `Commit`. Fields that are set will be updated. */
+export interface CommitPatch {
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Store this commit belongs to */
+  storeId?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+  /** Commit timestamp */
+  date?: string;
 }
 export interface DeleteRefInput {
   clientMutationId?: string;
-  /** The primary unique identifier for the ref. */
+  /** Unique ref identifier */
   id: string;
+  /** Database scope for multi-tenant isolation */
   databaseId: string;
 }
 export interface DeleteStoreInput {
   clientMutationId?: string;
-  /** The primary unique identifier for the store. */
+  /** Unique store identifier */
   id: string;
-}
-export interface DeleteCommitInput {
-  clientMutationId?: string;
-  /** The primary unique identifier for the commit. */
-  id: string;
-  /** The repository identifier */
-  databaseId: string;
 }
 export interface DeleteObjectInput {
   clientMutationId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
   id: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId: string;
+}
+export interface DeleteCommitInput {
+  clientMutationId?: string;
+  /** Unique commit identifier */
+  id: string;
+  /** Database scope for multi-tenant isolation */
   databaseId: string;
 }
 export interface ProvisionBucketInput {
@@ -439,13 +425,6 @@ export interface GetAllConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Object` values. */
-export interface ObjectConnection {
-  nodes: Object[];
-  edges: ObjectEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `Ref` values. */
 export interface RefConnection {
   nodes: Ref[];
@@ -460,6 +439,13 @@ export interface StoreConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `Object` values. */
+export interface ObjectConnection {
+  nodes: Object[];
+  edges: ObjectEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `Commit` values. */
 export interface CommitConnection {
   nodes: Commit[];
@@ -471,33 +457,14 @@ export interface CommitConnection {
 export interface MetaSchema {
   tables: MetaTable[];
 }
-export interface FreezeObjectsPayload {
-  clientMutationId?: string | null;
-}
 export interface InitEmptyRepoPayload {
   clientMutationId?: string | null;
-}
-export interface RemoveNodeAtPathPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
 }
 export interface SetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export interface SetPropsAndCommitPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
 export interface InsertNodeAtPathPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export interface UpdateNodeAtPathPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export interface SetAndCommitPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -513,17 +480,17 @@ export interface CreateStorePayload {
   store?: Store | null;
   storeEdge?: StoreEdge | null;
 }
-export interface CreateCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was created by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
 export interface CreateObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was created by this mutation. */
   object?: Object | null;
   objectEdge?: ObjectEdge | null;
+}
+export interface CreateCommitPayload {
+  clientMutationId?: string | null;
+  /** The `Commit` that was created by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
 }
 export interface UpdateRefPayload {
   clientMutationId?: string | null;
@@ -537,17 +504,17 @@ export interface UpdateStorePayload {
   store?: Store | null;
   storeEdge?: StoreEdge | null;
 }
-export interface UpdateCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was updated by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
 export interface UpdateObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was updated by this mutation. */
   object?: Object | null;
   objectEdge?: ObjectEdge | null;
+}
+export interface UpdateCommitPayload {
+  clientMutationId?: string | null;
+  /** The `Commit` that was updated by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
 }
 export interface DeleteRefPayload {
   clientMutationId?: string | null;
@@ -561,17 +528,17 @@ export interface DeleteStorePayload {
   store?: Store | null;
   storeEdge?: StoreEdge | null;
 }
-export interface DeleteCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was deleted by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
 export interface DeleteObjectPayload {
   clientMutationId?: string | null;
   /** The `Object` that was deleted by this mutation. */
   object?: Object | null;
   objectEdge?: ObjectEdge | null;
+}
+export interface DeleteCommitPayload {
+  clientMutationId?: string | null;
+  /** The `Commit` that was deleted by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
 }
 export interface ProvisionBucketPayload {
   /** Whether provisioning succeeded */
@@ -604,12 +571,6 @@ export interface PageInfo {
   /** When paginating forwards, the cursor to continue. */
   endCursor?: string | null;
 }
-/** A `Object` edge in the connection. */
-export interface ObjectEdge {
-  cursor?: string | null;
-  /** The `Object` at the end of the edge. */
-  node?: Object | null;
-}
 /** A `Ref` edge in the connection. */
 export interface RefEdge {
   cursor?: string | null;
@@ -621,6 +582,12 @@ export interface StoreEdge {
   cursor?: string | null;
   /** The `Store` at the end of the edge. */
   node?: Store | null;
+}
+/** A `Object` edge in the connection. */
+export interface ObjectEdge {
+  cursor?: string | null;
+  /** The `Object` at the end of the edge. */
+  node?: Object | null;
 }
 /** A `Commit` edge in the connection. */
 export interface CommitEdge {

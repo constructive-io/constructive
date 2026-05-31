@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for Object data operations
+Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 
 ## Usage
 
 ```typescript
-useObjectsQuery({ selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } } })
-useObjectQuery({ id: '<UUID>', selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } } })
+useObjectsQuery({ selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } } })
+useObjectQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } } })
 useCreateObjectMutation({ selection: { fields: { id: true } } })
 useUpdateObjectMutation({ selection: { fields: { id: true } } })
 useDeleteObjectMutation({})
@@ -20,7 +20,7 @@ useDeleteObjectMutation({})
 
 ```typescript
 const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+  selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useObjectsQuery({
 const { mutate } = useCreateObjectMutation({
   selection: { fields: { id: true } },
 });
-mutate({ hashUuid: '<UUID>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>', frzn: '<Boolean>' });
+mutate({ databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>' });
 ```

@@ -7,58 +7,28 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  FreezeObjectsInput,
   InitEmptyRepoInput,
-  RemoveNodeAtPathInput,
   SetDataAtPathInput,
-  SetPropsAndCommitInput,
   InsertNodeAtPathInput,
-  UpdateNodeAtPathInput,
-  SetAndCommitInput,
   ProvisionBucketInput,
-  FreezeObjectsPayload,
   InitEmptyRepoPayload,
-  RemoveNodeAtPathPayload,
   SetDataAtPathPayload,
-  SetPropsAndCommitPayload,
   InsertNodeAtPathPayload,
-  UpdateNodeAtPathPayload,
-  SetAndCommitPayload,
   ProvisionBucketPayload,
-  FreezeObjectsPayloadSelect,
   InitEmptyRepoPayloadSelect,
-  RemoveNodeAtPathPayloadSelect,
   SetDataAtPathPayloadSelect,
-  SetPropsAndCommitPayloadSelect,
   InsertNodeAtPathPayloadSelect,
-  UpdateNodeAtPathPayloadSelect,
-  SetAndCommitPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface FreezeObjectsVariables {
-  input: FreezeObjectsInput;
-}
 export interface InitEmptyRepoVariables {
   input: InitEmptyRepoInput;
-}
-export interface RemoveNodeAtPathVariables {
-  input: RemoveNodeAtPathInput;
 }
 export interface SetDataAtPathVariables {
   input: SetDataAtPathInput;
 }
-export interface SetPropsAndCommitVariables {
-  input: SetPropsAndCommitInput;
-}
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
-}
-export interface UpdateNodeAtPathVariables {
-  input: UpdateNodeAtPathInput;
-}
-export interface SetAndCommitVariables {
-  input: SetAndCommitInput;
 }
 /**
  * Variables for provisionBucket
@@ -72,35 +42,6 @@ export interface ProvisionBucketVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
-    freezeObjects: <S extends FreezeObjectsPayloadSelect>(
-      args: FreezeObjectsVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, FreezeObjectsPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        freezeObjects: InferSelectResult<FreezeObjectsPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'FreezeObjects',
-        fieldName: 'freezeObjects',
-        ...buildCustomDocument(
-          'mutation',
-          'FreezeObjects',
-          'freezeObjects',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'FreezeObjectsInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'FreezeObjectsPayload'
-        ),
-      }),
     initEmptyRepo: <S extends InitEmptyRepoPayloadSelect>(
       args: InitEmptyRepoVariables,
       options: {
@@ -128,35 +69,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'InitEmptyRepoPayload'
-        ),
-      }),
-    removeNodeAtPath: <S extends RemoveNodeAtPathPayloadSelect>(
-      args: RemoveNodeAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RemoveNodeAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        removeNodeAtPath: InferSelectResult<RemoveNodeAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RemoveNodeAtPath',
-        fieldName: 'removeNodeAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'RemoveNodeAtPath',
-          'removeNodeAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RemoveNodeAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RemoveNodeAtPathPayload'
         ),
       }),
     setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
@@ -188,35 +100,6 @@ export function createMutationOperations(client: OrmClient) {
           'SetDataAtPathPayload'
         ),
       }),
-    setPropsAndCommit: <S extends SetPropsAndCommitPayloadSelect>(
-      args: SetPropsAndCommitVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetPropsAndCommitPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setPropsAndCommit: InferSelectResult<SetPropsAndCommitPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetPropsAndCommit',
-        fieldName: 'setPropsAndCommit',
-        ...buildCustomDocument(
-          'mutation',
-          'SetPropsAndCommit',
-          'setPropsAndCommit',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetPropsAndCommitInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetPropsAndCommitPayload'
-        ),
-      }),
     insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
       args: InsertNodeAtPathVariables,
       options: {
@@ -244,64 +127,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'InsertNodeAtPathPayload'
-        ),
-      }),
-    updateNodeAtPath: <S extends UpdateNodeAtPathPayloadSelect>(
-      args: UpdateNodeAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, UpdateNodeAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        updateNodeAtPath: InferSelectResult<UpdateNodeAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'UpdateNodeAtPath',
-        fieldName: 'updateNodeAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'UpdateNodeAtPath',
-          'updateNodeAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'UpdateNodeAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'UpdateNodeAtPathPayload'
-        ),
-      }),
-    setAndCommit: <S extends SetAndCommitPayloadSelect>(
-      args: SetAndCommitVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetAndCommitPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setAndCommit: InferSelectResult<SetAndCommitPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetAndCommit',
-        fieldName: 'setAndCommit',
-        ...buildCustomDocument(
-          'mutation',
-          'SetAndCommit',
-          'setAndCommit',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetAndCommitInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetAndCommitPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

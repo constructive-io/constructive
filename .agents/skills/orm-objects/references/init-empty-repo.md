@@ -7,7 +7,7 @@ Execute the initEmptyRepo mutation
 ## Usage
 
 ```typescript
-db.mutation.initEmptyRepo({ input: { dbId: '<UUID>', storeId: '<UUID>' } }).execute()
+db.mutation.initEmptyRepo({ input: { sId: '<UUID>', storeId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.initEmptyRepo({ input: { dbId: '<UUID>', storeId: '<UUID>' } }).exec
 ### Run initEmptyRepo
 
 ```typescript
-const result = await db.mutation.initEmptyRepo({ input: { dbId: '<UUID>', storeId: '<UUID>' } }).execute();
+const result = await db.mutation.initEmptyRepo({ input: { sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```

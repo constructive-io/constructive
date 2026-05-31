@@ -14,7 +14,7 @@
 // ============================================================================
 
 import type { QueryClient } from '@tanstack/react-query';
-import { getAllRecordKeys, objectKeys, refKeys, storeKeys, commitKeys } from './query-keys';
+import { getAllRecordKeys, refKeys, storeKeys, objectKeys, commitKeys } from './query-keys';
 /**
 // ============================================================================
 // Invalidation Helpers
@@ -52,20 +52,6 @@ export const invalidate = {
         queryKey: getAllRecordKeys.detail(id),
       }),
   },
-  /** Invalidate object queries */ object: {
-    /** Invalidate all object queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.all,
-      }),
-    /** Invalidate object list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.lists(),
-      }),
-    /** Invalidate a specific object */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: objectKeys.detail(id),
-      }),
-  },
   /** Invalidate ref queries */ ref: {
     /** Invalidate all ref queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -92,6 +78,20 @@ export const invalidate = {
     /** Invalidate a specific store */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: storeKeys.detail(id),
+      }),
+  },
+  /** Invalidate object queries */ object: {
+    /** Invalidate all object queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: objectKeys.all,
+      }),
+    /** Invalidate object list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: objectKeys.lists(),
+      }),
+    /** Invalidate a specific object */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: objectKeys.detail(id),
       }),
   },
   /** Invalidate commit queries */ commit: {
@@ -129,11 +129,6 @@ export const remove = {
       queryKey: getAllRecordKeys.detail(id),
     });
   },
-  /** Remove object from cache */ object: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: objectKeys.detail(id),
-    });
-  },
   /** Remove ref from cache */ ref: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: refKeys.detail(id),
@@ -142,6 +137,11 @@ export const remove = {
   /** Remove store from cache */ store: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: storeKeys.detail(id),
+    });
+  },
+  /** Remove object from cache */ object: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: objectKeys.detail(id),
     });
   },
   /** Remove commit from cache */ commit: (queryClient: QueryClient, id: string | number) => {
