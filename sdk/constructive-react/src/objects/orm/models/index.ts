@@ -4,7 +4,7 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { GetAllRecordModel } from './getAllRecord';
-export { ObjectModel } from './object';
 export { RefModel } from './ref';
 export { StoreModel } from './store';
+export { ObjectModel } from './object';
 export { CommitModel } from './commit';

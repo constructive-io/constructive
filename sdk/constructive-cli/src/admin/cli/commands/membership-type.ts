@@ -19,7 +19,7 @@ const fieldSchema: FieldSchema = {
   id: 'int',
   name: 'string',
   description: 'string',
-  prefix: 'string',
+  scope: 'string',
   parentMembershipType: 'int',
   hasUsersTableEntry: 'boolean',
 };
@@ -77,7 +77,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       id: true,
       name: true,
       description: true,
-      prefix: true,
+      scope: true,
       parentMembershipType: true,
       hasUsersTableEntry: true,
     };
@@ -103,7 +103,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       id: true,
       name: true,
       description: true,
-      prefix: true,
+      scope: true,
       parentMembershipType: true,
       hasUsersTableEntry: true,
     };
@@ -141,7 +141,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           id: true,
           name: true,
           description: true,
-          prefix: true,
+          scope: true,
           parentMembershipType: true,
           hasUsersTableEntry: true,
         },
@@ -173,8 +173,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'prefix',
-        message: 'prefix',
+        name: 'scope',
+        message: 'scope',
         required: true,
       },
       {
@@ -203,7 +203,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           name: cleanedData.name,
           description: cleanedData.description,
-          prefix: cleanedData.prefix,
+          scope: cleanedData.scope,
           parentMembershipType: cleanedData.parentMembershipType,
           hasUsersTableEntry: cleanedData.hasUsersTableEntry,
         },
@@ -211,7 +211,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           id: true,
           name: true,
           description: true,
-          prefix: true,
+          scope: true,
           parentMembershipType: true,
           hasUsersTableEntry: true,
         },
@@ -249,8 +249,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'prefix',
-        message: 'prefix',
+        name: 'scope',
+        message: 'scope',
         required: false,
       },
       {
@@ -279,7 +279,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           name: cleanedData.name,
           description: cleanedData.description,
-          prefix: cleanedData.prefix,
+          scope: cleanedData.scope,
           parentMembershipType: cleanedData.parentMembershipType,
           hasUsersTableEntry: cleanedData.hasUsersTableEntry,
         },
@@ -287,7 +287,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: true,
           name: true,
           description: true,
-          prefix: true,
+          scope: true,
           parentMembershipType: true,
           hasUsersTableEntry: true,
         },

@@ -11,9 +11,12 @@
 | API | Endpoint | Generators | Docs |
 |-----|----------|------------|------|
 | admin | - | ORM | [./src/admin/README.md](./src/admin/README.md) |
+| agent | - | ORM | [./src/agent/README.md](./src/agent/README.md) |
+| api | - | ORM | [./src/api/README.md](./src/api/README.md) |
 | auth | - | ORM | [./src/auth/README.md](./src/auth/README.md) |
+| modules | - | ORM | [./src/modules/README.md](./src/modules/README.md) |
 | objects | - | ORM | [./src/objects/README.md](./src/objects/README.md) |
-| public | - | ORM | [./src/public/README.md](./src/public/README.md) |
+| usage | - | ORM | [./src/usage/README.md](./src/usage/README.md) |
 
 ---
 

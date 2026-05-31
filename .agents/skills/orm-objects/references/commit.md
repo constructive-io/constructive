@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-A commit records changes to the repository.
+Commit history — each commit snapshots a tree root for a store
 
 ## Usage
 

@@ -4,24 +4,19 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export * from './useCreateGetAllRecordMutation';
-export * from './useCreateObjectMutation';
-export * from './useUpdateObjectMutation';
-export * from './useDeleteObjectMutation';
 export * from './useCreateRefMutation';
 export * from './useUpdateRefMutation';
 export * from './useDeleteRefMutation';
 export * from './useCreateStoreMutation';
 export * from './useUpdateStoreMutation';
 export * from './useDeleteStoreMutation';
+export * from './useCreateObjectMutation';
+export * from './useUpdateObjectMutation';
+export * from './useDeleteObjectMutation';
 export * from './useCreateCommitMutation';
 export * from './useUpdateCommitMutation';
 export * from './useDeleteCommitMutation';
-export * from './useFreezeObjectsMutation';
 export * from './useInitEmptyRepoMutation';
-export * from './useRemoveNodeAtPathMutation';
 export * from './useSetDataAtPathMutation';
-export * from './useSetPropsAndCommitMutation';
 export * from './useInsertNodeAtPathMutation';
-export * from './useUpdateNodeAtPathMutation';
-export * from './useSetAndCommitMutation';
 export * from './useProvisionBucketMutation';

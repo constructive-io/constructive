@@ -27,14 +27,6 @@ export const getAllRecordMutationKeys = {
   /** Delete getAllRecord mutation key */ delete: (id: string | number) =>
     ['mutation', 'getallrecord', 'delete', id] as const,
 } as const;
-export const objectMutationKeys = {
-  /** All object mutation keys */ all: ['mutation', 'object'] as const,
-  /** Create object mutation key */ create: () => ['mutation', 'object', 'create'] as const,
-  /** Update object mutation key */ update: (id: string | number) =>
-    ['mutation', 'object', 'update', id] as const,
-  /** Delete object mutation key */ delete: (id: string | number) =>
-    ['mutation', 'object', 'delete', id] as const,
-} as const;
 export const refMutationKeys = {
   /** All ref mutation keys */ all: ['mutation', 'ref'] as const,
   /** Create ref mutation key */ create: () => ['mutation', 'ref', 'create'] as const,
@@ -51,6 +43,14 @@ export const storeMutationKeys = {
   /** Delete store mutation key */ delete: (id: string | number) =>
     ['mutation', 'store', 'delete', id] as const,
 } as const;
+export const objectMutationKeys = {
+  /** All object mutation keys */ all: ['mutation', 'object'] as const,
+  /** Create object mutation key */ create: () => ['mutation', 'object', 'create'] as const,
+  /** Update object mutation key */ update: (id: string | number) =>
+    ['mutation', 'object', 'update', id] as const,
+  /** Delete object mutation key */ delete: (id: string | number) =>
+    ['mutation', 'object', 'delete', id] as const,
+} as const;
 export const commitMutationKeys = {
   /** All commit mutation keys */ all: ['mutation', 'commit'] as const,
   /** Create commit mutation key */ create: () => ['mutation', 'commit', 'create'] as const,
@@ -65,38 +65,18 @@ export const commitMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
-  /** Mutation key for freezeObjects */ freezeObjects: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'freezeObjects', identifier] as const)
-      : (['mutation', 'freezeObjects'] as const),
   /** Mutation key for initEmptyRepo */ initEmptyRepo: (identifier?: string) =>
     identifier
       ? (['mutation', 'initEmptyRepo', identifier] as const)
       : (['mutation', 'initEmptyRepo'] as const),
-  /** Mutation key for removeNodeAtPath */ removeNodeAtPath: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'removeNodeAtPath', identifier] as const)
-      : (['mutation', 'removeNodeAtPath'] as const),
   /** Mutation key for setDataAtPath */ setDataAtPath: (identifier?: string) =>
     identifier
       ? (['mutation', 'setDataAtPath', identifier] as const)
       : (['mutation', 'setDataAtPath'] as const),
-  /** Mutation key for setPropsAndCommit */ setPropsAndCommit: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'setPropsAndCommit', identifier] as const)
-      : (['mutation', 'setPropsAndCommit'] as const),
   /** Mutation key for insertNodeAtPath */ insertNodeAtPath: (identifier?: string) =>
     identifier
       ? (['mutation', 'insertNodeAtPath', identifier] as const)
       : (['mutation', 'insertNodeAtPath'] as const),
-  /** Mutation key for updateNodeAtPath */ updateNodeAtPath: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'updateNodeAtPath', identifier] as const)
-      : (['mutation', 'updateNodeAtPath'] as const),
-  /** Mutation key for setAndCommit */ setAndCommit: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'setAndCommit', identifier] as const)
-      : (['mutation', 'setAndCommit'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
@@ -126,9 +106,9 @@ export const customMutationKeys = {
  */
 export const mutationKeys = {
   getAllRecord: getAllRecordMutationKeys,
-  object: objectMutationKeys,
   ref: refMutationKeys,
   store: storeMutationKeys,
+  object: objectMutationKeys,
   commit: commitMutationKeys,
   custom: customMutationKeys,
 } as const;

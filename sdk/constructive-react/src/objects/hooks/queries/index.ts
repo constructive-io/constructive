@@ -4,15 +4,11 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export * from './useGetAllQuery';
-export * from './useObjectsQuery';
-export * from './useObjectQuery';
 export * from './useRefsQuery';
 export * from './useRefQuery';
 export * from './useStoresQuery';
 export * from './useStoreQuery';
+export * from './useObjectsQuery';
+export * from './useObjectQuery';
 export * from './useCommitsQuery';
 export * from './useCommitQuery';
-export * from './useRevParseQuery';
-export * from './useGetAllObjectsFromRootQuery';
-export * from './useGetPathObjectsFromRootQuery';
-export * from './useGetObjectAtPathQuery';

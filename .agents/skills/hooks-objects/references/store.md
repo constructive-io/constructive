@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-A store represents an isolated object repository within a database.
+Named stores — one per version-controlled tree (e.g. one graph, one definition set)
 
 ## Usage
 
