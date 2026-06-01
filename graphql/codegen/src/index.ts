@@ -23,7 +23,7 @@ export { defineConfig } from './types/config';
 
 // Main generate function (orchestrates the entire pipeline)
 export type { GenerateOptions, GenerateResult, GenerateMultiOptions, GenerateMultiResult } from './core/generate';
-export { generate, generateMulti, expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget, removeStaleTargetDirs } from './core/generate';
+export { generate, generateMulti, expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget, removeStaleTargetDirs, GENERATED_SENTINEL } from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
