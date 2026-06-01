@@ -627,8 +627,46 @@ function applySharedPgpmDb(
 }
 
 /**
+ * Check whether a directory looks like codegen output by scanning for
+ * a `.ts` file containing the `@generated` marker in its first few lines.
+ */
+function isGeneratedDir(dirPath: string): boolean {
+  const MARKER = '@generated';
+  const MAX_BYTES = 256;
+
+  const queue = [dirPath];
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(current, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        queue.push(full);
+      } else if (entry.isFile() && entry.name.endsWith('.ts')) {
+        try {
+          const fd = fs.openSync(full, 'r');
+          const buf = Buffer.alloc(MAX_BYTES);
+          fs.readSync(fd, buf, 0, MAX_BYTES, 0);
+          fs.closeSync(fd);
+          if (buf.toString('utf8').includes(MARKER)) return true;
+        } catch {
+          continue;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Remove subdirectories in `outputRoot` that are not in `currentTargetNames`.
- * Useful for cleaning up stale target output before a fresh multi-target generate.
+ * Only removes directories that contain `@generated` marker files — hand-written
+ * directories (e.g. `config/`, `utils/`) are preserved automatically.
  * Returns the list of directory names that were removed.
  */
 export function removeStaleTargetDirs(
@@ -643,7 +681,14 @@ export function removeStaleTargetDirs(
   const entries = fs.readdirSync(outputRoot, { withFileTypes: true });
   for (const entry of entries) {
     if (entry.isDirectory() && !currentTargets.has(entry.name)) {
-      fs.rmSync(path.join(outputRoot, entry.name), { recursive: true, force: true });
+      const dirPath = path.join(outputRoot, entry.name);
+      if (!isGeneratedDir(dirPath)) {
+        if (verbose) {
+          console.log(`Preserved non-generated directory: ${entry.name}`);
+        }
+        continue;
+      }
+      fs.rmSync(dirPath, { recursive: true, force: true });
       removed.push(entry.name);
       if (verbose) {
         console.log(`Removed stale target directory: ${entry.name}`);
