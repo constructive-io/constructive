@@ -25,6 +25,7 @@ import { getNodeEnv } from '@pgpmjs/env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type {
   AuthSettings,
+  ConnectedAccountsConfig,
   ConstructiveContext,
   IdentityProvidersConfig,
   IdentityProviderConfigMap,
@@ -132,24 +133,37 @@ interface OAuthModules {
   identityProviderConfig: IdentityProviderConfigMap;
   userAuth: UserAuthConfig;
   authSettings: AuthSettings | undefined;
+  connectedAccounts: ConnectedAccountsConfig | undefined;
 }
 
 async function resolveOAuthModules(
   ctx: ConstructiveContext,
 ): Promise<OAuthModules | null> {
-  const [identityProviders, identityProviderConfig, userAuth, authSettings] =
-    await Promise.all([
-      ctx.useModule('identityProviders'),
-      ctx.useModule('identityProviderConfig'),
-      ctx.useModule('userAuth'),
-      ctx.useModule('authSettings'),
-    ]);
+  const [
+    identityProviders,
+    identityProviderConfig,
+    userAuth,
+    authSettings,
+    connectedAccounts,
+  ] = await Promise.all([
+    ctx.useModule('identityProviders'),
+    ctx.useModule('identityProviderConfig'),
+    ctx.useModule('userAuth'),
+    ctx.useModule('authSettings'),
+    ctx.useModule('connectedAccounts'),
+  ]);
 
   if (!identityProviders || !identityProviderConfig || !userAuth) {
     return null;
   }
 
-  return { identityProviders, identityProviderConfig, userAuth, authSettings };
+  return {
+    identityProviders,
+    identityProviderConfig,
+    userAuth,
+    authSettings,
+    connectedAccounts,
+  };
 }
 
 // =============================================================================
@@ -483,19 +497,36 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         }
 
         const userAgent = req.get('user-agent') || '';
-        const { identityProviders } = modules;
+        const { identityProviders, connectedAccounts } = modules;
         const authPrivateSchema = identityProviders.privateSchemaName;
         const signInFn = identityProviders.signInIdentityFunction;
         const signUpFn = identityProviders.signUpIdentityFunction;
         const emailVerified = isEmailVerified(profile);
 
-        // Use withPgClient to run sign_in/sign_up within a properly scoped
-        // RLS transaction. pgSettings (role, claims, request_id) are applied
-        // automatically via SET LOCAL.
-        //
-        // Pattern: try sign_in_identity first. If it throws IDENTITY_ACCOUNT_NOT_FOUND,
-        // fall back to sign_up_identity. This avoids a separate RLS-bypassing query
-        // to check identity existence.
+        // Check if identity already exists via connectedAccounts loader
+        // This determines whether to sign_in or sign_up, avoiding SAVEPOINT/rollback
+        let identityExists = false;
+        if (connectedAccounts) {
+          const checkSql = `
+            SELECT 1 FROM "${connectedAccounts.privateSchemaName}"."${connectedAccounts.tableName}"
+            WHERE service = $1 AND identifier = $2
+            LIMIT 1
+          `;
+          const checkResult = await ctx.pool.query(checkSql, [
+            profile.provider,
+            profile.providerId,
+          ]);
+          identityExists = checkResult.rowCount > 0;
+          log.info(
+            `[oauth] Identity check for ${profile.email}: ${identityExists ? 'exists' : 'new'}`,
+          );
+        }
+
+        // If new identity, check email verification requirement before proceeding
+        if (!identityExists && requireVerifiedEmail && !emailVerified) {
+          throw new Error('EMAIL_NOT_VERIFIED');
+        }
+
         const result = await ctx.withPgClient<SignInIdentityResult>(
           async (client) => {
             // Set OAuth-specific JWT claims on this transaction
@@ -515,13 +546,13 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
               raw_userinfo: profile.raw,
             };
 
-            // Try sign_in_identity first
-            const signInSql = `
-              SELECT * FROM "${authPrivateSchema}"."${signInFn}"(
-                $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
-              )
-            `;
-            try {
+            if (identityExists) {
+              // Sign in existing identity
+              const signInSql = `
+                SELECT * FROM "${authPrivateSchema}"."${signInFn}"(
+                  $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
+                )
+              `;
               const signInResult = await client.query(signInSql, [
                 profile.provider,
                 profile.providerId,
@@ -531,34 +562,25 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
                 deviceToken,
               ]);
               return signInResult.rows[0] || {};
-            } catch (err: any) {
-              // If identity not found, try sign_up_identity
-              if (err.message?.includes('IDENTITY_ACCOUNT_NOT_FOUND')) {
-                log.info(
-                  `[oauth] Account not found for ${profile.email}, attempting signup`,
-                );
-
-                // Check email verification requirement before signup
-                if (requireVerifiedEmail && !emailVerified) {
-                  throw new Error('EMAIL_NOT_VERIFIED');
-                }
-
-                const signUpSql = `
-                  SELECT * FROM "${authPrivateSchema}"."${signUpFn}"(
-                    $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
-                  )
-                `;
-                const signUpResult = await client.query(signUpSql, [
-                  profile.provider,
-                  profile.providerId,
-                  profile.email,
-                  JSON.stringify(details),
-                  true,
-                  deviceToken,
-                ]);
-                return signUpResult.rows[0] || {};
-              }
-              throw err;
+            } else {
+              // Sign up new identity
+              log.info(
+                `[oauth] Creating new account for ${profile.email}`,
+              );
+              const signUpSql = `
+                SELECT * FROM "${authPrivateSchema}"."${signUpFn}"(
+                  $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
+                )
+              `;
+              const signUpResult = await client.query(signUpSql, [
+                profile.provider,
+                profile.providerId,
+                profile.email,
+                JSON.stringify(details),
+                true,
+                deviceToken,
+              ]);
+              return signUpResult.rows[0] || {};
             }
           },
         );

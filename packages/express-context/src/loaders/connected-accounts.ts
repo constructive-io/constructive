@@ -6,15 +6,8 @@
  */
 
 import type { LoaderContext, ModuleLoader } from './types';
+import type { ConnectedAccountsConfig } from '../types';
 import { createModuleLoader } from './create-loader';
-
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-export interface ConnectedAccountsConfig {
-  schemaName: string;
-  privateSchemaName: string;
-  tableName: string;
-}
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
