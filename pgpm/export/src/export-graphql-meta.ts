@@ -94,6 +94,15 @@ const buildDynamicFieldsFromGraphQL = async (
       }
     }
 
+    // Exclude virtual/computed fields that don't map to physical columns
+    // (e.g., createdAt/updatedAt from stamps extension, lang_column from PostGraphile)
+    if (tableConfig.excludeFields) {
+      for (const fieldName of tableConfig.excludeFields) {
+        delete dynamicFields[fieldName];
+        enumFields.delete(fieldName);
+      }
+    }
+
     return { fields: dynamicFields, enumFields };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

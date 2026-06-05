@@ -196,12 +196,35 @@ export const META_TABLE_ORDER = [
 
 export type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'jsonb[]' | 'int' | 'interval' | 'timestamptz';
 
+/**
+ * Default fields to exclude from GraphQL introspection for all meta tables.
+ *
+ * The stamps extension exposes createdAt/updatedAt as computed columns via
+ * PostGraphile, but these are NOT physical columns on the base tables.
+ * Including them in INSERT statements causes deployment failures
+ * ("column does not exist").
+ *
+ * The SQL flow is unaffected — it uses information_schema.columns which
+ * only returns real physical columns.
+ */
+export const STAMPS_EXCLUDE_FIELDS: readonly string[] = ['created_at', 'updated_at'] as const;
+
 export interface TableConfig {
   schema: string;
   table: string;
   conflictDoNothing?: boolean;
   typeOverrides?: Record<string, FieldType>; // only for special types (image, upload, url) that can't be inferred
   gqlTypeName?: string; // override for GraphQL type name when automatic derivation doesn't match PostGraphile's inflector
+  /**
+   * snake_case column names to exclude from GraphQL introspection results.
+   *
+   * Defaults to STAMPS_EXCLUDE_FIELDS (created_at, updated_at) for all tables.
+   * Per-table entries add extra exclusions on top (e.g. lang_column for full_text_search).
+   *
+   * The SQL flow is unaffected — it uses information_schema.columns which
+   * only returns real physical columns.
+   */
+  excludeFields?: string[];
 }
 
 /**
@@ -221,83 +244,102 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
   // =============================================================================
   database: {
     schema: 'metaschema_public',
-    table: 'database'
+    table: 'database',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   schema: {
     schema: 'metaschema_public',
-    table: 'schema'
+    table: 'schema',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   function: {
     schema: 'metaschema_public',
-    table: 'function'
+    table: 'function',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   table: {
     schema: 'metaschema_public',
-    table: 'table'
+    table: 'table',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   field: {
     schema: 'metaschema_public',
     table: 'field',
-    conflictDoNothing: true
+    conflictDoNothing: true,
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   policy: {
     schema: 'metaschema_public',
-    table: 'policy'
+    table: 'policy',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   index: {
     schema: 'metaschema_public',
-    table: 'index'
+    table: 'index',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   trigger: {
     schema: 'metaschema_public',
-    table: 'trigger'
+    table: 'trigger',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   trigger_function: {
     schema: 'metaschema_public',
-    table: 'trigger_function'
+    table: 'trigger_function',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   rls_function: {
     schema: 'metaschema_public',
-    table: 'rls_function'
+    table: 'rls_function',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   foreign_key_constraint: {
     schema: 'metaschema_public',
-    table: 'foreign_key_constraint'
+    table: 'foreign_key_constraint',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   primary_key_constraint: {
     schema: 'metaschema_public',
-    table: 'primary_key_constraint'
+    table: 'primary_key_constraint',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   unique_constraint: {
     schema: 'metaschema_public',
-    table: 'unique_constraint'
+    table: 'unique_constraint',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   check_constraint: {
     schema: 'metaschema_public',
-    table: 'check_constraint'
+    table: 'check_constraint',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   full_text_search: {
     schema: 'metaschema_public',
-    table: 'full_text_search'
+    table: 'full_text_search',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS, 'lang_column']
   },
   schema_grant: {
     schema: 'metaschema_public',
-    table: 'schema_grant'
+    table: 'schema_grant',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   table_grant: {
     schema: 'metaschema_public',
-    table: 'table_grant'
+    table: 'table_grant',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   default_privilege: {
     schema: 'metaschema_public',
-    table: 'default_privilege'
+    table: 'default_privilege',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   // =============================================================================
   // services_public tables
   // =============================================================================
   domains: {
     schema: 'services_public',
-    table: 'domains'
+    table: 'domains',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   sites: {
     schema: 'services_public',
@@ -307,11 +349,13 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       favicon: 'upload',
       apple_touch_icon: 'image',
       logo: 'image'
-    }
+    },
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   apis: {
     schema: 'services_public',
-    table: 'apis'
+    table: 'apis',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   apps: {
     schema: 'services_public',
@@ -320,291 +364,361 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       app_image: 'image',
       app_store_link: 'url',
       play_store_link: 'url'
-    }
+    },
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   site_modules: {
     schema: 'services_public',
-    table: 'site_modules'
+    table: 'site_modules',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   site_themes: {
     schema: 'services_public',
-    table: 'site_themes'
+    table: 'site_themes',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   site_metadata: {
     schema: 'services_public',
     table: 'site_metadata',
     typeOverrides: {
       og_image: 'image'
-    }
+    },
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   api_modules: {
     schema: 'services_public',
-    table: 'api_modules'
+    table: 'api_modules',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   api_extensions: {
     schema: 'services_public',
-    table: 'api_extensions'
+    table: 'api_extensions',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   api_schemas: {
     schema: 'services_public',
-    table: 'api_schemas'
+    table: 'api_schemas',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   database_settings: {
     schema: 'services_public',
-    table: 'database_settings'
+    table: 'database_settings',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   api_settings: {
     schema: 'services_public',
-    table: 'api_settings'
+    table: 'api_settings',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   rls_settings: {
     schema: 'services_public',
-    table: 'rls_settings'
+    table: 'rls_settings',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   cors_settings: {
     schema: 'services_public',
-    table: 'cors_settings'
+    table: 'cors_settings',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   pubkey_settings: {
     schema: 'services_public',
-    table: 'pubkey_settings'
+    table: 'pubkey_settings',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   webauthn_settings: {
     schema: 'services_public',
-    table: 'webauthn_settings'
+    table: 'webauthn_settings',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   // =============================================================================
   // metaschema_modules_public tables
   // =============================================================================
   rls_module: {
     schema: 'metaschema_modules_public',
-    table: 'rls_module'
+    table: 'rls_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   user_auth_module: {
     schema: 'metaschema_modules_public',
-    table: 'user_auth_module'
+    table: 'user_auth_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   memberships_module: {
     schema: 'metaschema_modules_public',
-    table: 'memberships_module'
+    table: 'memberships_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   permissions_module: {
     schema: 'metaschema_modules_public',
-    table: 'permissions_module'
+    table: 'permissions_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   limits_module: {
     schema: 'metaschema_modules_public',
-    table: 'limits_module'
+    table: 'limits_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   levels_module: {
     schema: 'metaschema_modules_public',
-    table: 'levels_module'
+    table: 'levels_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   events_module: {
     schema: 'metaschema_modules_public',
-    table: 'events_module'
+    table: 'events_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   users_module: {
     schema: 'metaschema_modules_public',
-    table: 'users_module'
+    table: 'users_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   hierarchy_module: {
     schema: 'metaschema_modules_public',
-    table: 'hierarchy_module'
+    table: 'hierarchy_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   membership_types_module: {
     schema: 'metaschema_modules_public',
-    table: 'membership_types_module'
+    table: 'membership_types_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   invites_module: {
     schema: 'metaschema_modules_public',
-    table: 'invites_module'
+    table: 'invites_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   emails_module: {
     schema: 'metaschema_modules_public',
-    table: 'emails_module'
+    table: 'emails_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   sessions_module: {
     schema: 'metaschema_modules_public',
-    table: 'sessions_module'
+    table: 'sessions_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   user_state_module: {
     schema: 'metaschema_modules_public',
-    table: 'user_state_module'
+    table: 'user_state_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   profiles_module: {
     schema: 'metaschema_modules_public',
-    table: 'profiles_module'
+    table: 'profiles_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   config_secrets_user_module: {
     schema: 'metaschema_modules_public',
-    table: 'config_secrets_user_module'
+    table: 'config_secrets_user_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   user_credentials_module: {
     schema: 'metaschema_modules_public',
-    table: 'user_credentials_module'
+    table: 'user_credentials_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   user_settings_module: {
     schema: 'metaschema_modules_public',
-    table: 'user_settings_module'
+    table: 'user_settings_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   connected_accounts_module: {
     schema: 'metaschema_modules_public',
-    table: 'connected_accounts_module'
+    table: 'connected_accounts_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   phone_numbers_module: {
     schema: 'metaschema_modules_public',
-    table: 'phone_numbers_module'
+    table: 'phone_numbers_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   crypto_addresses_module: {
     schema: 'metaschema_modules_public',
-    table: 'crypto_addresses_module'
+    table: 'crypto_addresses_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   crypto_auth_module: {
     schema: 'metaschema_modules_public',
-    table: 'crypto_auth_module'
+    table: 'crypto_auth_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   field_module: {
     schema: 'metaschema_modules_public',
-    table: 'field_module'
+    table: 'field_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   table_module: {
     schema: 'metaschema_modules_public',
-    table: 'table_module'
+    table: 'table_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   // NOTE: table_template_module has been removed from pgpm-modules (superseded by blueprints)
   secure_table_provision: {
     schema: 'metaschema_modules_public',
-    table: 'secure_table_provision'
+    table: 'secure_table_provision',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   uuid_module: {
     schema: 'metaschema_modules_public',
-    table: 'uuid_module'
+    table: 'uuid_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   default_ids_module: {
     schema: 'metaschema_modules_public',
-    table: 'default_ids_module'
+    table: 'default_ids_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   denormalized_table_field: {
     schema: 'metaschema_modules_public',
-    table: 'denormalized_table_field'
+    table: 'denormalized_table_field',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   relation_provision: {
     schema: 'metaschema_modules_public',
-    table: 'relation_provision'
+    table: 'relation_provision',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   entity_type_provision: {
     schema: 'metaschema_modules_public',
-    table: 'entity_type_provision'
+    table: 'entity_type_provision',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   rate_limits_module: {
     schema: 'metaschema_modules_public',
-    table: 'rate_limits_module'
+    table: 'rate_limits_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   storage_module: {
     schema: 'metaschema_modules_public',
-    table: 'storage_module'
+    table: 'storage_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   billing_module: {
     schema: 'metaschema_modules_public',
-    table: 'billing_module'
+    table: 'billing_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   billing_provider_module: {
     schema: 'metaschema_modules_public',
-    table: 'billing_provider_module'
+    table: 'billing_provider_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   devices_module: {
     schema: 'metaschema_modules_public',
-    table: 'devices_module'
+    table: 'devices_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   identity_providers_module: {
     schema: 'metaschema_modules_public',
-    table: 'identity_providers_module'
+    table: 'identity_providers_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   notifications_module: {
     schema: 'metaschema_modules_public',
-    table: 'notifications_module'
+    table: 'notifications_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   plans_module: {
     schema: 'metaschema_modules_public',
-    table: 'plans_module'
+    table: 'plans_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   realtime_module: {
     schema: 'metaschema_modules_public',
-    table: 'realtime_module'
+    table: 'realtime_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   session_secrets_module: {
     schema: 'metaschema_modules_public',
-    table: 'session_secrets_module'
+    table: 'session_secrets_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   config_secrets_org_module: {
     schema: 'metaschema_modules_public',
-    table: 'config_secrets_org_module'
+    table: 'config_secrets_org_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   config_secrets_module: {
     schema: 'metaschema_modules_public',
-    table: 'config_secrets_module'
+    table: 'config_secrets_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   i18n_module: {
     schema: 'metaschema_modules_public',
     table: 'i18n_module',
-    gqlTypeName: 'I18NModule' // i18n is a well-known abbreviation; PostGraphile inflector capitalizes the N
+    gqlTypeName: 'I18NModule', // i18n is a well-known abbreviation; PostGraphile inflector capitalizes the N
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   agent_module: {
     schema: 'metaschema_modules_public',
-    table: 'agent_module'
+    table: 'agent_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   function_module: {
     schema: 'metaschema_modules_public',
-    table: 'function_module'
+    table: 'function_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   namespace_module: {
     schema: 'metaschema_modules_public',
-    table: 'namespace_module'
+    table: 'namespace_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   merkle_store_module: {
     schema: 'metaschema_modules_public',
-    table: 'merkle_store_module'
+    table: 'merkle_store_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   graph_module: {
     schema: 'metaschema_modules_public',
-    table: 'graph_module'
+    table: 'graph_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   compute_log_module: {
     schema: 'metaschema_modules_public',
-    table: 'compute_log_module'
+    table: 'compute_log_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   db_usage_module: {
     schema: 'metaschema_modules_public',
-    table: 'db_usage_module'
+    table: 'db_usage_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   storage_log_module: {
     schema: 'metaschema_modules_public',
-    table: 'storage_log_module'
+    table: 'storage_log_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   transfer_log_module: {
     schema: 'metaschema_modules_public',
-    table: 'transfer_log_module'
+    table: 'transfer_log_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   webauthn_auth_module: {
     schema: 'metaschema_modules_public',
-    table: 'webauthn_auth_module'
+    table: 'webauthn_auth_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   webauthn_credentials_module: {
     schema: 'metaschema_modules_public',
-    table: 'webauthn_credentials_module'
+    table: 'webauthn_credentials_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   inference_log_module: {
     schema: 'metaschema_modules_public',
     table: 'inference_log_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   rate_limit_meters_module: {
     schema: 'metaschema_modules_public',
     table: 'rate_limit_meters_module',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   },
   spatial_relation: {
     schema: 'metaschema_public',
-    table: 'spatial_relation'
+    table: 'spatial_relation',
+    excludeFields: [...STAMPS_EXCLUDE_FIELDS]
   }
 };
 

@@ -11,6 +11,7 @@ export {
   META_COMMON_FOOTER,
   META_TABLE_ORDER,
   META_TABLE_CONFIG,
+  STAMPS_EXCLUDE_FIELDS,
   mapPgTypeToFieldType,
   makeReplacer,
   preparePackage,
