@@ -1,18 +1,20 @@
 /**
- * Encrypted Secrets Module Loader
+ * Platform Secrets Module Loader
  *
- * Resolves the schema and table name for user_secrets from
- * metaschema_modules_public.config_secrets_user_module.
+ * Returns the fixed schema and table for platform_secrets.
+ * Platform secrets use the new platform-scoped infrastructure (PRs #1449, #1459, #1461):
+ *   - Schema: constructive_store_private
+ *   - Table: platform_secrets
  *
- * Note: The generator creates both user_secrets and app_secrets tables:
- *   - user_secrets: per-user/entity secrets (passwords, OAuth client_secret)
- *   - app_secrets: app-level secrets (API keys, admin-only)
+ * OAuth identity_providers.client_secret_id points to platform_secrets
+ * (see rotate_identity_provider_platform_secret procedure in constructive_auth_private).
  *
- * OAuth uses user_secrets because identity_providers.client_secret_id points
- * to user_secrets (see rotate_identity_provider_secret procedure).
+ * Secrets are PGP-encrypted at rest by BEFORE INSERT/UPDATE triggers.
+ * Use platform_secrets_get(name, default, namespace) to decrypt, or JOIN with
+ * pgp_sym_decrypt(value, key_id::text) for batch queries.
  */
 
-import type { LoaderContext, ModuleLoader } from './types';
+import type { ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -22,35 +24,16 @@ export interface EncryptedSecretsConfig {
   tableName: string;
 }
 
-// ─── SQL ────────────────────────────────────────────────────────────────────
-
-const ENCRYPTED_SECRETS_MODULE_SQL = `
-  SELECT s.schema_name
-  FROM metaschema_modules_public.config_secrets_user_module csm
-  JOIN metaschema_public.schema s ON s.id = csm.schema_id
-  WHERE csm.database_id = $1
-  LIMIT 1
-`;
-
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
 export const encryptedSecretsLoader: ModuleLoader<EncryptedSecretsConfig> =
   createModuleLoader<EncryptedSecretsConfig>({
     name: 'encryptedSecrets',
     ttlMs: 5 * 60_000,
-    async resolve(ctx: LoaderContext) {
-      const { tenantPool, databaseId } = ctx;
-
-      const result = await tenantPool.query<{
-        schema_name: string;
-      }>(ENCRYPTED_SECRETS_MODULE_SQL, [databaseId]);
-
-      const row = result.rows[0];
-      if (!row) return undefined;
-
+    async resolve() {
       return {
-        schemaName: row.schema_name,
-        tableName: 'user_secrets',
+        schemaName: 'constructive_store_private',
+        tableName: 'platform_secrets',
       };
     },
   });

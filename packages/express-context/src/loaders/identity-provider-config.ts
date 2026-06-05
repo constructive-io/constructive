@@ -6,8 +6,10 @@
  * for O(1) lookup.
  *
  * This loader combines data from:
- *   - identity_providers table (provider config)
- *   - user_secrets table (encrypted client_secret)
+ *   - identity_providers table (provider config in constructive_auth_private)
+ *   - platform_secrets table (encrypted client_secret in constructive_store_private)
+ *
+ * Secrets are PGP-encrypted at rest and decrypted via pgp_sym_decrypt.
  *
  * Usage:
  *   const providers = await ctx.useModule('identityProviderConfig');
@@ -26,17 +28,12 @@ import { createModuleLoader } from './create-loader';
 /**
  * Query to load all enabled providers with their decrypted secrets.
  * Parameters:
- *   $1: database_id
+ *   $1: database_id (unused, but kept for consistency with other loaders)
  *
- * The query dynamically uses schema/table names resolved from the loader context,
- * so we build it at runtime.
+ * Platform secrets are PGP-encrypted. We decrypt via pgp_sym_decrypt using the key_id.
+ * The decrypted value is hex-encoded, so we decode and convert to text.
  */
-function buildProvidersSql(
-  ipSchema: string,
-  ipTable: string,
-  secretsSchema: string,
-  secretsTable: string,
-): string {
+function buildProvidersSql(ipSchema: string, ipTable: string): string {
   return `
     SELECT
       ip.slug,
@@ -44,14 +41,21 @@ function buildProvidersSql(
       ip.display_name,
       ip.enabled,
       ip.client_id,
-      convert_from(secrets.value, 'UTF8') as client_secret,
+      CASE
+        WHEN secrets.algo = 'pgp' THEN
+          convert_from(decode(pgp_sym_decrypt(secrets.value, secrets.key_id::text), 'hex'), 'SQL_ASCII')
+        WHEN secrets.algo = 'crypt' THEN
+          convert_from(secrets.value, 'SQL_ASCII')
+        ELSE
+          convert_from(secrets.value, 'UTF8')
+      END as client_secret,
       ip.authorization_url,
       ip.token_url,
       ip.userinfo_url,
       ip.scopes,
       ip.pkce_enabled
     FROM "${ipSchema}"."${ipTable}" ip
-    LEFT JOIN "${secretsSchema}"."${secretsTable}" secrets ON secrets.id = ip.client_secret_id
+    LEFT JOIN "constructive_store_private"."platform_secrets" secrets ON secrets.id = ip.client_secret_id
     WHERE ip.enabled = true
       AND ip.client_id IS NOT NULL
       AND ip.client_secret_id IS NOT NULL
@@ -83,7 +87,7 @@ export const identityProviderConfigLoader: ModuleLoader<IdentityProviderConfigMa
     async resolve(ctx: LoaderContext) {
       const { tenantPool, databaseId } = ctx;
 
-      // First, resolve the identity_providers module config
+      // Resolve the identity_providers module config
       const ipModuleResult = await tenantPool.query<{
         schema_name: string;
         private_schema_name: string;
@@ -106,32 +110,11 @@ export const identityProviderConfigLoader: ModuleLoader<IdentityProviderConfigMa
       const ipModule = ipModuleResult.rows[0];
       if (!ipModule) return undefined;
 
-      // Resolve the user_secrets module config
-      const secretsModuleResult = await tenantPool.query<{
-        schema_name: string;
-        table_name: string;
-      }>(
-        `
-        SELECT
-          s.schema_name,
-          csm.table_name
-        FROM metaschema_modules_public.config_secrets_user_module csm
-        JOIN metaschema_public.schema s ON s.id = csm.schema_id
-        WHERE csm.database_id = $1
-        LIMIT 1
-        `,
-        [databaseId],
-      );
-
-      const secretsModule = secretsModuleResult.rows[0];
-      if (!secretsModule) return undefined;
-
       // Build and execute the providers query
+      // platform_secrets is a fixed schema/table, no module lookup needed
       const sql = buildProvidersSql(
         ipModule.private_schema_name,
         ipModule.table_name,
-        secretsModule.schema_name,
-        secretsModule.table_name,
       );
 
       const result = await tenantPool.query<ProviderRow>(sql);
