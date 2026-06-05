@@ -8,15 +8,8 @@
  */
 
 import type { LoaderContext, ModuleLoader } from './types';
+import type { IdentityProvidersConfig } from '../types';
 import { createModuleLoader } from './create-loader';
-
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-export interface IdentityProvidersConfig {
-  schemaName: string;
-  privateSchemaName: string;
-  tableName: string;
-}
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
@@ -60,6 +53,9 @@ export const identityProvidersLoader: ModuleLoader<IdentityProvidersConfig> =
         schemaName: row.schema_name,
         privateSchemaName: row.private_schema_name,
         tableName: row.table_name,
+        // Defaults until DB schema adds sign_in_identity_function / sign_up_identity_function columns
+        signInIdentityFunction: 'sign_in_identity',
+        signUpIdentityFunction: 'sign_up_identity',
       };
     },
   });

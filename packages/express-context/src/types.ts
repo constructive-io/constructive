@@ -186,6 +186,9 @@ export interface IdentityProvidersConfig {
   schemaName: string;
   privateSchemaName: string;
   tableName: string;
+  // Function names (defaults until DB schema adds these columns)
+  signInIdentityFunction: string;
+  signUpIdentityFunction: string;
 }
 
 export interface IdentityProviderFullConfig {

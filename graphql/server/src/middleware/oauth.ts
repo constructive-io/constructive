@@ -485,6 +485,8 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         const userAgent = req.get('user-agent') || '';
         const { identityProviders } = modules;
         const authPrivateSchema = identityProviders.privateSchemaName;
+        const signInFn = identityProviders.signInIdentityFunction;
+        const signUpFn = identityProviders.signUpIdentityFunction;
         const emailVerified = isEmailVerified(profile);
 
         // Use withPgClient to run sign_in/sign_up within a properly scoped
@@ -515,7 +517,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
 
             // Try sign_in_identity first
             const signInSql = `
-              SELECT * FROM "${authPrivateSchema}".sign_in_identity(
+              SELECT * FROM "${authPrivateSchema}"."${signInFn}"(
                 $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
               )
             `;
@@ -542,7 +544,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
                 }
 
                 const signUpSql = `
-                  SELECT * FROM "${authPrivateSchema}".sign_up_identity(
+                  SELECT * FROM "${authPrivateSchema}"."${signUpFn}"(
                     $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
                   )
                 `;
