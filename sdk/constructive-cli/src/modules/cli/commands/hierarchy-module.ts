@@ -36,6 +36,7 @@ const fieldSchema: FieldSchema = {
   getSubordinatesFunction: 'string',
   getManagersFunction: 'string',
   isManagerOfFunction: 'string',
+  defaultPermissions: 'string',
   createdAt: 'string',
 };
 const usage =
@@ -109,6 +110,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       getSubordinatesFunction: true,
       getManagersFunction: true,
       isManagerOfFunction: true,
+      defaultPermissions: true,
       createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -150,6 +152,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       getSubordinatesFunction: true,
       getManagersFunction: true,
       isManagerOfFunction: true,
+      defaultPermissions: true,
       createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -203,6 +206,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           getSubordinatesFunction: true,
           getManagersFunction: true,
           isManagerOfFunction: true,
+          defaultPermissions: true,
           createdAt: true,
         },
       })
@@ -349,6 +353,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -378,6 +389,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           getSubordinatesFunction: cleanedData.getSubordinatesFunction,
           getManagersFunction: cleanedData.getManagersFunction,
           isManagerOfFunction: cleanedData.isManagerOfFunction,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
@@ -400,6 +412,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           getSubordinatesFunction: true,
           getManagersFunction: true,
           isManagerOfFunction: true,
+          defaultPermissions: true,
           createdAt: true,
         },
       })
@@ -552,6 +565,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as HierarchyModulePatch;
@@ -581,6 +601,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           getSubordinatesFunction: cleanedData.getSubordinatesFunction,
           getManagersFunction: cleanedData.getManagersFunction,
           isManagerOfFunction: cleanedData.isManagerOfFunction,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
@@ -603,6 +624,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           getSubordinatesFunction: true,
           getManagersFunction: true,
           isManagerOfFunction: true,
+          defaultPermissions: true,
           createdAt: true,
         },
       })

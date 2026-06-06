@@ -1,13 +1,13 @@
 ---
 name: cli-admin
-description: CLI tool (csdk) for the admin API — provides CRUD commands for 26 tables and 12 custom operations
+description: CLI tool (csdk) for the admin API — provides CRUD commands for 30 tables and 12 custom operations
 ---
 
 # cli-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the admin API — provides CRUD commands for 26 tables and 12 custom operations
+CLI tool (csdk) for the admin API — provides CRUD commands for 30 tables and 12 custom operations
 
 ## Usage
 
@@ -59,10 +59,14 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-get-managers-record](references/org-get-managers-record.md)
 - [org-get-subordinates-record](references/org-get-subordinates-record.md)
 - [app-permission](references/app-permission.md)
+- [app-permission-default-grant](references/app-permission-default-grant.md)
 - [org-permission](references/org-permission.md)
+- [org-permission-default-permission](references/org-permission-default-permission.md)
+- [org-permission-default-grant](references/org-permission-default-grant.md)
 - [org-member](references/org-member.md)
 - [app-permission-default](references/app-permission-default.md)
 - [org-permission-default](references/org-permission-default.md)
+- [app-permission-default-permission](references/app-permission-default-permission.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
 - [org-admin-grant](references/org-admin-grant.md)

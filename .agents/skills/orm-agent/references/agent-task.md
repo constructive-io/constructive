@@ -9,8 +9,8 @@ Task within a plan, with ordering and optional approval gates
 ```typescript
 db.agentTask.findMany({ select: { id: true } }).execute()
 db.agentTask.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.agentTask.create({ data: { ownerId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' }, select: { id: true } }).execute()
-db.agentTask.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.agentTask.create({ data: { actorId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' }, select: { id: true } }).execute()
+db.agentTask.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.agentTask.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.agentTask.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.agentTask.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.agentTask.findMany({
 
 ```typescript
 const item = await db.agentTask.create({
-  data: { ownerId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' },
+  data: { actorId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' },
   select: { id: true }
 }).execute();
 ```

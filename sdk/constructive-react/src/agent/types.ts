@@ -47,17 +47,18 @@ export interface AgentMessage {
   id: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  ownerId: string | null;
+  actorId: string | null;
   parts: unknown | null;
   threadId: string | null;
   authorRole: string | null;
   model: string | null;
+  agentId: string | null;
 }
 export interface AgentTask {
   id: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  ownerId: string | null;
+  actorId: string | null;
   status: string | null;
   planId: string | null;
   description: string | null;

@@ -304,8 +304,8 @@ export interface AgentMessage {
   id: string;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** User who owns this message */
-  ownerId?: string | null;
+  /** User who authored this message */
+  actorId?: string | null;
   /** Message content: TextPart and ToolPart array */
   parts?: Record<string, unknown> | null;
   /** Foreign key to agent_thread */
@@ -314,14 +314,16 @@ export interface AgentMessage {
   authorRole?: string | null;
   /** LLM model that generated this response */
   model?: string | null;
+  /** Agent that authored this message (NULL for human messages) */
+  agentId?: string | null;
 }
 /** Task within a plan, with ordering and optional approval gates */
 export interface AgentTask {
   id: string;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** User who owns this task */
-  ownerId?: string | null;
+  /** User who authored this task */
+  actorId?: string | null;
   /** Current status of this task */
   status?: string | null;
   /** Foreign key to agent_plan */
@@ -465,6 +467,7 @@ export interface AgentRelations {
   parent?: Agent | null;
   persona?: AgentPersona | null;
   agentThreads?: ConnectionResult<AgentThread>;
+  agentMessages?: ConnectionResult<AgentMessage>;
   childAgents?: ConnectionResult<Agent>;
 }
 export interface AgentThreadRelations {
@@ -476,6 +479,7 @@ export interface AgentThreadRelations {
   agentPlansByThreadId?: ConnectionResult<AgentPlan>;
 }
 export interface AgentMessageRelations {
+  agent?: Agent | null;
   thread?: AgentThread | null;
 }
 export interface AgentTaskRelations {
@@ -545,6 +549,12 @@ export type AgentSelect = {
     filter?: AgentThreadFilter;
     orderBy?: AgentThreadOrderBy[];
   };
+  agentMessages?: {
+    select: AgentMessageSelect;
+    first?: number;
+    filter?: AgentMessageFilter;
+    orderBy?: AgentMessageOrderBy[];
+  };
   childAgents?: {
     select: AgentSelect;
     first?: number;
@@ -600,11 +610,15 @@ export type AgentMessageSelect = {
   id?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  ownerId?: boolean;
+  actorId?: boolean;
   parts?: boolean;
   threadId?: boolean;
   authorRole?: boolean;
   model?: boolean;
+  agentId?: boolean;
+  agent?: {
+    select: AgentSelect;
+  };
   thread?: {
     select: AgentThreadSelect;
   };
@@ -613,7 +627,7 @@ export type AgentTaskSelect = {
   id?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  ownerId?: boolean;
+  actorId?: boolean;
   status?: boolean;
   planId?: boolean;
   description?: boolean;
@@ -781,6 +795,10 @@ export interface AgentFilter {
   agentThreads?: AgentToManyAgentThreadFilter;
   /** `agentThreads` exist. */
   agentThreadsExist?: boolean;
+  /** Filter by the object’s `agentMessages` relation. */
+  agentMessages?: AgentToManyAgentMessageFilter;
+  /** `agentMessages` exist. */
+  agentMessagesExist?: boolean;
   /** Filter by the object’s `childAgents` relation. */
   childAgents?: AgentToManyAgentFilter;
   /** `childAgents` exist. */
@@ -855,8 +873,8 @@ export interface AgentMessageFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
   /** Filter by the object’s `parts` field. */
   parts?: JSONFilter;
   /** Filter by the object’s `threadId` field. */
@@ -865,12 +883,18 @@ export interface AgentMessageFilter {
   authorRole?: StringFilter;
   /** Filter by the object’s `model` field. */
   model?: StringFilter;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: AgentMessageFilter[];
   /** Checks for any expressions in this list. */
   or?: AgentMessageFilter[];
   /** Negates the expression. */
   not?: AgentMessageFilter;
+  /** Filter by the object’s `agent` relation. */
+  agent?: AgentFilter;
+  /** A related `agent` exists. */
+  agentExists?: boolean;
   /** Filter by the object’s `thread` relation. */
   thread?: AgentThreadFilter;
 }
@@ -881,8 +905,8 @@ export interface AgentTaskFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `planId` field. */
@@ -1164,8 +1188,8 @@ export type AgentMessageOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'PARTS_ASC'
   | 'PARTS_DESC'
   | 'THREAD_ID_ASC'
@@ -1173,7 +1197,9 @@ export type AgentMessageOrderBy =
   | 'AUTHOR_ROLE_ASC'
   | 'AUTHOR_ROLE_DESC'
   | 'MODEL_ASC'
-  | 'MODEL_DESC';
+  | 'MODEL_DESC'
+  | 'AGENT_ID_ASC'
+  | 'AGENT_ID_DESC';
 export type AgentTaskOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1184,8 +1210,8 @@ export type AgentTaskOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'STATUS_ASC'
   | 'STATUS_DESC'
   | 'PLAN_ID_ASC'
@@ -1440,19 +1466,21 @@ export interface DeleteAgentThreadInput {
 export interface CreateAgentMessageInput {
   clientMutationId?: string;
   agentMessage: {
-    ownerId?: string;
+    actorId?: string;
     parts?: Record<string, unknown>;
     threadId: string;
     authorRole: string;
     model?: string;
+    agentId?: string;
   };
 }
 export interface AgentMessagePatch {
-  ownerId?: string | null;
+  actorId?: string | null;
   parts?: Record<string, unknown> | null;
   threadId?: string | null;
   authorRole?: string | null;
   model?: string | null;
+  agentId?: string | null;
 }
 export interface UpdateAgentMessageInput {
   clientMutationId?: string;
@@ -1466,7 +1494,7 @@ export interface DeleteAgentMessageInput {
 export interface CreateAgentTaskInput {
   clientMutationId?: string;
   agentTask: {
-    ownerId?: string;
+    actorId?: string;
     status?: string;
     planId: string;
     description: string;
@@ -1481,7 +1509,7 @@ export interface CreateAgentTaskInput {
   };
 }
 export interface AgentTaskPatch {
-  ownerId?: string | null;
+  actorId?: string | null;
   status?: string | null;
   planId?: string | null;
   description?: string | null;
@@ -1644,6 +1672,7 @@ export const connectionFieldsMap = {
   },
   Agent: {
     agentThreads: 'AgentThread',
+    agentMessages: 'AgentMessage',
     childAgents: 'Agent',
   },
   AgentThread: {
@@ -1685,6 +1714,15 @@ export interface AgentToManyAgentThreadFilter {
   every?: AgentThreadFilter;
   /** Filters to entities where no related entity matches. */
   none?: AgentThreadFilter;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentToManyAgentMessageFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
 }
 /** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentToManyAgentFilter {
@@ -1847,8 +1885,8 @@ export interface AgentTaskFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `planId` field. */
@@ -1943,6 +1981,39 @@ export interface AgentThreadFilter {
   /** `agentPlansByThreadId` exist. */
   agentPlansByThreadIdExist?: boolean;
 }
+/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentMessageFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentMessageFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AgentMessageFilter[];
+  /** Negates the expression. */
+  not?: AgentMessageFilter;
+  /** Filter by the object’s `agent` relation. */
+  agent?: AgentFilter;
+  /** A related `agent` exists. */
+  agentExists?: boolean;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+}
 /** A filter to be used against `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentFilter {
   /** Filter by the object’s `id` field. */
@@ -1985,37 +2056,14 @@ export interface AgentFilter {
   agentThreads?: AgentToManyAgentThreadFilter;
   /** `agentThreads` exist. */
   agentThreadsExist?: boolean;
+  /** Filter by the object’s `agentMessages` relation. */
+  agentMessages?: AgentToManyAgentMessageFilter;
+  /** `agentMessages` exist. */
+  agentMessagesExist?: boolean;
   /** Filter by the object’s `childAgents` relation. */
   childAgents?: AgentToManyAgentFilter;
   /** `childAgents` exist. */
   childAgentsExist?: boolean;
-}
-/** A filter to be used against `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
-export interface AgentMessageFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `parts` field. */
-  parts?: JSONFilter;
-  /** Filter by the object’s `threadId` field. */
-  threadId?: UUIDFilter;
-  /** Filter by the object’s `authorRole` field. */
-  authorRole?: StringFilter;
-  /** Filter by the object’s `model` field. */
-  model?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AgentMessageFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AgentMessageFilter[];
-  /** Negates the expression. */
-  not?: AgentMessageFilter;
-  /** Filter by the object’s `thread` relation. */
-  thread?: AgentThreadFilter;
 }
 /** A filter to be used against `AgentPlan` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPlanFilter {

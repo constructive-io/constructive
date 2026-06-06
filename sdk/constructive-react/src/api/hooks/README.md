@@ -142,6 +142,11 @@ function App() {
 | `useCreateEnumMutation` | Mutation | Create a enum |
 | `useUpdateEnumMutation` | Mutation | Update a enum |
 | `useDeleteEnumMutation` | Mutation | Delete a enum |
+| `useCompositeTypesQuery` | Query | List all compositeTypes |
+| `useCompositeTypeQuery` | Query | Get one compositeType |
+| `useCreateCompositeTypeMutation` | Mutation | Create a compositeType |
+| `useUpdateCompositeTypeMutation` | Mutation | Update a compositeType |
+| `useDeleteCompositeTypeMutation` | Mutation | Delete a compositeType |
 | `useApiSchemasQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
 | `useApiSchemaQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
 | `useCreateApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
@@ -336,13 +341,13 @@ create({ databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: 
 ```typescript
 // List all tables
 const { data, isLoading } = useTablesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, inheritsId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } },
 });
 
 // Get one table
 const { data: item } = useTableQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, inheritsId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } },
 });
 
 // Create a table
@@ -749,6 +754,27 @@ const { mutate: create } = useCreateEnumMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+```
+
+### CompositeType
+
+```typescript
+// List all compositeTypes
+const { data, isLoading } = useCompositeTypesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+});
+
+// Get one compositeType
+const { data: item } = useCompositeTypeQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+});
+
+// Create a compositeType
+const { mutate: create } = useCreateCompositeTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### ApiSchema

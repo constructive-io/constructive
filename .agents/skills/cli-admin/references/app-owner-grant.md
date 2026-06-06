@@ -12,7 +12,7 @@ csdk app-owner-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk app-owner-grant list --limit 10 --after <cursor>
 csdk app-owner-grant find-first --where.<field>.<op> <value>
 csdk app-owner-grant get --id <UUID>
-csdk app-owner-grant create --actorId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk app-owner-grant create [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 csdk app-owner-grant update --id <UUID> [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 csdk app-owner-grant delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk app-owner-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appOwnerGrant
 
 ```bash
-csdk app-owner-grant create --actorId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk app-owner-grant create [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 ```
 
 ### Get a appOwnerGrant by id

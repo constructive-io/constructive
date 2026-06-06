@@ -24,10 +24,14 @@ const db = createClient({
 | `orgGetManagersRecord` | findMany, findOne, create, update, delete |
 | `orgGetSubordinatesRecord` | findMany, findOne, create, update, delete |
 | `appPermission` | findMany, findOne, create, update, delete |
+| `appPermissionDefaultGrant` | findMany, findOne, create, update, delete |
 | `orgPermission` | findMany, findOne, create, update, delete |
+| `orgPermissionDefaultPermission` | findMany, findOne, create, update, delete |
+| `orgPermissionDefaultGrant` | findMany, findOne, create, update, delete |
 | `orgMember` | findMany, findOne, create, update, delete |
 | `appPermissionDefault` | findMany, findOne, create, update, delete |
 | `orgPermissionDefault` | findMany, findOne, create, update, delete |
+| `appPermissionDefaultPermission` | findMany, findOne, create, update, delete |
 | `appAdminGrant` | findMany, findOne, create, update, delete |
 | `appOwnerGrant` | findMany, findOne, create, update, delete |
 | `orgAdminGrant` | findMany, findOne, create, update, delete |
@@ -143,6 +147,40 @@ const updated = await db.appPermission.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.appPermission.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.appPermissionDefaultGrant`
+
+CRUD operations for AppPermissionDefaultGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `permissionId` | UUID | Yes |
+| `isGrant` | Boolean | Yes |
+| `grantorId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all appPermissionDefaultGrant records
+const items = await db.appPermissionDefaultGrant.findMany({ select: { id: true, permissionId: true, isGrant: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.appPermissionDefaultGrant.findOne({ id: '<UUID>', select: { id: true, permissionId: true, isGrant: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.appPermissionDefaultGrant.create({ data: { permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.appPermissionDefaultGrant.update({ where: { id: '<UUID>' }, data: { permissionId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.appPermissionDefaultGrant.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.orgPermission`
 
 CRUD operations for OrgPermission records.
@@ -174,6 +212,74 @@ const updated = await db.orgPermission.update({ where: { id: '<UUID>' }, data: {
 
 // Delete
 const deleted = await db.orgPermission.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.orgPermissionDefaultPermission`
+
+CRUD operations for OrgPermissionDefaultPermission records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `permissionId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all orgPermissionDefaultPermission records
+const items = await db.orgPermissionDefaultPermission.findMany({ select: { id: true, permissionId: true, entityId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.orgPermissionDefaultPermission.findOne({ id: '<UUID>', select: { id: true, permissionId: true, entityId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.orgPermissionDefaultPermission.create({ data: { permissionId: '<UUID>', entityId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgPermissionDefaultPermission.update({ where: { id: '<UUID>' }, data: { permissionId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgPermissionDefaultPermission.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.orgPermissionDefaultGrant`
+
+CRUD operations for OrgPermissionDefaultGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `permissionId` | UUID | Yes |
+| `isGrant` | Boolean | Yes |
+| `grantorId` | UUID | Yes |
+| `entityId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all orgPermissionDefaultGrant records
+const items = await db.orgPermissionDefaultGrant.findMany({ select: { id: true, permissionId: true, isGrant: true, grantorId: true, entityId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.orgPermissionDefaultGrant.findOne({ id: '<UUID>', select: { id: true, permissionId: true, isGrant: true, grantorId: true, entityId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.orgPermissionDefaultGrant.create({ data: { permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>', entityId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgPermissionDefaultGrant.update({ where: { id: '<UUID>' }, data: { permissionId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgPermissionDefaultGrant.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.orgMember`
@@ -267,6 +373,38 @@ const updated = await db.orgPermissionDefault.update({ where: { id: '<UUID>' }, 
 
 // Delete
 const deleted = await db.orgPermissionDefault.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.appPermissionDefaultPermission`
+
+CRUD operations for AppPermissionDefaultPermission records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `permissionId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all appPermissionDefaultPermission records
+const items = await db.appPermissionDefaultPermission.findMany({ select: { id: true, permissionId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.appPermissionDefaultPermission.findOne({ id: '<UUID>', select: { id: true, permissionId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.appPermissionDefaultPermission.create({ data: { permissionId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.appPermissionDefaultPermission.update({ where: { id: '<UUID>' }, data: { permissionId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.appPermissionDefaultPermission.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.appAdminGrant`

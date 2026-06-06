@@ -8,10 +8,14 @@ import type { OrmClientConfig } from './client';
 import { OrgGetManagersRecordModel } from './models/orgGetManagersRecord';
 import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord';
 import { AppPermissionModel } from './models/appPermission';
+import { AppPermissionDefaultGrantModel } from './models/appPermissionDefaultGrant';
 import { OrgPermissionModel } from './models/orgPermission';
+import { OrgPermissionDefaultPermissionModel } from './models/orgPermissionDefaultPermission';
+import { OrgPermissionDefaultGrantModel } from './models/orgPermissionDefaultGrant';
 import { OrgMemberModel } from './models/orgMember';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
 import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
+import { AppPermissionDefaultPermissionModel } from './models/appPermissionDefaultPermission';
 import { AppAdminGrantModel } from './models/appAdminGrant';
 import { AppOwnerGrantModel } from './models/appOwnerGrant';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
@@ -69,10 +73,14 @@ export function createClient(config: OrmClientConfig) {
     orgGetManagersRecord: new OrgGetManagersRecordModel(client),
     orgGetSubordinatesRecord: new OrgGetSubordinatesRecordModel(client),
     appPermission: new AppPermissionModel(client),
+    appPermissionDefaultGrant: new AppPermissionDefaultGrantModel(client),
     orgPermission: new OrgPermissionModel(client),
+    orgPermissionDefaultPermission: new OrgPermissionDefaultPermissionModel(client),
+    orgPermissionDefaultGrant: new OrgPermissionDefaultGrantModel(client),
     orgMember: new OrgMemberModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
     orgPermissionDefault: new OrgPermissionDefaultModel(client),
+    appPermissionDefaultPermission: new AppPermissionDefaultPermissionModel(client),
     appAdminGrant: new AppAdminGrantModel(client),
     appOwnerGrant: new AppOwnerGrantModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),

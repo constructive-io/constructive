@@ -41,11 +41,26 @@ function App() {
 | `useCreateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useUpdateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useDeleteAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useAppPermissionDefaultGrantsQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
+| `useAppPermissionDefaultGrantQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
+| `useCreateAppPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
+| `useUpdateAppPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
+| `useDeleteAppPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
 | `useOrgPermissionsQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useOrgPermissionQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useCreateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useUpdateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useDeleteOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useOrgPermissionDefaultPermissionsQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useOrgPermissionDefaultPermissionQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useCreateOrgPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useUpdateOrgPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useDeleteOrgPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useOrgPermissionDefaultGrantsQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
+| `useOrgPermissionDefaultGrantQuery` | Query | Audit log of permission additions and removals from the defaults bitmask |
+| `useCreateOrgPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
+| `useUpdateOrgPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
+| `useDeleteOrgPermissionDefaultGrantMutation` | Mutation | Audit log of permission additions and removals from the defaults bitmask |
 | `useOrgMembersQuery` | Query | Simplified view of active members in an entity, used for listing who belongs to an org or group |
 | `useOrgMemberQuery` | Query | Simplified view of active members in an entity, used for listing who belongs to an org or group |
 | `useCreateOrgMemberMutation` | Mutation | Simplified view of active members in an entity, used for listing who belongs to an org or group |
@@ -61,6 +76,11 @@ function App() {
 | `useCreateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useUpdateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useDeleteOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useAppPermissionDefaultPermissionsQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useAppPermissionDefaultPermissionQuery` | Query | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useCreateAppPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useUpdateAppPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
+| `useDeleteAppPermissionDefaultPermissionMutation` | Mutation | Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask |
 | `useAppAdminGrantsQuery` | Query | Records of admin role grants and revocations between members |
 | `useAppAdminGrantQuery` | Query | Records of admin role grants and revocations between members |
 | `useCreateAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
@@ -225,6 +245,27 @@ const { mutate: create } = useCreateAppPermissionMutation({
 create({ name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' });
 ```
 
+### AppPermissionDefaultGrant
+
+```typescript
+// List all appPermissionDefaultGrants
+const { data, isLoading } = useAppPermissionDefaultGrantsQuery({
+  selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one appPermissionDefaultGrant
+const { data: item } = useAppPermissionDefaultGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a appPermissionDefaultGrant
+const { mutate: create } = useCreateAppPermissionDefaultGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>' });
+```
+
 ### OrgPermission
 
 ```typescript
@@ -244,6 +285,48 @@ const { mutate: create } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' });
+```
+
+### OrgPermissionDefaultPermission
+
+```typescript
+// List all orgPermissionDefaultPermissions
+const { data, isLoading } = useOrgPermissionDefaultPermissionsQuery({
+  selection: { fields: { id: true, permissionId: true, entityId: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one orgPermissionDefaultPermission
+const { data: item } = useOrgPermissionDefaultPermissionQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, permissionId: true, entityId: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a orgPermissionDefaultPermission
+const { mutate: create } = useCreateOrgPermissionDefaultPermissionMutation({
+  selection: { fields: { id: true } },
+});
+create({ permissionId: '<UUID>', entityId: '<UUID>' });
+```
+
+### OrgPermissionDefaultGrant
+
+```typescript
+// List all orgPermissionDefaultGrants
+const { data, isLoading } = useOrgPermissionDefaultGrantsQuery({
+  selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, entityId: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one orgPermissionDefaultGrant
+const { data: item } = useOrgPermissionDefaultGrantQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, entityId: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a orgPermissionDefaultGrant
+const { mutate: create } = useCreateOrgPermissionDefaultGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>', entityId: '<UUID>' });
 ```
 
 ### OrgMember
@@ -307,6 +390,27 @@ const { mutate: create } = useCreateOrgPermissionDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ permissions: '<BitString>', entityId: '<UUID>' });
+```
+
+### AppPermissionDefaultPermission
+
+```typescript
+// List all appPermissionDefaultPermissions
+const { data, isLoading } = useAppPermissionDefaultPermissionsQuery({
+  selection: { fields: { id: true, permissionId: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one appPermissionDefaultPermission
+const { data: item } = useAppPermissionDefaultPermissionQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, permissionId: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a appPermissionDefaultPermission
+const { mutate: create } = useCreateAppPermissionDefaultPermissionMutation({
+  selection: { fields: { id: true } },
+});
+create({ permissionId: '<UUID>' });
 ```
 
 ### AppAdminGrant
