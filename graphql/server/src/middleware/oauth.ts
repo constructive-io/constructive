@@ -515,6 +515,8 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
             WHERE service = $1 AND identifier = $2
             LIMIT 1
           `;
+          // Intentional RLS bypass: pre-auth lookup for anonymous user who cannot query
+          // connected_accounts via RLS. Only checks existence by service+identifier.
           const checkResult = await ctx.pool.query(checkSql, [
             profile.provider,
             profile.providerId,
