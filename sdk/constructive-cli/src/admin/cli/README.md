@@ -29,10 +29,14 @@ csdk auth set-token <your-token>
 | `org-get-managers-record` | orgGetManagersRecord CRUD operations |
 | `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
 | `app-permission` | appPermission CRUD operations |
+| `app-permission-default-grant` | appPermissionDefaultGrant CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
+| `org-permission-default-permission` | orgPermissionDefaultPermission CRUD operations |
+| `org-permission-default-grant` | orgPermissionDefaultGrant CRUD operations |
 | `org-member` | orgMember CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
 | `org-permission-default` | orgPermissionDefault CRUD operations |
+| `app-permission-default-permission` | appPermissionDefaultPermission CRUD operations |
 | `app-admin-grant` | appAdminGrant CRUD operations |
 | `app-owner-grant` | appOwnerGrant CRUD operations |
 | `org-admin-grant` | orgAdminGrant CRUD operations |
@@ -178,6 +182,33 @@ CRUD operations for AppPermission records.
 
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
+### `app-permission-default-grant`
+
+CRUD operations for AppPermissionDefaultGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appPermissionDefaultGrant records |
+| `find-first` | Find first matching appPermissionDefaultGrant record |
+| `get` | Get a appPermissionDefaultGrant by id |
+| `create` | Create a new appPermissionDefaultGrant |
+| `update` | Update an existing appPermissionDefaultGrant |
+| `delete` | Delete a appPermissionDefaultGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `permissionId` | UUID |
+| `isGrant` | Boolean |
+| `grantorId` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `permissionId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
+
 ### `org-permission`
 
 CRUD operations for OrgPermission records.
@@ -202,6 +233,59 @@ CRUD operations for OrgPermission records.
 | `description` | String |
 
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
+
+### `org-permission-default-permission`
+
+CRUD operations for OrgPermissionDefaultPermission records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgPermissionDefaultPermission records |
+| `find-first` | Find first matching orgPermissionDefaultPermission record |
+| `get` | Get a orgPermissionDefaultPermission by id |
+| `create` | Create a new orgPermissionDefaultPermission |
+| `update` | Update an existing orgPermissionDefaultPermission |
+| `delete` | Delete a orgPermissionDefaultPermission |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `permissionId` | UUID |
+| `entityId` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `permissionId`, `entityId`
+
+### `org-permission-default-grant`
+
+CRUD operations for OrgPermissionDefaultGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgPermissionDefaultGrant records |
+| `find-first` | Find first matching orgPermissionDefaultGrant record |
+| `get` | Get a orgPermissionDefaultGrant by id |
+| `create` | Create a new orgPermissionDefaultGrant |
+| `update` | Update an existing orgPermissionDefaultGrant |
+| `delete` | Delete a orgPermissionDefaultGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `permissionId` | UUID |
+| `isGrant` | Boolean |
+| `grantorId` | UUID |
+| `entityId` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `permissionId`, `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `org-member`
 
@@ -274,6 +358,30 @@ CRUD operations for OrgPermissionDefault records.
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `permissions`
 
+### `app-permission-default-permission`
+
+CRUD operations for AppPermissionDefaultPermission records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appPermissionDefaultPermission records |
+| `find-first` | Find first matching appPermissionDefaultPermission record |
+| `get` | Get a appPermissionDefaultPermission by id |
+| `create` | Create a new appPermissionDefaultPermission |
+| `update` | Update an existing appPermissionDefaultPermission |
+| `delete` | Delete a appPermissionDefaultPermission |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `permissionId` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `permissionId`
+
 ### `app-admin-grant`
 
 CRUD operations for AppAdminGrant records.
@@ -298,8 +406,7 @@ CRUD operations for AppAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `isGrant`, `grantorId`
+**Optional create fields (backend defaults):** `isGrant`, `actorId`, `grantorId`
 
 ### `app-owner-grant`
 
@@ -325,8 +432,7 @@ CRUD operations for AppOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `isGrant`, `grantorId`
+**Optional create fields (backend defaults):** `isGrant`, `actorId`, `grantorId`
 
 ### `org-admin-grant`
 
@@ -353,8 +459,8 @@ CRUD operations for OrgAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `isGrant`, `grantorId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `actorId`, `grantorId`
 
 ### `org-owner-grant`
 
@@ -381,8 +487,8 @@ CRUD operations for OrgOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `isGrant`, `grantorId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `actorId`, `grantorId`
 
 ### `org-chart-edge-grant`
 
@@ -492,8 +598,7 @@ CRUD operations for AppGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `actorId`, `grantorId`
 
 ### `app-membership-default`
 
@@ -604,8 +709,8 @@ CRUD operations for OrgGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `actorId`, `grantorId`
 
 ### `org-chart-edge`
 

@@ -169,6 +169,68 @@ type Query {
     orderBy: [OrgPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgPermissionDefaultConnection
 
+  """
+  Reads and enables pagination through a set of `AppPermissionDefaultPermission`.
+  """
+  appPermissionDefaultPermissions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppPermissionDefaultPermissionFilter
+
+    """The method to use when ordering `AppPermissionDefaultPermission`."""
+    orderBy: [AppPermissionDefaultPermissionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultPermissionConnection
+
+  """
+  Reads and enables pagination through a set of `OrgPermissionDefaultPermission`.
+  """
+  orgPermissionDefaultPermissions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgPermissionDefaultPermissionFilter
+
+    """The method to use when ordering `OrgPermissionDefaultPermission`."""
+    orderBy: [OrgPermissionDefaultPermissionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultPermissionConnection
+
   """Reads and enables pagination through a set of `AppAdminGrant`."""
   appAdminGrants(
     """Only read the first `n` values of the set."""
@@ -227,6 +289,37 @@ type Query {
     orderBy: [AppOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppOwnerGrantConnection
 
+  """
+  Reads and enables pagination through a set of `AppPermissionDefaultGrant`.
+  """
+  appPermissionDefaultGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppPermissionDefaultGrantFilter
+
+    """The method to use when ordering `AppPermissionDefaultGrant`."""
+    orderBy: [AppPermissionDefaultGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultGrantConnection
+
   """Reads and enables pagination through a set of `OrgAdminGrant`."""
   orgAdminGrants(
     """Only read the first `n` values of the set."""
@@ -284,6 +377,37 @@ type Query {
     """The method to use when ordering `OrgOwnerGrant`."""
     orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgOwnerGrantConnection
+
+  """
+  Reads and enables pagination through a set of `OrgPermissionDefaultGrant`.
+  """
+  orgPermissionDefaultGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgPermissionDefaultGrantFilter
+
+    """The method to use when ordering `OrgPermissionDefaultGrant`."""
+    orderBy: [OrgPermissionDefaultGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultGrantConnection
 
   """Reads and enables pagination through a set of `AppPermission`."""
   appPermissions(
@@ -914,132 +1038,152 @@ type AppPermission {
 
   """Human-readable description of what this permission allows"""
   description: String
-}
-
-"""A `AppPermission` edge in the connection."""
-type AppPermissionEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppPermission` at the end of the edge."""
-  node: AppPermission
-}
-
-"""A connection to a list of `OrgPermission` values."""
-type OrgPermissionConnection {
-  """A list of `OrgPermission` objects."""
-  nodes: [OrgPermission]!
 
   """
-  A list of edges which contains the `OrgPermission` and cursor to aid in pagination.
+  Reads a single `AppPermissionDefaultPermission` that is related to this `AppPermission`.
   """
-  edges: [OrgPermissionEdge]!
+  appPermissionDefaultPermissionByPermissionId: AppPermissionDefaultPermission
+
+  """
+  Reads and enables pagination through a set of `AppPermissionDefaultGrant`.
+  """
+  appPermissionDefaultGrantsByPermissionId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppPermissionDefaultGrantFilter
+
+    """The method to use when ordering `AppPermissionDefaultGrant`."""
+    orderBy: [AppPermissionDefaultGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultGrantConnection!
+}
+
+"""
+Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask
+"""
+type AppPermissionDefaultPermission {
+  id: UUID!
+
+  """References the permission included in the defaults bundle"""
+  permissionId: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """
+  Reads a single `AppPermission` that is related to this `AppPermissionDefaultPermission`.
+  """
+  permission: AppPermission
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""A connection to a list of `AppPermissionDefaultGrant` values."""
+type AppPermissionDefaultGrantConnection {
+  """A list of `AppPermissionDefaultGrant` objects."""
+  nodes: [AppPermissionDefaultGrant]!
+
+  """
+  A list of edges which contains the `AppPermissionDefaultGrant` and cursor to aid in pagination.
+  """
+  edges: [AppPermissionDefaultGrantEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `OrgPermission` you could get from the connection."""
+  """
+  The count of *all* `AppPermissionDefaultGrant` you could get from the connection.
+  """
   totalCount: Int!
 }
 
 """
-Defines available permissions as named bits within a bitmask, used by the RBAC system for access control
+Audit log of permission additions and removals from the defaults bitmask
 """
-type OrgPermission {
+type AppPermissionDefaultGrant {
   id: UUID!
 
-  """Human-readable permission name (e.g. read, write, manage)"""
-  name: String
+  """References the permission being added to or removed from defaults"""
+  permissionId: UUID!
+
+  """True to add the permission to defaults, false to remove it"""
+  isGrant: Boolean!
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
 
   """
-  Position of this permission in the bitmask (1-indexed), must be unique per permission set
+  Reads a single `AppPermission` that is related to this `AppPermissionDefaultGrant`.
   """
-  bitnum: Int
-
-  """
-  Pre-computed bitmask with only this permission bit set, used for bitwise OR/AND operations
-  """
-  bitstr: BitString!
-
-  """Human-readable description of what this permission allows"""
-  description: String
+  permission: AppPermission
 }
 
-"""A `OrgPermission` edge in the connection."""
-type OrgPermissionEdge {
+"""A `AppPermissionDefaultGrant` edge in the connection."""
+type AppPermissionDefaultGrantEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `OrgPermission` at the end of the edge."""
-  node: OrgPermission
-}
-
-"""A connection to a list of `OrgMember` values."""
-type OrgMemberConnection {
-  """A list of `OrgMember` objects."""
-  nodes: [OrgMember]!
-
-  """
-  A list of edges which contains the `OrgMember` and cursor to aid in pagination.
-  """
-  edges: [OrgMemberEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgMember` you could get from the connection."""
-  totalCount: Int!
+  """The `AppPermissionDefaultGrant` at the end of the edge."""
+  node: AppPermissionDefaultGrant
 }
 
 """
-Simplified view of active members in an entity, used for listing who belongs to an org or group
+A filter to be used against `AppPermissionDefaultGrant` object types. All fields are combined with a logical ‘and.’
 """
-type OrgMember {
-  id: UUID!
-
-  """Whether this member has admin privileges"""
-  isAdmin: Boolean!
-
-  """References the user who is a member"""
-  actorId: UUID!
-
-  """References the entity (org or group) this member belongs to"""
-  entityId: UUID!
-}
-
-"""A `OrgMember` edge in the connection."""
-type OrgMemberEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgMember` at the end of the edge."""
-  node: OrgMember
-}
-
-"""
-A filter to be used against `OrgMember` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgMemberFilter {
+input AppPermissionDefaultGrantFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
-  """Filter by the object’s `isAdmin` field."""
-  isAdmin: BooleanFilter
+  """Filter by the object’s `permissionId` field."""
+  permissionId: UUIDFilter
 
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
 
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [OrgMemberFilter!]
+  and: [AppPermissionDefaultGrantFilter!]
 
   """Checks for any expressions in this list."""
-  or: [OrgMemberFilter!]
+  or: [AppPermissionDefaultGrantFilter!]
 
   """Negates the expression."""
-  not: OrgMemberFilter
+  not: AppPermissionDefaultGrantFilter
+
+  """Filter by the object’s `permission` relation."""
+  permission: AppPermissionFilter
 }
 
 """
@@ -1126,290 +1270,6 @@ input BooleanFilter {
   greaterThanOrEqualTo: Boolean
 }
 
-"""Methods to use when ordering `OrgMember`."""
-enum OrgMemberOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  IS_ADMIN_ASC
-  IS_ADMIN_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-}
-
-"""A connection to a list of `AppPermissionDefault` values."""
-type AppPermissionDefaultConnection {
-  """A list of `AppPermissionDefault` objects."""
-  nodes: [AppPermissionDefault]!
-
-  """
-  A list of edges which contains the `AppPermissionDefault` and cursor to aid in pagination.
-  """
-  edges: [AppPermissionDefaultEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `AppPermissionDefault` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""
-Stores the default permission bitmask assigned to new members upon joining
-"""
-type AppPermissionDefault {
-  id: UUID!
-
-  """Default permission bitmask applied to new members"""
-  permissions: BitString!
-}
-
-"""A `AppPermissionDefault` edge in the connection."""
-type AppPermissionDefaultEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppPermissionDefault` at the end of the edge."""
-  node: AppPermissionDefault
-}
-
-"""
-A filter to be used against `AppPermissionDefault` object types. All fields are combined with a logical ‘and.’
-"""
-input AppPermissionDefaultFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `permissions` field."""
-  permissions: BitStringFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppPermissionDefaultFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppPermissionDefaultFilter!]
-
-  """Negates the expression."""
-  not: AppPermissionDefaultFilter
-}
-
-"""
-A filter to be used against BitString fields. All fields are combined with a logical ‘and.’
-"""
-input BitStringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: BitString
-
-  """Not equal to the specified value."""
-  notEqualTo: BitString
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: BitString
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: BitString
-
-  """Included in the specified list."""
-  in: [BitString!]
-
-  """Not included in the specified list."""
-  notIn: [BitString!]
-
-  """Less than the specified value."""
-  lessThan: BitString
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: BitString
-
-  """Greater than the specified value."""
-  greaterThan: BitString
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: BitString
-}
-
-"""Methods to use when ordering `AppPermissionDefault`."""
-enum AppPermissionDefaultOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PERMISSIONS_ASC
-  PERMISSIONS_DESC
-}
-
-"""A connection to a list of `OrgPermissionDefault` values."""
-type OrgPermissionDefaultConnection {
-  """A list of `OrgPermissionDefault` objects."""
-  nodes: [OrgPermissionDefault]!
-
-  """
-  A list of edges which contains the `OrgPermissionDefault` and cursor to aid in pagination.
-  """
-  edges: [OrgPermissionDefaultEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `OrgPermissionDefault` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""
-Stores the default permission bitmask assigned to new members upon joining
-"""
-type OrgPermissionDefault {
-  id: UUID!
-
-  """Default permission bitmask applied to new members"""
-  permissions: BitString!
-
-  """References the entity these default permissions apply to"""
-  entityId: UUID!
-}
-
-"""A `OrgPermissionDefault` edge in the connection."""
-type OrgPermissionDefaultEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgPermissionDefault` at the end of the edge."""
-  node: OrgPermissionDefault
-}
-
-"""
-A filter to be used against `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgPermissionDefaultFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `permissions` field."""
-  permissions: BitStringFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgPermissionDefaultFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgPermissionDefaultFilter!]
-
-  """Negates the expression."""
-  not: OrgPermissionDefaultFilter
-}
-
-"""Methods to use when ordering `OrgPermissionDefault`."""
-enum OrgPermissionDefaultOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PERMISSIONS_ASC
-  PERMISSIONS_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-}
-
-"""A connection to a list of `AppAdminGrant` values."""
-type AppAdminGrantConnection {
-  """A list of `AppAdminGrant` objects."""
-  nodes: [AppAdminGrant]!
-
-  """
-  A list of edges which contains the `AppAdminGrant` and cursor to aid in pagination.
-  """
-  edges: [AppAdminGrantEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppAdminGrant` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Records of admin role grants and revocations between members"""
-type AppAdminGrant {
-  id: UUID!
-
-  """True to grant admin, false to revoke admin"""
-  isGrant: Boolean!
-
-  """The member receiving or losing the admin grant"""
-  actorId: UUID!
-  grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
-3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
-that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
-to unexpected results.
-"""
-scalar Datetime
-
-"""A `AppAdminGrant` edge in the connection."""
-type AppAdminGrantEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppAdminGrant` at the end of the edge."""
-  node: AppAdminGrant
-}
-
-"""
-A filter to be used against `AppAdminGrant` object types. All fields are combined with a logical ‘and.’
-"""
-input AppAdminGrantFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isGrant` field."""
-  isGrant: BooleanFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppAdminGrantFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppAdminGrantFilter!]
-
-  """Negates the expression."""
-  not: AppAdminGrantFilter
-}
-
 """
 A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
 """
@@ -1452,314 +1312,6 @@ input DatetimeFilter {
   greaterThanOrEqualTo: Datetime
 }
 
-"""Methods to use when ordering `AppAdminGrant`."""
-enum AppAdminGrantOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  IS_GRANT_ASC
-  IS_GRANT_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `AppOwnerGrant` values."""
-type AppOwnerGrantConnection {
-  """A list of `AppOwnerGrant` objects."""
-  nodes: [AppOwnerGrant]!
-
-  """
-  A list of edges which contains the `AppOwnerGrant` and cursor to aid in pagination.
-  """
-  edges: [AppOwnerGrantEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppOwnerGrant` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Records of ownership transfers and grants between members"""
-type AppOwnerGrant {
-  id: UUID!
-
-  """True to grant ownership, false to revoke ownership"""
-  isGrant: Boolean!
-
-  """The member receiving or losing the ownership grant"""
-  actorId: UUID!
-  grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `AppOwnerGrant` edge in the connection."""
-type AppOwnerGrantEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppOwnerGrant` at the end of the edge."""
-  node: AppOwnerGrant
-}
-
-"""
-A filter to be used against `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’
-"""
-input AppOwnerGrantFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isGrant` field."""
-  isGrant: BooleanFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppOwnerGrantFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppOwnerGrantFilter!]
-
-  """Negates the expression."""
-  not: AppOwnerGrantFilter
-}
-
-"""Methods to use when ordering `AppOwnerGrant`."""
-enum AppOwnerGrantOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  IS_GRANT_ASC
-  IS_GRANT_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `OrgAdminGrant` values."""
-type OrgAdminGrantConnection {
-  """A list of `OrgAdminGrant` objects."""
-  nodes: [OrgAdminGrant]!
-
-  """
-  A list of edges which contains the `OrgAdminGrant` and cursor to aid in pagination.
-  """
-  edges: [OrgAdminGrantEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgAdminGrant` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Records of admin role grants and revocations between members"""
-type OrgAdminGrant {
-  id: UUID!
-
-  """True to grant admin, false to revoke admin"""
-  isGrant: Boolean!
-
-  """The member receiving or losing the admin grant"""
-  actorId: UUID!
-
-  """The entity (org or group) this admin grant applies to"""
-  entityId: UUID!
-  grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `OrgAdminGrant` edge in the connection."""
-type OrgAdminGrantEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgAdminGrant` at the end of the edge."""
-  node: OrgAdminGrant
-}
-
-"""
-A filter to be used against `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgAdminGrantFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isGrant` field."""
-  isGrant: BooleanFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgAdminGrantFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgAdminGrantFilter!]
-
-  """Negates the expression."""
-  not: OrgAdminGrantFilter
-}
-
-"""Methods to use when ordering `OrgAdminGrant`."""
-enum OrgAdminGrantOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  IS_GRANT_ASC
-  IS_GRANT_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `OrgOwnerGrant` values."""
-type OrgOwnerGrantConnection {
-  """A list of `OrgOwnerGrant` objects."""
-  nodes: [OrgOwnerGrant]!
-
-  """
-  A list of edges which contains the `OrgOwnerGrant` and cursor to aid in pagination.
-  """
-  edges: [OrgOwnerGrantEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgOwnerGrant` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Records of ownership transfers and grants between members"""
-type OrgOwnerGrant {
-  id: UUID!
-
-  """True to grant ownership, false to revoke ownership"""
-  isGrant: Boolean!
-
-  """The member receiving or losing the ownership grant"""
-  actorId: UUID!
-
-  """The entity (org or group) this ownership grant applies to"""
-  entityId: UUID!
-  grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `OrgOwnerGrant` edge in the connection."""
-type OrgOwnerGrantEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgOwnerGrant` at the end of the edge."""
-  node: OrgOwnerGrant
-}
-
-"""
-A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgOwnerGrantFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isGrant` field."""
-  isGrant: BooleanFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgOwnerGrantFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgOwnerGrantFilter!]
-
-  """Negates the expression."""
-  not: OrgOwnerGrantFilter
-}
-
-"""Methods to use when ordering `OrgOwnerGrant`."""
-enum OrgOwnerGrantOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  IS_GRANT_ASC
-  IS_GRANT_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
 """
 A filter to be used against `AppPermission` object types. All fields are combined with a logical ‘and.’
 """
@@ -1787,6 +1339,22 @@ input AppPermissionFilter {
 
   """Negates the expression."""
   not: AppPermissionFilter
+
+  """
+  Filter by the object’s `appPermissionDefaultPermissionByPermissionId` relation.
+  """
+  appPermissionDefaultPermissionByPermissionId: AppPermissionDefaultPermissionFilter
+
+  """A related `appPermissionDefaultPermissionByPermissionId` exists."""
+  appPermissionDefaultPermissionByPermissionIdExists: Boolean
+
+  """
+  Filter by the object’s `appPermissionDefaultGrantsByPermissionId` relation.
+  """
+  appPermissionDefaultGrantsByPermissionId: AppPermissionToManyAppPermissionDefaultGrantFilter
+
+  """`appPermissionDefaultGrantsByPermissionId` exist."""
+  appPermissionDefaultGrantsByPermissionIdExist: Boolean
 }
 
 """
@@ -1963,21 +1531,299 @@ input IntFilter {
   greaterThanOrEqualTo: Int
 }
 
-"""Methods to use when ordering `AppPermission`."""
-enum AppPermissionOrderBy {
+"""
+A filter to be used against BitString fields. All fields are combined with a logical ‘and.’
+"""
+input BitStringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: BitString
+
+  """Not equal to the specified value."""
+  notEqualTo: BitString
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BitString
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BitString
+
+  """Included in the specified list."""
+  in: [BitString!]
+
+  """Not included in the specified list."""
+  notIn: [BitString!]
+
+  """Less than the specified value."""
+  lessThan: BitString
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BitString
+
+  """Greater than the specified value."""
+  greaterThan: BitString
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BitString
+}
+
+"""
+A filter to be used against `AppPermissionDefaultPermission` object types. All fields are combined with a logical ‘and.’
+"""
+input AppPermissionDefaultPermissionFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `permissionId` field."""
+  permissionId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppPermissionDefaultPermissionFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppPermissionDefaultPermissionFilter!]
+
+  """Negates the expression."""
+  not: AppPermissionDefaultPermissionFilter
+
+  """Filter by the object’s `permission` relation."""
+  permission: AppPermissionFilter
+}
+
+"""
+A filter to be used against many `AppPermissionDefaultGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input AppPermissionToManyAppPermissionDefaultGrantFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AppPermissionDefaultGrantFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AppPermissionDefaultGrantFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AppPermissionDefaultGrantFilter
+}
+
+"""Methods to use when ordering `AppPermissionDefaultGrant`."""
+enum AppPermissionDefaultGrantOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  NAME_ASC
-  NAME_DESC
-  BITNUM_ASC
-  BITNUM_DESC
-  BITSTR_ASC
-  BITSTR_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
+  PERMISSION_ID_ASC
+  PERMISSION_ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A `AppPermission` edge in the connection."""
+type AppPermissionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppPermission` at the end of the edge."""
+  node: AppPermission
+}
+
+"""A connection to a list of `OrgPermission` values."""
+type OrgPermissionConnection {
+  """A list of `OrgPermission` objects."""
+  nodes: [OrgPermission]!
+
+  """
+  A list of edges which contains the `OrgPermission` and cursor to aid in pagination.
+  """
+  edges: [OrgPermissionEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgPermission` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Defines available permissions as named bits within a bitmask, used by the RBAC system for access control
+"""
+type OrgPermission {
+  id: UUID!
+
+  """Human-readable permission name (e.g. read, write, manage)"""
+  name: String
+
+  """
+  Position of this permission in the bitmask (1-indexed), must be unique per permission set
+  """
+  bitnum: Int
+
+  """
+  Pre-computed bitmask with only this permission bit set, used for bitwise OR/AND operations
+  """
+  bitstr: BitString!
+
+  """Human-readable description of what this permission allows"""
+  description: String
+
+  """
+  Reads and enables pagination through a set of `OrgPermissionDefaultPermission`.
+  """
+  orgPermissionDefaultPermissionsByPermissionId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgPermissionDefaultPermissionFilter
+
+    """The method to use when ordering `OrgPermissionDefaultPermission`."""
+    orderBy: [OrgPermissionDefaultPermissionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultPermissionConnection!
+
+  """
+  Reads and enables pagination through a set of `OrgPermissionDefaultGrant`.
+  """
+  orgPermissionDefaultGrantsByPermissionId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgPermissionDefaultGrantFilter
+
+    """The method to use when ordering `OrgPermissionDefaultGrant`."""
+    orderBy: [OrgPermissionDefaultGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultGrantConnection!
+}
+
+"""A connection to a list of `OrgPermissionDefaultPermission` values."""
+type OrgPermissionDefaultPermissionConnection {
+  """A list of `OrgPermissionDefaultPermission` objects."""
+  nodes: [OrgPermissionDefaultPermission]!
+
+  """
+  A list of edges which contains the `OrgPermissionDefaultPermission` and cursor to aid in pagination.
+  """
+  edges: [OrgPermissionDefaultPermissionEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgPermissionDefaultPermission` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Join table linking permission defaults to individual permissions; recompute trigger rebuilds the defaults bitmask
+"""
+type OrgPermissionDefaultPermission {
+  id: UUID!
+
+  """References the permission included in the defaults bundle"""
+  permissionId: UUID!
+
+  """Scopes this default permission to a specific entity"""
+  entityId: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """
+  Reads a single `OrgPermission` that is related to this `OrgPermissionDefaultPermission`.
+  """
+  permission: OrgPermission
+}
+
+"""A `OrgPermissionDefaultPermission` edge in the connection."""
+type OrgPermissionDefaultPermissionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgPermissionDefaultPermission` at the end of the edge."""
+  node: OrgPermissionDefaultPermission
+}
+
+"""
+A filter to be used against `OrgPermissionDefaultPermission` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgPermissionDefaultPermissionFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `permissionId` field."""
+  permissionId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgPermissionDefaultPermissionFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgPermissionDefaultPermissionFilter!]
+
+  """Negates the expression."""
+  not: OrgPermissionDefaultPermissionFilter
+
+  """Filter by the object’s `permission` relation."""
+  permission: OrgPermissionFilter
 }
 
 """
@@ -2007,6 +1853,864 @@ input OrgPermissionFilter {
 
   """Negates the expression."""
   not: OrgPermissionFilter
+
+  """
+  Filter by the object’s `orgPermissionDefaultPermissionsByPermissionId` relation.
+  """
+  orgPermissionDefaultPermissionsByPermissionId: OrgPermissionToManyOrgPermissionDefaultPermissionFilter
+
+  """`orgPermissionDefaultPermissionsByPermissionId` exist."""
+  orgPermissionDefaultPermissionsByPermissionIdExist: Boolean
+
+  """
+  Filter by the object’s `orgPermissionDefaultGrantsByPermissionId` relation.
+  """
+  orgPermissionDefaultGrantsByPermissionId: OrgPermissionToManyOrgPermissionDefaultGrantFilter
+
+  """`orgPermissionDefaultGrantsByPermissionId` exist."""
+  orgPermissionDefaultGrantsByPermissionIdExist: Boolean
+}
+
+"""
+A filter to be used against many `OrgPermissionDefaultPermission` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgPermissionToManyOrgPermissionDefaultPermissionFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: OrgPermissionDefaultPermissionFilter
+
+  """Filters to entities where every related entity matches."""
+  every: OrgPermissionDefaultPermissionFilter
+
+  """Filters to entities where no related entity matches."""
+  none: OrgPermissionDefaultPermissionFilter
+}
+
+"""
+A filter to be used against many `OrgPermissionDefaultGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgPermissionToManyOrgPermissionDefaultGrantFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: OrgPermissionDefaultGrantFilter
+
+  """Filters to entities where every related entity matches."""
+  every: OrgPermissionDefaultGrantFilter
+
+  """Filters to entities where no related entity matches."""
+  none: OrgPermissionDefaultGrantFilter
+}
+
+"""
+A filter to be used against `OrgPermissionDefaultGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgPermissionDefaultGrantFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `permissionId` field."""
+  permissionId: UUIDFilter
+
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgPermissionDefaultGrantFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgPermissionDefaultGrantFilter!]
+
+  """Negates the expression."""
+  not: OrgPermissionDefaultGrantFilter
+
+  """Filter by the object’s `permission` relation."""
+  permission: OrgPermissionFilter
+}
+
+"""Methods to use when ordering `OrgPermissionDefaultPermission`."""
+enum OrgPermissionDefaultPermissionOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERMISSION_ID_ASC
+  PERMISSION_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `OrgPermissionDefaultGrant` values."""
+type OrgPermissionDefaultGrantConnection {
+  """A list of `OrgPermissionDefaultGrant` objects."""
+  nodes: [OrgPermissionDefaultGrant]!
+
+  """
+  A list of edges which contains the `OrgPermissionDefaultGrant` and cursor to aid in pagination.
+  """
+  edges: [OrgPermissionDefaultGrantEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgPermissionDefaultGrant` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Audit log of permission additions and removals from the defaults bitmask
+"""
+type OrgPermissionDefaultGrant {
+  id: UUID!
+
+  """References the permission being added to or removed from defaults"""
+  permissionId: UUID!
+
+  """True to add the permission to defaults, false to remove it"""
+  isGrant: Boolean!
+  grantorId: UUID
+
+  """Scopes this audit entry to a specific entity"""
+  entityId: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """
+  Reads a single `OrgPermission` that is related to this `OrgPermissionDefaultGrant`.
+  """
+  permission: OrgPermission
+}
+
+"""A `OrgPermissionDefaultGrant` edge in the connection."""
+type OrgPermissionDefaultGrantEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgPermissionDefaultGrant` at the end of the edge."""
+  node: OrgPermissionDefaultGrant
+}
+
+"""Methods to use when ordering `OrgPermissionDefaultGrant`."""
+enum OrgPermissionDefaultGrantOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERMISSION_ID_ASC
+  PERMISSION_ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A `OrgPermission` edge in the connection."""
+type OrgPermissionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgPermission` at the end of the edge."""
+  node: OrgPermission
+}
+
+"""A connection to a list of `OrgMember` values."""
+type OrgMemberConnection {
+  """A list of `OrgMember` objects."""
+  nodes: [OrgMember]!
+
+  """
+  A list of edges which contains the `OrgMember` and cursor to aid in pagination.
+  """
+  edges: [OrgMemberEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgMember` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Simplified view of active members in an entity, used for listing who belongs to an org or group
+"""
+type OrgMember {
+  id: UUID!
+
+  """Whether this member has admin privileges"""
+  isAdmin: Boolean!
+
+  """References the user who is a member"""
+  actorId: UUID!
+
+  """References the entity (org or group) this member belongs to"""
+  entityId: UUID!
+}
+
+"""A `OrgMember` edge in the connection."""
+type OrgMemberEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgMember` at the end of the edge."""
+  node: OrgMember
+}
+
+"""
+A filter to be used against `OrgMember` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgMemberFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isAdmin` field."""
+  isAdmin: BooleanFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgMemberFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgMemberFilter!]
+
+  """Negates the expression."""
+  not: OrgMemberFilter
+}
+
+"""Methods to use when ordering `OrgMember`."""
+enum OrgMemberOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  IS_ADMIN_ASC
+  IS_ADMIN_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+}
+
+"""A connection to a list of `AppPermissionDefault` values."""
+type AppPermissionDefaultConnection {
+  """A list of `AppPermissionDefault` objects."""
+  nodes: [AppPermissionDefault]!
+
+  """
+  A list of edges which contains the `AppPermissionDefault` and cursor to aid in pagination.
+  """
+  edges: [AppPermissionDefaultEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppPermissionDefault` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Stores the default permission bitmask assigned to new members upon joining
+"""
+type AppPermissionDefault {
+  id: UUID!
+
+  """Default permission bitmask applied to new members"""
+  permissions: BitString!
+}
+
+"""A `AppPermissionDefault` edge in the connection."""
+type AppPermissionDefaultEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppPermissionDefault` at the end of the edge."""
+  node: AppPermissionDefault
+}
+
+"""
+A filter to be used against `AppPermissionDefault` object types. All fields are combined with a logical ‘and.’
+"""
+input AppPermissionDefaultFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `permissions` field."""
+  permissions: BitStringFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppPermissionDefaultFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppPermissionDefaultFilter!]
+
+  """Negates the expression."""
+  not: AppPermissionDefaultFilter
+}
+
+"""Methods to use when ordering `AppPermissionDefault`."""
+enum AppPermissionDefaultOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERMISSIONS_ASC
+  PERMISSIONS_DESC
+}
+
+"""A connection to a list of `OrgPermissionDefault` values."""
+type OrgPermissionDefaultConnection {
+  """A list of `OrgPermissionDefault` objects."""
+  nodes: [OrgPermissionDefault]!
+
+  """
+  A list of edges which contains the `OrgPermissionDefault` and cursor to aid in pagination.
+  """
+  edges: [OrgPermissionDefaultEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgPermissionDefault` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Stores the default permission bitmask assigned to new members upon joining
+"""
+type OrgPermissionDefault {
+  id: UUID!
+
+  """Default permission bitmask applied to new members"""
+  permissions: BitString!
+
+  """References the entity these default permissions apply to"""
+  entityId: UUID!
+}
+
+"""A `OrgPermissionDefault` edge in the connection."""
+type OrgPermissionDefaultEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgPermissionDefault` at the end of the edge."""
+  node: OrgPermissionDefault
+}
+
+"""
+A filter to be used against `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgPermissionDefaultFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `permissions` field."""
+  permissions: BitStringFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgPermissionDefaultFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgPermissionDefaultFilter!]
+
+  """Negates the expression."""
+  not: OrgPermissionDefaultFilter
+}
+
+"""Methods to use when ordering `OrgPermissionDefault`."""
+enum OrgPermissionDefaultOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERMISSIONS_ASC
+  PERMISSIONS_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+}
+
+"""A connection to a list of `AppPermissionDefaultPermission` values."""
+type AppPermissionDefaultPermissionConnection {
+  """A list of `AppPermissionDefaultPermission` objects."""
+  nodes: [AppPermissionDefaultPermission]!
+
+  """
+  A list of edges which contains the `AppPermissionDefaultPermission` and cursor to aid in pagination.
+  """
+  edges: [AppPermissionDefaultPermissionEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AppPermissionDefaultPermission` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `AppPermissionDefaultPermission` edge in the connection."""
+type AppPermissionDefaultPermissionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppPermissionDefaultPermission` at the end of the edge."""
+  node: AppPermissionDefaultPermission
+}
+
+"""Methods to use when ordering `AppPermissionDefaultPermission`."""
+enum AppPermissionDefaultPermissionOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERMISSION_ID_ASC
+  PERMISSION_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `AppAdminGrant` values."""
+type AppAdminGrantConnection {
+  """A list of `AppAdminGrant` objects."""
+  nodes: [AppAdminGrant]!
+
+  """
+  A list of edges which contains the `AppAdminGrant` and cursor to aid in pagination.
+  """
+  edges: [AppAdminGrantEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppAdminGrant` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Records of admin role grants and revocations between members"""
+type AppAdminGrant {
+  id: UUID!
+
+  """True to grant admin, false to revoke admin"""
+  isGrant: Boolean!
+
+  """
+  The member receiving or losing the admin grant; NULL if user was deleted
+  """
+  actorId: UUID
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A `AppAdminGrant` edge in the connection."""
+type AppAdminGrantEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppAdminGrant` at the end of the edge."""
+  node: AppAdminGrant
+}
+
+"""
+A filter to be used against `AppAdminGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input AppAdminGrantFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppAdminGrantFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppAdminGrantFilter!]
+
+  """Negates the expression."""
+  not: AppAdminGrantFilter
+}
+
+"""Methods to use when ordering `AppAdminGrant`."""
+enum AppAdminGrantOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `AppOwnerGrant` values."""
+type AppOwnerGrantConnection {
+  """A list of `AppOwnerGrant` objects."""
+  nodes: [AppOwnerGrant]!
+
+  """
+  A list of edges which contains the `AppOwnerGrant` and cursor to aid in pagination.
+  """
+  edges: [AppOwnerGrantEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppOwnerGrant` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Records of ownership transfers and grants between members"""
+type AppOwnerGrant {
+  id: UUID!
+
+  """True to grant ownership, false to revoke ownership"""
+  isGrant: Boolean!
+
+  """
+  The member receiving or losing the ownership grant; NULL if user was deleted
+  """
+  actorId: UUID
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A `AppOwnerGrant` edge in the connection."""
+type AppOwnerGrantEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppOwnerGrant` at the end of the edge."""
+  node: AppOwnerGrant
+}
+
+"""
+A filter to be used against `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input AppOwnerGrantFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppOwnerGrantFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppOwnerGrantFilter!]
+
+  """Negates the expression."""
+  not: AppOwnerGrantFilter
+}
+
+"""Methods to use when ordering `AppOwnerGrant`."""
+enum AppOwnerGrantOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `OrgAdminGrant` values."""
+type OrgAdminGrantConnection {
+  """A list of `OrgAdminGrant` objects."""
+  nodes: [OrgAdminGrant]!
+
+  """
+  A list of edges which contains the `OrgAdminGrant` and cursor to aid in pagination.
+  """
+  edges: [OrgAdminGrantEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgAdminGrant` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Records of admin role grants and revocations between members"""
+type OrgAdminGrant {
+  id: UUID!
+
+  """True to grant admin, false to revoke admin"""
+  isGrant: Boolean!
+
+  """
+  The member receiving or losing the admin grant; NULL if user was deleted
+  """
+  actorId: UUID
+
+  """The entity (org or group) this admin grant applies to"""
+  entityId: UUID!
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A `OrgAdminGrant` edge in the connection."""
+type OrgAdminGrantEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgAdminGrant` at the end of the edge."""
+  node: OrgAdminGrant
+}
+
+"""
+A filter to be used against `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgAdminGrantFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgAdminGrantFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgAdminGrantFilter!]
+
+  """Negates the expression."""
+  not: OrgAdminGrantFilter
+}
+
+"""Methods to use when ordering `OrgAdminGrant`."""
+enum OrgAdminGrantOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `OrgOwnerGrant` values."""
+type OrgOwnerGrantConnection {
+  """A list of `OrgOwnerGrant` objects."""
+  nodes: [OrgOwnerGrant]!
+
+  """
+  A list of edges which contains the `OrgOwnerGrant` and cursor to aid in pagination.
+  """
+  edges: [OrgOwnerGrantEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgOwnerGrant` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Records of ownership transfers and grants between members"""
+type OrgOwnerGrant {
+  id: UUID!
+
+  """True to grant ownership, false to revoke ownership"""
+  isGrant: Boolean!
+
+  """
+  The member receiving or losing the ownership grant; NULL if user was deleted
+  """
+  actorId: UUID
+
+  """The entity (org or group) this ownership grant applies to"""
+  entityId: UUID!
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A `OrgOwnerGrant` edge in the connection."""
+type OrgOwnerGrantEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgOwnerGrant` at the end of the edge."""
+  node: OrgOwnerGrant
+}
+
+"""
+A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgOwnerGrantFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgOwnerGrantFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgOwnerGrantFilter!]
+
+  """Negates the expression."""
+  not: OrgOwnerGrantFilter
+}
+
+"""Methods to use when ordering `OrgOwnerGrant`."""
+enum OrgOwnerGrantOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""Methods to use when ordering `AppPermission`."""
+enum AppPermissionOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  BITNUM_ASC
+  BITNUM_DESC
+  BITSTR_ASC
+  BITSTR_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
 }
 
 """Methods to use when ordering `OrgPermission`."""
@@ -2389,8 +3093,10 @@ type AppGrant {
   """True to grant the permissions, false to revoke them"""
   isGrant: Boolean!
 
-  """The member receiving or losing the permission grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the permission grant; NULL if user was deleted
+  """
+  actorId: UUID
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
@@ -2792,8 +3498,10 @@ type OrgGrant {
   """True to grant the permissions, false to revoke them"""
   isGrant: Boolean!
 
-  """The member receiving or losing the permission grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the permission grant; NULL if user was deleted
+  """
+  actorId: UUID
 
   """The entity (org or group) this permission grant applies to"""
   entityId: UUID!
@@ -4390,6 +5098,22 @@ type Mutation {
     input: CreateOrgPermissionDefaultInput!
   ): CreateOrgPermissionDefaultPayload
 
+  """Creates a single `AppPermissionDefaultPermission`."""
+  createAppPermissionDefaultPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppPermissionDefaultPermissionInput!
+  ): CreateAppPermissionDefaultPermissionPayload
+
+  """Creates a single `OrgPermissionDefaultPermission`."""
+  createOrgPermissionDefaultPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgPermissionDefaultPermissionInput!
+  ): CreateOrgPermissionDefaultPermissionPayload
+
   """Creates a single `AppAdminGrant`."""
   createAppAdminGrant(
     """
@@ -4406,6 +5130,14 @@ type Mutation {
     input: CreateAppOwnerGrantInput!
   ): CreateAppOwnerGrantPayload
 
+  """Creates a single `AppPermissionDefaultGrant`."""
+  createAppPermissionDefaultGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppPermissionDefaultGrantInput!
+  ): CreateAppPermissionDefaultGrantPayload
+
   """Creates a single `OrgAdminGrant`."""
   createOrgAdminGrant(
     """
@@ -4421,6 +5153,14 @@ type Mutation {
     """
     input: CreateOrgOwnerGrantInput!
   ): CreateOrgOwnerGrantPayload
+
+  """Creates a single `OrgPermissionDefaultGrant`."""
+  createOrgPermissionDefaultGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgPermissionDefaultGrantInput!
+  ): CreateOrgPermissionDefaultGrantPayload
 
   """Creates a single `AppPermission`."""
   createAppPermission(
@@ -4586,6 +5326,26 @@ type Mutation {
     input: UpdateOrgPermissionDefaultInput!
   ): UpdateOrgPermissionDefaultPayload
 
+  """
+  Updates a single `AppPermissionDefaultPermission` using a unique key and a patch.
+  """
+  updateAppPermissionDefaultPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppPermissionDefaultPermissionInput!
+  ): UpdateAppPermissionDefaultPermissionPayload
+
+  """
+  Updates a single `OrgPermissionDefaultPermission` using a unique key and a patch.
+  """
+  updateOrgPermissionDefaultPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgPermissionDefaultPermissionInput!
+  ): UpdateOrgPermissionDefaultPermissionPayload
+
   """Updates a single `AppAdminGrant` using a unique key and a patch."""
   updateAppAdminGrant(
     """
@@ -4602,6 +5362,16 @@ type Mutation {
     input: UpdateAppOwnerGrantInput!
   ): UpdateAppOwnerGrantPayload
 
+  """
+  Updates a single `AppPermissionDefaultGrant` using a unique key and a patch.
+  """
+  updateAppPermissionDefaultGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppPermissionDefaultGrantInput!
+  ): UpdateAppPermissionDefaultGrantPayload
+
   """Updates a single `OrgAdminGrant` using a unique key and a patch."""
   updateOrgAdminGrant(
     """
@@ -4617,6 +5387,16 @@ type Mutation {
     """
     input: UpdateOrgOwnerGrantInput!
   ): UpdateOrgOwnerGrantPayload
+
+  """
+  Updates a single `OrgPermissionDefaultGrant` using a unique key and a patch.
+  """
+  updateOrgPermissionDefaultGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgPermissionDefaultGrantInput!
+  ): UpdateOrgPermissionDefaultGrantPayload
 
   """Updates a single `AppPermission` using a unique key and a patch."""
   updateAppPermission(
@@ -4784,6 +5564,22 @@ type Mutation {
     input: DeleteOrgPermissionDefaultInput!
   ): DeleteOrgPermissionDefaultPayload
 
+  """Deletes a single `AppPermissionDefaultPermission` using a unique key."""
+  deleteAppPermissionDefaultPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppPermissionDefaultPermissionInput!
+  ): DeleteAppPermissionDefaultPermissionPayload
+
+  """Deletes a single `OrgPermissionDefaultPermission` using a unique key."""
+  deleteOrgPermissionDefaultPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgPermissionDefaultPermissionInput!
+  ): DeleteOrgPermissionDefaultPermissionPayload
+
   """Deletes a single `AppAdminGrant` using a unique key."""
   deleteAppAdminGrant(
     """
@@ -4800,6 +5596,14 @@ type Mutation {
     input: DeleteAppOwnerGrantInput!
   ): DeleteAppOwnerGrantPayload
 
+  """Deletes a single `AppPermissionDefaultGrant` using a unique key."""
+  deleteAppPermissionDefaultGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppPermissionDefaultGrantInput!
+  ): DeleteAppPermissionDefaultGrantPayload
+
   """Deletes a single `OrgAdminGrant` using a unique key."""
   deleteOrgAdminGrant(
     """
@@ -4815,6 +5619,14 @@ type Mutation {
     """
     input: DeleteOrgOwnerGrantInput!
   ): DeleteOrgOwnerGrantPayload
+
+  """Deletes a single `OrgPermissionDefaultGrant` using a unique key."""
+  deleteOrgPermissionDefaultGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgPermissionDefaultGrantInput!
+  ): DeleteOrgPermissionDefaultGrantPayload
 
   """Deletes a single `AppPermission` using a unique key."""
   deleteAppPermission(
@@ -5154,6 +5966,107 @@ input OrgPermissionDefaultInput {
   entityId: UUID!
 }
 
+"""The output of our create `AppPermissionDefaultPermission` mutation."""
+type CreateAppPermissionDefaultPermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `AppPermissionDefaultPermission` that was created by this mutation.
+  """
+  appPermissionDefaultPermission: AppPermissionDefaultPermission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  An edge for our `AppPermissionDefaultPermission`. May be used by Relay 1.
+  """
+  appPermissionDefaultPermissionEdge(
+    """The method to use when ordering `AppPermissionDefaultPermission`."""
+    orderBy: [AppPermissionDefaultPermissionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultPermissionEdge
+}
+
+"""All input for the create `AppPermissionDefaultPermission` mutation."""
+input CreateAppPermissionDefaultPermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppPermissionDefaultPermission` to be created by this mutation."""
+  appPermissionDefaultPermission: AppPermissionDefaultPermissionInput!
+}
+
+"""An input for mutations affecting `AppPermissionDefaultPermission`"""
+input AppPermissionDefaultPermissionInput {
+  id: UUID
+
+  """References the permission included in the defaults bundle"""
+  permissionId: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `OrgPermissionDefaultPermission` mutation."""
+type CreateOrgPermissionDefaultPermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `OrgPermissionDefaultPermission` that was created by this mutation.
+  """
+  orgPermissionDefaultPermission: OrgPermissionDefaultPermission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  An edge for our `OrgPermissionDefaultPermission`. May be used by Relay 1.
+  """
+  orgPermissionDefaultPermissionEdge(
+    """The method to use when ordering `OrgPermissionDefaultPermission`."""
+    orderBy: [OrgPermissionDefaultPermissionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultPermissionEdge
+}
+
+"""All input for the create `OrgPermissionDefaultPermission` mutation."""
+input CreateOrgPermissionDefaultPermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgPermissionDefaultPermission` to be created by this mutation."""
+  orgPermissionDefaultPermission: OrgPermissionDefaultPermissionInput!
+}
+
+"""An input for mutations affecting `OrgPermissionDefaultPermission`"""
+input OrgPermissionDefaultPermissionInput {
+  id: UUID
+
+  """References the permission included in the defaults bundle"""
+  permissionId: UUID!
+
+  """Scopes this default permission to a specific entity"""
+  entityId: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our create `AppAdminGrant` mutation."""
 type CreateAppAdminGrantPayload {
   """
@@ -5196,8 +6109,10 @@ input AppAdminGrantInput {
   """True to grant admin, false to revoke admin"""
   isGrant: Boolean
 
-  """The member receiving or losing the admin grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the admin grant; NULL if user was deleted
+  """
+  actorId: UUID
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
@@ -5245,8 +6160,59 @@ input AppOwnerGrantInput {
   """True to grant ownership, false to revoke ownership"""
   isGrant: Boolean
 
-  """The member receiving or losing the ownership grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the ownership grant; NULL if user was deleted
+  """
+  actorId: UUID
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `AppPermissionDefaultGrant` mutation."""
+type CreateAppPermissionDefaultGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppPermissionDefaultGrant` that was created by this mutation."""
+  appPermissionDefaultGrant: AppPermissionDefaultGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppPermissionDefaultGrant`. May be used by Relay 1."""
+  appPermissionDefaultGrantEdge(
+    """The method to use when ordering `AppPermissionDefaultGrant`."""
+    orderBy: [AppPermissionDefaultGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultGrantEdge
+}
+
+"""All input for the create `AppPermissionDefaultGrant` mutation."""
+input CreateAppPermissionDefaultGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppPermissionDefaultGrant` to be created by this mutation."""
+  appPermissionDefaultGrant: AppPermissionDefaultGrantInput!
+}
+
+"""An input for mutations affecting `AppPermissionDefaultGrant`"""
+input AppPermissionDefaultGrantInput {
+  id: UUID
+
+  """References the permission being added to or removed from defaults"""
+  permissionId: UUID!
+
+  """True to add the permission to defaults, false to remove it"""
+  isGrant: Boolean
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
@@ -5294,8 +6260,10 @@ input OrgAdminGrantInput {
   """True to grant admin, false to revoke admin"""
   isGrant: Boolean
 
-  """The member receiving or losing the admin grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the admin grant; NULL if user was deleted
+  """
+  actorId: UUID
 
   """The entity (org or group) this admin grant applies to"""
   entityId: UUID!
@@ -5346,12 +6314,66 @@ input OrgOwnerGrantInput {
   """True to grant ownership, false to revoke ownership"""
   isGrant: Boolean
 
-  """The member receiving or losing the ownership grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the ownership grant; NULL if user was deleted
+  """
+  actorId: UUID
 
   """The entity (org or group) this ownership grant applies to"""
   entityId: UUID!
   grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `OrgPermissionDefaultGrant` mutation."""
+type CreateOrgPermissionDefaultGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgPermissionDefaultGrant` that was created by this mutation."""
+  orgPermissionDefaultGrant: OrgPermissionDefaultGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgPermissionDefaultGrant`. May be used by Relay 1."""
+  orgPermissionDefaultGrantEdge(
+    """The method to use when ordering `OrgPermissionDefaultGrant`."""
+    orderBy: [OrgPermissionDefaultGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultGrantEdge
+}
+
+"""All input for the create `OrgPermissionDefaultGrant` mutation."""
+input CreateOrgPermissionDefaultGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgPermissionDefaultGrant` to be created by this mutation."""
+  orgPermissionDefaultGrant: OrgPermissionDefaultGrantInput!
+}
+
+"""An input for mutations affecting `OrgPermissionDefaultGrant`"""
+input OrgPermissionDefaultGrantInput {
+  id: UUID
+
+  """References the permission being added to or removed from defaults"""
+  permissionId: UUID!
+
+  """True to add the permission to defaults, false to remove it"""
+  isGrant: Boolean
+  grantorId: UUID
+
+  """Scopes this audit entry to a specific entity"""
+  entityId: UUID!
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -5694,8 +6716,10 @@ input AppGrantInput {
   """True to grant the permissions, false to revoke them"""
   isGrant: Boolean
 
-  """The member receiving or losing the permission grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the permission grant; NULL if user was deleted
+  """
+  actorId: UUID
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
@@ -5898,8 +6922,10 @@ input OrgGrantInput {
   """True to grant the permissions, false to revoke them"""
   isGrant: Boolean
 
-  """The member receiving or losing the permission grant"""
-  actorId: UUID!
+  """
+  The member receiving or losing the permission grant; NULL if user was deleted
+  """
+  actorId: UUID
 
   """The entity (org or group) this permission grant applies to"""
   entityId: UUID!
@@ -6602,6 +7628,117 @@ input OrgPermissionDefaultPatch {
   entityId: UUID
 }
 
+"""The output of our update `AppPermissionDefaultPermission` mutation."""
+type UpdateAppPermissionDefaultPermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `AppPermissionDefaultPermission` that was updated by this mutation.
+  """
+  appPermissionDefaultPermission: AppPermissionDefaultPermission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  An edge for our `AppPermissionDefaultPermission`. May be used by Relay 1.
+  """
+  appPermissionDefaultPermissionEdge(
+    """The method to use when ordering `AppPermissionDefaultPermission`."""
+    orderBy: [AppPermissionDefaultPermissionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultPermissionEdge
+}
+
+"""All input for the `updateAppPermissionDefaultPermission` mutation."""
+input UpdateAppPermissionDefaultPermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppPermissionDefaultPermission` being updated.
+  """
+  appPermissionDefaultPermissionPatch: AppPermissionDefaultPermissionPatch!
+}
+
+"""
+Represents an update to a `AppPermissionDefaultPermission`. Fields that are set will be updated.
+"""
+input AppPermissionDefaultPermissionPatch {
+  id: UUID
+
+  """References the permission included in the defaults bundle"""
+  permissionId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `OrgPermissionDefaultPermission` mutation."""
+type UpdateOrgPermissionDefaultPermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `OrgPermissionDefaultPermission` that was updated by this mutation.
+  """
+  orgPermissionDefaultPermission: OrgPermissionDefaultPermission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  An edge for our `OrgPermissionDefaultPermission`. May be used by Relay 1.
+  """
+  orgPermissionDefaultPermissionEdge(
+    """The method to use when ordering `OrgPermissionDefaultPermission`."""
+    orderBy: [OrgPermissionDefaultPermissionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultPermissionEdge
+}
+
+"""All input for the `updateOrgPermissionDefaultPermission` mutation."""
+input UpdateOrgPermissionDefaultPermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgPermissionDefaultPermission` being updated.
+  """
+  orgPermissionDefaultPermissionPatch: OrgPermissionDefaultPermissionPatch!
+}
+
+"""
+Represents an update to a `OrgPermissionDefaultPermission`. Fields that are set will be updated.
+"""
+input OrgPermissionDefaultPermissionPatch {
+  id: UUID
+
+  """References the permission included in the defaults bundle"""
+  permissionId: UUID
+
+  """Scopes this default permission to a specific entity"""
+  entityId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our update `AppAdminGrant` mutation."""
 type UpdateAppAdminGrantPayload {
   """
@@ -6649,7 +7786,9 @@ input AppAdminGrantPatch {
   """True to grant admin, false to revoke admin"""
   isGrant: Boolean
 
-  """The member receiving or losing the admin grant"""
+  """
+  The member receiving or losing the admin grant; NULL if user was deleted
+  """
   actorId: UUID
   grantorId: UUID
   createdAt: Datetime
@@ -6703,8 +7842,64 @@ input AppOwnerGrantPatch {
   """True to grant ownership, false to revoke ownership"""
   isGrant: Boolean
 
-  """The member receiving or losing the ownership grant"""
+  """
+  The member receiving or losing the ownership grant; NULL if user was deleted
+  """
   actorId: UUID
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `AppPermissionDefaultGrant` mutation."""
+type UpdateAppPermissionDefaultGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppPermissionDefaultGrant` that was updated by this mutation."""
+  appPermissionDefaultGrant: AppPermissionDefaultGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppPermissionDefaultGrant`. May be used by Relay 1."""
+  appPermissionDefaultGrantEdge(
+    """The method to use when ordering `AppPermissionDefaultGrant`."""
+    orderBy: [AppPermissionDefaultGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultGrantEdge
+}
+
+"""All input for the `updateAppPermissionDefaultGrant` mutation."""
+input UpdateAppPermissionDefaultGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppPermissionDefaultGrant` being updated.
+  """
+  appPermissionDefaultGrantPatch: AppPermissionDefaultGrantPatch!
+}
+
+"""
+Represents an update to a `AppPermissionDefaultGrant`. Fields that are set will be updated.
+"""
+input AppPermissionDefaultGrantPatch {
+  id: UUID
+
+  """References the permission being added to or removed from defaults"""
+  permissionId: UUID
+
+  """True to add the permission to defaults, false to remove it"""
+  isGrant: Boolean
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
@@ -6757,7 +7952,9 @@ input OrgAdminGrantPatch {
   """True to grant admin, false to revoke admin"""
   isGrant: Boolean
 
-  """The member receiving or losing the admin grant"""
+  """
+  The member receiving or losing the admin grant; NULL if user was deleted
+  """
   actorId: UUID
 
   """The entity (org or group) this admin grant applies to"""
@@ -6814,12 +8011,71 @@ input OrgOwnerGrantPatch {
   """True to grant ownership, false to revoke ownership"""
   isGrant: Boolean
 
-  """The member receiving or losing the ownership grant"""
+  """
+  The member receiving or losing the ownership grant; NULL if user was deleted
+  """
   actorId: UUID
 
   """The entity (org or group) this ownership grant applies to"""
   entityId: UUID
   grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `OrgPermissionDefaultGrant` mutation."""
+type UpdateOrgPermissionDefaultGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgPermissionDefaultGrant` that was updated by this mutation."""
+  orgPermissionDefaultGrant: OrgPermissionDefaultGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgPermissionDefaultGrant`. May be used by Relay 1."""
+  orgPermissionDefaultGrantEdge(
+    """The method to use when ordering `OrgPermissionDefaultGrant`."""
+    orderBy: [OrgPermissionDefaultGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultGrantEdge
+}
+
+"""All input for the `updateOrgPermissionDefaultGrant` mutation."""
+input UpdateOrgPermissionDefaultGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgPermissionDefaultGrant` being updated.
+  """
+  orgPermissionDefaultGrantPatch: OrgPermissionDefaultGrantPatch!
+}
+
+"""
+Represents an update to a `OrgPermissionDefaultGrant`. Fields that are set will be updated.
+"""
+input OrgPermissionDefaultGrantPatch {
+  id: UUID
+
+  """References the permission being added to or removed from defaults"""
+  permissionId: UUID
+
+  """True to add the permission to defaults, false to remove it"""
+  isGrant: Boolean
+  grantorId: UUID
+
+  """Scopes this audit entry to a specific entity"""
+  entityId: UUID
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -7196,7 +8452,9 @@ input AppGrantPatch {
   """True to grant the permissions, false to revoke them"""
   isGrant: Boolean
 
-  """The member receiving or losing the permission grant"""
+  """
+  The member receiving or losing the permission grant; NULL if user was deleted
+  """
   actorId: UUID
   grantorId: UUID
   createdAt: Datetime
@@ -7420,7 +8678,9 @@ input OrgGrantPatch {
   """True to grant the permissions, false to revoke them"""
   isGrant: Boolean
 
-  """The member receiving or losing the permission grant"""
+  """
+  The member receiving or losing the permission grant; NULL if user was deleted
+  """
   actorId: UUID
 
   """The entity (org or group) this permission grant applies to"""
@@ -8111,6 +9371,80 @@ input DeleteOrgPermissionDefaultInput {
   id: UUID!
 }
 
+"""The output of our delete `AppPermissionDefaultPermission` mutation."""
+type DeleteAppPermissionDefaultPermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `AppPermissionDefaultPermission` that was deleted by this mutation.
+  """
+  appPermissionDefaultPermission: AppPermissionDefaultPermission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  An edge for our `AppPermissionDefaultPermission`. May be used by Relay 1.
+  """
+  appPermissionDefaultPermissionEdge(
+    """The method to use when ordering `AppPermissionDefaultPermission`."""
+    orderBy: [AppPermissionDefaultPermissionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultPermissionEdge
+}
+
+"""All input for the `deleteAppPermissionDefaultPermission` mutation."""
+input DeleteAppPermissionDefaultPermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgPermissionDefaultPermission` mutation."""
+type DeleteOrgPermissionDefaultPermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  The `OrgPermissionDefaultPermission` that was deleted by this mutation.
+  """
+  orgPermissionDefaultPermission: OrgPermissionDefaultPermission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  An edge for our `OrgPermissionDefaultPermission`. May be used by Relay 1.
+  """
+  orgPermissionDefaultPermissionEdge(
+    """The method to use when ordering `OrgPermissionDefaultPermission`."""
+    orderBy: [OrgPermissionDefaultPermissionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultPermissionEdge
+}
+
+"""All input for the `deleteOrgPermissionDefaultPermission` mutation."""
+input DeleteOrgPermissionDefaultPermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `AppAdminGrant` mutation."""
 type DeleteAppAdminGrantPayload {
   """
@@ -8177,6 +9511,39 @@ input DeleteAppOwnerGrantInput {
   id: UUID!
 }
 
+"""The output of our delete `AppPermissionDefaultGrant` mutation."""
+type DeleteAppPermissionDefaultGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppPermissionDefaultGrant` that was deleted by this mutation."""
+  appPermissionDefaultGrant: AppPermissionDefaultGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppPermissionDefaultGrant`. May be used by Relay 1."""
+  appPermissionDefaultGrantEdge(
+    """The method to use when ordering `AppPermissionDefaultGrant`."""
+    orderBy: [AppPermissionDefaultGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultGrantEdge
+}
+
+"""All input for the `deleteAppPermissionDefaultGrant` mutation."""
+input DeleteAppPermissionDefaultGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `OrgAdminGrant` mutation."""
 type DeleteOrgAdminGrantPayload {
   """
@@ -8235,6 +9602,39 @@ type DeleteOrgOwnerGrantPayload {
 
 """All input for the `deleteOrgOwnerGrant` mutation."""
 input DeleteOrgOwnerGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgPermissionDefaultGrant` mutation."""
+type DeleteOrgPermissionDefaultGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgPermissionDefaultGrant` that was deleted by this mutation."""
+  orgPermissionDefaultGrant: OrgPermissionDefaultGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgPermissionDefaultGrant`. May be used by Relay 1."""
+  orgPermissionDefaultGrantEdge(
+    """The method to use when ordering `OrgPermissionDefaultGrant`."""
+    orderBy: [OrgPermissionDefaultGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultGrantEdge
+}
+
+"""All input for the `deleteOrgPermissionDefaultGrant` mutation."""
+input DeleteOrgPermissionDefaultGrantInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.

@@ -261,18 +261,6 @@ export const cryptoAuthModuleMutationKeys = {
   /** Delete cryptoAuthModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'cryptoauthmodule', 'delete', id] as const,
 } as const;
-export const rateLimitMetersModuleMutationKeys = {
-  /** All rateLimitMetersModule mutation keys */ all: [
-    'mutation',
-    'ratelimitmetersmodule',
-  ] as const,
-  /** Create rateLimitMetersModule mutation key */ create: () =>
-    ['mutation', 'ratelimitmetersmodule', 'create'] as const,
-  /** Update rateLimitMetersModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'ratelimitmetersmodule', 'update', id] as const,
-  /** Delete rateLimitMetersModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'ratelimitmetersmodule', 'delete', id] as const,
-} as const;
 export const sessionsModuleMutationKeys = {
   /** All sessionsModule mutation keys */ all: ['mutation', 'sessionsmodule'] as const,
   /** Create sessionsModule mutation key */ create: () =>
@@ -318,6 +306,18 @@ export const secureTableProvisionMutationKeys = {
   /** Delete secureTableProvision mutation key */ delete: (id: string | number) =>
     ['mutation', 'securetableprovision', 'delete', id] as const,
 } as const;
+export const rateLimitMetersModuleMutationKeys = {
+  /** All rateLimitMetersModule mutation keys */ all: [
+    'mutation',
+    'ratelimitmetersmodule',
+  ] as const,
+  /** Create rateLimitMetersModule mutation key */ create: () =>
+    ['mutation', 'ratelimitmetersmodule', 'create'] as const,
+  /** Update rateLimitMetersModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'ratelimitmetersmodule', 'update', id] as const,
+  /** Delete rateLimitMetersModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'ratelimitmetersmodule', 'delete', id] as const,
+} as const;
 export const invitesModuleMutationKeys = {
   /** All invitesModule mutation keys */ all: ['mutation', 'invitesmodule'] as const,
   /** Create invitesModule mutation key */ create: () =>
@@ -339,15 +339,6 @@ export const databaseProvisionModuleMutationKeys = {
   /** Delete databaseProvisionModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'databaseprovisionmodule', 'delete', id] as const,
 } as const;
-export const namespaceModuleMutationKeys = {
-  /** All namespaceModule mutation keys */ all: ['mutation', 'namespacemodule'] as const,
-  /** Create namespaceModule mutation key */ create: () =>
-    ['mutation', 'namespacemodule', 'create'] as const,
-  /** Update namespaceModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'namespacemodule', 'update', id] as const,
-  /** Delete namespaceModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'namespacemodule', 'delete', id] as const,
-} as const;
 export const realtimeModuleMutationKeys = {
   /** All realtimeModule mutation keys */ all: ['mutation', 'realtimemodule'] as const,
   /** Create realtimeModule mutation key */ create: () =>
@@ -365,6 +356,15 @@ export const webauthnAuthModuleMutationKeys = {
     ['mutation', 'webauthnauthmodule', 'update', id] as const,
   /** Delete webauthnAuthModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'webauthnauthmodule', 'delete', id] as const,
+} as const;
+export const namespaceModuleMutationKeys = {
+  /** All namespaceModule mutation keys */ all: ['mutation', 'namespacemodule'] as const,
+  /** Create namespaceModule mutation key */ create: () =>
+    ['mutation', 'namespacemodule', 'create'] as const,
+  /** Update namespaceModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'namespacemodule', 'update', id] as const,
+  /** Delete namespaceModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'namespacemodule', 'delete', id] as const,
 } as const;
 export const computeLogModuleMutationKeys = {
   /** All computeLogModule mutation keys */ all: ['mutation', 'computelogmodule'] as const,
@@ -402,6 +402,15 @@ export const transferLogModuleMutationKeys = {
   /** Delete transferLogModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'transferlogmodule', 'delete', id] as const,
 } as const;
+export const plansModuleMutationKeys = {
+  /** All plansModule mutation keys */ all: ['mutation', 'plansmodule'] as const,
+  /** Create plansModule mutation key */ create: () =>
+    ['mutation', 'plansmodule', 'create'] as const,
+  /** Update plansModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'plansmodule', 'update', id] as const,
+  /** Delete plansModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'plansmodule', 'delete', id] as const,
+} as const;
 export const dbUsageModuleMutationKeys = {
   /** All dbUsageModule mutation keys */ all: ['mutation', 'dbusagemodule'] as const,
   /** Create dbUsageModule mutation key */ create: () =>
@@ -420,33 +429,6 @@ export const notificationsModuleMutationKeys = {
   /** Delete notificationsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'notificationsmodule', 'delete', id] as const,
 } as const;
-export const plansModuleMutationKeys = {
-  /** All plansModule mutation keys */ all: ['mutation', 'plansmodule'] as const,
-  /** Create plansModule mutation key */ create: () =>
-    ['mutation', 'plansmodule', 'create'] as const,
-  /** Update plansModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'plansmodule', 'update', id] as const,
-  /** Delete plansModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'plansmodule', 'delete', id] as const,
-} as const;
-export const hierarchyModuleMutationKeys = {
-  /** All hierarchyModule mutation keys */ all: ['mutation', 'hierarchymodule'] as const,
-  /** Create hierarchyModule mutation key */ create: () =>
-    ['mutation', 'hierarchymodule', 'create'] as const,
-  /** Update hierarchyModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'hierarchymodule', 'update', id] as const,
-  /** Delete hierarchyModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'hierarchymodule', 'delete', id] as const,
-} as const;
-export const billingModuleMutationKeys = {
-  /** All billingModule mutation keys */ all: ['mutation', 'billingmodule'] as const,
-  /** Create billingModule mutation key */ create: () =>
-    ['mutation', 'billingmodule', 'create'] as const,
-  /** Update billingModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'billingmodule', 'update', id] as const,
-  /** Delete billingModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'billingmodule', 'delete', id] as const,
-} as const;
 export const billingProviderModuleMutationKeys = {
   /** All billingProviderModule mutation keys */ all: [
     'mutation',
@@ -458,6 +440,24 @@ export const billingProviderModuleMutationKeys = {
     ['mutation', 'billingprovidermodule', 'update', id] as const,
   /** Delete billingProviderModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'billingprovidermodule', 'delete', id] as const,
+} as const;
+export const functionModuleMutationKeys = {
+  /** All functionModule mutation keys */ all: ['mutation', 'functionmodule'] as const,
+  /** Create functionModule mutation key */ create: () =>
+    ['mutation', 'functionmodule', 'create'] as const,
+  /** Update functionModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'functionmodule', 'update', id] as const,
+  /** Delete functionModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'functionmodule', 'delete', id] as const,
+} as const;
+export const hierarchyModuleMutationKeys = {
+  /** All hierarchyModule mutation keys */ all: ['mutation', 'hierarchymodule'] as const,
+  /** Create hierarchyModule mutation key */ create: () =>
+    ['mutation', 'hierarchymodule', 'create'] as const,
+  /** Update hierarchyModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'hierarchymodule', 'update', id] as const,
+  /** Delete hierarchyModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'hierarchymodule', 'delete', id] as const,
 } as const;
 export const profilesModuleMutationKeys = {
   /** All profilesModule mutation keys */ all: ['mutation', 'profilesmodule'] as const,
@@ -477,6 +477,15 @@ export const permissionsModuleMutationKeys = {
   /** Delete permissionsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'permissionsmodule', 'delete', id] as const,
 } as const;
+export const billingModuleMutationKeys = {
+  /** All billingModule mutation keys */ all: ['mutation', 'billingmodule'] as const,
+  /** Create billingModule mutation key */ create: () =>
+    ['mutation', 'billingmodule', 'create'] as const,
+  /** Update billingModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'billingmodule', 'update', id] as const,
+  /** Delete billingModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'billingmodule', 'delete', id] as const,
+} as const;
 export const relationProvisionMutationKeys = {
   /** All relationProvision mutation keys */ all: ['mutation', 'relationprovision'] as const,
   /** Create relationProvision mutation key */ create: () =>
@@ -485,15 +494,6 @@ export const relationProvisionMutationKeys = {
     ['mutation', 'relationprovision', 'update', id] as const,
   /** Delete relationProvision mutation key */ delete: (id: string | number) =>
     ['mutation', 'relationprovision', 'delete', id] as const,
-} as const;
-export const functionModuleMutationKeys = {
-  /** All functionModule mutation keys */ all: ['mutation', 'functionmodule'] as const,
-  /** Create functionModule mutation key */ create: () =>
-    ['mutation', 'functionmodule', 'create'] as const,
-  /** Update functionModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'functionmodule', 'update', id] as const,
-  /** Delete functionModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'functionmodule', 'delete', id] as const,
 } as const;
 export const userAuthModuleMutationKeys = {
   /** All userAuthModule mutation keys */ all: ['mutation', 'userauthmodule'] as const,
@@ -540,15 +540,6 @@ export const storageModuleMutationKeys = {
   /** Delete storageModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'storagemodule', 'delete', id] as const,
 } as const;
-export const eventsModuleMutationKeys = {
-  /** All eventsModule mutation keys */ all: ['mutation', 'eventsmodule'] as const,
-  /** Create eventsModule mutation key */ create: () =>
-    ['mutation', 'eventsmodule', 'create'] as const,
-  /** Update eventsModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'eventsmodule', 'update', id] as const,
-  /** Delete eventsModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'eventsmodule', 'delete', id] as const,
-} as const;
 export const entityTypeProvisionMutationKeys = {
   /** All entityTypeProvision mutation keys */ all: ['mutation', 'entitytypeprovision'] as const,
   /** Create entityTypeProvision mutation key */ create: () =>
@@ -557,6 +548,15 @@ export const entityTypeProvisionMutationKeys = {
     ['mutation', 'entitytypeprovision', 'update', id] as const,
   /** Delete entityTypeProvision mutation key */ delete: (id: string | number) =>
     ['mutation', 'entitytypeprovision', 'delete', id] as const,
+} as const;
+export const eventsModuleMutationKeys = {
+  /** All eventsModule mutation keys */ all: ['mutation', 'eventsmodule'] as const,
+  /** Create eventsModule mutation key */ create: () =>
+    ['mutation', 'eventsmodule', 'create'] as const,
+  /** Update eventsModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'eventsmodule', 'update', id] as const,
+  /** Delete eventsModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'eventsmodule', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -658,37 +658,37 @@ export const mutationKeys = {
   blueprintTemplate: blueprintTemplateMutationKeys,
   blueprintConstruction: blueprintConstructionMutationKeys,
   cryptoAuthModule: cryptoAuthModuleMutationKeys,
-  rateLimitMetersModule: rateLimitMetersModuleMutationKeys,
   sessionsModule: sessionsModuleMutationKeys,
   configSecretsModule: configSecretsModuleMutationKeys,
   merkleStoreModule: merkleStoreModuleMutationKeys,
   graphModule: graphModuleMutationKeys,
   secureTableProvision: secureTableProvisionMutationKeys,
+  rateLimitMetersModule: rateLimitMetersModuleMutationKeys,
   invitesModule: invitesModuleMutationKeys,
   databaseProvisionModule: databaseProvisionModuleMutationKeys,
-  namespaceModule: namespaceModuleMutationKeys,
   realtimeModule: realtimeModuleMutationKeys,
   webauthnAuthModule: webauthnAuthModuleMutationKeys,
+  namespaceModule: namespaceModuleMutationKeys,
   computeLogModule: computeLogModuleMutationKeys,
   inferenceLogModule: inferenceLogModuleMutationKeys,
   storageLogModule: storageLogModuleMutationKeys,
   transferLogModule: transferLogModuleMutationKeys,
+  plansModule: plansModuleMutationKeys,
   dbUsageModule: dbUsageModuleMutationKeys,
   notificationsModule: notificationsModuleMutationKeys,
-  plansModule: plansModuleMutationKeys,
-  hierarchyModule: hierarchyModuleMutationKeys,
-  billingModule: billingModuleMutationKeys,
   billingProviderModule: billingProviderModuleMutationKeys,
+  functionModule: functionModuleMutationKeys,
+  hierarchyModule: hierarchyModuleMutationKeys,
   profilesModule: profilesModuleMutationKeys,
   permissionsModule: permissionsModuleMutationKeys,
+  billingModule: billingModuleMutationKeys,
   relationProvision: relationProvisionMutationKeys,
-  functionModule: functionModuleMutationKeys,
   userAuthModule: userAuthModuleMutationKeys,
   agentModule: agentModuleMutationKeys,
   limitsModule: limitsModuleMutationKeys,
   membershipsModule: membershipsModuleMutationKeys,
   storageModule: storageModuleMutationKeys,
-  eventsModule: eventsModuleMutationKeys,
   entityTypeProvision: entityTypeProvisionMutationKeys,
+  eventsModule: eventsModuleMutationKeys,
   custom: customMutationKeys,
 } as const;

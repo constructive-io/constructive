@@ -12,6 +12,7 @@ import type {
   App,
   AstMigration,
   CheckConstraint,
+  CompositeType,
   CorsSetting,
   Database,
   DatabaseSetting,
@@ -637,12 +638,12 @@ export type TableOrderBy =
   | 'PARTITION_KEY_NAMES_DESC'
   | 'PARTITION_KEY_TYPES_ASC'
   | 'PARTITION_KEY_TYPES_DESC'
-  | 'INHERITS_ID_ASC'
-  | 'INHERITS_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'INHERITS_ID_ASC'
+  | 'INHERITS_ID_DESC';
 /** Methods to use when ordering `SchemaGrant`. */
 export type SchemaGrantOrderBy =
   | 'NATURAL'
@@ -721,6 +722,35 @@ export type FunctionOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
+/** Methods to use when ordering `CompositeType`. */
+export type CompositeTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ATTRIBUTES_ASC'
+  | 'ATTRIBUTES_DESC'
+  | 'SMART_TAGS_ASC'
+  | 'SMART_TAGS_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'MODULE_ASC'
+  | 'MODULE_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC';
 /** Methods to use when ordering `ApiModule`. */
 export type ApiModuleOrderBy =
   | 'NATURAL'
@@ -1453,6 +1483,10 @@ export interface DatabaseFilter {
   partitions?: DatabaseToManyPartitionFilter;
   /** `partitions` exist. */
   partitionsExist?: boolean;
+  /** Filter by the object’s `compositeTypes` relation. */
+  compositeTypes?: DatabaseToManyCompositeTypeFilter;
+  /** `compositeTypes` exist. */
+  compositeTypesExist?: boolean;
   /** Filter by the object’s `databaseTransfers` relation. */
   databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
   /** `databaseTransfers` exist. */
@@ -1589,6 +1623,10 @@ export interface SchemaFilter {
   functions?: SchemaToManyFunctionFilter;
   /** `functions` exist. */
   functionsExist?: boolean;
+  /** Filter by the object’s `compositeTypes` relation. */
+  compositeTypes?: SchemaToManyCompositeTypeFilter;
+  /** `compositeTypes` exist. */
+  compositeTypesExist?: boolean;
   /** Filter by the object’s `apiSchemas` relation. */
   apiSchemas?: SchemaToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
@@ -1645,12 +1683,12 @@ export interface TableFilter {
   partitionKeyNames?: StringListFilter;
   /** Filter by the object’s `partitionKeyTypes` field. */
   partitionKeyTypes?: StringListFilter;
-  /** Filter by the object’s `inheritsId` field. */
-  inheritsId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `inheritsId` field. */
+  inheritsId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: TableFilter[];
   /** Checks for any expressions in this list. */
@@ -2741,6 +2779,52 @@ export interface FunctionFilter {
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
 }
+/** A filter to be used against many `CompositeType` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyCompositeTypeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CompositeTypeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CompositeTypeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CompositeTypeFilter;
+}
+/** A filter to be used against `CompositeType` object types. All fields are combined with a logical ‘and.’ */
+export interface CompositeTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `attributes` field. */
+  attributes?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: CompositeTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CompositeTypeFilter[];
+  /** Negates the expression. */
+  not?: CompositeTypeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
 /** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManyApiSchemaFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -3643,6 +3727,15 @@ export interface DatabaseToManyPartitionFilter {
   every?: PartitionFilter;
   /** Filters to entities where no related entity matches. */
   none?: PartitionFilter;
+}
+/** A filter to be used against many `CompositeType` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCompositeTypeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CompositeTypeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CompositeTypeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CompositeTypeFilter;
 }
 /** A filter to be used against many `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseTransferFilter {
@@ -4696,6 +4789,26 @@ export interface DatabaseSettingInput {
   /** Extensible JSON for additional settings that do not have dedicated columns */
   options?: unknown;
 }
+export interface CreateCompositeTypeInput {
+  clientMutationId?: string;
+  /** The `CompositeType` to be created by this mutation. */
+  compositeType: CompositeTypeInput;
+}
+/** An input for mutations affecting `CompositeType` */
+export interface CompositeTypeInput {
+  id?: string;
+  databaseId: string;
+  schemaId: string;
+  name: string;
+  label?: string;
+  description?: string;
+  attributes?: unknown;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  module?: string;
+  scope?: number;
+  tags?: string[];
+}
 export interface CreateEnumInput {
   clientMutationId?: string;
   /** The `Enum` to be created by this mutation. */
@@ -5215,9 +5328,9 @@ export interface TableInput {
   partitionStrategy?: string;
   partitionKeyNames?: string[];
   partitionKeyTypes?: string[];
-  inheritsId?: string;
   createdAt?: string;
   updatedAt?: string;
+  inheritsId?: string;
 }
 export interface UpdateFunctionInput {
   clientMutationId?: string;
@@ -5677,6 +5790,27 @@ export interface DatabaseSettingPatch {
   enableI18N?: boolean;
   /** Extensible JSON for additional settings that do not have dedicated columns */
   options?: unknown;
+}
+export interface UpdateCompositeTypeInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `CompositeType` being updated. */
+  compositeTypePatch: CompositeTypePatch;
+}
+/** Represents an update to a `CompositeType`. Fields that are set will be updated. */
+export interface CompositeTypePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  name?: string;
+  label?: string;
+  description?: string;
+  attributes?: unknown;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  module?: string;
+  scope?: number;
+  tags?: string[];
 }
 export interface UpdateEnumInput {
   clientMutationId?: string;
@@ -6209,9 +6343,9 @@ export interface TablePatch {
   partitionStrategy?: string;
   partitionKeyNames?: string[];
   partitionKeyTypes?: string[];
-  inheritsId?: string;
   createdAt?: string;
   updatedAt?: string;
+  inheritsId?: string;
 }
 export interface DeleteFunctionInput {
   clientMutationId?: string;
@@ -6314,6 +6448,10 @@ export interface DeletePartitionInput {
 export interface DeleteDatabaseSettingInput {
   clientMutationId?: string;
   /** Unique identifier for this settings record */
+  id: string;
+}
+export interface DeleteCompositeTypeInput {
+  clientMutationId?: string;
   id: string;
 }
 export interface DeleteEnumInput {
@@ -6577,6 +6715,13 @@ export interface SqlActionConnection {
 export interface DatabaseSettingConnection {
   nodes: DatabaseSetting[];
   edges: DatabaseSettingEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `CompositeType` values. */
+export interface CompositeTypeConnection {
+  nodes: CompositeType[];
+  edges: CompositeTypeEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -6902,6 +7047,12 @@ export interface CreateDatabaseSettingPayload {
   databaseSetting?: DatabaseSetting | null;
   databaseSettingEdge?: DatabaseSettingEdge | null;
 }
+export interface CreateCompositeTypePayload {
+  clientMutationId?: string | null;
+  /** The `CompositeType` that was created by this mutation. */
+  compositeType?: CompositeType | null;
+  compositeTypeEdge?: CompositeTypeEdge | null;
+}
 export interface CreateEnumPayload {
   clientMutationId?: string | null;
   /** The `Enum` that was created by this mutation. */
@@ -7159,6 +7310,12 @@ export interface UpdateDatabaseSettingPayload {
   databaseSetting?: DatabaseSetting | null;
   databaseSettingEdge?: DatabaseSettingEdge | null;
 }
+export interface UpdateCompositeTypePayload {
+  clientMutationId?: string | null;
+  /** The `CompositeType` that was updated by this mutation. */
+  compositeType?: CompositeType | null;
+  compositeTypeEdge?: CompositeTypeEdge | null;
+}
 export interface UpdateEnumPayload {
   clientMutationId?: string | null;
   /** The `Enum` that was updated by this mutation. */
@@ -7410,6 +7567,12 @@ export interface DeleteDatabaseSettingPayload {
   /** The `DatabaseSetting` that was deleted by this mutation. */
   databaseSetting?: DatabaseSetting | null;
   databaseSettingEdge?: DatabaseSettingEdge | null;
+}
+export interface DeleteCompositeTypePayload {
+  clientMutationId?: string | null;
+  /** The `CompositeType` that was deleted by this mutation. */
+  compositeType?: CompositeType | null;
+  compositeTypeEdge?: CompositeTypeEdge | null;
 }
 export interface DeleteEnumPayload {
   clientMutationId?: string | null;
@@ -7699,6 +7862,12 @@ export interface DatabaseSettingEdge {
   cursor?: string | null;
   /** The `DatabaseSetting` at the end of the edge. */
   node?: DatabaseSetting | null;
+}
+/** A `CompositeType` edge in the connection. */
+export interface CompositeTypeEdge {
+  cursor?: string | null;
+  /** The `CompositeType` at the end of the edge. */
+  node?: CompositeType | null;
 }
 /** A `Enum` edge in the connection. */
 export interface EnumEdge {

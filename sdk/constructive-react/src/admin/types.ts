@@ -20,12 +20,36 @@ export interface AppPermission {
   bitstr: string | null;
   description: string | null;
 }
+export interface AppPermissionDefaultGrant {
+  id: string | null;
+  permissionId: string | null;
+  isGrant: boolean | null;
+  grantorId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface OrgPermission {
   id: string | null;
   name: string | null;
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
+}
+export interface OrgPermissionDefaultPermission {
+  id: string | null;
+  permissionId: string | null;
+  entityId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface OrgPermissionDefaultGrant {
+  id: string | null;
+  permissionId: string | null;
+  isGrant: boolean | null;
+  grantorId: string | null;
+  entityId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface OrgMember {
   id: string | null;
@@ -41,6 +65,12 @@ export interface OrgPermissionDefault {
   id: string | null;
   permissions: string | null;
   entityId: string | null;
+}
+export interface AppPermissionDefaultPermission {
+  id: string | null;
+  permissionId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface AppAdminGrant {
   id: string | null;

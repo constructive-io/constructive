@@ -12,7 +12,7 @@ csdk org-owner-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk org-owner-grant list --limit 10 --after <cursor>
 csdk org-owner-grant find-first --where.<field>.<op> <value>
 csdk org-owner-grant get --id <UUID>
-csdk org-owner-grant create --actorId <UUID> --entityId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk org-owner-grant create --entityId <UUID> [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 csdk org-owner-grant update --id <UUID> [--isGrant <Boolean>] [--actorId <UUID>] [--entityId <UUID>] [--grantorId <UUID>]
 csdk org-owner-grant delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk org-owner-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgOwnerGrant
 
 ```bash
-csdk org-owner-grant create --actorId <UUID> --entityId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk org-owner-grant create --entityId <UUID> [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 ```
 
 ### Get a orgOwnerGrant by id

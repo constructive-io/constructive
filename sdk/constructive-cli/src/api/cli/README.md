@@ -48,6 +48,7 @@ csdk auth set-token <your-token>
 | `schema-grant` | schemaGrant CRUD operations |
 | `default-privilege` | defaultPrivilege CRUD operations |
 | `enum` | enum CRUD operations |
+| `composite-type` | compositeType CRUD operations |
 | `api-schema` | apiSchema CRUD operations |
 | `api-module` | apiModule CRUD operations |
 | `domain` | domain CRUD operations |
@@ -238,9 +239,9 @@ CRUD operations for Table records.
 | `partitionStrategy` | String |
 | `partitionKeyNames` | String |
 | `partitionKeyTypes` | String |
-| `inheritsId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `inheritsId` | UUID |
 
 **Required create fields:** `schemaId`, `name`
 **Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `category`, `module`, `scope`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `partitioned`, `partitionStrategy`, `partitionKeyNames`, `partitionKeyTypes`, `inheritsId`
@@ -887,6 +888,39 @@ CRUD operations for Enum records.
 
 **Required create fields:** `databaseId`, `schemaId`, `name`
 **Optional create fields (backend defaults):** `label`, `description`, `values`, `smartTags`, `category`, `module`, `scope`, `tags`
+
+### `composite-type`
+
+CRUD operations for CompositeType records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all compositeType records |
+| `find-first` | Find first matching compositeType record |
+| `get` | Get a compositeType by id |
+| `create` | Create a new compositeType |
+| `update` | Update an existing compositeType |
+| `delete` | Delete a compositeType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `name` | String |
+| `label` | String |
+| `description` | String |
+| `attributes` | JSON |
+| `smartTags` | JSON |
+| `category` | ObjectCategory |
+| `module` | String |
+| `scope` | Int |
+| `tags` | String |
+
+**Required create fields:** `databaseId`, `schemaId`, `name`
+**Optional create fields (backend defaults):** `label`, `description`, `attributes`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `api-schema`
 

@@ -52,9 +52,9 @@ export interface Table {
   partitionStrategy: string | null;
   partitionKeyNames: string[] | null;
   partitionKeyTypes: string[] | null;
-  inheritsId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  inheritsId: string | null;
 }
 export interface CheckConstraint {
   id: string | null;
@@ -332,6 +332,20 @@ export interface Enum {
   label: string | null;
   description: string | null;
   values: string[] | null;
+  smartTags: unknown | null;
+  category: ObjectCategory | null;
+  module: string | null;
+  scope: number | null;
+  tags: string[] | null;
+}
+export interface CompositeType {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  name: string | null;
+  label: string | null;
+  description: string | null;
+  attributes: unknown | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
   module: string | null;

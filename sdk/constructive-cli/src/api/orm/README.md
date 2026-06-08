@@ -43,6 +43,7 @@ const db = createClient({
 | `schemaGrant` | findMany, findOne, create, update, delete |
 | `defaultPrivilege` | findMany, findOne, create, update, delete |
 | `enum` | findMany, findOne, create, update, delete |
+| `compositeType` | findMany, findOne, create, update, delete |
 | `apiSchema` | findMany, findOne, create, update, delete |
 | `apiModule` | findMany, findOne, create, update, delete |
 | `domain` | findMany, findOne, create, update, delete |
@@ -171,18 +172,18 @@ CRUD operations for Table records.
 | `partitionStrategy` | String | Yes |
 | `partitionKeyNames` | String | Yes |
 | `partitionKeyTypes` | String | Yes |
-| `inheritsId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `inheritsId` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all table records
-const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, inheritsId: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
 
 // Get one by id
-const item = await db.table.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, inheritsId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.table.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
 
 // Create
 const created = await db.table.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', useRls: '<Boolean>', timestamps: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', singularName: '<String>', tags: '<String>', partitioned: '<Boolean>', partitionStrategy: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', inheritsId: '<UUID>' }, select: { id: true } }).execute();
@@ -968,6 +969,46 @@ const updated = await db.enum.update({ where: { id: '<UUID>' }, data: { database
 
 // Delete
 const deleted = await db.enum.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.compositeType`
+
+CRUD operations for CompositeType records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `name` | String | Yes |
+| `label` | String | Yes |
+| `description` | String | Yes |
+| `attributes` | JSON | Yes |
+| `smartTags` | JSON | Yes |
+| `category` | ObjectCategory | Yes |
+| `module` | String | Yes |
+| `scope` | Int | Yes |
+| `tags` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all compositeType records
+const items = await db.compositeType.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, module: true, scope: true, tags: true } }).execute();
+
+// Get one by id
+const item = await db.compositeType.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, module: true, scope: true, tags: true } }).execute();
+
+// Create
+const created = await db.compositeType.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.compositeType.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.compositeType.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.apiSchema`

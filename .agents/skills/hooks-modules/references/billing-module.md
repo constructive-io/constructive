@@ -7,8 +7,8 @@ React Query hooks for BillingModule data operations
 ## Usage
 
 ```typescript
-useBillingModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, recordUsageFunction: true, prefix: true, apiName: true, privateApiName: true } } })
-useBillingModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, recordUsageFunction: true, prefix: true, apiName: true, privateApiName: true } } })
+useBillingModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, recordUsageFunction: true, prefix: true, defaultPermissions: true, apiName: true, privateApiName: true } } })
+useBillingModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, recordUsageFunction: true, prefix: true, defaultPermissions: true, apiName: true, privateApiName: true } } })
 useCreateBillingModuleMutation({ selection: { fields: { id: true } } })
 useUpdateBillingModuleMutation({ selection: { fields: { id: true } } })
 useDeleteBillingModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteBillingModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useBillingModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, recordUsageFunction: true, prefix: true, apiName: true, privateApiName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, metersTableId: true, metersTableName: true, planSubscriptionsTableId: true, planSubscriptionsTableName: true, ledgerTableId: true, ledgerTableName: true, balancesTableId: true, balancesTableName: true, meterCreditsTableId: true, meterCreditsTableName: true, meterSourcesTableId: true, meterSourcesTableName: true, meterDefaultsTableId: true, meterDefaultsTableName: true, recordUsageFunction: true, prefix: true, defaultPermissions: true, apiName: true, privateApiName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useBillingModulesQuery({
 const { mutate } = useCreateBillingModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', meterCreditsTableId: '<UUID>', meterCreditsTableName: '<String>', meterSourcesTableId: '<UUID>', meterSourcesTableName: '<String>', meterDefaultsTableId: '<UUID>', meterDefaultsTableName: '<String>', recordUsageFunction: '<String>', prefix: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', metersTableId: '<UUID>', metersTableName: '<String>', planSubscriptionsTableId: '<UUID>', planSubscriptionsTableName: '<String>', ledgerTableId: '<UUID>', ledgerTableName: '<String>', balancesTableId: '<UUID>', balancesTableName: '<String>', meterCreditsTableId: '<UUID>', meterCreditsTableName: '<String>', meterSourcesTableId: '<UUID>', meterSourcesTableName: '<String>', meterDefaultsTableId: '<UUID>', meterDefaultsTableName: '<String>', recordUsageFunction: '<String>', prefix: '<String>', defaultPermissions: '<String>', apiName: '<String>', privateApiName: '<String>' });
 ```

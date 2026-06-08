@@ -27,6 +27,7 @@ import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { SchemaGrantModel } from './models/schemaGrant';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
 import { EnumModel } from './models/enum';
+import { CompositeTypeModel } from './models/compositeType';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiModuleModel } from './models/apiModule';
 import { DomainModel } from './models/domain';
@@ -107,6 +108,7 @@ export function createClient(config: OrmClientConfig) {
     schemaGrant: new SchemaGrantModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
     enum: new EnumModel(client),
+    compositeType: new CompositeTypeModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiModule: new ApiModuleModel(client),
     domain: new DomainModel(client),

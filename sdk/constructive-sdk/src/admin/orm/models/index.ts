@@ -6,10 +6,14 @@
 export { OrgGetManagersRecordModel } from './orgGetManagersRecord';
 export { OrgGetSubordinatesRecordModel } from './orgGetSubordinatesRecord';
 export { AppPermissionModel } from './appPermission';
+export { AppPermissionDefaultGrantModel } from './appPermissionDefaultGrant';
 export { OrgPermissionModel } from './orgPermission';
+export { OrgPermissionDefaultPermissionModel } from './orgPermissionDefaultPermission';
+export { OrgPermissionDefaultGrantModel } from './orgPermissionDefaultGrant';
 export { OrgMemberModel } from './orgMember';
 export { AppPermissionDefaultModel } from './appPermissionDefault';
 export { OrgPermissionDefaultModel } from './orgPermissionDefault';
+export { AppPermissionDefaultPermissionModel } from './appPermissionDefaultPermission';
 export { AppAdminGrantModel } from './appAdminGrant';
 export { AppOwnerGrantModel } from './appOwnerGrant';
 export { OrgAdminGrantModel } from './orgAdminGrant';
