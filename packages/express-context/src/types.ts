@@ -202,6 +202,10 @@ export interface IdentityProvidersConfig {
   schemaName: string;
   privateSchemaName: string;
   tableName: string;
+  // Module prefix for generated function names (e.g., 'app' → rotate_identity_provider_app_secret)
+  prefix: string;
+  // Generated function name for rotating client secrets
+  rotateSecretFunction: string;
   // Function names (defaults until DB schema adds these columns)
   signInIdentityFunction: string;
   signUpIdentityFunction: string;

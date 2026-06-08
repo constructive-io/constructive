@@ -40,6 +40,7 @@ import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { createLlmApiRouter } from './middleware/llm-api';
 import { createOAuthRoutes } from './middleware/oauth';
+import { createIdentityProvidersRouter } from './middleware/identity-providers';
 import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
@@ -203,6 +204,9 @@ class Server {
     // OAuth / SSO routes — mounted before graphile so OAuth callbacks
     // are handled without going through PostGraphile
     app.use('/auth', createOAuthRoutes(effectiveOpts));
+
+    // Identity Providers API — mounted before graphile
+    app.use(createIdentityProvidersRouter());
 
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile
