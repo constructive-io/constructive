@@ -102,7 +102,6 @@ export {
   encryptedSecretsLoader,
   userAuthLoader,
   identityProvidersLoader,
-  identityProviderConfigLoader,
   connectedAccountsLoader,
 } from './loaders';
 
