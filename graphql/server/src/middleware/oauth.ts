@@ -29,7 +29,6 @@ import type {
   ConnectedAccountsConfig,
   ConstructiveContext,
   IdentityProvidersConfig,
-  IdentityProviderConfigMap,
   IdentityProviderFullConfig,
   PgInterval,
   UserAuthConfig,
@@ -131,7 +130,6 @@ function verifySignedState(state: string): StatePayload | null {
 
 interface OAuthModules {
   identityProviders: IdentityProvidersConfig;
-  identityProviderConfig: IdentityProviderConfigMap;
   userAuth: UserAuthConfig;
   authSettings: AuthSettings | undefined;
   connectedAccounts: ConnectedAccountsConfig | undefined;
@@ -142,25 +140,22 @@ async function resolveOAuthModules(
 ): Promise<OAuthModules | null> {
   const [
     identityProviders,
-    identityProviderConfig,
     userAuth,
     authSettings,
     connectedAccounts,
   ] = await Promise.all([
     ctx.useModule('identityProviders'),
-    ctx.useModule('identityProviderConfig'),
     ctx.useModule('userAuth'),
     ctx.useModule('authSettings'),
     ctx.useModule('connectedAccounts'),
   ]);
 
-  if (!identityProviders || !identityProviderConfig || !userAuth) {
+  if (!identityProviders || !userAuth) {
     return null;
   }
 
   return {
     identityProviders,
-    identityProviderConfig,
     userAuth,
     authSettings,
     connectedAccounts,
@@ -280,7 +275,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         return res.json({ providers: [] });
       }
       // Get all enabled provider slugs from the cached config map
-      const providers = Array.from(modules.identityProviderConfig.keys());
+      const providers = Array.from(modules.identityProviders.providers.keys());
       res.json({ providers });
     } catch (error) {
       log.error('[oauth] Failed to fetch providers:', error);
@@ -324,12 +319,12 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         );
       }
 
-      const { authSettings, identityProviderConfig } = modules;
+      const { authSettings, identityProviders } = modules;
       const errorRedirectPath =
         authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
 
       // Get provider config from cached map
-      const providerConfig = identityProviderConfig.get(provider);
+      const providerConfig = identityProviders.providers.get(provider);
       if (!providerConfig) {
         log.warn(`[oauth] Provider ${provider} not found or not configured`);
         return redirectToError(
@@ -455,14 +450,14 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           );
         }
 
-        const { authSettings, identityProviderConfig } = modules;
+        const { authSettings, identityProviders } = modules;
         const errorRedirectPath =
           authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
         const requireVerifiedEmail =
           authSettings?.oauthRequireVerifiedEmail ?? true;
 
         // Get provider config from cached map
-        const providerConfig = identityProviderConfig.get(provider);
+        const providerConfig = identityProviders.providers.get(provider);
         if (!providerConfig) {
           log.error(`[oauth] Provider ${provider} not found in database`);
           return redirectToError(

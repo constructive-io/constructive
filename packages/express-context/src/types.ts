@@ -182,15 +182,6 @@ export interface UserAuthConfig {
   extendTokenExpires: string;
 }
 
-export interface IdentityProvidersConfig {
-  schemaName: string;
-  privateSchemaName: string;
-  tableName: string;
-  // Function names (defaults until DB schema adds these columns)
-  signInIdentityFunction: string;
-  signUpIdentityFunction: string;
-}
-
 export interface IdentityProviderFullConfig {
   slug: string;
   kind: 'oauth2' | 'oidc';
@@ -206,6 +197,17 @@ export interface IdentityProviderFullConfig {
 }
 
 export type IdentityProviderConfigMap = Map<string, IdentityProviderFullConfig>;
+
+export interface IdentityProvidersConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+  // Function names (defaults until DB schema adds these columns)
+  signInIdentityFunction: string;
+  signUpIdentityFunction: string;
+  // Enabled providers with full config (merged from identityProviderConfig loader)
+  providers: IdentityProviderConfigMap;
+}
 
 export interface ConnectedAccountsConfig {
   schemaName: string;

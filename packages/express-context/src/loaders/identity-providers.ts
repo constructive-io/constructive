@@ -1,15 +1,28 @@
 /**
  * Identity Providers Module Loader
  *
- * Resolves the identity_providers_module config from metaschema_modules_public.
- * Provides schema names where the identity_providers table lives, used by
- * OAuth/SSO middleware to look up provider definitions (client_id, encrypted
- * client_secret, scopes, etc.).
+ * Resolves the identity_providers_module config from metaschema_modules_public
+ * and loads all enabled providers with their full configuration.
+ *
+ * This loader combines:
+ *   - Module schema info (schema names, table name, function names)
+ *   - All enabled providers with decrypted client secrets
+ *
+ * Secrets are PGP-encrypted at rest and decrypted via pgp_sym_decrypt.
+ *
+ * Usage:
+ *   const identityProviders = await ctx.useModule('identityProviders');
+ *   const github = identityProviders?.providers.get('github');
  */
 
 import type { LoaderContext, ModuleLoader } from './types';
-import type { IdentityProvidersConfig } from '../types';
+import type {
+  IdentityProvidersConfig,
+  IdentityProviderFullConfig,
+  IdentityProviderConfigMap,
+} from '../types';
 import { createModuleLoader } from './create-loader';
+import { QuoteUtils } from '@pgsql/quotes';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
@@ -25,12 +38,55 @@ const IDENTITY_PROVIDERS_MODULE_SQL = `
   LIMIT 1
 `;
 
+function buildProvidersSql(ipSchema: string, ipTable: string): string {
+  return `
+    SELECT
+      ip.slug,
+      ip.kind,
+      ip.display_name,
+      ip.enabled,
+      ip.client_id,
+      CASE
+        WHEN secrets.algo = 'pgp' THEN
+          convert_from(decode(pgp_sym_decrypt(secrets.value, secrets.key_id::text), 'hex'), 'SQL_ASCII')
+        WHEN secrets.algo = 'crypt' THEN
+          convert_from(secrets.value, 'SQL_ASCII')
+        ELSE
+          convert_from(secrets.value, 'UTF8')
+      END as client_secret,
+      ip.authorization_url,
+      ip.token_url,
+      ip.userinfo_url,
+      ip.scopes,
+      ip.pkce_enabled
+    FROM ${QuoteUtils.quoteQualifiedIdentifier(ipSchema, ipTable)} ip
+    LEFT JOIN "constructive_store_private"."platform_secrets" secrets ON secrets.id = ip.client_secret_id
+    WHERE ip.enabled = true
+      AND ip.client_id IS NOT NULL
+      AND ip.client_secret_id IS NOT NULL
+  `;
+}
+
 // ─── Row Types ──────────────────────────────────────────────────────────────
 
 interface IdentityProvidersModuleRow {
   schema_name: string;
   private_schema_name: string;
   table_name: string;
+}
+
+interface ProviderRow {
+  slug: string;
+  kind: 'oauth2' | 'oidc';
+  display_name: string;
+  enabled: boolean;
+  client_id: string;
+  client_secret: string | null;
+  authorization_url: string | null;
+  token_url: string | null;
+  userinfo_url: string | null;
+  scopes: string[] | null;
+  pkce_enabled: boolean | null;
 }
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
@@ -42,20 +98,49 @@ export const identityProvidersLoader: ModuleLoader<IdentityProvidersConfig> =
     async resolve(ctx: LoaderContext) {
       const { tenantPool, databaseId } = ctx;
 
-      const result = await tenantPool.query<IdentityProvidersModuleRow>(
+      // Step 1: Resolve module config
+      const moduleResult = await tenantPool.query<IdentityProvidersModuleRow>(
         IDENTITY_PROVIDERS_MODULE_SQL,
         [databaseId],
       );
-      const row = result.rows[0];
-      if (!row) return undefined;
+      const moduleRow = moduleResult.rows[0];
+      if (!moduleRow) return undefined;
+
+      // Step 2: Load all enabled providers with secrets
+      const providersSql = buildProvidersSql(
+        moduleRow.private_schema_name,
+        moduleRow.table_name,
+      );
+      const providersResult = await tenantPool.query<ProviderRow>(providersSql);
+
+      // Step 3: Build providers Map
+      const providers: IdentityProviderConfigMap = new Map();
+      for (const row of providersResult.rows) {
+        if (!row.client_id || !row.client_secret) {
+          continue;
+        }
+        providers.set(row.slug, {
+          slug: row.slug,
+          kind: row.kind,
+          displayName: row.display_name,
+          enabled: row.enabled,
+          clientId: row.client_id,
+          clientSecret: row.client_secret,
+          authorizationUrl: row.authorization_url,
+          tokenUrl: row.token_url,
+          userinfoUrl: row.userinfo_url,
+          scopes: row.scopes || [],
+          pkceEnabled: row.pkce_enabled ?? true,
+        });
+      }
 
       return {
-        schemaName: row.schema_name,
-        privateSchemaName: row.private_schema_name,
-        tableName: row.table_name,
-        // Defaults until DB schema adds sign_in_identity_function / sign_up_identity_function columns
+        schemaName: moduleRow.schema_name,
+        privateSchemaName: moduleRow.private_schema_name,
+        tableName: moduleRow.table_name,
         signInIdentityFunction: 'sign_in_identity',
         signUpIdentityFunction: 'sign_up_identity',
+        providers,
       };
     },
   });
