@@ -5,6 +5,7 @@ export { createApiMiddleware, getSubdomain, getApiConfig } from './middleware/ap
 export { createAuthenticateMiddleware } from './middleware/auth';
 export { createUploadAuthenticateMiddleware } from './middleware/upload';
 export { createIdentityProvidersRouter } from './middleware/identity-providers';
+export { createAppSettingsAuthRouter } from './middleware/app-settings-auth';
 export { cors } from './middleware/cors';
 export { graphile } from './middleware/graphile';
 export { flush, flushService } from './middleware/flush';

@@ -41,6 +41,7 @@ import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/up
 import { createLlmApiRouter } from './middleware/llm-api';
 import { createOAuthRoutes } from './middleware/oauth';
 import { createIdentityProvidersRouter } from './middleware/identity-providers';
+import { createAppSettingsAuthRouter } from './middleware/app-settings-auth';
 import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
@@ -207,6 +208,9 @@ class Server {
 
     // Identity Providers API — mounted before graphile
     app.use(createIdentityProvidersRouter());
+
+    // App Settings Auth API — mounted before graphile
+    app.use(createAppSettingsAuthRouter());
 
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile
