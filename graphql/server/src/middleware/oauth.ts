@@ -217,6 +217,9 @@ async function generateCrossOriginToken(
     RETURNING id
   `;
 
+  // Intentional RLS bypass: runs as pool user because the session was just created
+  // server-side and the user hasn't authenticated via JWT yet. The accessToken hash
+  // ensures we only update the session we just created.
   const result = await ctx.pool.query(sql, [otToken, accessToken]);
   if (result.rows.length === 0) {
     throw new Error('Failed to set cross-origin token');
