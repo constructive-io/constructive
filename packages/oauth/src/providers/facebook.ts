@@ -29,6 +29,7 @@ export const facebookProvider: OAuthProviderConfig = {
       email: profile.email || null,
       name: profile.name || null,
       picture: profile.picture?.data?.url || null,
+      emailVerified: null, // Facebook does not provide email verification status
       raw: data,
     };
   },

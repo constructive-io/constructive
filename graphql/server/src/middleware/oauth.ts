@@ -240,16 +240,10 @@ function getBaseUrl(req: Request): string {
 }
 
 /**
- * Extract email_verified from the raw provider response.
- * OAuthProfile.raw contains the original provider data which includes
- * email_verified for OIDC providers (Google, etc.).
+ * Check if the user's email is verified by the OAuth provider.
  */
 function isEmailVerified(profile: OAuthProfile): boolean {
-  const raw = profile.raw as Record<string, unknown> | null;
-  if (!raw) return false;
-  if (typeof raw.email_verified === 'boolean') return raw.email_verified;
-  if (typeof raw.verified_email === 'boolean') return raw.verified_email;
-  return false;
+  return profile.emailVerified === true;
 }
 
 function redirectToError(
