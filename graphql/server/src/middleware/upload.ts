@@ -1,4 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
+import { getEnvVars } from '@pgpmjs/env';
 import type { PgpmOptions } from '@pgpmjs/types';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import fs from 'fs';
@@ -16,10 +17,8 @@ import './types';
 const uploadLog = new Logger('upload');
 const authLog = new Logger('upload-auth');
 
-const envFileSize = process.env.MAX_UPLOAD_FILE_SIZE
-  ? parseInt(process.env.MAX_UPLOAD_FILE_SIZE, 10)
-  : NaN;
-const MAX_FILE_SIZE = envFileSize > 0 ? envFileSize : 10 * 1024 * 1024;
+const envFileSize = getEnvVars().upload?.maxFileSize;
+const MAX_FILE_SIZE = envFileSize && envFileSize > 0 ? envFileSize : 10 * 1024 * 1024;
 
 const BLOCKED_MIME_TYPES = new Set([
   'application/x-executable',

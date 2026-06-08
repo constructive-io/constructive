@@ -21,7 +21,7 @@ import crypto from 'crypto';
 import { Router, Request, Response } from 'express';
 import { OAuthClient, OAuthProfile } from '@constructive-io/oauth';
 import { Logger } from '@pgpmjs/logger';
-import { getNodeEnv } from '@pgpmjs/env';
+import { getNodeEnv, getEnvVars } from '@pgpmjs/env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type {
   AuthSettings,
@@ -72,7 +72,7 @@ interface StatePayload {
 }
 
 function getStateSecret(): string {
-  const secret = process.env.OAUTH_SECRET;
+  const secret = getEnvVars().oauth?.secret;
   if (!secret) {
     throw new Error('OAUTH_SECRET environment variable is required');
   }

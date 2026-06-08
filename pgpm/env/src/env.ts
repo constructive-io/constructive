@@ -98,7 +98,16 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     SMTP_MAX_MESSAGES,
     SMTP_NAME,
     SMTP_LOGGER,
-    SMTP_DEBUG
+    SMTP_DEBUG,
+
+    // OAuth env vars
+    OAUTH_SECRET,
+
+    // Captcha env vars
+    RECAPTCHA_SECRET_KEY,
+
+    // Upload env vars
+    MAX_UPLOAD_FILE_SIZE
   } = env;
 
   return {
@@ -230,6 +239,15 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(SMTP_NAME && { name: SMTP_NAME }),
       ...(SMTP_LOGGER && { logger: parseEnvBoolean(SMTP_LOGGER) }),
       ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) }),
+    },
+    oauth: {
+      ...(OAUTH_SECRET && { secret: OAUTH_SECRET }),
+    },
+    captcha: {
+      ...(RECAPTCHA_SECRET_KEY && { recaptchaSecretKey: RECAPTCHA_SECRET_KEY }),
+    },
+    upload: {
+      ...(MAX_UPLOAD_FILE_SIZE && { maxFileSize: parseEnvNumber(MAX_UPLOAD_FILE_SIZE) }),
     }
   };
 };
