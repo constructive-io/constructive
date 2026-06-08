@@ -490,7 +490,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         }
 
         const userAgent = req.get('user-agent') || '';
-        const { identityProviders, connectedAccounts } = modules;
+        const { connectedAccounts } = modules;
         const authPrivateSchema = identityProviders.privateSchemaName;
         const signInFn = identityProviders.signInIdentityFunction;
         const signUpFn = identityProviders.signUpIdentityFunction;
