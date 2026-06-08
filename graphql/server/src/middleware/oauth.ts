@@ -22,6 +22,7 @@ import { Router, Request, Response } from 'express';
 import { OAuthClient, OAuthProfile } from '@constructive-io/oauth';
 import { Logger } from '@pgpmjs/logger';
 import { getNodeEnv, getEnvVars } from '@pgpmjs/env';
+import { QuoteUtils } from '@pgsql/quotes';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type {
   AuthSettings,
@@ -211,7 +212,7 @@ async function generateCrossOriginToken(
   const { sessionCredentialsSchemaName } = modules.userAuth;
 
   const sql = `
-    UPDATE "${sessionCredentialsSchemaName}".session_credentials
+    UPDATE ${QuoteUtils.quoteQualifiedIdentifier(sessionCredentialsSchemaName, 'session_credentials')}
     SET ot_token = $1
     WHERE secret_hash = digest($2::text, 'sha256')
     RETURNING id
@@ -511,7 +512,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         let identityExists = false;
         if (connectedAccounts) {
           const checkSql = `
-            SELECT 1 FROM "${connectedAccounts.privateSchemaName}"."${connectedAccounts.tableName}"
+            SELECT 1 FROM ${QuoteUtils.quoteQualifiedIdentifier(connectedAccounts.privateSchemaName, connectedAccounts.tableName)}
             WHERE service = $1 AND identifier = $2
             LIMIT 1
           `;
@@ -554,7 +555,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
             if (identityExists) {
               // Sign in existing identity
               const signInSql = `
-                SELECT * FROM "${authPrivateSchema}"."${signInFn}"(
+                SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(authPrivateSchema, signInFn)}(
                   $1::text, $2::text, $3::jsonb, $4::text, 'access_token'::text, $5::boolean, $6::text
                 )
               `;
@@ -573,7 +574,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
                 `[oauth] Creating new account for ${profile.email}`,
               );
               const signUpSql = `
-                SELECT * FROM "${authPrivateSchema}"."${signUpFn}"(
+                SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(authPrivateSchema, signUpFn)}(
                   $1::text, $2::text, $3::text, $4::jsonb, 'access_token'::text, $5::boolean, $6::text
                 )
               `;
