@@ -30,7 +30,7 @@ export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoade
   const cache = new LRUCache<string, T | undefined>({
     max: opts.max ?? DEFAULT_MAX,
     ttl: opts.ttlMs ?? DEFAULT_TTL_MS,
-    updateAgeOnGet: true,
+    updateAgeOnGet: false, // TTL from first set, not refreshed on read
     allowStale: false,
   });
 
