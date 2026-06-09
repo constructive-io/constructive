@@ -12,7 +12,7 @@
  *   POST   /identity-providers/:slug/secret → rotate client secret
  */
 
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
 import type { ConstructiveContext } from '@constructive-io/express-context';
@@ -55,9 +55,23 @@ interface RotateSecretBody {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function requireAdmin(ctx: ConstructiveContext, res: Response): boolean {
-  if (ctx.token?.role !== 'administrator') {
-    res.status(403).json({ error: 'ADMIN_REQUIRED' });
+async function isAppMember(ctx: ConstructiveContext): Promise<boolean> {
+  const userId = ctx.userId;
+  if (!userId) return false;
+
+  // Check if user is an app member (has a record in app_memberships_sprt)
+  const sql = `
+    SELECT 1 FROM constructive_memberships_private.app_memberships_sprt
+    WHERE actor_id = $1
+    LIMIT 1
+  `;
+  const result = await ctx.pool.query(sql, [userId]);
+  return result.rows.length > 0;
+}
+
+async function requireAppMember(ctx: ConstructiveContext, res: Response): Promise<boolean> {
+  if (!(await isAppMember(ctx))) {
+    res.status(403).json({ error: 'MEMBERSHIP_REQUIRED' });
     return false;
   }
   return true;
@@ -67,6 +81,9 @@ function requireAdmin(ctx: ConstructiveContext, res: Response): boolean {
 
 export function createIdentityProvidersRouter(): Router {
   const router = Router();
+
+  // Parse JSON body for PATCH/POST requests
+  router.use(express.json());
 
   /**
    * GET /identity-providers
@@ -78,7 +95,7 @@ export function createIdentityProvidersRouter(): Router {
       return res.status(500).json({ error: 'Missing context' });
     }
 
-    if (!requireAdmin(ctx, res)) return;
+    if (!(await requireAppMember(ctx, res))) return;
 
     try {
       const identityProviders = await ctx.useModule('identityProviders');
@@ -88,19 +105,17 @@ export function createIdentityProvidersRouter(): Router {
 
       const { privateSchemaName, tableName } = identityProviders;
 
-      const providers = await ctx.withPgClient(async (client) => {
-        const sql = `
-          SELECT
-            id, slug, kind, display_name, enabled, is_built_in,
-            client_id, client_secret_id,
-            authorization_url, token_url, userinfo_url,
-            scopes, pkce_enabled
-          FROM ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
-          ORDER BY is_built_in DESC, slug ASC
-        `;
-        const result = await client.query<ProviderRow>(sql);
-        return result.rows;
-      });
+      const sql = `
+        SELECT
+          id, slug, kind, display_name, enabled, is_built_in,
+          client_id, client_secret_id,
+          authorization_url, token_url, userinfo_url,
+          scopes, pkce_enabled
+        FROM ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
+        ORDER BY is_built_in DESC, slug ASC
+      `;
+      const result = await ctx.pool.query<ProviderRow>(sql);
+      const providers = result.rows;
 
       res.json({
         providers: providers.map((p) => ({
@@ -135,7 +150,7 @@ export function createIdentityProvidersRouter(): Router {
       return res.status(500).json({ error: 'Missing context' });
     }
 
-    if (!requireAdmin(ctx, res)) return;
+    if (!(await requireAppMember(ctx, res))) return;
 
     const { slug } = req.params;
 
@@ -147,19 +162,17 @@ export function createIdentityProvidersRouter(): Router {
 
       const { privateSchemaName, tableName } = identityProviders;
 
-      const provider = await ctx.withPgClient(async (client) => {
-        const sql = `
-          SELECT
-            id, slug, kind, display_name, enabled, is_built_in,
-            client_id, client_secret_id,
-            authorization_url, token_url, userinfo_url,
-            scopes, pkce_enabled
-          FROM ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
-          WHERE slug = $1
-        `;
-        const result = await client.query<ProviderRow>(sql, [slug]);
-        return result.rows[0];
-      });
+      const sql = `
+        SELECT
+          id, slug, kind, display_name, enabled, is_built_in,
+          client_id, client_secret_id,
+          authorization_url, token_url, userinfo_url,
+          scopes, pkce_enabled
+        FROM ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
+        WHERE slug = $1
+      `;
+      const result = await ctx.pool.query<ProviderRow>(sql, [slug]);
+      const provider = result.rows[0];
 
       if (!provider) {
         return res.status(404).json({ error: 'Provider not found' });
@@ -196,7 +209,7 @@ export function createIdentityProvidersRouter(): Router {
       return res.status(500).json({ error: 'Missing context' });
     }
 
-    if (!requireAdmin(ctx, res)) return;
+    if (!(await requireAppMember(ctx, res))) return;
 
     const { slug } = req.params;
     const body = req.body as UpdateProviderBody;
@@ -248,17 +261,15 @@ export function createIdentityProvidersRouter(): Router {
 
       values.push(slug);
 
-      await ctx.withPgClient(async (client) => {
-        const sql = `
-          UPDATE ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
-          SET ${setClauses.join(', ')}
-          WHERE slug = $${paramIndex}
-        `;
-        const result = await client.query(sql, values);
-        if (result.rowCount === 0) {
-          throw new Error('PROVIDER_NOT_FOUND');
-        }
-      });
+      const sql = `
+        UPDATE ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
+        SET ${setClauses.join(', ')}
+        WHERE slug = $${paramIndex}
+      `;
+      const result = await ctx.pool.query(sql, values);
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Provider not found' });
+      }
 
       log.info(`[admin-identity-providers] Updated provider ${slug}`);
       res.json({ success: true });
@@ -282,7 +293,7 @@ export function createIdentityProvidersRouter(): Router {
       return res.status(500).json({ error: 'Missing context' });
     }
 
-    if (!requireAdmin(ctx, res)) return;
+    if (!(await requireAppMember(ctx, res))) return;
 
     const { slug } = req.params;
     const body = req.body as RotateSecretBody;
@@ -297,27 +308,69 @@ export function createIdentityProvidersRouter(): Router {
         return res.status(404).json({ error: 'Identity providers module not configured' });
       }
 
-      const { privateSchemaName, tableName, rotateSecretFunction } = identityProviders;
+      const { privateSchemaName, tableName } = identityProviders;
+      const databaseId = ctx.databaseId;
+      if (!databaseId) {
+        return res.status(500).json({ error: 'Database context not available' });
+      }
 
-      await ctx.withPgClient(async (client) => {
-        // First get the provider ID
-        const lookupSql = `
-          SELECT id FROM ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
-          WHERE slug = $1
+      // Get provider info
+      const lookupSql = `
+        SELECT id, client_secret_id FROM ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
+        WHERE slug = $1
+      `;
+      const lookupResult = await ctx.pool.query<{ id: string; client_secret_id: string | null }>(lookupSql, [slug]);
+      if (lookupResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Provider not found' });
+      }
+
+      const provider = lookupResult.rows[0];
+
+      // Ensure default namespace exists
+      const namespaceSql = `
+        INSERT INTO constructive_infra_public.platform_namespaces (database_id, name)
+        VALUES ($1, 'default')
+        ON CONFLICT (database_id, name) DO UPDATE SET name = EXCLUDED.name
+        RETURNING id
+      `;
+      const namespaceResult = await ctx.pool.query<{ id: string }>(namespaceSql, [databaseId]);
+      const namespaceId = namespaceResult.rows[0].id;
+
+      let secretId = provider.client_secret_id;
+
+      if (secretId) {
+        // Update existing secret
+        const updateSecretSql = `
+          UPDATE constructive_store_private.platform_secrets
+          SET value = $1::bytea, algo = 'plain', updated_at = now()
+          WHERE id = $2
         `;
-        const lookupResult = await client.query<{ id: string }>(lookupSql, [slug]);
-        if (lookupResult.rows.length === 0) {
-          throw new Error('PROVIDER_NOT_FOUND');
-        }
+        await ctx.pool.query(updateSecretSql, [body.clientSecret, secretId]);
+      } else {
+        // Insert new secret
+        const insertSecretSql = `
+          INSERT INTO constructive_store_private.platform_secrets (database_id, namespace_id, name, value, algo)
+          VALUES ($1, $2, $3, $4::bytea, 'plain')
+          RETURNING id
+        `;
+        const secretResult = await ctx.pool.query<{ id: string }>(insertSecretSql, [
+          databaseId,
+          namespaceId,
+          `${slug}/client-secret`,
+          body.clientSecret,
+        ]);
+        secretId = secretResult.rows[0].id;
 
-        const providerId = lookupResult.rows[0].id;
+        // Link secret to provider
+        const linkSql = `
+          UPDATE ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, tableName)}
+          SET client_secret_id = $1
+          WHERE id = $2
+        `;
+        await ctx.pool.query(linkSql, [secretId, provider.id]);
+      }
 
-        // Call the rotate secret procedure
-        const rotateSql = `CALL ${QuoteUtils.quoteQualifiedIdentifier(privateSchemaName, rotateSecretFunction)}($1, $2)`;
-        await client.query(rotateSql, [providerId, body.clientSecret]);
-      });
-
-      log.info(`[admin-identity-providers] Rotated secret for provider ${slug}`);
+      log.info(`[admin-identity-providers] Set secret for provider ${slug}`);
       res.json({ success: true });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
