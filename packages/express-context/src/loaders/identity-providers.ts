@@ -30,7 +30,8 @@ const IDENTITY_PROVIDERS_MODULE_SQL = `
   SELECT
     s.schema_name,
     ps.schema_name AS private_schema_name,
-    ipm.table_name
+    ipm.table_name,
+    ipm.prefix
   FROM metaschema_modules_public.identity_providers_module ipm
   JOIN metaschema_public.schema s ON s.id = ipm.schema_id
   JOIN metaschema_public.schema ps ON ps.id = ipm.private_schema_id
@@ -73,6 +74,7 @@ interface IdentityProvidersModuleRow {
   schema_name: string;
   private_schema_name: string;
   table_name: string;
+  prefix: string;
 }
 
 interface ProviderRow {
@@ -138,6 +140,8 @@ export const identityProvidersLoader: ModuleLoader<IdentityProvidersConfig> =
         schemaName: moduleRow.schema_name,
         privateSchemaName: moduleRow.private_schema_name,
         tableName: moduleRow.table_name,
+        prefix: moduleRow.prefix,
+        rotateSecretFunction: `rotate_identity_provider_${moduleRow.prefix}_secret`,
         signInIdentityFunction: 'sign_in_identity',
         signUpIdentityFunction: 'sign_up_identity',
         providers,
