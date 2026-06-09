@@ -10,7 +10,7 @@
  *   PATCH /app-settings-auth  → update settings
  */
 
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
 import type { ConstructiveContext } from '@constructive-io/express-context';
@@ -31,6 +31,8 @@ const AUTH_SETTINGS_DISCOVERY_SQL = `
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 interface AuthSettingsRow {
+  allow_identity_sign_in: boolean;
+  allow_identity_sign_up: boolean;
   cookie_secure: boolean;
   cookie_samesite: string;
   cookie_domain: string | null;
@@ -46,6 +48,8 @@ interface AuthSettingsRow {
 }
 
 interface UpdateAuthSettingsBody {
+  allowIdentitySignIn?: boolean;
+  allowIdentitySignUp?: boolean;
   cookieSecure?: boolean;
   cookieSamesite?: string;
   cookieDomain?: string | null;
@@ -62,9 +66,23 @@ interface UpdateAuthSettingsBody {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function requireAdmin(ctx: ConstructiveContext, res: Response): boolean {
-  if (ctx.token?.role !== 'administrator') {
-    res.status(403).json({ error: 'ADMIN_REQUIRED' });
+async function isAppMember(ctx: ConstructiveContext): Promise<boolean> {
+  const userId = ctx.userId;
+  if (!userId) return false;
+
+  // Check if user is an app member (has a record in app_memberships_sprt)
+  const sql = `
+    SELECT 1 FROM constructive_memberships_private.app_memberships_sprt
+    WHERE actor_id = $1
+    LIMIT 1
+  `;
+  const result = await ctx.pool.query(sql, [userId]);
+  return result.rows.length > 0;
+}
+
+async function requireAppMember(ctx: ConstructiveContext, res: Response): Promise<boolean> {
+  if (!(await isAppMember(ctx))) {
+    res.status(403).json({ error: 'MEMBERSHIP_REQUIRED' });
     return false;
   }
   return true;
@@ -73,20 +91,21 @@ function requireAdmin(ctx: ConstructiveContext, res: Response): boolean {
 async function discoverAuthSettingsTable(
   ctx: ConstructiveContext,
 ): Promise<{ schemaName: string; tableName: string } | null> {
-  return await ctx.withPgClient(async (client) => {
-    const result = await client.query<{ schema_name: string; table_name: string }>(
-      AUTH_SETTINGS_DISCOVERY_SQL,
-    );
-    const row = result.rows[0];
-    if (!row) return null;
-    return { schemaName: row.schema_name, tableName: row.table_name };
-  });
+  const result = await ctx.pool.query<{ schema_name: string; table_name: string }>(
+    AUTH_SETTINGS_DISCOVERY_SQL,
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return { schemaName: row.schema_name, tableName: row.table_name };
 }
 
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 export function createAppSettingsAuthRouter(): Router {
   const router = Router();
+
+  // Parse JSON body for PATCH requests
+  router.use(express.json());
 
   /**
    * GET /app-settings-auth
@@ -98,7 +117,7 @@ export function createAppSettingsAuthRouter(): Router {
       return res.status(500).json({ error: 'Missing context' });
     }
 
-    if (!requireAdmin(ctx, res)) return;
+    if (!(await requireAppMember(ctx, res))) return;
 
     try {
       const table = await discoverAuthSettingsTable(ctx);
@@ -106,33 +125,35 @@ export function createAppSettingsAuthRouter(): Router {
         return res.status(404).json({ error: 'Auth settings module not configured' });
       }
 
-      const settings = await ctx.withPgClient(async (client) => {
-        const sql = `
-          SELECT
-            cookie_secure,
-            cookie_samesite,
-            cookie_domain,
-            cookie_httponly,
-            cookie_max_age::text,
-            cookie_path,
-            remember_me_duration::text,
-            enable_captcha,
-            captcha_site_key,
-            oauth_state_max_age::text,
-            oauth_require_verified_email,
-            oauth_error_redirect_path
-          FROM ${QuoteUtils.quoteQualifiedIdentifier(table.schemaName, table.tableName)}
-          LIMIT 1
-        `;
-        const result = await client.query<AuthSettingsRow>(sql);
-        return result.rows[0];
-      });
+      const sql = `
+        SELECT
+          allow_identity_sign_in,
+          allow_identity_sign_up,
+          cookie_secure,
+          cookie_samesite,
+          cookie_domain,
+          cookie_httponly,
+          cookie_max_age::text,
+          cookie_path,
+          remember_me_duration::text,
+          enable_captcha,
+          captcha_site_key,
+          oauth_state_max_age::text,
+          oauth_require_verified_email,
+          oauth_error_redirect_path
+        FROM ${QuoteUtils.quoteQualifiedIdentifier(table.schemaName, table.tableName)}
+        LIMIT 1
+      `;
+      const result = await ctx.pool.query<AuthSettingsRow>(sql);
+      const settings = result.rows[0];
 
       if (!settings) {
         return res.status(404).json({ error: 'Auth settings not found' });
       }
 
       res.json({
+        allowIdentitySignIn: settings.allow_identity_sign_in,
+        allowIdentitySignUp: settings.allow_identity_sign_up,
         cookieSecure: settings.cookie_secure,
         cookieSamesite: settings.cookie_samesite,
         cookieDomain: settings.cookie_domain,
@@ -162,7 +183,7 @@ export function createAppSettingsAuthRouter(): Router {
       return res.status(500).json({ error: 'Missing context' });
     }
 
-    if (!requireAdmin(ctx, res)) return;
+    if (!(await requireAppMember(ctx, res))) return;
 
     const body = req.body as UpdateAuthSettingsBody;
 
@@ -173,6 +194,8 @@ export function createAppSettingsAuthRouter(): Router {
       }
 
       const fieldMap: Record<string, string> = {
+        allowIdentitySignIn: 'allow_identity_sign_in',
+        allowIdentitySignUp: 'allow_identity_sign_up',
         cookieSecure: 'cookie_secure',
         cookieSamesite: 'cookie_samesite',
         cookieDomain: 'cookie_domain',
@@ -207,13 +230,11 @@ export function createAppSettingsAuthRouter(): Router {
         return res.status(400).json({ error: 'No fields to update' });
       }
 
-      await ctx.withPgClient(async (client) => {
-        const sql = `
-          UPDATE ${QuoteUtils.quoteQualifiedIdentifier(table.schemaName, table.tableName)}
-          SET ${setClauses.join(', ')}
-        `;
-        await client.query(sql, values);
-      });
+      const sql = `
+        UPDATE ${QuoteUtils.quoteQualifiedIdentifier(table.schemaName, table.tableName)}
+        SET ${setClauses.join(', ')}
+      `;
+      await ctx.pool.query(sql, values);
 
       log.info('[app-settings-auth] Updated settings');
       res.json({ success: true });
