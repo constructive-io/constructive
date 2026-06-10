@@ -149,33 +149,40 @@ export function createDownloadUrlPlugin(
                       let downloadUrlExpirySeconds = 3600;
                       try {
                         if (withPgClient && pgSettings) {
-                          const resolved = await withPgClient(null, async (pgClient: any) => {
+                          // 1. Get databaseId with user connection (needs JWT claims)
+                          const databaseId = await withPgClient(pgSettings, async (pgClient: any) => {
                             const dbResult = await pgClient.query({
                               text: `SELECT jwt_private.current_database_id() AS id`,
                             });
-                            const databaseId = dbResult.rows[0]?.id;
-                            if (!databaseId) return null;
-                            const allConfigs = await loadAllStorageModules(pgClient, databaseId);
-                            const config = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-                            if (!config) return null;
-
-                            // Look up the bucket key for scoped S3 resolution
-                            let bucketKey = 'public';
-                            if (bucketId) {
-                              const bucketResult = await pgClient.query({
-                                text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
-                                values: [bucketId],
-                              });
-                              if (bucketResult.rows[0]?.key) {
-                                bucketKey = bucketResult.rows[0].key;
-                              }
-                            }
-
-                            return { config, databaseId, bucketKey };
+                            return dbResult.rows[0]?.id ?? null;
                           });
-                          if (resolved) {
-                            downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;
-                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId, resolved.bucketKey);
+                          if (!databaseId) {
+                            // Fall back to global config
+                          } else {
+                            // 2. Load storage config + bucket key with ROOT connection (no RLS)
+                            const resolved = await withPgClient(null, async (rootClient: any) => {
+                              const allConfigs = await loadAllStorageModules(rootClient, databaseId);
+                              const config = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
+                              if (!config) return null;
+
+                              // Look up the bucket key for scoped S3 resolution
+                              let bucketKey = 'public';
+                              if (bucketId) {
+                                const bucketResult = await rootClient.query({
+                                  text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                                  values: [bucketId],
+                                });
+                                if (bucketResult.rows[0]?.key) {
+                                  bucketKey = bucketResult.rows[0].key;
+                                }
+                              }
+
+                              return { config, databaseId, bucketKey };
+                            });
+                            if (resolved) {
+                              downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;
+                              s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId, resolved.bucketKey);
+                            }
                           }
                         }
                       } catch {
