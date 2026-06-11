@@ -4,7 +4,6 @@ This document is the single source of truth for Constructive upload behavior acr
 
 - `graphile/graphile-upload-plugin` (GraphQL upload field wrapping)
 - `graphile/graphile-settings` (upload resolver + storage helpers)
-- `graphql/server` (`POST /upload` endpoint + upload auth middleware)
 
 It replaces the previous upload handoff notes so upload behavior is documented
 in one place.
@@ -19,11 +18,6 @@ For CRUD updates, trying to rely on `*Upload` patch fields can fail in the plan
 phase (before resolver-time upload transformation), causing:
 
 - `"Attempted to update a record, but no new values were specified."`
-
-The stable production pattern is now:
-
-1. Upload file to `POST /upload` (REST multipart endpoint)
-2. Patch DB row with returned metadata via normal JSON GraphQL mutation
 
 ## Current Design
 
@@ -64,8 +58,7 @@ Files:
 - `uploads/s3-streamer/src/streamer.ts`
 - `uploads/s3-streamer/src/utils.ts`
 
-`uploadResolver` and `streamToStorage` are shared by GraphQL resolver path and
-REST endpoint path.
+`uploadResolver` streams GraphQL upload values to configured object storage.
 
 Security behavior:
 
@@ -75,73 +68,6 @@ Security behavior:
 
 This prevents writing disallowed files to object storage and avoids orphaned
 objects from post-upload MIME rejection.
-
-### 3) REST `/upload` Endpoint + Upload-Specific Auth
-
-File:
-- `graphql/server/src/middleware/upload.ts`
-
-This file now contains both:
-
-- `createUploadAuthenticateMiddleware(opts)`
-- `uploadRoute`
-
-`upload-auth.ts` was intentionally consolidated into `upload.ts`.
-
-Server wiring:
-- `graphql/server/src/server.ts`
-  - `app.post('/upload', uploadAuthenticate, ...uploadRoute)`
-
-#### Upload auth semantics
-
-`/upload` is strict:
-
-- Requires bearer token
-- Returns HTTP `401` for missing/invalid auth
-- Requires `req.token.user_id`
-
-It does not rely on shared GraphQL auth behavior for anonymous fallback.
-
-RLS module resolution for `/upload`:
-
-1. Use `req.api.rlsModule` when present (API-scoped)
-2. Fallback to database-scoped lookup by `database_id`
-3. Fallback to database-scoped lookup by `dbname`
-
-This preserves existing GraphQL route semantics while making `/upload` work for
-both:
-
-- meta API hosts (`api.localhost:3000`)
-- data API hosts (`app-public-...localhost:3000`)
-
-#### Upload endpoint behavior
-
-Request:
-
-- `POST /upload`
-- `Content-Type: multipart/form-data`
-- one file field named `file`
-- `Authorization: Bearer <token>`
-
-Success response (`200`):
-
-```json
-{
-  "url": "https://bucket.s3.amazonaws.com/a8f3k2m9x1-photo.jpg",
-  "filename": "photo.jpg",
-  "mime": "image/jpeg",
-  "size": 123456
-}
-```
-
-Errors:
-
-- `401` auth missing/invalid
-- `400` no `file` field
-- `413` payload too large (multer limit)
-
-Current route file-size limit:
-- `10 MB` (`graphql/server/src/middleware/upload.ts`)
 
 ## Resolver-Based vs Plan-Based (Decision)
 
@@ -163,18 +89,13 @@ Revisit if:
 
 ## Frontend Integration Contract
 
-Use two-step flow:
+Use GraphQL-backed upload flows. Do not derive a REST upload endpoint from the
+GraphQL endpoint.
 
-1. Upload file to `/upload`
-2. Patch actual DB column field in JSON GraphQL mutation
+For domain-backed row fields, use GraphQL multipart direct upload when the
+generated schema exposes `*Upload` input fields.
 
-Do not patch `*Upload` fields in CRUD inputs for this flow.
-
-Upload URL derivation from GraphQL endpoint:
-
-```ts
-const uploadUrl = graphqlEndpoint.replace(/\/graphql\/?$/, '/upload');
-```
+For storage-module file records, use presigned URL upload.
 
 Column patch shape depends on DB domain:
 
@@ -189,13 +110,8 @@ From `graphql/server/src/server.ts`:
   - `graphqlUploadExpress()`
   - `multipartBridge`
   - shared API/auth/graphile chain
-- `/upload`
-  - shared API resolution (`api`)
-  - upload-specific auth (`createUploadAuthenticateMiddleware`)
-  - multipart parsing + storage (`uploadRoute`)
 
-`graphqlUploadExpress` remains scoped to `/graphql` and does not interfere with
-`/upload`.
+`graphqlUploadExpress` remains scoped to `/graphql`.
 
 ## Test Coverage
 
@@ -205,12 +121,26 @@ Current key tests:
   - max size enforcement on resolver-consumed streams
 - `graphile/graphile-settings/__tests__/upload-resolver.test.ts`
   - MIME validation before storage upload
-- `graphql/server/src/middleware/__tests__/upload.test.ts`
-  - upload auth behavior, fallback RLS resolution, strict auth handling
 
-## Operational Notes
+## Removed REST `/upload` Endpoint
 
-- Auth failures on `/upload` are intentionally HTTP `401` JSON errors.
-- GraphQL shared auth behavior (including anon fallback patterns) is unchanged.
-- This separation avoids cross-route behavior regressions while fixing data API
-  upload auth.
+The historical REST `POST /upload` endpoint and its upload-specific auth
+middleware have been removed from `graphql/server`.
+
+Removed server pieces included:
+
+- `graphql/server/src/middleware/upload.ts`
+- `createUploadAuthenticateMiddleware(opts)`
+- `uploadRoute`
+- `multer`
+- `streamToStorage()`
+
+Clients must stop deriving upload URLs with:
+
+```ts
+const uploadUrl = graphqlEndpoint.replace(/\/graphql\/?$/, '/upload');
+```
+
+Known dashboard impact is documented in:
+
+- `graphile/graphile-upload-plugin/DASHBOARD_UPLOAD_FOLLOWUP.md`
