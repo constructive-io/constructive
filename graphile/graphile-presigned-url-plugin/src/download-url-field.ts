@@ -166,16 +166,13 @@ export function createDownloadUrlPlugin(
                               if (!config) return null;
 
                               // Look up the bucket key for scoped S3 resolution
-                              let bucketKey = 'public';
-                              if (bucketId) {
-                                const bucketResult = await rootClient.query({
-                                  text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
-                                  values: [bucketId],
-                                });
-                                if (bucketResult.rows[0]?.key) {
-                                  bucketKey = bucketResult.rows[0].key;
-                                }
-                              }
+                              if (!bucketId) return null;
+                              const bucketResult = await rootClient.query({
+                                text: `SELECT key FROM ${config.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
+                                values: [bucketId],
+                              });
+                              const bucketKey = bucketResult.rows[0]?.key;
+                              if (!bucketKey) return null;
 
                               return { config, databaseId, bucketKey };
                             });
