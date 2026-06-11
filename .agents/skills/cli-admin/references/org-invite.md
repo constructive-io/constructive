@@ -12,8 +12,8 @@ csdk org-invite list --where.<field>.<op> <value> --orderBy <values>
 csdk org-invite list --limit 10 --after <cursor>
 csdk org-invite find-first --where.<field>.<op> <value>
 csdk org-invite get --id <UUID>
-csdk org-invite create --entityId <UUID> [--email <Email>] [--senderId <UUID>] [--receiverId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--isReadOnly <Boolean>] [--expiresAt <Datetime>]
-csdk org-invite update --id <UUID> [--email <Email>] [--senderId <UUID>] [--receiverId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--isReadOnly <Boolean>] [--expiresAt <Datetime>] [--entityId <UUID>]
+csdk org-invite create --entityId <UUID> [--channel <String>] [--email <Email>] [--phone <String>] [--senderId <UUID>] [--receiverId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--isReadOnly <Boolean>] [--expiresAt <Datetime>]
+csdk org-invite update --id <UUID> [--channel <String>] [--email <Email>] [--phone <String>] [--senderId <UUID>] [--receiverId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--isReadOnly <Boolean>] [--expiresAt <Datetime>] [--entityId <UUID>]
 csdk org-invite delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-invite list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgInvite
 
 ```bash
-csdk org-invite create --entityId <UUID> [--email <Email>] [--senderId <UUID>] [--receiverId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--isReadOnly <Boolean>] [--expiresAt <Datetime>]
+csdk org-invite create --entityId <UUID> [--channel <String>] [--email <Email>] [--phone <String>] [--senderId <UUID>] [--receiverId <UUID>] [--inviteToken <String>] [--inviteValid <Boolean>] [--inviteLimit <Int>] [--inviteCount <Int>] [--multiple <Boolean>] [--data <JSON>] [--profileId <UUID>] [--isReadOnly <Boolean>] [--expiresAt <Datetime>]
 ```
 
 ### Get a orgInvite by id

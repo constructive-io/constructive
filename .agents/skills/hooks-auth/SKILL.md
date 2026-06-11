@@ -1,13 +1,13 @@
 ---
 name: hooks-auth
-description: React Query hooks for the auth API — provides typed query and mutation hooks for 9 tables and 27 custom operations
+description: React Query hooks for the auth API — provides typed query and mutation hooks for 9 tables and 30 custom operations
 ---
 
 # hooks-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the auth API — provides typed query and mutation hooks for 9 tables and 27 custom operations
+React Query hooks for the auth API — provides typed query and mutation hooks for 9 tables and 30 custom operations
 
 ## Usage
 
@@ -66,8 +66,11 @@ See the `references/` directory for detailed per-entity API documentation:
 - [provision-new-user](references/provision-new-user.md)
 - [reset-password](references/reset-password.md)
 - [sign-in-cross-origin](references/sign-in-cross-origin.md)
+- [sign-in-sms-otp](references/sign-in-sms-otp.md)
+- [sign-up-sms](references/sign-up-sms.md)
 - [sign-up](references/sign-up.md)
 - [sign-in](references/sign-in.md)
+- [link-identity](references/link-identity.md)
 - [extend-token-expires](references/extend-token-expires.md)
 - [create-api-key](references/create-api-key.md)
 - [request-cross-origin-token](references/request-cross-origin-token.md)

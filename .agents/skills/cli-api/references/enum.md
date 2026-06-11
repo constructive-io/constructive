@@ -12,8 +12,8 @@ csdk enum list --where.<field>.<op> <value> --orderBy <values>
 csdk enum list --limit 10 --after <cursor>
 csdk enum find-first --where.<field>.<op> <value>
 csdk enum get --id <UUID>
-csdk enum create --databaseId <UUID> --schemaId <UUID> --name <String> [--label <String>] [--description <String>] [--values <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--module <String>] [--scope <Int>] [--tags <String>]
-csdk enum update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--name <String>] [--label <String>] [--description <String>] [--values <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--module <String>] [--scope <Int>] [--tags <String>]
+csdk enum create --databaseId <UUID> --schemaId <UUID> --name <String> [--label <String>] [--description <String>] [--values <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk enum update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--name <String>] [--label <String>] [--description <String>] [--values <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
 csdk enum delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk enum list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a enum
 
 ```bash
-csdk enum create --databaseId <UUID> --schemaId <UUID> --name <String> [--label <String>] [--description <String>] [--values <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--module <String>] [--scope <Int>] [--tags <String>]
+csdk enum create --databaseId <UUID> --schemaId <UUID> --name <String> [--label <String>] [--description <String>] [--values <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
 ```
 
 ### Get a enum by id

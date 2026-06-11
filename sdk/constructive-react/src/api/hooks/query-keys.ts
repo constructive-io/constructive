@@ -217,6 +217,15 @@ export const enumKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...enumKeys.details(), id] as const,
 } as const;
+export const compositeTypeKeys = {
+  /** All compositeType queries */ all: ['compositetype'] as const,
+  /** List query keys */ lists: () => [...compositeTypeKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...compositeTypeKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...compositeTypeKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...compositeTypeKeys.details(), id] as const,
+} as const;
 export const apiSchemaKeys = {
   /** All apiSchema queries */ all: ['apischema'] as const,
   /** List query keys */ lists: () => [...apiSchemaKeys.all, 'list'] as const,
@@ -478,6 +487,7 @@ export const queryKeys = {
   schemaGrant: schemaGrantKeys,
   defaultPrivilege: defaultPrivilegeKeys,
   enum: enumKeys,
+  compositeType: compositeTypeKeys,
   apiSchema: apiSchemaKeys,
   apiModule: apiModuleKeys,
   domain: domainKeys,

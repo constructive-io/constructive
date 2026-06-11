@@ -21,8 +21,11 @@ import type {
   ProvisionNewUserInput,
   ResetPasswordInput,
   SignInCrossOriginInput,
+  SignInSmsOtpInput,
+  SignUpSmsInput,
   SignUpInput,
   SignInInput,
+  LinkIdentityInput,
   ExtendTokenExpiresInput,
   CreateApiKeyInput,
   RequestCrossOriginTokenInput,
@@ -43,8 +46,11 @@ import type {
   ProvisionNewUserPayload,
   ResetPasswordPayload,
   SignInCrossOriginPayload,
+  SignInSmsOtpPayload,
+  SignUpSmsPayload,
   SignUpPayload,
   SignInPayload,
+  LinkIdentityPayload,
   ExtendTokenExpiresPayload,
   CreateApiKeyPayload,
   RequestCrossOriginTokenPayload,
@@ -65,8 +71,11 @@ import type {
   ProvisionNewUserPayloadSelect,
   ResetPasswordPayloadSelect,
   SignInCrossOriginPayloadSelect,
+  SignInSmsOtpPayloadSelect,
+  SignUpSmsPayloadSelect,
   SignUpPayloadSelect,
   SignInPayloadSelect,
+  LinkIdentityPayloadSelect,
   ExtendTokenExpiresPayloadSelect,
   CreateApiKeyPayloadSelect,
   RequestCrossOriginTokenPayloadSelect,
@@ -117,11 +126,20 @@ export interface ResetPasswordVariables {
 export interface SignInCrossOriginVariables {
   input: SignInCrossOriginInput;
 }
+export interface SignInSmsOtpVariables {
+  input: SignInSmsOtpInput;
+}
+export interface SignUpSmsVariables {
+  input: SignUpSmsInput;
+}
 export interface SignUpVariables {
   input: SignUpInput;
 }
 export interface SignInVariables {
   input: SignInInput;
+}
+export interface LinkIdentityVariables {
+  input: LinkIdentityInput;
 }
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
@@ -556,6 +574,64 @@ export function createMutationOperations(client: OrmClient) {
           'SignInCrossOriginPayload'
         ),
       }),
+    signInSmsOtp: <S extends SignInSmsOtpPayloadSelect>(
+      args: SignInSmsOtpVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SignInSmsOtpPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        signInSmsOtp: InferSelectResult<SignInSmsOtpPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SignInSmsOtp',
+        fieldName: 'signInSmsOtp',
+        ...buildCustomDocument(
+          'mutation',
+          'SignInSmsOtp',
+          'signInSmsOtp',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SignInSmsOtpInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SignInSmsOtpPayload'
+        ),
+      }),
+    signUpSms: <S extends SignUpSmsPayloadSelect>(
+      args: SignUpSmsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SignUpSmsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        signUpSms: InferSelectResult<SignUpSmsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SignUpSms',
+        fieldName: 'signUpSms',
+        ...buildCustomDocument(
+          'mutation',
+          'SignUpSms',
+          'signUpSms',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SignUpSmsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SignUpSmsPayload'
+        ),
+      }),
     signUp: <S extends SignUpPayloadSelect>(
       args: SignUpVariables,
       options: {
@@ -612,6 +688,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SignInPayload'
+        ),
+      }),
+    linkIdentity: <S extends LinkIdentityPayloadSelect>(
+      args: LinkIdentityVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, LinkIdentityPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        linkIdentity: InferSelectResult<LinkIdentityPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'LinkIdentity',
+        fieldName: 'linkIdentity',
+        ...buildCustomDocument(
+          'mutation',
+          'LinkIdentity',
+          'linkIdentity',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'LinkIdentityInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'LinkIdentityPayload'
         ),
       }),
     extendTokenExpires: <S extends ExtendTokenExpiresPayloadSelect>(

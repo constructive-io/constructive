@@ -231,7 +231,7 @@ export interface UUIDListFilter {
   anyGreaterThanOrEqualTo?: string;
 }
 // ============ Enum Types ============
-export type ObjectCategory = 'CORE' | 'MODULE' | 'APP';
+export type ObjectCategory = 'CORE' | 'MODULE' | 'PERMISSIONS' | 'AUTH' | 'MEMBERSHIPS' | 'APP';
 // ============ Custom Scalar Types ============
 export type ConstructiveInternalTypeAttachment = unknown;
 export type ConstructiveInternalTypeHostname = unknown;
@@ -254,7 +254,6 @@ export interface Schema {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   isPublic?: boolean | null;
@@ -270,7 +269,6 @@ export interface Table {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   useRls?: boolean | null;
   timestamps?: boolean | null;
@@ -282,9 +280,9 @@ export interface Table {
   partitionStrategy?: string | null;
   partitionKeyNames?: string[] | null;
   partitionKeyTypes?: string[] | null;
-  inheritsId?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  inheritsId?: string | null;
 }
 export interface CheckConstraint {
   id: string;
@@ -296,7 +294,6 @@ export interface CheckConstraint {
   expr?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -322,7 +319,6 @@ export interface Field {
   max?: number | null;
   tags?: string[] | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -338,7 +334,6 @@ export interface SpatialRelation {
   operator?: string | null;
   paramName?: string | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -358,7 +353,6 @@ export interface ForeignKeyConstraint {
   deleteAction?: string | null;
   updateAction?: string | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -391,7 +385,6 @@ export interface Index {
   opClasses?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -410,7 +403,6 @@ export interface Policy {
   data?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -425,7 +417,6 @@ export interface PrimaryKeyConstraint {
   fieldIds?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -451,7 +442,6 @@ export interface Trigger {
   functionName?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -467,7 +457,6 @@ export interface UniqueConstraint {
   type?: string | null;
   fieldIds?: string[] | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
@@ -487,13 +476,13 @@ export interface View {
   isReadOnly?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
 /** Junction table linking views to their joined tables for referential integrity */
 export interface ViewTable {
   id: string;
+  databaseId?: string | null;
   viewId?: string | null;
   tableId?: string | null;
   joinOrder?: number | null;
@@ -568,7 +557,19 @@ export interface Enum {
   values?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
+  scope?: number | null;
+  tags?: string[] | null;
+}
+export interface CompositeType {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  name?: string | null;
+  label?: string | null;
+  description?: string | null;
+  attributes?: Record<string, unknown> | null;
+  smartTags?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -989,6 +990,7 @@ export interface SchemaRelations {
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
   enums?: ConnectionResult<Enum>;
   functions?: ConnectionResult<Function>;
+  compositeTypes?: ConnectionResult<CompositeType>;
   apiSchemas?: ConnectionResult<ApiSchema>;
 }
 export interface TableRelations {
@@ -1072,6 +1074,7 @@ export interface ViewRelations {
   viewRules?: ConnectionResult<ViewRule>;
 }
 export interface ViewTableRelations {
+  database?: Database | null;
   table?: Table | null;
   view?: View | null;
 }
@@ -1099,6 +1102,10 @@ export interface DefaultPrivilegeRelations {
   schema?: Schema | null;
 }
 export interface EnumRelations {
+  database?: Database | null;
+  schema?: Schema | null;
+}
+export interface CompositeTypeRelations {
   database?: Database | null;
   schema?: Schema | null;
 }
@@ -1197,6 +1204,7 @@ export interface DatabaseRelations {
   triggers?: ConnectionResult<Trigger>;
   uniqueConstraints?: ConnectionResult<UniqueConstraint>;
   views?: ConnectionResult<View>;
+  viewTables?: ConnectionResult<ViewTable>;
   viewGrants?: ConnectionResult<ViewGrant>;
   viewRules?: ConnectionResult<ViewRule>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
@@ -1205,6 +1213,7 @@ export interface DatabaseRelations {
   spatialRelations?: ConnectionResult<SpatialRelation>;
   functions?: ConnectionResult<Function>;
   partitions?: ConnectionResult<Partition>;
+  compositeTypes?: ConnectionResult<CompositeType>;
   databaseTransfers?: ConnectionResult<DatabaseTransfer>;
   apis?: ConnectionResult<Api>;
   apiModules?: ConnectionResult<ApiModule>;
@@ -1271,6 +1280,7 @@ export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelatio
 export type SchemaGrantWithRelations = SchemaGrant & SchemaGrantRelations;
 export type DefaultPrivilegeWithRelations = DefaultPrivilege & DefaultPrivilegeRelations;
 export type EnumWithRelations = Enum & EnumRelations;
+export type CompositeTypeWithRelations = CompositeType & CompositeTypeRelations;
 export type ApiSchemaWithRelations = ApiSchema & ApiSchemaRelations;
 export type ApiModuleWithRelations = ApiModule & ApiModuleRelations;
 export type DomainWithRelations = Domain & DomainRelations;
@@ -1316,7 +1326,6 @@ export type SchemaSelect = {
   description?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   isPublic?: boolean;
@@ -1361,6 +1370,12 @@ export type SchemaSelect = {
     filter?: FunctionFilter;
     orderBy?: FunctionOrderBy[];
   };
+  compositeTypes?: {
+    select: CompositeTypeSelect;
+    first?: number;
+    filter?: CompositeTypeFilter;
+    orderBy?: CompositeTypeOrderBy[];
+  };
   apiSchemas?: {
     select: ApiSchemaSelect;
     first?: number;
@@ -1377,7 +1392,6 @@ export type TableSelect = {
   description?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   useRls?: boolean;
   timestamps?: boolean;
@@ -1389,9 +1403,9 @@ export type TableSelect = {
   partitionStrategy?: boolean;
   partitionKeyNames?: boolean;
   partitionKeyTypes?: boolean;
-  inheritsId?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
+  inheritsId?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -1511,7 +1525,6 @@ export type CheckConstraintSelect = {
   expr?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1543,7 +1556,6 @@ export type FieldSelect = {
   max?: boolean;
   tags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1577,7 +1589,6 @@ export type SpatialRelationSelect = {
   operator?: boolean;
   paramName?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1612,7 +1623,6 @@ export type ForeignKeyConstraintSelect = {
   deleteAction?: boolean;
   updateAction?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1660,7 +1670,6 @@ export type IndexSelect = {
   opClasses?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1685,7 +1694,6 @@ export type PolicySelect = {
   data?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1706,7 +1714,6 @@ export type PrimaryKeyConstraintSelect = {
   fieldIds?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1744,7 +1751,6 @@ export type TriggerSelect = {
   functionName?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1766,7 +1772,6 @@ export type UniqueConstraintSelect = {
   type?: boolean;
   fieldIds?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
@@ -1792,7 +1797,6 @@ export type ViewSelect = {
   isReadOnly?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
   scope?: boolean;
   tags?: boolean;
   database?: {
@@ -1825,9 +1829,13 @@ export type ViewSelect = {
 };
 export type ViewTableSelect = {
   id?: boolean;
+  databaseId?: boolean;
   viewId?: boolean;
   tableId?: boolean;
   joinOrder?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
   table?: {
     select: TableSelect;
   };
@@ -1941,7 +1949,25 @@ export type EnumSelect = {
   values?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  module?: boolean;
+  scope?: boolean;
+  tags?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
+  };
+};
+export type CompositeTypeSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  name?: boolean;
+  label?: boolean;
+  description?: boolean;
+  attributes?: boolean;
+  smartTags?: boolean;
+  category?: boolean;
   scope?: boolean;
   tags?: boolean;
   database?: {
@@ -2376,6 +2402,12 @@ export type DatabaseSelect = {
     filter?: ViewFilter;
     orderBy?: ViewOrderBy[];
   };
+  viewTables?: {
+    select: ViewTableSelect;
+    first?: number;
+    filter?: ViewTableFilter;
+    orderBy?: ViewTableOrderBy[];
+  };
   viewGrants?: {
     select: ViewGrantSelect;
     first?: number;
@@ -2423,6 +2455,12 @@ export type DatabaseSelect = {
     first?: number;
     filter?: PartitionFilter;
     orderBy?: PartitionOrderBy[];
+  };
+  compositeTypes?: {
+    select: CompositeTypeSelect;
+    first?: number;
+    filter?: CompositeTypeFilter;
+    orderBy?: CompositeTypeOrderBy[];
   };
   databaseTransfers?: {
     select: DatabaseTransferSelect;
@@ -2674,8 +2712,6 @@ export interface SchemaFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -2718,6 +2754,10 @@ export interface SchemaFilter {
   functions?: SchemaToManyFunctionFilter;
   /** `functions` exist. */
   functionsExist?: boolean;
+  /** Filter by the object’s `compositeTypes` relation. */
+  compositeTypes?: SchemaToManyCompositeTypeFilter;
+  /** `compositeTypes` exist. */
+  compositeTypesExist?: boolean;
   /** Filter by the object’s `apiSchemas` relation. */
   apiSchemas?: SchemaToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
@@ -2740,8 +2780,6 @@ export interface TableFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `useRls` field. */
@@ -2764,12 +2802,12 @@ export interface TableFilter {
   partitionKeyNames?: StringListFilter;
   /** Filter by the object’s `partitionKeyTypes` field. */
   partitionKeyTypes?: StringListFilter;
-  /** Filter by the object’s `inheritsId` field. */
-  inheritsId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `inheritsId` field. */
+  inheritsId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: TableFilter[];
   /** Checks for any expressions in this list. */
@@ -2872,8 +2910,6 @@ export interface CheckConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -2932,8 +2968,6 @@ export interface FieldFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2980,8 +3014,6 @@ export interface SpatialRelationFilter {
   paramName?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3034,8 +3066,6 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3118,8 +3148,6 @@ export interface IndexFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3164,8 +3192,6 @@ export interface PolicyFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3202,8 +3228,6 @@ export interface PrimaryKeyConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3270,8 +3294,6 @@ export interface TriggerFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3310,8 +3332,6 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3358,8 +3378,6 @@ export interface ViewFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3394,6 +3412,8 @@ export interface ViewFilter {
 export interface ViewTableFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
   /** Filter by the object’s `tableId` field. */
@@ -3406,6 +3426,8 @@ export interface ViewTableFilter {
   or?: ViewTableFilter[];
   /** Negates the expression. */
   not?: ViewTableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
   /** Filter by the object’s `view` relation. */
@@ -3596,8 +3618,6 @@ export interface EnumFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -3608,6 +3628,40 @@ export interface EnumFilter {
   or?: EnumFilter[];
   /** Negates the expression. */
   not?: EnumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+export interface CompositeTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `attributes` field. */
+  attributes?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: CompositeTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CompositeTypeFilter[];
+  /** Negates the expression. */
+  not?: CompositeTypeFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `schema` relation. */
@@ -4204,6 +4258,10 @@ export interface DatabaseFilter {
   views?: DatabaseToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: DatabaseToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
   /** Filter by the object’s `viewGrants` relation. */
   viewGrants?: DatabaseToManyViewGrantFilter;
   /** `viewGrants` exist. */
@@ -4236,6 +4294,10 @@ export interface DatabaseFilter {
   partitions?: DatabaseToManyPartitionFilter;
   /** `partitions` exist. */
   partitionsExist?: boolean;
+  /** Filter by the object’s `compositeTypes` relation. */
+  compositeTypes?: DatabaseToManyCompositeTypeFilter;
+  /** `compositeTypes` exist. */
+  compositeTypesExist?: boolean;
   /** Filter by the object’s `databaseTransfers` relation. */
   databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
   /** `databaseTransfers` exist. */
@@ -4584,8 +4646,6 @@ export type SchemaOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -4616,8 +4676,6 @@ export type TableOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'USE_RLS_ASC'
@@ -4640,12 +4698,12 @@ export type TableOrderBy =
   | 'PARTITION_KEY_NAMES_DESC'
   | 'PARTITION_KEY_TYPES_ASC'
   | 'PARTITION_KEY_TYPES_DESC'
-  | 'INHERITS_ID_ASC'
-  | 'INHERITS_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'INHERITS_ID_ASC'
+  | 'INHERITS_ID_DESC';
 export type CheckConstraintOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -4668,8 +4726,6 @@ export type CheckConstraintOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -4720,8 +4776,6 @@ export type FieldOrderBy =
   | 'TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'CREATED_AT_ASC'
@@ -4752,8 +4806,6 @@ export type SpatialRelationOrderBy =
   | 'PARAM_NAME_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -4792,8 +4844,6 @@ export type ForeignKeyConstraintOrderBy =
   | 'UPDATE_ACTION_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -4858,8 +4908,6 @@ export type IndexOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -4896,8 +4944,6 @@ export type PolicyOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -4926,8 +4972,6 @@ export type PrimaryKeyConstraintOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -4978,8 +5022,6 @@ export type TriggerOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -5010,8 +5052,6 @@ export type UniqueConstraintOrderBy =
   | 'FIELD_IDS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -5050,8 +5090,6 @@ export type ViewOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -5062,6 +5100,8 @@ export type ViewTableOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'VIEW_ID_ASC'
   | 'VIEW_ID_DESC'
   | 'TABLE_ID_ASC'
@@ -5204,8 +5244,32 @@ export type EnumOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC';
+export type CompositeTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ATTRIBUTES_ASC'
+  | 'ATTRIBUTES_DESC'
+  | 'SMART_TAGS_ASC'
+  | 'SMART_TAGS_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
   | 'TAGS_ASC'
@@ -5737,7 +5801,6 @@ export interface CreateSchemaInput {
     description?: string;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
     isPublic?: boolean;
@@ -5751,7 +5814,6 @@ export interface SchemaPatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
   isPublic?: boolean | null;
@@ -5775,7 +5837,6 @@ export interface CreateTableInput {
     description?: string;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     useRls?: boolean;
     timestamps?: boolean;
@@ -5798,7 +5859,6 @@ export interface TablePatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   useRls?: boolean | null;
   timestamps?: boolean | null;
@@ -5832,7 +5892,6 @@ export interface CreateCheckConstraintInput {
     expr?: Record<string, unknown>;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -5846,7 +5905,6 @@ export interface CheckConstraintPatch {
   expr?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -5880,7 +5938,6 @@ export interface CreateFieldInput {
     max?: number;
     tags?: string[];
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
   };
 }
@@ -5903,7 +5960,6 @@ export interface FieldPatch {
   max?: number | null;
   tags?: string[] | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
 }
 export interface UpdateFieldInput {
@@ -5927,7 +5983,6 @@ export interface CreateSpatialRelationInput {
     operator: string;
     paramName?: string;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -5942,7 +5997,6 @@ export interface SpatialRelationPatch {
   operator?: string | null;
   paramName?: string | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -5970,7 +6024,6 @@ export interface CreateForeignKeyConstraintInput {
     deleteAction?: string;
     updateAction?: string;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -5988,7 +6041,6 @@ export interface ForeignKeyConstraintPatch {
   deleteAction?: string | null;
   updateAction?: string | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6047,7 +6099,6 @@ export interface CreateIndexInput {
     opClasses?: string[];
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -6066,7 +6117,6 @@ export interface IndexPatch {
   opClasses?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6093,7 +6143,6 @@ export interface CreatePolicyInput {
     data?: Record<string, unknown>;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -6110,7 +6159,6 @@ export interface PolicyPatch {
   data?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6133,7 +6181,6 @@ export interface CreatePrimaryKeyConstraintInput {
     fieldIds: string[];
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -6146,7 +6193,6 @@ export interface PrimaryKeyConstraintPatch {
   fieldIds?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6197,7 +6243,6 @@ export interface CreateTriggerInput {
     functionName?: string;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -6210,7 +6255,6 @@ export interface TriggerPatch {
   functionName?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6234,7 +6278,6 @@ export interface CreateUniqueConstraintInput {
     type?: string;
     fieldIds: string[];
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -6248,7 +6291,6 @@ export interface UniqueConstraintPatch {
   type?: string | null;
   fieldIds?: string[] | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6276,7 +6318,6 @@ export interface CreateViewInput {
     isReadOnly?: boolean;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -6294,7 +6335,6 @@ export interface ViewPatch {
   isReadOnly?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6310,12 +6350,14 @@ export interface DeleteViewInput {
 export interface CreateViewTableInput {
   clientMutationId?: string;
   viewTable: {
+    databaseId?: string;
     viewId: string;
     tableId: string;
     joinOrder?: number;
   };
 }
 export interface ViewTablePatch {
+  databaseId?: string | null;
   viewId?: string | null;
   tableId?: string | null;
   joinOrder?: number | null;
@@ -6496,7 +6538,6 @@ export interface CreateEnumInput {
     values?: string[];
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    module?: string;
     scope?: number;
     tags?: string[];
   };
@@ -6510,7 +6551,6 @@ export interface EnumPatch {
   values?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
 }
@@ -6520,6 +6560,42 @@ export interface UpdateEnumInput {
   enumPatch: EnumPatch;
 }
 export interface DeleteEnumInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateCompositeTypeInput {
+  clientMutationId?: string;
+  compositeType: {
+    databaseId: string;
+    schemaId: string;
+    name: string;
+    label?: string;
+    description?: string;
+    attributes?: Record<string, unknown>;
+    smartTags?: Record<string, unknown>;
+    category?: ObjectCategory;
+    scope?: number;
+    tags?: string[];
+  };
+}
+export interface CompositeTypePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  name?: string | null;
+  label?: string | null;
+  description?: string | null;
+  attributes?: Record<string, unknown> | null;
+  smartTags?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
+  scope?: number | null;
+  tags?: string[] | null;
+}
+export interface UpdateCompositeTypeInput {
+  clientMutationId?: string;
+  id: string;
+  compositeTypePatch: CompositeTypePatch;
+}
+export interface DeleteCompositeTypeInput {
   clientMutationId?: string;
   id: string;
 }
@@ -7250,6 +7326,7 @@ export const connectionFieldsMap = {
     defaultPrivileges: 'DefaultPrivilege',
     enums: 'Enum',
     functions: 'Function',
+    compositeTypes: 'CompositeType',
     apiSchemas: 'ApiSchema',
   },
   Table: {
@@ -7307,6 +7384,7 @@ export const connectionFieldsMap = {
     triggers: 'Trigger',
     uniqueConstraints: 'UniqueConstraint',
     views: 'View',
+    viewTables: 'ViewTable',
     viewGrants: 'ViewGrant',
     viewRules: 'ViewRule',
     defaultPrivileges: 'DefaultPrivilege',
@@ -7315,6 +7393,7 @@ export const connectionFieldsMap = {
     spatialRelations: 'SpatialRelation',
     functions: 'Function',
     partitions: 'Partition',
+    compositeTypes: 'CompositeType',
     databaseTransfers: 'DatabaseTransfer',
     apis: 'Api',
     apiModules: 'ApiModule',
@@ -7471,6 +7550,15 @@ export interface SchemaToManyFunctionFilter {
   every?: FunctionFilter;
   /** Filters to entities where no related entity matches. */
   none?: FunctionFilter;
+}
+/** A filter to be used against many `CompositeType` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyCompositeTypeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CompositeTypeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CompositeTypeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CompositeTypeFilter;
 }
 /** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManyApiSchemaFilter {
@@ -8151,6 +8239,15 @@ export interface DatabaseToManyViewFilter {
   /** Filters to entities where no related entity matches. */
   none?: ViewFilter;
 }
+/** A filter to be used against many `ViewTable` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyViewTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewTableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewTableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewTableFilter;
+}
 /** A filter to be used against many `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyViewGrantFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -8222,6 +8319,15 @@ export interface DatabaseToManyPartitionFilter {
   every?: PartitionFilter;
   /** Filters to entities where no related entity matches. */
   none?: PartitionFilter;
+}
+/** A filter to be used against many `CompositeType` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCompositeTypeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CompositeTypeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CompositeTypeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CompositeTypeFilter;
 }
 /** A filter to be used against many `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseTransferFilter {
@@ -8368,8 +8474,6 @@ export interface TableFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `useRls` field. */
@@ -8392,12 +8496,12 @@ export interface TableFilter {
   partitionKeyNames?: StringListFilter;
   /** Filter by the object’s `partitionKeyTypes` field. */
   partitionKeyTypes?: StringListFilter;
-  /** Filter by the object’s `inheritsId` field. */
-  inheritsId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `inheritsId` field. */
+  inheritsId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: TableFilter[];
   /** Checks for any expressions in this list. */
@@ -8534,8 +8638,6 @@ export interface ViewFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -8614,8 +8716,6 @@ export interface EnumFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -8647,6 +8747,41 @@ export interface FunctionFilter {
   or?: FunctionFilter[];
   /** Negates the expression. */
   not?: FunctionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `CompositeType` object types. All fields are combined with a logical ‘and.’ */
+export interface CompositeTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `attributes` field. */
+  attributes?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: CompositeTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CompositeTypeFilter[];
+  /** Negates the expression. */
+  not?: CompositeTypeFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `schema` relation. */
@@ -8695,8 +8830,6 @@ export interface CheckConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -8756,8 +8889,6 @@ export interface FieldFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -8811,8 +8942,6 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -8897,8 +9026,6 @@ export interface IndexFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -8944,8 +9071,6 @@ export interface PolicyFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -8983,8 +9108,6 @@ export interface PrimaryKeyConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -9053,8 +9176,6 @@ export interface TriggerFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -9094,8 +9215,6 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -9119,6 +9238,8 @@ export interface UniqueConstraintFilter {
 export interface ViewTableFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
   /** Filter by the object’s `tableId` field. */
@@ -9131,6 +9252,8 @@ export interface ViewTableFilter {
   or?: ViewTableFilter[];
   /** Negates the expression. */
   not?: ViewTableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
   /** Filter by the object’s `view` relation. */
@@ -9225,8 +9348,6 @@ export interface SpatialRelationFilter {
   paramName?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -9464,8 +9585,6 @@ export interface SchemaFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `module` field. */
-  module?: StringFilter;
   /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
@@ -9508,6 +9627,10 @@ export interface SchemaFilter {
   functions?: SchemaToManyFunctionFilter;
   /** `functions` exist. */
   functionsExist?: boolean;
+  /** Filter by the object’s `compositeTypes` relation. */
+  compositeTypes?: SchemaToManyCompositeTypeFilter;
+  /** `compositeTypes` exist. */
+  compositeTypesExist?: boolean;
   /** Filter by the object’s `apiSchemas` relation. */
   apiSchemas?: SchemaToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
@@ -10121,6 +10244,10 @@ export interface DatabaseFilter {
   views?: DatabaseToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: DatabaseToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
   /** Filter by the object’s `viewGrants` relation. */
   viewGrants?: DatabaseToManyViewGrantFilter;
   /** `viewGrants` exist. */
@@ -10153,6 +10280,10 @@ export interface DatabaseFilter {
   partitions?: DatabaseToManyPartitionFilter;
   /** `partitions` exist. */
   partitionsExist?: boolean;
+  /** Filter by the object’s `compositeTypes` relation. */
+  compositeTypes?: DatabaseToManyCompositeTypeFilter;
+  /** `compositeTypes` exist. */
+  compositeTypesExist?: boolean;
   /** Filter by the object’s `databaseTransfers` relation. */
   databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
   /** `databaseTransfers` exist. */
@@ -11620,6 +11751,51 @@ export type DeleteEnumPayloadSelect = {
     select: EnumEdgeSelect;
   };
 };
+export interface CreateCompositeTypePayload {
+  clientMutationId?: string | null;
+  /** The `CompositeType` that was created by this mutation. */
+  compositeType?: CompositeType | null;
+  compositeTypeEdge?: CompositeTypeEdge | null;
+}
+export type CreateCompositeTypePayloadSelect = {
+  clientMutationId?: boolean;
+  compositeType?: {
+    select: CompositeTypeSelect;
+  };
+  compositeTypeEdge?: {
+    select: CompositeTypeEdgeSelect;
+  };
+};
+export interface UpdateCompositeTypePayload {
+  clientMutationId?: string | null;
+  /** The `CompositeType` that was updated by this mutation. */
+  compositeType?: CompositeType | null;
+  compositeTypeEdge?: CompositeTypeEdge | null;
+}
+export type UpdateCompositeTypePayloadSelect = {
+  clientMutationId?: boolean;
+  compositeType?: {
+    select: CompositeTypeSelect;
+  };
+  compositeTypeEdge?: {
+    select: CompositeTypeEdgeSelect;
+  };
+};
+export interface DeleteCompositeTypePayload {
+  clientMutationId?: string | null;
+  /** The `CompositeType` that was deleted by this mutation. */
+  compositeType?: CompositeType | null;
+  compositeTypeEdge?: CompositeTypeEdge | null;
+}
+export type DeleteCompositeTypePayloadSelect = {
+  clientMutationId?: boolean;
+  compositeType?: {
+    select: CompositeTypeSelect;
+  };
+  compositeTypeEdge?: {
+    select: CompositeTypeEdgeSelect;
+  };
+};
 export interface CreateApiSchemaPayload {
   clientMutationId?: string | null;
   /** The `ApiSchema` that was created by this mutation. */
@@ -12843,6 +13019,18 @@ export type EnumEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: EnumSelect;
+  };
+};
+/** A `CompositeType` edge in the connection. */
+export interface CompositeTypeEdge {
+  cursor?: string | null;
+  /** The `CompositeType` at the end of the edge. */
+  node?: CompositeType | null;
+}
+export type CompositeTypeEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: CompositeTypeSelect;
   };
 };
 /** A `ApiSchema` edge in the connection. */

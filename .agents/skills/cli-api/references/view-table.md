@@ -12,8 +12,8 @@ csdk view-table list --where.<field>.<op> <value> --orderBy <values>
 csdk view-table list --limit 10 --after <cursor>
 csdk view-table find-first --where.<field>.<op> <value>
 csdk view-table get --id <UUID>
-csdk view-table create --viewId <UUID> --tableId <UUID> [--joinOrder <Int>]
-csdk view-table update --id <UUID> [--viewId <UUID>] [--tableId <UUID>] [--joinOrder <Int>]
+csdk view-table create --viewId <UUID> --tableId <UUID> [--databaseId <UUID>] [--joinOrder <Int>]
+csdk view-table update --id <UUID> [--databaseId <UUID>] [--viewId <UUID>] [--tableId <UUID>] [--joinOrder <Int>]
 csdk view-table delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk view-table list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a viewTable
 
 ```bash
-csdk view-table create --viewId <UUID> --tableId <UUID> [--joinOrder <Int>]
+csdk view-table create --viewId <UUID> --tableId <UUID> [--databaseId <UUID>] [--joinOrder <Int>]
 ```
 
 ### Get a viewTable by id

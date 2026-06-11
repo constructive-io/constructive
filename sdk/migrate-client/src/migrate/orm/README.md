@@ -75,6 +75,7 @@ CRUD operations for SqlAction records.
 | `revert` | String | Yes |
 | `verify` | String | Yes |
 | `createdAt` | Datetime | No |
+| `category` | String | Yes |
 | `action` | String | Yes |
 | `actionId` | UUID | Yes |
 | `actorId` | UUID | Yes |
@@ -83,13 +84,13 @@ CRUD operations for SqlAction records.
 
 ```typescript
 // List all sqlAction records
-const items = await db.sqlAction.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const items = await db.sqlAction.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, category: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Get one by id
-const item = await db.sqlAction.findOne({ id: '<Int>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.sqlAction.findOne({ id: '<Int>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, category: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Create
-const created = await db.sqlAction.create({ data: { name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.sqlAction.create({ data: { name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', category: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();

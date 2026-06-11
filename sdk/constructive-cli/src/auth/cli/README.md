@@ -54,8 +54,11 @@ csdk auth set-token <your-token>
 | `provision-new-user` | provisionNewUser |
 | `reset-password` | resetPassword |
 | `sign-in-cross-origin` | signInCrossOrigin |
+| `sign-in-sms-otp` | signInSmsOtp |
+| `sign-up-sms` | signUpSms |
 | `sign-up` | signUp |
 | `sign-in` | signIn |
+| `link-identity` | linkIdentity |
 | `extend-token-expires` | extendTokenExpires |
 | `create-api-key` | createApiKey |
 | `request-cross-origin-token` | requestCrossOriginToken |
@@ -606,6 +609,38 @@ signInCrossOrigin
   | `--input.token` | String |
   | `--input.credentialKind` | String |
 
+### `sign-in-sms-otp`
+
+signInSmsOtp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.phone` | String |
+  | `--input.code` | String |
+  | `--input.credentialKind` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.deviceToken` | String |
+
+### `sign-up-sms`
+
+signUpSms
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.phone` | String |
+  | `--input.code` | String |
+  | `--input.credentialKind` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.deviceToken` | String |
+
 ### `sign-up`
 
 signUp
@@ -639,6 +674,20 @@ signIn
   | `--input.credentialKind` | String |
   | `--input.csrfToken` | String |
   | `--input.deviceToken` | String |
+
+### `link-identity`
+
+linkIdentity
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.service` | String (required) |
+  | `--input.identifier` | String (required) |
+  | `--input.details` | JSON |
 
 ### `extend-token-expires`
 

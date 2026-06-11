@@ -24,7 +24,6 @@ export interface Schema {
   description: string | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   isPublic: boolean | null;
@@ -40,7 +39,6 @@ export interface Table {
   description: string | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   useRls: boolean | null;
   timestamps: boolean | null;
@@ -52,9 +50,9 @@ export interface Table {
   partitionStrategy: string | null;
   partitionKeyNames: string[] | null;
   partitionKeyTypes: string[] | null;
-  inheritsId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  inheritsId: string | null;
 }
 export interface CheckConstraint {
   id: string | null;
@@ -66,7 +64,6 @@ export interface CheckConstraint {
   expr: unknown | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -92,7 +89,6 @@ export interface Field {
   max: number | null;
   tags: string[] | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -108,7 +104,6 @@ export interface SpatialRelation {
   operator: string | null;
   paramName: string | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -128,7 +123,6 @@ export interface ForeignKeyConstraint {
   deleteAction: string | null;
   updateAction: string | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -161,7 +155,6 @@ export interface Index {
   opClasses: string[] | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -180,7 +173,6 @@ export interface Policy {
   data: unknown | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -195,7 +187,6 @@ export interface PrimaryKeyConstraint {
   fieldIds: string[] | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -221,7 +212,6 @@ export interface Trigger {
   functionName: string | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -237,7 +227,6 @@ export interface UniqueConstraint {
   type: string | null;
   fieldIds: string[] | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
   createdAt: string | null;
@@ -257,12 +246,12 @@ export interface View {
   isReadOnly: boolean | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
   scope: number | null;
   tags: string[] | null;
 }
 export interface ViewTable {
   id: string | null;
+  databaseId: string | null;
   viewId: string | null;
   tableId: string | null;
   joinOrder: number | null;
@@ -334,7 +323,19 @@ export interface Enum {
   values: string[] | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
-  module: string | null;
+  scope: number | null;
+  tags: string[] | null;
+}
+export interface CompositeType {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  name: string | null;
+  label: string | null;
+  description: string | null;
+  attributes: unknown | null;
+  smartTags: unknown | null;
+  category: ObjectCategory | null;
   scope: number | null;
   tags: string[] | null;
 }

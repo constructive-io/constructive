@@ -25,6 +25,7 @@ export { EmbeddingChunkModel } from './embeddingChunk';
 export { SchemaGrantModel } from './schemaGrant';
 export { DefaultPrivilegeModel } from './defaultPrivilege';
 export { EnumModel } from './enum';
+export { CompositeTypeModel } from './compositeType';
 export { ApiSchemaModel } from './apiSchema';
 export { ApiModuleModel } from './apiModule';
 export { DomainModel } from './domain';

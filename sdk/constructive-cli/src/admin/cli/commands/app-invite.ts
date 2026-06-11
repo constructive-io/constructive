@@ -17,7 +17,9 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
+  channel: 'string',
   email: 'string',
+  phone: 'string',
   senderId: 'uuid',
   inviteToken: 'string',
   inviteValid: 'boolean',
@@ -82,7 +84,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       id: true,
+      channel: true,
       email: true,
+      phone: true,
       senderId: true,
       inviteToken: true,
       inviteValid: true,
@@ -115,7 +119,9 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       id: true,
+      channel: true,
       email: true,
+      phone: true,
       senderId: true,
       inviteToken: true,
       inviteValid: true,
@@ -160,7 +166,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           id: true,
+          channel: true,
           email: true,
+          phone: true,
           senderId: true,
           inviteToken: true,
           inviteValid: true,
@@ -189,8 +197,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'channel',
+        message: 'channel',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'email',
         message: 'email',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'phone',
+        message: 'phone',
         required: false,
         skipPrompt: true,
       },
@@ -264,7 +286,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.appInvite
       .create({
         data: {
+          channel: cleanedData.channel,
           email: cleanedData.email,
+          phone: cleanedData.phone,
           senderId: cleanedData.senderId,
           inviteToken: cleanedData.inviteToken,
           inviteValid: cleanedData.inviteValid,
@@ -277,7 +301,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           id: true,
+          channel: true,
           email: true,
+          phone: true,
           senderId: true,
           inviteToken: true,
           inviteValid: true,
@@ -312,8 +338,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'channel',
+        message: 'channel',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'email',
         message: 'email',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'phone',
+        message: 'phone',
         required: false,
         skipPrompt: true,
       },
@@ -390,7 +430,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          channel: cleanedData.channel,
           email: cleanedData.email,
+          phone: cleanedData.phone,
           senderId: cleanedData.senderId,
           inviteToken: cleanedData.inviteToken,
           inviteValid: cleanedData.inviteValid,
@@ -403,7 +445,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           id: true,
+          channel: true,
           email: true,
+          phone: true,
           senderId: true,
           inviteToken: true,
           inviteValid: true,

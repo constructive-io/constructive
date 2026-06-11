@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
+  databaseId: 'uuid',
   viewId: 'uuid',
   tableId: 'uuid',
   joinOrder: 'int',
@@ -73,6 +74,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       id: true,
+      databaseId: true,
       viewId: true,
       tableId: true,
       joinOrder: true,
@@ -97,6 +99,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       id: true,
+      databaseId: true,
       viewId: true,
       tableId: true,
       joinOrder: true,
@@ -133,6 +136,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           id: true,
+          databaseId: true,
           viewId: true,
           tableId: true,
           joinOrder: true,
@@ -151,6 +155,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+        skipPrompt: true,
+      },
       {
         type: 'text',
         name: 'viewId',
@@ -177,12 +188,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.viewTable
       .create({
         data: {
+          databaseId: cleanedData.databaseId,
           viewId: cleanedData.viewId,
           tableId: cleanedData.tableId,
           joinOrder: cleanedData.joinOrder,
         },
         select: {
           id: true,
+          databaseId: true,
           viewId: true,
           tableId: true,
           joinOrder: true,
@@ -206,6 +219,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -236,12 +256,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          databaseId: cleanedData.databaseId,
           viewId: cleanedData.viewId,
           tableId: cleanedData.tableId,
           joinOrder: cleanedData.joinOrder,
         },
         select: {
           id: true,
+          databaseId: true,
           viewId: true,
           tableId: true,
           joinOrder: true,

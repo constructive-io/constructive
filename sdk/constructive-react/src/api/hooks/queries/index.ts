@@ -47,6 +47,8 @@ export * from './useDefaultPrivilegesQuery';
 export * from './useDefaultPrivilegeQuery';
 export * from './useEnumsQuery';
 export * from './useEnumQuery';
+export * from './useCompositeTypesQuery';
+export * from './useCompositeTypeQuery';
 export * from './useApiSchemasQuery';
 export * from './useApiSchemaQuery';
 export * from './useApiModulesQuery';

@@ -142,6 +142,11 @@ function App() {
 | `useCreateEnumMutation` | Mutation | Create a enum |
 | `useUpdateEnumMutation` | Mutation | Update a enum |
 | `useDeleteEnumMutation` | Mutation | Delete a enum |
+| `useCompositeTypesQuery` | Query | List all compositeTypes |
+| `useCompositeTypeQuery` | Query | Get one compositeType |
+| `useCreateCompositeTypeMutation` | Mutation | Create a compositeType |
+| `useUpdateCompositeTypeMutation` | Mutation | Update a compositeType |
+| `useDeleteCompositeTypeMutation` | Mutation | Delete a compositeType |
 | `useApiSchemasQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
 | `useApiSchemaQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
 | `useCreateApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
@@ -315,20 +320,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>' });
 ```typescript
 // List all schemas
 const { data, isLoading } = useSchemasQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one schema
 const { data: item } = useSchemaQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a schema
 const { mutate: create } = useCreateSchemaMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>' });
+create({ databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>' });
 ```
 
 ### Table
@@ -336,20 +341,20 @@ create({ databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: 
 ```typescript
 // List all tables
 const { data, isLoading } = useTablesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, inheritsId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } },
 });
 
 // Get one table
 const { data: item } = useTableQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, inheritsId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } },
 });
 
 // Create a table
 const { mutate: create } = useCreateTableMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', useRls: '<Boolean>', timestamps: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', singularName: '<String>', tags: '<String>', partitioned: '<Boolean>', partitionStrategy: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', inheritsId: '<UUID>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', useRls: '<Boolean>', timestamps: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', singularName: '<String>', tags: '<String>', partitioned: '<Boolean>', partitionStrategy: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', inheritsId: '<UUID>' });
 ```
 
 ### CheckConstraint
@@ -357,20 +362,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<St
 ```typescript
 // List all checkConstraints
 const { data, isLoading } = useCheckConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one checkConstraint
 const { data: item } = useCheckConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a checkConstraint
 const { mutate: create } = useCreateCheckConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', expr: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', expr: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### Field
@@ -378,20 +383,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<Stri
 ```typescript
 // List all fields
 const { data, isLoading } = useFieldsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, scope: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one field
 const { data: item } = useFieldQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, scope: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a field
 const { mutate: create } = useCreateFieldMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', isRequired: '<Boolean>', apiRequired: '<Boolean>', defaultValue: '<JSON>', type: '<JSON>', fieldOrder: '<Int>', regexp: '<String>', chk: '<JSON>', chkExpr: '<JSON>', min: '<Float>', max: '<Float>', tags: '<String>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', isRequired: '<Boolean>', apiRequired: '<Boolean>', defaultValue: '<JSON>', type: '<JSON>', fieldOrder: '<Int>', regexp: '<String>', chk: '<JSON>', chkExpr: '<JSON>', min: '<Float>', max: '<Float>', tags: '<String>', category: '<ObjectCategory>', scope: '<Int>' });
 ```
 
 ### SpatialRelation
@@ -399,20 +404,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<Str
 ```typescript
 // List all spatialRelations
 const { data, isLoading } = useSpatialRelationsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one spatialRelation
 const { data: item } = useSpatialRelationQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a spatialRelation
 const { mutate: create } = useCreateSpatialRelationMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', refTableId: '<UUID>', refFieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', refTableId: '<UUID>', refFieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### ForeignKeyConstraint
@@ -420,20 +425,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', refTableId:
 ```typescript
 // List all foreignKeyConstraints
 const { data, isLoading } = useForeignKeyConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one foreignKeyConstraint
 const { data: item } = useForeignKeyConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a foreignKeyConstraint
 const { mutate: create } = useCreateForeignKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', refTableId: '<UUID>', refFieldIds: '<UUID>', deleteAction: '<String>', updateAction: '<String>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', refTableId: '<UUID>', refFieldIds: '<UUID>', deleteAction: '<String>', updateAction: '<String>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### FullTextSearch
@@ -462,20 +467,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', fieldIds: '
 ```typescript
 // List all indices
 const { data, isLoading } = useIndicesQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one index
 const { data: item } = useIndexQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a index
 const { mutate: create } = useCreateIndexMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', fieldIds: '<UUID>', includeFieldIds: '<UUID>', accessMethod: '<String>', indexParams: '<JSON>', whereClause: '<JSON>', isUnique: '<Boolean>', options: '<JSON>', opClasses: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', fieldIds: '<UUID>', includeFieldIds: '<UUID>', accessMethod: '<String>', indexParams: '<JSON>', whereClause: '<JSON>', isUnique: '<Boolean>', options: '<JSON>', opClasses: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### Policy
@@ -483,20 +488,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', fieldIds: '<
 ```typescript
 // List all policies
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one policy
 const { data: item } = usePolicyQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a policy
 const { mutate: create } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### PrimaryKeyConstraint
@@ -504,20 +509,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName:
 ```typescript
 // List all primaryKeyConstraints
 const { data, isLoading } = usePrimaryKeyConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one primaryKeyConstraint
 const { data: item } = usePrimaryKeyConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a primaryKeyConstraint
 const { mutate: create } = useCreatePrimaryKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### TableGrant
@@ -546,20 +551,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', privilege: '<String>', grantee
 ```typescript
 // List all triggers
 const { data, isLoading } = useTriggersQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one trigger
 const { data: item } = useTriggerQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a trigger
 const { mutate: create } = useCreateTriggerMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', event: '<String>', functionName: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', event: '<String>', functionName: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### UniqueConstraint
@@ -567,20 +572,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', event: '<Str
 ```typescript
 // List all uniqueConstraints
 const { data, isLoading } = useUniqueConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one uniqueConstraint
 const { data: item } = useUniqueConstraintQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a uniqueConstraint
 const { mutate: create } = useCreateUniqueConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### View
@@ -588,20 +593,20 @@ create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description:
 ```typescript
 // List all views
 const { data, isLoading } = useViewsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, scope: true, tags: true } },
 });
 
 // Get one view
 const { data: item } = useViewQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, scope: true, tags: true } },
 });
 
 // Create a view
 const { mutate: create } = useCreateViewMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', tableId: '<UUID>', viewType: '<String>', data: '<JSON>', filterType: '<String>', filterData: '<JSON>', securityInvoker: '<Boolean>', isReadOnly: '<Boolean>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', tableId: '<UUID>', viewType: '<String>', data: '<JSON>', filterType: '<String>', filterData: '<JSON>', securityInvoker: '<Boolean>', isReadOnly: '<Boolean>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### ViewTable
@@ -609,20 +614,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', tableId: '<
 ```typescript
 // List all viewTables
 const { data, isLoading } = useViewTablesQuery({
-  selection: { fields: { id: true, viewId: true, tableId: true, joinOrder: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, tableId: true, joinOrder: true } },
 });
 
 // Get one viewTable
 const { data: item } = useViewTableQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, viewId: true, tableId: true, joinOrder: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, tableId: true, joinOrder: true } },
 });
 
 // Create a viewTable
 const { mutate: create } = useCreateViewTableMutation({
   selection: { fields: { id: true } },
 });
-create({ viewId: '<UUID>', tableId: '<UUID>', joinOrder: '<Int>' });
+create({ databaseId: '<UUID>', viewId: '<UUID>', tableId: '<UUID>', joinOrder: '<Int>' });
 ```
 
 ### ViewGrant
@@ -735,20 +740,41 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', objectType: '<String>', privi
 ```typescript
 // List all enums
 const { data, isLoading } = useEnumsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, scope: true, tags: true } },
 });
 
 // Get one enum
 const { data: item } = useEnumQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, scope: true, tags: true } },
 });
 
 // Create a enum
 const { mutate: create } = useCreateEnumMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
+```
+
+### CompositeType
+
+```typescript
+// List all compositeTypes
+const { data, isLoading } = useCompositeTypesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, scope: true, tags: true } },
+});
+
+// Get one compositeType
+const { data: item } = useCompositeTypeQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, scope: true, tags: true } },
+});
+
+// Create a compositeType
+const { mutate: create } = useCreateCompositeTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### ApiSchema
