@@ -20,12 +20,36 @@ export interface AppPermission {
   bitstr: string | null;
   description: string | null;
 }
+export interface AppPermissionDefaultGrant {
+  id: string | null;
+  permissionId: string | null;
+  isGrant: boolean | null;
+  grantorId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface OrgPermission {
   id: string | null;
   name: string | null;
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
+}
+export interface OrgPermissionDefaultPermission {
+  id: string | null;
+  permissionId: string | null;
+  entityId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface OrgPermissionDefaultGrant {
+  id: string | null;
+  permissionId: string | null;
+  isGrant: boolean | null;
+  grantorId: string | null;
+  entityId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface OrgMember {
   id: string | null;
@@ -41,6 +65,12 @@ export interface OrgPermissionDefault {
   id: string | null;
   permissions: string | null;
   entityId: string | null;
+}
+export interface AppPermissionDefaultPermission {
+  id: string | null;
+  permissionId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface AppAdminGrant {
   id: string | null;
@@ -193,21 +223,6 @@ export interface AppMembership {
   actorId: string | null;
   profileId: string | null;
 }
-export interface AppInvite {
-  id: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  senderId: string | null;
-  inviteToken: string | null;
-  inviteValid: boolean | null;
-  inviteLimit: number | null;
-  inviteCount: number | null;
-  multiple: boolean | null;
-  data: unknown | null;
-  profileId: string | null;
-  expiresAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface OrgMembership {
   id: string | null;
   createdAt: string | null;
@@ -241,9 +256,28 @@ export interface OrgMemberProfile {
   bio: string | null;
   profilePicture: ConstructiveInternalTypeImage | null;
 }
+export interface AppInvite {
+  id: string | null;
+  channel: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  phone: string | null;
+  senderId: string | null;
+  inviteToken: string | null;
+  inviteValid: boolean | null;
+  inviteLimit: number | null;
+  inviteCount: number | null;
+  multiple: boolean | null;
+  data: unknown | null;
+  profileId: string | null;
+  expiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface OrgInvite {
   id: string | null;
+  channel: string | null;
   email: ConstructiveInternalTypeEmail | null;
+  phone: string | null;
   senderId: string | null;
   receiverId: string | null;
   inviteToken: string | null;

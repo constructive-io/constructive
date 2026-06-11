@@ -93,8 +93,11 @@ function App() {
 | `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
+| `useSignInSmsOtpMutation` | Mutation | signInSmsOtp |
+| `useSignUpSmsMutation` | Mutation | signUpSms |
 | `useSignUpMutation` | Mutation | signUp |
 | `useSignInMutation` | Mutation | signIn |
+| `useLinkIdentityMutation` | Mutation | linkIdentity |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useCreateApiKeyMutation` | Mutation | createApiKey |
 | `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
@@ -485,6 +488,28 @@ signInCrossOrigin
   |----------|------|
   | `input` | SignInCrossOriginInput (required) |
 
+### `useSignInSmsOtpMutation`
+
+signInSmsOtp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInSmsOtpInput (required) |
+
+### `useSignUpSmsMutation`
+
+signUpSms
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignUpSmsInput (required) |
+
 ### `useSignUpMutation`
 
 signUp
@@ -506,6 +531,17 @@ signIn
   | Argument | Type |
   |----------|------|
   | `input` | SignInInput (required) |
+
+### `useLinkIdentityMutation`
+
+linkIdentity
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | LinkIdentityInput (required) |
 
 ### `useExtendTokenExpiresMutation`
 

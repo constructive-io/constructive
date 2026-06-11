@@ -269,22 +269,6 @@ export interface CryptoAuthModule {
   signUpWithKey: string | null;
   signInWithChallenge: string | null;
 }
-export interface RateLimitMetersModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  rateLimitStateTableId: string | null;
-  rateLimitStateTableName: string | null;
-  rateLimitOverridesTableId: string | null;
-  rateLimitOverridesTableName: string | null;
-  rateWindowLimitsTableId: string | null;
-  rateWindowLimitsTableName: string | null;
-  checkRateLimitFunction: string | null;
-  prefix: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-}
 export interface SessionsModule {
   id: string | null;
   databaseId: string | null;
@@ -315,6 +299,54 @@ export interface ConfigSecretsModule {
   provisions: unknown | null;
   hasConfig: boolean | null;
 }
+export interface SecureTableProvision {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  tableId: string | null;
+  tableName: string | null;
+  nodes: unknown | null;
+  useRls: boolean | null;
+  fields: unknown[] | null;
+  grants: unknown | null;
+  policies: unknown | null;
+  outFields: string[] | null;
+}
+export interface RateLimitMetersModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  rateLimitStateTableId: string | null;
+  rateLimitStateTableName: string | null;
+  rateLimitOverridesTableId: string | null;
+  rateLimitOverridesTableName: string | null;
+  rateWindowLimitsTableId: string | null;
+  rateWindowLimitsTableName: string | null;
+  checkRateLimitFunction: string | null;
+  prefix: string | null;
+  defaultPermissions: string[] | null;
+  apiName: string | null;
+  privateApiName: string | null;
+}
+export interface InvitesModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  emailsTableId: string | null;
+  usersTableId: string | null;
+  invitesTableId: string | null;
+  claimedInvitesTableId: string | null;
+  invitesTableName: string | null;
+  claimedInvitesTableName: string | null;
+  submitInviteCodeFunction: string | null;
+  scope: string | null;
+  prefix: string | null;
+  entityTableId: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+}
 export interface MerkleStoreModule {
   id: string | null;
   databaseId: string | null;
@@ -330,6 +362,7 @@ export interface MerkleStoreModule {
   apiName: string | null;
   privateApiName: string | null;
   scope: string | null;
+  functionPrefix: string | null;
   createdAt: string | null;
 }
 export interface GraphModule {
@@ -350,38 +383,8 @@ export interface GraphModule {
   entityTableId: string | null;
   policies: unknown | null;
   provisions: unknown | null;
+  defaultPermissions: string[] | null;
   createdAt: string | null;
-}
-export interface SecureTableProvision {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  tableId: string | null;
-  tableName: string | null;
-  nodes: unknown | null;
-  useRls: boolean | null;
-  fields: unknown[] | null;
-  grants: unknown | null;
-  policies: unknown | null;
-  outFields: string[] | null;
-}
-export interface InvitesModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  emailsTableId: string | null;
-  usersTableId: string | null;
-  invitesTableId: string | null;
-  claimedInvitesTableId: string | null;
-  invitesTableName: string | null;
-  claimedInvitesTableName: string | null;
-  submitInviteCodeFunction: string | null;
-  scope: string | null;
-  prefix: string | null;
-  entityTableId: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
 }
 export interface DatabaseProvisionModule {
   id: string | null;
@@ -398,25 +401,6 @@ export interface DatabaseProvisionModule {
   createdAt: string | null;
   updatedAt: string | null;
   completedAt: string | null;
-}
-export interface NamespaceModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  publicSchemaName: string | null;
-  privateSchemaName: string | null;
-  namespacesTableId: string | null;
-  namespaceEventsTableId: string | null;
-  namespacesTableName: string | null;
-  namespaceEventsTableName: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-  scope: string | null;
-  prefix: string | null;
-  entityTableId: string | null;
-  policies: unknown | null;
-  provisions: unknown | null;
 }
 export interface RealtimeModule {
   id: string | null;
@@ -451,6 +435,66 @@ export interface WebauthnAuthModule {
   requireUserVerification: boolean | null;
   residentKey: string | null;
   challengeExpiry: string | null;
+}
+export interface FunctionInvocationModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  invocationsTableId: string | null;
+  executionLogsTableId: string | null;
+  invocationsTableName: string | null;
+  executionLogsTableName: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  scope: string | null;
+  prefix: string | null;
+  entityTableId: string | null;
+  policies: unknown | null;
+  provisions: unknown | null;
+  defaultPermissions: string[] | null;
+}
+export interface FunctionModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  definitionsTableId: string | null;
+  secretDefinitionsTableId: string | null;
+  definitionsTableName: string | null;
+  secretDefinitionsTableName: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  scope: string | null;
+  prefix: string | null;
+  entityTableId: string | null;
+  policies: unknown | null;
+  provisions: unknown | null;
+  defaultPermissions: string[] | null;
+}
+export interface NamespaceModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  namespacesTableId: string | null;
+  namespaceEventsTableId: string | null;
+  namespacesTableName: string | null;
+  namespaceEventsTableName: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  scope: string | null;
+  prefix: string | null;
+  entityTableId: string | null;
+  policies: unknown | null;
+  provisions: unknown | null;
+  defaultPermissions: string[] | null;
 }
 export interface ComputeLogModule {
   id: string | null;
@@ -528,48 +572,6 @@ export interface TransferLogModule {
   apiName: string | null;
   privateApiName: string | null;
 }
-export interface DbUsageModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  tableStatsLogTableId: string | null;
-  tableStatsLogTableName: string | null;
-  tableStatsDailyTableId: string | null;
-  tableStatsDailyTableName: string | null;
-  queryStatsLogTableId: string | null;
-  queryStatsLogTableName: string | null;
-  queryStatsDailyTableId: string | null;
-  queryStatsDailyTableName: string | null;
-  interval: string | null;
-  retention: string | null;
-  premake: number | null;
-  scope: string | null;
-  prefix: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-}
-export interface NotificationsModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  notificationsTableId: string | null;
-  readStateTableId: string | null;
-  preferencesTableId: string | null;
-  channelsTableId: string | null;
-  deliveryLogTableId: string | null;
-  ownerTableId: string | null;
-  userSettingsTableId: string | null;
-  organizationSettingsTableId: string | null;
-  hasChannels: boolean | null;
-  hasPreferences: boolean | null;
-  hasSettingsExtension: boolean | null;
-  hasDigestMetadata: boolean | null;
-  hasSubscriptions: boolean | null;
-  apiName: string | null;
-  privateApiName: string | null;
-}
 export interface PlansModule {
   id: string | null;
   databaseId: string | null;
@@ -591,50 +593,48 @@ export interface PlansModule {
   apiName: string | null;
   privateApiName: string | null;
 }
-export interface HierarchyModule {
+export interface DbUsageModule {
   id: string | null;
   databaseId: string | null;
   schemaId: string | null;
   privateSchemaId: string | null;
-  chartEdgesTableId: string | null;
-  chartEdgesTableName: string | null;
-  hierarchySprtTableId: string | null;
-  hierarchySprtTableName: string | null;
-  chartEdgeGrantsTableId: string | null;
-  chartEdgeGrantsTableName: string | null;
-  entityTableId: string | null;
-  usersTableId: string | null;
+  tableStatsLogTableId: string | null;
+  tableStatsLogTableName: string | null;
+  tableStatsDailyTableId: string | null;
+  tableStatsDailyTableName: string | null;
+  queryStatsLogTableId: string | null;
+  queryStatsLogTableName: string | null;
+  queryStatsDailyTableId: string | null;
+  queryStatsDailyTableName: string | null;
+  interval: string | null;
+  retention: string | null;
+  premake: number | null;
   scope: string | null;
   prefix: string | null;
-  privateSchemaName: string | null;
-  sprtTableName: string | null;
-  rebuildHierarchyFunction: string | null;
-  getSubordinatesFunction: string | null;
-  getManagersFunction: string | null;
-  isManagerOfFunction: string | null;
-  createdAt: string | null;
+  defaultPermissions: string[] | null;
+  apiName: string | null;
+  privateApiName: string | null;
 }
-export interface BillingModule {
+export interface NotificationsModule {
   id: string | null;
   databaseId: string | null;
   schemaId: string | null;
   privateSchemaId: string | null;
-  metersTableId: string | null;
-  metersTableName: string | null;
-  planSubscriptionsTableId: string | null;
-  planSubscriptionsTableName: string | null;
-  ledgerTableId: string | null;
-  ledgerTableName: string | null;
-  balancesTableId: string | null;
-  balancesTableName: string | null;
-  meterCreditsTableId: string | null;
-  meterCreditsTableName: string | null;
-  meterSourcesTableId: string | null;
-  meterSourcesTableName: string | null;
-  meterDefaultsTableId: string | null;
-  meterDefaultsTableName: string | null;
-  recordUsageFunction: string | null;
-  prefix: string | null;
+  notificationsTableId: string | null;
+  readStateTableId: string | null;
+  preferencesTableId: string | null;
+  channelsTableId: string | null;
+  deliveryLogTableId: string | null;
+  suppressionsTableId: string | null;
+  ownerTableId: string | null;
+  userSettingsTableId: string | null;
+  organizationSettingsTableId: string | null;
+  hasChannels: boolean | null;
+  hasPreferences: boolean | null;
+  hasSettingsExtension: boolean | null;
+  hasDigestMetadata: boolean | null;
+  hasSubscriptions: boolean | null;
+  defaultPermissions: string[] | null;
   apiName: string | null;
   privateApiName: string | null;
 }
@@ -661,6 +661,30 @@ export interface BillingProviderModule {
   prefix: string | null;
   apiName: string | null;
   privateApiName: string | null;
+}
+export interface HierarchyModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  chartEdgesTableId: string | null;
+  chartEdgesTableName: string | null;
+  hierarchySprtTableId: string | null;
+  hierarchySprtTableName: string | null;
+  chartEdgeGrantsTableId: string | null;
+  chartEdgeGrantsTableName: string | null;
+  entityTableId: string | null;
+  usersTableId: string | null;
+  scope: string | null;
+  prefix: string | null;
+  privateSchemaName: string | null;
+  sprtTableName: string | null;
+  rebuildHierarchyFunction: string | null;
+  getSubordinatesFunction: string | null;
+  getManagersFunction: string | null;
+  isManagerOfFunction: string | null;
+  defaultPermissions: string[] | null;
+  createdAt: string | null;
 }
 export interface ProfilesModule {
   id: string | null;
@@ -707,6 +731,31 @@ export interface PermissionsModule {
   apiName: string | null;
   privateApiName: string | null;
 }
+export interface BillingModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  metersTableId: string | null;
+  metersTableName: string | null;
+  planSubscriptionsTableId: string | null;
+  planSubscriptionsTableName: string | null;
+  ledgerTableId: string | null;
+  ledgerTableName: string | null;
+  balancesTableId: string | null;
+  balancesTableName: string | null;
+  meterCreditsTableId: string | null;
+  meterCreditsTableName: string | null;
+  meterSourcesTableId: string | null;
+  meterSourcesTableName: string | null;
+  meterDefaultsTableId: string | null;
+  meterDefaultsTableName: string | null;
+  recordUsageFunction: string | null;
+  prefix: string | null;
+  defaultPermissions: string[] | null;
+  apiName: string | null;
+  privateApiName: string | null;
+}
 export interface RelationProvision {
   id: string | null;
   databaseId: string | null;
@@ -732,34 +781,6 @@ export interface RelationProvision {
   outJunctionTableId: string | null;
   outSourceFieldId: string | null;
   outTargetFieldId: string | null;
-}
-export interface FunctionModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  publicSchemaName: string | null;
-  privateSchemaName: string | null;
-  definitionsTableId: string | null;
-  invocationsTableId: string | null;
-  executionLogsTableId: string | null;
-  secretDefinitionsTableId: string | null;
-  requirementsTableId: string | null;
-  configDefinitionsTableId: string | null;
-  configRequirementsTableId: string | null;
-  definitionsTableName: string | null;
-  invocationsTableName: string | null;
-  executionLogsTableName: string | null;
-  secretDefinitionsTableName: string | null;
-  requirementsTableName: string | null;
-  configRequirementsTableName: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-  scope: string | null;
-  prefix: string | null;
-  entityTableId: string | null;
-  policies: unknown | null;
-  provisions: unknown | null;
 }
 export interface UserAuthModule {
   id: string | null;
@@ -815,6 +836,7 @@ export interface AgentModule {
   hasPlans: boolean | null;
   hasResources: boolean | null;
   hasAgents: boolean | null;
+  shared: boolean | null;
   apiName: string | null;
   privateApiName: string | null;
   scope: string | null;
@@ -823,6 +845,7 @@ export interface AgentModule {
   policies: unknown | null;
   resources: unknown | null;
   provisions: unknown | null;
+  defaultPermissions: string[] | null;
 }
 export interface LimitsModule {
   id: string | null;
@@ -896,6 +919,8 @@ export interface MembershipsModule {
   entityIdsByPerm: string | null;
   entityIdsFunction: string | null;
   memberProfilesTableId: string | null;
+  permissionDefaultPermissionsTableId: string | null;
+  permissionDefaultGrantsTableId: string | null;
   apiName: string | null;
   privateApiName: string | null;
 }
@@ -934,49 +959,7 @@ export interface StorageModule {
   hasConfirmUpload: boolean | null;
   confirmUploadDelay: string | null;
   fileEventsTableId: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-}
-export interface EventsModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  eventsTableId: string | null;
-  eventsTableName: string | null;
-  eventAggregatesTableId: string | null;
-  eventAggregatesTableName: string | null;
-  eventTypesTableId: string | null;
-  eventTypesTableName: string | null;
-  levelsTableId: string | null;
-  levelsTableName: string | null;
-  levelRequirementsTableId: string | null;
-  levelRequirementsTableName: string | null;
-  levelGrantsTableId: string | null;
-  levelGrantsTableName: string | null;
-  achievementRewardsTableId: string | null;
-  achievementRewardsTableName: string | null;
-  recordEvent: string | null;
-  removeEvent: string | null;
-  tgEvent: string | null;
-  tgEventToggle: string | null;
-  tgEventToggleBool: string | null;
-  tgEventBool: string | null;
-  upsertAggregate: string | null;
-  tgUpdateAggregates: string | null;
-  pruneEvents: string | null;
-  stepsRequired: string | null;
-  levelAchieved: string | null;
-  tgCheckAchievements: string | null;
-  grantAchievement: string | null;
-  tgAchievementReward: string | null;
-  interval: string | null;
-  retention: string | null;
-  premake: number | null;
-  scope: string | null;
-  prefix: string | null;
-  entityTableId: string | null;
-  actorTableId: string | null;
+  defaultPermissions: string[] | null;
   apiName: string | null;
   privateApiName: string | null;
 }
@@ -1018,11 +1001,53 @@ export interface EntityTypeProvision {
   outInvocationsTableId: string | null;
   outExecutionLogsTableId: string | null;
   outSecretDefinitionsTableId: string | null;
-  outRequirementsTableId: string | null;
-  outConfigRequirementsTableId: string | null;
   outGraphModuleId: string | null;
   outGraphsTableId: string | null;
   outAgentModuleId: string | null;
+}
+export interface EventsModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  eventsTableId: string | null;
+  eventsTableName: string | null;
+  eventAggregatesTableId: string | null;
+  eventAggregatesTableName: string | null;
+  eventTypesTableId: string | null;
+  eventTypesTableName: string | null;
+  levelsTableId: string | null;
+  levelsTableName: string | null;
+  levelRequirementsTableId: string | null;
+  levelRequirementsTableName: string | null;
+  levelGrantsTableId: string | null;
+  levelGrantsTableName: string | null;
+  achievementRewardsTableId: string | null;
+  achievementRewardsTableName: string | null;
+  recordEvent: string | null;
+  removeEvent: string | null;
+  tgEvent: string | null;
+  tgEventToggle: string | null;
+  tgEventToggleBool: string | null;
+  tgEventBool: string | null;
+  upsertAggregate: string | null;
+  tgUpdateAggregates: string | null;
+  pruneEvents: string | null;
+  stepsRequired: string | null;
+  levelAchieved: string | null;
+  tgCheckAchievements: string | null;
+  grantAchievement: string | null;
+  tgAchievementReward: string | null;
+  interval: string | null;
+  retention: string | null;
+  premake: number | null;
+  scope: string | null;
+  prefix: string | null;
+  entityTableId: string | null;
+  actorTableId: string | null;
+  defaultPermissions: string[] | null;
+  apiName: string | null;
+  privateApiName: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

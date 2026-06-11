@@ -1,13 +1,13 @@
 ---
 name: hooks-admin
-description: React Query hooks for the admin API — provides typed query and mutation hooks for 26 tables and 12 custom operations
+description: React Query hooks for the admin API — provides typed query and mutation hooks for 30 tables and 12 custom operations
 ---
 
 # hooks-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the admin API — provides typed query and mutation hooks for 26 tables and 12 custom operations
+React Query hooks for the admin API — provides typed query and mutation hooks for 30 tables and 12 custom operations
 
 ## Usage
 
@@ -41,10 +41,14 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-get-managers-record](references/org-get-managers-record.md)
 - [org-get-subordinates-record](references/org-get-subordinates-record.md)
 - [app-permission](references/app-permission.md)
+- [app-permission-default-grant](references/app-permission-default-grant.md)
 - [org-permission](references/org-permission.md)
+- [org-permission-default-permission](references/org-permission-default-permission.md)
+- [org-permission-default-grant](references/org-permission-default-grant.md)
 - [org-member](references/org-member.md)
 - [app-permission-default](references/app-permission-default.md)
 - [org-permission-default](references/org-permission-default.md)
+- [app-permission-default-permission](references/app-permission-default-permission.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
 - [org-admin-grant](references/org-admin-grant.md)
@@ -60,9 +64,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-chart-edge](references/org-chart-edge.md)
 - [org-membership-setting](references/org-membership-setting.md)
 - [app-membership](references/app-membership.md)
-- [app-invite](references/app-invite.md)
 - [org-membership](references/org-membership.md)
 - [org-member-profile](references/org-member-profile.md)
+- [app-invite](references/app-invite.md)
 - [org-invite](references/org-invite.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)

@@ -37,6 +37,7 @@ import {
   schemaGrantKeys,
   defaultPrivilegeKeys,
   enumKeys,
+  compositeTypeKeys,
   apiSchemaKeys,
   apiModuleKeys,
   domainKeys,
@@ -423,6 +424,23 @@ export const invalidate = {
     /** Invalidate a specific enum */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: enumKeys.detail(id),
+      }),
+  },
+  /** Invalidate compositeType queries */ compositeType: {
+    /** Invalidate all compositeType queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: compositeTypeKeys.all,
+      }),
+    /** Invalidate compositeType list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: compositeTypeKeys.lists(),
+      }),
+    /** Invalidate a specific compositeType */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: compositeTypeKeys.detail(id),
       }),
   },
   /** Invalidate apiSchema queries */ apiSchema: {
@@ -952,6 +970,14 @@ export const remove = {
   /** Remove enum from cache */ enum: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: enumKeys.detail(id),
+    });
+  },
+  /** Remove compositeType from cache */ compositeType: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: compositeTypeKeys.detail(id),
     });
   },
   /** Remove apiSchema from cache */ apiSchema: (queryClient: QueryClient, id: string | number) => {

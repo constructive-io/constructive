@@ -24,7 +24,6 @@ const fieldSchema: FieldSchema = {
   description: 'string',
   smartTags: 'json',
   category: 'string',
-  module: 'string',
   scope: 'int',
   useRls: 'boolean',
   timestamps: 'boolean',
@@ -36,9 +35,9 @@ const fieldSchema: FieldSchema = {
   partitionStrategy: 'string',
   partitionKeyNames: 'string',
   partitionKeyTypes: 'string',
-  inheritsId: 'uuid',
   createdAt: 'string',
   updatedAt: 'string',
+  inheritsId: 'uuid',
 };
 const usage =
   '\ntable <command>\n\nCommands:\n  list                  List table records\n  find-first            Find first matching table record\n  get                   Get a table by ID\n  create                Create a new table\n  update                Update an existing table\n  delete                Delete a table\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -99,7 +98,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       description: true,
       smartTags: true,
       category: true,
-      module: true,
       scope: true,
       useRls: true,
       timestamps: true,
@@ -111,9 +109,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       partitionStrategy: true,
       partitionKeyNames: true,
       partitionKeyTypes: true,
-      inheritsId: true,
       createdAt: true,
       updatedAt: true,
+      inheritsId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<TableSelect, TableFilter, TableOrderBy> & {
@@ -142,7 +140,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       description: true,
       smartTags: true,
       category: true,
-      module: true,
       scope: true,
       useRls: true,
       timestamps: true,
@@ -154,9 +151,9 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       partitionStrategy: true,
       partitionKeyNames: true,
       partitionKeyTypes: true,
-      inheritsId: true,
       createdAt: true,
       updatedAt: true,
+      inheritsId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<TableSelect, TableFilter, TableOrderBy> & {
@@ -197,7 +194,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           description: true,
           smartTags: true,
           category: true,
-          module: true,
           scope: true,
           useRls: true,
           timestamps: true,
@@ -209,9 +205,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           partitionStrategy: true,
           partitionKeyNames: true,
           partitionKeyTypes: true,
-          inheritsId: true,
           createdAt: true,
           updatedAt: true,
+          inheritsId: true,
         },
       })
       .execute();
@@ -271,13 +267,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'category',
         message: 'category',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'module',
-        message: 'module',
         required: false,
         skipPrompt: true,
       },
@@ -379,7 +368,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           description: cleanedData.description,
           smartTags: cleanedData.smartTags,
           category: cleanedData.category,
-          module: cleanedData.module,
           scope: cleanedData.scope,
           useRls: cleanedData.useRls,
           timestamps: cleanedData.timestamps,
@@ -402,7 +390,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           description: true,
           smartTags: true,
           category: true,
-          module: true,
           scope: true,
           useRls: true,
           timestamps: true,
@@ -414,9 +401,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           partitionStrategy: true,
           partitionKeyNames: true,
           partitionKeyTypes: true,
-          inheritsId: true,
           createdAt: true,
           updatedAt: true,
+          inheritsId: true,
         },
       })
       .execute();
@@ -482,13 +469,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'category',
         message: 'category',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'module',
-        message: 'module',
         required: false,
         skipPrompt: true,
       },
@@ -593,7 +573,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           description: cleanedData.description,
           smartTags: cleanedData.smartTags,
           category: cleanedData.category,
-          module: cleanedData.module,
           scope: cleanedData.scope,
           useRls: cleanedData.useRls,
           timestamps: cleanedData.timestamps,
@@ -616,7 +595,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           description: true,
           smartTags: true,
           category: true,
-          module: true,
           scope: true,
           useRls: true,
           timestamps: true,
@@ -628,9 +606,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           partitionStrategy: true,
           partitionKeyNames: true,
           partitionKeyTypes: true,
-          inheritsId: true,
           createdAt: true,
           updatedAt: true,
+          inheritsId: true,
         },
       })
       .execute();

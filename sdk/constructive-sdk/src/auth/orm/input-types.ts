@@ -1306,6 +1306,22 @@ export interface SignInCrossOriginInput {
   token?: string;
   credentialKind?: string;
 }
+export interface SignInSmsOtpInput {
+  clientMutationId?: string;
+  phone?: string;
+  code?: string;
+  credentialKind?: string;
+  rememberMe?: boolean;
+  deviceToken?: string;
+}
+export interface SignUpSmsInput {
+  clientMutationId?: string;
+  phone?: string;
+  code?: string;
+  credentialKind?: string;
+  rememberMe?: boolean;
+  deviceToken?: string;
+}
 export interface SignUpInput {
   clientMutationId?: string;
   email?: string;
@@ -1323,6 +1339,12 @@ export interface SignInInput {
   credentialKind?: string;
   csrfToken?: string;
   deviceToken?: string;
+}
+export interface LinkIdentityInput {
+  clientMutationId?: string;
+  service: string;
+  identifier: string;
+  details?: Record<string, unknown>;
 }
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
@@ -2345,6 +2367,26 @@ export type SignInCrossOriginPayloadSelect = {
     select: SignInCrossOriginRecordSelect;
   };
 };
+export interface SignInSmsOtpPayload {
+  clientMutationId?: string | null;
+  result?: SignInSmsOtpRecord | null;
+}
+export type SignInSmsOtpPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignInSmsOtpRecordSelect;
+  };
+};
+export interface SignUpSmsPayload {
+  clientMutationId?: string | null;
+  result?: SignUpSmsRecord | null;
+}
+export type SignUpSmsPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignUpSmsRecordSelect;
+  };
+};
 export interface SignUpPayload {
   clientMutationId?: string | null;
   result?: SignUpRecord | null;
@@ -2364,6 +2406,14 @@ export type SignInPayloadSelect = {
   result?: {
     select: SignInRecordSelect;
   };
+};
+export interface LinkIdentityPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type LinkIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -2781,6 +2831,26 @@ export type SignInCrossOriginRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+};
+export interface SignInSmsOtpRecord {
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+}
+export type SignInSmsOtpRecordSelect = {
+  userId?: boolean;
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
+};
+export interface SignUpSmsRecord {
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+}
+export type SignUpSmsRecordSelect = {
+  userId?: boolean;
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
 };
 export interface SignUpRecord {
   id?: string | null;

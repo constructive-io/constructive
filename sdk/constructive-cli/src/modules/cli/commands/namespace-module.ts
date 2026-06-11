@@ -33,6 +33,7 @@ const fieldSchema: FieldSchema = {
   entityTableId: 'uuid',
   policies: 'json',
   provisions: 'json',
+  defaultPermissions: 'string',
 };
 const usage =
   '\nnamespace-module <command>\n\nCommands:\n  list                  List namespaceModule records\n  find-first            Find first matching namespaceModule record\n  get                   Get a namespaceModule by ID\n  create                Create a new namespaceModule\n  update                Update an existing namespaceModule\n  delete                Delete a namespaceModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -102,6 +103,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       entityTableId: true,
       policies: true,
       provisions: true,
+      defaultPermissions: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy> & {
@@ -139,6 +141,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       entityTableId: true,
       policies: true,
       provisions: true,
+      defaultPermissions: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<NamespaceModuleSelect, NamespaceModuleFilter, NamespaceModuleOrderBy> & {
@@ -188,6 +191,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           entityTableId: true,
           policies: true,
           provisions: true,
+          defaultPermissions: true,
         },
       })
       .execute();
@@ -314,6 +318,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -340,6 +351,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: cleanedData.entityTableId,
           policies: cleanedData.policies,
           provisions: cleanedData.provisions,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
@@ -359,6 +371,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: true,
           policies: true,
           provisions: true,
+          defaultPermissions: true,
         },
       })
       .execute();
@@ -491,6 +504,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as NamespaceModulePatch;
@@ -517,6 +537,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: cleanedData.entityTableId,
           policies: cleanedData.policies,
           provisions: cleanedData.provisions,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
@@ -536,6 +557,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: true,
           policies: true,
           provisions: true,
+          defaultPermissions: true,
         },
       })
       .execute();

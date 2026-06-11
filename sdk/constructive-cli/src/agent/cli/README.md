@@ -197,14 +197,15 @@ CRUD operations for AgentMessage records.
 | `id` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
-| `ownerId` | UUID |
+| `actorId` | UUID |
 | `parts` | JSON |
 | `threadId` | UUID |
 | `authorRole` | String |
 | `model` | String |
+| `agentId` | UUID |
 
 **Required create fields:** `threadId`, `authorRole`
-**Optional create fields (backend defaults):** `ownerId`, `parts`, `model`
+**Optional create fields (backend defaults):** `actorId`, `parts`, `model`, `agentId`
 
 ### `agent-task`
 
@@ -226,7 +227,7 @@ CRUD operations for AgentTask records.
 | `id` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
-| `ownerId` | UUID |
+| `actorId` | UUID |
 | `status` | String |
 | `planId` | UUID |
 | `description` | String |
@@ -240,7 +241,7 @@ CRUD operations for AgentTask records.
 | `approvalFeedback` | String |
 
 **Required create fields:** `planId`, `description`
-**Optional create fields (backend defaults):** `ownerId`, `status`, `source`, `error`, `orderIndex`, `requiresApproval`, `approvalStatus`, `approvedBy`, `approvedAt`, `approvalFeedback`
+**Optional create fields (backend defaults):** `actorId`, `status`, `source`, `error`, `orderIndex`, `requiresApproval`, `approvalStatus`, `approvedBy`, `approvedAt`, `approvalFeedback`
 
 ### `agent-prompt`
 

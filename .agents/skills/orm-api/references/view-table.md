@@ -9,8 +9,8 @@ Junction table linking views to their joined tables for referential integrity
 ```typescript
 db.viewTable.findMany({ select: { id: true } }).execute()
 db.viewTable.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.viewTable.create({ data: { viewId: '<UUID>', tableId: '<UUID>', joinOrder: '<Int>' }, select: { id: true } }).execute()
-db.viewTable.update({ where: { id: '<UUID>' }, data: { viewId: '<UUID>' }, select: { id: true } }).execute()
+db.viewTable.create({ data: { databaseId: '<UUID>', viewId: '<UUID>', tableId: '<UUID>', joinOrder: '<Int>' }, select: { id: true } }).execute()
+db.viewTable.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.viewTable.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.viewTable.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.viewTable.findMany({
-  select: { id: true, viewId: true }
+  select: { id: true, databaseId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.viewTable.findMany({
 
 ```typescript
 const item = await db.viewTable.create({
-  data: { viewId: '<UUID>', tableId: '<UUID>', joinOrder: '<Int>' },
+  data: { databaseId: '<UUID>', viewId: '<UUID>', tableId: '<UUID>', joinOrder: '<Int>' },
   select: { id: true }
 }).execute();
 ```

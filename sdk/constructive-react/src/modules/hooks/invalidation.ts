@@ -39,38 +39,39 @@ import {
   blueprintTemplateKeys,
   blueprintConstructionKeys,
   cryptoAuthModuleKeys,
-  rateLimitMetersModuleKeys,
   sessionsModuleKeys,
   configSecretsModuleKeys,
+  secureTableProvisionKeys,
+  rateLimitMetersModuleKeys,
+  invitesModuleKeys,
   merkleStoreModuleKeys,
   graphModuleKeys,
-  secureTableProvisionKeys,
-  invitesModuleKeys,
   databaseProvisionModuleKeys,
-  namespaceModuleKeys,
   realtimeModuleKeys,
   webauthnAuthModuleKeys,
+  functionInvocationModuleKeys,
+  functionModuleKeys,
+  namespaceModuleKeys,
   computeLogModuleKeys,
   inferenceLogModuleKeys,
   storageLogModuleKeys,
   transferLogModuleKeys,
+  plansModuleKeys,
   dbUsageModuleKeys,
   notificationsModuleKeys,
-  plansModuleKeys,
-  hierarchyModuleKeys,
-  billingModuleKeys,
   billingProviderModuleKeys,
+  hierarchyModuleKeys,
   profilesModuleKeys,
   permissionsModuleKeys,
+  billingModuleKeys,
   relationProvisionKeys,
-  functionModuleKeys,
   userAuthModuleKeys,
   agentModuleKeys,
   limitsModuleKeys,
   membershipsModuleKeys,
   storageModuleKeys,
-  eventsModuleKeys,
   entityTypeProvisionKeys,
+  eventsModuleKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -500,23 +501,6 @@ export const invalidate = {
         queryKey: cryptoAuthModuleKeys.detail(id),
       }),
   },
-  /** Invalidate rateLimitMetersModule queries */ rateLimitMetersModule: {
-    /** Invalidate all rateLimitMetersModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.all,
-      }),
-    /** Invalidate rateLimitMetersModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.lists(),
-      }),
-    /** Invalidate a specific rateLimitMetersModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate sessionsModule queries */ sessionsModule: {
     /** Invalidate all sessionsModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -549,6 +533,57 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: configSecretsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate secureTableProvision queries */ secureTableProvision: {
+    /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: secureTableProvisionKeys.all,
+      }),
+    /** Invalidate secureTableProvision list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: secureTableProvisionKeys.lists(),
+      }),
+    /** Invalidate a specific secureTableProvision */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: secureTableProvisionKeys.detail(id),
+      }),
+  },
+  /** Invalidate rateLimitMetersModule queries */ rateLimitMetersModule: {
+    /** Invalidate all rateLimitMetersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.all,
+      }),
+    /** Invalidate rateLimitMetersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific rateLimitMetersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate invitesModule queries */ invitesModule: {
+    /** Invalidate all invitesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.all,
+      }),
+    /** Invalidate invitesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific invitesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.detail(id),
       }),
   },
   /** Invalidate merkleStoreModule queries */ merkleStoreModule: {
@@ -585,40 +620,6 @@ export const invalidate = {
         queryKey: graphModuleKeys.detail(id),
       }),
   },
-  /** Invalidate secureTableProvision queries */ secureTableProvision: {
-    /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.all,
-      }),
-    /** Invalidate secureTableProvision list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.lists(),
-      }),
-    /** Invalidate a specific secureTableProvision */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.detail(id),
-      }),
-  },
-  /** Invalidate invitesModule queries */ invitesModule: {
-    /** Invalidate all invitesModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.all,
-      }),
-    /** Invalidate invitesModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.lists(),
-      }),
-    /** Invalidate a specific invitesModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate databaseProvisionModule queries */ databaseProvisionModule: {
     /** Invalidate all databaseProvisionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -634,23 +635,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: databaseProvisionModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate namespaceModule queries */ namespaceModule: {
-    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.all,
-      }),
-    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.lists(),
-      }),
-    /** Invalidate a specific namespaceModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.detail(id),
       }),
   },
   /** Invalidate realtimeModule queries */ realtimeModule: {
@@ -685,6 +669,57 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: webauthnAuthModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionInvocationModule queries */ functionInvocationModule: {
+    /** Invalidate all functionInvocationModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationModuleKeys.all,
+      }),
+    /** Invalidate functionInvocationModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationModuleKeys.lists(),
+      }),
+    /** Invalidate a specific functionInvocationModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionModule queries */ functionModule: {
+    /** Invalidate all functionModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionModuleKeys.all,
+      }),
+    /** Invalidate functionModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionModuleKeys.lists(),
+      }),
+    /** Invalidate a specific functionModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate namespaceModule queries */ namespaceModule: {
+    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.all,
+      }),
+    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.lists(),
+      }),
+    /** Invalidate a specific namespaceModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.detail(id),
       }),
   },
   /** Invalidate computeLogModule queries */ computeLogModule: {
@@ -755,6 +790,23 @@ export const invalidate = {
         queryKey: transferLogModuleKeys.detail(id),
       }),
   },
+  /** Invalidate plansModule queries */ plansModule: {
+    /** Invalidate all plansModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: plansModuleKeys.all,
+      }),
+    /** Invalidate plansModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: plansModuleKeys.lists(),
+      }),
+    /** Invalidate a specific plansModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: plansModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate dbUsageModule queries */ dbUsageModule: {
     /** Invalidate all dbUsageModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -789,21 +841,21 @@ export const invalidate = {
         queryKey: notificationsModuleKeys.detail(id),
       }),
   },
-  /** Invalidate plansModule queries */ plansModule: {
-    /** Invalidate all plansModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate billingProviderModule queries */ billingProviderModule: {
+    /** Invalidate all billingProviderModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.all,
+        queryKey: billingProviderModuleKeys.all,
       }),
-    /** Invalidate plansModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate billingProviderModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.lists(),
+        queryKey: billingProviderModuleKeys.lists(),
       }),
-    /** Invalidate a specific plansModule */ detail: (
+    /** Invalidate a specific billingProviderModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: plansModuleKeys.detail(id),
+        queryKey: billingProviderModuleKeys.detail(id),
       }),
   },
   /** Invalidate hierarchyModule queries */ hierarchyModule: {
@@ -821,40 +873,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: hierarchyModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate billingModule queries */ billingModule: {
-    /** Invalidate all billingModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.all,
-      }),
-    /** Invalidate billingModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.lists(),
-      }),
-    /** Invalidate a specific billingModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate billingProviderModule queries */ billingProviderModule: {
-    /** Invalidate all billingProviderModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.all,
-      }),
-    /** Invalidate billingProviderModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.lists(),
-      }),
-    /** Invalidate a specific billingProviderModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: billingProviderModuleKeys.detail(id),
       }),
   },
   /** Invalidate profilesModule queries */ profilesModule: {
@@ -891,6 +909,23 @@ export const invalidate = {
         queryKey: permissionsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate billingModule queries */ billingModule: {
+    /** Invalidate all billingModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: billingModuleKeys.all,
+      }),
+    /** Invalidate billingModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: billingModuleKeys.lists(),
+      }),
+    /** Invalidate a specific billingModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: billingModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate relationProvision queries */ relationProvision: {
     /** Invalidate all relationProvision queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -906,23 +941,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: relationProvisionKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionModule queries */ functionModule: {
-    /** Invalidate all functionModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.all,
-      }),
-    /** Invalidate functionModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.lists(),
-      }),
-    /** Invalidate a specific functionModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.detail(id),
       }),
   },
   /** Invalidate userAuthModule queries */ userAuthModule: {
@@ -1010,23 +1028,6 @@ export const invalidate = {
         queryKey: storageModuleKeys.detail(id),
       }),
   },
-  /** Invalidate eventsModule queries */ eventsModule: {
-    /** Invalidate all eventsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: eventsModuleKeys.all,
-      }),
-    /** Invalidate eventsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: eventsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific eventsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: eventsModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate entityTypeProvision queries */ entityTypeProvision: {
     /** Invalidate all entityTypeProvision queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1042,6 +1043,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: entityTypeProvisionKeys.detail(id),
+      }),
+  },
+  /** Invalidate eventsModule queries */ eventsModule: {
+    /** Invalidate all eventsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: eventsModuleKeys.all,
+      }),
+    /** Invalidate eventsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: eventsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific eventsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: eventsModuleKeys.detail(id),
       }),
   },
 } as const;
@@ -1243,14 +1261,6 @@ export const remove = {
       queryKey: cryptoAuthModuleKeys.detail(id),
     });
   },
-  /** Remove rateLimitMetersModule from cache */ rateLimitMetersModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: rateLimitMetersModuleKeys.detail(id),
-    });
-  },
   /** Remove sessionsModule from cache */ sessionsModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1265,6 +1275,30 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: configSecretsModuleKeys.detail(id),
+    });
+  },
+  /** Remove secureTableProvision from cache */ secureTableProvision: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: secureTableProvisionKeys.detail(id),
+    });
+  },
+  /** Remove rateLimitMetersModule from cache */ rateLimitMetersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: rateLimitMetersModuleKeys.detail(id),
+    });
+  },
+  /** Remove invitesModule from cache */ invitesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: invitesModuleKeys.detail(id),
     });
   },
   /** Remove merkleStoreModule from cache */ merkleStoreModule: (
@@ -1283,36 +1317,12 @@ export const remove = {
       queryKey: graphModuleKeys.detail(id),
     });
   },
-  /** Remove secureTableProvision from cache */ secureTableProvision: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: secureTableProvisionKeys.detail(id),
-    });
-  },
-  /** Remove invitesModule from cache */ invitesModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: invitesModuleKeys.detail(id),
-    });
-  },
   /** Remove databaseProvisionModule from cache */ databaseProvisionModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: databaseProvisionModuleKeys.detail(id),
-    });
-  },
-  /** Remove namespaceModule from cache */ namespaceModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: namespaceModuleKeys.detail(id),
     });
   },
   /** Remove realtimeModule from cache */ realtimeModule: (
@@ -1329,6 +1339,30 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: webauthnAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove functionInvocationModule from cache */ functionInvocationModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionInvocationModuleKeys.detail(id),
+    });
+  },
+  /** Remove functionModule from cache */ functionModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionModuleKeys.detail(id),
+    });
+  },
+  /** Remove namespaceModule from cache */ namespaceModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: namespaceModuleKeys.detail(id),
     });
   },
   /** Remove computeLogModule from cache */ computeLogModule: (
@@ -1363,6 +1397,14 @@ export const remove = {
       queryKey: transferLogModuleKeys.detail(id),
     });
   },
+  /** Remove plansModule from cache */ plansModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: plansModuleKeys.detail(id),
+    });
+  },
   /** Remove dbUsageModule from cache */ dbUsageModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1379,12 +1421,12 @@ export const remove = {
       queryKey: notificationsModuleKeys.detail(id),
     });
   },
-  /** Remove plansModule from cache */ plansModule: (
+  /** Remove billingProviderModule from cache */ billingProviderModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: plansModuleKeys.detail(id),
+      queryKey: billingProviderModuleKeys.detail(id),
     });
   },
   /** Remove hierarchyModule from cache */ hierarchyModule: (
@@ -1393,22 +1435,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: hierarchyModuleKeys.detail(id),
-    });
-  },
-  /** Remove billingModule from cache */ billingModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: billingModuleKeys.detail(id),
-    });
-  },
-  /** Remove billingProviderModule from cache */ billingProviderModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: billingProviderModuleKeys.detail(id),
     });
   },
   /** Remove profilesModule from cache */ profilesModule: (
@@ -1427,20 +1453,20 @@ export const remove = {
       queryKey: permissionsModuleKeys.detail(id),
     });
   },
+  /** Remove billingModule from cache */ billingModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: billingModuleKeys.detail(id),
+    });
+  },
   /** Remove relationProvision from cache */ relationProvision: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: relationProvisionKeys.detail(id),
-    });
-  },
-  /** Remove functionModule from cache */ functionModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionModuleKeys.detail(id),
     });
   },
   /** Remove userAuthModule from cache */ userAuthModule: (
@@ -1483,20 +1509,20 @@ export const remove = {
       queryKey: storageModuleKeys.detail(id),
     });
   },
-  /** Remove eventsModule from cache */ eventsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: eventsModuleKeys.detail(id),
-    });
-  },
   /** Remove entityTypeProvision from cache */ entityTypeProvision: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: entityTypeProvisionKeys.detail(id),
+    });
+  },
+  /** Remove eventsModule from cache */ eventsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: eventsModuleKeys.detail(id),
     });
   },
 } as const;

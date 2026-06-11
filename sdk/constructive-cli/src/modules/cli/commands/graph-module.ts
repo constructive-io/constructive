@@ -33,6 +33,7 @@ const fieldSchema: FieldSchema = {
   entityTableId: 'uuid',
   policies: 'json',
   provisions: 'json',
+  defaultPermissions: 'string',
   createdAt: 'string',
 };
 const usage =
@@ -103,6 +104,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       entityTableId: true,
       policies: true,
       provisions: true,
+      defaultPermissions: true,
       createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -141,6 +143,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       entityTableId: true,
       policies: true,
       provisions: true,
+      defaultPermissions: true,
       createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -191,6 +194,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           entityTableId: true,
           policies: true,
           provisions: true,
+          defaultPermissions: true,
           createdAt: true,
         },
       })
@@ -317,6 +321,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -343,6 +354,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: cleanedData.entityTableId,
           policies: cleanedData.policies,
           provisions: cleanedData.provisions,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
@@ -362,6 +374,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: true,
           policies: true,
           provisions: true,
+          defaultPermissions: true,
           createdAt: true,
         },
       })
@@ -494,6 +507,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as GraphModulePatch;
@@ -520,6 +540,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: cleanedData.entityTableId,
           policies: cleanedData.policies,
           provisions: cleanedData.provisions,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
@@ -539,6 +560,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           entityTableId: true,
           policies: true,
           provisions: true,
+          defaultPermissions: true,
           createdAt: true,
         },
       })

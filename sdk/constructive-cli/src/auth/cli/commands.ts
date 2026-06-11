@@ -34,8 +34,11 @@ import verifyEmailCmd from './commands/verify-email';
 import provisionNewUserCmd from './commands/provision-new-user';
 import resetPasswordCmd from './commands/reset-password';
 import signInCrossOriginCmd from './commands/sign-in-cross-origin';
+import signInSmsOtpCmd from './commands/sign-in-sms-otp';
+import signUpSmsCmd from './commands/sign-up-sms';
 import signUpCmd from './commands/sign-up';
 import signInCmd from './commands/sign-in';
+import linkIdentityCmd from './commands/link-identity';
 import extendTokenExpiresCmd from './commands/extend-token-expires';
 import createApiKeyCmd from './commands/create-api-key';
 import requestCrossOriginTokenCmd from './commands/request-cross-origin-token';
@@ -80,8 +83,11 @@ const createCommandMap: () => Record<
   'provision-new-user': provisionNewUserCmd,
   'reset-password': resetPasswordCmd,
   'sign-in-cross-origin': signInCrossOriginCmd,
+  'sign-in-sms-otp': signInSmsOtpCmd,
+  'sign-up-sms': signUpSmsCmd,
   'sign-up': signUpCmd,
   'sign-in': signInCmd,
+  'link-identity': linkIdentityCmd,
   'extend-token-expires': extendTokenExpiresCmd,
   'create-api-key': createApiKeyCmd,
   'request-cross-origin-token': requestCrossOriginTokenCmd,
@@ -90,7 +96,7 @@ const createCommandMap: () => Record<
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  webauthn-credential  webauthnCredential CRUD operations\n  audit-log-auth       auditLogAuth CRUD operations\n  identity-provider    identityProvider CRUD operations\n  role-type            roleType CRUD operations\n  user-connected-account userConnectedAccount CRUD operations\n  user                 user CRUD operations\n  current-user-agent   currentUserAgent\n  current-ip-address   currentIpAddress\n  current-user-id      currentUserId\n  require-step-up      requireStepUp\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  disconnect-account   disconnectAccount\n  revoke-api-key       revokeApiKey\n  revoke-session       revokeSession\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  provision-new-user   provisionNewUser\n  reset-password       resetPassword\n  sign-in-cross-origin signInCrossOrigin\n  sign-up              signUp\n  sign-in              signIn\n  extend-token-expires extendTokenExpires\n  create-api-key       createApiKey\n  request-cross-origin-token requestCrossOriginToken\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  webauthn-credential  webauthnCredential CRUD operations\n  audit-log-auth       auditLogAuth CRUD operations\n  identity-provider    identityProvider CRUD operations\n  role-type            roleType CRUD operations\n  user-connected-account userConnectedAccount CRUD operations\n  user                 user CRUD operations\n  current-user-agent   currentUserAgent\n  current-ip-address   currentIpAddress\n  current-user-id      currentUserId\n  require-step-up      requireStepUp\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  disconnect-account   disconnectAccount\n  revoke-api-key       revokeApiKey\n  revoke-session       revokeSession\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  provision-new-user   provisionNewUser\n  reset-password       resetPassword\n  sign-in-cross-origin signInCrossOrigin\n  sign-in-sms-otp      signInSmsOtp\n  sign-up-sms          signUpSms\n  sign-up              signUp\n  sign-in              signIn\n  link-identity        linkIdentity\n  extend-token-expires extendTokenExpires\n  create-api-key       createApiKey\n  request-cross-origin-token requestCrossOriginToken\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

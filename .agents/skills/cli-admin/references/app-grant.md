@@ -12,7 +12,7 @@ csdk app-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk app-grant list --limit 10 --after <cursor>
 csdk app-grant find-first --where.<field>.<op> <value>
 csdk app-grant get --id <UUID>
-csdk app-grant create --actorId <UUID> [--permissions <BitString>] [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk app-grant create [--permissions <BitString>] [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 csdk app-grant update --id <UUID> [--permissions <BitString>] [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 csdk app-grant delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk app-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appGrant
 
 ```bash
-csdk app-grant create --actorId <UUID> [--permissions <BitString>] [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk app-grant create [--permissions <BitString>] [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
 ```
 
 ### Get a appGrant by id

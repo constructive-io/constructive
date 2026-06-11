@@ -30,6 +30,7 @@ const fieldSchema: FieldSchema = {
   apiName: 'string',
   privateApiName: 'string',
   scope: 'string',
+  functionPrefix: 'string',
   createdAt: 'string',
 };
 const usage =
@@ -97,6 +98,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       apiName: true,
       privateApiName: true,
       scope: true,
+      functionPrefix: true,
       createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -132,6 +134,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       apiName: true,
       privateApiName: true,
       scope: true,
+      functionPrefix: true,
       createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -179,6 +182,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           apiName: true,
           privateApiName: true,
           scope: true,
+          functionPrefix: true,
           createdAt: true,
         },
       })
@@ -285,6 +289,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'functionPrefix',
+        message: 'functionPrefix',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -308,6 +319,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           apiName: cleanedData.apiName,
           privateApiName: cleanedData.privateApiName,
           scope: cleanedData.scope,
+          functionPrefix: cleanedData.functionPrefix,
         },
         select: {
           id: true,
@@ -324,6 +336,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           apiName: true,
           privateApiName: true,
           scope: true,
+          functionPrefix: true,
           createdAt: true,
         },
       })
@@ -436,6 +449,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'functionPrefix',
+        message: 'functionPrefix',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as MerkleStoreModulePatch;
@@ -459,6 +479,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           apiName: cleanedData.apiName,
           privateApiName: cleanedData.privateApiName,
           scope: cleanedData.scope,
+          functionPrefix: cleanedData.functionPrefix,
         },
         select: {
           id: true,
@@ -475,6 +496,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           apiName: true,
           privateApiName: true,
           scope: true,
+          functionPrefix: true,
           createdAt: true,
         },
       })

@@ -889,6 +889,22 @@ export interface SignInCrossOriginInput {
   token?: string;
   credentialKind?: string;
 }
+export interface SignInSmsOtpInput {
+  clientMutationId?: string;
+  phone?: string;
+  code?: string;
+  credentialKind?: string;
+  rememberMe?: boolean;
+  deviceToken?: string;
+}
+export interface SignUpSmsInput {
+  clientMutationId?: string;
+  phone?: string;
+  code?: string;
+  credentialKind?: string;
+  rememberMe?: boolean;
+  deviceToken?: string;
+}
 export interface SignUpInput {
   clientMutationId?: string;
   email?: string;
@@ -906,6 +922,12 @@ export interface SignInInput {
   credentialKind?: string;
   csrfToken?: string;
   deviceToken?: string;
+}
+export interface LinkIdentityInput {
+  clientMutationId?: string;
+  service: string;
+  identifier: string;
+  details?: unknown;
 }
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
@@ -975,6 +997,22 @@ export interface RoleTypeInput {
   id: number;
   name: string;
 }
+export interface CreateUserConnectedAccountInput {
+  clientMutationId?: string;
+  /** The `UserConnectedAccount` to be created by this mutation. */
+  userConnectedAccount: UserConnectedAccountInput;
+}
+/** An input for mutations affecting `UserConnectedAccount` */
+export interface UserConnectedAccountInput {
+  id?: string;
+  ownerId?: string;
+  service?: string;
+  identifier?: string;
+  details?: unknown;
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
 export interface CreateCryptoAddressInput {
   clientMutationId?: string;
   /** The `CryptoAddress` to be created by this mutation. */
@@ -1039,22 +1077,6 @@ export interface AuditLogAuthInput {
   ipAddress?: string;
   /** Whether the authentication attempt succeeded */
   success: boolean;
-}
-export interface CreateUserConnectedAccountInput {
-  clientMutationId?: string;
-  /** The `UserConnectedAccount` to be created by this mutation. */
-  userConnectedAccount: UserConnectedAccountInput;
-}
-/** An input for mutations affecting `UserConnectedAccount` */
-export interface UserConnectedAccountInput {
-  id?: string;
-  ownerId?: string;
-  service?: string;
-  identifier?: string;
-  details?: unknown;
-  isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
 }
 export interface CreateEmailInput {
   clientMutationId?: string;
@@ -1329,6 +1351,13 @@ export interface RoleTypeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `UserConnectedAccount` values. */
+export interface UserConnectedAccountConnection {
+  nodes: UserConnectedAccount[];
+  edges: UserConnectedAccountEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `CryptoAddress` values. */
 export interface CryptoAddressConnection {
   nodes: CryptoAddress[];
@@ -1347,13 +1376,6 @@ export interface PhoneNumberConnection {
 export interface AuditLogAuthConnection {
   nodes: AuditLogAuth[];
   edges: AuditLogAuthEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `UserConnectedAccount` values. */
-export interface UserConnectedAccountConnection {
-  nodes: UserConnectedAccount[];
-  edges: UserConnectedAccountEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1436,6 +1458,14 @@ export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
   result?: SignInCrossOriginRecord | null;
 }
+export interface SignInSmsOtpPayload {
+  clientMutationId?: string | null;
+  result?: SignInSmsOtpRecord | null;
+}
+export interface SignUpSmsPayload {
+  clientMutationId?: string | null;
+  result?: SignUpSmsRecord | null;
+}
 export interface SignUpPayload {
   clientMutationId?: string | null;
   result?: SignUpRecord | null;
@@ -1443,6 +1473,10 @@ export interface SignUpPayload {
 export interface SignInPayload {
   clientMutationId?: string | null;
   result?: SignInRecord | null;
+}
+export interface LinkIdentityPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
 }
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -1474,6 +1508,11 @@ export interface CreateRoleTypePayload {
   roleType?: RoleType | null;
   roleTypeEdge?: RoleTypeEdge | null;
 }
+export interface CreateUserConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `UserConnectedAccount` that was created by this mutation. */
+  userConnectedAccount?: UserConnectedAccount | null;
+}
 export interface CreateCryptoAddressPayload {
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was created by this mutation. */
@@ -1491,11 +1530,6 @@ export interface CreateAuditLogAuthPayload {
   /** The `AuditLogAuth` that was created by this mutation. */
   auditLogAuth?: AuditLogAuth | null;
   auditLogAuthEdge?: AuditLogAuthEdge | null;
-}
-export interface CreateUserConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `UserConnectedAccount` that was created by this mutation. */
-  userConnectedAccount?: UserConnectedAccount | null;
 }
 export interface CreateEmailPayload {
   clientMutationId?: string | null;
@@ -1636,6 +1670,12 @@ export interface RoleTypeEdge {
   /** The `RoleType` at the end of the edge. */
   node?: RoleType | null;
 }
+/** A `UserConnectedAccount` edge in the connection. */
+export interface UserConnectedAccountEdge {
+  cursor?: string | null;
+  /** The `UserConnectedAccount` at the end of the edge. */
+  node?: UserConnectedAccount | null;
+}
 /** A `CryptoAddress` edge in the connection. */
 export interface CryptoAddressEdge {
   cursor?: string | null;
@@ -1653,12 +1693,6 @@ export interface AuditLogAuthEdge {
   cursor?: string | null;
   /** The `AuditLogAuth` at the end of the edge. */
   node?: AuditLogAuth | null;
-}
-/** A `UserConnectedAccount` edge in the connection. */
-export interface UserConnectedAccountEdge {
-  cursor?: string | null;
-  /** The `UserConnectedAccount` at the end of the edge. */
-  node?: UserConnectedAccount | null;
 }
 /** A `Email` edge in the connection. */
 export interface EmailEdge {
@@ -1699,6 +1733,16 @@ export interface SignInCrossOriginRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+}
+export interface SignInSmsOtpRecord {
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+}
+export interface SignUpSmsRecord {
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
 }
 export interface SignUpRecord {
   id?: string | null;

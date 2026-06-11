@@ -1,13 +1,13 @@
 ---
 name: orm-modules
-description: ORM client for the modules API — provides typed CRUD operations for 56 tables and 12 custom operations
+description: ORM client for the modules API — provides typed CRUD operations for 57 tables and 12 custom operations
 ---
 
 # orm-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the modules API — provides typed CRUD operations for 56 tables and 12 custom operations
+ORM client for the modules API — provides typed CRUD operations for 57 tables and 12 custom operations
 
 ## Usage
 
@@ -61,38 +61,39 @@ See the `references/` directory for detailed per-entity API documentation:
 - [blueprint-template](references/blueprint-template.md)
 - [blueprint-construction](references/blueprint-construction.md)
 - [crypto-auth-module](references/crypto-auth-module.md)
-- [rate-limit-meters-module](references/rate-limit-meters-module.md)
 - [sessions-module](references/sessions-module.md)
 - [config-secrets-module](references/config-secrets-module.md)
+- [secure-table-provision](references/secure-table-provision.md)
+- [rate-limit-meters-module](references/rate-limit-meters-module.md)
+- [invites-module](references/invites-module.md)
 - [merkle-store-module](references/merkle-store-module.md)
 - [graph-module](references/graph-module.md)
-- [secure-table-provision](references/secure-table-provision.md)
-- [invites-module](references/invites-module.md)
 - [database-provision-module](references/database-provision-module.md)
-- [namespace-module](references/namespace-module.md)
 - [realtime-module](references/realtime-module.md)
 - [webauthn-auth-module](references/webauthn-auth-module.md)
+- [function-invocation-module](references/function-invocation-module.md)
+- [function-module](references/function-module.md)
+- [namespace-module](references/namespace-module.md)
 - [compute-log-module](references/compute-log-module.md)
 - [inference-log-module](references/inference-log-module.md)
 - [storage-log-module](references/storage-log-module.md)
 - [transfer-log-module](references/transfer-log-module.md)
+- [plans-module](references/plans-module.md)
 - [db-usage-module](references/db-usage-module.md)
 - [notifications-module](references/notifications-module.md)
-- [plans-module](references/plans-module.md)
-- [hierarchy-module](references/hierarchy-module.md)
-- [billing-module](references/billing-module.md)
 - [billing-provider-module](references/billing-provider-module.md)
+- [hierarchy-module](references/hierarchy-module.md)
 - [profiles-module](references/profiles-module.md)
 - [permissions-module](references/permissions-module.md)
+- [billing-module](references/billing-module.md)
 - [relation-provision](references/relation-provision.md)
-- [function-module](references/function-module.md)
 - [user-auth-module](references/user-auth-module.md)
 - [agent-module](references/agent-module.md)
 - [limits-module](references/limits-module.md)
 - [memberships-module](references/memberships-module.md)
 - [storage-module](references/storage-module.md)
-- [events-module](references/events-module.md)
 - [entity-type-provision](references/entity-type-provision.md)
+- [events-module](references/events-module.md)
 - [resolve-blueprint-field](references/resolve-blueprint-field.md)
 - [resolve-blueprint-table](references/resolve-blueprint-table.md)
 - [construct-blueprint](references/construct-blueprint.md)
