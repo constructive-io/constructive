@@ -34,6 +34,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
+    "@pgsql/quotes": "^17.1.0",
     "lru-cache": "^11.2.7",
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
