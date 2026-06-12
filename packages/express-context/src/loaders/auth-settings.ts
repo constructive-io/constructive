@@ -10,7 +10,7 @@
  * database rather than the services database.
  */
 
-import type { AuthSettings } from '../types';
+import type { AuthSettings, PgInterval } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
 
@@ -33,7 +33,10 @@ const buildAuthSettingsQuery = (schemaName: string, tableName: string) => `
     cookie_path,
     remember_me_duration,
     enable_captcha,
-    captcha_site_key
+    captcha_site_key,
+    oauth_state_max_age,
+    oauth_require_verified_email,
+    oauth_error_redirect_path
   FROM "${schemaName}"."${tableName}"
   LIMIT 1
 `;
@@ -45,11 +48,14 @@ interface AuthSettingsRow {
   cookie_samesite: string;
   cookie_domain: string | null;
   cookie_httponly: boolean;
-  cookie_max_age: string | null;
+  cookie_max_age: string | PgInterval | null;
   cookie_path: string;
-  remember_me_duration: string | null;
+  remember_me_duration: string | PgInterval | null;
   enable_captcha: boolean;
   captcha_site_key: string | null;
+  oauth_state_max_age: string | PgInterval | null;
+  oauth_require_verified_email: boolean;
+  oauth_error_redirect_path: string | null;
 }
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
@@ -84,6 +90,9 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
       rememberMeDuration: row.remember_me_duration,
       enableCaptcha: row.enable_captcha,
       captchaSiteKey: row.captcha_site_key,
+      oauthStateMaxAge: row.oauth_state_max_age,
+      oauthRequireVerifiedEmail: row.oauth_require_verified_email,
+      oauthErrorRedirectPath: row.oauth_error_redirect_path,
     };
   },
 });
