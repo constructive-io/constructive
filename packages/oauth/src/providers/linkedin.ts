@@ -24,6 +24,7 @@ export const linkedinProvider: OAuthProviderConfig = {
       provider: 'linkedin',
       providerId: profile.sub,
       email: profile.email || null,
+      emailVerified: profile.email_verified ?? false,
       name: profile.name || null,
       picture: profile.picture || null,
       raw: data,

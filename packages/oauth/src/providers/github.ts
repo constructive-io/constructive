@@ -28,6 +28,7 @@ export const githubProvider: OAuthProviderConfig = {
       provider: 'github',
       providerId: String(profile.id),
       email: profile.email || null,
+      emailVerified: false, // GitHub requires separate /user/emails call for verification status
       name: profile.name || profile.login || null,
       picture: profile.avatar_url || null,
       raw: data,
@@ -37,10 +38,16 @@ export const githubProvider: OAuthProviderConfig = {
 
 export const GITHUB_EMAILS_URL = 'https://api.github.com/user/emails';
 
-export function extractPrimaryEmail(emails: GitHubEmail[]): string | null {
+export interface ExtractedEmail {
+  email: string;
+  verified: boolean;
+}
+
+export function extractPrimaryEmail(emails: GitHubEmail[]): ExtractedEmail | null {
   const primary = emails.find((e) => e.primary && e.verified);
-  if (primary) return primary.email;
+  if (primary) return { email: primary.email, verified: true };
   const verified = emails.find((e) => e.verified);
-  if (verified) return verified.email;
-  return emails[0]?.email || null;
+  if (verified) return { email: verified.email, verified: true };
+  if (emails[0]) return { email: emails[0].email, verified: emails[0].verified };
+  return null;
 }
