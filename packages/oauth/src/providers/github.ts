@@ -30,6 +30,7 @@ export const githubProvider: OAuthProviderConfig = {
       email: profile.email || null,
       name: profile.name || profile.login || null,
       picture: profile.avatar_url || null,
+      emailVerified: null, // GitHub requires separate /user/emails API call
       raw: data,
     };
   },

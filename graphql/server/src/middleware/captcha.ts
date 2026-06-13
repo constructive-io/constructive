@@ -1,4 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
+import { getEnvVars } from '@pgpmjs/env';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import './types'; // for Request type
 
@@ -94,7 +95,7 @@ export const createCaptchaMiddleware = (): RequestHandler => {
     }
 
     // Secret key must be set server-side (env var, not stored in DB for security)
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    const secretKey = getEnvVars().captcha?.recaptchaSecretKey;
     if (!secretKey) {
       log.warn('[captcha] enable_captcha is true but RECAPTCHA_SECRET_KEY env var is not set; skipping verification');
       return next();

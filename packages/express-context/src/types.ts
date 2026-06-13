@@ -88,16 +88,29 @@ export interface RlsModule {
   currentUserAgent: string;
 }
 
+export interface PgInterval {
+  years?: number;
+  months?: number;
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  milliseconds?: number;
+}
+
 export interface AuthSettings {
   cookieSecure?: boolean;
   cookieSamesite?: string;
   cookieDomain?: string | null;
   cookieHttponly?: boolean;
-  cookieMaxAge?: string | null;
+  cookieMaxAge?: string | PgInterval | null;
   cookiePath?: string;
-  rememberMeDuration?: string | null;
+  rememberMeDuration?: string | PgInterval | null;
   enableCaptcha?: boolean;
   captchaSiteKey?: string | null;
+  oauthStateMaxAge?: string | PgInterval | null;
+  oauthRequireVerifiedEmail?: boolean;
+  oauthErrorRedirectPath?: string | null;
 }
 
 export interface ApiStructure {
@@ -153,6 +166,57 @@ export interface AgentChatConfig {
   taskTableName: string | null;
 }
 
+// ─── OAuth / Identity Types ─────────────────────────────────────────────────
+
+export interface EncryptedSecretsConfig {
+  schemaName: string;
+  tableName: string;
+}
+
+export interface UserAuthConfig {
+  schemaName: string;
+  sessionCredentialsSchemaName: string;
+  signInFunction: string;
+  signUpFunction: string;
+  signOutFunction: string;
+  signInCrossOriginFunction: string | null;
+  requestCrossOriginTokenFunction: string | null;
+  extendTokenExpires: string;
+}
+
+export interface IdentityProviderFullConfig {
+  slug: string;
+  kind: 'oauth2' | 'oidc';
+  displayName: string;
+  enabled: boolean;
+  clientId: string;
+  clientSecret: string;
+  authorizationUrl: string | null;
+  tokenUrl: string | null;
+  userinfoUrl: string | null;
+  scopes: string[];
+  pkceEnabled: boolean;
+}
+
+export type IdentityProviderConfigMap = Map<string, IdentityProviderFullConfig>;
+
+export interface IdentityProvidersConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+  // Function names (defaults until DB schema adds these columns)
+  signInIdentityFunction: string;
+  signUpIdentityFunction: string;
+  // Enabled providers with full config (merged from identityProviderConfig loader)
+  providers: IdentityProviderConfigMap;
+}
+
+export interface ConnectedAccountsConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+}
+
 // ─── Module Types Map ───────────────────────────────────────────────────────
 
 /**
@@ -173,6 +237,11 @@ export interface BuiltinModuleMap {
   billing: BillingConfig;
   inferenceLog: InferenceLogConfig;
   agentChat: AgentChatConfig;
+  encryptedSecrets: EncryptedSecretsConfig;
+  userAuth: UserAuthConfig;
+  identityProviders: IdentityProvidersConfig;
+  identityProviderConfig: IdentityProviderConfigMap;
+  connectedAccounts: ConnectedAccountsConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

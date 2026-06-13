@@ -1,10 +1,27 @@
 import type { Request, Response } from 'express';
-import type { AuthSettings } from '../types';
+import type { AuthSettings, PgInterval } from '../types';
 
 export const SESSION_COOKIE_NAME = 'constructive_session';
 export const DEVICE_TOKEN_COOKIE_NAME = 'constructive_device_token';
 
 const DEVICE_TOKEN_MAX_AGE = 90 * 24 * 60 * 60; // 90 days in seconds
+
+export const parseIntervalToSeconds = (interval: string | PgInterval | null | undefined): number | null => {
+  if (!interval) return null;
+  if (typeof interval === 'string') {
+    const parsed = parseInt(interval, 10);
+    return isNaN(parsed) ? null : parsed;
+  }
+  let totalSeconds = 0;
+  if (interval.years) totalSeconds += interval.years * 365 * 24 * 60 * 60;
+  if (interval.months) totalSeconds += interval.months * 30 * 24 * 60 * 60;
+  if (interval.days) totalSeconds += interval.days * 24 * 60 * 60;
+  if (interval.hours) totalSeconds += interval.hours * 60 * 60;
+  if (interval.minutes) totalSeconds += interval.minutes * 60;
+  if (interval.seconds) totalSeconds += interval.seconds;
+  if (interval.milliseconds) totalSeconds += interval.milliseconds / 1000;
+  return totalSeconds > 0 ? totalSeconds : null;
+};
 
 export interface CookieConfig {
   secure: boolean;
@@ -25,11 +42,11 @@ export const getSessionCookieConfig = (
   const DEFAULT_MAX_AGE = 86400; // 24 hours
   let maxAge = DEFAULT_MAX_AGE;
   if (rememberMe && authSettings?.rememberMeDuration) {
-    const parsed = parseInt(authSettings.rememberMeDuration, 10);
-    if (!isNaN(parsed)) maxAge = parsed;
+    const parsed = parseIntervalToSeconds(authSettings.rememberMeDuration);
+    if (parsed !== null) maxAge = parsed;
   } else if (authSettings?.cookieMaxAge) {
-    const parsed = parseInt(authSettings.cookieMaxAge, 10);
-    if (!isNaN(parsed)) maxAge = parsed;
+    const parsed = parseIntervalToSeconds(authSettings.cookieMaxAge);
+    if (parsed !== null) maxAge = parsed;
   }
 
   return {

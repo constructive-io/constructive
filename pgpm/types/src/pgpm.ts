@@ -128,6 +128,30 @@ export interface CDNOptions {
 }
 
 /**
+ * OAuth configuration options
+ */
+export interface OAuthOptions {
+    /** Secret key for signing OAuth state tokens (HMAC-SHA256) */
+    secret?: string;
+}
+
+/**
+ * Captcha configuration options
+ */
+export interface CaptchaOptions {
+    /** reCAPTCHA secret key for server-side verification */
+    recaptchaSecretKey?: string;
+}
+
+/**
+ * Upload configuration options
+ */
+export interface UploadOptions {
+    /** Maximum upload file size in bytes (default: 10MB) */
+    maxFileSize?: number;
+}
+
+/**
  * SMTP email configuration options
  */
 export interface SmtpOptions {
@@ -255,6 +279,12 @@ export interface PgpmOptions {
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
+    /** OAuth configuration */
+    oauth?: OAuthOptions;
+    /** Captcha configuration */
+    captcha?: CaptchaOptions;
+    /** Upload configuration */
+    upload?: UploadOptions;
 }
 
 /**
