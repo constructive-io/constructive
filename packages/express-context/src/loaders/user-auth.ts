@@ -6,7 +6,7 @@
  * including identity-based OAuth/SSO auth functions.
  */
 
-import type { UserAuthConfig } from '../types';
+import type { UserAuthConfig, UserAuthModuleRow } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
 
@@ -30,18 +30,8 @@ const USER_AUTH_MODULE_SQL = `
   LIMIT 1
 `;
 
-// ─── Row Types ──────────────────────────────────────────────────────────────
-
-interface UserAuthModuleRow {
-  schema_name: string;
-  session_credentials_schema_name: string | null;
-  sign_in_function: string;
-  sign_up_function: string;
-  sign_out_function: string;
-  sign_in_cross_origin_function: string | null;
-  request_cross_origin_token_function: string | null;
-  extend_token_expires: string;
-}
+const SIGN_IN_IDENTITY_FUNCTION = 'sign_in_identity';
+const SIGN_UP_IDENTITY_FUNCTION = 'sign_up_identity';
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
@@ -65,6 +55,8 @@ export const userAuthLoader: ModuleLoader<UserAuthConfig> =
           row.session_credentials_schema_name || row.schema_name,
         signInFunction: row.sign_in_function,
         signUpFunction: row.sign_up_function,
+        signInIdentityFunction: SIGN_IN_IDENTITY_FUNCTION,
+        signUpIdentityFunction: SIGN_UP_IDENTITY_FUNCTION,
         signOutFunction: row.sign_out_function,
         signInCrossOriginFunction: row.sign_in_cross_origin_function,
         requestCrossOriginTokenFunction: row.request_cross_origin_token_function,

@@ -10,7 +10,9 @@
  * database rather than the services database.
  */
 
-import type { AuthSettings, PgInterval } from '../types';
+import { QuoteUtils } from '@pgsql/quotes';
+
+import type { AuthSettings, AuthSettingsRow } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
 
@@ -23,39 +25,29 @@ const AUTH_SETTINGS_DISCOVERY_SQL = `
   LIMIT 1
 `;
 
-const buildAuthSettingsQuery = (schemaName: string, tableName: string) => `
-  SELECT
-    cookie_secure,
-    cookie_samesite,
-    cookie_domain,
-    cookie_httponly,
-    cookie_max_age,
-    cookie_path,
-    remember_me_duration,
-    enable_captcha,
-    captcha_site_key,
-    oauth_state_max_age,
-    oauth_require_verified_email,
-    oauth_error_redirect_path
-  FROM "${schemaName}"."${tableName}"
-  LIMIT 1
-`;
+function buildAuthSettingsQuery(schemaName: string, tableName: string): string {
+  const authSettingsTable = QuoteUtils.quoteQualifiedIdentifier(
+    schemaName,
+    tableName,
+  );
 
-// ─── Row Types ──────────────────────────────────────────────────────────────
-
-interface AuthSettingsRow {
-  cookie_secure: boolean;
-  cookie_samesite: string;
-  cookie_domain: string | null;
-  cookie_httponly: boolean;
-  cookie_max_age: string | PgInterval | null;
-  cookie_path: string;
-  remember_me_duration: string | PgInterval | null;
-  enable_captcha: boolean;
-  captcha_site_key: string | null;
-  oauth_state_max_age: string | PgInterval | null;
-  oauth_require_verified_email: boolean;
-  oauth_error_redirect_path: string | null;
+  return `
+    SELECT
+      cookie_secure,
+      cookie_samesite,
+      cookie_domain,
+      cookie_httponly,
+      cookie_max_age,
+      cookie_path,
+      remember_me_duration,
+      enable_captcha,
+      captcha_site_key,
+      oauth_state_max_age,
+      oauth_require_verified_email,
+      oauth_error_redirect_path
+    FROM ${authSettingsTable}
+    LIMIT 1
+  `;
 }
 
 // ─── Loader ─────────────────────────────────────────────────────────────────

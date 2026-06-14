@@ -166,20 +166,43 @@ export interface AgentChatConfig {
 
 // ─── OAuth / Identity Types ─────────────────────────────────────────────────
 
-export interface EncryptedSecretsConfig {
-  schemaName: string;
-  tableName: string;
-}
-
 export interface UserAuthConfig {
   schemaName: string;
   sessionCredentialsSchemaName: string;
   signInFunction: string;
   signUpFunction: string;
+  signInIdentityFunction: string;
+  signUpIdentityFunction: string;
   signOutFunction: string;
   signInCrossOriginFunction: string | null;
   requestCrossOriginTokenFunction: string | null;
   extendTokenExpires: string;
+}
+
+export interface UserAuthModuleRow {
+  schema_name: string;
+  session_credentials_schema_name: string | null;
+  sign_in_function: string;
+  sign_up_function: string;
+  sign_out_function: string;
+  sign_in_cross_origin_function: string | null;
+  request_cross_origin_token_function: string | null;
+  extend_token_expires: string;
+}
+
+export interface AuthSettingsRow {
+  cookie_secure: boolean;
+  cookie_samesite: string;
+  cookie_domain: string | null;
+  cookie_httponly: boolean;
+  cookie_max_age: string | PgInterval | null;
+  cookie_path: string;
+  remember_me_duration: string | PgInterval | null;
+  enable_captcha: boolean;
+  captcha_site_key: string | null;
+  oauth_state_max_age: string | PgInterval | null;
+  oauth_require_verified_email: boolean;
+  oauth_error_redirect_path: string | null;
 }
 
 export interface IdentityProviderFullConfig {
@@ -204,15 +227,44 @@ export interface IdentityProvidersConfig {
   tableName: string;
   prefix: string;
   rotateSecretFunction: string;
-  signInIdentityFunction: string;
-  signUpIdentityFunction: string;
   providers: IdentityProviderConfigMap;
+}
+
+export interface IdentityProvidersModuleRow {
+  schema_name: string;
+  private_schema_name: string;
+  table_name: string;
+  prefix: string;
+}
+
+export interface PlatformDatabaseRow {
+  database_id: string;
+}
+
+export interface ProviderRow {
+  slug: string;
+  kind: 'oauth2' | 'oidc';
+  display_name: string;
+  enabled: boolean;
+  client_id: string;
+  client_secret: string | null;
+  authorization_url: string | null;
+  token_url: string | null;
+  userinfo_url: string | null;
+  scopes: string[] | null;
+  pkce_enabled: boolean | null;
 }
 
 export interface ConnectedAccountsConfig {
   schemaName: string;
   privateSchemaName: string;
   tableName: string;
+}
+
+export interface ConnectedAccountsModuleRow {
+  schema_name: string;
+  private_schema_name: string;
+  table_name: string;
 }
 
 // ─── Module Types Map ───────────────────────────────────────────────────────
@@ -235,7 +287,6 @@ export interface BuiltinModuleMap {
   billing: BillingConfig;
   inferenceLog: InferenceLogConfig;
   agentChat: AgentChatConfig;
-  encryptedSecrets: EncryptedSecretsConfig;
   userAuth: UserAuthConfig;
   identityProviders: IdentityProvidersConfig;
   connectedAccounts: ConnectedAccountsConfig;

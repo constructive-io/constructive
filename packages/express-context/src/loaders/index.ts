@@ -12,7 +12,6 @@
  *   - pubkeyChallengeSettings (services_public.pubkey_settings)
  *   - webauthnSettings(services_public.webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
- *   - encryptedSecrets (constructive_store_private.platform_secrets)
  *   - userAuth        (metaschema_modules_public.user_auth_module)
  *   - identityProviders (metaschema_modules_public.identity_providers_module + providers Map)
  *   - connectedAccounts (metaschema_modules_public.connected_accounts_module)
@@ -51,7 +50,6 @@ export { authSettingsLoader } from './auth-settings';
 export { billingLoader } from './billing';
 export { inferenceLogLoader } from './inference-log';
 export { agentChatLoader } from './agent-chat';
-export { encryptedSecretsLoader } from './encrypted-secrets';
 export { userAuthLoader } from './user-auth';
 export { identityProvidersLoader } from './identity-providers';
 export { connectedAccountsLoader } from './connected-accounts';
@@ -69,7 +67,6 @@ import { authSettingsLoader } from './auth-settings';
 import { billingLoader } from './billing';
 import { inferenceLogLoader } from './inference-log';
 import { agentChatLoader } from './agent-chat';
-import { encryptedSecretsLoader } from './encrypted-secrets';
 import { userAuthLoader } from './user-auth';
 import { identityProvidersLoader } from './identity-providers';
 import { connectedAccountsLoader } from './connected-accounts';
@@ -85,7 +82,6 @@ export function createDefaultRegistry() {
   registry.register(billingLoader);
   registry.register(inferenceLogLoader);
   registry.register(agentChatLoader);
-  registry.register(encryptedSecretsLoader);
   registry.register(userAuthLoader);
   registry.register(identityProvidersLoader);
   registry.register(connectedAccountsLoader);
