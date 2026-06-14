@@ -5,7 +5,10 @@
  * Provides schema names for querying OAuth identity associations.
  */
 
-import type { ConnectedAccountsConfig } from '../types';
+import type {
+  ConnectedAccountsConfig,
+  ConnectedAccountsModuleRow,
+} from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
 
@@ -22,14 +25,6 @@ const CONNECTED_ACCOUNTS_MODULE_SQL = `
   WHERE cam.database_id = $1
   LIMIT 1
 `;
-
-// ─── Row Types ──────────────────────────────────────────────────────────────
-
-interface ConnectedAccountsModuleRow {
-  schema_name: string;
-  private_schema_name: string;
-  table_name: string;
-}
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
