@@ -15,6 +15,7 @@ import {
   getCreateMutationName,
   getDeleteInputTypeName,
   getDeleteMutationName,
+  getExtraInputKeys,
   getFilterTypeName,
   getGeneratedFileHeader,
   getOrderByTypeName,
@@ -25,6 +26,7 @@ import {
   lcFirst,
   ucFirst,
 } from '../utils';
+import type { ExtraInputKey } from '../utils';
 
 export interface GeneratedModelFile {
   fileName: string;
@@ -168,43 +170,7 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
   );
 }
 
-interface ExtraInputKey {
-  name: string;
-  gqlType: string;
-  tsType: string;
-}
-
-/**
- * Discover extra required fields on a mutation input type beyond the standard
- * ones (clientMutationId, PK fields, patch field). PostGraphile adds these for
- * partitioned tables (e.g. databaseId as the partition key).
- */
-function getExtraInputKeys(
-  inputTypeName: string,
-  pkFieldNames: Set<string>,
-  patchFieldName: string | null,
-  typeRegistry?: TypeRegistry,
-): ExtraInputKey[] {
-  if (!typeRegistry) return [];
-  const inputType = typeRegistry.get(inputTypeName);
-  if (!inputType || inputType.kind !== 'INPUT_OBJECT' || !inputType.inputFields) return [];
-
-  const skip = new Set<string>(['clientMutationId', ...(patchFieldName ? [patchFieldName] : [])]);
-  for (const pk of pkFieldNames) skip.add(pk);
-
-  const extras: ExtraInputKey[] = [];
-  for (const field of inputType.inputFields) {
-    if (skip.has(field.name)) continue;
-    if (field.type.kind !== 'NON_NULL') continue;
-    const innerName = field.type.ofType?.name;
-    if (!innerName) continue;
-    let tsType = 'string';
-    if (innerName === 'Int' || innerName === 'Float' || innerName === 'BigFloat') tsType = 'number';
-    else if (innerName === 'Boolean') tsType = 'boolean';
-    extras.push({ name: field.name, gqlType: innerName, tsType });
-  }
-  return extras;
-}
+// ExtraInputKey type and getExtraInputKeys are imported from ../utils
 
 export function generateModelFile(
   table: Table,

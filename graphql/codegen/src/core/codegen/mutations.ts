@@ -9,7 +9,7 @@
  */
 import * as t from '@babel/types';
 
-import type { Table } from '../../types/schema';
+import type { Table, TypeRegistry } from '../../types/schema';
 import {
   addJSDocComment,
   buildSelectionArgsCall,
@@ -50,11 +50,14 @@ import {
   getCreateMutationFileName,
   getCreateMutationHookName,
   getCreateMutationName,
+  getDeleteInputTypeName,
   getDeleteMutationFileName,
   getDeleteMutationHookName,
   getDeleteMutationName,
+  getExtraInputKeys,
   getPrimaryKeyInfo,
   getTableNames,
+  getUpdateInputTypeName,
   getUpdateMutationFileName,
   getUpdateMutationHookName,
   getUpdateMutationName,
@@ -70,6 +73,7 @@ export interface GeneratedMutationFile {
 export interface MutationGeneratorOptions {
   reactQueryEnabled?: boolean;
   useCentralizedKeys?: boolean;
+  typeRegistry?: TypeRegistry;
 }
 
 function buildMutationResultType(
@@ -332,7 +336,7 @@ export function generateUpdateMutationHook(
   table: Table,
   options: MutationGeneratorOptions = {},
 ): GeneratedMutationFile | null {
-  const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
+  const { reactQueryEnabled = true, useCentralizedKeys = true, typeRegistry } = options;
 
   if (!reactQueryEnabled) return null;
   if (table.query?.update === null) return null;
@@ -354,6 +358,14 @@ export function generateUpdateMutationHook(
 
   const pkTsType =
     pkField.tsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+
+  const updateInputTypeName = getUpdateInputTypeName(table);
+  const updateExtraKeys = getExtraInputKeys(
+    updateInputTypeName,
+    new Set(pkFields.map((pk) => pk.name)),
+    patchFieldName,
+    typeRegistry,
+  );
 
   const statements: t.Statement[] = [];
 
@@ -409,11 +421,21 @@ export function generateUpdateMutationHook(
     ),
   );
 
-  // Variable type: { pkField: type; patchFieldName: PatchType }
+  // Variable type: { pkField: type; extraKeys...; patchFieldName: PatchType }
   const updateVarType = t.tsTypeLiteral([
     t.tsPropertySignature(
       t.identifier(pkField.name),
       t.tsTypeAnnotation(pkTsType),
+    ),
+    ...updateExtraKeys.map((ek) =>
+      t.tsPropertySignature(
+        t.identifier(ek.name),
+        t.tsTypeAnnotation(
+          ek.tsType === 'number' ? t.tsNumberKeyword() :
+          ek.tsType === 'boolean' ? t.tsBooleanKeyword() :
+          t.tsStringKeyword()
+        ),
+      ),
     ),
     t.tsPropertySignature(
       t.identifier(patchFieldName),
@@ -485,6 +507,7 @@ export function generateUpdateMutationHook(
   //   getClient().singular.update({ where: { pkField }, data: patchFieldName, select: ... }).unwrap()
   const destructParam = t.objectPattern([
     shorthandProp(pkField.name),
+    ...updateExtraKeys.map((ek) => shorthandProp(ek.name)),
     shorthandProp(patchFieldName),
   ]);
   destructParam.typeAnnotation = t.tsTypeAnnotation(updateVarType);
@@ -494,7 +517,10 @@ export function generateUpdateMutationHook(
       singularName,
       'update',
       t.objectExpression([
-        objectProp('where', t.objectExpression([shorthandProp(pkField.name)])),
+        objectProp('where', t.objectExpression([
+          shorthandProp(pkField.name),
+          ...updateExtraKeys.map((ek) => shorthandProp(ek.name)),
+        ])),
         objectProp('data', t.identifier(patchFieldName)),
         objectProp(
           'select',
@@ -592,7 +618,7 @@ export function generateDeleteMutationHook(
   table: Table,
   options: MutationGeneratorOptions = {},
 ): GeneratedMutationFile | null {
-  const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
+  const { reactQueryEnabled = true, useCentralizedKeys = true, typeRegistry } = options;
 
   if (!reactQueryEnabled) return null;
   if (table.query?.delete === null) return null;
@@ -611,6 +637,14 @@ export function generateDeleteMutationHook(
 
   const pkTsType =
     pkField.tsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+
+  const deleteInputTypeName = getDeleteInputTypeName(table);
+  const deleteExtraKeys = getExtraInputKeys(
+    deleteInputTypeName,
+    new Set(pkFields.map((pk) => pk.name)),
+    null,
+    typeRegistry,
+  );
 
   const statements: t.Statement[] = [];
 
@@ -666,11 +700,21 @@ export function generateDeleteMutationHook(
     ),
   );
 
-  // Variable type: { pkField: type }
+  // Variable type: { pkField: type; extraKeys... }
   const deleteVarType = t.tsTypeLiteral([
     t.tsPropertySignature(
       t.identifier(pkField.name),
       t.tsTypeAnnotation(pkTsType),
+    ),
+    ...deleteExtraKeys.map((ek) =>
+      t.tsPropertySignature(
+        t.identifier(ek.name),
+        t.tsTypeAnnotation(
+          ek.tsType === 'number' ? t.tsNumberKeyword() :
+          ek.tsType === 'boolean' ? t.tsBooleanKeyword() :
+          t.tsStringKeyword()
+        ),
+      ),
     ),
   ]);
 
@@ -736,7 +780,10 @@ export function generateDeleteMutationHook(
 
   // mutationFn: ({ pkField }: { pkField: type }) =>
   //   getClient().singular.delete({ where: { pkField }, select: ... }).unwrap()
-  const destructParam = t.objectPattern([shorthandProp(pkField.name)]);
+  const destructParam = t.objectPattern([
+    shorthandProp(pkField.name),
+    ...deleteExtraKeys.map((ek) => shorthandProp(ek.name)),
+  ]);
   destructParam.typeAnnotation = t.tsTypeAnnotation(deleteVarType);
   const mutationFnExpr = t.arrowFunctionExpression(
     [destructParam],
@@ -744,7 +791,10 @@ export function generateDeleteMutationHook(
       singularName,
       'delete',
       t.objectExpression([
-        objectProp('where', t.objectExpression([shorthandProp(pkField.name)])),
+        objectProp('where', t.objectExpression([
+          shorthandProp(pkField.name),
+          ...deleteExtraKeys.map((ek) => shorthandProp(ek.name)),
+        ])),
         objectProp(
           'select',
           t.memberExpression(t.identifier('args'), t.identifier('select')),
