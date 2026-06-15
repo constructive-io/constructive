@@ -6,7 +6,7 @@
  * including identity-based OAuth/SSO auth functions.
  */
 
-import type { UserAuthConfig, UserAuthModuleRow } from '../types';
+import type { UserAuthModuleConfig, UserAuthModuleRow } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
 
@@ -35,9 +35,9 @@ const SIGN_UP_IDENTITY_FUNCTION = 'sign_up_identity';
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
-export const userAuthLoader: ModuleLoader<UserAuthConfig> =
-  createModuleLoader<UserAuthConfig>({
-    name: 'userAuth',
+export const userAuthModuleLoader: ModuleLoader<UserAuthModuleConfig> =
+  createModuleLoader<UserAuthModuleConfig>({
+    name: 'userAuthModule',
     ttlMs: 5 * 60_000,
     async resolve(ctx: LoaderContext) {
       const { tenantPool, databaseId } = ctx;

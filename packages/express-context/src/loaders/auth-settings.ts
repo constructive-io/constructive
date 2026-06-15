@@ -22,6 +22,7 @@ const AUTH_SETTINGS_DISCOVERY_SQL = `
   SELECT s.schema_name, sm.auth_settings_table AS table_name
   FROM metaschema_modules_public.sessions_module sm
   JOIN metaschema_public.schema s ON s.id = sm.schema_id
+  WHERE sm.database_id = $1
   LIMIT 1
 `;
 
@@ -56,11 +57,12 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
   name: 'authSettings',
   ttlMs: 5 * 60_000,
   async resolve(ctx: LoaderContext) {
-    const { tenantPool } = ctx;
+    const { tenantPool, databaseId } = ctx;
 
     // Step 1: Discover schema + table from sessions_module
     const discovery = await tenantPool.query<{ schema_name: string; table_name: string }>(
       AUTH_SETTINGS_DISCOVERY_SQL,
+      [databaseId],
     );
     const resolved = discovery.rows[0];
     if (!resolved) return undefined;
