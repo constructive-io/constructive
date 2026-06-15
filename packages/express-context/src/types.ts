@@ -166,7 +166,7 @@ export interface AgentChatConfig {
 
 // ─── OAuth / Identity Types ─────────────────────────────────────────────────
 
-export interface UserAuthConfig {
+export interface UserAuthModuleConfig {
   schemaName: string;
   sessionCredentialsSchemaName: string;
   signInFunction: string;
@@ -255,7 +255,7 @@ export interface ProviderRow {
   pkce_enabled: boolean | null;
 }
 
-export interface ConnectedAccountsConfig {
+export interface ConnectedAccountsModuleConfig {
   schemaName: string;
   privateSchemaName: string;
   tableName: string;
@@ -287,9 +287,9 @@ export interface BuiltinModuleMap {
   billing: BillingConfig;
   inferenceLog: InferenceLogConfig;
   agentChat: AgentChatConfig;
-  userAuth: UserAuthConfig;
+  userAuthModule: UserAuthModuleConfig;
   identityProviders: IdentityProvidersConfig;
-  connectedAccounts: ConnectedAccountsConfig;
+  connectedAccountsModule: ConnectedAccountsModuleConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

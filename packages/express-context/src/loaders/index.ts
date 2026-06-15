@@ -12,9 +12,9 @@
  *   - pubkeyChallengeSettings (services_public.pubkey_settings)
  *   - webauthnSettings(services_public.webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
- *   - userAuth        (metaschema_modules_public.user_auth_module)
+ *   - userAuthModule  (metaschema_modules_public.user_auth_module)
  *   - identityProviders (metaschema_modules_public.identity_providers_module + providers Map)
- *   - connectedAccounts (metaschema_modules_public.connected_accounts_module)
+ *   - connectedAccountsModule (metaschema_modules_public.connected_accounts_module)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:
  *
@@ -50,9 +50,9 @@ export { authSettingsLoader } from './auth-settings';
 export { billingLoader } from './billing';
 export { inferenceLogLoader } from './inference-log';
 export { agentChatLoader } from './agent-chat';
-export { userAuthLoader } from './user-auth';
+export { userAuthModuleLoader } from './user-auth-module';
 export { identityProvidersLoader } from './identity-providers';
-export { connectedAccountsLoader } from './connected-accounts';
+export { connectedAccountsModuleLoader } from './connected-accounts-module';
 
 /**
  * Convenience: create a registry pre-loaded with all built-in loaders.
@@ -67,9 +67,9 @@ import { authSettingsLoader } from './auth-settings';
 import { billingLoader } from './billing';
 import { inferenceLogLoader } from './inference-log';
 import { agentChatLoader } from './agent-chat';
-import { userAuthLoader } from './user-auth';
+import { userAuthModuleLoader } from './user-auth-module';
 import { identityProvidersLoader } from './identity-providers';
-import { connectedAccountsLoader } from './connected-accounts';
+import { connectedAccountsModuleLoader } from './connected-accounts-module';
 
 export function createDefaultRegistry() {
   const registry = createLoaderRegistry();
@@ -82,8 +82,8 @@ export function createDefaultRegistry() {
   registry.register(billingLoader);
   registry.register(inferenceLogLoader);
   registry.register(agentChatLoader);
-  registry.register(userAuthLoader);
+  registry.register(userAuthModuleLoader);
   registry.register(identityProvidersLoader);
-  registry.register(connectedAccountsLoader);
+  registry.register(connectedAccountsModuleLoader);
   return registry;
 }

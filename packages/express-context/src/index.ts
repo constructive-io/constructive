@@ -45,7 +45,7 @@ export type {
   AuthSettings,
   BillingConfig,
   BuiltinModuleMap,
-  ConnectedAccountsConfig,
+  ConnectedAccountsModuleConfig,
   ConstructiveAPIToken,
   ConstructiveContext,
   CorsModuleData,
@@ -59,7 +59,7 @@ export type {
   PublicKeyChallengeData,
   PubkeyChallengeSettings,
   RlsModule,
-  UserAuthConfig,
+  UserAuthModuleConfig,
   WebauthnSettings,
   WithPgClient,
 } from './types';
@@ -89,7 +89,7 @@ export {
   agentChatLoader,
   authSettingsLoader,
   billingLoader,
-  connectedAccountsLoader,
+  connectedAccountsModuleLoader,
   corsLoader,
   createDefaultRegistry,
   createLoaderRegistry,
@@ -99,7 +99,7 @@ export {
   inferenceLogLoader,
   pubkeyLoader,
   rlsLoader,
-  userAuthLoader,
+  userAuthModuleLoader,
   webauthnLoader,
 } from './loaders';
 
