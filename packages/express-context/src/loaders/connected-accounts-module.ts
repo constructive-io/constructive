@@ -6,7 +6,7 @@
  */
 
 import type {
-  ConnectedAccountsConfig,
+  ConnectedAccountsModuleConfig,
   ConnectedAccountsModuleRow,
 } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
@@ -28,9 +28,9 @@ const CONNECTED_ACCOUNTS_MODULE_SQL = `
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
-export const connectedAccountsLoader: ModuleLoader<ConnectedAccountsConfig> =
-  createModuleLoader<ConnectedAccountsConfig>({
-    name: 'connectedAccounts',
+export const connectedAccountsModuleLoader: ModuleLoader<ConnectedAccountsModuleConfig> =
+  createModuleLoader<ConnectedAccountsModuleConfig>({
+    name: 'connectedAccountsModule',
     ttlMs: 5 * 60_000,
     async resolve(ctx: LoaderContext) {
       const { tenantPool, databaseId } = ctx;

@@ -184,7 +184,7 @@ export interface LlmConfig {
 
 // ─── OAuth / Identity Types ─────────────────────────────────────────────────
 
-export interface UserAuthConfig {
+export interface UserAuthModuleConfig {
   schemaName: string;
   sessionCredentialsSchemaName: string;
   signInFunction: string;
@@ -273,7 +273,7 @@ export interface ProviderRow {
   pkce_enabled: boolean | null;
 }
 
-export interface ConnectedAccountsConfig {
+export interface ConnectedAccountsModuleConfig {
   schemaName: string;
   privateSchemaName: string;
   tableName: string;
@@ -307,9 +307,9 @@ export interface BuiltinModuleMap {
   agentChat: AgentChatConfig;
   llm: LlmConfig;
   compute: ComputeConfig;
-  userAuth: UserAuthConfig;
+  userAuthModule: UserAuthModuleConfig;
   identityProviders: IdentityProvidersConfig;
-  connectedAccounts: ConnectedAccountsConfig;
+  connectedAccountsModule: ConnectedAccountsModuleConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

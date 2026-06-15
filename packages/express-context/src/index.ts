@@ -46,7 +46,7 @@ export type {
   BuiltinModuleMap,
   ComputeConfig,
   ComputeModuleConfig,
-  ConnectedAccountsConfig,
+  ConnectedAccountsModuleConfig,
   ConstructiveAPIToken,
   ConstructiveContext,
   DatabaseSettings,
@@ -58,7 +58,7 @@ export type {
   PgInterval,
   PubkeyChallengeSettings,
   RlsModule,
-  UserAuthConfig,
+  UserAuthModuleConfig,
   WebauthnSettings,
   WithPgClient,
 } from './types';
@@ -93,7 +93,7 @@ export {
   authSettingsLoader,
   billingLoader,
   computeLoader,
-  connectedAccountsLoader,
+  connectedAccountsModuleLoader,
   corsLoader,
   createDefaultRegistry,
   createLoaderRegistry,
@@ -104,7 +104,7 @@ export {
   llmLoader,
   pubkeyLoader,
   rlsLoader,
-  userAuthLoader,
+  userAuthModuleLoader,
   webauthnLoader,
 } from './loaders';
 
