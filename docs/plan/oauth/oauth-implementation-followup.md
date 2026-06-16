@@ -15,3 +15,7 @@
 ## Loader Cache TTL Semantics
 
 - Revisit `createModuleLoader` cache expiration semantics. The current implementation uses `updateAgeOnGet: true`, so each cache hit refreshes the TTL and frequently accessed config may not expire while traffic continues. The reference branch changed the default to `false`, but the desired behavior needs further design discussion, including whether `updateAgeOnGet` should remain global or become a per-loader option.
+
+## Env Config Consolidation
+
+- Consider moving existing CAPTCHA and upload environment variables into the shared `@pgpmjs/env` config surface in a separate cleanup PR. The reference OAuth branch added `RECAPTCHA_SECRET_KEY` and `MAX_UPLOAD_FILE_SIZE` to `PgpmOptions`, but this OAuth migration keeps those existing middleware paths on direct `process.env` reads to avoid widening the PR scope beyond OAuth/server admin APIs.

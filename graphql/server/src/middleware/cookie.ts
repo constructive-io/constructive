@@ -24,10 +24,10 @@ export const getSessionCookieConfig = (
 ): CookieConfig => {
   const DEFAULT_MAX_AGE = 86400; // 24 hours
   let maxAge = DEFAULT_MAX_AGE;
-  if (rememberMe && authSettings?.rememberMeDuration) {
+  if (rememberMe && typeof authSettings?.rememberMeDuration === 'string') {
     const parsed = parseInt(authSettings.rememberMeDuration, 10);
     if (!isNaN(parsed)) maxAge = parsed;
-  } else if (authSettings?.cookieMaxAge) {
+  } else if (typeof authSettings?.cookieMaxAge === 'string') {
     const parsed = parseInt(authSettings.cookieMaxAge, 10);
     if (!isNaN(parsed)) maxAge = parsed;
   }
