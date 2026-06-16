@@ -320,6 +320,8 @@ export interface BuiltinModuleMap {
  */
 export type WithPgClient = <T>(
   fn: (client: PoolClient) => Promise<T>,
+  /** Per-call settings merged over the request pgSettings before SET LOCAL. */
+  pgSettingsOverrides?: Record<string, string>,
 ) => Promise<T>;
 
 /**

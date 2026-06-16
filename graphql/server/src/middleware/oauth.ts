@@ -479,13 +479,6 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
 
         const result = await ctx.withPgClient<SignInIdentityResult>(
           async (client) => {
-            // Set OAuth-specific JWT claims on this transaction
-            await client.query(
-              `SELECT set_config('jwt.claims.user_agent', $1, true),
-                      set_config('jwt.claims.origin', $2, true)`,
-              [userAgent, baseUrl],
-            );
-
             const details = {
               provider: profile.provider,
               sub: profile.providerId,
@@ -532,6 +525,10 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
               ]);
               return signUpResult.rows[0] || {};
             }
+          },
+          {
+            'jwt.claims.user_agent': userAgent,
+            'jwt.claims.origin': baseUrl,
           },
         );
 
