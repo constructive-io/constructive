@@ -39,7 +39,10 @@ import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { createLlmApiRouter } from './middleware/llm-api';
-import { createContextMiddleware, requestIdMiddleware } from '@constructive-io/express-context';
+import { createOAuthRoutes } from './middleware/oauth';
+import { createIdentityProvidersRouter } from './middleware/identity-providers';
+import { createAppSettingsAuthRouter } from './middleware/app-settings-auth';
+import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
 const log = new Logger('server');
@@ -167,7 +170,7 @@ class Server {
     app.use(api);
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
-    app.use(createContextMiddleware({ pg: effectiveOpts.pg }));
+    app.use(createContextMiddleware({ pg: effectiveOpts.pg, loaders: createDefaultRegistry() }));
     app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests
@@ -198,6 +201,16 @@ class Server {
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
     app.use('/graphql', csrfProtect); // Enforce CSRF on GraphQL mutations
+
+    // OAuth / SSO routes — mounted before graphile so OAuth callbacks
+    // are handled without going through PostGraphile
+    app.use('/auth', createOAuthRoutes(effectiveOpts));
+
+    // Identity Providers API — mounted before graphile
+    app.use(createIdentityProvidersRouter());
+
+    // App Settings Auth API — mounted before graphile
+    app.use(createAppSettingsAuthRouter());
 
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile

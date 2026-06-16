@@ -98,7 +98,10 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     SMTP_MAX_MESSAGES,
     SMTP_NAME,
     SMTP_LOGGER,
-    SMTP_DEBUG
+    SMTP_DEBUG,
+
+    // OAuth env vars
+    OAUTH_SECRET
   } = env;
 
   return {
@@ -230,6 +233,9 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(SMTP_NAME && { name: SMTP_NAME }),
       ...(SMTP_LOGGER && { logger: parseEnvBoolean(SMTP_LOGGER) }),
       ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) }),
+    },
+    oauth: {
+      ...(OAUTH_SECRET && { secret: OAUTH_SECRET }),
     }
   };
 };
