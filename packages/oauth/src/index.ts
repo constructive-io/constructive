@@ -21,13 +21,3 @@ export {
   facebookProvider,
   linkedinProvider,
 } from './providers';
-
-export {
-  createOAuthMiddleware,
-  OAuthMiddlewareConfig,
-  OAuthCallbackContext,
-  OAuthErrorContext,
-  OAuthRouteHandlers,
-  generateState,
-  verifyState,
-} from './middleware/express';
