@@ -5,5 +5,5 @@ export { createApiMiddleware, getSubdomain, getApiConfig } from './middleware/ap
 export { createAuthenticateMiddleware } from './middleware/auth';
 export { createUploadAuthenticateMiddleware } from './middleware/upload';
 export { cors } from './middleware/cors';
-export { graphile } from './middleware/graphile';
-export { flush, flushService } from './middleware/flush';
+export { graphile, multiTenancyHandler, isMultiTenancyCacheEnabled, shutdownMultiTenancy } from './middleware/graphile';
+export { flush, createFlushMiddleware, flushService } from './middleware/flush';
