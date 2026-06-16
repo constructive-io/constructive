@@ -12,9 +12,23 @@
 
 - Fix cookie/session duration parsing after the OAuth loader work lands. `app_settings_auth.cookie_max_age`, `remember_me_duration`, and `oauth_state_max_age` are PostgreSQL `interval` columns; `pg` returns them as `PostgresInterval` objects such as `{ days: 14 }` or `{ minutes: 10 }`. The current GraphQL server cookie helper still parses these values as second strings with `parseInt`, so loader-backed auth settings can silently fall back to defaults. This is an existing cookie auth settings compatibility issue exposed by the OAuth/auth settings loader path and should be handled in a follow-up PR.
 
-## Loader Cache TTL Semantics
+## App Settings Auth Loader Refactor
 
-- Revisit `createModuleLoader` cache expiration semantics. The current implementation uses `updateAgeOnGet: true`, so each cache hit refreshes the TTL and frequently accessed config may not expire while traffic continues. The reference branch changed the default to `false`, but the desired behavior needs further design discussion, including whether `updateAgeOnGet` should remain global or become a per-loader option.
+- Revisit the reverted `f77d301d1c780f348c0e9243633e34167ae42735` change that moved `graphql/server/src/middleware/app-settings-auth.ts` onto the `authSettings` loader and an `updateAuthSettings()` helper. The `app-settings-auth` REST API came from the reviewed admin identity providers branch, but this loader-backed rewrite was an extra `feat/oauth-reorg` refactor and has been reverted out of the migration scope. If reintroduced, it should be done as a dedicated cleanup PR that preserves the admin branch API behavior, keeps module-not-configured vs settings-not-found error semantics clear, includes `allowIdentitySignIn` and `allowIdentitySignUp` in both reads and writes, and defines post-write invalidation together with the broader loader cache policy below.
+
+## Loader Cache Invalidation and TTL Semantics
+
+- Revisit `createModuleLoader` cache expiration and invalidation semantics. The current implementation uses `updateAgeOnGet: true`, so each cache hit refreshes the TTL and frequently accessed config may not expire while traffic continues. The reference branch changed the default to `false`, but the desired behavior should be decided together with explicit invalidation for writes performed by our own systems.
+
+- Known changes made through this process, such as admin APIs updating auth settings or identity providers, should invalidate the relevant loader cache after the database write succeeds. The current identity provider admin writes do not yet invalidate the cached OAuth provider config, and any future app-settings-auth loader-backed write path should invalidate `authSettingsLoader` as part of the same design. Recommended shape: loaders own read, transform, cache, and invalidate; services or repositories own validate, authorize, write, audit, and post-write invalidate. For example, `identityProvidersService.updateProvider(ctx, input)` writes the provider config and then calls a targeted invalidation such as `registry.invalidate(ctx.databaseId, "identityProviders")` or the equivalent loader-specific invalidation API.
+
+- Unknown external changes, such as manual SQL, migrations, or another service updating module configuration, cannot be invalidated precisely by this process. Baseline approach: keep `updateAgeOnGet: false` so TTL remains a bounded staleness window, then reload from the database on the next read after TTL expiry. If stronger freshness is needed later, add an optional lightweight fingerprint probe near loader resolution, for example `getFingerprint(ctx)` using `updated_at`, version, or checksum plus `revalidateAfterMs` as the minimum interval between probes. This lets loaders detect external changes faster than full TTL expiry without fully reloading config on every request.
+
+- Recommendation: set `updateAgeOnGet` to `false`, add explicit post-write invalidation for known admin writes, and rely on TTL as the fallback for unknown external changes. Add fingerprint probing only if TTL-based staleness becomes too slow in practice.
+
+## API Service Cache Loader Snapshots
+
+- Revisit `graphql/server/src/middleware/api.ts` storing resolved loader values inside the cached `ApiStructure`. The API resolver currently resolves mutable module settings such as `authSettings`, `corsOrigins`, `databaseSettings`, `pubkeyChallengeSettings`, and `webauthnSettings`, then stores the whole API structure in `svcCache`, whose TTL is effectively long-lived. This can bypass each loader's own TTL and invalidation path; for example, a future loader-backed auth settings update path could invalidate `authSettingsLoader`, while middleware that reads `req.api.authSettings` could still see the old value from `svcCache`. Consider narrowing `svcCache` to stable API routing fields only, resolving mutable module settings through `ctx.useModule(...)` at use sites, or adding coordinated `svcCache` invalidation whenever loader-backed settings are updated.
 
 ## Env Config Consolidation
 
