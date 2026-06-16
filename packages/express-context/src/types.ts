@@ -115,28 +115,6 @@ export interface AuthSettings {
   oauthErrorRedirectPath?: string | null;
 }
 
-export interface UpdateAuthSettingsInput {
-  allowIdentitySignIn?: boolean;
-  allowIdentitySignUp?: boolean;
-  cookieSecure?: boolean;
-  cookieSamesite?: string;
-  cookieDomain?: string | null;
-  cookieHttponly?: boolean;
-  cookieMaxAge?: string | null;
-  cookiePath?: string;
-  rememberMeDuration?: string | null;
-  enableCaptcha?: boolean;
-  captchaSiteKey?: string | null;
-  oauthStateMaxAge?: string | null;
-  oauthRequireVerifiedEmail?: boolean;
-  oauthErrorRedirectPath?: string | null;
-}
-
-export type UpdateAuthSettingsResult =
-  | 'updated'
-  | 'not_configured'
-  | 'no_fields';
-
 export interface ApiStructure {
   apiId?: string;
   dbname: string;

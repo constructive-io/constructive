@@ -46,7 +46,7 @@ export { corsLoader } from './cors';
 export { databaseSettingsLoader } from './database-settings';
 export { pubkeyLoader } from './pubkey';
 export { webauthnLoader } from './webauthn';
-export { authSettingsLoader, updateAuthSettings } from './auth-settings';
+export { authSettingsLoader } from './auth-settings';
 export { billingLoader } from './billing';
 export { inferenceLogLoader } from './inference-log';
 export { agentChatLoader } from './agent-chat';

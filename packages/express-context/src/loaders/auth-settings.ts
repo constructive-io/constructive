@@ -16,9 +16,6 @@ import type { Pool } from 'pg';
 import type {
   AuthSettings,
   AuthSettingsRow,
-  ConstructiveContext,
-  UpdateAuthSettingsInput,
-  UpdateAuthSettingsResult,
 } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
@@ -37,26 +34,6 @@ interface AuthSettingsTableRef {
   schemaName: string;
   tableName: string;
 }
-
-const UPDATE_FIELD_MAP: Record<
-  keyof UpdateAuthSettingsInput,
-  { column: string; castInterval?: boolean }
-> = {
-  allowIdentitySignIn: { column: 'allow_identity_sign_in' },
-  allowIdentitySignUp: { column: 'allow_identity_sign_up' },
-  cookieSecure: { column: 'cookie_secure' },
-  cookieSamesite: { column: 'cookie_samesite' },
-  cookieDomain: { column: 'cookie_domain' },
-  cookieHttponly: { column: 'cookie_httponly' },
-  cookieMaxAge: { column: 'cookie_max_age', castInterval: true },
-  cookiePath: { column: 'cookie_path' },
-  rememberMeDuration: { column: 'remember_me_duration', castInterval: true },
-  enableCaptcha: { column: 'enable_captcha' },
-  captchaSiteKey: { column: 'captcha_site_key' },
-  oauthStateMaxAge: { column: 'oauth_state_max_age', castInterval: true },
-  oauthRequireVerifiedEmail: { column: 'oauth_require_verified_email' },
-  oauthErrorRedirectPath: { column: 'oauth_error_redirect_path' },
-};
 
 async function discoverAuthSettingsTable(
   pool: Pool,
@@ -104,42 +81,6 @@ function buildAuthSettingsQuery(schemaName: string, tableName: string): string {
   `;
 }
 
-function buildUpdateAuthSettingsQuery(
-  schemaName: string,
-  tableName: string,
-  patch: UpdateAuthSettingsInput,
-): { sql: string; values: unknown[] } | null {
-  const authSettingsTable = QuoteUtils.quoteQualifiedIdentifier(
-    schemaName,
-    tableName,
-  );
-  const setClauses: string[] = [];
-  const values: unknown[] = [];
-  let paramIndex = 1;
-
-  for (const [field, config] of Object.entries(UPDATE_FIELD_MAP) as Array<
-    [keyof UpdateAuthSettingsInput, { column: string; castInterval?: boolean }]
-  >) {
-    if (field in patch) {
-      const cast = config.castInterval ? '::interval' : '';
-      setClauses.push(
-        `${QuoteUtils.quoteIdentifier(config.column)} = $${paramIndex++}${cast}`,
-      );
-      values.push(patch[field]);
-    }
-  }
-
-  if (setClauses.length === 0) return null;
-
-  return {
-    sql: `
-      UPDATE ${authSettingsTable}
-      SET ${setClauses.join(', ')}
-    `,
-    values,
-  };
-}
-
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
 export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader<AuthSettings>({
@@ -175,25 +116,3 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
     };
   },
 });
-
-export async function updateAuthSettings(
-  ctx: ConstructiveContext,
-  patch: UpdateAuthSettingsInput,
-): Promise<UpdateAuthSettingsResult> {
-  const table = await discoverAuthSettingsTable(ctx.pool, ctx.databaseId);
-  if (!table) return 'not_configured';
-
-  const update = buildUpdateAuthSettingsQuery(
-    table.schemaName,
-    table.tableName,
-    patch,
-  );
-  if (!update) return 'no_fields';
-
-  await ctx.pool.query(update.sql, update.values);
-  if (ctx.databaseId) {
-    authSettingsLoader.invalidate(ctx.databaseId);
-  }
-
-  return 'updated';
-}
