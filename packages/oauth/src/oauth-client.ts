@@ -1,4 +1,4 @@
-import { extractPrimaryEmail,getProvider, GITHUB_EMAILS_URL } from './providers';
+import { getProvider, GITHUB_EMAILS_URL, selectGitHubEmail } from './providers';
 import {
   AuthorizationUrlParams,
   CallbackParams,
@@ -152,10 +152,10 @@ export class OAuthClient {
     }
 
     const data = await response.json();
-    let profile = provider.mapProfile(data);
+    const profile = provider.mapProfile(data);
 
-    if (providerId === 'github' && !profile.email) {
-      profile = await this.fetchGitHubEmail(accessToken, profile);
+    if (providerId === 'github') {
+      return this.fetchGitHubEmail(accessToken, profile);
     }
 
     return profile;
@@ -180,14 +180,26 @@ export class OAuthClient {
       });
 
       if (response.ok) {
-        const emails = await response.json();
-        const email = extractPrimaryEmail(emails);
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          return profile;
+        }
+
+        const email = selectGitHubEmail(data, profile.email);
         if (email) {
-          return { ...profile, email };
+          if (profile.email && email.email !== profile.email) {
+            return profile;
+          }
+
+          return {
+            ...profile,
+            email: email.email,
+            emailVerified: email.verified,
+          };
         }
       }
     } catch {
-      // Ignore email fetch errors, return profile without email
+      // Ignore email fetch errors, return profile without email verification details.
     }
     return profile;
   }

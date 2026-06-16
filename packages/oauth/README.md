@@ -120,6 +120,7 @@ interface OAuthProfile {
   email: string | null;
   name: string | null;
   picture: string | null;
+  emailVerified: boolean | null; // Whether the provider verified the email
   raw: unknown;          // Original provider response
 }
 ```

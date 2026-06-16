@@ -1,6 +1,11 @@
 import { OAuthProviderConfig } from '../types';
 import { facebookProvider } from './facebook';
-import { extractPrimaryEmail,GITHUB_EMAILS_URL, githubProvider } from './github';
+import {
+  extractPrimaryEmail,
+  GITHUB_EMAILS_URL,
+  githubProvider,
+  selectGitHubEmail,
+} from './github';
 import { googleProvider } from './google';
 import { linkedinProvider } from './linkedin';
 
@@ -26,4 +31,5 @@ export {
   githubProvider,
   googleProvider,
   linkedinProvider,
+  selectGitHubEmail,
 };
