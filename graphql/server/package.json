@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "4.35.5",
+  "version": "4.36.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -41,7 +41,7 @@
     "backend"
   ],
   "dependencies": {
-    "@agentic-kit/ollama": "^2.0.0",
+    "@agentic-kit/ollama": "workspace:*",
     "@constructive-io/csrf": "workspace:^",
     "@constructive-io/express-context": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",

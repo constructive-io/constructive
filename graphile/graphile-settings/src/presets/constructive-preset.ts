@@ -9,6 +9,7 @@ import { createPostgisOperatorFactory,GraphilePostgisPreset } from 'graphile-pos
 import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
 import { RealtimeSubscriptionsPreset } from 'graphile-realtime-subscriptions';
 import { createMatchesOperatorFactory, createTrgmOperatorFactories,UnifiedSearchPreset } from 'graphile-search';
+import { GraphileLlmPreset } from 'graphile-llm';
 import { UploadPreset } from 'graphile-upload-plugin';
 
 import { getBucketProvisionerConnection } from '../bucket-provisioner-resolver';
@@ -60,7 +61,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
   enableManyToMany: true,
   enableConnectionFilter: true,
   enableLtree: true,
-  enableLlm: false,
+  enableLlm: true,
   enableRealtime: false,
   enableBulk: false,
   enableI18n: false
@@ -74,7 +75,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
  * its corresponding plugin preset is included; when `false` it is omitted.
  *
  * Calling with no arguments produces the same preset as the previous static
- * `ConstructivePreset` (everything on except aggregates and LLM).
+ * `ConstructivePreset` (everything on except aggregates).
  *
  * CORE PRESETS (always included):
  * - MinimalPreset (PostGraphile without Node/Relay)
@@ -98,7 +99,7 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
  * - enableRealtime          -> RealtimeSubscriptionsPreset (off by default)
  * - enableBulk              -> BulkMutationPreset (off by default)
  * - enableI18n              -> I18nPreset (off by default)
- * - enableLlm               -> (no plugin yet, reserved for future use)
+ * - enableLlm               -> GraphileLlmPreset (auto-embed unifiedSearch, vector text fields)
  *
  * RELATION FILTERS (when enableConnectionFilter is true):
  * - Forward: filter child by parent
@@ -203,6 +204,10 @@ export function createConstructivePreset(
     presets.push(I18nPreset());
   }
 
+  if (opts.enableLlm) {
+    presets.push(GraphileLlmPreset());
+  }
+
   // ----- connectionFilterOperatorFactories -----
   // Only include operator factories for features that are actually enabled.
   // graphile-config replaces (not concatenates) arrays when merging presets,
@@ -258,7 +263,7 @@ export function createConstructivePreset(
 }
 
 /**
- * Default Constructive preset -- everything enabled except aggregates and LLM.
+ * Default Constructive preset -- everything enabled except aggregates.
  * Backwards-compatible: identical to the previous static ConstructivePreset.
  */
 export const ConstructivePreset: GraphileConfig.Preset = createConstructivePreset();

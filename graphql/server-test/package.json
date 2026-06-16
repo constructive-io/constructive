@@ -1,6 +1,6 @@
 {
   "name": "graphql-server-test",
-  "version": "2.25.9",
+  "version": "2.25.14",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server Testing with SuperTest HTTP requests",
   "main": "index.js",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@0no-co/graphql.web": "^1.2.0",
-    "@agentic-kit/ollama": "^2.0.0",
+    "@agentic-kit/ollama": "workspace:*",
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-query": "workspace:^",
     "@types/express": "^5.0.6",

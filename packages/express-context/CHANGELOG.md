@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.5.0...@constructive-io/express-context@0.6.0) (2026-06-14)
+
+### Features
+
+- **express-context, agentic-server, graphile-llm:** centralize LLM provider config via express-context loaders ([534b05d](https://github.com/constructive-io/constructive/commit/534b05d507f358fa7b462993f70fec466d8a89f0))
+- **express-context:** add shared BillingClient abstraction ([7f3a1cb](https://github.com/constructive-io/constructive/commit/7f3a1cbf71e2b14017661e48168082863df2f75d)), closes [constructive-io/constructive-planning#1054](https://github.com/constructive-io/constructive-planning/issues/1054)
+
 # [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.4.0...@constructive-io/express-context@0.5.0) (2026-05-31)
 
 ### Features

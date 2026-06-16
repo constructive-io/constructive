@@ -878,7 +878,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
    *
    * generates:
    *
-   *   ORDER BY paradedb.score(id) ASC,
+   *   ORDER BY (body <@> to_bm25query('park green', '"schema"."idx"')) ASC,
    *            similarity(name, 'park') DESC
    *
    * Each scoring plugin (tsvector, BM25, pg_trgm) registers its own enum
@@ -947,7 +947,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
               tsvTsv: "park"
 
               # 2. BM25 relevance search (Bm25SearchPlugin via pg_textsearch)
-              #    WHERE body @@@ paradedb.parse('park green')
+              #    WHERE (body <@> to_bm25query('park green', '"schema"."idx"')) < threshold
               #    (BM25 filter apply runs first in the schema → primary ORDER BY)
               bm25Body: { query: "park green" }
 
@@ -978,7 +978,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
             # Tiebreaker:     pg_trgm similarity score (best fuzzy match first)
             #
             # Generates SQL:
-            #   ORDER BY paradedb.score(id) ASC,
+            #   ORDER BY (body <@> to_bm25query('park green', '"schema"."idx"')) ASC,
             #            similarity(name, 'park') DESC
             #
             # Each plugin registers its own enum values on LocationOrderBy:

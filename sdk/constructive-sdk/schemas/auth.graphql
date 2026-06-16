@@ -64,6 +64,35 @@ type Query {
     orderBy: [RoleTypeOrderBy!] = [PRIMARY_KEY_ASC]
   ): RoleTypeConnection
 
+  """Reads and enables pagination through a set of `UserConnectedAccount`."""
+  userConnectedAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UserConnectedAccountFilter
+
+    """The method to use when ordering `UserConnectedAccount`."""
+    orderBy: [UserConnectedAccountOrderBy!] = [NATURAL]
+  ): UserConnectedAccountConnection
+
   """Reads and enables pagination through a set of `CryptoAddress`."""
   cryptoAddresses(
     """Only read the first `n` values of the set."""
@@ -150,35 +179,6 @@ type Query {
     """The method to use when ordering `AuditLogAuth`."""
     orderBy: [AuditLogAuthOrderBy!] = [PRIMARY_KEY_ASC]
   ): AuditLogAuthConnection
-
-  """Reads and enables pagination through a set of `UserConnectedAccount`."""
-  userConnectedAccounts(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: UserConnectedAccountFilter
-
-    """The method to use when ordering `UserConnectedAccount`."""
-    orderBy: [UserConnectedAccountOrderBy!] = [NATURAL]
-  ): UserConnectedAccountConnection
 
   """Reads and enables pagination through a set of `Email`."""
   emails(
@@ -450,7 +450,7 @@ type User {
   displayNameTrgmSimilarity: Float
 
   """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
+  Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
   """
   searchScore: Float
 }
@@ -2918,6 +2918,18 @@ type Mutation {
     """
     input: SignInCrossOriginInput!
   ): SignInCrossOriginPayload
+  signInSmsOtp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignInSmsOtpInput!
+  ): SignInSmsOtpPayload
+  signUpSms(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignUpSmsInput!
+  ): SignUpSmsPayload
   signUp(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2930,6 +2942,12 @@ type Mutation {
     """
     input: SignInInput!
   ): SignInPayload
+  linkIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: LinkIdentityInput!
+  ): LinkIdentityPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2977,6 +2995,14 @@ type Mutation {
     input: CreateRoleTypeInput!
   ): CreateRoleTypePayload
 
+  """Creates a single `UserConnectedAccount`."""
+  createUserConnectedAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserConnectedAccountInput!
+  ): CreateUserConnectedAccountPayload
+
   """Creates a single `CryptoAddress`."""
   createCryptoAddress(
     """
@@ -3000,14 +3026,6 @@ type Mutation {
     """
     input: CreateAuditLogAuthInput!
   ): CreateAuditLogAuthPayload
-
-  """Creates a single `UserConnectedAccount`."""
-  createUserConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateUserConnectedAccountInput!
-  ): CreateUserConnectedAccountPayload
 
   """Creates a single `Email`."""
   createEmail(
@@ -3521,6 +3539,76 @@ input SignInCrossOriginInput {
   credentialKind: String
 }
 
+"""The output of our `signInSmsOtp` mutation."""
+type SignInSmsOtpPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: SignInSmsOtpRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SignInSmsOtpRecord {
+  userId: UUID
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+}
+
+"""All input for the `signInSmsOtp` mutation."""
+input SignInSmsOtpInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  phone: String
+  code: String
+  credentialKind: String
+  rememberMe: Boolean
+  deviceToken: String
+}
+
+"""The output of our `signUpSms` mutation."""
+type SignUpSmsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: SignUpSmsRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SignUpSmsRecord {
+  userId: UUID
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+}
+
+"""All input for the `signUpSms` mutation."""
+input SignUpSmsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  phone: String
+  code: String
+  credentialKind: String
+  rememberMe: Boolean
+  deviceToken: String
+}
+
 """The output of our `signUp` mutation."""
 type SignUpPayload {
   """
@@ -3599,6 +3687,33 @@ input SignInInput {
   credentialKind: String
   csrfToken: String
   deviceToken: String
+}
+
+"""The output of our `linkIdentity` mutation."""
+type LinkIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `linkIdentity` mutation."""
+input LinkIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  service: String!
+  identifier: String!
+  details: JSON
 }
 
 """The output of our `extendTokenExpires` mutation."""
@@ -3849,6 +3964,47 @@ input RoleTypeInput {
   name: String!
 }
 
+"""The output of our create `UserConnectedAccount` mutation."""
+type CreateUserConnectedAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `UserConnectedAccount` that was created by this mutation."""
+  userConnectedAccount: UserConnectedAccount
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `UserConnectedAccount` mutation."""
+input CreateUserConnectedAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `UserConnectedAccount` to be created by this mutation."""
+  userConnectedAccount: UserConnectedAccountInput!
+}
+
+"""An input for mutations affecting `UserConnectedAccount`"""
+input UserConnectedAccountInput {
+  id: UUID
+  ownerId: UUID
+  service: String
+  identifier: String
+  details: JSON
+  isVerified: Boolean
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our create `CryptoAddress` mutation."""
 type CreateCryptoAddressPayload {
   """
@@ -4031,47 +4187,6 @@ input AuditLogAuthInput {
 
   """Whether the authentication attempt succeeded"""
   success: Boolean!
-}
-
-"""The output of our create `UserConnectedAccount` mutation."""
-type CreateUserConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `UserConnectedAccount` that was created by this mutation."""
-  userConnectedAccount: UserConnectedAccount
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `UserConnectedAccount` mutation."""
-input CreateUserConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `UserConnectedAccount` to be created by this mutation."""
-  userConnectedAccount: UserConnectedAccountInput!
-}
-
-"""An input for mutations affecting `UserConnectedAccount`"""
-input UserConnectedAccountInput {
-  id: UUID
-  ownerId: UUID
-  service: String
-  identifier: String
-  details: JSON
-  isVerified: Boolean
-  createdAt: Datetime
-  updatedAt: Datetime
 }
 
 """The output of our create `Email` mutation."""

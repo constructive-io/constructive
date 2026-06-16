@@ -203,6 +203,15 @@ export const enumMutationKeys = {
   /** Delete enum mutation key */ delete: (id: string | number) =>
     ['mutation', 'enum', 'delete', id] as const,
 } as const;
+export const compositeTypeMutationKeys = {
+  /** All compositeType mutation keys */ all: ['mutation', 'compositetype'] as const,
+  /** Create compositeType mutation key */ create: () =>
+    ['mutation', 'compositetype', 'create'] as const,
+  /** Update compositeType mutation key */ update: (id: string | number) =>
+    ['mutation', 'compositetype', 'update', id] as const,
+  /** Delete compositeType mutation key */ delete: (id: string | number) =>
+    ['mutation', 'compositetype', 'delete', id] as const,
+} as const;
 export const apiSchemaMutationKeys = {
   /** All apiSchema mutation keys */ all: ['mutation', 'apischema'] as const,
   /** Create apiSchema mutation key */ create: () => ['mutation', 'apischema', 'create'] as const,
@@ -487,6 +496,7 @@ export const mutationKeys = {
   schemaGrant: schemaGrantMutationKeys,
   defaultPrivilege: defaultPrivilegeMutationKeys,
   enum: enumMutationKeys,
+  compositeType: compositeTypeMutationKeys,
   apiSchema: apiSchemaMutationKeys,
   apiModule: apiModuleMutationKeys,
   domain: domainMutationKeys,

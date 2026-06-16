@@ -8,22 +8,25 @@ import * as t from '@babel/types';
 
 import { singularize } from 'inflekt';
 
-import type { Table } from '../../../types/schema';
+import type { Table, TypeRegistry } from '../../../types/schema';
 import { asConst, generateCode } from '../babel-ast';
 import {
   getCreateInputTypeName,
   getCreateMutationName,
   getDeleteInputTypeName,
   getDeleteMutationName,
+  getExtraInputKeys,
   getFilterTypeName,
   getGeneratedFileHeader,
   getOrderByTypeName,
   getPrimaryKeyInfo,
   getTableNames,
+  getUpdateInputTypeName,
   hasValidPrimaryKey,
   lcFirst,
   ucFirst,
 } from '../utils';
+import type { ExtraInputKey } from '../utils';
 
 export interface GeneratedModelFile {
   fileName: string;
@@ -167,11 +170,14 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
   );
 }
 
+// ExtraInputKey type and getExtraInputKeys are imported from ../utils
+
 export function generateModelFile(
   table: Table,
   _useSharedTypes: boolean,
   options?: Record<string, never>,
   allTables?: Table[],
+  typeRegistry?: TypeRegistry,
 ): GeneratedModelFile {
   const { typeName, singularName, pluralName } = getTableNames(table);
   const modelName = `${typeName}Model`;
@@ -185,7 +191,7 @@ export function generateModelFile(
   const whereTypeName = getFilterTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
   const createInputTypeName = `Create${typeName}Input`;
-  const updateInputTypeName = `Update${typeName}Input`;
+  const updateInputTypeName = getUpdateInputTypeName(table);
   const patchTypeName = `${typeName}Patch`;
 
   const pkFields = getPrimaryKeyInfo(table);
@@ -845,6 +851,14 @@ export function generateModelFile(
 
   // ── update ─────────────────────────────────────────────────────────────
   if (updateMutationName) {
+    const patchFieldName =
+      table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
+    const updateExtraKeys = getExtraInputKeys(
+      updateInputTypeName,
+      new Set(pkFields.map((pk) => pk.name)),
+      patchFieldName,
+      typeRegistry,
+    );
     const whereLiteral = () =>
       t.tsTypeLiteral([
         (() => {
@@ -855,6 +869,14 @@ export function generateModelFile(
           prop.optional = false;
           return prop;
         })(),
+        ...updateExtraKeys.map((ek) => {
+          const prop = t.tsPropertySignature(
+            t.identifier(ek.name),
+            t.tsTypeAnnotation(tsTypeFromPrimitive(ek.tsType)),
+          );
+          prop.optional = false;
+          return prop;
+        }),
       ]);
     const argsType = (sel: t.TSType) =>
       t.tsTypeReference(
@@ -907,8 +929,20 @@ export function generateModelFile(
       t.identifier('args'),
       t.identifier('select'),
     );
-    const patchFieldName =
-      table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
+    // Build extraKeys object for partitioned table fields
+    const extraKeysArg = updateExtraKeys.length > 0
+      ? t.objectExpression(
+          updateExtraKeys.map((ek) =>
+            t.objectProperty(
+              t.identifier(ek.name),
+              t.memberExpression(
+                t.memberExpression(t.identifier('args'), t.identifier('where')),
+                t.identifier(ek.name),
+              ),
+            ),
+          ),
+        )
+      : t.identifier('undefined');
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(updateMutationName),
@@ -923,6 +957,7 @@ export function generateModelFile(
       t.stringLiteral(pkField.name),
       t.stringLiteral(patchFieldName),
       t.identifier('connectionFieldsMap'),
+      extraKeysArg,
     ];
     classBody.push(
       createClassMethod(
@@ -943,10 +978,16 @@ export function generateModelFile(
 
   // ── delete ─────────────────────────────────────────────────────────────
   if (deleteMutationName) {
-    // Build where type with ALL PK fields (supports composite PKs)
+    const deleteExtraKeys = getExtraInputKeys(
+      deleteInputTypeName,
+      new Set(pkFields.map((pk) => pk.name)),
+      null,
+      typeRegistry,
+    );
+    // Build where type with ALL PK fields + extra keys (supports composite PKs + partition keys)
     const whereLiteral = () =>
-      t.tsTypeLiteral(
-        pkFields.map((pk) => {
+      t.tsTypeLiteral([
+        ...pkFields.map((pk) => {
           const prop = t.tsPropertySignature(
             t.identifier(pk.name),
             t.tsTypeAnnotation(tsTypeFromPrimitive(pk.tsType ?? 'string')),
@@ -954,7 +995,15 @@ export function generateModelFile(
           prop.optional = false;
           return prop;
         }),
-      );
+        ...deleteExtraKeys.map((ek) => {
+          const prop = t.tsPropertySignature(
+            t.identifier(ek.name),
+            t.tsTypeAnnotation(tsTypeFromPrimitive(ek.tsType)),
+          );
+          prop.optional = false;
+          return prop;
+        }),
+      ]);
     const argsType = (sel: t.TSType) =>
       t.tsTypeReference(
         t.identifier('DeleteArgs'),
@@ -1002,9 +1051,9 @@ export function generateModelFile(
       t.identifier('args'),
       t.identifier('select'),
     );
-    // Build keys object: { field1: args.where.field1, field2: args.where.field2, ... }
-    const keysObj = t.objectExpression(
-      pkFields.map((pk) =>
+    // Build keys object: { field1: args.where.field1, ... } including extra keys
+    const keysObj = t.objectExpression([
+      ...pkFields.map((pk) =>
         t.objectProperty(
           t.identifier(pk.name),
           t.memberExpression(
@@ -1013,7 +1062,16 @@ export function generateModelFile(
           ),
         ),
       ),
-    );
+      ...deleteExtraKeys.map((ek) =>
+        t.objectProperty(
+          t.identifier(ek.name),
+          t.memberExpression(
+            t.memberExpression(t.identifier('args'), t.identifier('where')),
+            t.identifier(ek.name),
+          ),
+        ),
+      ),
+    ]);
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(deleteMutationName),
@@ -1516,6 +1574,7 @@ export function generateModelFile(
 export function generateAllModelFiles(
   tables: Table[],
   useSharedTypes: boolean,
+  typeRegistry?: TypeRegistry,
 ): GeneratedModelFile[] {
-  return tables.map((table) => generateModelFile(table, useSharedTypes, undefined, tables));
+  return tables.map((table) => generateModelFile(table, useSharedTypes, undefined, tables, typeRegistry));
 }

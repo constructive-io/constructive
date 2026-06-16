@@ -10,8 +10,8 @@
  * - Adds `{column}Text: String` companion fields on mutation inputs for vector columns
  * - Optionally enables billing/metering via the LlmMeteringPlugin
  *
- * This preset is standalone — it is NOT included in ConstructivePreset by default.
- * Projects that want LLM features opt in by adding it to their preset.
+ * Included in ConstructivePreset when `enableLlm` is true (the default).
+ * Can also be used standalone by adding it directly to your preset's `extends` array.
  *
  * @example
  * ```typescript
@@ -53,6 +53,17 @@
  * })
  * ```
  *
+ * @example With strict quota enforcement (fail if embedding unavailable):
+ * ```typescript
+ * GraphileLlmPreset({
+ *   defaultEmbedder: { provider: 'openai', model: 'text-embedding-3-small' },
+ *   metering: true,
+ *   onQuotaExceeded: 'throw',
+ *   // → if billing quota is exceeded, queries with unifiedSearch throw an error
+ *   // → without this, queries silently fall back to text-only search
+ * })
+ * ```
+ *
  * @example With custom entity_id resolution (bill per-database):
  * ```typescript
  * GraphileLlmPreset({
@@ -86,6 +97,7 @@ export function GraphileLlmPreset(
     enableTextSearch = true,
     enableTextMutations = true,
     enableRag = false,
+    onQuotaExceeded,
     ragDefaults,
     metering
   } = options;
@@ -102,7 +114,7 @@ export function GraphileLlmPreset(
   }
 
   if (enableTextSearch) {
-    plugins.push(createLlmTextSearchPlugin());
+    plugins.push(createLlmTextSearchPlugin({ onQuotaExceeded }));
   }
 
   if (enableTextMutations) {

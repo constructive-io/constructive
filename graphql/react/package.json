@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-react",
-  "version": "4.20.9",
+  "version": "4.20.14",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL React",
   "main": "index.js",

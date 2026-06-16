@@ -12,8 +12,8 @@ csdk schema list --where.<field>.<op> <value> --orderBy <values>
 csdk schema list --limit 10 --after <cursor>
 csdk schema find-first --where.<field>.<op> <value>
 csdk schema get --id <UUID>
-csdk schema create --databaseId <UUID> --name <String> --schemaName <String> [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--module <String>] [--scope <Int>] [--tags <String>] [--isPublic <Boolean>]
-csdk schema update --id <UUID> [--databaseId <UUID>] [--name <String>] [--schemaName <String>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--module <String>] [--scope <Int>] [--tags <String>] [--isPublic <Boolean>]
+csdk schema create --databaseId <UUID> --name <String> --schemaName <String> [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>] [--isPublic <Boolean>]
+csdk schema update --id <UUID> [--databaseId <UUID>] [--name <String>] [--schemaName <String>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>] [--isPublic <Boolean>]
 csdk schema delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk schema list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a schema
 
 ```bash
-csdk schema create --databaseId <UUID> --name <String> --schemaName <String> [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--module <String>] [--scope <Int>] [--tags <String>] [--isPublic <Boolean>]
+csdk schema create --databaseId <UUID> --name <String> --schemaName <String> [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>] [--isPublic <Boolean>]
 ```
 
 ### Get a schema by id

@@ -56,6 +56,7 @@ export type {
   IdentityProvidersConfig,
   InferenceLogConfig,
   PgInterval,
+  LlmConfig,
   PublicKeyChallengeData,
   PubkeyChallengeSettings,
   RlsModule,
@@ -63,6 +64,10 @@ export type {
   WebauthnSettings,
   WithPgClient,
 } from './types';
+
+// Billing client
+export type { BillingClient, InferenceLogEntry } from './billing-client';
+export { createBillingClient } from './billing-client';
 
 // pgSettings builder
 export type { PgSettingsInput } from './pg-settings';
@@ -100,6 +105,7 @@ export {
   pubkeyLoader,
   rlsLoader,
   userAuthModuleLoader,
+  llmLoader,
   webauthnLoader,
 } from './loaders';
 

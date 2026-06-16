@@ -226,4 +226,15 @@ export interface UnifiedSearchOptions {
    * @example { bm25: 0.5, trgm: 0.3, tsv: 0.2 }
    */
   searchScoreWeights?: Record<string, number>;
+
+  /**
+   * RRF (Reciprocal Rank Fusion) smoothing constant. Controls how much
+   * top-ranked items dominate the composite score. Higher values make the
+   * scoring more democratic across rank positions.
+   *
+   * The RRF contribution of each adapter is: weight / (rrfK + rank)
+   *
+   * @default 60
+   */
+  rrfK?: number;
 }

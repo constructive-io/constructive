@@ -162,26 +162,27 @@ CRUD operations for AgentMessage records.
 | `id` | UUID | No |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
-| `ownerId` | UUID | Yes |
+| `actorId` | UUID | Yes |
 | `parts` | JSON | Yes |
 | `threadId` | UUID | Yes |
 | `authorRole` | String | Yes |
 | `model` | String | Yes |
+| `agentId` | UUID | Yes |
 
 **Operations:**
 
 ```typescript
 // List all agentMessage records
-const items = await db.agentMessage.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true, threadId: true, authorRole: true, model: true } }).execute();
+const items = await db.agentMessage.findMany({ select: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } }).execute();
 
 // Get one by id
-const item = await db.agentMessage.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true, threadId: true, authorRole: true, model: true } }).execute();
+const item = await db.agentMessage.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } }).execute();
 
 // Create
-const created = await db.agentMessage.create({ data: { ownerId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>' }, select: { id: true } }).execute();
+const created = await db.agentMessage.create({ data: { actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>', agentId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.agentMessage.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.agentMessage.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.agentMessage.delete({ where: { id: '<UUID>' } }).execute();
@@ -198,7 +199,7 @@ CRUD operations for AgentTask records.
 | `id` | UUID | No |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
-| `ownerId` | UUID | Yes |
+| `actorId` | UUID | Yes |
 | `status` | String | Yes |
 | `planId` | UUID | Yes |
 | `description` | String | Yes |
@@ -215,16 +216,16 @@ CRUD operations for AgentTask records.
 
 ```typescript
 // List all agentTask records
-const items = await db.agentTask.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
+const items = await db.agentTask.findMany({ select: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
 
 // Get one by id
-const item = await db.agentTask.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
+const item = await db.agentTask.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
 
 // Create
-const created = await db.agentTask.create({ data: { ownerId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' }, select: { id: true } }).execute();
+const created = await db.agentTask.create({ data: { actorId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.agentTask.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.agentTask.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.agentTask.delete({ where: { id: '<UUID>' } }).execute();

@@ -12,8 +12,8 @@ csdk agent-task list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-task list --limit 10 --after <cursor>
 csdk agent-task find-first --where.<field>.<op> <value>
 csdk agent-task get --id <UUID>
-csdk agent-task create --planId <UUID> --description <String> [--ownerId <UUID>] [--status <String>] [--source <String>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--approvalStatus <String>] [--approvedBy <UUID>] [--approvedAt <Datetime>] [--approvalFeedback <String>]
-csdk agent-task update --id <UUID> [--ownerId <UUID>] [--status <String>] [--planId <UUID>] [--description <String>] [--source <String>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--approvalStatus <String>] [--approvedBy <UUID>] [--approvedAt <Datetime>] [--approvalFeedback <String>]
+csdk agent-task create --planId <UUID> --description <String> [--actorId <UUID>] [--status <String>] [--source <String>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--approvalStatus <String>] [--approvedBy <UUID>] [--approvedAt <Datetime>] [--approvalFeedback <String>]
+csdk agent-task update --id <UUID> [--actorId <UUID>] [--status <String>] [--planId <UUID>] [--description <String>] [--source <String>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--approvalStatus <String>] [--approvedBy <UUID>] [--approvedAt <Datetime>] [--approvalFeedback <String>]
 csdk agent-task delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-task list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentTask
 
 ```bash
-csdk agent-task create --planId <UUID> --description <String> [--ownerId <UUID>] [--status <String>] [--source <String>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--approvalStatus <String>] [--approvedBy <UUID>] [--approvedAt <Datetime>] [--approvalFeedback <String>]
+csdk agent-task create --planId <UUID> --description <String> [--actorId <UUID>] [--status <String>] [--source <String>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--approvalStatus <String>] [--approvedBy <UUID>] [--approvedAt <Datetime>] [--approvalFeedback <String>]
 ```
 
 ### Get a agentTask by id

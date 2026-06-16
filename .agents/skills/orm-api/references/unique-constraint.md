@@ -9,7 +9,7 @@ ORM operations for UniqueConstraint records
 ```typescript
 db.uniqueConstraint.findMany({ select: { id: true } }).execute()
 db.uniqueConstraint.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.uniqueConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute()
+db.uniqueConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute()
 db.uniqueConstraint.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.uniqueConstraint.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.uniqueConstraint.findMany({
 
 ```typescript
 const item = await db.uniqueConstraint.create({
-  data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' },
+  data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' },
   select: { id: true }
 }).execute();
 ```

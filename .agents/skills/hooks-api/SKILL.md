@@ -1,13 +1,13 @@
 ---
 name: hooks-api
-description: React Query hooks for the api API — provides typed query and mutation hooks for 45 tables and 10 custom operations
+description: React Query hooks for the api API — provides typed query and mutation hooks for 46 tables and 10 custom operations
 ---
 
 # hooks-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the api API — provides typed query and mutation hooks for 45 tables and 10 custom operations
+React Query hooks for the api API — provides typed query and mutation hooks for 46 tables and 10 custom operations
 
 ## Usage
 
@@ -60,6 +60,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [schema-grant](references/schema-grant.md)
 - [default-privilege](references/default-privilege.md)
 - [enum](references/enum.md)
+- [composite-type](references/composite-type.md)
 - [api-schema](references/api-schema.md)
 - [api-module](references/api-module.md)
 - [domain](references/domain.md)

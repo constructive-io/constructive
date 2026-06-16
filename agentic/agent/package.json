@@ -1,0 +1,38 @@
+{
+  "name": "@agentic-kit/agent",
+  "version": "0.5.0",
+  "author": "Dan Lynch <pyramation@gmail.com>",
+  "description": "Minimal stateful agent runtime for agentic-kit",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "agentic-kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@agentic-kit/openai": "workspace:*"
+  },
+  "keywords": []
+}

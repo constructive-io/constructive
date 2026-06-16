@@ -1,4 +1,5 @@
 import type {
+  EnumMeta,
   FieldMeta,
   GqlTypeResolverBuild,
   PgAttribute,
@@ -75,6 +76,22 @@ function resolveGqlTypeName(
   return nestedTypeName ? pgTypeToGqlType(nestedTypeName) : pgTypeName;
 }
 
+function extractEnumMeta(
+  codec: PgCodec | null | undefined,
+): EnumMeta | null {
+  if (!codec) return null;
+
+  // Check the codec itself, or unwrap domain/array wrappers
+  const inner = (codec as any).domainOfCodec ?? (codec as any).arrayOfCodec ?? codec;
+  const values = (inner as any).values;
+  if (!Array.isArray(values) || values.length === 0) return null;
+
+  return {
+    name: inner.name || codec.name || 'unknown',
+    values: values.map((v: any) => (typeof v === 'string' ? v : v.value)),
+  };
+}
+
 export interface BuildFieldMetaOptions {
   isPrimaryKey?: boolean;
   isForeignKey?: boolean;
@@ -106,5 +123,6 @@ export function buildFieldMeta(
     isPrimaryKey: options?.isPrimaryKey ?? false,
     isForeignKey: options?.isForeignKey ?? false,
     description: attr?.description ?? null,
+    enumValues: extractEnumMeta(attr?.codec),
   };
 }

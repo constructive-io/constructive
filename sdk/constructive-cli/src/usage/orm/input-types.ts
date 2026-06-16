@@ -2194,6 +2194,320 @@ export interface IntervalFilter {
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: IntervalInput;
 }
+/** An input for mutations affecting `AppLimitCapsDefault` */
+export interface AppLimitCapsDefaultInput {
+  id?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+}
+/** An input for mutations affecting `OrgLimitCapsDefault` */
+export interface OrgLimitCapsDefaultInput {
+  id?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+}
+/** An input for mutations affecting `AppLimitCap` */
+export interface AppLimitCapInput {
+  id?: string;
+  /** Name identifier of the cap being overridden */
+  name: string;
+  /** Entity this cap override applies to */
+  entityId: string;
+  /** Override cap value for this entity */
+  max?: string;
+}
+/** An input for mutations affecting `OrgLimitCap` */
+export interface OrgLimitCapInput {
+  id?: string;
+  /** Name identifier of the cap being overridden */
+  name: string;
+  /** Entity this cap override applies to */
+  entityId: string;
+  /** Override cap value for this entity */
+  max?: string;
+}
+/** An input for mutations affecting `AppLimitDefault` */
+export interface AppLimitDefaultInput {
+  id?: string;
+  /** Name identifier of the limit this default applies to */
+  name: string;
+  /** Default maximum usage allowed for this limit */
+  max?: string;
+  /** Default soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+}
+/** An input for mutations affecting `AppLimitCredit` */
+export interface AppLimitCreditInput {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+/** An input for mutations affecting `AppLimitCreditCodeItem` */
+export interface AppLimitCreditCodeItemInput {
+  id?: string;
+  /** FK to credit_codes — which code this item belongs to */
+  creditCodeId: string;
+  /** FK to default_limits — which limit this item grants credits for */
+  defaultLimitId: string;
+  /** Number of credits this item grants per redemption */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+}
+/** An input for mutations affecting `AppLimitCreditRedemption` */
+export interface AppLimitCreditRedemptionInput {
+  id?: string;
+  /** FK to credit_codes — which code is being redeemed */
+  creditCodeId: string;
+  /** Entity receiving the credits (personal org user_id or org entity_id) */
+  entityId: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+}
+/** An input for mutations affecting `OrgLimitDefault` */
+export interface OrgLimitDefaultInput {
+  id?: string;
+  /** Name identifier of the limit this default applies to */
+  name: string;
+  /** Default maximum usage allowed for this limit */
+  max?: string;
+  /** Default soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+}
+/** An input for mutations affecting `OrgLimitCredit` */
+export interface OrgLimitCreditInput {
+  id?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Entity this credit applies to; NULL for actor-only credits */
+  entityId?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+/** An input for mutations affecting `AppLimitWarning` */
+export interface AppLimitWarningInput {
+  id?: string;
+  /** Limit name this warning applies to (must match a default_limits entry) */
+  name: string;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType: string;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue: string;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier: string;
+}
+/** An input for mutations affecting `OrgLimitWarning` */
+export interface OrgLimitWarningInput {
+  id?: string;
+  /** Limit name this warning applies to (must match a default_limits entry) */
+  name: string;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType: string;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue: string;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier: string;
+  /** Per-entity override (NULL = scope default for all entities) */
+  entityId?: string;
+}
+/** An input for mutations affecting `AppLimitCreditCode` */
+export interface AppLimitCreditCodeInput {
+  id?: string;
+  /** Human-readable credit code (case-insensitive, unique) */
+  code: string;
+  /** Maximum total redemptions allowed; NULL for unlimited */
+  maxRedemptions?: number;
+  /** Current number of redemptions (incremented by trigger on credit_redemptions) */
+  currentRedemptions?: number;
+  /** Expiration timestamp; NULL for no expiry */
+  expiresAt?: string;
+}
+/** An input for mutations affecting `AppLimitEvent` */
+export interface AppLimitEventInput {
+  createdAt?: string;
+  /** Unique identifier for each limit event */
+  id?: string;
+  /** Limit name this event applies to */
+  name?: string;
+  /** User who triggered this event; NULL for system/aggregate events */
+  actorId?: string;
+  /** Entity this event applies to; NULL for app-level events */
+  entityId?: string;
+  /** Resolved billable organization via get_organization_id; NULL for app-level events */
+  organizationId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
+  eventType?: string;
+  /** Change amount: positive for increment, negative for decrement */
+  delta?: string;
+  /** Usage count before this event */
+  numBefore?: string;
+  /** Usage count after this event */
+  numAfter?: string;
+  /** Max limit ceiling at the time of this event */
+  maxAtEvent?: string;
+  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
+  reason?: string;
+}
+/** An input for mutations affecting `OrgLimitEvent` */
+export interface OrgLimitEventInput {
+  createdAt?: string;
+  /** Unique identifier for each limit event */
+  id?: string;
+  /** Limit name this event applies to */
+  name?: string;
+  /** User who triggered this event; NULL for system/aggregate events */
+  actorId?: string;
+  /** Entity this event applies to; NULL for app-level events */
+  entityId?: string;
+  /** Resolved billable organization via get_organization_id; NULL for app-level events */
+  organizationId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
+  eventType?: string;
+  /** Change amount: positive for increment, negative for decrement */
+  delta?: string;
+  /** Usage count before this event */
+  numBefore?: string;
+  /** Usage count after this event */
+  numAfter?: string;
+  /** Max limit ceiling at the time of this event */
+  maxAtEvent?: string;
+  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
+  reason?: string;
+}
+/** An input for mutations affecting `AppLimit` */
+export interface AppLimitInput {
+  id?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** User whose usage is being tracked against this limit */
+  actorId: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+}
+/** An interval of time that has passed where the smallest distinct unit is a second. */
+export interface IntervalInput {
+  /**
+   * A quantity of seconds. This is the only non-integer field, as all the other
+   * fields will dump their overflow into a smaller unit of time. Intervals don’t
+   * have a smaller unit than seconds.
+   */
+  seconds?: number;
+  /** A quantity of minutes. */
+  minutes?: number;
+  /** A quantity of hours. */
+  hours?: number;
+  /** A quantity of days. */
+  days?: number;
+  /** A quantity of months. */
+  months?: number;
+  /** A quantity of years. */
+  years?: number;
+}
+/** An input for mutations affecting `OrgLimitAggregate` */
+export interface OrgLimitAggregateInput {
+  id?: string;
+  /** Name identifier of the aggregate limit being tracked */
+  name?: string;
+  /** Entity (org) whose aggregate usage is being tracked */
+  entityId: string;
+  /** Current aggregate usage count for this entity and limit */
+  num?: string;
+  /** Maximum allowed aggregate usage; negative means unlimited */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
+  reserved?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+}
+/** An input for mutations affecting `OrgLimit` */
+export interface OrgLimitInput {
+  id?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** User whose usage is being tracked against this limit */
+  actorId: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  entityId: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+}
 /** A filter to be used against `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCreditFilter {
   /** Filter by the object’s `id` field. */
@@ -2289,25 +2603,6 @@ export interface AppLimitCreditRedemptionFilter {
   not?: AppLimitCreditRedemptionFilter;
   /** Filter by the object’s `creditCode` relation. */
   creditCode?: AppLimitCreditCodeFilter;
-}
-/** An interval of time that has passed where the smallest distinct unit is a second. */
-export interface IntervalInput {
-  /**
-   * A quantity of seconds. This is the only non-integer field, as all the other
-   * fields will dump their overflow into a smaller unit of time. Intervals don’t
-   * have a smaller unit than seconds.
-   */
-  seconds?: number;
-  /** A quantity of minutes. */
-  minutes?: number;
-  /** A quantity of hours. */
-  hours?: number;
-  /** A quantity of days. */
-  days?: number;
-  /** A quantity of months. */
-  months?: number;
-  /** A quantity of years. */
-  years?: number;
 }
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {

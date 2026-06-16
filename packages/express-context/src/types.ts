@@ -9,6 +9,8 @@
 
 import type { Pool, PoolClient } from 'pg';
 
+import type { BillingClient } from './billing-client';
+
 // ─── API Structure ──────────────────────────────────────────────────────────
 
 export interface CorsModuleData {
@@ -267,6 +269,19 @@ export interface ConnectedAccountsModuleRow {
   table_name: string;
 }
 
+export interface LlmConfig {
+  embeddingProvider: string;
+  embeddingModel: string;
+  embeddingBaseUrl: string;
+  embeddingDimensions: number | null;
+  chatProvider: string | null;
+  chatModel: string | null;
+  chatBaseUrl: string | null;
+  rateLimitRpm: number | null;
+  maxTokensPerRequest: number | null;
+  ragContextLimit: number | null;
+}
+
 // ─── Module Types Map ───────────────────────────────────────────────────────
 
 /**
@@ -290,6 +305,7 @@ export interface BuiltinModuleMap {
   userAuthModule: UserAuthModuleConfig;
   identityProviders: IdentityProvidersConfig;
   connectedAccountsModule: ConnectedAccountsModuleConfig;
+  llm: LlmConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────
@@ -346,6 +362,30 @@ export interface ConstructiveContext {
     <K extends keyof BuiltinModuleMap>(name: K): Promise<BuiltinModuleMap[K] | undefined>;
     (name: string): Promise<unknown>;
   };
+
+  /**
+   * Resolve a shared BillingClient bound to this request's entity.
+   *
+   * Returns a BillingClient with `checkQuota`, `recordUsage`, and
+   * `logInference` methods. Returns null if billing_module is not
+   * provisioned for this database or if no entity ID is available.
+   *
+   * Lazy: only resolves billing/inferenceLog loaders on first call.
+   * Cached: subsequent calls return the same client instance.
+   */
+  useBilling(): Promise<BillingClient | null>;
+
+  /**
+   * Resolve per-database LLM provider config.
+   *
+   * Returns the resolved LlmConfig from the llm_module table, or null
+   * if the module is not provisioned for this database. Callers should
+   * fall back to environment variables when null.
+   *
+   * Lazy: only resolves the llm loader on first call.
+   * Cached: subsequent calls return the same config instance.
+   */
+  useLlm(): Promise<LlmConfig | null>;
 }
 
 // ─── Express Augmentation ───────────────────────────────────────────────────

@@ -1,13 +1,13 @@
 ---
 name: orm-api
-description: ORM client for the api API — provides typed CRUD operations for 45 tables and 10 custom operations
+description: ORM client for the api API — provides typed CRUD operations for 46 tables and 10 custom operations
 ---
 
 # orm-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the api API — provides typed CRUD operations for 45 tables and 10 custom operations
+ORM client for the api API — provides typed CRUD operations for 46 tables and 10 custom operations
 
 ## Usage
 
@@ -59,6 +59,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [schema-grant](references/schema-grant.md)
 - [default-privilege](references/default-privilege.md)
 - [enum](references/enum.md)
+- [composite-type](references/composite-type.md)
 - [api-schema](references/api-schema.md)
 - [api-module](references/api-module.md)
 - [domain](references/domain.md)

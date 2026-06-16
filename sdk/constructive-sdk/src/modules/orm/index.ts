@@ -22,45 +22,46 @@ import { RateLimitsModuleModel } from './models/rateLimitsModule';
 import { UsersModuleModel } from './models/usersModule';
 import { WebauthnCredentialsModuleModel } from './models/webauthnCredentialsModule';
 import { CryptoAddressesModuleModel } from './models/cryptoAddressesModule';
-import { IdentityProvidersModuleModel } from './models/identityProvidersModule';
 import { DenormalizedTableFieldModel } from './models/denormalizedTableField';
+import { IdentityProvidersModuleModel } from './models/identityProvidersModule';
 import { RlsModuleModel } from './models/rlsModule';
 import { BlueprintModel } from './models/blueprint';
 import { BlueprintTemplateModel } from './models/blueprintTemplate';
 import { BlueprintConstructionModel } from './models/blueprintConstruction';
 import { CryptoAuthModuleModel } from './models/cryptoAuthModule';
-import { RateLimitMetersModuleModel } from './models/rateLimitMetersModule';
 import { SessionsModuleModel } from './models/sessionsModule';
-import { ConfigSecretsModuleModel } from './models/configSecretsModule';
+import { SecureTableProvisionModel } from './models/secureTableProvision';
 import { MerkleStoreModuleModel } from './models/merkleStoreModule';
 import { GraphModuleModel } from './models/graphModule';
-import { SecureTableProvisionModel } from './models/secureTableProvision';
-import { InvitesModuleModel } from './models/invitesModule';
 import { DatabaseProvisionModuleModel } from './models/databaseProvisionModule';
-import { NamespaceModuleModel } from './models/namespaceModule';
+import { ConfigSecretsModuleModel } from './models/configSecretsModule';
+import { RateLimitMetersModuleModel } from './models/rateLimitMetersModule';
 import { RealtimeModuleModel } from './models/realtimeModule';
 import { WebauthnAuthModuleModel } from './models/webauthnAuthModule';
+import { FunctionInvocationModuleModel } from './models/functionInvocationModule';
+import { FunctionModuleModel } from './models/functionModule';
+import { InvitesModuleModel } from './models/invitesModule';
+import { NamespaceModuleModel } from './models/namespaceModule';
 import { ComputeLogModuleModel } from './models/computeLogModule';
 import { InferenceLogModuleModel } from './models/inferenceLogModule';
 import { StorageLogModuleModel } from './models/storageLogModule';
 import { TransferLogModuleModel } from './models/transferLogModule';
-import { DbUsageModuleModel } from './models/dbUsageModule';
-import { NotificationsModuleModel } from './models/notificationsModule';
 import { PlansModuleModel } from './models/plansModule';
-import { HierarchyModuleModel } from './models/hierarchyModule';
-import { BillingModuleModel } from './models/billingModule';
 import { BillingProviderModuleModel } from './models/billingProviderModule';
-import { ProfilesModuleModel } from './models/profilesModule';
+import { DbUsageModuleModel } from './models/dbUsageModule';
+import { HierarchyModuleModel } from './models/hierarchyModule';
 import { PermissionsModuleModel } from './models/permissionsModule';
+import { NotificationsModuleModel } from './models/notificationsModule';
+import { ProfilesModuleModel } from './models/profilesModule';
+import { BillingModuleModel } from './models/billingModule';
 import { RelationProvisionModel } from './models/relationProvision';
-import { FunctionModuleModel } from './models/functionModule';
 import { UserAuthModuleModel } from './models/userAuthModule';
 import { AgentModuleModel } from './models/agentModule';
 import { LimitsModuleModel } from './models/limitsModule';
 import { MembershipsModuleModel } from './models/membershipsModule';
+import { EntityTypeProvisionModel } from './models/entityTypeProvision';
 import { StorageModuleModel } from './models/storageModule';
 import { EventsModuleModel } from './models/eventsModule';
-import { EntityTypeProvisionModel } from './models/entityTypeProvision';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -113,45 +114,46 @@ export function createClient(config: OrmClientConfig) {
     usersModule: new UsersModuleModel(client),
     webauthnCredentialsModule: new WebauthnCredentialsModuleModel(client),
     cryptoAddressesModule: new CryptoAddressesModuleModel(client),
-    identityProvidersModule: new IdentityProvidersModuleModel(client),
     denormalizedTableField: new DenormalizedTableFieldModel(client),
+    identityProvidersModule: new IdentityProvidersModuleModel(client),
     rlsModule: new RlsModuleModel(client),
     blueprint: new BlueprintModel(client),
     blueprintTemplate: new BlueprintTemplateModel(client),
     blueprintConstruction: new BlueprintConstructionModel(client),
     cryptoAuthModule: new CryptoAuthModuleModel(client),
-    rateLimitMetersModule: new RateLimitMetersModuleModel(client),
     sessionsModule: new SessionsModuleModel(client),
-    configSecretsModule: new ConfigSecretsModuleModel(client),
+    secureTableProvision: new SecureTableProvisionModel(client),
     merkleStoreModule: new MerkleStoreModuleModel(client),
     graphModule: new GraphModuleModel(client),
-    secureTableProvision: new SecureTableProvisionModel(client),
-    invitesModule: new InvitesModuleModel(client),
     databaseProvisionModule: new DatabaseProvisionModuleModel(client),
-    namespaceModule: new NamespaceModuleModel(client),
+    configSecretsModule: new ConfigSecretsModuleModel(client),
+    rateLimitMetersModule: new RateLimitMetersModuleModel(client),
     realtimeModule: new RealtimeModuleModel(client),
     webauthnAuthModule: new WebauthnAuthModuleModel(client),
+    functionInvocationModule: new FunctionInvocationModuleModel(client),
+    functionModule: new FunctionModuleModel(client),
+    invitesModule: new InvitesModuleModel(client),
+    namespaceModule: new NamespaceModuleModel(client),
     computeLogModule: new ComputeLogModuleModel(client),
     inferenceLogModule: new InferenceLogModuleModel(client),
     storageLogModule: new StorageLogModuleModel(client),
     transferLogModule: new TransferLogModuleModel(client),
-    dbUsageModule: new DbUsageModuleModel(client),
-    notificationsModule: new NotificationsModuleModel(client),
     plansModule: new PlansModuleModel(client),
-    hierarchyModule: new HierarchyModuleModel(client),
-    billingModule: new BillingModuleModel(client),
     billingProviderModule: new BillingProviderModuleModel(client),
-    profilesModule: new ProfilesModuleModel(client),
+    dbUsageModule: new DbUsageModuleModel(client),
+    hierarchyModule: new HierarchyModuleModel(client),
     permissionsModule: new PermissionsModuleModel(client),
+    notificationsModule: new NotificationsModuleModel(client),
+    profilesModule: new ProfilesModuleModel(client),
+    billingModule: new BillingModuleModel(client),
     relationProvision: new RelationProvisionModel(client),
-    functionModule: new FunctionModuleModel(client),
     userAuthModule: new UserAuthModuleModel(client),
     agentModule: new AgentModuleModel(client),
     limitsModule: new LimitsModuleModel(client),
     membershipsModule: new MembershipsModuleModel(client),
+    entityTypeProvision: new EntityTypeProvisionModel(client),
     storageModule: new StorageModuleModel(client),
     eventsModule: new EventsModuleModel(client),
-    entityTypeProvision: new EntityTypeProvisionModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

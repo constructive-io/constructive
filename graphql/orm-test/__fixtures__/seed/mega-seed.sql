@@ -186,6 +186,11 @@ INSERT INTO mega_test.location_amenities (location_id, amenity_id) VALUES
   (5, 3),                    -- High Line Park: Restrooms
   (6, 1), (6, 3), (6, 4);   -- Met Museum: WiFi, Restrooms, Gift Shop
 
+-- Ensure BM25 index is fully built before tests run.
+-- pg_textsearch's bm25 index can have a brief lag after INSERT; VACUUM forces
+-- a full index pass so queries immediately return correct results.
+VACUUM ANALYZE mega_test.locations;
+
 -- Reset sequences
 SELECT setval('mega_test.categories_id_seq', 3);
 SELECT setval('mega_test.locations_id_seq', 7);

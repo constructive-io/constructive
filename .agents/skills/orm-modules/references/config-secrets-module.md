@@ -11,7 +11,7 @@ Entity-aware PGP-encrypted key-value config/secrets module. Supports app-level (
 ```typescript
 db.configSecretsModule.findMany({ select: { id: true } }).execute()
 db.configSecretsModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.configSecretsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', configDefinitionsTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', hasConfig: '<Boolean>' }, select: { id: true } }).execute()
+db.configSecretsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableId: '<UUID>', configDefinitionsTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', hasConfig: '<Boolean>' }, select: { id: true } }).execute()
 db.configSecretsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.configSecretsModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -30,7 +30,7 @@ const items = await db.configSecretsModule.findMany({
 
 ```typescript
 const item = await db.configSecretsModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', configDefinitionsTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', hasConfig: '<Boolean>' },
+  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableId: '<UUID>', configDefinitionsTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', hasConfig: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```

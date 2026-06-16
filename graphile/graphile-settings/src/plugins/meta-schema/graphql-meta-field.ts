@@ -1,5 +1,6 @@
 import {
   GraphQLBoolean,
+  GraphQLFloat,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -35,6 +36,15 @@ function createMetaSchemaType(): GraphQLObjectType {
     }),
   });
 
+  const MetaEnumType = new GraphQLObjectType({
+    name: 'MetaEnum',
+    description: 'Information about a PostgreSQL enum type',
+    fields: () => ({
+      name: { type: nn(GraphQLString), description: 'The PostgreSQL enum type name' },
+      values: { type: nnList(GraphQLString), description: 'Allowed values for this enum' },
+    }),
+  });
+
   const MetaFieldType = new GraphQLObjectType({
     name: 'MetaField',
     description: 'Information about a table field/column',
@@ -46,6 +56,7 @@ function createMetaSchemaType(): GraphQLObjectType {
       isPrimaryKey: { type: nn(GraphQLBoolean) },
       isForeignKey: { type: nn(GraphQLBoolean) },
       description: { type: GraphQLString },
+      enumValues: { type: MetaEnumType, description: 'Enum metadata if this field has an enum type' },
     }),
   });
 
@@ -194,6 +205,78 @@ function createMetaSchemaType(): GraphQLObjectType {
     }),
   });
 
+  const MetaStorageType = new GraphQLObjectType({
+    name: 'MetaStorage',
+    description: 'Storage metadata for a table',
+    fields: () => ({
+      isFilesTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage files table' },
+      isBucketsTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage buckets table' },
+    }),
+  });
+
+  const MetaSearchConfigType = new GraphQLObjectType({
+    name: 'MetaSearchConfig',
+    description: 'Per-table search configuration from @searchConfig smart tag',
+    fields: () => ({
+      weights: {
+        type: GraphQLString,
+        description: 'JSON-encoded per-adapter score weights',
+        resolve(source: any) {
+          return source.weights ? JSON.stringify(source.weights) : null;
+        },
+      },
+      boostRecent: { type: nn(GraphQLBoolean), description: 'Whether recency boosting is enabled' },
+      boostRecencyField: { type: GraphQLString, description: 'Field used for recency decay' },
+      boostRecencyDecay: { type: GraphQLFloat, description: 'Exponential decay factor per day' },
+    }),
+  });
+
+  const MetaSearchColumnType = new GraphQLObjectType({
+    name: 'MetaSearchColumn',
+    description: 'A searchable column with its algorithm',
+    fields: () => ({
+      name: { type: nn(GraphQLString), description: 'Column name (camelCase)' },
+      algorithm: { type: nn(GraphQLString), description: 'Search algorithm: tsvector, bm25, trgm, or vector' },
+    }),
+  });
+
+  const MetaSearchType = new GraphQLObjectType({
+    name: 'MetaSearch',
+    description: 'Search metadata for a table',
+    fields: () => ({
+      algorithms: { type: nnList(GraphQLString), description: 'Active search algorithms on this table' },
+      columns: { type: nnList(MetaSearchColumnType), description: 'Searchable columns with their algorithm' },
+      hasUnifiedSearch: { type: nn(GraphQLBoolean), description: 'Whether unifiedSearch composite filter is available' },
+      config: { type: MetaSearchConfigType, description: 'Per-table search configuration' },
+    }),
+  });
+
+  const MetaI18nFieldType = new GraphQLObjectType({
+    name: 'MetaI18nField',
+    description: 'A translatable field',
+    fields: () => ({
+      name: { type: nn(GraphQLString), description: 'GraphQL field name' },
+      type: { type: nn(GraphQLString), description: 'PostgreSQL column type (text, citext)' },
+    }),
+  });
+
+  const MetaI18nType = new GraphQLObjectType({
+    name: 'MetaI18n',
+    description: 'i18n metadata for a table with @i18n tag',
+    fields: () => ({
+      translationTable: { type: nn(GraphQLString), description: 'Name of the translation table' },
+      translatableFields: { type: nnList(MetaI18nFieldType), description: 'Fields that are translatable' },
+    }),
+  });
+
+  const MetaRealtimeType = new GraphQLObjectType({
+    name: 'MetaRealtime',
+    description: 'Realtime metadata for a table with @realtime tag',
+    fields: () => ({
+      subscriptionFieldName: { type: nn(GraphQLString), description: 'The generated subscription field name (e.g. onPostChanged)' },
+    }),
+  });
+
   const MetaTableType = new GraphQLObjectType({
     name: 'MetaTable',
     description: 'Information about a database table',
@@ -209,6 +292,10 @@ function createMetaSchemaType(): GraphQLObjectType {
       relations: { type: nn(MetaRelationsType) },
       inflection: { type: nn(MetaInflectionType) },
       query: { type: nn(MetaQueryType) },
+      storage: { type: MetaStorageType, description: 'Storage metadata (null if not a storage table)' },
+      search: { type: MetaSearchType, description: 'Search metadata (null if no search configured)' },
+      i18n: { type: MetaI18nType, description: 'i18n metadata (null if no @i18n tag)' },
+      realtime: { type: MetaRealtimeType, description: 'Realtime metadata (null if no @realtime tag)' },
     }),
   });
 

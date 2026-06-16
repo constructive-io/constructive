@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.47.12](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.11...@constructive-io/graphql-codegen@4.47.12) (2026-06-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.47.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.10...@constructive-io/graphql-codegen@4.47.11) (2026-06-14)
+
+### Bug Fixes
+
+- **codegen:** include partition keys in hooks update/delete mutation variables ([03b7a8a](https://github.com/constructive-io/constructive/commit/03b7a8aae4e436fd832a24add643b3d03e5404ba))
+
+## [4.47.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.9...@constructive-io/graphql-codegen@4.47.10) (2026-06-14)
+
+### Bug Fixes
+
+- **codegen:** include partition keys in ORM update/delete mutations ([338e3e6](https://github.com/constructive-io/constructive/commit/338e3e63bdd2da50533dc4a8a222307ceb8af280))
+
+## [4.47.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.8...@constructive-io/graphql-codegen@4.47.9) (2026-06-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.47.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.7...@constructive-io/graphql-codegen@4.47.8) (2026-06-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
 ## [4.47.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.6...@constructive-io/graphql-codegen@4.47.7) (2026-06-11)
 
 ### Bug Fixes

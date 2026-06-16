@@ -1,6 +1,6 @@
 {
   "name": "graphile-settings",
-  "version": "5.6.4",
+  "version": "5.7.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "graphile settings",
   "main": "index.js",
@@ -53,6 +53,7 @@
     "graphile-config": "1.0.1",
     "graphile-connection-filter": "workspace:^",
     "graphile-i18n": "workspace:^",
+    "graphile-llm": "workspace:^",
     "graphile-ltree": "workspace:^",
     "graphile-pg-aggregates": "workspace:^",
     "graphile-postgis": "workspace:^",

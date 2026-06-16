@@ -289,7 +289,7 @@ CREATE TABLE IF NOT EXISTS services_public.database_settings (
   enable_many_to_many boolean NOT NULL DEFAULT true,
   enable_connection_filter boolean NOT NULL DEFAULT true,
   enable_ltree boolean NOT NULL DEFAULT true,
-  enable_llm boolean NOT NULL DEFAULT false,
+  enable_llm boolean NOT NULL DEFAULT true,
   enable_realtime boolean NOT NULL DEFAULT false,
   enable_bulk boolean NOT NULL DEFAULT false,
   enable_i18n boolean NOT NULL DEFAULT false,

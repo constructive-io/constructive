@@ -632,6 +632,36 @@ signInCrossOrigin
 const result = await db.mutation.signInCrossOrigin({ input: { token: '<String>', credentialKind: '<String>' } }).execute();
 ```
 
+### `db.mutation.signInSmsOtp`
+
+signInSmsOtp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInSmsOtpInput (required) |
+
+```typescript
+const result = await db.mutation.signInSmsOtp({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } }).execute();
+```
+
+### `db.mutation.signUpSms`
+
+signUpSms
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignUpSmsInput (required) |
+
+```typescript
+const result = await db.mutation.signUpSms({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } }).execute();
+```
+
 ### `db.mutation.signUp`
 
 signUp
@@ -660,6 +690,21 @@ signIn
 
 ```typescript
 const result = await db.mutation.signIn({ input: '<SignInInput>' }).execute();
+```
+
+### `db.mutation.linkIdentity`
+
+linkIdentity
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | LinkIdentityInput (required) |
+
+```typescript
+const result = await db.mutation.linkIdentity({ input: { service: '<String>', identifier: '<String>', details: '<JSON>' } }).execute();
 ```
 
 ### `db.mutation.extendTokenExpires`

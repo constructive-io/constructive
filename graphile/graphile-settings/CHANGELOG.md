@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.7.0...graphile-settings@5.7.1) (2026-06-14)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.7.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.6.5...graphile-settings@5.7.0) (2026-06-14)
+
+### Features
+
+- **graphile-settings:** wire GraphileLlmPreset into createConstructivePreset ([517ce84](https://github.com/constructive-io/constructive/commit/517ce845b2363bbdd3b3c8a18792d58117ab2c7c))
+
+## [5.6.5](https://github.com/constructive-io/constructive/compare/graphile-settings@5.6.4...graphile-settings@5.6.5) (2026-06-12)
+
+### Bug Fixes
+
+- correct BM25 SQL comments — use pg_textsearch <@> operator, not paradedb.score/parse ([6180c18](https://github.com/constructive-io/constructive/commit/6180c18bf600d449d7067ebc6f8bf4e4d26cc87b))
+
 ## [5.6.4](https://github.com/constructive-io/constructive/compare/graphile-settings@5.6.3...graphile-settings@5.6.4) (2026-06-07)
 
 **Note:** Version bump only for package graphile-settings

@@ -558,6 +558,35 @@ type Agent {
     orderBy: [AgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
   ): AgentThreadConnection!
 
+  """Reads and enables pagination through a set of `AgentMessage`."""
+  agentMessages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentMessageFilter
+
+    """The method to use when ordering `AgentMessage`."""
+    orderBy: [AgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentMessageConnection!
+
   """Reads and enables pagination through a set of `Agent`."""
   childAgents(
     """Only read the first `n` values of the set."""
@@ -761,6 +790,12 @@ input AgentFilter {
 
   """`agentThreads` exist."""
   agentThreadsExist: Boolean
+
+  """Filter by the object’s `agentMessages` relation."""
+  agentMessages: AgentToManyAgentMessageFilter
+
+  """`agentMessages` exist."""
+  agentMessagesExist: Boolean
 
   """Filter by the object’s `childAgents` relation."""
   childAgents: AgentToManyAgentFilter
@@ -1411,8 +1446,8 @@ input AgentMessageFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
 
   """Filter by the object’s `parts` field."""
   parts: JSONFilter
@@ -1426,6 +1461,9 @@ input AgentMessageFilter {
   """Filter by the object’s `model` field."""
   model: StringFilter
 
+  """Filter by the object’s `agentId` field."""
+  agentId: UUIDFilter
+
   """Checks for all expressions in this list."""
   and: [AgentMessageFilter!]
 
@@ -1434,6 +1472,12 @@ input AgentMessageFilter {
 
   """Negates the expression."""
   not: AgentMessageFilter
+
+  """Filter by the object’s `agent` relation."""
+  agent: AgentFilter
+
+  """A related `agent` exists."""
+  agentExists: Boolean
 
   """Filter by the object’s `thread` relation."""
   thread: AgentThreadFilter
@@ -1527,8 +1571,8 @@ input AgentTaskFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
 
   """Filter by the object’s `status` field."""
   status: StringFilter
@@ -1616,6 +1660,20 @@ input IntFilter {
 
   """Greater than or equal to the specified value."""
   greaterThanOrEqualTo: Int
+}
+
+"""
+A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input AgentToManyAgentMessageFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AgentMessageFilter
+
+  """Filters to entities where every related entity matches."""
+  every: AgentMessageFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AgentMessageFilter
 }
 
 """
@@ -1724,30 +1782,6 @@ enum AgentThreadOrderBy {
   PARENT_THREAD_ID_DESC
 }
 
-"""Shared system prompt templates for agent conversations"""
-type AgentPrompt {
-  id: UUID!
-  createdAt: Datetime
-  updatedAt: Datetime
-  createdBy: UUID
-  updatedBy: UUID
-
-  """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
-  name: String!
-
-  """The system prompt template content"""
-  content: String!
-
-  """What this prompt template is for"""
-  description: String
-
-  """Whether this is the default prompt for the entity/app"""
-  isDefault: Boolean!
-
-  """Variables, tags, category metadata"""
-  metadata: JSON
-}
-
 """A connection to a list of `AgentMessage` values."""
 type AgentMessageConnection {
   """A list of `AgentMessage` objects."""
@@ -1771,8 +1805,8 @@ type AgentMessage {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """User who owns this message"""
-  ownerId: UUID!
+  """User who authored this message"""
+  actorId: UUID!
 
   """Message content: TextPart and ToolPart array"""
   parts: JSON
@@ -1785,6 +1819,12 @@ type AgentMessage {
 
   """LLM model that generated this response"""
   model: String
+
+  """Agent that authored this message (NULL for human messages)"""
+  agentId: UUID
+
+  """Reads a single `Agent` that is related to this `AgentMessage`."""
+  agent: Agent
 
   """Reads a single `AgentThread` that is related to this `AgentMessage`."""
   thread: AgentThread
@@ -1810,8 +1850,8 @@ enum AgentMessageOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
-  OWNER_ID_ASC
-  OWNER_ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   PARTS_ASC
   PARTS_DESC
   THREAD_ID_ASC
@@ -1820,6 +1860,32 @@ enum AgentMessageOrderBy {
   AUTHOR_ROLE_DESC
   MODEL_ASC
   MODEL_DESC
+  AGENT_ID_ASC
+  AGENT_ID_DESC
+}
+
+"""Shared system prompt templates for agent conversations"""
+type AgentPrompt {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
+  name: String!
+
+  """The system prompt template content"""
+  content: String!
+
+  """What this prompt template is for"""
+  description: String
+
+  """Whether this is the default prompt for the entity/app"""
+  isDefault: Boolean!
+
+  """Variables, tags, category metadata"""
+  metadata: JSON
 }
 
 """Methods to use when ordering `AgentPlan`."""
@@ -1868,8 +1934,8 @@ type AgentTask {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """User who owns this task"""
-  ownerId: UUID!
+  """User who authored this task"""
+  actorId: UUID!
 
   """Current status of this task"""
   status: String!
@@ -1930,8 +1996,8 @@ enum AgentTaskOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
-  OWNER_ID_ASC
-  OWNER_ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   STATUS_ASC
   STATUS_DESC
   PLAN_ID_ASC
@@ -2061,7 +2127,7 @@ type AgentResourceChunk {
   embeddingVectorDistance: Float
 
   """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
+  Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
   """
   searchScore: Float
 }
@@ -2178,7 +2244,7 @@ type AgentResource {
   bodyTrgmSimilarity: Float
 
   """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
+  Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
   """
   searchScore: Float
 }
@@ -3380,8 +3446,8 @@ input AgentMessageInput {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """User who owns this message"""
-  ownerId: UUID
+  """User who authored this message"""
+  actorId: UUID
 
   """Message content: TextPart and ToolPart array"""
   parts: JSON
@@ -3394,6 +3460,9 @@ input AgentMessageInput {
 
   """LLM model that generated this response"""
   model: String
+
+  """Agent that authored this message (NULL for human messages)"""
+  agentId: UUID
 }
 
 """The output of our create `AgentTask` mutation."""
@@ -3437,8 +3506,8 @@ input AgentTaskInput {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """User who owns this task"""
-  ownerId: UUID
+  """User who authored this task"""
+  actorId: UUID
 
   """Current status of this task"""
   status: String
@@ -3987,8 +4056,8 @@ input AgentMessagePatch {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """User who owns this message"""
-  ownerId: UUID
+  """User who authored this message"""
+  actorId: UUID
 
   """Message content: TextPart and ToolPart array"""
   parts: JSON
@@ -4001,6 +4070,9 @@ input AgentMessagePatch {
 
   """LLM model that generated this response"""
   model: String
+
+  """Agent that authored this message (NULL for human messages)"""
+  agentId: UUID
 }
 
 """The output of our update `AgentTask` mutation."""
@@ -4049,8 +4121,8 @@ input AgentTaskPatch {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """User who owns this task"""
-  ownerId: UUID
+  """User who authored this task"""
+  actorId: UUID
 
   """Current status of this task"""
   status: String

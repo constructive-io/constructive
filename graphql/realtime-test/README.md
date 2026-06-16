@@ -1,5 +1,9 @@
 # @constructive-io/graphql-realtime-test
 
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
 Constructive-level wrapper around `graphile-realtime-test` that pre-loads the
 full `ConstructivePreset` (auth, RLS, storage, search, realtime subscriptions,
 etc.) into the GraphQL schema used for subscription testing.

@@ -11,10 +11,15 @@
  * to consume.
  *
  * Resolution order for the embedder:
- *   1. `llm_module` from api_modules (per-database, loaded at schema build time)
- *   2. `defaultEmbedder` from preset options (dev/testing fallback)
- *   3. Environment variables (EMBEDDER_PROVIDER, EMBEDDER_MODEL, EMBEDDER_BASE_URL)
- *   4. null — LLM features are disabled
+ *   1. `defaultEmbedder` from preset options (build-time)
+ *   2. Environment variables (EMBEDDER_PROVIDER, EMBEDDER_MODEL, EMBEDDER_BASE_URL)
+ *   3. null — LLM features are disabled
+ *
+ * Per-database model/baseUrl overrides (from `llm_module` via `ctx.useLlm()`)
+ * are applied at request time via `llmConfigStore` (AsyncLocalStorage) in
+ * the text-search-plugin resolver wrapper. The same embedder function — and
+ * its metering wrapper — handles every request; only the model name and
+ * base URL parameters change per-tenant.
  *
  * This plugin is intentionally pure — no billing or metering logic.
  * The optional LlmMeteringPlugin wraps the embedder with billing integration

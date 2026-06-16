@@ -14,16 +14,18 @@
  * route handler can use for tenant-scoped database operations.
  */
 
+import type { PgpmOptions } from '@pgpmjs/types';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
-import type { PgpmOptions } from '@pgpmjs/types';
 
+import type { BillingClient } from './billing-client';
+import { createBillingClient } from './billing-client';
 import type { LoaderRegistry } from './loaders/registry';
 import type { LoaderContext } from './loaders/types';
 import { withPgClient as withPgClientFn } from './pg-client';
 import { buildPgSettings } from './pg-settings';
-import type { BuiltinModuleMap, ConstructiveContext } from './types';
+import type { BillingConfig, BuiltinModuleMap, ConstructiveContext, InferenceLogConfig, LlmConfig } from './types';
 
 export interface ContextMiddlewareOptions {
   /** Base PG options for pool creation (host, port, user, password) */
@@ -41,7 +43,7 @@ export interface ContextMiddlewareOptions {
  */
 function createUseModule(
   registry: LoaderRegistry | undefined,
-  loaderCtx: LoaderContext | null,
+  loaderCtx: LoaderContext | null
 ): ConstructiveContext['useModule'] {
   return (async <K extends keyof BuiltinModuleMap>(name: K | string) => {
     if (!registry || !loaderCtx) return undefined;
@@ -73,12 +75,12 @@ export function buildContext(
     api,
     token,
     requestId,
-    clientIp: req.clientIp,
+    clientIp: req.clientIp
   });
 
   const tenantPool: Pool = getPgPool({
     ...opts.pg,
-    database: api.dbname,
+    database: api.dbname
   });
 
   // Build loader context (if registry provided and databaseId known)
@@ -90,9 +92,18 @@ export function buildContext(
       tenantPool,
       databaseId: api.databaseId,
       apiId: api.apiId,
-      dbname: api.dbname,
+      dbname: api.dbname
     };
   }
+
+  const withPgClient = <T>(fn: (client: any) => Promise<T>) =>
+    withPgClientFn(tenantPool, pgSettings, fn);
+  const useModule = createUseModule(opts.loaders, loaderCtx);
+
+  // Lazy-initialized billing client (cached per request)
+  let billingClient: BillingClient | null | undefined;
+  // Lazy-initialized LLM config (cached per request)
+  let llmConfig: LlmConfig | null | undefined;
 
   return {
     api,
@@ -102,9 +113,41 @@ export function buildContext(
     userId: token?.user_id ?? null,
     requestId,
     pool: tenantPool,
-    withPgClient: <T>(fn: (client: any) => Promise<T>) =>
-      withPgClientFn(tenantPool, pgSettings, fn),
-    useModule: createUseModule(opts.loaders, loaderCtx),
+    withPgClient,
+    useModule,
+    async useBilling() {
+      if (billingClient !== undefined) return billingClient;
+
+      const entityId = token?.entity_id as string | undefined;
+      if (!entityId) {
+        billingClient = null;
+        return null;
+      }
+
+      const [billing, inferenceLog] = await Promise.all([
+        useModule('billing') as Promise<BillingConfig | undefined>,
+        useModule('inferenceLog') as Promise<InferenceLogConfig | undefined>
+      ]);
+
+      if (!billing) {
+        billingClient = null;
+        return null;
+      }
+
+      billingClient = createBillingClient(
+        withPgClient,
+        entityId,
+        billing,
+        inferenceLog ?? null
+      );
+      return billingClient;
+    },
+    async useLlm() {
+      if (llmConfig !== undefined) return llmConfig;
+      const resolved = await useModule('llm') as LlmConfig | undefined;
+      llmConfig = resolved ?? null;
+      return llmConfig;
+    }
   };
 }
 

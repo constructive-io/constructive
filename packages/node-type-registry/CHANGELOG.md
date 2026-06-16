@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.50.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.49.0...node-type-registry@0.50.0) (2026-06-12)
+
+### Features
+
+- **graphile-search:** replace sigmoid weighted-average with Reciprocal Rank Fusion (RRF) ([2c61257](https://github.com/constructive-io/constructive/commit/2c6125749d6b5f37a17ddbdefc3c0475bdfecdcf)), closes [constructive-io/constructive-planning#1047](https://github.com/constructive-io/constructive-planning/issues/1047)
+
 # [0.49.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.48.0...node-type-registry@0.49.0) (2026-06-09)
 
 ### Features

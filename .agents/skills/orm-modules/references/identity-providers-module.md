@@ -18,7 +18,7 @@ Entity-aware config row for the identity_providers_module, which provisions a pe
 ```typescript
 db.identityProvidersModule.findMany({ select: { id: true } }).execute()
 db.identityProvidersModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.identityProvidersModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>' }, select: { id: true } }).execute()
+db.identityProvidersModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>' }, select: { id: true } }).execute()
 db.identityProvidersModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.identityProvidersModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -37,7 +37,7 @@ const items = await db.identityProvidersModule.findMany({
 
 ```typescript
 const item = await db.identityProvidersModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>' },
+  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

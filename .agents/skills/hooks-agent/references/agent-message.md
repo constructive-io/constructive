@@ -7,8 +7,8 @@ Message within an agent thread with TextPart/ToolPart jsonb parts
 ## Usage
 
 ```typescript
-useAgentMessagesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true, threadId: true, authorRole: true, model: true } } })
-useAgentMessageQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true, threadId: true, authorRole: true, model: true } } })
+useAgentMessagesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } } })
+useAgentMessageQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } } })
 useCreateAgentMessageMutation({ selection: { fields: { id: true } } })
 useUpdateAgentMessageMutation({ selection: { fields: { id: true } } })
 useDeleteAgentMessageMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentMessageMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentMessagesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true, threadId: true, authorRole: true, model: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentMessagesQuery({
 const { mutate } = useCreateAgentMessageMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>' });
+mutate({ actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>', agentId: '<UUID>' });
 ```

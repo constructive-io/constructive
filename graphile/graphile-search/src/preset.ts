@@ -91,6 +91,13 @@ export interface UnifiedSearchPresetOptions {
    * @default 'english'
    */
   tsConfig?: string;
+
+  /**
+   * RRF (Reciprocal Rank Fusion) smoothing constant for composite searchScore.
+   * Higher values make scoring more democratic across rank positions.
+   * @default 60
+   */
+  rrfK?: number;
 }
 
 /**
@@ -109,6 +116,7 @@ export function UnifiedSearchPreset(
     searchScoreWeights,
     fullTextScalarName = 'FullText',
     tsConfig = 'english',
+    rrfK,
   } = options;
 
   const adapters = [];
@@ -138,6 +146,7 @@ export function UnifiedSearchPreset(
     enableSearchScore,
     enableUnifiedSearch,
     searchScoreWeights,
+    rrfK,
   };
 
   // Collect codec plugins based on which adapters are enabled

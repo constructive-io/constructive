@@ -1,5 +1,9 @@
 # graphile-ltree
 
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
 PostGraphile v5 plugin for PostgreSQL's ltree hierarchical data type.
 
 Auto-detects ltree columns, exposes slash-path folder fields, and provides containment/glob filter operators for hierarchical data.

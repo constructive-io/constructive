@@ -362,7 +362,7 @@ export interface User {
   searchTsvRank?: number | null;
   /** TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active. */
   displayNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active. */
+  /** Composite search relevance score (0..1, higher = more relevant). Computed using Reciprocal Rank Fusion (RRF) across all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active. */
   searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
@@ -1306,6 +1306,22 @@ export interface SignInCrossOriginInput {
   token?: string;
   credentialKind?: string;
 }
+export interface SignInSmsOtpInput {
+  clientMutationId?: string;
+  phone?: string;
+  code?: string;
+  credentialKind?: string;
+  rememberMe?: boolean;
+  deviceToken?: string;
+}
+export interface SignUpSmsInput {
+  clientMutationId?: string;
+  phone?: string;
+  code?: string;
+  credentialKind?: string;
+  rememberMe?: boolean;
+  deviceToken?: string;
+}
 export interface SignUpInput {
   clientMutationId?: string;
   email?: string;
@@ -1323,6 +1339,12 @@ export interface SignInInput {
   credentialKind?: string;
   csrfToken?: string;
   deviceToken?: string;
+}
+export interface LinkIdentityInput {
+  clientMutationId?: string;
+  service: string;
+  identifier: string;
+  details?: Record<string, unknown>;
 }
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
@@ -1697,6 +1719,132 @@ export interface TrgmSearchInput {
   value: string;
   /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
   threshold?: number;
+}
+/** An input for mutations affecting `Email` */
+export interface EmailInput {
+  id?: string;
+  ownerId?: string;
+  /** The email address */
+  email: ConstructiveInternalTypeEmail;
+  /** Whether the email address has been verified via confirmation link */
+  isVerified?: boolean;
+  /** Whether this is the user's primary email address */
+  isPrimary?: boolean;
+  /** Optional user-provided label for this email (e.g. "Work", "Personal"). */
+  name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `PhoneNumber` */
+export interface PhoneNumberInput {
+  id?: string;
+  ownerId?: string;
+  /** Country calling code (e.g. +1, +44) */
+  cc: string;
+  /** The phone number without country code */
+  number: string;
+  /** Whether the phone number has been verified via SMS code */
+  isVerified?: boolean;
+  /** Whether this is the user's primary phone number */
+  isPrimary?: boolean;
+  /** Optional user-provided label for this phone number (e.g. "Mobile", "Work"). */
+  name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `CryptoAddress` */
+export interface CryptoAddressInput {
+  id?: string;
+  ownerId?: string;
+  /** The cryptocurrency wallet address, validated against network-specific patterns */
+  address: string;
+  /** Whether ownership of this address has been cryptographically verified */
+  isVerified?: boolean;
+  /** Whether this is the user's primary cryptocurrency address */
+  isPrimary?: boolean;
+  /** Optional user-provided label for this address (e.g. "Main wallet", "Hardware wallet"). */
+  name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `WebauthnCredential` */
+export interface WebauthnCredentialInput {
+  id?: string;
+  ownerId?: string;
+  /** Base64url-encoded credential ID returned by the authenticator. Globally unique per WebAuthn spec. */
+  credentialId: string;
+  /** COSE-encoded public key bytes from the authenticator attestation. */
+  publicKey: Base64EncodedBinary;
+  /** Monotonic signature counter. Strict-increase check during sign-in detects cloned credentials. 0 means the authenticator does not implement a counter. */
+  signCount?: string;
+  /** Random per-user handle sent to authenticators as user.id. Privacy-preserving; NOT the internal user UUID. */
+  webauthnUserId: string;
+  /** Authenticator transport hints (e.g. usb, nfc, ble, internal, hybrid). Used to hint browser UI during sign-in. */
+  transports?: string[];
+  /** Either 'singleDevice' (hardware-bound) or 'multiDevice' (synced passkey). Enforced by CHECK constraint below. */
+  credentialDeviceType: string;
+  /** Whether this credential is eligible for backup (syncing) per the authenticator's flags at registration. */
+  backupEligible?: boolean;
+  /** Current backup state; updated on each successful sign-in assertion. */
+  backupState?: boolean;
+  /** User-provided label for this credential (e.g. "YubiKey 5C", "iPhone 15"). Renamed via rename_passkey. */
+  name?: string;
+  /** Timestamp of the most recent successful sign-in assertion using this credential. */
+  lastUsedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `AuditLogAuth` */
+export interface AuditLogAuthInput {
+  createdAt?: string;
+  /** Unique identifier for each audit event (uuidv7 provides temporal ordering) */
+  id?: string;
+  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
+  event: string;
+  /** User who performed the authentication action; NULL if user was deleted */
+  actorId?: string;
+  /** Request origin (domain) where the auth event occurred */
+  origin?: ConstructiveInternalTypeOrigin;
+  /** Browser or client user-agent string from the request */
+  userAgent?: string;
+  /** IP address of the client that initiated the auth event */
+  ipAddress?: string;
+  /** Whether the authentication attempt succeeded */
+  success: boolean;
+}
+/** An input for mutations affecting `IdentityProvider` */
+export interface IdentityProviderInput {
+  slug?: string;
+  kind?: string;
+  displayName?: string;
+  enabled?: boolean;
+  isBuiltIn?: boolean;
+}
+/** An input for mutations affecting `RoleType` */
+export interface RoleTypeInput {
+  id: number;
+  name: string;
+}
+/** An input for mutations affecting `UserConnectedAccount` */
+export interface UserConnectedAccountInput {
+  id?: string;
+  ownerId?: string;
+  service?: string;
+  identifier?: string;
+  details?: Record<string, unknown>;
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+/** An input for mutations affecting `User` */
+export interface UserInput {
+  id?: string;
+  username?: string;
+  displayName?: string;
+  profilePicture?: ConstructiveInternalTypeImage;
+  type?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 /** An interval of time that has passed where the smallest distinct unit is a second. */
 export interface IntervalInput {
@@ -2345,6 +2493,26 @@ export type SignInCrossOriginPayloadSelect = {
     select: SignInCrossOriginRecordSelect;
   };
 };
+export interface SignInSmsOtpPayload {
+  clientMutationId?: string | null;
+  result?: SignInSmsOtpRecord | null;
+}
+export type SignInSmsOtpPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignInSmsOtpRecordSelect;
+  };
+};
+export interface SignUpSmsPayload {
+  clientMutationId?: string | null;
+  result?: SignUpSmsRecord | null;
+}
+export type SignUpSmsPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignUpSmsRecordSelect;
+  };
+};
 export interface SignUpPayload {
   clientMutationId?: string | null;
   result?: SignUpRecord | null;
@@ -2364,6 +2532,14 @@ export type SignInPayloadSelect = {
   result?: {
     select: SignInRecordSelect;
   };
+};
+export interface LinkIdentityPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type LinkIdentityPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -2781,6 +2957,26 @@ export type SignInCrossOriginRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+};
+export interface SignInSmsOtpRecord {
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+}
+export type SignInSmsOtpRecordSelect = {
+  userId?: boolean;
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
+};
+export interface SignUpSmsRecord {
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+}
+export type SignUpSmsRecordSelect = {
+  userId?: boolean;
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
 };
 export interface SignUpRecord {
   id?: string | null;

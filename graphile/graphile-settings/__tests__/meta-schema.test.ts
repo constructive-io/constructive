@@ -346,7 +346,7 @@ query MetaContract {
       name
       schemaName
       query { all one create update delete }
-      fields { name type { pgType gqlType isArray subtype } }
+      fields { name type { pgType gqlType isArray subtype } enumValues { name values } }
       indexes { name isUnique isPrimary columns fields { name } }
       constraints {
         primaryKey { name }
@@ -386,9 +386,24 @@ query MetaContract {
           rightTable { name }
         }
       }
+      storage { isFilesTable isBucketsTable }
+      search {
+        algorithms
+        columns { name algorithm }
+        hasUnifiedSearch
+        config { weights boostRecent boostRecencyField boostRecencyDecay }
+      }
+      i18n {
+        translationTable
+        translatableFields { name type }
+      }
+      realtime {
+        subscriptionFieldName
+      }
     }
   }
 }
+
 `;
 
 const REQUIRED_META_QUERY_PATHS = [
@@ -449,6 +464,22 @@ const REQUIRED_META_QUERY_PATHS = [
   'relations.manyToMany.leftKeyAttributes.name',
   'relations.manyToMany.rightKeyAttributes.name',
   'relations.manyToMany.rightTable.name',
+  'storage.isFilesTable',
+  'storage.isBucketsTable',
+  'search.algorithms',
+  'search.columns.name',
+  'search.columns.algorithm',
+  'search.hasUnifiedSearch',
+  'search.config.weights',
+  'search.config.boostRecent',
+  'search.config.boostRecencyField',
+  'search.config.boostRecencyDecay',
+  'fields.enumValues.name',
+  'fields.enumValues.values',
+  'i18n.translationTable',
+  'i18n.translatableFields.name',
+  'i18n.translatableFields.type',
+  'realtime.subscriptionFieldName',
 ];
 
 function collectSelectionPaths(selections: readonly SelectionNode[], prefix = ''): string[] {
@@ -812,6 +843,7 @@ describe('MetaSchemaPlugin', () => {
         isPrimaryKey: false,
         isForeignKey: false,
         description: null,
+        enumValues: null,
       });
     });
 
@@ -1894,6 +1926,470 @@ describe('MetaSchemaPlugin', () => {
 
       expect(collectMetaInvariantErrors(normalized)).toEqual([]);
       expect(normalized).toMatchSnapshot();
+    });
+  });
+
+  describe('storage metadata', () => {
+    it('returns null storage for tables without storage tags', () => {
+      const build = createMockBuild({
+        user: {
+          codec: createMockCodec('user', { id: createMockAttribute('uuid') }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].storage).toBeNull();
+    });
+
+    it('detects @storageFiles tagged tables', () => {
+      const codec = createMockCodec('app_file', {
+        id: createMockAttribute('uuid'),
+        key: createMockAttribute('text'),
+        bucket_id: createMockAttribute('uuid'),
+      });
+      (codec as any).extensions = {
+        ...codec.extensions,
+        tags: { storageFiles: true },
+      };
+      const build = createMockBuild({
+        app_file: { codec, uniques: [], relations: {} },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].storage).toEqual({
+        isFilesTable: true,
+        isBucketsTable: false,
+      });
+    });
+
+    it('detects @storageBuckets tagged tables', () => {
+      const codec = createMockCodec('app_bucket', {
+        id: createMockAttribute('uuid'),
+        key: createMockAttribute('text'),
+      });
+      (codec as any).extensions = {
+        ...codec.extensions,
+        tags: { storageBuckets: true },
+      };
+      const build = createMockBuild({
+        app_bucket: { codec, uniques: [], relations: {} },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].storage).toEqual({
+        isFilesTable: false,
+        isBucketsTable: true,
+      });
+    });
+  });
+
+  describe('search metadata', () => {
+    it('returns null search for tables without search features', () => {
+      const build = createMockBuild({
+        user: {
+          codec: createMockCodec('user', { id: createMockAttribute('uuid') }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].search).toBeNull();
+    });
+
+    it('detects tsvector columns', () => {
+      const codec = createMockCodec('article', {
+        id: createMockAttribute('uuid'),
+        title: createMockAttribute('text'),
+        tsv: createMockAttribute('tsvector'),
+      });
+      const build = createMockBuild({
+        article: { codec, uniques: [], relations: {} },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].search).toEqual({
+        algorithms: ['tsvector'],
+        columns: [{ name: 'tsv', algorithm: 'tsvector' }],
+        hasUnifiedSearch: true,
+        config: null,
+      });
+    });
+
+    it('detects vector columns (pgvector)', () => {
+      const codec = createMockCodec('document', {
+        id: createMockAttribute('uuid'),
+        embedding: createMockAttribute('vector'),
+      });
+      const build = createMockBuild({
+        document: { codec, uniques: [], relations: {} },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].search).toEqual({
+        algorithms: ['vector'],
+        columns: [{ name: 'embedding', algorithm: 'vector' }],
+        hasUnifiedSearch: false,
+        config: null,
+      });
+    });
+
+    it('detects @bm25Index tagged columns', () => {
+      const bm25Attr = createMockAttribute('text');
+      (bm25Attr as any).extensions = { tags: { bm25Index: true } };
+      const codec = createMockCodec('article', {
+        id: createMockAttribute('uuid'),
+        body: bm25Attr,
+      });
+      const build = createMockBuild({
+        article: { codec, uniques: [], relations: {} },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].search).toEqual({
+        algorithms: ['bm25'],
+        columns: [{ name: 'body', algorithm: 'bm25' }],
+        hasUnifiedSearch: true,
+        config: null,
+      });
+    });
+
+    it('parses @searchConfig smart tag', () => {
+      const codec = createMockCodec('article', {
+        id: createMockAttribute('uuid'),
+        tsv: createMockAttribute('tsvector'),
+      });
+      (codec as any).extensions = {
+        ...codec.extensions,
+        tags: {
+          searchConfig: {
+            weights: { bm25: 0.6, tsv: 0.4 },
+            boost_recent: true,
+            boost_recency_field: 'created_at',
+            boost_recency_decay: 0.95,
+          },
+        },
+      };
+      const build = createMockBuild({
+        article: { codec, uniques: [], relations: {} },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].search).toEqual({
+        algorithms: ['tsvector'],
+        columns: [{ name: 'tsv', algorithm: 'tsvector' }],
+        hasUnifiedSearch: true,
+        config: {
+          weights: { bm25: 0.6, tsv: 0.4 },
+          boostRecent: true,
+          boostRecencyField: 'created_at',
+          boostRecencyDecay: 0.95,
+        },
+      });
+    });
+
+    it('detects multiple search algorithms on one table', () => {
+      const bm25Attr = createMockAttribute('text');
+      (bm25Attr as any).extensions = { tags: { bm25Index: true } };
+      const codec = createMockCodec('article', {
+        id: createMockAttribute('uuid'),
+        tsv: createMockAttribute('tsvector'),
+        embedding: createMockAttribute('vector'),
+        body: bm25Attr,
+      });
+      const build = createMockBuild({
+        article: { codec, uniques: [], relations: {} },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].search!.algorithms).toEqual(['bm25', 'tsvector', 'vector']);
+      expect(tables[0].search!.hasUnifiedSearch).toBe(true);
+      expect(tables[0].search!.columns).toHaveLength(3);
+    });
+  });
+
+  describe('enum metadata', () => {
+    it('returns null enumValues for non-enum fields', () => {
+      const build = createMockBuild({
+        user: {
+          codec: createMockCodec('user', {
+            id: createMockAttribute('uuid'),
+            name: createMockAttribute('text'),
+          }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      for (const field of tables[0].fields) {
+        expect(field.enumValues).toBeNull();
+      }
+    });
+
+    it('detects enum type on a field', () => {
+      const enumCodec = {
+        name: 'status_enum',
+        values: [{ value: 'active' }, { value: 'inactive' }, { value: 'pending' }],
+      };
+      const build = createMockBuild({
+        task: {
+          codec: createMockCodec('task', {
+            id: createMockAttribute('uuid'),
+            status: createMockAttribute('status_enum', { codec: enumCodec }),
+          }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      const statusField = tables[0].fields.find((f: any) => f.name === 'status');
+      expect(statusField.enumValues).toEqual({
+        name: 'status_enum',
+        values: ['active', 'inactive', 'pending'],
+      });
+    });
+
+    it('detects enum values as plain strings', () => {
+      const enumCodec = {
+        name: 'priority_enum',
+        values: ['low', 'medium', 'high'],
+      };
+      const build = createMockBuild({
+        task: {
+          codec: createMockCodec('task', {
+            id: createMockAttribute('uuid'),
+            priority: createMockAttribute('priority_enum', { codec: enumCodec }),
+          }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      const priorityField = tables[0].fields.find((f: any) => f.name === 'priority');
+      expect(priorityField.enumValues).toEqual({
+        name: 'priority_enum',
+        values: ['low', 'medium', 'high'],
+      });
+    });
+
+    it('detects enum through domain wrapper', () => {
+      const innerEnumCodec = {
+        name: 'color_enum',
+        values: [{ value: 'red' }, { value: 'green' }, { value: 'blue' }],
+      };
+      const domainCodec = {
+        name: 'color_domain',
+        domainOfCodec: innerEnumCodec,
+      };
+      const build = createMockBuild({
+        item: {
+          codec: createMockCodec('item', {
+            id: createMockAttribute('uuid'),
+            color: createMockAttribute('color_domain', { codec: domainCodec }),
+          }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      const colorField = tables[0].fields.find((f: any) => f.name === 'color');
+      expect(colorField.enumValues).toEqual({
+        name: 'color_enum',
+        values: ['red', 'green', 'blue'],
+      });
+    });
+
+    it('does not detect enum on non-enum array codec', () => {
+      const innerCodec = { name: 'text', arrayOfCodec: null as any };
+      const arrayCodec = { name: '_text', arrayOfCodec: innerCodec };
+      const build = createMockBuild({
+        item: {
+          codec: createMockCodec('item', {
+            id: createMockAttribute('uuid'),
+            tags: createMockAttribute('_text', { codec: arrayCodec }),
+          }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      const tagsField = tables[0].fields.find((f: any) => f.name === 'tags');
+      expect(tagsField.enumValues).toBeNull();
+    });
+  });
+
+  describe('i18n metadata', () => {
+    it('returns null i18n for tables without @i18n tag', () => {
+      const build = createMockBuild({
+        user: {
+          codec: createMockCodec('user', {
+            id: createMockAttribute('uuid'),
+            name: createMockAttribute('text'),
+          }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].i18n).toBeNull();
+    });
+
+    it('detects @i18n tagged tables with translation table name', () => {
+      const baseCodec = {
+        name: 'post',
+        attributes: {
+          id: createMockAttribute('uuid'),
+          title: createMockAttribute('text'),
+          body: createMockAttribute('text'),
+          views: createMockAttribute('int4'),
+        },
+        isAnonymous: false,
+        extensions: {
+          pg: { schemaName: 'app_public' },
+          tags: { i18n: 'post_translations' },
+        },
+      };
+      const translationCodec = {
+        name: 'postTranslations',
+        attributes: {
+          post_id: createMockAttribute('uuid'),
+          lang_code: createMockAttribute('text'),
+          title: createMockAttribute('text'),
+          body: createMockAttribute('text'),
+        },
+        isAnonymous: false,
+        extensions: {
+          pg: { schemaName: 'app_public', name: 'post_translations' },
+        },
+      };
+      const build = createMockBuild({
+        post: {
+          codec: baseCodec,
+          uniques: [],
+          relations: {},
+        },
+        post_translations: {
+          codec: translationCodec,
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      const postTable = tables.find((t: any) => t.name === 'Post');
+      expect(postTable.i18n).toEqual({
+        translationTable: 'post_translations',
+        translatableFields: [
+          { name: 'title', type: 'text' },
+          { name: 'body', type: 'text' },
+        ],
+      });
+    });
+
+    it('excludes non-text columns from translatable fields', () => {
+      const baseCodec = {
+        name: 'item',
+        attributes: {
+          id: createMockAttribute('uuid'),
+          label: createMockAttribute('text'),
+          count: createMockAttribute('int4'),
+        },
+        isAnonymous: false,
+        extensions: {
+          pg: { schemaName: 'app_public' },
+          tags: { i18n: 'item_translations' },
+        },
+      };
+      const translationCodec = {
+        name: 'itemTranslations',
+        attributes: {
+          item_id: createMockAttribute('uuid'),
+          lang_code: createMockAttribute('text'),
+          label: createMockAttribute('text'),
+        },
+        isAnonymous: false,
+        extensions: {
+          pg: { schemaName: 'app_public', name: 'item_translations' },
+        },
+      };
+      const build = createMockBuild({
+        item: {
+          codec: baseCodec,
+          uniques: [],
+          relations: {},
+        },
+        item_translations: {
+          codec: translationCodec,
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      const itemTable = tables.find((t: any) => t.name === 'Item');
+      expect(itemTable.i18n).toEqual({
+        translationTable: 'item_translations',
+        translatableFields: [{ name: 'label', type: 'text' }],
+      });
+    });
+  });
+
+  describe('realtime metadata', () => {
+    it('returns null realtime for tables without @realtime tag', () => {
+      const build = createMockBuild({
+        user: {
+          codec: createMockCodec('user', {
+            id: createMockAttribute('uuid'),
+            name: createMockAttribute('text'),
+          }),
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].realtime).toBeNull();
+    });
+
+    it('detects @realtime tagged tables', () => {
+      const realtimeCodec = {
+        name: 'message',
+        attributes: {
+          id: createMockAttribute('uuid'),
+          content: createMockAttribute('text'),
+        },
+        isAnonymous: false,
+        extensions: {
+          pg: { schemaName: 'app_public' },
+          tags: { realtime: true },
+        },
+      };
+      const build = createMockBuild({
+        message: {
+          codec: realtimeCodec,
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].realtime).toEqual({
+        subscriptionFieldName: 'onMessageChanged',
+      });
+    });
+
+    it('generates correct subscription field name from table type', () => {
+      const realtimeCodec = {
+        name: 'chat_room',
+        attributes: {
+          id: createMockAttribute('uuid'),
+        },
+        isAnonymous: false,
+        extensions: {
+          pg: { schemaName: 'app_public' },
+          tags: { realtime: true },
+        },
+      };
+      const build = createMockBuild({
+        chat_room: {
+          codec: realtimeCodec,
+          uniques: [],
+          relations: {},
+        },
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].realtime).toEqual({
+        subscriptionFieldName: 'onChatRoomChanged',
+      });
     });
   });
 

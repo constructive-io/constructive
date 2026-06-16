@@ -1,6 +1,6 @@
 {
   "name": "graphile-llm",
-  "version": "0.11.4",
+  "version": "0.12.1",
   "description": "LLM integration plugin for PostGraphile v5 — server-side text-to-vector embedding and text companion fields for pgvector columns",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -29,7 +29,9 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "@agentic-kit/ollama": "^2.0.0",
+    "@agentic-kit/ollama": "workspace:*",
+    "@constructive-io/express-context": "workspace:^",
+    "@constructive-io/llm-env": "workspace:^",
     "graphile-cache": "workspace:^"
   },
   "peerDependencies": {

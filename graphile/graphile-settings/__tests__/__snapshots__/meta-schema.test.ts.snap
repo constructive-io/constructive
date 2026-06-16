@@ -16,6 +16,9 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "constraints.unique",
   "constraints.unique.name",
   "fields",
+  "fields.enumValues",
+  "fields.enumValues.name",
+  "fields.enumValues.values",
   "fields.name",
   "fields.type",
   "fields.type.gqlType",
@@ -30,6 +33,11 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "foreignKeyConstraints.refFields.name",
   "foreignKeyConstraints.referencedFields",
   "foreignKeyConstraints.referencedTable",
+  "i18n",
+  "i18n.translatableFields",
+  "i18n.translatableFields.name",
+  "i18n.translatableFields.type",
+  "i18n.translationTable",
   "indexes",
   "indexes.columns",
   "indexes.fields",
@@ -46,6 +54,8 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "query.delete",
   "query.one",
   "query.update",
+  "realtime",
+  "realtime.subscriptionFieldName",
   "relations",
   "relations.belongsTo",
   "relations.belongsTo.fieldName",
@@ -95,6 +105,20 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "relations.manyToMany.rightTable.name",
   "relations.manyToMany.type",
   "schemaName",
+  "search",
+  "search.algorithms",
+  "search.columns",
+  "search.columns.algorithm",
+  "search.columns.name",
+  "search.config",
+  "search.config.boostRecencyDecay",
+  "search.config.boostRecencyField",
+  "search.config.boostRecent",
+  "search.config.weights",
+  "search.hasUnifiedSearch",
+  "storage",
+  "storage.isBucketsTable",
+  "storage.isFilesTable",
   "uniqueConstraints",
   "uniqueConstraints.name",
 ]
@@ -120,6 +144,10 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
           gqlType
           isArray
           subtype
+        }
+        enumValues {
+          name
+          values
         }
       }
       indexes {
@@ -237,6 +265,34 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
           }
         }
       }
+      storage {
+        isFilesTable
+        isBucketsTable
+      }
+      search {
+        algorithms
+        columns {
+          name
+          algorithm
+        }
+        hasUnifiedSearch
+        config {
+          weights
+          boostRecent
+          boostRecencyField
+          boostRecencyDecay
+        }
+      }
+      i18n {
+        translationTable
+        translatableFields {
+          name
+          type
+        }
+      }
+      realtime {
+        subscriptionFieldName
+      }
     }
   }
 }"
@@ -251,6 +307,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "fields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -270,6 +327,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "refFields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -297,6 +355,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "fields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -316,6 +375,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "refFields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -344,6 +404,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -366,6 +427,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "fields": [
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": true,
         "isNotNull": true,
@@ -382,6 +444,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": false,
         "isNotNull": true,
@@ -398,6 +461,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": true,
         "isForeignKey": false,
         "isNotNull": true,
@@ -414,6 +478,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": true,
         "isNotNull": true,
@@ -434,6 +499,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -453,6 +519,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "refFields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -480,6 +547,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -499,6 +567,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "refFields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -523,6 +592,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "referencedTable": "post",
       },
     ],
+    "i18n": null,
     "indexes": [
       {
         "columns": [
@@ -531,6 +601,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -571,6 +642,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -596,6 +668,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "one": "comment",
       "update": "updatecomment",
     },
+    "realtime": null,
     "relations": {
       "belongsTo": [
         {
@@ -604,6 +677,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -630,6 +704,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -657,6 +732,8 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "search": null,
+    "storage": null,
     "uniqueConstraints": [],
   },
   {
@@ -666,6 +743,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "fields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -685,6 +763,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "refFields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -713,6 +792,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -735,6 +815,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "fields": [
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": true,
         "isNotNull": true,
@@ -751,6 +832,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": true,
         "isForeignKey": false,
         "isNotNull": true,
@@ -767,6 +849,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": false,
         "isNotNull": false,
@@ -783,6 +866,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": false,
         "isNotNull": true,
@@ -803,6 +887,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -822,6 +907,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "refFields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -846,6 +932,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "referencedTable": "user",
       },
     ],
+    "i18n": null,
     "indexes": [
       {
         "columns": [
@@ -854,6 +941,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -894,6 +982,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -919,6 +1008,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "one": "post",
       "update": "updatepost",
     },
+    "realtime": null,
     "relations": {
       "belongsTo": [
         {
@@ -927,6 +1017,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -955,6 +1046,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -981,6 +1073,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1009,6 +1102,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1035,6 +1129,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1064,6 +1159,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "fields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": false,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -1083,6 +1179,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "refFields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": true,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -1109,6 +1206,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionLeftKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1128,6 +1226,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "fields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": false,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -1147,6 +1246,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "refFields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": true,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -1173,6 +1273,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionRightKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1194,6 +1295,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "leftKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1212,6 +1314,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "rightKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1235,6 +1338,8 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       ],
     },
     "schemaName": "app_public",
+    "search": null,
+    "storage": null,
     "uniqueConstraints": [],
   },
   {
@@ -1244,6 +1349,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "fields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1263,6 +1369,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "refFields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1290,6 +1397,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "fields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1309,6 +1417,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "refFields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1337,6 +1446,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1353,6 +1463,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1375,6 +1486,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "fields": [
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": true,
         "isNotNull": true,
@@ -1391,6 +1503,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": true,
         "isNotNull": true,
@@ -1411,6 +1524,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1430,6 +1544,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "refFields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1457,6 +1572,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1476,6 +1592,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "refFields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1500,6 +1617,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "referencedTable": "tag",
       },
     ],
+    "i18n": null,
     "indexes": [
       {
         "columns": [
@@ -1509,6 +1627,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1525,6 +1644,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1565,6 +1685,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1581,6 +1702,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1606,6 +1728,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "one": "post_tag",
       "update": "updatepost_tag",
     },
+    "realtime": null,
     "relations": {
       "belongsTo": [
         {
@@ -1614,6 +1737,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1640,6 +1764,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1667,6 +1792,8 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "search": null,
+    "storage": null,
     "uniqueConstraints": [],
   },
   {
@@ -1676,6 +1803,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1698,6 +1826,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "fields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1720,6 +1849,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "fields": [
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": true,
         "isForeignKey": false,
         "isNotNull": true,
@@ -1736,6 +1866,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": false,
         "isNotNull": true,
@@ -1752,6 +1883,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
     ],
     "foreignKeyConstraints": [],
+    "i18n": null,
     "indexes": [
       {
         "columns": [
@@ -1760,6 +1892,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1786,6 +1919,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1826,6 +1960,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -1851,6 +1986,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "one": "tag",
       "update": "updatetag",
     },
+    "realtime": null,
     "relations": {
       "belongsTo": [],
       "has": [
@@ -1860,6 +1996,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1888,6 +2025,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1917,6 +2055,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "fields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": false,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -1936,6 +2075,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "refFields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": true,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -1962,6 +2102,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionLeftKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -1981,6 +2122,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "fields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": false,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -2000,6 +2142,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "refFields": [
               {
                 "description": null,
+                "enumValues": null,
                 "hasDefault": true,
                 "isForeignKey": false,
                 "isNotNull": true,
@@ -2026,6 +2169,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionRightKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2047,6 +2191,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "leftKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2065,6 +2210,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "rightKeyAttributes": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2088,11 +2234,14 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       ],
     },
     "schemaName": "app_public",
+    "search": null,
+    "storage": null,
     "uniqueConstraints": [
       {
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -2119,6 +2268,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -2141,6 +2291,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "fields": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": false,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2163,6 +2314,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     "fields": [
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": false,
         "isNotNull": false,
@@ -2179,6 +2331,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": false,
         "isForeignKey": false,
         "isNotNull": true,
@@ -2195,6 +2348,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
       {
         "description": null,
+        "enumValues": null,
         "hasDefault": true,
         "isForeignKey": false,
         "isNotNull": true,
@@ -2211,6 +2365,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       },
     ],
     "foreignKeyConstraints": [],
+    "i18n": null,
     "indexes": [
       {
         "columns": [
@@ -2219,6 +2374,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,
@@ -2245,6 +2401,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -2285,6 +2442,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": true,
             "isForeignKey": false,
             "isNotNull": true,
@@ -2310,6 +2468,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "one": "user",
       "update": "updateuser",
     },
+    "realtime": null,
     "relations": {
       "belongsTo": [],
       "has": [
@@ -2319,6 +2478,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2345,6 +2505,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2373,6 +2534,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2399,6 +2561,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "keys": [
             {
               "description": null,
+              "enumValues": null,
               "hasDefault": true,
               "isForeignKey": false,
               "isNotNull": true,
@@ -2424,11 +2587,14 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "search": null,
+    "storage": null,
     "uniqueConstraints": [
       {
         "fields": [
           {
             "description": null,
+            "enumValues": null,
             "hasDefault": false,
             "isForeignKey": false,
             "isNotNull": true,

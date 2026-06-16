@@ -152,20 +152,20 @@ create({ ownerId: '<UUID>', status: '<String>', isArchived: '<Boolean>', archive
 ```typescript
 // List all agentMessages
 const { data, isLoading } = useAgentMessagesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true, threadId: true, authorRole: true, model: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } },
 });
 
 // Get one agentMessage
 const { data: item } = useAgentMessageQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, parts: true, threadId: true, authorRole: true, model: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } },
 });
 
 // Create a agentMessage
 const { mutate: create } = useCreateAgentMessageMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>' });
+create({ actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>', agentId: '<UUID>' });
 ```
 
 ### AgentTask
@@ -173,20 +173,20 @@ create({ ownerId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<S
 ```typescript
 // List all agentTasks
 const { data, isLoading } = useAgentTasksQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
 });
 
 // Get one agentTask
 const { data: item } = useAgentTaskQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
 });
 
 // Create a agentTask
 const { mutate: create } = useCreateAgentTaskMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' });
+create({ actorId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' });
 ```
 
 ### AgentPrompt

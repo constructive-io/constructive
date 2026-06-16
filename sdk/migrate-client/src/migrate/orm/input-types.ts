@@ -249,6 +249,7 @@ export interface SqlAction {
   revert?: string | null;
   verify?: string | null;
   createdAt?: string | null;
+  category?: string | null;
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
@@ -288,6 +289,7 @@ export type SqlActionSelect = {
   revert?: boolean;
   verify?: boolean;
   createdAt?: boolean;
+  category?: boolean;
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
@@ -326,6 +328,8 @@ export interface SqlActionFilter {
   verify?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
   /** Filter by the object’s `action` field. */
   action?: StringFilter;
   /** Filter by the object’s `actionId` field. */
@@ -374,6 +378,8 @@ export type SqlActionOrderBy =
   | 'VERIFY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
   | 'ACTION_ASC'
   | 'ACTION_DESC'
   | 'ACTION_ID_ASC'
@@ -413,6 +419,7 @@ export interface CreateSqlActionInput {
     content?: string;
     revert?: string;
     verify?: string;
+    category?: string;
     action?: string;
     actionId?: string;
     actorId?: string;
@@ -427,6 +434,7 @@ export interface SqlActionPatch {
   content?: string | null;
   revert?: string | null;
   verify?: string | null;
+  category?: string | null;
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
@@ -496,6 +504,29 @@ export interface ConstructiveInternalTypeUploadFilter {
   containsAnyKeys?: string[];
   /** Contained by the specified JSON. */
   containedBy?: ConstructiveInternalTypeUpload;
+}
+/** An input for mutations affecting `MigrateFile` */
+export interface MigrateFileInput {
+  id?: string;
+  databaseId?: string;
+  upload?: ConstructiveInternalTypeUpload;
+}
+/** An input for mutations affecting `SqlAction` */
+export interface SqlActionInput {
+  id?: number;
+  name?: string;
+  databaseId?: string;
+  deploy?: string;
+  deps?: string[];
+  payload?: Record<string, unknown>;
+  content?: string;
+  revert?: string;
+  verify?: string;
+  createdAt?: string;
+  category?: string;
+  action?: string;
+  actionId?: string;
+  actorId?: string;
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface ExecuteSqlPayload {

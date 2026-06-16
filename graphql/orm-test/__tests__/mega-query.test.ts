@@ -819,10 +819,10 @@ describe('Mega query integration (ORM)', () => {
       expect(nodes).toHaveLength(4);
 
       for (const node of nodes) {
-        // searchScore is a composite of the individual signals
+        // searchScore is a composite via RRF — 0..1 (rank-1 doc can be exactly 1.0)
         expect(typeof node.searchScore).toBe('number');
         expect(node.searchScore).toBeGreaterThan(0);
-        expect(node.searchScore).toBeLessThan(1);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
 
         // All three individual signals are populated
         expect(node.tsvRank).toBeGreaterThan(0);
@@ -921,10 +921,10 @@ describe('Mega query integration (ORM)', () => {
         expect(typeof node.nameTrgmSimilarity).toBe('number');
         expect(node.nameTrgmSimilarity).toBeGreaterThan(0.2);
 
-        // searchScore \u2014 composite signal combining all active search signals
+        // searchScore \u2014 composite via RRF, 0..1 (rank-1 can be exactly 1.0)
         expect(typeof node.searchScore).toBe('number');
         expect(node.searchScore).toBeGreaterThan(0);
-        expect(node.searchScore).toBeLessThan(1);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
 
         // pgvector embedding (float array)
         expect(Array.isArray(node.embedding)).toBe(true);

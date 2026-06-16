@@ -118,7 +118,7 @@ export class UserModel {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select, args.where.id, args.data, "UpdateUserInput", "id", "userPatch", connectionFieldsMap);
+    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select, args.where.id, args.data, "UpdateUserInput", "id", "userPatch", connectionFieldsMap, undefined);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -273,7 +273,7 @@ exports[`model-generator handles custom query/mutation names 1`] = `
 import { OrmClient } from "../client";
 import { QueryBuilder, buildFindManyDocument, buildFindFirstDocument, buildFindOneDocument, buildCreateDocument, buildUpdateByPkDocument, buildDeleteByPkDocument } from "../query-builder";
 import type { ConnectionResult, FindManyArgs, FindFirstArgs, CreateArgs, UpdateArgs, DeleteArgs, InferSelectResult, StrictSelect } from "../select-types";
-import type { Organization, OrganizationWithRelations, OrganizationSelect, OrganizationFilter, OrganizationsOrderBy, CreateOrganizationInput, UpdateOrganizationInput, OrganizationPatch } from "../input-types";
+import type { Organization, OrganizationWithRelations, OrganizationSelect, OrganizationFilter, OrganizationsOrderBy, CreateOrganizationInput, ModifyOrganizationInput, OrganizationPatch } from "../input-types";
 import { connectionFieldsMap } from "../input-types";
 export class OrganizationModel {
   constructor(private client: OrmClient) {}
@@ -382,7 +382,7 @@ export class OrganizationModel {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select, args.where.id, args.data, "UpdateOrganizationInput", "id", "organizationPatch", connectionFieldsMap);
+    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select, args.where.id, args.data, "ModifyOrganizationInput", "id", "organizationPatch", connectionFieldsMap, undefined);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",

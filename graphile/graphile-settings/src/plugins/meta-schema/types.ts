@@ -10,6 +10,72 @@ export interface TableMeta {
   relations: RelationsMeta;
   inflection: InflectionMeta;
   query: QueryMeta;
+  storage: StorageMeta | null;
+  search: SearchMeta | null;
+  i18n: I18nMeta | null;
+  realtime: RealtimeMeta | null;
+}
+
+export interface StorageMeta {
+  /** Whether this table is tagged as a storage files table */
+  isFilesTable: boolean;
+  /** Whether this table is tagged as a storage buckets table */
+  isBucketsTable: boolean;
+}
+
+export interface SearchColumnMeta {
+  /** Column name (camelCase inflected) */
+  name: string;
+  /** Search algorithm: 'tsvector', 'bm25', 'trgm', 'vector' */
+  algorithm: string;
+}
+
+export interface SearchMeta {
+  /** Which search algorithms are active on this table */
+  algorithms: string[];
+  /** Searchable columns with their algorithm */
+  columns: SearchColumnMeta[];
+  /** Whether unifiedSearch composite filter is available */
+  hasUnifiedSearch: boolean;
+  /** Per-table search config from @searchConfig smart tag */
+  config: SearchConfigMeta | null;
+}
+
+export interface SearchConfigMeta {
+  /** Per-adapter score weights */
+  weights: Record<string, number> | null;
+  /** Whether recency boosting is enabled */
+  boostRecent: boolean;
+  /** Field used for recency decay */
+  boostRecencyField: string | null;
+  /** Exponential decay factor per day */
+  boostRecencyDecay: number | null;
+}
+
+export interface I18nFieldMeta {
+  /** Inflected GraphQL field name */
+  name: string;
+  /** PostgreSQL column type (text, citext) */
+  type: string;
+}
+
+export interface I18nMeta {
+  /** Name of the translation table */
+  translationTable: string;
+  /** Fields that are translatable */
+  translatableFields: I18nFieldMeta[];
+}
+
+export interface RealtimeMeta {
+  /** The generated subscription field name (e.g. onPostChanged) */
+  subscriptionFieldName: string;
+}
+
+export interface EnumMeta {
+  /** The PostgreSQL enum type name */
+  name: string;
+  /** Allowed values for this enum */
+  values: string[];
 }
 
 export interface FieldMeta {
@@ -20,6 +86,7 @@ export interface FieldMeta {
   isPrimaryKey: boolean;
   isForeignKey: boolean;
   description: string | null;
+  enumValues: EnumMeta | null;
 }
 
 export interface TypeMeta {
@@ -228,4 +295,11 @@ export interface MetaBuild extends GqlTypeResolverBuild {
     [key: string]: unknown;
   };
   pgManyToManyRealtionshipsByResource?: Map<unknown, unknown>;
+}
+
+export interface PgCodecExtensions {
+  pg?: {
+    schemaName?: string;
+  };
+  tags?: Record<string, unknown>;
 }

@@ -249,6 +249,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   const mutationHooks = generateAllMutationHooks(tables, {
     reactQueryEnabled,
     useCentralizedKeys,
+    typeRegistry: customOperations?.typeRegistry,
   });
   for (const hook of mutationHooks) {
     files.push({

@@ -115,8 +115,22 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             }
           } = context as any;
 
-          // Only intercept create/update input types for table rows
-          if (!pgCodec?.attributes || (!isPgPatch && !isPgBaseInput && !isMutationInput)) {
+          // Only intercept mutation-related input types for table rows.
+          // PostGraphile v5 sets isPgPatch on update types, isPgBaseInput on
+          // create base types. For tables with `serial PRIMARY KEY`, the create
+          // input type (e.g. ArticleInput) has pgCodec set but none of the
+          // explicit mutation scope flags — detect via type name convention.
+          if (!pgCodec?.attributes) return fields;
+
+          const typeName = context.Self.name;
+          const hasExplicitMutationScope = isPgPatch || isPgBaseInput || isMutationInput;
+          const looksLikeMutationInput = typeName.endsWith('Input') || typeName.endsWith('Patch');
+          const isFilterOrCondition = typeName.endsWith('FilterInput')
+            || typeName.endsWith('Filter')
+            || typeName.endsWith('Condition')
+            || typeName === 'VectorNearbyInput';
+
+          if (!hasExplicitMutationScope && (!looksLikeMutationInput || isFilterOrCondition)) {
             return fields;
           }
 

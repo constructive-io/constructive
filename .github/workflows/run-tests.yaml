@@ -28,6 +28,7 @@ concurrency:
 #   unit-tests        → no services (pure JS/TS)
 #   pg-tests          → PostgreSQL only
 #   integration-tests → PostgreSQL + MinIO
+#   ai-tests          → PostgreSQL + Ollama
 # ---------------------------------------------------------------------------
 
 jobs:
@@ -334,6 +335,84 @@ jobs:
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
+
+      - name: Test ${{ matrix.package }}
+        run: cd ./${{ matrix.package }} && pnpm test
+        env: ${{ matrix.env }}
+
+  # =========================================================================
+  # TIER 4 – AI integration tests (PostgreSQL + Ollama)
+  # =========================================================================
+  ai-tests:
+    needs: build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: graphile/graphile-llm
+            env: {}
+
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: password
+
+    services:
+      pg_db:
+        image: ghcr.io/constructive-io/docker/postgres-plus:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace-build
+
+      - name: Extract workspace
+        run: tar -xzf workspace.tar.gz && rm workspace.tar.gz
+
+      - name: Configure Git (for tests)
+        run: |
+          git config --global user.name "CI Test User"
+          git config --global user.email "ci@example.com"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Seed app_user
+        run: |
+          pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
+          pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
+
+      - name: Install Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve &
+          sleep 3
+          ollama pull nomic-embed-text
 
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test

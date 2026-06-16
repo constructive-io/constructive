@@ -160,10 +160,22 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'signInCrossOrigin', identifier] as const)
       : (['mutation', 'signInCrossOrigin'] as const),
+  /** Mutation key for signInSmsOtp */ signInSmsOtp: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'signInSmsOtp', identifier] as const)
+      : (['mutation', 'signInSmsOtp'] as const),
+  /** Mutation key for signUpSms */ signUpSms: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'signUpSms', identifier] as const)
+      : (['mutation', 'signUpSms'] as const),
   /** Mutation key for signUp */ signUp: (identifier?: string) =>
     identifier ? (['mutation', 'signUp', identifier] as const) : (['mutation', 'signUp'] as const),
   /** Mutation key for signIn */ signIn: (identifier?: string) =>
     identifier ? (['mutation', 'signIn', identifier] as const) : (['mutation', 'signIn'] as const),
+  /** Mutation key for linkIdentity */ linkIdentity: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'linkIdentity', identifier] as const)
+      : (['mutation', 'linkIdentity'] as const),
   /** Mutation key for extendTokenExpires */ extendTokenExpires: (identifier?: string) =>
     identifier
       ? (['mutation', 'extendTokenExpires', identifier] as const)

@@ -6,6 +6,10 @@ import { createUploadAuthenticateMiddleware } from '../upload';
 
 jest.mock('pg-cache', () => ({
   getPgPool: jest.fn(),
+  pgCache: {
+    registerCleanupCallback: jest.fn(() => jest.fn()),
+    close: jest.fn(),
+  },
 }));
 
 jest.mock('pg-query-context', () => jest.fn());

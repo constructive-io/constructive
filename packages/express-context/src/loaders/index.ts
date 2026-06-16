@@ -53,6 +53,7 @@ export { agentChatLoader } from './agent-chat';
 export { userAuthModuleLoader } from './user-auth-module';
 export { identityProvidersLoader } from './identity-providers';
 export { connectedAccountsModuleLoader } from './connected-accounts-module';
+export { llmLoader } from './llm';
 
 /**
  * Convenience: create a registry pre-loaded with all built-in loaders.
@@ -70,6 +71,7 @@ import { agentChatLoader } from './agent-chat';
 import { userAuthModuleLoader } from './user-auth-module';
 import { identityProvidersLoader } from './identity-providers';
 import { connectedAccountsModuleLoader } from './connected-accounts-module';
+import { llmLoader } from './llm';
 
 export function createDefaultRegistry() {
   const registry = createLoaderRegistry();
@@ -85,5 +87,6 @@ export function createDefaultRegistry() {
   registry.register(userAuthModuleLoader);
   registry.register(identityProvidersLoader);
   registry.register(connectedAccountsModuleLoader);
+  registry.register(llmLoader);
   return registry;
 }

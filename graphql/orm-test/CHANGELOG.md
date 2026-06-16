@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.14](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.16.13...graphql-orm-test@0.16.14) (2026-06-14)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.16.13](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.16.12...graphql-orm-test@0.16.13) (2026-06-14)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.16.12](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.16.11...graphql-orm-test@0.16.12) (2026-06-14)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.16.11](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.16.10...graphql-orm-test@0.16.11) (2026-06-14)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.16.10](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.16.9...graphql-orm-test@0.16.10) (2026-06-12)
+
+### Bug Fixes
+
+- **orm-test:** update searchScore assertions for RRF (allows 1.0) ([0b8f6ce](https://github.com/constructive-io/constructive/commit/0b8f6ce34414ab4eebb04a71e00a59011ebd326d))
+- restore ROW_NUMBER() for per-adapter RRF + VACUUM BM25 index in seed ([589ec10](https://github.com/constructive-io/constructive/commit/589ec10cb2d7ae281ab011eb99eb38548dd069c6))
+- update BM25 seed comment to reference pg_textsearch instead of ParadeDB ([f8c9a1c](https://github.com/constructive-io/constructive/commit/f8c9a1cfbd95aa3284e90ad0d164cfe7b74e770d))
+
 ## [0.16.9](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.16.8...graphql-orm-test@0.16.9) (2026-06-11)
 
 **Note:** Version bump only for package graphql-orm-test

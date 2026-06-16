@@ -2,6 +2,8 @@ import OllamaClient from '@agentic-kit/ollama';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { createPgvectorAdapter } from 'graphile-search/adapters/pgvector';
+import { createTsvectorAdapter } from 'graphile-search/adapters/tsvector';
+import { TsvectorCodecPlugin } from 'graphile-search/codecs/tsvector-codec';
 import { VectorCodecPlugin } from 'graphile-search/codecs/vector-codec';
 import { createUnifiedSearchPlugin } from 'graphile-search/plugin';
 import type { GraphQLResponse } from 'graphile-test';
@@ -22,8 +24,8 @@ import {
 import { createLlmModulePlugin } from '../../src/plugins/llm-module-plugin';
 import { createLlmRagPlugin } from '../../src/plugins/rag-plugin';
 import { createLlmTextMutationPlugin } from '../../src/plugins/text-mutation-plugin';
-import { createLlmTextSearchPlugin } from '../../src/plugins/text-search-plugin';
-import type { LlmModuleData } from '../../src/types';
+import { createLlmTextSearchPlugin, embedTextInWhere } from '../../src/plugins/text-search-plugin';
+import type { EmbedderFunction, LlmModuleData } from '../../src/types';
 
 // ─── @agentic-kit/ollama client ─────────────────────────────────────────────
 
@@ -256,12 +258,12 @@ describe('graphile-llm schema enrichment', () => {
   // ─── Mutation text companion fields ──────────────────────────────────────
 
   describe('Mutation text companion fields', () => {
-    it('adds embeddingText field to CreateArticleInput', async () => {
+    it('adds embeddingText field to ArticleInput (create input)', async () => {
       const result = await query<{
         __type: { inputFields: Array<{ name: string; type: { name: string } }> };
       }>(`
         query {
-          __type(name: "CreateArticleInput") {
+          __type(name: "ArticleInput") {
             inputFields {
               name
               type { name }
@@ -275,9 +277,7 @@ describe('graphile-llm schema enrichment', () => {
       expect(inputType).toBeDefined();
 
       const fieldNames = inputType!.inputFields.map((f) => f.name);
-      // Original embedding field
       expect(fieldNames).toContain('embedding');
-      // Companion text field from LlmTextMutationPlugin
       expect(fieldNames).toContain('embeddingText');
 
       const textField = inputType!.inputFields.find(
@@ -538,13 +538,17 @@ function makeTestSmartTagsPlugin(
   return {
     name: 'TestSmartTagsPlugin',
     version: '1.0.0',
+    before: ['LlmRagPlugin'],
 
     schema: {
       hooks: {
-        init: {
-          before: ['UnifiedSearchPlugin', 'LlmRagPlugin'],
-          callback(_, build) {
-            for (const codec of Object.values(build.input.pgRegistry.pgCodecs)) {
+        build: {
+          before: ['LlmRagPlugin'],
+          callback(build) {
+            const pgRegistry = build.input?.pgRegistry ?? (build as any).pgRegistry;
+            if (!pgRegistry) return build;
+
+            for (const codec of Object.values(pgRegistry.pgCodecs || {})) {
               const c = codec as any;
               if (!c.attributes || !c.name) continue;
 
@@ -556,7 +560,7 @@ function makeTestSmartTagsPlugin(
 
               Object.assign(c.extensions.tags, tags);
             }
-            return _;
+            return build;
           }
         }
       }
@@ -603,31 +607,11 @@ describe('RAG plugin schema enrichment', () => {
       };
     };
 
-    const testPreset = {
-      extends: [ConnectionFilterPreset()],
-      plugins: [
-        VectorCodecPlugin,
-        unifiedPlugin,
-        smartTagsPlugin,
-        createLlmModulePlugin({
-          defaultEmbedder: {
-            provider: 'ollama',
-            model: 'nomic-embed-text',
-            baseUrl: 'http://localhost:11434'
-          }
-        }),
-        createLlmTextSearchPlugin(),
-        createLlmTextMutationPlugin(),
-        createLlmRagPlugin()
-      ]
-    };
-
-    // Override the embedder and chat completer on the build context
-    // by wrapping the LlmModulePlugin's build hook
-    const overridePlugin: GraphileConfig.Plugin = {
-      name: 'TestOverridePlugin',
+    // Provide mock embedder/chat directly instead of using createLlmModulePlugin
+    // to avoid build.extend naming conflicts when overriding
+    const mockLlmPlugin: GraphileConfig.Plugin = {
+      name: 'TestMockLlmPlugin',
       version: '1.0.0',
-      after: ['LlmModulePlugin'],
       schema: {
         hooks: {
           build(build) {
@@ -635,22 +619,34 @@ describe('RAG plugin schema enrichment', () => {
               build,
               {
                 llmEmbedder: mockEmbedder,
-                llmChatCompleter: mockChatCompleter
+                llmChatCompleter: mockChatCompleter,
+                llmEmbeddingModel: 'test-mock-model',
+                llmChatModel: 'test-mock-chat'
               },
-              'TestOverridePlugin overriding embedder and chat completer'
+              'TestMockLlmPlugin providing mock embedder and chat completer'
             );
           }
         }
       }
     };
 
+    const testPreset = {
+      extends: [ConnectionFilterPreset()],
+      plugins: [
+        VectorCodecPlugin,
+        unifiedPlugin,
+        smartTagsPlugin,
+        mockLlmPlugin,
+        createLlmTextSearchPlugin(),
+        createLlmTextMutationPlugin(),
+        createLlmRagPlugin()
+      ]
+    };
+
     const connections = await getConnections(
       {
         schemas: ['llm_test'],
-        preset: {
-          ...testPreset,
-          plugins: [...testPreset.plugins, overridePlugin]
-        },
+        preset: testPreset,
         useRoot: true,
         authRole: 'postgres'
       },
@@ -882,5 +878,352 @@ describe('GraphileLlmPreset toggles', () => {
     expect(pluginNames).toContain('LlmTextSearchPlugin');
     expect(pluginNames).toContain('LlmTextMutationPlugin');
     expect(pluginNames).not.toContain('LlmRagPlugin');
+  });
+});
+
+// =============================================================================
+// Suite 7: Real Ollama + unifiedSearch + pgvector RRF integration
+//
+// End-to-end: embeds article text with real Ollama nomic-embed-text (768 dims),
+// seeds the DB, then runs hybrid text+vector queries verifying RRF fusion,
+// semantic relevance, and the embedTextInWhere pipeline.
+//
+// Requires: PostgreSQL with pgvector + Ollama with nomic-embed-text.
+// =============================================================================
+
+const INTEGRATION_ARTICLES = [
+  { id: 1, title: 'Introduction to Machine Learning', body: 'Machine learning is a subset of artificial intelligence that focuses on algorithms and statistical models.' },
+  { id: 2, title: 'Cooking Italian Pasta', body: 'The best Italian pasta is made with fresh ingredients like San Marzano tomatoes and homemade egg noodles.' },
+  { id: 3, title: 'Deep Learning with Neural Networks', body: 'Deep learning uses neural networks with multiple layers to learn hierarchical representations of data.' },
+  { id: 4, title: 'Gardening Tips for Spring', body: 'Start your spring garden by preparing soil, choosing the right seeds, and ensuring proper sunlight and watering.' },
+  { id: 5, title: 'Natural Language Processing', body: 'NLP combines computational linguistics with machine learning to enable computers to understand human language.' },
+];
+
+const INTEGRATION_SETUP_SQL = `
+  CREATE EXTENSION IF NOT EXISTS vector;
+  CREATE SCHEMA IF NOT EXISTS llm_integration;
+
+  CREATE TABLE llm_integration.articles (
+    id serial PRIMARY KEY,
+    title text NOT NULL,
+    body text NOT NULL,
+    tsv tsvector GENERATED ALWAYS AS (
+      setweight(to_tsvector('english', title), 'A') ||
+      setweight(to_tsvector('english', body), 'B')
+    ) STORED,
+    embedding vector(768) NOT NULL
+  );
+
+  CREATE INDEX idx_int_articles_tsv ON llm_integration.articles USING gin(tsv);
+  CREATE INDEX idx_int_articles_embedding ON llm_integration.articles
+    USING hnsw(embedding vector_cosine_ops);
+`;
+
+describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
+  let db: PgTestClient;
+  let teardown: () => Promise<void>;
+  let query: QueryFn;
+  let embedder: EmbedderFunction;
+  // Pre-computed query vectors (embedded once in beforeAll)
+  let mlQueryVector: number[];
+  let cookingQueryVector: number[];
+
+  beforeAll(async () => {
+    // Build a real Ollama embedder
+    const built = buildEmbedder({
+      provider: 'ollama',
+      model: 'nomic-embed-text',
+      baseUrl: 'http://localhost:11434',
+    });
+    if (!built) throw new Error('Failed to build Ollama embedder');
+    embedder = built;
+
+    await ensureNomicModel();
+
+    // Embed all article bodies in parallel
+    const embeddings = await Promise.all(
+      INTEGRATION_ARTICLES.map((a) => embedder(`${a.title}. ${a.body}`))
+    );
+
+    // Build seed SQL with real 768-dim embeddings
+    const values = INTEGRATION_ARTICLES.map((a, i) => {
+      const vecStr = `'[${embeddings[i].embedding.join(',')}]'`;
+      const titleEsc = a.title.replace(/'/g, "''");
+      const bodyEsc = a.body.replace(/'/g, "''");
+      return `(${a.id}, '${titleEsc}', '${bodyEsc}', ${vecStr})`;
+    }).join(',\n  ');
+
+    const seedSql = `
+      INSERT INTO llm_integration.articles (id, title, body, embedding)
+      VALUES ${values};
+      SELECT setval('llm_integration.articles_id_seq', ${INTEGRATION_ARTICLES.length});
+    `;
+
+    // Pre-compute search query vectors
+    const [mlResult, cookResult] = await Promise.all([
+      embedder('machine learning artificial intelligence algorithms'),
+      embedder('Italian cooking pasta recipes tomatoes'),
+    ]);
+    mlQueryVector = mlResult.embedding;
+    cookingQueryVector = cookResult.embedding;
+
+    // Set up PostGraphile with tsvector + pgvector adapters + LLM plugin
+    const unifiedPlugin = createUnifiedSearchPlugin({
+      adapters: [
+        createTsvectorAdapter(),
+        createPgvectorAdapter(),
+      ],
+      enableSearchScore: true,
+      enableUnifiedSearch: true,
+      rrfK: 60,
+    });
+
+    const testPreset = {
+      extends: [ConnectionFilterPreset()],
+      plugins: [
+        TsvectorCodecPlugin,
+        VectorCodecPlugin,
+        unifiedPlugin,
+        createLlmModulePlugin({
+          defaultEmbedder: {
+            provider: 'ollama',
+            model: 'nomic-embed-text',
+            baseUrl: 'http://localhost:11434',
+          },
+        }),
+        createLlmTextSearchPlugin(),
+      ],
+    };
+
+    const connections = await getConnections({
+      schemas: ['llm_integration'],
+      preset: testPreset,
+      useRoot: true,
+      authRole: 'postgres',
+    }, [
+      seed.fn(async (ctx) => {
+        await ctx.pg.query(INTEGRATION_SETUP_SQL);
+        await ctx.pg.query(seedSql);
+      }),
+    ]);
+
+    db = connections.db;
+    teardown = connections.teardown;
+    query = connections.query;
+
+    await db.client.query('BEGIN');
+  }, 120_000);
+
+  afterAll(async () => {
+    if (db) {
+      try { await db.client.query('ROLLBACK'); } catch {}
+    }
+    if (teardown) await teardown();
+  });
+
+  beforeEach(async () => { await db.beforeEach(); });
+  afterEach(async () => { await db.afterEach(); });
+
+  // ─── embedTextInWhere with real Ollama ──────────────────────────────────
+
+  it('embedTextInWhere transforms unifiedSearch with real 768-dim Ollama vector', async () => {
+    const realEmbedder = async (text: string) => {
+      const result = await embedder(text);
+      return result.embedding;
+    };
+
+    const where: any = { unifiedSearch: 'machine learning algorithms' };
+    await embedTextInWhere(where, realEmbedder, true);
+
+    expect(where.unifiedSearch).toHaveProperty('__text', 'machine learning algorithms');
+    expect(where.unifiedSearch).toHaveProperty('__vector');
+    expect(Array.isArray(where.unifiedSearch.__vector)).toBe(true);
+    expect(where.unifiedSearch.__vector.length).toBe(768);
+
+    for (const v of where.unifiedSearch.__vector) {
+      expect(typeof v).toBe('number');
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  }, 30_000);
+
+  // ─── unifiedSearch text-only (no vector injection) ─────────────────────
+
+  it('unifiedSearch text-only uses tsvector without pgvector', async () => {
+    const result = await query<{
+      allArticles: { nodes: Array<{ rowId: number; title: string; tsvRank: number | null; embeddingVectorDistance: number | null; searchScore: number }> };
+    }>(`
+      query {
+        allArticles(where: { unifiedSearch: "machine learning" }) {
+          nodes { rowId title tsvRank embeddingVectorDistance searchScore }
+        }
+      }
+    `);
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.allArticles?.nodes ?? [];
+    expect(nodes.length).toBeGreaterThan(0);
+
+    // tsvector should be active
+    const hasTsv = nodes.some((n) => n.tsvRank !== null);
+    expect(hasTsv).toBe(true);
+
+    // pgvector should NOT participate (no vector injection in graphile-test)
+    for (const node of nodes) {
+      expect(node.embeddingVectorDistance).toBeNull();
+    }
+  });
+
+  // ─── unifiedSearch + real pgvector: hybrid RRF ─────────────────────────
+
+  it('unifiedSearch + real vector embedding fuses tsvector + pgvector via RRF', async () => {
+    const vecStr = `[${mlQueryVector.join(',')}]`;
+    const result = await query<{
+      allArticles: { nodes: Array<{ rowId: number; title: string; tsvRank: number | null; embeddingVectorDistance: number | null; searchScore: number }> };
+    }>(`
+      query($vec: [Float!]!) {
+        allArticles(where: {
+          unifiedSearch: "machine learning"
+          vectorEmbedding: { vector: $vec, metric: COSINE }
+        }) {
+          nodes { rowId title tsvRank embeddingVectorDistance searchScore }
+        }
+      }
+    `, { vec: mlQueryVector });
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.allArticles?.nodes ?? [];
+    expect(nodes.length).toBeGreaterThan(0);
+
+    // Both adapters should be active
+    const hasTsv = nodes.some((n) => n.tsvRank !== null);
+    const hasVector = nodes.some((n) => n.embeddingVectorDistance !== null);
+    expect(hasTsv).toBe(true);
+    expect(hasVector).toBe(true);
+
+    // searchScore must be normalized [0,1]
+    for (const node of nodes) {
+      expect(node.searchScore).toBeGreaterThanOrEqual(0);
+      expect(node.searchScore).toBeLessThanOrEqual(1);
+    }
+  });
+
+  // ─── Semantic relevance with real embeddings ───────────────────────────
+
+  it('ML query ranks ML articles higher than cooking/gardening with real embeddings', async () => {
+    const result = await query<{
+      allArticles: { nodes: Array<{ rowId: number; title: string; searchScore: number }> };
+    }>(`
+      query($vec: [Float!]!) {
+        allArticles(where: {
+          unifiedSearch: "machine learning"
+          vectorEmbedding: { vector: $vec, metric: COSINE }
+        }) {
+          nodes { rowId title searchScore }
+        }
+      }
+    `, { vec: mlQueryVector });
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.allArticles?.nodes ?? [];
+
+    // ML-related articles (1, 3, 5) should score higher than non-ML (2, 4)
+    const mlArticles = nodes.filter((n) => [1, 3, 5].includes(n.rowId));
+    const nonMlArticles = nodes.filter((n) => [2, 4].includes(n.rowId));
+
+    if (mlArticles.length > 0 && nonMlArticles.length > 0) {
+      const bestMlScore = Math.max(...mlArticles.map((n) => n.searchScore));
+      const bestNonMlScore = Math.max(...nonMlArticles.map((n) => n.searchScore));
+      expect(bestMlScore).toBeGreaterThan(bestNonMlScore);
+    }
+  });
+
+  it('cooking query ranks cooking article higher than ML articles with real embeddings', async () => {
+    const result = await query<{
+      allArticles: { nodes: Array<{ rowId: number; title: string; searchScore: number }> };
+    }>(`
+      query($vec: [Float!]!) {
+        allArticles(where: {
+          unifiedSearch: "Italian pasta cooking"
+          vectorEmbedding: { vector: $vec, metric: COSINE }
+        }) {
+          nodes { rowId title searchScore }
+        }
+      }
+    `, { vec: cookingQueryVector });
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.allArticles?.nodes ?? [];
+
+    // Cooking article (id=2) should rank highest
+    const cookingArticle = nodes.find((n) => n.rowId === 2);
+    const otherArticles = nodes.filter((n) => n.rowId !== 2);
+
+    if (cookingArticle && otherArticles.length > 0) {
+      const bestOtherScore = Math.max(...otherArticles.map((n) => n.searchScore));
+      expect(cookingArticle.searchScore).toBeGreaterThan(bestOtherScore);
+    }
+  });
+
+  // ─── Vector-only search with real embeddings ───────────────────────────
+
+  it('VectorNearbyInput with real embedding returns semantically relevant results', async () => {
+    const result = await query<{
+      allArticles: { nodes: Array<{ rowId: number; title: string; embeddingVectorDistance: number }> };
+    }>(`
+      query($vec: [Float!]!) {
+        allArticles(where: {
+          vectorEmbedding: { vector: $vec, metric: COSINE }
+        }) {
+          nodes { rowId title embeddingVectorDistance }
+        }
+      }
+    `, { vec: mlQueryVector });
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.allArticles?.nodes ?? [];
+    expect(nodes.length).toBe(5);
+
+    // Nearest to ML query should be ML articles
+    const sorted = [...nodes].sort((a, b) => a.embeddingVectorDistance - b.embeddingVectorDistance);
+    // Top result should be an ML-related article (1, 3, or 5)
+    expect([1, 3, 5]).toContain(sorted[0].rowId);
+  });
+
+  // ─── RRF boost: text+vector scores higher than text-only ───────────────
+
+  it('hybrid text+vector search scores higher than text-only for relevant docs', async () => {
+    const textOnly = await query<{
+      allArticles: { nodes: Array<{ rowId: number; searchScore: number }> };
+    }>(`
+      query {
+        allArticles(where: { unifiedSearch: "machine learning" }) {
+          nodes { rowId searchScore }
+        }
+      }
+    `);
+
+    const hybrid = await query<{
+      allArticles: { nodes: Array<{ rowId: number; searchScore: number }> };
+    }>(`
+      query($vec: [Float!]!) {
+        allArticles(where: {
+          unifiedSearch: "machine learning"
+          vectorEmbedding: { vector: $vec, metric: COSINE }
+        }) {
+          nodes { rowId searchScore }
+        }
+      }
+    `, { vec: mlQueryVector });
+
+    expect(textOnly.errors).toBeUndefined();
+    expect(hybrid.errors).toBeUndefined();
+
+    const doc1TextOnly = textOnly.data?.allArticles?.nodes?.find((n) => n.rowId === 1);
+    const doc1Hybrid = hybrid.data?.allArticles?.nodes?.find((n) => n.rowId === 1);
+
+    // Doc 1 (ML article) should score at least as high with hybrid
+    if (doc1TextOnly && doc1Hybrid) {
+      expect(doc1Hybrid.searchScore).toBeGreaterThanOrEqual(doc1TextOnly.searchScore);
+    }
   });
 });

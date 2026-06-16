@@ -200,7 +200,7 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
  * When `databaseSettings` are available the flags are forwarded to
  * `createConstructivePreset()` which conditionally includes each
  * plugin preset.  Without settings the default preset is used
- * (everything on except aggregates and LLM).
+ * (everything on except aggregates).
  */
 const buildPreset = (
   pool: import('pg').Pool,

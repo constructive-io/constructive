@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.1](https://github.com/constructive-io/constructive/compare/graphile-llm@0.12.0...graphile-llm@0.12.1) (2026-06-14)
+
+**Note:** Version bump only for package graphile-llm
+
+# [0.12.0](https://github.com/constructive-io/constructive/compare/graphile-llm@0.11.5...graphile-llm@0.12.0) (2026-06-14)
+
+### Bug Fixes
+
+- **graphile-llm:** fix all failing tests — RAG chunk discovery, mutation input detection, text-search scope ([49ead07](https://github.com/constructive-io/constructive/commit/49ead07fe1d863ea1c18bf4cb9446b031bd63188))
+- **graphile-llm:** per-DB config uses same embedder via AsyncLocalStorage — no separate pipeline ([5b7ae42](https://github.com/constructive-io/constructive/commit/5b7ae42d67e56a4b66953b764bb2be212f0930d9))
+
+### Features
+
+- **express-context, agentic-server, graphile-llm:** centralize LLM provider config via express-context loaders ([534b05d](https://github.com/constructive-io/constructive/commit/534b05d507f358fa7b462993f70fec466d8a89f0))
+- **express-context:** add shared BillingClient abstraction ([7f3a1cb](https://github.com/constructive-io/constructive/commit/7f3a1cbf71e2b14017661e48168082863df2f75d)), closes [constructive-io/constructive-planning#1054](https://github.com/constructive-io/constructive-planning/issues/1054)
+- **graphile-llm:** add onQuotaExceeded option to control embedding failure behavior ([a59b08f](https://github.com/constructive-io/constructive/commit/a59b08fd2cae1ce90d783ce277b366e08290294e))
+- **graphile-llm:** auto-embed unifiedSearch text for hybrid vector+keyword search ([dc4a5c1](https://github.com/constructive-io/constructive/commit/dc4a5c1befec668f93586fb94d02303b219e427c)), closes [#1054](https://github.com/constructive-io/constructive/issues/1054)
+- **graphile-settings:** wire GraphileLlmPreset into createConstructivePreset ([517ce84](https://github.com/constructive-io/constructive/commit/517ce845b2363bbdd3b3c8a18792d58117ab2c7c))
+
+## [0.11.5](https://github.com/constructive-io/constructive/compare/graphile-llm@0.11.4...graphile-llm@0.11.5) (2026-06-12)
+
+**Note:** Version bump only for package graphile-llm
+
 ## [0.11.4](https://github.com/constructive-io/constructive/compare/graphile-llm@0.11.3...graphile-llm@0.11.4) (2026-06-07)
 
 **Note:** Version bump only for package graphile-llm

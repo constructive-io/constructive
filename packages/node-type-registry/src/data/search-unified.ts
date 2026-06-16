@@ -201,15 +201,7 @@ export const SearchUnified: NodeTypeDefinition = {
             type: 'object',
             description: 'Per-algorithm weights: {tsv: 1.5, bm25: 1.0, pgvector: 0.8, trgm: 0.3}'
           },
-          normalization: {
-            type: 'string',
-            enum: [
-              'linear',
-              'sigmoid'
-            ],
-            description: 'Score normalization strategy',
-            default: 'linear'
-          },
+
           boost_recent: {
             type: 'boolean',
             description: 'Enable recency boost for search results',

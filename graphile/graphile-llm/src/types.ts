@@ -254,6 +254,20 @@ export interface GraphileLlmOptions {
   enableTextSearch?: boolean;
 
   /**
+   * Controls behavior when the embedder returns null (e.g. billing quota exceeded).
+   *
+   * - `'degrade'` (default): Skip the vector search silently and fall back to
+   *   text-only adapters (tsvector, BM25, trgm). If no text adapters are
+   *   available, throws an error regardless of this setting.
+   * - `'throw'`: Always throw an error when the embedder fails, even if
+   *   text adapters could handle the query. Use this when semantic search
+   *   is critical and keyword-only results are unacceptable.
+   *
+   * @default 'degrade'
+   */
+  onQuotaExceeded?: 'degrade' | 'throw';
+
+  /**
    * Whether to add `*Text` companion fields on mutation inputs for vector columns.
    * @default true
    */

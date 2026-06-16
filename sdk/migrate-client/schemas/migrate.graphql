@@ -284,6 +284,7 @@ type SqlAction {
   revert: String
   verify: String
   createdAt: Datetime
+  category: String
   action: String
   actionId: UUID
   actorId: UUID
@@ -342,6 +343,9 @@ input SqlActionFilter {
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
+
+  """Filter by the object’s `category` field."""
+  category: StringFilter
 
   """Filter by the object’s `action` field."""
   action: StringFilter
@@ -666,6 +670,8 @@ enum SqlActionOrderBy {
   VERIFY_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  CATEGORY_ASC
+  CATEGORY_DESC
   ACTION_ASC
   ACTION_DESC
   ACTION_ID_ASC
@@ -1042,6 +1048,7 @@ input SqlActionInput {
   revert: String
   verify: String
   createdAt: Datetime
+  category: String
   action: String
   actionId: UUID
   actorId: UUID
@@ -1152,6 +1159,7 @@ input SqlActionPatch {
   revert: String
   verify: String
   createdAt: Datetime
+  category: String
   action: String
   actionId: UUID
   actorId: UUID

@@ -95,7 +95,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   });
 
   // 2. Generate model files
-  const modelFiles = generateAllModelFiles(tables, useSharedTypes);
+  const modelFiles = generateAllModelFiles(tables, useSharedTypes, typeRegistry);
   for (const modelFile of modelFiles) {
     files.push({
       path: `models/${modelFile.fileName}`,

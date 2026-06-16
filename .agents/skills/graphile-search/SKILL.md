@@ -78,13 +78,16 @@ UnifiedSearchPreset({
   enableSearchScore: true,           // expose searchScore (0..1) on search-enabled tables
   enableUnifiedSearch: true,          // expose unifiedSearch composite filter
 
-  // Weights for composite searchScore
+  // Weights for composite searchScore (used in weighted RRF contributions)
   searchScoreWeights: {
     tsv: 0.3,
     bm25: 0.4,
     trgm: 0.2,
     vector: 0.1,
   },
+
+  // RRF smoothing constant (higher = more democratic across ranks, default 60)
+  rrfK: 60,
 
   // Scalar naming
   fullTextScalarName: 'FullText',    // GraphQL scalar name for tsvector columns
@@ -116,7 +119,7 @@ type Article {
 }
 ```
 
-Computed by normalizing all active search signals to 0..1 and averaging them. Returns `null` when no search filters are active.
+Computed via **Reciprocal Rank Fusion (RRF)**: each active adapter ranks its results independently, then `searchScore = Σ(weight_i / (rrfK + rank_i)) / max_possible`. Returns `null` when no search filters are active. Always in [0, 1] with 1.0 = ranked #1 by every active adapter.
 
 ### Per-Adapter Filter Fields (on connection filters)
 
@@ -224,9 +227,9 @@ After running `cnc codegen`, the generated SDK client exposes search filters, sc
 - **Chunk-aware search** — `includeChunks` toggle for RAG tables with `@hasChunks`, transparent parent + chunk distance
 - **Multi-strategy patterns** — fuzzy fallback, autocomplete pipeline, semantic + keyword hybrid
 
-## Score Semantics
+## Score Semantics & RRF Fusion
 
-Each adapter declares how its scores behave for normalization in `searchScore`:
+Each adapter declares how its scores behave:
 
 | Adapter | Metric | Lower is Better? | Range |
 |---------|--------|-------------------|-------|
@@ -235,7 +238,17 @@ Each adapter declares how its scores behave for normalization in `searchScore`:
 | trgm | `similarity` | No (higher = better) | [0, 1] |
 | pgvector | `distance` | Yes (closer = better) | Unbounded |
 
-Bounded ranges use linear normalization. Unbounded ranges use sigmoid normalization (`1 / (1 + |score|)`).
+**Composite `searchScore` uses Reciprocal Rank Fusion (RRF)** — not score normalization. Each adapter's results are ranked by `ROW_NUMBER()` window functions in SQL, and the composite score is:
+
+```
+searchScore = Σ(weight_i / (rrfK + rank_i)) / Σ(weight_i / (rrfK + 1))
+```
+
+This avoids the problem of BM25/pgvector producing unbounded scores that can't be meaningfully normalized. RRF only uses rank positions, making cross-algorithm fusion fair regardless of score scale.
+
+- `rrfK` (default 60) controls how much top-ranked items dominate. Lower values amplify rank-1 advantage.
+- `weights` from `@searchConfig` scale each adapter's RRF contribution (weighted RRF).
+- `boost_recent` / `boost_recency_decay` apply exponential decay as a post-RRF multiplier.
 
 ## Common Pitfalls
 

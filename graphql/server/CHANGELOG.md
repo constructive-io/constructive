@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.36.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.36.0...@constructive-io/graphql-server@4.36.1) (2026-06-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.36.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.35.6...@constructive-io/graphql-server@4.36.0) (2026-06-14)
+
+### Bug Fixes
+
+- **graphql/server:** add pgCache to pg-cache mock in upload test ([090a69b](https://github.com/constructive-io/constructive/commit/090a69b5040a714c07de2144b75da7329902d156))
+
+### Features
+
+- **graphile-settings:** wire GraphileLlmPreset into createConstructivePreset ([517ce84](https://github.com/constructive-io/constructive/commit/517ce845b2363bbdd3b3c8a18792d58117ab2c7c))
+
+## [4.35.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.35.5...@constructive-io/graphql-server@4.35.6) (2026-06-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [4.35.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.35.4...@constructive-io/graphql-server@4.35.5) (2026-06-07)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

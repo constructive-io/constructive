@@ -20,6 +20,8 @@ const fieldSchema: FieldSchema = {
   databaseId: 'uuid',
   schemaId: 'uuid',
   privateSchemaId: 'uuid',
+  publicSchemaName: 'string',
+  privateSchemaName: 'string',
   threadTableId: 'uuid',
   messageTableId: 'uuid',
   taskTableId: 'uuid',
@@ -39,6 +41,7 @@ const fieldSchema: FieldSchema = {
   hasPlans: 'boolean',
   hasResources: 'boolean',
   hasAgents: 'boolean',
+  shared: 'boolean',
   apiName: 'string',
   privateApiName: 'string',
   scope: 'string',
@@ -47,6 +50,7 @@ const fieldSchema: FieldSchema = {
   policies: 'json',
   resources: 'json',
   provisions: 'json',
+  defaultPermissions: 'string',
 };
 const usage =
   '\nagent-module <command>\n\nCommands:\n  list                  List agentModule records\n  find-first            Find first matching agentModule record\n  get                   Get a agentModule by ID\n  create                Create a new agentModule\n  update                Update an existing agentModule\n  delete                Delete a agentModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -103,6 +107,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       databaseId: true,
       schemaId: true,
       privateSchemaId: true,
+      publicSchemaName: true,
+      privateSchemaName: true,
       threadTableId: true,
       messageTableId: true,
       taskTableId: true,
@@ -122,6 +128,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       hasPlans: true,
       hasResources: true,
       hasAgents: true,
+      shared: true,
       apiName: true,
       privateApiName: true,
       scope: true,
@@ -130,6 +137,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       policies: true,
       resources: true,
       provisions: true,
+      defaultPermissions: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentModuleSelect, AgentModuleFilter, AgentModuleOrderBy> & {
@@ -154,6 +162,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       databaseId: true,
       schemaId: true,
       privateSchemaId: true,
+      publicSchemaName: true,
+      privateSchemaName: true,
       threadTableId: true,
       messageTableId: true,
       taskTableId: true,
@@ -173,6 +183,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       hasPlans: true,
       hasResources: true,
       hasAgents: true,
+      shared: true,
       apiName: true,
       privateApiName: true,
       scope: true,
@@ -181,6 +192,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       policies: true,
       resources: true,
       provisions: true,
+      defaultPermissions: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentModuleSelect, AgentModuleFilter, AgentModuleOrderBy> & {
@@ -217,6 +229,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           databaseId: true,
           schemaId: true,
           privateSchemaId: true,
+          publicSchemaName: true,
+          privateSchemaName: true,
           threadTableId: true,
           messageTableId: true,
           taskTableId: true,
@@ -236,6 +250,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           hasPlans: true,
           hasResources: true,
           hasAgents: true,
+          shared: true,
           apiName: true,
           privateApiName: true,
           scope: true,
@@ -244,6 +259,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           policies: true,
           resources: true,
           provisions: true,
+          defaultPermissions: true,
         },
       })
       .execute();
@@ -276,6 +292,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'privateSchemaId',
         message: 'privateSchemaId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'publicSchemaName',
+        message: 'publicSchemaName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'privateSchemaName',
+        message: 'privateSchemaName',
         required: false,
         skipPrompt: true,
       },
@@ -413,6 +443,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'shared',
+        message: 'shared',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'apiName',
         message: 'apiName',
@@ -468,6 +505,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -481,6 +525,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: cleanedData.databaseId,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
+          publicSchemaName: cleanedData.publicSchemaName,
+          privateSchemaName: cleanedData.privateSchemaName,
           threadTableId: cleanedData.threadTableId,
           messageTableId: cleanedData.messageTableId,
           taskTableId: cleanedData.taskTableId,
@@ -500,6 +546,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           hasPlans: cleanedData.hasPlans,
           hasResources: cleanedData.hasResources,
           hasAgents: cleanedData.hasAgents,
+          shared: cleanedData.shared,
           apiName: cleanedData.apiName,
           privateApiName: cleanedData.privateApiName,
           scope: cleanedData.scope,
@@ -508,12 +555,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           policies: cleanedData.policies,
           resources: cleanedData.resources,
           provisions: cleanedData.provisions,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
           databaseId: true,
           schemaId: true,
           privateSchemaId: true,
+          publicSchemaName: true,
+          privateSchemaName: true,
           threadTableId: true,
           messageTableId: true,
           taskTableId: true,
@@ -533,6 +583,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           hasPlans: true,
           hasResources: true,
           hasAgents: true,
+          shared: true,
           apiName: true,
           privateApiName: true,
           scope: true,
@@ -541,6 +592,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           policies: true,
           resources: true,
           provisions: true,
+          defaultPermissions: true,
         },
       })
       .execute();
@@ -584,6 +636,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'publicSchemaName',
+        message: 'publicSchemaName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'privateSchemaName',
+        message: 'privateSchemaName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'threadTableId',
         message: 'threadTableId',
         required: false,
@@ -716,6 +782,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'shared',
+        message: 'shared',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'apiName',
         message: 'apiName',
@@ -771,6 +844,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'defaultPermissions',
+        message: 'defaultPermissions',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentModulePatch;
@@ -784,6 +864,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: cleanedData.databaseId,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
+          publicSchemaName: cleanedData.publicSchemaName,
+          privateSchemaName: cleanedData.privateSchemaName,
           threadTableId: cleanedData.threadTableId,
           messageTableId: cleanedData.messageTableId,
           taskTableId: cleanedData.taskTableId,
@@ -803,6 +885,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           hasPlans: cleanedData.hasPlans,
           hasResources: cleanedData.hasResources,
           hasAgents: cleanedData.hasAgents,
+          shared: cleanedData.shared,
           apiName: cleanedData.apiName,
           privateApiName: cleanedData.privateApiName,
           scope: cleanedData.scope,
@@ -811,12 +894,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           policies: cleanedData.policies,
           resources: cleanedData.resources,
           provisions: cleanedData.provisions,
+          defaultPermissions: cleanedData.defaultPermissions,
         },
         select: {
           id: true,
           databaseId: true,
           schemaId: true,
           privateSchemaId: true,
+          publicSchemaName: true,
+          privateSchemaName: true,
           threadTableId: true,
           messageTableId: true,
           taskTableId: true,
@@ -836,6 +922,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           hasPlans: true,
           hasResources: true,
           hasAgents: true,
+          shared: true,
           apiName: true,
           privateApiName: true,
           scope: true,
@@ -844,6 +931,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           policies: true,
           resources: true,
           provisions: true,
+          defaultPermissions: true,
         },
       })
       .execute();

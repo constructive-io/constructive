@@ -32,45 +32,46 @@ import {
   usersModuleKeys,
   webauthnCredentialsModuleKeys,
   cryptoAddressesModuleKeys,
-  identityProvidersModuleKeys,
   denormalizedTableFieldKeys,
+  identityProvidersModuleKeys,
   rlsModuleKeys,
   blueprintKeys,
   blueprintTemplateKeys,
   blueprintConstructionKeys,
   cryptoAuthModuleKeys,
-  rateLimitMetersModuleKeys,
   sessionsModuleKeys,
-  configSecretsModuleKeys,
+  secureTableProvisionKeys,
   merkleStoreModuleKeys,
   graphModuleKeys,
-  secureTableProvisionKeys,
-  invitesModuleKeys,
   databaseProvisionModuleKeys,
-  namespaceModuleKeys,
+  configSecretsModuleKeys,
+  rateLimitMetersModuleKeys,
   realtimeModuleKeys,
   webauthnAuthModuleKeys,
+  functionInvocationModuleKeys,
+  functionModuleKeys,
+  invitesModuleKeys,
+  namespaceModuleKeys,
   computeLogModuleKeys,
   inferenceLogModuleKeys,
   storageLogModuleKeys,
   transferLogModuleKeys,
-  dbUsageModuleKeys,
-  notificationsModuleKeys,
   plansModuleKeys,
-  hierarchyModuleKeys,
-  billingModuleKeys,
   billingProviderModuleKeys,
-  profilesModuleKeys,
+  dbUsageModuleKeys,
+  hierarchyModuleKeys,
   permissionsModuleKeys,
+  notificationsModuleKeys,
+  profilesModuleKeys,
+  billingModuleKeys,
   relationProvisionKeys,
-  functionModuleKeys,
   userAuthModuleKeys,
   agentModuleKeys,
   limitsModuleKeys,
   membershipsModuleKeys,
+  entityTypeProvisionKeys,
   storageModuleKeys,
   eventsModuleKeys,
-  entityTypeProvisionKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -381,23 +382,6 @@ export const invalidate = {
         queryKey: cryptoAddressesModuleKeys.detail(id),
       }),
   },
-  /** Invalidate identityProvidersModule queries */ identityProvidersModule: {
-    /** Invalidate all identityProvidersModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.all,
-      }),
-    /** Invalidate identityProvidersModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.lists(),
-      }),
-    /** Invalidate a specific identityProvidersModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: identityProvidersModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate denormalizedTableField queries */ denormalizedTableField: {
     /** Invalidate all denormalizedTableField queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -413,6 +397,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: denormalizedTableFieldKeys.detail(id),
+      }),
+  },
+  /** Invalidate identityProvidersModule queries */ identityProvidersModule: {
+    /** Invalidate all identityProvidersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.all,
+      }),
+    /** Invalidate identityProvidersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvidersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.detail(id),
       }),
   },
   /** Invalidate rlsModule queries */ rlsModule: {
@@ -500,23 +501,6 @@ export const invalidate = {
         queryKey: cryptoAuthModuleKeys.detail(id),
       }),
   },
-  /** Invalidate rateLimitMetersModule queries */ rateLimitMetersModule: {
-    /** Invalidate all rateLimitMetersModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.all,
-      }),
-    /** Invalidate rateLimitMetersModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.lists(),
-      }),
-    /** Invalidate a specific rateLimitMetersModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: rateLimitMetersModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate sessionsModule queries */ sessionsModule: {
     /** Invalidate all sessionsModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -534,21 +518,21 @@ export const invalidate = {
         queryKey: sessionsModuleKeys.detail(id),
       }),
   },
-  /** Invalidate configSecretsModule queries */ configSecretsModule: {
-    /** Invalidate all configSecretsModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate secureTableProvision queries */ secureTableProvision: {
+    /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsModuleKeys.all,
+        queryKey: secureTableProvisionKeys.all,
       }),
-    /** Invalidate configSecretsModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate secureTableProvision list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsModuleKeys.lists(),
+        queryKey: secureTableProvisionKeys.lists(),
       }),
-    /** Invalidate a specific configSecretsModule */ detail: (
+    /** Invalidate a specific secureTableProvision */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: configSecretsModuleKeys.detail(id),
+        queryKey: secureTableProvisionKeys.detail(id),
       }),
   },
   /** Invalidate merkleStoreModule queries */ merkleStoreModule: {
@@ -585,40 +569,6 @@ export const invalidate = {
         queryKey: graphModuleKeys.detail(id),
       }),
   },
-  /** Invalidate secureTableProvision queries */ secureTableProvision: {
-    /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.all,
-      }),
-    /** Invalidate secureTableProvision list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.lists(),
-      }),
-    /** Invalidate a specific secureTableProvision */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: secureTableProvisionKeys.detail(id),
-      }),
-  },
-  /** Invalidate invitesModule queries */ invitesModule: {
-    /** Invalidate all invitesModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.all,
-      }),
-    /** Invalidate invitesModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.lists(),
-      }),
-    /** Invalidate a specific invitesModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: invitesModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate databaseProvisionModule queries */ databaseProvisionModule: {
     /** Invalidate all databaseProvisionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -636,21 +586,38 @@ export const invalidate = {
         queryKey: databaseProvisionModuleKeys.detail(id),
       }),
   },
-  /** Invalidate namespaceModule queries */ namespaceModule: {
-    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate configSecretsModule queries */ configSecretsModule: {
+    /** Invalidate all configSecretsModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.all,
+        queryKey: configSecretsModuleKeys.all,
       }),
-    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate configSecretsModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.lists(),
+        queryKey: configSecretsModuleKeys.lists(),
       }),
-    /** Invalidate a specific namespaceModule */ detail: (
+    /** Invalidate a specific configSecretsModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.detail(id),
+        queryKey: configSecretsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate rateLimitMetersModule queries */ rateLimitMetersModule: {
+    /** Invalidate all rateLimitMetersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.all,
+      }),
+    /** Invalidate rateLimitMetersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific rateLimitMetersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitMetersModuleKeys.detail(id),
       }),
   },
   /** Invalidate realtimeModule queries */ realtimeModule: {
@@ -685,6 +652,74 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: webauthnAuthModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionInvocationModule queries */ functionInvocationModule: {
+    /** Invalidate all functionInvocationModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationModuleKeys.all,
+      }),
+    /** Invalidate functionInvocationModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationModuleKeys.lists(),
+      }),
+    /** Invalidate a specific functionInvocationModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionModule queries */ functionModule: {
+    /** Invalidate all functionModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionModuleKeys.all,
+      }),
+    /** Invalidate functionModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionModuleKeys.lists(),
+      }),
+    /** Invalidate a specific functionModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate invitesModule queries */ invitesModule: {
+    /** Invalidate all invitesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.all,
+      }),
+    /** Invalidate invitesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific invitesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: invitesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate namespaceModule queries */ namespaceModule: {
+    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.all,
+      }),
+    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.lists(),
+      }),
+    /** Invalidate a specific namespaceModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.detail(id),
       }),
   },
   /** Invalidate computeLogModule queries */ computeLogModule: {
@@ -755,40 +790,6 @@ export const invalidate = {
         queryKey: transferLogModuleKeys.detail(id),
       }),
   },
-  /** Invalidate dbUsageModule queries */ dbUsageModule: {
-    /** Invalidate all dbUsageModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: dbUsageModuleKeys.all,
-      }),
-    /** Invalidate dbUsageModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: dbUsageModuleKeys.lists(),
-      }),
-    /** Invalidate a specific dbUsageModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: dbUsageModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate notificationsModule queries */ notificationsModule: {
-    /** Invalidate all notificationsModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: notificationsModuleKeys.all,
-      }),
-    /** Invalidate notificationsModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: notificationsModuleKeys.lists(),
-      }),
-    /** Invalidate a specific notificationsModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: notificationsModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate plansModule queries */ plansModule: {
     /** Invalidate all plansModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -804,40 +805,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: plansModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate hierarchyModule queries */ hierarchyModule: {
-    /** Invalidate all hierarchyModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: hierarchyModuleKeys.all,
-      }),
-    /** Invalidate hierarchyModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: hierarchyModuleKeys.lists(),
-      }),
-    /** Invalidate a specific hierarchyModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: hierarchyModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate billingModule queries */ billingModule: {
-    /** Invalidate all billingModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.all,
-      }),
-    /** Invalidate billingModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.lists(),
-      }),
-    /** Invalidate a specific billingModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: billingModuleKeys.detail(id),
       }),
   },
   /** Invalidate billingProviderModule queries */ billingProviderModule: {
@@ -857,21 +824,38 @@ export const invalidate = {
         queryKey: billingProviderModuleKeys.detail(id),
       }),
   },
-  /** Invalidate profilesModule queries */ profilesModule: {
-    /** Invalidate all profilesModule queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate dbUsageModule queries */ dbUsageModule: {
+    /** Invalidate all dbUsageModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: profilesModuleKeys.all,
+        queryKey: dbUsageModuleKeys.all,
       }),
-    /** Invalidate profilesModule list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate dbUsageModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: profilesModuleKeys.lists(),
+        queryKey: dbUsageModuleKeys.lists(),
       }),
-    /** Invalidate a specific profilesModule */ detail: (
+    /** Invalidate a specific dbUsageModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: profilesModuleKeys.detail(id),
+        queryKey: dbUsageModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate hierarchyModule queries */ hierarchyModule: {
+    /** Invalidate all hierarchyModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: hierarchyModuleKeys.all,
+      }),
+    /** Invalidate hierarchyModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: hierarchyModuleKeys.lists(),
+      }),
+    /** Invalidate a specific hierarchyModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: hierarchyModuleKeys.detail(id),
       }),
   },
   /** Invalidate permissionsModule queries */ permissionsModule: {
@@ -891,6 +875,57 @@ export const invalidate = {
         queryKey: permissionsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate notificationsModule queries */ notificationsModule: {
+    /** Invalidate all notificationsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.all,
+      }),
+    /** Invalidate notificationsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific notificationsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate profilesModule queries */ profilesModule: {
+    /** Invalidate all profilesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: profilesModuleKeys.all,
+      }),
+    /** Invalidate profilesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: profilesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific profilesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: profilesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate billingModule queries */ billingModule: {
+    /** Invalidate all billingModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: billingModuleKeys.all,
+      }),
+    /** Invalidate billingModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: billingModuleKeys.lists(),
+      }),
+    /** Invalidate a specific billingModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: billingModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate relationProvision queries */ relationProvision: {
     /** Invalidate all relationProvision queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -906,23 +941,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: relationProvisionKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionModule queries */ functionModule: {
-    /** Invalidate all functionModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.all,
-      }),
-    /** Invalidate functionModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.lists(),
-      }),
-    /** Invalidate a specific functionModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionModuleKeys.detail(id),
       }),
   },
   /** Invalidate userAuthModule queries */ userAuthModule: {
@@ -993,6 +1011,23 @@ export const invalidate = {
         queryKey: membershipsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate entityTypeProvision queries */ entityTypeProvision: {
+    /** Invalidate all entityTypeProvision queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.all,
+      }),
+    /** Invalidate entityTypeProvision list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.lists(),
+      }),
+    /** Invalidate a specific entityTypeProvision */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.detail(id),
+      }),
+  },
   /** Invalidate storageModule queries */ storageModule: {
     /** Invalidate all storageModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1025,23 +1060,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: eventsModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate entityTypeProvision queries */ entityTypeProvision: {
-    /** Invalidate all entityTypeProvision queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.all,
-      }),
-    /** Invalidate entityTypeProvision list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.lists(),
-      }),
-    /** Invalidate a specific entityTypeProvision */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: entityTypeProvisionKeys.detail(id),
       }),
   },
 } as const;
@@ -1193,20 +1211,20 @@ export const remove = {
       queryKey: cryptoAddressesModuleKeys.detail(id),
     });
   },
-  /** Remove identityProvidersModule from cache */ identityProvidersModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: identityProvidersModuleKeys.detail(id),
-    });
-  },
   /** Remove denormalizedTableField from cache */ denormalizedTableField: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: denormalizedTableFieldKeys.detail(id),
+    });
+  },
+  /** Remove identityProvidersModule from cache */ identityProvidersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: identityProvidersModuleKeys.detail(id),
     });
   },
   /** Remove rlsModule from cache */ rlsModule: (queryClient: QueryClient, id: string | number) => {
@@ -1243,14 +1261,6 @@ export const remove = {
       queryKey: cryptoAuthModuleKeys.detail(id),
     });
   },
-  /** Remove rateLimitMetersModule from cache */ rateLimitMetersModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: rateLimitMetersModuleKeys.detail(id),
-    });
-  },
   /** Remove sessionsModule from cache */ sessionsModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1259,12 +1269,12 @@ export const remove = {
       queryKey: sessionsModuleKeys.detail(id),
     });
   },
-  /** Remove configSecretsModule from cache */ configSecretsModule: (
+  /** Remove secureTableProvision from cache */ secureTableProvision: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: configSecretsModuleKeys.detail(id),
+      queryKey: secureTableProvisionKeys.detail(id),
     });
   },
   /** Remove merkleStoreModule from cache */ merkleStoreModule: (
@@ -1283,22 +1293,6 @@ export const remove = {
       queryKey: graphModuleKeys.detail(id),
     });
   },
-  /** Remove secureTableProvision from cache */ secureTableProvision: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: secureTableProvisionKeys.detail(id),
-    });
-  },
-  /** Remove invitesModule from cache */ invitesModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: invitesModuleKeys.detail(id),
-    });
-  },
   /** Remove databaseProvisionModule from cache */ databaseProvisionModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1307,12 +1301,20 @@ export const remove = {
       queryKey: databaseProvisionModuleKeys.detail(id),
     });
   },
-  /** Remove namespaceModule from cache */ namespaceModule: (
+  /** Remove configSecretsModule from cache */ configSecretsModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: namespaceModuleKeys.detail(id),
+      queryKey: configSecretsModuleKeys.detail(id),
+    });
+  },
+  /** Remove rateLimitMetersModule from cache */ rateLimitMetersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: rateLimitMetersModuleKeys.detail(id),
     });
   },
   /** Remove realtimeModule from cache */ realtimeModule: (
@@ -1329,6 +1331,38 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: webauthnAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove functionInvocationModule from cache */ functionInvocationModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionInvocationModuleKeys.detail(id),
+    });
+  },
+  /** Remove functionModule from cache */ functionModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionModuleKeys.detail(id),
+    });
+  },
+  /** Remove invitesModule from cache */ invitesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: invitesModuleKeys.detail(id),
+    });
+  },
+  /** Remove namespaceModule from cache */ namespaceModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: namespaceModuleKeys.detail(id),
     });
   },
   /** Remove computeLogModule from cache */ computeLogModule: (
@@ -1363,44 +1397,12 @@ export const remove = {
       queryKey: transferLogModuleKeys.detail(id),
     });
   },
-  /** Remove dbUsageModule from cache */ dbUsageModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: dbUsageModuleKeys.detail(id),
-    });
-  },
-  /** Remove notificationsModule from cache */ notificationsModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: notificationsModuleKeys.detail(id),
-    });
-  },
   /** Remove plansModule from cache */ plansModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: plansModuleKeys.detail(id),
-    });
-  },
-  /** Remove hierarchyModule from cache */ hierarchyModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: hierarchyModuleKeys.detail(id),
-    });
-  },
-  /** Remove billingModule from cache */ billingModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: billingModuleKeys.detail(id),
     });
   },
   /** Remove billingProviderModule from cache */ billingProviderModule: (
@@ -1411,12 +1413,20 @@ export const remove = {
       queryKey: billingProviderModuleKeys.detail(id),
     });
   },
-  /** Remove profilesModule from cache */ profilesModule: (
+  /** Remove dbUsageModule from cache */ dbUsageModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: profilesModuleKeys.detail(id),
+      queryKey: dbUsageModuleKeys.detail(id),
+    });
+  },
+  /** Remove hierarchyModule from cache */ hierarchyModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: hierarchyModuleKeys.detail(id),
     });
   },
   /** Remove permissionsModule from cache */ permissionsModule: (
@@ -1427,20 +1437,36 @@ export const remove = {
       queryKey: permissionsModuleKeys.detail(id),
     });
   },
+  /** Remove notificationsModule from cache */ notificationsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: notificationsModuleKeys.detail(id),
+    });
+  },
+  /** Remove profilesModule from cache */ profilesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: profilesModuleKeys.detail(id),
+    });
+  },
+  /** Remove billingModule from cache */ billingModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: billingModuleKeys.detail(id),
+    });
+  },
   /** Remove relationProvision from cache */ relationProvision: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: relationProvisionKeys.detail(id),
-    });
-  },
-  /** Remove functionModule from cache */ functionModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionModuleKeys.detail(id),
     });
   },
   /** Remove userAuthModule from cache */ userAuthModule: (
@@ -1475,6 +1501,14 @@ export const remove = {
       queryKey: membershipsModuleKeys.detail(id),
     });
   },
+  /** Remove entityTypeProvision from cache */ entityTypeProvision: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: entityTypeProvisionKeys.detail(id),
+    });
+  },
   /** Remove storageModule from cache */ storageModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1489,14 +1523,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: eventsModuleKeys.detail(id),
-    });
-  },
-  /** Remove entityTypeProvision from cache */ entityTypeProvision: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: entityTypeProvisionKeys.detail(id),
     });
   },
 } as const;

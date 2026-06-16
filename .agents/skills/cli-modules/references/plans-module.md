@@ -12,8 +12,8 @@ csdk plans-module list --where.<field>.<op> <value> --orderBy <values>
 csdk plans-module list --limit 10 --after <cursor>
 csdk plans-module find-first --where.<field>.<op> <value>
 csdk plans-module get --id <UUID>
-csdk plans-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--plansTableId <UUID>] [--plansTableName <String>] [--planLimitsTableId <UUID>] [--planLimitsTableName <String>] [--planPricingTableId <UUID>] [--planOverridesTableId <UUID>] [--planMeterLimitsTableId <UUID>] [--planCapsTableId <UUID>] [--applyPlanFunction <String>] [--applyPlanAggregateFunction <String>] [--applyBillingPlanFunction <String>] [--applyPlanCapsFunction <String>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
-csdk plans-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--plansTableId <UUID>] [--plansTableName <String>] [--planLimitsTableId <UUID>] [--planLimitsTableName <String>] [--planPricingTableId <UUID>] [--planOverridesTableId <UUID>] [--planMeterLimitsTableId <UUID>] [--planCapsTableId <UUID>] [--applyPlanFunction <String>] [--applyPlanAggregateFunction <String>] [--applyBillingPlanFunction <String>] [--applyPlanCapsFunction <String>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk plans-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--plansTableId <UUID>] [--plansTableName <String>] [--planLimitsTableId <UUID>] [--planLimitsTableName <String>] [--planPricingTableId <UUID>] [--planOverridesTableId <UUID>] [--planMeterLimitsTableId <UUID>] [--planCapsTableId <UUID>] [--applyPlanFunction <String>] [--applyPlanAggregateFunction <String>] [--applyBillingPlanFunction <String>] [--applyPlanCapsFunction <String>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk plans-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--plansTableId <UUID>] [--plansTableName <String>] [--planLimitsTableId <UUID>] [--planLimitsTableName <String>] [--planPricingTableId <UUID>] [--planOverridesTableId <UUID>] [--planMeterLimitsTableId <UUID>] [--planCapsTableId <UUID>] [--applyPlanFunction <String>] [--applyPlanAggregateFunction <String>] [--applyBillingPlanFunction <String>] [--applyPlanCapsFunction <String>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
 csdk plans-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk plans-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a plansModule
 
 ```bash
-csdk plans-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--plansTableId <UUID>] [--plansTableName <String>] [--planLimitsTableId <UUID>] [--planLimitsTableName <String>] [--planPricingTableId <UUID>] [--planOverridesTableId <UUID>] [--planMeterLimitsTableId <UUID>] [--planCapsTableId <UUID>] [--applyPlanFunction <String>] [--applyPlanAggregateFunction <String>] [--applyBillingPlanFunction <String>] [--applyPlanCapsFunction <String>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk plans-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--plansTableId <UUID>] [--plansTableName <String>] [--planLimitsTableId <UUID>] [--planLimitsTableName <String>] [--planPricingTableId <UUID>] [--planOverridesTableId <UUID>] [--planMeterLimitsTableId <UUID>] [--planCapsTableId <UUID>] [--applyPlanFunction <String>] [--applyPlanAggregateFunction <String>] [--applyBillingPlanFunction <String>] [--applyPlanCapsFunction <String>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
 ```
 
 ### Get a plansModule by id
