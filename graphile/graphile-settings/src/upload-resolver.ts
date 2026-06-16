@@ -21,7 +21,6 @@ import uploadNames from '@constructive-io/upload-names';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { randomBytes } from 'crypto';
-import type { Readable } from 'stream';
 import type {
 	FileUpload,
 	UploadFieldDefinition,
@@ -76,30 +75,6 @@ function getStreamer(): Streamer {
 function generateKey(filename: string): string {
 	const rand = randomBytes(12).toString('hex');
 	return `${rand}-${uploadNames(filename)}`;
-}
-
-/**
- * Streams a file to S3/MinIO storage and returns the URL and metadata.
- *
- * Reusable by both the GraphQL upload resolver and REST /upload endpoint.
- */
-export async function streamToStorage(
-	readStream: Readable,
-	filename: string,
-): Promise<{ url: string; filename: string; mime: string }> {
-	const s3 = getStreamer();
-	const key = generateKey(filename);
-	const result = await s3.upload({
-		readStream,
-		filename,
-		key,
-		bucket: bucketName,
-	});
-	return {
-		url: result.upload.Location,
-		filename,
-		mime: result.contentType,
-	};
 }
 
 /**

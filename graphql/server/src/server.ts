@@ -48,10 +48,6 @@ import { createRequestLogger } from './middleware/observability/request-logger';
 // Auth cookie handling is done via AuthCookiePlugin in grafserv
 import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
-import {
-  createUploadAuthenticateMiddleware,
-  uploadRoute,
-} from './middleware/upload';
 import { createLlmApiRouter } from './middleware/llm-api';
 import {
   createContextMiddleware,
@@ -112,8 +108,6 @@ class Server {
     const app = express();
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
-    const uploadAuthenticate =
-      createUploadAuthenticateMiddleware(effectiveOpts);
     const requestLogger = createRequestLogger({ observabilityEnabled });
 
     // Log startup configuration (non-sensitive values only)
@@ -197,7 +191,6 @@ class Server {
     app.use(requestIdMiddleware());
     app.use(requestLogger);
     app.use(api);
-    app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
     app.use(createContextMiddleware({ pg: effectiveOpts.pg }));
     app.use(createCaptchaMiddleware());
