@@ -77,8 +77,6 @@ export interface PgInterval {
 }
 
 export interface AuthSettings {
-  allowIdentitySignIn?: boolean;
-  allowIdentitySignUp?: boolean;
   cookieSecure?: boolean;
   cookieSamesite?: string;
   cookieDomain?: string | null;
@@ -92,28 +90,6 @@ export interface AuthSettings {
   oauthRequireVerifiedEmail?: boolean;
   oauthErrorRedirectPath?: string | null;
 }
-
-export interface UpdateAuthSettingsInput {
-  allowIdentitySignIn?: boolean;
-  allowIdentitySignUp?: boolean;
-  cookieSecure?: boolean;
-  cookieSamesite?: string;
-  cookieDomain?: string | null;
-  cookieHttponly?: boolean;
-  cookieMaxAge?: string | null;
-  cookiePath?: string;
-  rememberMeDuration?: string | null;
-  enableCaptcha?: boolean;
-  captchaSiteKey?: string | null;
-  oauthStateMaxAge?: string | null;
-  oauthRequireVerifiedEmail?: boolean;
-  oauthErrorRedirectPath?: string | null;
-}
-
-export type UpdateAuthSettingsResult =
-  | 'updated'
-  | 'not_configured'
-  | 'no_fields';
 
 export interface ApiStructure {
   apiId?: string;
@@ -233,8 +209,6 @@ export interface UserAuthModuleRow {
 }
 
 export interface AuthSettingsRow {
-  allow_identity_sign_in: boolean;
-  allow_identity_sign_up: boolean;
   cookie_secure: boolean;
   cookie_samesite: string;
   cookie_domain: string | null;
