@@ -16,7 +16,6 @@
  * the manual `set_config()` calls in the original implementation.
  */
 
-import crypto from 'crypto';
 import { Router, Request, Response } from 'express';
 import {
   OAuthClient,
@@ -128,10 +127,6 @@ function createOAuthClientForProvider(
   });
 }
 
-// =============================================================================
-// Database Functions
-// =============================================================================
-
 interface SignInIdentityResult {
   id?: string;
   user_id?: string;
@@ -144,32 +139,6 @@ interface SignInIdentityResult {
   out_device_token?: string;
 }
 
-async function generateCrossOriginToken(
-  ctx: ConstructiveContext,
-  modules: OAuthModules,
-  accessToken: string,
-): Promise<string> {
-  const otToken = crypto.randomBytes(32).toString('base64url');
-  const { sessionCredentialsSchemaName } = modules.userAuthModule;
-
-  const sql = `
-    UPDATE ${QuoteUtils.quoteQualifiedIdentifier(sessionCredentialsSchemaName, 'session_credentials')}
-    SET ot_token = $1
-    WHERE secret_hash = digest($2::text, 'sha256')
-    RETURNING id
-  `;
-
-  // Intentional RLS bypass: runs as pool user because the session was just created
-  // server-side and the user hasn't authenticated via JWT yet. The accessToken hash
-  // ensures we only update the session we just created.
-  const result = await ctx.pool.query(sql, [otToken, accessToken]);
-  if (result.rows.length === 0) {
-    throw new Error('Failed to set cross-origin token');
-  }
-
-  return otToken;
-}
-
 // =============================================================================
 // OAuth Routes
 // =============================================================================
@@ -178,6 +147,21 @@ function getBaseUrl(req: Request): string {
   const protocol = req.protocol || 'http';
   const host = req.get('host') || 'localhost:3000';
   return `${protocol}://${host}`;
+}
+
+function normalizeRedirectUri(
+  redirectUri: string | undefined,
+  baseUrl: string,
+): string | null {
+  const requestedRedirectUri = redirectUri || '/';
+
+  try {
+    const url = new URL(requestedRedirectUri, baseUrl);
+    if (url.origin !== new URL(baseUrl).origin) return null;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -237,7 +221,10 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
   // GET /auth/:provider - Initiate OAuth flow
   router.get('/:provider', async (req: Request, res: Response) => {
     const { provider } = req.params;
-    const redirectUri = (req.query.redirect_uri as string) || '/';
+    const requestedRedirectUri =
+      typeof req.query.redirect_uri === 'string'
+        ? req.query.redirect_uri
+        : undefined;
     const ctx = req.constructive;
     const baseUrl = getBaseUrl(req);
 
@@ -268,6 +255,18 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
       const { authSettings, identityProviders } = modules;
       const errorRedirectPath =
         authSettings?.oauthErrorRedirectPath || DEFAULT_ERROR_REDIRECT_PATH;
+
+      const redirectUri = normalizeRedirectUri(requestedRedirectUri, baseUrl);
+      if (!redirectUri) {
+        log.warn(`[oauth] Rejected cross-origin redirect_uri for ${provider}`);
+        return redirectToError(
+          res,
+          baseUrl,
+          errorRedirectPath,
+          'INVALID_REDIRECT_URI',
+          provider,
+        );
+      }
 
       // Get provider config from cached map
       const providerConfig = identityProviders.providers.get(provider);
@@ -372,7 +371,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         );
       }
 
-      const { redirect_uri: redirectUri } = statePayload;
+      const { redirect_uri: redirectUriFromState } = statePayload;
       const ctx = req.constructive;
 
       if (!ctx) {
@@ -410,6 +409,18 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         const requireVerifiedEmail =
           authSettings?.oauthRequireVerifiedEmail ?? true;
 
+        const redirectUri = normalizeRedirectUri(redirectUriFromState, baseUrl);
+        if (!redirectUri) {
+          log.warn(`[oauth] Rejected cross-origin redirect_uri for ${provider}`);
+          return redirectToError(
+            res,
+            baseUrl,
+            errorRedirectPath,
+            'INVALID_REDIRECT_URI',
+            provider,
+          );
+        }
+
         // Get provider config from cached map
         const providerConfig = identityProviders.providers.get(provider);
         if (!providerConfig) {
@@ -432,16 +443,6 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
 
         const deviceToken =
           parseCookieValue(req, DEVICE_TOKEN_COOKIE_NAME) ?? null;
-
-        // Calculate target origin for cross-origin flow
-        const currentOrigin = baseUrl;
-        let targetOrigin: string;
-        try {
-          const redirectUrl = new URL(redirectUri, currentOrigin);
-          targetOrigin = redirectUrl.origin;
-        } catch {
-          targetOrigin = currentOrigin;
-        }
 
         const userAgent = req.get('user-agent') || '';
         const { connectedAccountsModule, userAuthModule } = modules;
@@ -482,7 +483,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
             await client.query(
               `SELECT set_config('jwt.claims.user_agent', $1, true),
                       set_config('jwt.claims.origin', $2, true)`,
-              [userAgent, targetOrigin],
+              [userAgent, baseUrl],
             );
 
             const details = {
@@ -547,39 +548,21 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           throw new Error('No access token returned from sign_in_identity');
         }
 
-        const isCrossOrigin = targetOrigin !== currentOrigin;
+        const sessionConfig = getSessionCookieConfig(
+          modules.authSettings,
+          true,
+        );
+        setSessionCookie(res, result.access_token, sessionConfig);
 
-        if (isCrossOrigin) {
-          const otToken = await generateCrossOriginToken(
-            ctx,
-            modules,
-            result.access_token,
-          );
-          const redirectUrl = new URL(redirectUri, currentOrigin);
-          redirectUrl.searchParams.set('token', otToken);
-          log.info(
-            `[oauth] OAuth success for ${profile.email}, cross-origin redirect`,
-          );
-          return res.redirect(redirectUrl.toString());
-        } else {
-          const sessionConfig = getSessionCookieConfig(
+        if (result.out_device_token) {
+          const deviceConfig = getDeviceTokenCookieConfig(
             modules.authSettings,
-            true,
           );
-          setSessionCookie(res, result.access_token, sessionConfig);
-
-          if (result.out_device_token) {
-            const deviceConfig = getDeviceTokenCookieConfig(
-              modules.authSettings,
-            );
-            setDeviceTokenCookie(res, result.out_device_token, deviceConfig);
-          }
-
-          log.info(
-            `[oauth] OAuth success for ${profile.email}, same-origin redirect`,
-          );
-          return res.redirect(redirectUri);
+          setDeviceTokenCookie(res, result.out_device_token, deviceConfig);
         }
+
+        log.info(`[oauth] OAuth success for ${profile.email}`);
+        return res.redirect(redirectUri);
       } catch (error: any) {
         const fallbackPath =
           modules?.authSettings?.oauthErrorRedirectPath ||
