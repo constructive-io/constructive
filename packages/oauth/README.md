@@ -54,42 +54,6 @@ const { url, state } = client.getAuthorizationUrl({ provider: 'google' });
 const profile = await client.handleCallback({ provider: 'google', code });
 ```
 
-### Express Middleware
-
-```typescript
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import { createOAuthMiddleware } from '@constructive-io/oauth';
-
-const app = express();
-app.use(cookieParser());
-
-const oauth = createOAuthMiddleware({
-  providers: {
-    google: { clientId: '...', clientSecret: '...' },
-    github: { clientId: '...', clientSecret: '...' },
-    facebook: { clientId: '...', clientSecret: '...' },
-    linkedin: { clientId: '...', clientSecret: '...' },
-  },
-  baseUrl: 'https://api.example.com',
-  onSuccess: async (profile, context) => {
-    // Handle successful authentication
-    // Create/update user in database, generate session token, etc.
-    return { user: profile };
-  },
-  onError: (error, context) => {
-    console.error('OAuth error:', error);
-  },
-  successRedirect: 'https://app.example.com/dashboard',
-  errorRedirect: 'https://app.example.com/login?error=auth_failed',
-});
-
-// Mount routes
-app.get('/auth/:provider', oauth.initiateAuth);
-app.get('/auth/:provider/callback', oauth.handleCallback);
-app.get('/auth/providers', oauth.getProviders);
-```
-
 ## Supported Providers
 
 | Provider | Scopes |
@@ -104,10 +68,6 @@ app.get('/auth/providers', oauth.getProviders);
 ### `createOAuthClient(config)`
 
 Creates an OAuth client instance.
-
-### `createOAuthMiddleware(config)`
-
-Creates Express route handlers for OAuth flows.
 
 ### `OAuthProfile`
 

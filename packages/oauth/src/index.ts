@@ -1,30 +1,23 @@
 export {
-  createOAuthMiddleware,
-  generateState,
-  OAuthCallbackContext,
-  OAuthErrorContext,
-  OAuthMiddlewareConfig,
-  OAuthRouteHandlers,
-  verifyState,
-} from './middleware/express';
-export { createOAuthClient,OAuthClient } from './oauth-client';
-export {
-  facebookProvider,
-  getProvider,
-  getProviderIds,
-  githubProvider,
-  googleProvider,
-  linkedinProvider,
-  providers,
-} from './providers';
-export {
+  OAuthProviderConfig,
+  OAuthProfile,
+  OAuthCredentials,
+  OAuthClientConfig,
+  TokenResponse,
   AuthorizationUrlParams,
   CallbackParams,
-  createOAuthError,
-  OAuthClientConfig,
-  OAuthCredentials,
   OAuthError,
-  OAuthProfile,
-  OAuthProviderConfig,
-  TokenResponse,
+  createOAuthError,
 } from './types';
+
+export { OAuthClient, createOAuthClient } from './oauth-client';
+
+export {
+  providers,
+  getProvider,
+  getProviderIds,
+  googleProvider,
+  githubProvider,
+  facebookProvider,
+  linkedinProvider,
+} from './providers';
