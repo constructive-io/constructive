@@ -129,39 +129,27 @@ describe('computeBuildKey', () => {
     const k2 = computeBuildKey(pool, ['services_public'], 'administrator', 'administrator');
     expect(k1).toBe(k2);
   });
-});
 
-// --- Orchestrator tests (require mocking PostGraphile) ---
-
-// Mock the heavy dependencies before importing the orchestrator
-jest.mock('postgraphile', () => ({
-  postgraphile: jest.fn(() => ({
-    createServ: jest.fn(() => ({
-      addTo: jest.fn(async () => {}),
-      ready: jest.fn(async () => {}),
-    })),
-    release: jest.fn(async () => {}),
-  })),
-}));
-
-jest.mock('grafserv/express/v4', () => ({
-  grafserv: 'mock-grafserv',
-}));
-
-jest.mock('express', () => {
-  const mockExpress = jest.fn(() => {
-    const app = jest.fn();
-    return app;
+  it('should differ when preset options differ', () => {
+    const pool = makeMockPool();
+    const k1 = computeBuildKey(pool, ['public'], 'anon', 'auth', { enableSearch: true });
+    const k2 = computeBuildKey(pool, ['public'], 'anon', 'auth', { enableSearch: false });
+    expect(k1).not.toBe(k2);
   });
-  return mockExpress;
-});
 
-jest.mock('node:http', () => ({
-  createServer: jest.fn(() => ({
-    listening: false,
-    close: jest.fn((cb: () => void) => cb()),
-  })),
-}));
+  it('should canonicalize preset option object key order', () => {
+    const pool = makeMockPool();
+    const k1 = computeBuildKey(pool, ['public'], 'anon', 'auth', {
+      enableSearch: true,
+      enableRealtime: false,
+    });
+    const k2 = computeBuildKey(pool, ['public'], 'anon', 'auth', {
+      enableRealtime: false,
+      enableSearch: true,
+    });
+    expect(k1).toBe(k2);
+  });
+});
 
 jest.mock('@pgpmjs/logger', () => ({
   Logger: jest.fn().mockImplementation(() => ({
@@ -181,17 +169,21 @@ import {
   getMultiTenancyCacheStats,
   shutdownMultiTenancyCache,
   getBuildKeyForSvcKey,
+  type TenantHandlerFactoryContext,
+  type TenantHandlerResources,
 } from '../multi-tenancy-cache';
 
-const mockPresetBuilder = jest.fn((_pool: import('pg').Pool, _schemas: string[], _anon: string, _role: string): import('graphile-config').GraphileConfig.Preset => ({
-  extends: [] as import('graphile-config').GraphileConfig.Preset[],
-  pgServices: [] as never[],
-}));
+const makeMockResources = (_ctx: TenantHandlerFactoryContext): TenantHandlerResources => ({
+  handler: jest.fn() as never,
+  release: jest.fn(async () => {}),
+});
+
+const mockHandlerFactory = jest.fn(async (ctx: TenantHandlerFactoryContext) => makeMockResources(ctx));
 
 beforeEach(async () => {
   await shutdownMultiTenancyCache();
-  configureMultiTenancyCache({ basePresetBuilder: mockPresetBuilder });
-  mockPresetBuilder.mockClear();
+  configureMultiTenancyCache({ handlerFactory: mockHandlerFactory });
+  mockHandlerFactory.mockClear();
 });
 
 afterAll(async () => {
@@ -222,8 +214,8 @@ describe('getOrCreateTenantInstance — buildKey deduplication', () => {
     expect(t1).toBe(t2);
     expect(t1.buildKey).toBe(t2.buildKey);
 
-    // Preset builder called only once (deduplication)
-    expect(mockPresetBuilder).toHaveBeenCalledTimes(1);
+    // Handler factory called only once (deduplication)
+    expect(mockHandlerFactory).toHaveBeenCalledTimes(1);
 
     // Both svc_keys resolve to the same buildKey
     expect(getBuildKeyForSvcKey('schemata:db-0001-tenant-a:services_public')).toBe(t1.buildKey);
@@ -251,7 +243,7 @@ describe('getOrCreateTenantInstance — buildKey deduplication', () => {
 
     expect(t1).not.toBe(t2);
     expect(t1.buildKey).not.toBe(t2.buildKey);
-    expect(mockPresetBuilder).toHaveBeenCalledTimes(2);
+    expect(mockHandlerFactory).toHaveBeenCalledTimes(2);
   });
 
   it('should return different handlers when roles differ', async () => {
@@ -275,6 +267,32 @@ describe('getOrCreateTenantInstance — buildKey deduplication', () => {
 
     expect(t1).not.toBe(t2);
     expect(t1.buildKey).not.toBe(t2.buildKey);
+  });
+
+  it('should return different handlers when preset options differ', async () => {
+    const pool = makeMockPool();
+
+    const t1 = await getOrCreateTenantInstance({
+      svcKey: 'tenant-a',
+      pool,
+      schemas: ['public'],
+      anonRole: 'anon',
+      roleName: 'auth',
+      presetOptions: { enableSearch: true },
+    });
+
+    const t2 = await getOrCreateTenantInstance({
+      svcKey: 'tenant-b',
+      pool,
+      schemas: ['public'],
+      anonRole: 'anon',
+      roleName: 'auth',
+      presetOptions: { enableSearch: false },
+    });
+
+    expect(t1).not.toBe(t2);
+    expect(t1.buildKey).not.toBe(t2.buildKey);
+    expect(mockHandlerFactory).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -461,6 +479,24 @@ describe('shutdownMultiTenancyCache', () => {
     expect(stats.databaseIdMappings).toBe(0);
     expect(stats.inflightCreations).toBe(0);
   });
+
+  it('should release each handler only once', async () => {
+    const pool = makeMockPool();
+
+    const tenant = await getOrCreateTenantInstance({
+      svcKey: 'key-a',
+      pool,
+      schemas: ['public'],
+      anonRole: 'anon',
+      roleName: 'auth',
+      databaseId: 'db-001',
+    });
+    const release = tenant.release as jest.Mock;
+
+    await shutdownMultiTenancyCache();
+
+    expect(release).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('getMultiTenancyCacheStats', () => {
@@ -533,11 +569,11 @@ describe('re-creation after flush', () => {
 
 describe('handler creation failure — orphaned index cleanup', () => {
   it('should clean up svc_key index when handler creation fails', async () => {
-    // Make the preset builder throw to simulate handler creation failure
-    const failingBuilder = jest.fn(() => {
+    // Make the handler factory throw to simulate handler creation failure
+    const failingFactory = jest.fn(async () => {
       throw new Error('simulated build failure');
     });
-    configureMultiTenancyCache({ basePresetBuilder: failingBuilder as any });
+    configureMultiTenancyCache({ handlerFactory: failingFactory });
 
     const pool = makeMockPool();
 
@@ -578,10 +614,10 @@ describe('handler creation failure — orphaned index cleanup', () => {
     expect(getTenantInstance('good-key')).toBeDefined();
 
     // Now make the next creation fail (different buildKey — different schemas)
-    const failingBuilder = jest.fn(() => {
+    const failingFactory = jest.fn(async () => {
       throw new Error('simulated build failure');
     });
-    configureMultiTenancyCache({ basePresetBuilder: failingBuilder as any });
+    configureMultiTenancyCache({ handlerFactory: failingFactory });
 
     await expect(
       getOrCreateTenantInstance({
@@ -671,8 +707,8 @@ describe('connectionString-based pool identity', () => {
 
 describe('coalesced creation failure — no orphaned mappings (Finding 1)', () => {
   it('should clean up both svc_keys when 2 coalesced requests fail', async () => {
-    const failingBuilder = jest.fn(() => { throw new Error('coalesced fail'); });
-    configureMultiTenancyCache({ basePresetBuilder: failingBuilder as any });
+    const failingFactory = jest.fn(async () => { throw new Error('coalesced fail'); });
+    configureMultiTenancyCache({ handlerFactory: failingFactory });
 
     const pool = makeMockPool();
     const base = { pool, schemas: ['public'] as string[], anonRole: 'anon', roleName: 'auth', databaseId: 'db-001' };
@@ -697,8 +733,8 @@ describe('coalesced creation failure — no orphaned mappings (Finding 1)', () =
   });
 
   it('should clean up all svc_keys when 3+ coalesced requests fail', async () => {
-    const failingBuilder = jest.fn(() => { throw new Error('coalesced fail 3+'); });
-    configureMultiTenancyCache({ basePresetBuilder: failingBuilder as any });
+    const failingFactory = jest.fn(async () => { throw new Error('coalesced fail 3+'); });
+    configureMultiTenancyCache({ handlerFactory: failingFactory });
 
     const pool = makeMockPool();
     const base = { pool, schemas: ['public'] as string[], anonRole: 'anon', roleName: 'auth', databaseId: 'db-002' };
@@ -902,52 +938,28 @@ describe('svc_key rebinding — old handler cleanup (Finding 2)', () => {
 
 describe('getOrCreateTenantInstance — svc_key race condition (epoch guard)', () => {
   /**
-   * Access the module-level postgraphile mock so we can override it
-   * per-test with gate-controlled behaviour.
-   */
-  const pgMock = () =>
-    (jest.requireMock('postgraphile') as { postgraphile: jest.Mock }).postgraphile;
-
-  /**
-   * Install a gated postgraphile mock.  Each call to `postgraphile()`
-   * creates a new gate; `serv.ready()` blocks until the gate is resolved.
+   * Install a gated handler factory. Each handler creation creates a new gate
+   * and blocks until that gate is resolved.
    * Returns the ordered array of gates so the test can resolve them in
    * any desired order.
    */
-  function installGatedMock(): Array<{ resolve: () => void }> {
+  function installGatedFactory(): Array<{ resolve: () => void }> {
     const gates: Array<{ resolve: () => void }> = [];
-    pgMock().mockImplementation(() => {
+    const gatedFactory = jest.fn(async (ctx: TenantHandlerFactoryContext) => {
       let resolve!: () => void;
       const promise = new Promise<void>((r) => {
         resolve = r;
       });
       gates.push({ resolve });
-      return {
-        createServ: jest.fn(() => ({
-          addTo: jest.fn(async () => {}),
-          ready: jest.fn(async () => {
-            await promise;
-          }),
-        })),
-        release: jest.fn(async () => {}),
-      };
+      await promise;
+      return makeMockResources(ctx);
     });
+    configureMultiTenancyCache({ handlerFactory: gatedFactory });
     return gates;
   }
 
-  afterEach(() => {
-    // Restore the default (instant-resolving) mock so other tests are unaffected
-    pgMock().mockImplementation(() => ({
-      createServ: jest.fn(() => ({
-        addTo: jest.fn(async () => {}),
-        ready: jest.fn(async () => {}),
-      })),
-      release: jest.fn(async () => {}),
-    }));
-  });
-
   it('newer request finishes first — final mapping stays on newer buildKey', async () => {
-    const gates = installGatedMock();
+    const gates = installGatedFactory();
     const pool = makeMockPool();
 
     // Start OLDER request (buildKey A — schemas=['schema_old'])
@@ -988,7 +1000,7 @@ describe('getOrCreateTenantInstance — svc_key race condition (epoch guard)', (
   });
 
   it('older request finishes first — final mapping ends on newer buildKey', async () => {
-    const gates = installGatedMock();
+    const gates = installGatedFactory();
     const pool = makeMockPool();
 
     const pOld = getOrCreateTenantInstance({
@@ -1027,7 +1039,7 @@ describe('getOrCreateTenantInstance — svc_key race condition (epoch guard)', (
   });
 
   it('no orphaned handler/index state remains after race', async () => {
-    const gates = installGatedMock();
+    const gates = installGatedFactory();
     const pool = makeMockPool();
 
     const pOld = getOrCreateTenantInstance({

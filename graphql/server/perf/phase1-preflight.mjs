@@ -82,6 +82,23 @@ const dbpmShapeVariants = Number.parseInt(
   getArgValue(args, '--dbpm-shape-variants', '0'),
   10,
 );
+const dbpmRouteHost = getArgValue(args, '--route-host', 'localhost');
+const dbpmPrivateApiName = getArgValue(args, '--private-api-name', 'private');
+const dbpmPrivateDatabaseId = getArgValue(
+  args,
+  '--private-database-id',
+  '028752cb-510b-1438-2f39-64534bd1cbd7',
+);
+const dbpmAuthHost = getArgValue(args, '--auth-host', '');
+const dbpmProvisionHost = getArgValue(args, '--provision-host', '');
+const businessRoutingMode = getArgValue(args, '--business-routing-mode', 'public');
+const businessCompatRoutingMode = getArgValue(args, '--business-compat-routing-mode', businessRoutingMode);
+const businessPublicApiName = getArgValue(args, '--business-public-api-name', 'api');
+const businessPublicSubdomainPrefix = getArgValue(
+  args,
+  '--business-public-subdomain-prefix',
+  'api-dbpm-',
+);
 const keyspaceOutputPath = path.resolve(
   getArgValue(args, '--keyspace-output', path.join(runDir, 'data', 'tokens.keyspace.json')),
 );
@@ -281,6 +298,24 @@ const runDbpmTechValidationScript = async () => {
         dbpmUserPrefix,
         '--shape-variants',
         String(dbpmShapeVariants),
+        '--route-host',
+        dbpmRouteHost,
+        '--private-api-name',
+        dbpmPrivateApiName,
+        '--private-database-id',
+        dbpmPrivateDatabaseId,
+        ...(dbpmAuthHost ? ['--auth-host', dbpmAuthHost] : []),
+        ...(dbpmProvisionHost ? ['--provision-host', dbpmProvisionHost] : []),
+        '--pg-host',
+        String(pgConfig.host),
+        '--pg-port',
+        String(pgConfig.port),
+        '--pg-database',
+        String(pgConfig.database),
+        '--pg-user',
+        String(pgConfig.user),
+        '--pg-password',
+        String(pgConfig.password),
       ],
       { stdio: ['ignore', 'pipe', 'pipe'] },
     );
@@ -324,6 +359,14 @@ const runBusinessProfileBuilder = async () => {
         tokenOutputPath,
         '--output',
         businessProfilesOutputPath,
+        '--routing-mode',
+        businessRoutingMode,
+        '--compat-routing-mode',
+        businessCompatRoutingMode,
+        '--public-api-name',
+        businessPublicApiName,
+        '--public-subdomain-prefix',
+        businessPublicSubdomainPrefix,
       ],
       { stdio: ['ignore', 'pipe', 'pipe'] },
     );

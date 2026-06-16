@@ -39,10 +39,8 @@
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
     "express": "^5.2.1",
-    "grafserv": "1.0.0",
-    "graphile-config": "1.0.0",
-    "pg": "^8.11.3",
-    "postgraphile": "5.0.0"
+    "lru-cache": "^11.2.7",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

@@ -47,12 +47,16 @@ const privateDatabaseId = getArgValue(
   '--private-database-id',
   '028752cb-510b-1438-2f39-64534bd1cbd7',
 );
+const authHost = getArgValue(args, '--auth-host', '');
+const provisionHost = getArgValue(args, '--provision-host', '');
 
-const routeHeaders = {
+const privateRouteHeaders = {
   Host: routeHost,
   'X-Api-Name': privateApiName,
   'X-Database-Id': privateDatabaseId,
 };
+const authRouteHeaders = authHost ? { Host: authHost } : privateRouteHeaders;
+const provisionRouteHeaders = provisionHost ? { Host: provisionHost } : privateRouteHeaders;
 
 const modules = modulesArg
   .split(',')
@@ -66,6 +70,9 @@ if (modules.length === 0) {
 // ---------------------------------------------------------------------------
 // Shape variant definitions (Option A — extra provisioned tables only)
 // ---------------------------------------------------------------------------
+
+const fieldType = (name) => ({ name });
+const provisionField = (name, typeName) => ({ name, type: fieldType(typeName) });
 
 /**
  * Each entry describes extra tables to provision for tenants assigned to
@@ -84,8 +91,8 @@ const VARIANT_DEFS = [
       {
         suffix: 'tags',
         fields: [
-          { name: 'label', type: 'text' },
-          { name: 'priority', type: 'integer' },
+          provisionField('label', 'text'),
+          provisionField('priority', 'integer'),
         ],
       },
     ],
@@ -96,9 +103,9 @@ const VARIANT_DEFS = [
       {
         suffix: 'metrics',
         fields: [
-          { name: 'value', type: 'numeric' },
-          { name: 'recorded_at', type: 'timestamptz' },
-          { name: 'active', type: 'boolean' },
+          provisionField('value', 'numeric'),
+          provisionField('recorded_at', 'timestamptz'),
+          provisionField('active', 'boolean'),
         ],
       },
     ],
@@ -170,14 +177,13 @@ mutation CreateSecureTableProvision($input: CreateSecureTableProvisionInput!) {
       schemaId
       tableId
       tableName
-      nodeType
       outFields
     }
   }
 }
 `;
 
-const gql = async ({ query, variables, headers = {}, timeoutMs = 30000 }) => {
+const gql = async ({ query, variables, headers = {}, routeHeaders = provisionRouteHeaders, timeoutMs = 30000 }) => {
   return await postJson({
     url: `${baseUrl}/graphql`,
     headers: {
@@ -189,11 +195,18 @@ const gql = async ({ query, variables, headers = {}, timeoutMs = 30000 }) => {
   });
 };
 
-const firstError = (response) => response.json?.errors?.[0]?.message || response.error || 'unknown';
+const firstError = (response) => {
+  const message = response.json?.errors?.[0]?.message || response.error;
+  if (message) return message;
+  const text = typeof response.text === 'string' ? response.text.trim().slice(0, 300) : '';
+  if (text) return `status=${response.status}; body=${text}`;
+  return `status=${response.status}; empty response`;
+};
 
 const signUpOrSignInUser = async ({ email, password }) => {
   const signUpRes = await gql({
     query: signUpMutation,
+    routeHeaders: authRouteHeaders,
     variables: {
       input: {
         email,
@@ -215,6 +228,7 @@ const signUpOrSignInUser = async ({ email, password }) => {
 
   const signInRes = await gql({
     query: signInMutation,
+    routeHeaders: authRouteHeaders,
     variables: {
       input: {
         email,
@@ -363,8 +377,8 @@ const createBusinessTable = async ({ token, databaseId, schemaId, tableName }) =
           databaseId,
           schemaId,
           tableName,
-          nodeType: 'DataId',
-          fields: [{ name: 'note', type: 'text' }],
+          nodes: ['DataId'],
+          fields: [provisionField('note', 'text')],
         },
       },
     },
@@ -397,7 +411,7 @@ const createVariantTable = async ({ token, databaseId, schemaId, tableName, fiel
           databaseId,
           schemaId,
           tableName,
-          nodeType: 'DataId',
+          nodes: ['DataId'],
           fields,
         },
       },
@@ -615,7 +629,6 @@ const main = async () => {
               schemaId: secureTable.schemaId,
               tableId: secureTable.tableId,
               tableName: secureTable.tableName,
-              nodeType: secureTable.nodeType,
               outFields: secureTable.outFields,
             },
           },
@@ -693,7 +706,11 @@ const main = async () => {
   const report = {
     createdAt: new Date().toISOString(),
     baseUrl,
-    routeHeaders,
+    routes: {
+      auth: authRouteHeaders,
+      provision: provisionRouteHeaders,
+      fallbackPrivate: privateRouteHeaders,
+    },
     flow: 'signUp/signIn -> createDatabaseProvisionModule(modules=all) -> use app_public -> createSecureTableProvision(DataId+note) -> SQL insert/select/update by id',
     options: {
       tenantCount,
@@ -729,8 +746,8 @@ const main = async () => {
     tenantKey: account.tenantKey,
     email: account.email,
     password: userPassword,
-    host: routeHost,
-    apiName: privateApiName,
+    host: authRouteHeaders.Host,
+    ...(authRouteHeaders['X-Api-Name'] ? { apiName: authRouteHeaders['X-Api-Name'] } : {}),
     databaseId: account.created.provisionFinal.databaseId,
     provisionedDatabaseId: account.created.provisionFinal.databaseId,
   }));

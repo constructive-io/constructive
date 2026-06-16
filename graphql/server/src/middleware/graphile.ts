@@ -9,12 +9,12 @@ import type { GraphileConfig } from 'graphile-config';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
+import type { Pool } from 'pg';
 import {
   configureMultiTenancyCache,
   getTenantInstance,
   getOrCreateTenantInstance,
   shutdownMultiTenancyCache,
-  flushByDatabaseId,
 } from 'graphile-multi-tenancy-cache';
 import './types'; // for Request type
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
@@ -210,7 +210,7 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
  * (everything on except aggregates).
  */
 const buildPreset = (
-  pool: import('pg').Pool,
+  pool: Pool,
   schemas: string[],
   anonRole: string,
   roleName: string,
@@ -306,7 +306,47 @@ const buildPreset = (
 };
 };
 
-export const graphile = (opts: ConstructiveOptions): RequestHandler => {
+interface CreateTenantGraphileResourcesOptions {
+  pool: Pool;
+  schemas: string[];
+  anonRole: string;
+  roleName: string;
+  databaseSettings?: DatabaseSettings;
+  cacheKey: string;
+  serviceKey: string;
+  databaseId?: string | null;
+  observabilityEnabled: boolean;
+}
+
+const createTenantGraphileResources = ({
+  pool,
+  schemas,
+  anonRole,
+  roleName,
+  databaseSettings,
+  cacheKey,
+  serviceKey,
+  databaseId,
+  observabilityEnabled,
+}: CreateTenantGraphileResourcesOptions): Promise<GraphileCacheEntry> => {
+  const preset = buildPreset(pool, schemas, anonRole, roleName, databaseSettings);
+  return observeGraphileBuild(
+    {
+      cacheKey,
+      serviceKey,
+      databaseId: databaseId ?? null,
+    },
+    () =>
+      createGraphileInstance({
+        preset,
+        cacheKey,
+        enableRealtime: databaseSettings?.enableRealtime,
+      }),
+    { enabled: observabilityEnabled },
+  );
+};
+
+const routeKeyGraphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
 
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -384,20 +424,17 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings);
-      const creationPromise = observeGraphileBuild(
-        {
-          cacheKey: key,
-          serviceKey: key,
-          databaseId: api.databaseId ?? null,
-        },
-        () => createGraphileInstance({
-          preset,
-          cacheKey: key,
-          enableRealtime: api.databaseSettings?.enableRealtime,
-        }),
-        { enabled: observabilityEnabled },
-      );
+      const creationPromise = createTenantGraphileResources({
+        pool,
+        schemas: schema || [],
+        anonRole,
+        roleName,
+        databaseSettings: api.databaseSettings,
+        cacheKey: key,
+        serviceKey: key,
+        databaseId: api.databaseId,
+        observabilityEnabled,
+      });
       creating.set(key, creationPromise);
 
       try {
@@ -454,14 +491,38 @@ export async function shutdownMultiTenancy(): Promise<void> {
  * Selected when opts.api.useMultiTenancyCache === true.
  * Calls configureMultiTenancyCache() once at startup (package owns wrapping).
  * Uses getTenantInstance() for fast-path cache hit.
- * On miss, calls getOrCreateTenantInstance() — no preset builder passed from server.
- * Routes request to tenant.handler — the package's Grafast context callback
- * handles pgSqlTextTransform injection internally.
+ * On miss, calls getOrCreateTenantInstance(); the package handles buildKey
+ * dedupe while this server injects the concrete Graphile handler factory.
+ * Routes request to tenant.handler.
  */
 export const multiTenancyHandler = (opts: ConstructiveOptions): RequestHandler => {
+  const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+
   // One-time bootstrap: configure the multi-tenancy cache with our preset builder
   configureMultiTenancyCache({
-    basePresetBuilder: buildPreset,
+    handlerFactory: async ({
+      buildKey,
+      svcKey,
+      pool,
+      schemas,
+      anonRole,
+      roleName,
+      databaseId,
+      presetOptions,
+    }) => {
+      const databaseSettings = presetOptions as DatabaseSettings | undefined;
+      return createTenantGraphileResources({
+        pool,
+        schemas,
+        anonRole,
+        roleName,
+        databaseSettings,
+        cacheKey: buildKey,
+        serviceKey: svcKey,
+        databaseId,
+        observabilityEnabled,
+      });
+    },
   });
 
   log.info('Multi-tenancy cache handler initialized');
@@ -505,6 +566,7 @@ export const multiTenancyHandler = (opts: ConstructiveOptions): RequestHandler =
         anonRole,
         roleName,
         databaseId: api.databaseId,
+        presetOptions: api.databaseSettings,
       });
 
       return tenant.handler(req, res, next);
@@ -518,4 +580,18 @@ export const multiTenancyHandler = (opts: ConstructiveOptions): RequestHandler =
       next(e);
     }
   };
+};
+
+/**
+ * Graphile middleware facade.
+ *
+ * `server.ts` mounts this once; this module owns the choice between the
+ * legacy route-key cache and the buildKey-based multi-tenancy cache.
+ */
+export const graphile = (opts: ConstructiveOptions): RequestHandler => {
+  if (isMultiTenancyCacheEnabled(opts)) {
+    log.info('Multi-tenancy cache ENABLED');
+    return multiTenancyHandler(opts);
+  }
+  return routeKeyGraphile(opts);
 };

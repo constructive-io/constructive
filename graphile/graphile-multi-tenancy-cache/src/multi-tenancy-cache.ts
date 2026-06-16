@@ -16,13 +16,11 @@
  *   databaseIdToBuildKeys: databaseId → Set<buildKey>
  */
 
-import { createServer } from 'node:http';
 import { Logger } from '@pgpmjs/logger';
-import express from 'express';
-import { postgraphile } from 'postgraphile';
-import { grafserv } from 'grafserv/express/v4';
+import type { Express } from 'express';
+import type { Server as HttpServer } from 'node:http';
 import type { Pool } from 'pg';
-import type { GraphileConfig } from 'graphile-config';
+import { LRUCache } from 'lru-cache';
 
 const log = new Logger('multi-tenancy-cache');
 
@@ -35,23 +33,32 @@ export interface TenantConfig {
   anonRole: string;
   roleName: string;
   databaseId?: string;
+  presetOptions?: unknown;
 }
 
-export interface TenantInstance {
+export interface TenantHandlerResources {
+  handler: Express;
+  httpServer?: HttpServer;
+  pgl?: { release(): void | PromiseLike<void> };
+  realtimeManager?: { stop(): Promise<void> } | null;
+  release?: () => Promise<void>;
+}
+
+export interface TenantInstance extends TenantHandlerResources {
   buildKey: string;
-  handler: import('express').Express;
   schemas: string[];
-  pgl: import('postgraphile').PostGraphileInstance;
-  httpServer: import('http').Server;
   createdAt: number;
   lastUsedAt: number;
 }
 
 export interface MultiTenancyCacheStats {
   handlerCacheSize: number;
+  handlerCacheMax: number;
+  handlerCacheTtlMs: number;
   svcKeyMappings: number;
   databaseIdMappings: number;
   inflightCreations: number;
+  buildKeys: string[];
 }
 
 interface BuildKeyParts {
@@ -59,12 +66,66 @@ interface BuildKeyParts {
   schemas: string[];
   anonRole: string;
   roleName: string;
+  presetOptions?: unknown;
 }
+
+export interface TenantHandlerFactoryContext {
+  buildKey: string;
+  svcKey: string;
+  pool: Pool;
+  schemas: string[];
+  anonRole: string;
+  roleName: string;
+  databaseId?: string;
+  presetOptions?: unknown;
+}
+
+export type TenantHandlerFactory = (
+  context: TenantHandlerFactoryContext,
+) => Promise<TenantHandlerResources>;
 
 // --- Internal state ---
 
+const parsePositiveIntEnv = (value: string | undefined, fallback: number): number => {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const ONE_HOUR_MS = 1000 * 60 * 60;
+const FIVE_MINUTES_MS = 1000 * 60 * 5;
+const ONE_YEAR_MS = ONE_HOUR_MS * 24 * 366;
+
+const getHandlerCacheConfig = () => {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  return {
+    max: parsePositiveIntEnv(
+      process.env.GRAPHILE_MULTI_TENANCY_CACHE_MAX ?? process.env.GRAPHILE_CACHE_MAX,
+      50,
+    ),
+    ttlMs: parsePositiveIntEnv(
+      process.env.GRAPHILE_MULTI_TENANCY_CACHE_TTL_MS ?? process.env.GRAPHILE_CACHE_TTL_MS,
+      isDevelopment ? FIVE_MINUTES_MS : ONE_YEAR_MS,
+    ),
+  };
+};
+
+const initialCacheConfig = getHandlerCacheConfig();
+
+/** Tenant resources that have already been disposed. Prevents double release via manual + LRU paths. */
+const disposedTenants = new WeakSet<TenantInstance>();
+
 /** buildKey → TenantInstance (the real handler cache) */
-const handlerCache = new Map<string, TenantInstance>();
+const handlerCache = new LRUCache<string, TenantInstance>({
+  max: initialCacheConfig.max,
+  ttl: initialCacheConfig.ttlMs,
+  updateAgeOnGet: true,
+  dispose: (handler, buildKey) => {
+    removeIndexesForBuildKey(buildKey);
+    disposeTenant(handler).catch((err) => {
+      log.error(`Failed to dispose handler buildKey=${buildKey}:`, err);
+    });
+  },
+});
 
 /** svc_key → buildKey (routing index) */
 const svcKeyToBuildKey = new Map<string, string>();
@@ -87,31 +148,21 @@ const creatingHandlers = new Map<string, Promise<TenantInstance>>();
  */
 const svcKeyEpoch = new Map<string, number>();
 
-/** The preset builder, set once by configureMultiTenancyCache(). */
-let presetBuilder: ((
-  pool: Pool,
-  schemas: string[],
-  anonRole: string,
-  roleName: string,
-) => GraphileConfig.Preset) | null = null;
+/** The handler factory, set once by configureMultiTenancyCache(). */
+let handlerFactory: TenantHandlerFactory | null = null;
 
 // --- Configuration ---
 
 export interface MultiTenancyCacheConfig {
-  basePresetBuilder: (
-    pool: Pool,
-    schemas: string[],
-    anonRole: string,
-    roleName: string,
-  ) => GraphileConfig.Preset;
+  handlerFactory: TenantHandlerFactory;
 }
 
 /**
- * One-time package bootstrap. Stores the preset builder.
+ * One-time package bootstrap. Stores the handler factory.
  * Must be called before any getOrCreateTenantInstance() calls.
  */
 export function configureMultiTenancyCache(config: MultiTenancyCacheConfig): void {
-  presetBuilder = config.basePresetBuilder;
+  handlerFactory = config.handlerFactory;
   log.info('Multi-tenancy cache configured (buildKey-based handler caching)');
 }
 
@@ -156,6 +207,24 @@ function getPoolIdentity(pool: Pool): string {
   return 'unknown-pool';
 }
 
+function normalizeBuildInput(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(normalizeBuildInput);
+  }
+  if (value && typeof value === 'object') {
+    const input = value as Record<string, unknown>;
+    const output: Record<string, unknown> = {};
+    for (const key of Object.keys(input).sort()) {
+      const normalized = normalizeBuildInput(input[key]);
+      if (normalized !== undefined) {
+        output[key] = normalized;
+      }
+    }
+    return output;
+  }
+  return value;
+}
+
 /**
  * Compute the buildKey from the inputs that materially affect
  * Graphile handler construction.
@@ -180,6 +249,7 @@ export function computeBuildKey(
   schemas: string[],
   anonRole: string,
   roleName: string,
+  presetOptions?: unknown,
 ): string {
   const input: BuildKeyParts = {
     conn: getPoolIdentity(pool),
@@ -187,6 +257,10 @@ export function computeBuildKey(
     anonRole,
     roleName,
   };
+  const normalizedPresetOptions = normalizeBuildInput(presetOptions);
+  if (normalizedPresetOptions !== undefined) {
+    input.presetOptions = normalizedPresetOptions;
+  }
   return JSON.stringify(input);
 }
 
@@ -234,6 +308,17 @@ function getSvcKeysForBuildKey(buildKey: string): string[] {
   return result;
 }
 
+function removeIndexesForBuildKey(buildKey: string): void {
+  for (const svcKey of getSvcKeysForBuildKey(buildKey)) {
+    svcKeyToBuildKey.delete(svcKey);
+  }
+
+  for (const [dbId, keys] of databaseIdToBuildKeys) {
+    keys.delete(buildKey);
+    if (keys.size === 0) databaseIdToBuildKeys.delete(dbId);
+  }
+}
+
 /**
  * Remove a buildKey from all indexes and dispose the handler (if present).
  *
@@ -242,29 +327,12 @@ function getSvcKeysForBuildKey(buildKey: string): string[] {
  * still reference the buildKey. This function cleans those too.
  */
 function evictBuildKey(buildKey: string): void {
-  const handler = handlerCache.get(buildKey);
-
-  // Always clean indexes, even if handler isn't cached (handles orphaned indexes)
-  handlerCache.delete(buildKey);
-
-  // Remove all svc_key → buildKey mappings pointing to this buildKey
-  for (const svcKey of getSvcKeysForBuildKey(buildKey)) {
-    svcKeyToBuildKey.delete(svcKey);
+  const deleted = handlerCache.delete(buildKey);
+  if (!deleted) {
+    removeIndexesForBuildKey(buildKey);
   }
 
-  // Remove from databaseId index
-  for (const [dbId, keys] of databaseIdToBuildKeys) {
-    keys.delete(buildKey);
-    if (keys.size === 0) databaseIdToBuildKeys.delete(dbId);
-  }
-
-  if (handler) {
-    disposeTenant(handler).catch((err) => {
-      log.error(`Failed to dispose handler buildKey=${buildKey}:`, err);
-    });
-  }
-
-  log.debug(`Evicted buildKey=${buildKey} (handler=${handler ? 'disposed' : 'none/orphaned'})`);
+  log.debug(`Evicted buildKey=${buildKey} (handler=${deleted ? 'disposed' : 'none/orphaned'})`);
 }
 
 // --- Core API ---
@@ -297,7 +365,7 @@ export function getBuildKeyForSvcKey(svcKey: string): string | undefined {
  * 1. Compute buildKey from config's build inputs
  * 2. Check handlerCache (fast path) → register mapping, return
  * 3. Check creatingHandlers (single-flight coalesce) → await, register on success
- * 4. Create a new independent PostGraphile instance keyed by buildKey
+ * 4. Create a new independent handler keyed by buildKey
  * 5. On success: register mapping, store in handlerCache, return
  *
  * Registration is deferred until AFTER handler creation succeeds.  This
@@ -307,13 +375,13 @@ export function getBuildKeyForSvcKey(svcKey: string): string | undefined {
 export async function getOrCreateTenantInstance(
   config: TenantConfig,
 ): Promise<TenantInstance> {
-  const { svcKey, pool, schemas, anonRole, roleName, databaseId } = config;
+  const { svcKey, pool, schemas, anonRole, roleName, databaseId, presetOptions } = config;
 
-  if (!presetBuilder) {
+  if (!handlerFactory) {
     throw new Error('Multi-tenancy cache not configured. Call configureMultiTenancyCache() first.');
   }
 
-  const buildKey = computeBuildKey(pool, schemas, anonRole, roleName);
+  const buildKey = computeBuildKey(pool, schemas, anonRole, roleName, presetOptions);
 
   // Capture a monotonically increasing epoch for this svc_key.
   // Only the request holding the latest epoch is allowed to register.
@@ -342,7 +410,16 @@ export async function getOrCreateTenantInstance(
   }
 
   // Step 3: Creator path — build a new handler
-  const promise = doCreateHandler(buildKey, pool, schemas, anonRole, roleName);
+  const promise = doCreateHandler({
+    buildKey,
+    svcKey,
+    pool,
+    schemas,
+    anonRole,
+    roleName,
+    databaseId,
+    presetOptions,
+  });
   creatingHandlers.set(buildKey, promise);
 
   try {
@@ -366,31 +443,19 @@ export async function getOrCreateTenantInstance(
 }
 
 async function doCreateHandler(
-  buildKey: string,
-  pool: Pool,
-  schemas: string[],
-  anonRole: string,
-  roleName: string,
+  context: TenantHandlerFactoryContext,
 ): Promise<TenantInstance> {
+  const { buildKey, schemas } = context;
   const schemaLabel = schemas.join(',') || 'unknown';
 
   log.info(`Building handler buildKey=${buildKey} schemas=${schemaLabel}`);
 
-  const preset = presetBuilder!(pool, schemas, anonRole, roleName);
-  const pgl = postgraphile(preset);
-  const serv = pgl.createServ(grafserv);
-
-  const handler = express();
-  const httpServer = createServer(handler);
-  await serv.addTo(handler, httpServer);
-  await serv.ready();
+  const resources = await handlerFactory!(context);
 
   const tenant: TenantInstance = {
+    ...resources,
     buildKey,
-    handler,
     schemas,
-    pgl,
-    httpServer,
     createdAt: Date.now(),
     lastUsedAt: Date.now(),
   };
@@ -436,11 +501,23 @@ export function flushByDatabaseId(databaseId: string): void {
 }
 
 async function disposeTenant(tenant: TenantInstance): Promise<void> {
+  if (disposedTenants.has(tenant)) {
+    return;
+  }
+  disposedTenants.add(tenant);
+
   try {
+    if (tenant.release) {
+      await tenant.release();
+      return;
+    }
     if (tenant.httpServer?.listening) {
       await new Promise<void>((resolve) => {
         tenant.httpServer.close(() => resolve());
       });
+    }
+    if (tenant.realtimeManager) {
+      await tenant.realtimeManager.stop();
     }
     if (tenant.pgl) {
       await tenant.pgl.release();
@@ -456,9 +533,12 @@ async function disposeTenant(tenant: TenantInstance): Promise<void> {
 export function getMultiTenancyCacheStats(): MultiTenancyCacheStats {
   return {
     handlerCacheSize: handlerCache.size,
+    handlerCacheMax: initialCacheConfig.max,
+    handlerCacheTtlMs: initialCacheConfig.ttlMs,
     svcKeyMappings: svcKeyToBuildKey.size,
     databaseIdMappings: databaseIdToBuildKeys.size,
     inflightCreations: creatingHandlers.size,
+    buildKeys: [...handlerCache.keys()],
   };
 }
 
@@ -481,7 +561,7 @@ export async function shutdownMultiTenancyCache(): Promise<void> {
   databaseIdToBuildKeys.clear();
   creatingHandlers.clear();
   svcKeyEpoch.clear();
-  presetBuilder = null;
+  handlerFactory = null;
 
   log.info('Multi-tenancy cache shutdown complete');
 }

@@ -3,7 +3,7 @@
 # Usage: bash perf/run-stress-suite.sh
 #
 # Requires: server NOT running (this script manages server lifecycle)
-# Requires: postgres_perf database with test data
+# Requires: a deployed Constructive database; defaults to PGDATABASE=constructive
 
 set -euo pipefail
 
@@ -12,17 +12,41 @@ SERVER_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$SERVER_DIR"
 
 # Common env
-export PGHOST=127.0.0.1 PGPORT=5432 PGUSER=postgres PGPASSWORD=password PGDATABASE=postgres_perf
+export PGHOST="${PGHOST:-127.0.0.1}" PGPORT="${PGPORT:-5432}" PGUSER="${PGUSER:-postgres}" PGPASSWORD="${PGPASSWORD:-password}" PGDATABASE="${PGDATABASE:-constructive}"
 export NODE_ENV=development GRAPHILE_ENV=development API_IS_PUBLIC=false GRAPHQL_OBSERVABILITY_ENABLED=true
 export SERVER_PORT=3000
+export PORT="$SERVER_PORT"
+export STOP_WAIT_SECONDS="${STOP_WAIT_SECONDS:-10}"
+export NO_PROXY="${NO_PROXY:-localhost,127.0.0.1,::1}"
+export no_proxy="${no_proxy:-$NO_PROXY}"
 
 RESULTS_FILE="/tmp/stress-suite-results.jsonl"
 > "$RESULTS_FILE"
 
 kill_server() {
-  fuser -k $SERVER_PORT/tcp 2>/dev/null || true
-  sleep 2
+  local pids
+  pids="$(lsof -tiTCP:"${SERVER_PORT}" -sTCP:LISTEN 2>/dev/null || true)"
+  if [ -n "$pids" ]; then
+    kill $pids 2>/dev/null || true
+    for _ in $(seq 1 "$STOP_WAIT_SECONDS"); do
+      if ! lsof -tiTCP:"${SERVER_PORT}" -sTCP:LISTEN >/dev/null 2>&1; then
+        for pid in $pids; do wait "$pid" 2>/dev/null || true; done
+        if [ -n "${SERVER_PID:-}" ]; then wait "$SERVER_PID" 2>/dev/null || true; fi
+        return 0
+      fi
+      sleep 1
+    done
+
+    pids="$(lsof -tiTCP:"${SERVER_PORT}" -sTCP:LISTEN 2>/dev/null || true)"
+    if [ -n "$pids" ]; then
+      kill -9 $pids 2>/dev/null || true
+      for pid in $pids; do wait "$pid" 2>/dev/null || true; done
+      if [ -n "${SERVER_PID:-}" ]; then wait "$SERVER_PID" 2>/dev/null || true; fi
+    fi
+  fi
 }
+
+trap kill_server EXIT
 
 start_server() {
   local mode="$1"
@@ -42,7 +66,11 @@ start_server() {
 
   # Wait for server to be ready
   for i in $(seq 1 30); do
-    if curl -sf http://localhost:$SERVER_PORT/debug/memory > /dev/null 2>&1; then
+    if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+      echo ">>> Server process exited before becoming ready"
+      return 1
+    fi
+    if curl --noproxy '*' -sf http://localhost:$SERVER_PORT/debug/memory > /dev/null 2>&1; then
       echo ">>> Server ready"
       return 0
     fi
@@ -53,7 +81,7 @@ start_server() {
 }
 
 capture_memory() {
-  curl -sf http://localhost:$SERVER_PORT/debug/memory 2>/dev/null || echo '{}'
+  curl --noproxy '*' -sf http://localhost:$SERVER_PORT/debug/memory 2>/dev/null || echo '{}'
 }
 
 run_test() {
@@ -79,7 +107,11 @@ import sys,json
 try:
   d=json.load(sys.stdin)
   m=d.get('memory',d)
-  print(f'  Heap: {m.get(\"heapUsed\",0)/1024/1024:.1f} MB, RSS: {m.get(\"rss\",0)/1024/1024:.1f} MB')
+  heap=m.get('heapUsedBytes', m.get('heapUsed', 0))
+  rss=m.get('rssBytes', m.get('rss', 0))
+  if isinstance(heap, str): heap=0
+  if isinstance(rss, str): rss=0
+  print(f'  Heap: {heap/1024/1024:.1f} MB, RSS: {rss/1024/1024:.1f} MB')
   gb=d.get('graphileBuilds',{})
   gc=d.get('graphileCache',{})
   print(f'  Builds: {gb.get(\"succeeded\",\"?\")}, Cache: {gc.get(\"size\",\"?\")}')

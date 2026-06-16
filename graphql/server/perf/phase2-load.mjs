@@ -159,9 +159,53 @@ const nonNegativeDelta = (startValue, endValue) => {
   return delta >= 0 ? delta : 0;
 };
 
+const isMultiTenancyCacheStats = (value) =>
+  value != null && Number.isFinite(Number(value.handlerCacheSize));
+
+const cacheSizeDelta = (start, end) => {
+  const startBuildKeys = Array.isArray(start.buildKeys) ? start.buildKeys : [];
+  const endBuildKeys = Array.isArray(end.buildKeys) ? end.buildKeys : [];
+  const startBuildKeySet = new Set(startBuildKeys);
+  const endBuildKeySet = new Set(endBuildKeys);
+  const addedBuildKeys = endBuildKeys.filter((key) => !startBuildKeySet.has(key));
+  const removedBuildKeys = startBuildKeys.filter((key) => !endBuildKeySet.has(key));
+
+  return {
+    kind: 'multiTenancyCache',
+    handlerCache: {
+      start: asCount(start.handlerCacheSize),
+      end: asCount(end.handlerCacheSize),
+      delta: asCount(end.handlerCacheSize) - asCount(start.handlerCacheSize),
+      max: asCount(end.handlerCacheMax ?? start.handlerCacheMax),
+      ttlMs: asCount(end.handlerCacheTtlMs ?? start.handlerCacheTtlMs),
+    },
+    mappings: {
+      svcKeyStart: asCount(start.svcKeyMappings),
+      svcKeyEnd: asCount(end.svcKeyMappings),
+      svcKeyDelta: asCount(end.svcKeyMappings) - asCount(start.svcKeyMappings),
+      databaseIdStart: asCount(start.databaseIdMappings),
+      databaseIdEnd: asCount(end.databaseIdMappings),
+      databaseIdDelta: asCount(end.databaseIdMappings) - asCount(start.databaseIdMappings),
+    },
+    inflightCreationsEnd: asCount(end.inflightCreations),
+    buildKeys: {
+      start: startBuildKeys.length,
+      end: endBuildKeys.length,
+      added: addedBuildKeys.length,
+      removed: removedBuildKeys.length,
+      addedSamples: addedBuildKeys.slice(0, 10),
+      removedSamples: removedBuildKeys.slice(0, 10),
+    },
+  };
+};
+
 const cacheActivityDelta = (start, end) => {
   if (!start || !end) {
     return null;
+  }
+
+  if (isMultiTenancyCacheStats(start) || isMultiTenancyCacheStats(end)) {
+    return cacheSizeDelta(start, end);
   }
 
   const lookupTotal = nonNegativeDelta(start.lookups?.total, end.lookups?.total);
@@ -430,7 +474,8 @@ const analyzeCacheRedundancyRisk = ({ baselineSnapshot, afterSnapshot, idleSnaps
   };
 };
 
-const extractCacheActivity = (debugPayload) => debugPayload?.json?.graphileCacheActivity ?? null;
+const extractCacheActivity = (debugPayload) =>
+  debugPayload?.json?.graphileCacheActivity ?? debugPayload?.json?.multiTenancyCache ?? null;
 
 const clamp01 = (value) => {
   if (!Number.isFinite(value)) return 0;
@@ -589,7 +634,7 @@ const buildBusinessRequest = ({ profile, operation, rowId }) => {
       return {
         operation: 'getById',
         payload: {
-          query: `query($id:UUID!){${table.queryField}(condition:{id:$id},first:1){nodes{id note}}}`,
+          query: `query($id:UUID!){${table.queryField}(where:{id:{equalTo:$id}},first:1){nodes{id note}}}`,
           variables: {
             id: rowId,
           },
@@ -735,15 +780,18 @@ const runRouteProbe = async ({ profiles }) => {
   }
 
   const profile = profiles[0];
+  const payload = isBusinessProfile(profile)
+    ? { query: `query{${profile.table.queryField}(first:1){nodes{id}}}` }
+    : { query: '{ __typename }' };
   const result = await postJson({
     url: resolveProfileGraphqlUrl(profile),
     headers: profile.headers ?? {},
-    payload: { query: '{ __typename }' },
+    payload,
     timeoutMs: 15000,
   });
 
   const hasGraphQLErrors = Array.isArray(result.json?.errors) && result.json.errors.length > 0;
-  const ok = result.ok && !hasGraphQLErrors && result.json?.data?.__typename === 'Query';
+  const ok = result.ok && !hasGraphQLErrors && result.json?.data != null;
 
   const probe = {
     attempted: true,

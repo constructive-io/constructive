@@ -33,11 +33,9 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
-import { flush, createFlushMiddleware, flushService } from './middleware/flush';
+import { createFlushMiddleware, flushService } from './middleware/flush';
 import {
   graphile,
-  multiTenancyHandler,
-  isMultiTenancyCacheEnabled,
   shutdownMultiTenancy,
 } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
@@ -236,15 +234,8 @@ class Server {
     // routes are handled without going through PostGraphile
     app.use(createLlmApiRouter());
 
-    // Select handler based on multi-tenancy cache mode
-    if (isMultiTenancyCacheEnabled(effectiveOpts)) {
-      log.info('[server] Multi-tenancy cache ENABLED');
-      app.use(multiTenancyHandler(effectiveOpts));
-      app.use(createFlushMiddleware(effectiveOpts));
-    } else {
-      app.use(graphile(effectiveOpts));
-      app.use(flush);
-    }
+    app.use(graphile(effectiveOpts));
+    app.use(createFlushMiddleware(effectiveOpts));
 
     // Error handling - MUST be LAST
     app.use(notFoundHandler); // Catches unmatched routes (404)

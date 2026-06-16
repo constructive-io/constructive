@@ -124,7 +124,15 @@ async function getHeapUsedMB(): Promise<number> {
         .on('error', reject);
     });
     const parsed = JSON.parse(res);
-    if (parsed.heapUsed) return parsed.heapUsed / 1024 / 1024;
+    const heapUsedBytes =
+      typeof parsed?.memory?.heapUsedBytes === 'number'
+        ? parsed.memory.heapUsedBytes
+        : typeof parsed?.heapUsedBytes === 'number'
+          ? parsed.heapUsedBytes
+          : typeof parsed?.heapUsed === 'number'
+            ? parsed.heapUsed
+            : null;
+    if (heapUsedBytes !== null) return heapUsedBytes / 1024 / 1024;
   } catch {
     // fallback
   }

@@ -29,6 +29,7 @@ IDLE_SECONDS="${IDLE_SECONDS:-30}"
 SERVER_PORT="${SERVER_PORT:-3000}"
 BASE_URL="http://localhost:${SERVER_PORT}"
 RUN_DIR="${RUN_DIR:-/tmp/constructive-perf/comparison-$(date +%Y%m%dT%H%M%S)}"
+STOP_WAIT_SECONDS="${STOP_WAIT_SECONDS:-10}"
 
 # Parse CLI args
 while [[ $# -gt 0 ]]; do
@@ -56,11 +57,15 @@ export PGHOST="${PGHOST:-localhost}"
 export PGPORT="${PGPORT:-5432}"
 export PGUSER="${PGUSER:-postgres}"
 export PGPASSWORD="${PGPASSWORD:-password}"
-export PGDATABASE="${PGDATABASE:-postgres}"
+export PGDATABASE="${PGDATABASE:-constructive}"
+export PORT="$SERVER_PORT"
+export NO_PROXY="${NO_PROXY:-localhost,127.0.0.1,::1}"
+export no_proxy="${no_proxy:-$NO_PROXY}"
 export NODE_ENV=development
 export GRAPHILE_ENV=development
 export GRAPHQL_OBSERVABILITY_ENABLED=true
 export API_IS_PUBLIC=false
+export K DURATION WORKERS SERVER_PORT
 
 echo "=============================================================="
 echo "E2E Multi-Tenancy Comparison (Perf Framework)"
@@ -72,15 +77,39 @@ echo "=============================================================="
 mkdir -p "$RUN_DIR"
 
 kill_server() {
-  fuser -k ${SERVER_PORT}/tcp 2>/dev/null || true
-  sleep 2
+  local pids
+  pids="$(lsof -tiTCP:"${SERVER_PORT}" -sTCP:LISTEN 2>/dev/null || true)"
+  if [ -n "$pids" ]; then
+    kill $pids 2>/dev/null || true
+    for _ in $(seq 1 "$STOP_WAIT_SECONDS"); do
+      if ! lsof -tiTCP:"${SERVER_PORT}" -sTCP:LISTEN >/dev/null 2>&1; then
+        for pid in $pids; do wait "$pid" 2>/dev/null || true; done
+        if [ -n "${SERVER_PID:-}" ]; then wait "$SERVER_PID" 2>/dev/null || true; fi
+        return 0
+      fi
+      sleep 1
+    done
+
+    pids="$(lsof -tiTCP:"${SERVER_PORT}" -sTCP:LISTEN 2>/dev/null || true)"
+    if [ -n "$pids" ]; then
+      kill -9 $pids 2>/dev/null || true
+      for pid in $pids; do wait "$pid" 2>/dev/null || true; done
+      if [ -n "${SERVER_PID:-}" ]; then wait "$SERVER_PID" 2>/dev/null || true; fi
+    fi
+  fi
 }
+
+trap kill_server EXIT
 
 wait_for_server() {
   local max_wait=90
   local waited=0
   echo -n "  Waiting for server on port $SERVER_PORT..."
-  while ! curl -sf "${BASE_URL}/debug/memory" >/dev/null 2>&1; do
+  while ! curl --noproxy '*' -sf "${BASE_URL}/debug/memory" >/dev/null 2>&1; do
+    if [ -n "${SERVER_PID:-}" ] && ! kill -0 "$SERVER_PID" 2>/dev/null; then
+      echo " failed (server process exited)"
+      return 1
+    fi
     sleep 1
     waited=$((waited + 1))
     if [ $waited -ge $max_wait ]; then
@@ -89,6 +118,10 @@ wait_for_server() {
     fi
     echo -n "."
   done
+  if [ -n "${SERVER_PID:-}" ] && ! kill -0 "$SERVER_PID" 2>/dev/null; then
+    echo " failed (server process exited)"
+    return 1
+  fi
   echo " ready (${waited}s)"
 }
 
@@ -104,7 +137,7 @@ start_server() {
   if [ "$mode" = "new" ]; then
     export USE_MULTI_TENANCY_CACHE=true
     unset GRAPHILE_CACHE_MAX 2>/dev/null || true
-    echo "  USE_MULTI_TENANCY_CACHE=true (shared templates)"
+    echo "  USE_MULTI_TENANCY_CACHE=true (buildKey handler reuse)"
   else
     unset USE_MULTI_TENANCY_CACHE 2>/dev/null || true
     export GRAPHILE_CACHE_MAX="$OLD_CACHE_MAX"
@@ -122,10 +155,12 @@ start_server() {
 run_e2e_benchmark() {
   local mode="$1"
   local tier="e2e-${mode}-k${K}"
+  local mode_label
+  mode_label="$(printf '%s' "$mode" | tr '[:lower:]' '[:upper:]')"
 
   echo ""
   echo "=============================================================="
-  echo "Running ${mode^^} mode benchmark (k=$K, ${DURATION}s, ${WORKERS} workers)"
+  echo "Running ${mode_label} mode benchmark (k=$K, ${DURATION}s, ${WORKERS} workers)"
   echo "=============================================================="
 
   cd "$SERVER_DIR"
@@ -135,14 +170,14 @@ run_e2e_benchmark() {
     SERVER_PORT="$SERVER_PORT" \
     npx ts-node perf/e2e-benchmark.ts 2>&1 | tee "$RUN_DIR/benchmark-${mode}-output.txt"
 
-  echo "  ${mode^^} mode complete."
+  echo "  ${mode_label} mode complete."
 }
 
 # Capture server memory snapshot
 capture_memory() {
   local label="$1"
   local outfile="$RUN_DIR/memory-${label}.json"
-  curl -sf "${BASE_URL}/debug/memory" > "$outfile" 2>/dev/null || echo '{"error":"failed"}' > "$outfile"
+  curl --noproxy '*' -sf "${BASE_URL}/debug/memory" > "$outfile" 2>/dev/null || echo '{"error":"failed"}' > "$outfile"
   echo "  Memory snapshot: $outfile"
 }
 
@@ -228,7 +263,7 @@ run_e2e_benchmark "old"
 capture_memory "old-after"
 kill_server
 
-# Phase B: NEW mode (multi-tenancy cache with shared templates)
+# Phase B: NEW mode (multi-tenancy cache with buildKey handler reuse)
 start_server "new"
 capture_memory "new-before"
 run_e2e_benchmark "new"

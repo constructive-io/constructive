@@ -12,6 +12,24 @@ const POLICY_NAMES = {
   update: 'perf_load_public_update',
 };
 
+const policySuffixForRole = (role) => {
+  const suffix = String(role ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return suffix || 'role';
+};
+
+const policyNamesForRole = (role) => {
+  const suffix = policySuffixForRole(role);
+  return {
+    select: `${POLICY_NAMES.select}_${suffix}`,
+    insert: `${POLICY_NAMES.insert}_${suffix}`,
+    update: `${POLICY_NAMES.update}_${suffix}`,
+  };
+};
+
 export const extractProfiles = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload?.profiles)) return payload.profiles;
@@ -103,6 +121,7 @@ export const ensurePublicAccessForTargets = async ({
 
         const createdPolicies = [];
         if (rlsEnabled) {
+          const policyNames = policyNamesForRole(publicRole);
           const policyResult = await pool.query(
             `
               select policyname
@@ -121,16 +140,16 @@ export const ensurePublicAccessForTargets = async ({
           };
 
           await maybeCreatePolicy(
-            POLICY_NAMES.select,
-            `create policy ${quoteIdent(POLICY_NAMES.select)} on ${qualified} for select to ${publicRoleIdent} using (true);`,
+            policyNames.select,
+            `create policy ${quoteIdent(policyNames.select)} on ${qualified} for select to ${publicRoleIdent} using (true);`,
           );
           await maybeCreatePolicy(
-            POLICY_NAMES.insert,
-            `create policy ${quoteIdent(POLICY_NAMES.insert)} on ${qualified} for insert to ${publicRoleIdent} with check (true);`,
+            policyNames.insert,
+            `create policy ${quoteIdent(policyNames.insert)} on ${qualified} for insert to ${publicRoleIdent} with check (true);`,
           );
           await maybeCreatePolicy(
-            POLICY_NAMES.update,
-            `create policy ${quoteIdent(POLICY_NAMES.update)} on ${qualified} for update to ${publicRoleIdent} using (true) with check (true);`,
+            policyNames.update,
+            `create policy ${quoteIdent(policyNames.update)} on ${qualified} for update to ${publicRoleIdent} using (true) with check (true);`,
           );
         }
 

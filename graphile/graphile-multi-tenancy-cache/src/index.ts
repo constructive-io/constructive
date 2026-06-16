@@ -13,6 +13,9 @@ export {
 
 export type {
   TenantConfig,
+  TenantHandlerFactory,
+  TenantHandlerFactoryContext,
+  TenantHandlerResources,
   TenantInstance,
   MultiTenancyCacheStats,
   MultiTenancyCacheConfig,

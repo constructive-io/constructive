@@ -34,8 +34,8 @@ const compatRoutingMode = getArgValue(
 )
   .trim()
   .toLowerCase();
-const publicApiName = getArgValue(args, '--public-api-name', 'app').trim();
-const publicSubdomainPrefix = getArgValue(args, '--public-subdomain-prefix', 'app-public-').trim();
+const publicApiName = getArgValue(args, '--public-api-name', 'api').trim();
+const publicSubdomainPrefix = getArgValue(args, '--public-subdomain-prefix', 'api-dbpm-').trim();
 
 const outputPath = path.resolve(
   getArgValue(args, '--output', path.join(runDir, 'data', 'business-op-profiles.json')),
