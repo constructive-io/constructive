@@ -12,16 +12,75 @@
 
 import express, { Router, Request, Response } from 'express';
 import { Logger } from '@pgpmjs/logger';
+import { QuoteUtils } from '@pgsql/quotes';
 import {
-  updateAuthSettings,
+  authSettingsLoader,
   type AuthSettings,
   type ConstructiveContext,
-  type UpdateAuthSettingsInput,
 } from '@constructive-io/express-context';
 
 import './types';
 
 const log = new Logger('app-settings-auth');
+
+// ─── SQL ────────────────────────────────────────────────────────────────────
+
+const AUTH_SETTINGS_DISCOVERY_SQL = `
+  SELECT s.schema_name, sm.auth_settings_table AS table_name
+  FROM metaschema_modules_public.sessions_module sm
+  JOIN metaschema_public.schema s ON s.id = sm.schema_id
+  WHERE sm.database_id = $1
+  LIMIT 1
+`;
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+interface AuthSettingsTableRef {
+  schemaName: string;
+  tableName: string;
+}
+
+interface UpdateAuthSettingsInput {
+  allowIdentitySignIn?: boolean;
+  allowIdentitySignUp?: boolean;
+  cookieSecure?: boolean;
+  cookieSamesite?: string;
+  cookieDomain?: string | null;
+  cookieHttponly?: boolean;
+  cookieMaxAge?: string | null;
+  cookiePath?: string;
+  rememberMeDuration?: string | null;
+  enableCaptcha?: boolean;
+  captchaSiteKey?: string | null;
+  oauthStateMaxAge?: string | null;
+  oauthRequireVerifiedEmail?: boolean;
+  oauthErrorRedirectPath?: string | null;
+}
+
+type UpdateAuthSettingsResult =
+  | 'updated'
+  | 'not_configured'
+  | 'no_fields';
+
+const UPDATE_FIELD_MAP: Record<
+  keyof UpdateAuthSettingsInput,
+  { column: string; castInterval?: boolean }
+> = {
+  allowIdentitySignIn: { column: 'allow_identity_sign_in' },
+  allowIdentitySignUp: { column: 'allow_identity_sign_up' },
+  cookieSecure: { column: 'cookie_secure' },
+  cookieSamesite: { column: 'cookie_samesite' },
+  cookieDomain: { column: 'cookie_domain' },
+  cookieHttponly: { column: 'cookie_httponly' },
+  cookieMaxAge: { column: 'cookie_max_age', castInterval: true },
+  cookiePath: { column: 'cookie_path' },
+  rememberMeDuration: { column: 'remember_me_duration', castInterval: true },
+  enableCaptcha: { column: 'enable_captcha' },
+  captchaSiteKey: { column: 'captcha_site_key' },
+  oauthStateMaxAge: { column: 'oauth_state_max_age', castInterval: true },
+  oauthRequireVerifiedEmail: { column: 'oauth_require_verified_email' },
+  oauthErrorRedirectPath: { column: 'oauth_error_redirect_path' },
+};
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -63,6 +122,82 @@ function sendAuthSettings(res: Response, settings: AuthSettings): void {
     oauthRequireVerifiedEmail: settings.oauthRequireVerifiedEmail,
     oauthErrorRedirectPath: settings.oauthErrorRedirectPath,
   });
+}
+
+async function discoverAuthSettingsTable(
+  ctx: ConstructiveContext,
+): Promise<AuthSettingsTableRef | null> {
+  if (!ctx.databaseId) return null;
+
+  const discovery = await ctx.pool.query<{ schema_name: string; table_name: string }>(
+    AUTH_SETTINGS_DISCOVERY_SQL,
+    [ctx.databaseId],
+  );
+  const resolved = discovery.rows[0];
+  if (!resolved) return null;
+
+  return {
+    schemaName: resolved.schema_name,
+    tableName: resolved.table_name,
+  };
+}
+
+function buildUpdateAuthSettingsQuery(
+  schemaName: string,
+  tableName: string,
+  patch: UpdateAuthSettingsInput,
+): { sql: string; values: unknown[] } | null {
+  const authSettingsTable = QuoteUtils.quoteQualifiedIdentifier(
+    schemaName,
+    tableName,
+  );
+  const setClauses: string[] = [];
+  const values: unknown[] = [];
+  let paramIndex = 1;
+
+  for (const [field, config] of Object.entries(UPDATE_FIELD_MAP) as Array<
+    [keyof UpdateAuthSettingsInput, { column: string; castInterval?: boolean }]
+  >) {
+    if (field in patch) {
+      const cast = config.castInterval ? '::interval' : '';
+      setClauses.push(
+        `${QuoteUtils.quoteIdentifier(config.column)} = $${paramIndex++}${cast}`,
+      );
+      values.push(patch[field]);
+    }
+  }
+
+  if (setClauses.length === 0) return null;
+
+  return {
+    sql: `
+      UPDATE ${authSettingsTable}
+      SET ${setClauses.join(', ')}
+    `,
+    values,
+  };
+}
+
+async function updateAuthSettings(
+  ctx: ConstructiveContext,
+  patch: UpdateAuthSettingsInput,
+): Promise<UpdateAuthSettingsResult> {
+  const table = await discoverAuthSettingsTable(ctx);
+  if (!table) return 'not_configured';
+
+  const update = buildUpdateAuthSettingsQuery(
+    table.schemaName,
+    table.tableName,
+    patch,
+  );
+  if (!update) return 'no_fields';
+
+  await ctx.pool.query(update.sql, update.values);
+  if (ctx.databaseId) {
+    authSettingsLoader.invalidate(ctx.databaseId);
+  }
+
+  return 'updated';
 }
 
 // ─── Router ─────────────────────────────────────────────────────────────────

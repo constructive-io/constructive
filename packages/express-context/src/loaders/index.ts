@@ -42,7 +42,7 @@ export { createLoaderRegistry } from './registry';
 
 // Built-in loaders
 export { agentChatLoader } from './agent-chat';
-export { authSettingsLoader, updateAuthSettings } from './auth-settings';
+export { authSettingsLoader } from './auth-settings';
 export { billingLoader } from './billing';
 export { computeLoader } from './compute';
 export { connectedAccountsModuleLoader } from './connected-accounts-module';

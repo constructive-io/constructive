@@ -58,8 +58,6 @@ export type {
   PgInterval,
   PubkeyChallengeSettings,
   RlsModule,
-  UpdateAuthSettingsInput,
-  UpdateAuthSettingsResult,
   UserAuthModuleConfig,
   WebauthnSettings,
   WithPgClient,
@@ -106,7 +104,6 @@ export {
   llmLoader,
   pubkeyLoader,
   rlsLoader,
-  updateAuthSettings,
   userAuthModuleLoader,
   webauthnLoader,
 } from './loaders';
