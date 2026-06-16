@@ -16,6 +16,8 @@ export interface OAuthProfile {
   email: string | null;
   name: string | null;
   picture: string | null;
+  /** Whether the email is verified by the provider. null if unknown/unsupported. */
+  emailVerified: boolean | null;
   raw: unknown;
 }
 

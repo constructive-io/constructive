@@ -1,6 +1,22 @@
 import { OAuthClient, createOAuthClient } from '../src/oauth-client';
-import { getProvider, getProviderIds } from '../src/providers';
+import { GITHUB_EMAILS_URL, getProvider, getProviderIds } from '../src/providers';
 import { generateState, verifyState } from '../src/utils/state';
+
+const originalFetch = global.fetch;
+
+function jsonResponse(body: unknown, ok = true, status = 200) {
+  return {
+    ok,
+    status,
+    json: jest.fn().mockResolvedValue(body),
+    text: jest.fn().mockResolvedValue(typeof body === 'string' ? body : JSON.stringify(body)),
+  };
+}
+
+afterEach(() => {
+  global.fetch = originalFetch;
+  jest.restoreAllMocks();
+});
 
 describe('OAuthClient', () => {
   const config = {
@@ -116,6 +132,263 @@ describe('OAuthClient', () => {
       expect(returnedConfig.stateCookieMaxAge).toBe(300);
     });
   });
+
+  describe('getUserProfile', () => {
+    it('should enrich GitHub public email verification serially', async () => {
+      const fetchMock = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            name: 'Octo Cat',
+            email: 'octo@example.com',
+          })
+        )
+        .mockResolvedValueOnce(
+          jsonResponse([
+            {
+              email: 'octo@example.com',
+              primary: true,
+              verified: true,
+            },
+          ])
+        );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('github', 'github-token');
+
+      expect(profile.email).toBe('octo@example.com');
+      expect(profile.emailVerified).toBe(true);
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        1,
+        'https://api.github.com/user',
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            Authorization: 'Bearer github-token',
+            'User-Agent': 'Constructive-OAuth',
+          }),
+        })
+      );
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        2,
+        GITHUB_EMAILS_URL,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer github-token',
+            'User-Agent': 'Constructive-OAuth',
+          }),
+        })
+      );
+    });
+
+    it('should preserve explicit GitHub unverified email status', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            email: 'octo@example.com',
+          })
+        )
+        .mockResolvedValueOnce(
+          jsonResponse([
+            {
+              email: 'octo@example.com',
+              primary: true,
+              verified: false,
+            },
+          ])
+        );
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('github', 'github-token');
+
+      expect(profile.email).toBe('octo@example.com');
+      expect(profile.emailVerified).toBe(false);
+    });
+
+    it('should not replace a public GitHub email when no email-list match exists', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            email: 'public@example.com',
+          })
+        )
+        .mockResolvedValueOnce(
+          jsonResponse([
+            {
+              email: 'primary@example.com',
+              primary: true,
+              verified: true,
+            },
+          ])
+        );
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('github', 'github-token');
+
+      expect(profile.email).toBe('public@example.com');
+      expect(profile.emailVerified).toBeNull();
+    });
+
+    it('should use the best GitHub fallback email when profile email is private', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            email: null,
+          })
+        )
+        .mockResolvedValueOnce(
+          jsonResponse([
+            {
+              email: 'secondary@example.com',
+              primary: false,
+              verified: true,
+            },
+            {
+              email: 'primary@example.com',
+              primary: true,
+              verified: true,
+            },
+          ])
+        );
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('github', 'github-token');
+
+      expect(profile.email).toBe('primary@example.com');
+      expect(profile.emailVerified).toBe(true);
+    });
+
+    it('should use a verified GitHub fallback email when there is no primary verified email', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            email: null,
+          })
+        )
+        .mockResolvedValueOnce(
+          jsonResponse([
+            {
+              email: 'first@example.com',
+              primary: false,
+              verified: false,
+            },
+            {
+              email: 'verified@example.com',
+              primary: false,
+              verified: true,
+            },
+            {
+              email: 'primary@example.com',
+              primary: true,
+              verified: false,
+            },
+          ])
+        );
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('github', 'github-token');
+
+      expect(profile.email).toBe('verified@example.com');
+      expect(profile.emailVerified).toBe(true);
+    });
+
+    it('should use the primary GitHub fallback email when no verified email exists', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            email: null,
+          })
+        )
+        .mockResolvedValueOnce(
+          jsonResponse([
+            {
+              email: 'secondary@example.com',
+              primary: false,
+              verified: false,
+            },
+            {
+              email: 'primary@example.com',
+              primary: true,
+              verified: false,
+            },
+          ])
+        );
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('github', 'github-token');
+
+      expect(profile.email).toBe('primary@example.com');
+      expect(profile.emailVerified).toBe(false);
+    });
+
+    it('should keep the base GitHub profile when email enrichment fails', async () => {
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            email: 'octo@example.com',
+          })
+        )
+        .mockResolvedValueOnce(jsonResponse('forbidden', false, 403));
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('github', 'github-token');
+
+      expect(profile.email).toBe('octo@example.com');
+      expect(profile.emailVerified).toBeNull();
+    });
+
+    it('should fail when the GitHub profile request fails', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(jsonResponse('server error', false, 500));
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient(config);
+
+      await expect(client.getUserProfile('github', 'github-token')).rejects.toMatchObject({
+        code: 'USER_PROFILE_FAILED',
+        statusCode: 500,
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not call the GitHub emails endpoint for other providers', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(
+        jsonResponse({
+          sub: '123456789',
+          email: 'test@gmail.com',
+          email_verified: true,
+        })
+      );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient(config);
+      const profile = await client.getUserProfile('google', 'google-token');
+
+      expect(profile.email).toBe('test@gmail.com');
+      expect(profile.emailVerified).toBe(true);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 
 describe('providers', () => {
@@ -192,6 +465,7 @@ describe('provider profile mapping', () => {
     const profile = google.mapProfile({
       sub: '123456789',
       email: 'test@gmail.com',
+      email_verified: true,
       name: 'Test User',
       picture: 'https://example.com/photo.jpg',
     });
@@ -201,6 +475,7 @@ describe('provider profile mapping', () => {
     expect(profile.email).toBe('test@gmail.com');
     expect(profile.name).toBe('Test User');
     expect(profile.picture).toBe('https://example.com/photo.jpg');
+    expect(profile.emailVerified).toBe(true);
   });
 
   it('should map GitHub profile correctly', () => {
@@ -218,6 +493,7 @@ describe('provider profile mapping', () => {
     expect(profile.email).toBe('test@github.com');
     expect(profile.name).toBe('Test User');
     expect(profile.picture).toBe('https://avatars.githubusercontent.com/u/12345');
+    expect(profile.emailVerified).toBeNull();
   });
 
   it('should map Facebook profile correctly', () => {
@@ -234,6 +510,7 @@ describe('provider profile mapping', () => {
     expect(profile.email).toBe('test@facebook.com');
     expect(profile.name).toBe('Test User');
     expect(profile.picture).toBe('https://example.com/fb-photo.jpg');
+    expect(profile.emailVerified).toBe(true);
   });
 
   it('should map LinkedIn profile correctly', () => {
@@ -241,6 +518,7 @@ describe('provider profile mapping', () => {
     const profile = linkedin.mapProfile({
       sub: 'linkedin-123',
       email: 'test@linkedin.com',
+      email_verified: true,
       name: 'Test User',
       picture: 'https://example.com/li-photo.jpg',
     });
@@ -250,6 +528,7 @@ describe('provider profile mapping', () => {
     expect(profile.email).toBe('test@linkedin.com');
     expect(profile.name).toBe('Test User');
     expect(profile.picture).toBe('https://example.com/li-photo.jpg');
+    expect(profile.emailVerified).toBe(true);
   });
 
   it('should handle missing optional fields', () => {
@@ -263,5 +542,6 @@ describe('provider profile mapping', () => {
     expect(profile.email).toBeNull();
     expect(profile.name).toBeNull();
     expect(profile.picture).toBeNull();
+    expect(profile.emailVerified).toBeNull();
   });
 });

@@ -26,6 +26,7 @@ export const linkedinProvider: OAuthProviderConfig = {
       email: profile.email || null,
       name: profile.name || null,
       picture: profile.picture || null,
+      emailVerified: profile.email_verified ?? null,
       raw: data,
     };
   },
