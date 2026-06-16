@@ -1,6 +1,7 @@
 import { OAuthClient, createOAuthClient } from '../src/oauth-client';
 import { GITHUB_EMAILS_URL, getProvider, getProviderIds } from '../src/providers';
 import { generateState, verifyState } from '../src/utils/state';
+import { createSignedState, verifySignedState } from '../src/utils/signed-state';
 
 const originalFetch = global.fetch;
 
@@ -455,6 +456,77 @@ describe('state utilities', () => {
 
     it('should return false for different length states', () => {
       expect(verifyState('short', 'much-longer-state')).toBe(false);
+    });
+  });
+
+  describe('signed state', () => {
+    interface RedirectStatePayload {
+      redirect_uri: string;
+      provider: string;
+    }
+
+    const payload: RedirectStatePayload = {
+      redirect_uri: '/dashboard',
+      provider: 'github',
+    };
+
+    it('should verify a signed state payload', () => {
+      const state = createSignedState(payload, {
+        secret: 'test-secret',
+        maxAgeMs: 60_000,
+      });
+
+      const verified = verifySignedState<RedirectStatePayload>(state, {
+        secret: 'test-secret',
+      });
+
+      expect(verified).toMatchObject(payload);
+      expect(verified?.nonce).toHaveLength(32);
+      expect(typeof verified?.exp).toBe('number');
+    });
+
+    it('should reject a signed state with the wrong secret', () => {
+      const state = createSignedState(payload, {
+        secret: 'test-secret',
+        maxAgeMs: 60_000,
+      });
+
+      expect(
+        verifySignedState<RedirectStatePayload>(state, {
+          secret: 'other-secret',
+        })
+      ).toBeNull();
+    });
+
+    it('should reject an expired signed state', () => {
+      const state = createSignedState(payload, {
+        secret: 'test-secret',
+        maxAgeMs: -1,
+      });
+
+      expect(
+        verifySignedState<RedirectStatePayload>(state, {
+          secret: 'test-secret',
+        })
+      ).toBeNull();
+    });
+
+    it('should return null when verifying without a secret', () => {
+      const state = createSignedState(payload, {
+        secret: 'test-secret',
+        maxAgeMs: 60_000,
+      });
+
+      expect(verifySignedState<RedirectStatePayload>(state, {})).toBeNull();
+    });
+
+    it('should require a secret when creating signed state', () => {
+      expect(() =>
+        createSignedState(payload, {
+          secret: '',
+          maxAgeMs: 60_000,
+        })
+      ).toThrow('OAuth state secret is required');
     });
   });
 });
