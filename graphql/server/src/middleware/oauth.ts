@@ -18,7 +18,12 @@
 
 import crypto from 'crypto';
 import { Router, Request, Response } from 'express';
-import { OAuthClient, OAuthProfile } from '@constructive-io/oauth';
+import {
+  OAuthClient,
+  OAuthProfile,
+  createSignedState,
+  verifySignedState,
+} from '@constructive-io/oauth';
 import { Logger } from '@pgpmjs/logger';
 import { getNodeEnv, getEnvVars } from '@pgpmjs/env';
 import { QuoteUtils } from '@pgsql/quotes';
@@ -29,7 +34,6 @@ import type {
   ConstructiveContext,
   IdentityProvidersConfig,
   IdentityProviderFullConfig,
-  PgInterval,
   UserAuthModuleConfig,
 } from '@constructive-io/express-context';
 
@@ -41,6 +45,7 @@ import {
   setDeviceTokenCookie,
   parseCookieValue,
 } from './cookie';
+import { pgIntervalToMilliseconds } from '../utils/pg-interval';
 
 const log = new Logger('oauth');
 
@@ -48,99 +53,21 @@ const OAUTH_STATE_COOKIE = 'oauth_state';
 const DEFAULT_OAUTH_STATE_MAX_AGE = 10 * 60 * 1000; // 10 minutes
 const DEFAULT_ERROR_REDIRECT_PATH = '/auth/error';
 
-/**
- * Parse OAuth state interval to milliseconds.
- *
- * Kept local so OAuth can handle PgInterval values without changing the
- * existing session cookie max-age parser in this migration.
- */
-function parseIntervalToMs(
-  interval: string | PgInterval | null | undefined,
-): number {
-  if (!interval) return DEFAULT_OAUTH_STATE_MAX_AGE;
-  if (typeof interval === 'string') {
-    const seconds = parseInt(interval, 10);
-    return Number.isNaN(seconds)
-      ? DEFAULT_OAUTH_STATE_MAX_AGE
-      : seconds * 1000;
-  }
-
-  let totalSeconds = 0;
-  if (interval.years) totalSeconds += interval.years * 365 * 24 * 60 * 60;
-  if (interval.months) totalSeconds += interval.months * 30 * 24 * 60 * 60;
-  if (interval.days) totalSeconds += interval.days * 24 * 60 * 60;
-  if (interval.hours) totalSeconds += interval.hours * 60 * 60;
-  if (interval.minutes) totalSeconds += interval.minutes * 60;
-  if (interval.seconds) totalSeconds += interval.seconds;
-  if (interval.milliseconds) totalSeconds += interval.milliseconds / 1000;
-
-  return totalSeconds > 0
-    ? totalSeconds * 1000
-    : DEFAULT_OAUTH_STATE_MAX_AGE;
-}
-
-// =============================================================================
-// Signed State Utilities
-// =============================================================================
-
-interface StatePayload {
+interface OAuthStatePayload {
   redirect_uri: string;
   provider: string;
-  nonce: string;
-  exp: number;
 }
 
-function getStateSecret(): string {
+function getStateSecret(): string | undefined {
+  return getEnvVars().oauth?.secret;
+}
+
+function requireStateSecret(): string {
   const secret = getEnvVars().oauth?.secret;
   if (!secret) {
     throw new Error('OAUTH_SECRET environment variable is required');
   }
   return secret;
-}
-
-function createSignedState(
-  payload: { redirect_uri: string; provider: string },
-  maxAge: number,
-): string {
-  const data: StatePayload = {
-    ...payload,
-    nonce: crypto.randomBytes(16).toString('hex'),
-    exp: Date.now() + maxAge,
-  };
-  const json = JSON.stringify(data);
-  const sig = crypto
-    .createHmac('sha256', getStateSecret())
-    .update(json)
-    .digest('base64url');
-  return Buffer.from(json).toString('base64url') + '.' + sig;
-}
-
-function verifySignedState(state: string): StatePayload | null {
-  try {
-    const [payloadB64, sig] = state.split('.');
-    if (!payloadB64 || !sig) return null;
-
-    const json = Buffer.from(payloadB64, 'base64url').toString();
-    const expectedSig = crypto
-      .createHmac('sha256', getStateSecret())
-      .update(json)
-      .digest('base64url');
-
-    if (
-      !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig))
-    ) {
-      return null;
-    }
-
-    const data = JSON.parse(json) as StatePayload;
-    if (data.exp < Date.now()) {
-      return null;
-    }
-
-    return data;
-  } catch {
-    return null;
-  }
 }
 
 // =============================================================================
@@ -355,10 +282,15 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         );
       }
 
-      const stateMaxAge = parseIntervalToMs(authSettings?.oauthStateMaxAge);
+      const stateMaxAge =
+        pgIntervalToMilliseconds(authSettings?.oauthStateMaxAge) ??
+        DEFAULT_OAUTH_STATE_MAX_AGE;
       const state = createSignedState(
         { redirect_uri: redirectUri, provider },
-        stateMaxAge,
+        {
+          secret: requireStateSecret(),
+          maxAgeMs: stateMaxAge,
+        },
       );
 
       res.cookie(OAUTH_STATE_COOKIE, state, {
@@ -425,7 +357,10 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         );
       }
 
-      const statePayload = verifySignedState(storedState as string);
+      const statePayload = verifySignedState<OAuthStatePayload>(
+        storedState as string,
+        { secret: getStateSecret() },
+      );
       if (!statePayload) {
         log.warn(`[oauth] Invalid or expired state for ${provider}`);
         return redirectToError(

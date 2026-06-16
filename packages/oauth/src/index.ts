@@ -21,3 +21,11 @@ export {
   facebookProvider,
   linkedinProvider,
 } from './providers';
+
+export {
+  CreateSignedStateOptions,
+  VerifySignedStateOptions,
+  SignedStatePayload,
+  createSignedState,
+  verifySignedState,
+} from './utils/signed-state';
