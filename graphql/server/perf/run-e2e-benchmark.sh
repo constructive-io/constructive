@@ -44,12 +44,13 @@ export no_proxy="${no_proxy:-$NO_PROXY}"
 export NODE_ENV=development
 export GRAPHILE_ENV=development
 export GRAPHQL_OBSERVABILITY_ENABLED=true
-export API_IS_PUBLIC=false
+export API_IS_PUBLIC="${API_IS_PUBLIC:-false}"
 MODE_LABEL="$(printf '%s' "$MODE" | tr '[:lower:]' '[:upper:]')"
 
 echo "=============================================================="
 echo "E2E Multi-Tenancy Benchmark (Single Mode)"
 echo "  Mode=$MODE, K=$K tenants, Duration=${DURATION}s, Workers=$WORKERS"
+echo "  API_IS_PUBLIC=$API_IS_PUBLIC"
 echo "=============================================================="
 
 kill_server() {

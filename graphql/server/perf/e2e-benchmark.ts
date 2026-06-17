@@ -20,6 +20,11 @@ const WORKERS = parseInt(process.env.WORKERS || '8', 10);
 const SERVER_PORT = parseInt(process.env.SERVER_PORT || '3000', 10);
 const SERVER_HOST = process.env.SERVER_HOST || 'localhost';
 const MODE = process.env.MODE || 'old'; // 'old' or 'new'
+const API_IS_PUBLIC = process.env.API_IS_PUBLIC === 'true';
+const PUBLIC_HOSTS = (process.env.E2E_PUBLIC_HOSTS || process.env.PUBLIC_HOSTS || '')
+  .split(',')
+  .map((host) => host.trim())
+  .filter(Boolean);
 
 // Schemas to expose per tenant (via X-Schemata header)
 const SCHEMAS = 'services_public';
@@ -142,6 +147,24 @@ async function getHeapUsedMB(): Promise<number> {
 // ─── Tenant Profiles ────────────────────────────────────────────────────────
 function buildTenantProfiles(k: number): TenantProfile[] {
   const profiles: TenantProfile[] = [];
+  if (API_IS_PUBLIC) {
+    if (PUBLIC_HOSTS.length === 0) {
+      throw new Error('API_IS_PUBLIC=true requires E2E_PUBLIC_HOSTS or PUBLIC_HOSTS');
+    }
+
+    for (let i = 0; i < k; i++) {
+      const host = PUBLIC_HOSTS[i % PUBLIC_HOSTS.length];
+      profiles.push({
+        tenantId: `public-${i}-${host}`,
+        databaseId: host,
+        headers: {
+          Host: host,
+        },
+      });
+    }
+    return profiles;
+  }
+
   for (let i = 0; i < k; i++) {
     const tenantId = `tenant-${i}`;
     const databaseId = `db-${i.toString().padStart(4, '0')}-${tenantId}`;
@@ -159,6 +182,26 @@ function buildTenantProfiles(k: number): TenantProfile[] {
 
 // ─── Operation Profiles ─────────────────────────────────────────────────────
 function buildOperationProfiles(): OperationProfile[] {
+  if (API_IS_PUBLIC) {
+    return [
+      {
+        name: 'Typename',
+        weight: 60,
+        query: `query Typename { __typename }`,
+      },
+      {
+        name: 'QueryType',
+        weight: 20,
+        query: `query QueryType { __schema { queryType { name } } }`,
+      },
+      {
+        name: 'TypeList',
+        weight: 20,
+        query: `query TypeList { __schema { types { name kind } } }`,
+      },
+    ];
+  }
+
   return [
     {
       name: 'ListApis',
@@ -270,6 +313,10 @@ async function runBenchmark(): Promise<BenchmarkResult> {
   console.log(`  K=${K} tenants, Duration=${DURATION_SEC}s, Workers=${WORKERS}`);
   console.log(`  Server: http://${SERVER_HOST}:${SERVER_PORT}`);
   console.log(`  Schemas: ${SCHEMAS}`);
+  console.log(`  API_IS_PUBLIC=${API_IS_PUBLIC}`);
+  if (API_IS_PUBLIC) {
+    console.log(`  Public hosts: ${PUBLIC_HOSTS.length}`);
+  }
   console.log('='.repeat(70));
 
   const tenants = buildTenantProfiles(K);
@@ -327,7 +374,9 @@ async function runBenchmark(): Promise<BenchmarkResult> {
   for (const r of results) {
     totalQueries += r.totalQueries;
     totalErrors += r.errors;
-    allLatencies.push(...r.latencies);
+    for (const latency of r.latencies) {
+      allLatencies.push(latency);
+    }
     allErrorSamples.push(...r.errorSamples);
   }
 

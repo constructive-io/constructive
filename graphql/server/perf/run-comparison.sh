@@ -64,12 +64,13 @@ export no_proxy="${no_proxy:-$NO_PROXY}"
 export NODE_ENV=development
 export GRAPHILE_ENV=development
 export GRAPHQL_OBSERVABILITY_ENABLED=true
-export API_IS_PUBLIC=false
+export API_IS_PUBLIC="${API_IS_PUBLIC:-false}"
 export K DURATION WORKERS SERVER_PORT
 
 echo "=============================================================="
 echo "E2E Multi-Tenancy Comparison (Perf Framework)"
 echo "  K=$K tenants, Duration=${DURATION}s, Workers=$WORKERS"
+echo "  API_IS_PUBLIC=$API_IS_PUBLIC"
 echo "  Old approach GRAPHILE_CACHE_MAX=$OLD_CACHE_MAX"
 echo "  Run dir: $RUN_DIR"
 echo "=============================================================="
