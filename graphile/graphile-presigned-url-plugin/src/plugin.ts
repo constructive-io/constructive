@@ -269,15 +269,27 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
+                      // 1. Get databaseId with user connection (needs JWT claims)
+                      const databaseId = await vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
+                        return resolveDatabaseId(pgClient);
+                      });
+                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+
+                      // 2. Load storage config with ROOT connection (no RLS)
+                      // storage_module is database-level system config, not user data.
+                      // RLS on storage_module checks org_memberships_sprt which only
+                      // includes platform users, not tenant users. Using root connection
+                      // is safe because databaseId comes from JWT and bucket/file ops
+                      // still use RLS.
+                      const allConfigs = await vals.withPgClient(null, async (rootClient: any) => {
+                        return loadAllStorageModules(rootClient, databaseId);
+                      });
+                      const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
+                      if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
+
+                      // 3. User operations with RLS (bucket access, file creation)
                       return vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
                         return pgClient.withTransaction(async (txClient: any) => {
-                          const databaseId = await resolveDatabaseId(txClient);
-                          if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
-
-                          const allConfigs = await loadAllStorageModules(txClient, databaseId);
-                          const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
-                          if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
-
                           const bucket = await getBucketConfig(
                             txClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined,
                           );
@@ -370,33 +382,40 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
+                      // 1. Get databaseId with user connection (needs JWT claims)
+                      const databaseId = await vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
+                        return resolveDatabaseId(pgClient);
+                      });
+                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+
+                      // 2. Load storage config with ROOT connection (no RLS)
+                      const allConfigs = await vals.withPgClient(null, async (rootClient: any) => {
+                        return loadAllStorageModules(rootClient, databaseId);
+                      });
+                      const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
+                      if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
+
+                      // Enforce bulk upload limits (use config before transaction)
+                      const filesArray = vals.files as any[];
+                      if (filesArray.length > storageConfig.maxBulkFiles) {
+                        throw new Error(
+                          `BULK_UPLOAD_FILES_EXCEEDED: ${filesArray.length} files exceeds maximum of ${storageConfig.maxBulkFiles} per batch`,
+                        );
+                      }
+                      const totalSize = filesArray.reduce((sum: number, f: any) => sum + (f.size || 0), 0);
+                      if (totalSize > storageConfig.maxBulkTotalSize) {
+                        throw new Error(
+                          `BULK_UPLOAD_SIZE_EXCEEDED: ${totalSize} bytes exceeds maximum of ${storageConfig.maxBulkTotalSize} bytes per batch`,
+                        );
+                      }
+
+                      // 3. User operations with RLS (bucket access, file creation)
                       return vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
                         return pgClient.withTransaction(async (txClient: any) => {
-                          const databaseId = await resolveDatabaseId(txClient);
-                          if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
-
-                          const allConfigs = await loadAllStorageModules(txClient, databaseId);
-                          const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
-                          if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
-
                           const bucket = await getBucketConfig(
                             txClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined,
                           );
                           if (!bucket) throw new Error('BUCKET_NOT_FOUND');
-
-                          // Enforce bulk upload limits
-                          const filesArray = vals.files as any[];
-                          if (filesArray.length > storageConfig.maxBulkFiles) {
-                            throw new Error(
-                              `BULK_UPLOAD_FILES_EXCEEDED: ${filesArray.length} files exceeds maximum of ${storageConfig.maxBulkFiles} per batch`,
-                            );
-                          }
-                          const totalSize = filesArray.reduce((sum: number, f: any) => sum + (f.size || 0), 0);
-                          if (totalSize > storageConfig.maxBulkTotalSize) {
-                            throw new Error(
-                              `BULK_UPLOAD_SIZE_EXCEEDED: ${totalSize} bytes exceeds maximum of ${storageConfig.maxBulkTotalSize} bytes per batch`,
-                            );
-                          }
 
                           const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId, bucket.key);
                           await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId, storageConfig.allowedOrigins);
@@ -480,15 +499,21 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
+                    // 1. Get databaseId with user connection (needs JWT claims)
+                    const databaseId = await withPgClient(pgSettings, async (pgClient: any) => {
+                      return resolveDatabaseId(pgClient);
+                    });
+                    if (!databaseId) return;
+
+                    // 2. Load storage config with ROOT connection (no RLS)
+                    const allConfigs = await withPgClient(null, async (rootClient: any) => {
+                      return loadAllStorageModules(rootClient, databaseId);
+                    });
+                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
+                    if (!storageConfig) return;
+
+                    // 3. Read the file row with user connection (RLS enforced)
                     await withPgClient(pgSettings, async (pgClient: any) => {
-                      const databaseId = await resolveDatabaseId(pgClient);
-                      if (!databaseId) return;
-
-                      const allConfigs = await loadAllStorageModules(pgClient, databaseId);
-                      const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-                      if (!storageConfig) return;
-
-                      // Read the file row (RLS enforced)
                       const result = await pgClient.query({
                         text: `SELECT key, bucket_id FROM ${storageConfig.filesQualifiedName} WHERE id = $1 LIMIT 1`,
                         values: [fileInput],
@@ -513,16 +538,23 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
-                    await withPgClient(pgSettings, async (pgClient: any) => {
-                      const databaseId = await resolveDatabaseId(pgClient);
-                      if (!databaseId) return;
+                    // 1. Get databaseId with user connection (needs JWT claims)
+                    const databaseId = await withPgClient(pgSettings, async (pgClient: any) => {
+                      return resolveDatabaseId(pgClient);
+                    });
+                    if (!databaseId) return;
 
-                      const allConfigs = await loadAllStorageModules(pgClient, databaseId);
-                      const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-                      if (!storageConfig) return;
+                    // 2. Load storage config with ROOT connection (no RLS)
+                    const allConfigs = await withPgClient(null, async (rootClient: any) => {
+                      return loadAllStorageModules(rootClient, databaseId);
+                    });
+                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
+                    if (!storageConfig) return;
 
-                      // Check refcount: any other file with the same key in this bucket?
-                      const refResult = await pgClient.query({
+                    // 3. Check refcount and cleanup with ROOT connection
+                    // Refcount must be system-level to see all files, not just user's
+                    await withPgClient(null, async (rootClient: any) => {
+                      const refResult = await rootClient.query({
                         text: `SELECT COUNT(*)::int AS ref_count FROM ${storageConfig.filesQualifiedName} WHERE key = $1 AND bucket_id = $2`,
                         values: [fileRow!.key, fileRow!.bucket_id],
                       });
@@ -534,8 +566,7 @@ export function createPresignedUrlPlugin(
                       }
 
                       // No other references — attempt sync S3 delete
-                      // Look up the bucket key for scoped S3 resolution
-                      const bucketResult = await pgClient.query({
+                      const bucketResult = await rootClient.query({
                         text: `SELECT key FROM ${storageConfig.bucketsQualifiedName} WHERE id = $1 LIMIT 1`,
                         values: [fileRow!.bucket_id],
                       });
