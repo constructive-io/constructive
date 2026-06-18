@@ -763,7 +763,7 @@ describe('coalesced creation failure — no orphaned mappings (Finding 1)', () =
   });
 
   it('should preserve all svc_key mappings when coalesced creation succeeds', async () => {
-    // Uses the default (working) preset builder from beforeEach
+    // Uses the default (working) handler factory from beforeEach
     const pool = makeMockPool();
     const base = { pool, schemas: ['public'] as string[], anonRole: 'anon', roleName: 'auth', databaseId: 'db-003' };
 

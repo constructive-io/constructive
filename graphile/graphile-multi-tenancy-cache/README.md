@@ -39,7 +39,7 @@ npm install graphile-multi-tenancy-cache
 
 ## Usage
 
-This package is a runtime orchestrator, not a schema plugin. You configure it with a preset builder, then resolve handlers per request.
+This package is a runtime orchestrator, not a schema plugin. You configure it with a handler factory, then resolve handlers per request.
 
 ```typescript
 import {
@@ -51,14 +51,26 @@ import {
 } from 'graphile-multi-tenancy-cache';
 
 configureMultiTenancyCache({
-  basePresetBuilder(pool, schemas, anonRole, roleName) {
-    return {
-      extends: [],
-      grafast: {
-        context: () => ({})
-      },
-      pgServices: [],
-    };
+  async handlerFactory({
+    buildKey,
+    svcKey,
+    pool,
+    schemas,
+    anonRole,
+    roleName,
+    databaseId,
+    presetOptions,
+  }) {
+    return createTenantGraphileResources({
+      pool,
+      schemas,
+      anonRole,
+      roleName,
+      databaseSettings: presetOptions,
+      cacheKey: buildKey,
+      serviceKey: svcKey,
+      databaseId,
+    });
   },
 });
 
@@ -74,6 +86,7 @@ async function handleGraphql(req, res) {
       anonRole: req.api.anonRole,
       roleName: req.api.roleName,
       databaseId: req.api.databaseId,
+      presetOptions: req.api.databaseSettings,
     });
   }
 
@@ -87,7 +100,7 @@ process.on('SIGTERM', async () => {
 
 ## Features
 
-- **Exact-match buildKey reuse** — handlers are shared only when connection identity, schema set, and role inputs match exactly
+- **Exact-match buildKey reuse** — handlers are shared only when connection identity, schema set, role inputs, and preset options match exactly
 - **Request-key indirection** — `svc_key` remains the routing and flush key while `buildKey` becomes the handler identity
 - **Single-flight creation** — concurrent requests for the same `buildKey` coalesce onto one in-flight handler build
 - **Safe rebinding** — reassigning a `svc_key` to a new `buildKey` cleans up unreachable handlers and stale indexes
@@ -111,6 +124,7 @@ process.on('SIGTERM', async () => {
 - schema list
 - `anonRole`
 - `roleName`
+- `presetOptions`, when supplied
 
 It does **not** include:
 
@@ -125,10 +139,10 @@ Schema order is preserved. `['a', 'b']` and `['b', 'a']` intentionally produce d
 
 Examples:
 
-- A buildKey is a canonical string derived from connection identity, schemas, and role inputs:
+- A buildKey is a canonical string derived from connection identity, schemas, role inputs, and preset options:
 
 ```json
-{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["services_public"],"anonRole":"administrator","roleName":"administrator"}
+{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["services_public"],"anonRole":"administrator","roleName":"administrator","presetOptions":{"watch":false}}
 ```
 
 - Different route keys can still share the same handler when they resolve to the same build inputs:
@@ -146,11 +160,12 @@ svc_key: schemata:main-db:services_public
   - `schemas`
   - `anonRole`
   - `roleName`
+  - `presetOptions`
 
   These then feed into the buildKey:
 
 ```json
-{"conn":"<host>:<port>/<dbname>@<user>","schemas":[...],"anonRole":"...","roleName":"..."}
+{"conn":"<host>:<port>/<dbname>@<user>","schemas":[...],"anonRole":"...","roleName":"...","presetOptions":{...}}
 ```
 
   Different route keys only share a `buildKey` if they ultimately resolve to the same:
@@ -159,6 +174,7 @@ svc_key: schemata:main-db:services_public
   - `schemas`
   - `anonRole`
   - `roleName`
+  - `presetOptions`
 
   In practice, the resolution rules differ by path:
 
@@ -172,8 +188,8 @@ svc_key: schemata:main-db:services_public
 - Schema order matters, so these produce different buildKeys:
 
 ```json
-{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["services_public","metaschema_public"],"anonRole":"administrator","roleName":"administrator"}
-{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["metaschema_public","services_public"],"anonRole":"administrator","roleName":"administrator"}
+{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["services_public","metaschema_public"],"anonRole":"administrator","roleName":"administrator","presetOptions":{"watch":false}}
+{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["metaschema_public","services_public"],"anonRole":"administrator","roleName":"administrator","presetOptions":{"watch":false}}
 ```
 
 - Different database connections also produce different buildKeys, even when schema names match.
@@ -188,7 +204,7 @@ At runtime the cache maintains three main indexes:
 
 The flow is:
 
-1. Compute the `buildKey` from pool identity, schemas, and role inputs.
+1. Compute the `buildKey` from pool identity, schemas, role inputs, and preset options.
 2. Check the handler cache for an existing `buildKey`.
 3. If another request is already building that handler, await the shared promise.
 4. If no handler exists, create a fresh PostGraphile instance.
@@ -217,14 +233,14 @@ The package supports:
 
 | Export | Purpose |
 |--------|---------|
-| `configureMultiTenancyCache(config)` | Registers the base preset builder. Must be called before handler creation. |
+| `configureMultiTenancyCache(config)` | Registers the handler factory. Must be called before handler creation. |
 | `getTenantInstance(svcKey)` | Fast-path lookup via `svc_key`. |
 | `getOrCreateTenantInstance(config)` | Resolve or create a handler for a request. |
 | `flushTenantInstance(svcKey)` | Evict the handler currently mapped to a route key. |
 | `flushByDatabaseId(databaseId)` | Evict all handlers associated with a database. |
 | `getMultiTenancyCacheStats()` | Return cache/index counts for diagnostics. |
 | `shutdownMultiTenancyCache()` | Dispose handlers and clear all internal state. |
-| `computeBuildKey(pool, schemas, anonRole, roleName)` | Compute the exact-match handler identity. |
+| `computeBuildKey(pool, schemas, anonRole, roleName, presetOptions?)` | Compute the exact-match handler identity. |
 | `getBuildKeyForSvcKey(svcKey)` | Resolve the buildKey currently mapped to a route key. |
 
 ## License

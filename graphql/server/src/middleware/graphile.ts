@@ -498,7 +498,7 @@ export async function shutdownMultiTenancy(): Promise<void> {
 export const multiTenancyHandler = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
 
-  // One-time bootstrap: configure the multi-tenancy cache with our preset builder
+  // One-time bootstrap: configure the multi-tenancy cache with our handler factory
   configureMultiTenancyCache({
     handlerFactory: async ({
       buildKey,
