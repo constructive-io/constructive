@@ -58,9 +58,6 @@ export * from './presets/index';
 // Re-export makePgService for convenience
 export { makePgService };
 
-// Upload utilities
-export { streamToStorage } from './upload-resolver';
-
 // Presigned URL utilities
 export { getPresignedUrlS3Config } from './presigned-url-resolver';
 

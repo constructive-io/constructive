@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.8.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.8.0...graphile-settings@5.8.1) (2026-06-18)
+
+**Note:** Version bump only for package graphile-settings
+
+# [5.8.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.7.1...graphile-settings@5.8.0) (2026-06-17)
+
+### Features
+
+- **meta-schema:** expose enum metadata in \_meta field-level introspection ([06137fc](https://github.com/constructive-io/constructive/commit/06137fc18db4291dffb47d42513ed553e955e347))
+- **meta-schema:** expose i18n and realtime metadata in \_meta query ([8b6b459](https://github.com/constructive-io/constructive/commit/8b6b459236611524b9e8be20f6fd51930fcfb508))
+- **meta-schema:** expose storage and search metadata in \_meta query ([b46c4ba](https://github.com/constructive-io/constructive/commit/b46c4baee628848046ae46a0289ff47ffc071cd8))
+
 ## [5.7.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.7.0...graphile-settings@5.7.1) (2026-06-14)
 
 **Note:** Version bump only for package graphile-settings

@@ -345,9 +345,11 @@ export async function loadAllStorageModules(
     storageModuleCache.set(key, config);
   }
 
-  // Store the full list under a sentinel key
-  const sentinel = { ...configs[0] || {}, _allConfigs: configs } as any;
-  storageModuleCache.set(cacheKey, sentinel);
+  // Store the full list under a sentinel key (only if non-empty to avoid caching failed lookups)
+  if (configs.length > 0) {
+    const sentinel = { ...configs[0], _allConfigs: configs } as any;
+    storageModuleCache.set(cacheKey, sentinel);
+  }
 
   return configs;
 }

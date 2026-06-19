@@ -149,7 +149,7 @@ export function createDownloadUrlPlugin(
                       let downloadUrlExpirySeconds = 3600;
                       try {
                         if (withPgClient && pgSettings) {
-                          const resolved = await withPgClient(null, async (pgClient: any) => {
+                          const resolved = await withPgClient(pgSettings, async (pgClient: any) => {
                             const dbResult = await pgClient.query({
                               text: `SELECT jwt_private.current_database_id() AS id`,
                             });

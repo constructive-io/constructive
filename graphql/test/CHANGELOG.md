@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.22.0...@constructive-io/graphql-test@4.22.1) (2026-06-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+# [4.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.21.14...@constructive-io/graphql-test@4.22.0) (2026-06-17)
+
+### Bug Fixes
+
+- correct introspection snapshot type ordering (Float before MetaI18n) ([533e462](https://github.com/constructive-io/constructive/commit/533e462adeab994ae5217e915571ea87b00c031d))
+- escape backticks in Float scalar description in snapshot ([c191084](https://github.com/constructive-io/constructive/commit/c19108472bc8e4eb8e9889131a9223ed9f0e4fa3))
+- reorder MetaEnum type after MetaType in introspection snapshots ([7dc2afe](https://github.com/constructive-io/constructive/commit/7dc2afea6794ee96792995042daee6497e40994b))
+- update introspection and schema snapshots for new meta types ([db76434](https://github.com/constructive-io/constructive/commit/db764344dd7891f5bd2a97f3ce12582ab5a6a556))
+
+### Features
+
+- **meta-schema:** expose enum metadata in \_meta field-level introspection ([06137fc](https://github.com/constructive-io/constructive/commit/06137fc18db4291dffb47d42513ed553e955e347))
+- **meta-schema:** expose i18n and realtime metadata in \_meta query ([8b6b459](https://github.com/constructive-io/constructive/commit/8b6b459236611524b9e8be20f6fd51930fcfb508))
+
 ## [4.21.14](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.21.13...@constructive-io/graphql-test@4.21.14) (2026-06-14)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

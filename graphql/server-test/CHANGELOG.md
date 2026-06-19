@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.26.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.26.0...graphql-server-test@2.26.1) (2026-06-18)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [2.26.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.25.14...graphql-server-test@2.26.0) (2026-06-17)
+
+### Bug Fixes
+
+- reorder MetaEnum type after MetaType in introspection snapshots ([7dc2afe](https://github.com/constructive-io/constructive/commit/7dc2afea6794ee96792995042daee6497e40994b))
+- update introspection and schema snapshots for new meta types ([db76434](https://github.com/constructive-io/constructive/commit/db764344dd7891f5bd2a97f3ce12582ab5a6a556))
+
+### Features
+
+- **meta-schema:** expose enum metadata in \_meta field-level introspection ([06137fc](https://github.com/constructive-io/constructive/commit/06137fc18db4291dffb47d42513ed553e955e347))
+- **meta-schema:** expose i18n and realtime metadata in \_meta query ([8b6b459](https://github.com/constructive-io/constructive/commit/8b6b459236611524b9e8be20f6fd51930fcfb508))
+
 ## [2.25.14](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.25.13...graphql-server-test@2.25.14) (2026-06-14)
 
 **Note:** Version bump only for package graphql-server-test
