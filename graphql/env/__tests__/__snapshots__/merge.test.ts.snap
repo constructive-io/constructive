@@ -24,7 +24,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "bucketName": "test-bucket",
     "endpoint": "http://localhost:9000",
     "provider": "minio",
-    "publicUrlPrefix": "http://localhost:9000/test-bucket",
+    "publicUrlPrefix": "http://localhost:9000",
   },
   "db": {
     "connections": {
