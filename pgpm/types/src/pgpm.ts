@@ -304,7 +304,7 @@ export const pgpmDefaults: PgpmOptions = {
     awsAccessKey: 'minioadmin',
     awsSecretKey: 'minioadmin',
     endpoint: 'http://localhost:9000',
-    publicUrlPrefix: 'http://localhost:9000/test-bucket'
+    publicUrlPrefix: 'http://localhost:9000'
   },
   deployment: {
     useTx: true,

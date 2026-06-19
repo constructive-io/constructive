@@ -183,7 +183,7 @@ export function createDownloadUrlPlugin(
                       }
 
                       if (isPublic && s3ForDb.publicUrlPrefix) {
-                        return `${s3ForDb.publicUrlPrefix}/${key}`;
+                        return `${s3ForDb.publicUrlPrefix}/${s3ForDb.bucket}/${key}`;
                       }
 
                       return generatePresignedGetUrl(
