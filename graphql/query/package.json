@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-query",
-  "version": "3.27.8",
+  "version": "3.27.10",
   "description": "Constructive GraphQL Query",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",

@@ -179,6 +179,9 @@ export const META_TABLE_ORDER = [
   'namespace_module',
   'merkle_store_module',
   'graph_module',
+  'graph_execution_module',
+  'function_deployment_module',
+  'function_invocation_module',
   'compute_log_module',
   'db_usage_module',
   'storage_log_module',
@@ -580,6 +583,18 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
   graph_module: {
     schema: 'metaschema_modules_public',
     table: 'graph_module'
+  },
+  graph_execution_module: {
+    schema: 'metaschema_modules_public',
+    table: 'graph_execution_module'
+  },
+  function_deployment_module: {
+    schema: 'metaschema_modules_public',
+    table: 'function_deployment_module'
+  },
+  function_invocation_module: {
+    schema: 'metaschema_modules_public',
+    table: 'function_invocation_module'
   },
   compute_log_module: {
     schema: 'metaschema_modules_public',

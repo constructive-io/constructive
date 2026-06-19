@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.22.0...@pgpmjs/export@0.22.1) (2026-06-18)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+# [0.22.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.21.7...@pgpmjs/export@0.22.0) (2026-06-17)
+
+### Features
+
+- **pgpm/export:** add function_deployment, function_invocation, graph_execution modules to exporter ([692cc0a](https://github.com/constructive-io/constructive/commit/692cc0afe75c603280c12fa0cab2f7e9dc23c45f))
+
 ## [0.21.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.21.6...@pgpmjs/export@0.21.7) (2026-06-14)
 
 **Note:** Version bump only for package @pgpmjs/export
