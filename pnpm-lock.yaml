@@ -1676,9 +1676,6 @@ importers:
 
   graphql/server:
     dependencies:
-      '@agentic-kit/ollama':
-        specifier: workspace:*
-        version: link:../../agentic/ollama/dist
       '@constructive-io/csrf':
         specifier: workspace:^
         version: link:../../packages/csrf/dist
@@ -1712,6 +1709,9 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
+      agentic-server:
+        specifier: workspace:*
+        version: link:../../agentic/agentic-server/dist
       cors:
         specifier: ^2.8.6
         version: 2.8.6
@@ -1742,9 +1742,6 @@ importers:
       graphile-config:
         specifier: 1.0.1
         version: 1.0.1
-      graphile-llm:
-        specifier: workspace:^
-        version: link:../../graphile/graphile-llm/dist
       graphile-multi-tenancy-cache:
         specifier: workspace:^
         version: link:../../graphile/graphile-multi-tenancy-cache/dist
