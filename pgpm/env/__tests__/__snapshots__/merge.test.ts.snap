@@ -2,7 +2,6 @@
 
 exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
 {
-  "captcha": {},
   "cdn": {
     "awsAccessKey": "minioadmin",
     "awsRegion": "us-east-1",
@@ -101,6 +100,5 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "port": 587,
     "secure": false,
   },
-  "upload": {},
 }
 `;
