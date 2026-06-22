@@ -196,7 +196,8 @@ export class EventsModuleModel {
       'UpdateEventsModuleInput',
       'id',
       'eventsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

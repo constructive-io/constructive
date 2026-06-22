@@ -196,7 +196,8 @@ export class TableGrantModel {
       'UpdateTableGrantInput',
       'id',
       'tableGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

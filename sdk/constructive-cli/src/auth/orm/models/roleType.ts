@@ -196,7 +196,8 @@ export class RoleTypeModel {
       'UpdateRoleTypeInput',
       'id',
       'roleTypePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -198,7 +198,8 @@ export class DenormalizedTableFieldModel {
       'UpdateDenormalizedTableFieldInput',
       'id',
       'denormalizedTableFieldPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

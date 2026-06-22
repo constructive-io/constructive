@@ -196,7 +196,8 @@ export class NodeTypeRegistryModel {
       'UpdateNodeTypeRegistryInput',
       'name',
       'nodeTypeRegistryPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

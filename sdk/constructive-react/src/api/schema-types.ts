@@ -75,6 +75,7 @@ export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 export type ObjectCategory = 'CORE' | 'MODULE' | 'PERMISSIONS' | 'AUTH' | 'MEMBERSHIPS' | 'APP';
+export type ApiExposureLevel = 'EXPOSABLE' | 'INTERNAL_ONLY' | 'NEVER_EXPOSE';
 /** Methods to use when ordering `CheckConstraint`. */
 export type CheckConstraintOrderBy =
   | 'NATURAL'
@@ -857,6 +858,8 @@ export type SchemaOrderBy =
   | 'TAGS_DESC'
   | 'IS_PUBLIC_ASC'
   | 'IS_PUBLIC_DESC'
+  | 'API_EXPOSURE_ASC'
+  | 'API_EXPOSURE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -1561,6 +1564,8 @@ export interface SchemaFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `apiExposure` field. */
+  apiExposure?: ApiExposureLevelFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -1605,6 +1610,31 @@ export interface SchemaFilter {
   apiSchemas?: SchemaToManyApiSchemaFilter;
   /** `apiSchemas` exist. */
   apiSchemasExist?: boolean;
+}
+/** A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’ */
+export interface ApiExposureLevelFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ApiExposureLevel;
+  /** Not equal to the specified value. */
+  notEqualTo?: ApiExposureLevel;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ApiExposureLevel;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ApiExposureLevel;
+  /** Included in the specified list. */
+  in?: ApiExposureLevel[];
+  /** Not included in the specified list. */
+  notIn?: ApiExposureLevel[];
+  /** Less than the specified value. */
+  lessThan?: ApiExposureLevel;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ApiExposureLevel;
+  /** Greater than the specified value. */
+  greaterThan?: ApiExposureLevel;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ApiExposureLevel;
 }
 /** A filter to be used against many `Table` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManyTableFilter {
@@ -5056,27 +5086,6 @@ export interface SiteInput {
   /** PostgreSQL database name this site connects to */
   dbname?: string;
 }
-export interface CreateSchemaInput {
-  clientMutationId?: string;
-  /** The `Schema` to be created by this mutation. */
-  schema: SchemaInput;
-}
-/** An input for mutations affecting `Schema` */
-export interface SchemaInput {
-  id?: string;
-  databaseId: string;
-  name: string;
-  schemaName: string;
-  label?: string;
-  description?: string;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  isPublic?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface CreateIndexInput {
   clientMutationId?: string;
   /** The `Index` to be created by this mutation. */
@@ -5221,6 +5230,28 @@ export interface AstMigrationInput {
   action?: string;
   actionId?: string;
   actorId?: string;
+}
+export interface CreateSchemaInput {
+  clientMutationId?: string;
+  /** The `Schema` to be created by this mutation. */
+  schema: SchemaInput;
+}
+/** An input for mutations affecting `Schema` */
+export interface SchemaInput {
+  id?: string;
+  databaseId: string;
+  name: string;
+  schemaName: string;
+  label?: string;
+  description?: string;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  scope?: number;
+  tags?: string[];
+  isPublic?: boolean;
+  apiExposure?: ApiExposureLevel;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface CreateFieldInput {
   clientMutationId?: string;
@@ -6071,28 +6102,6 @@ export interface SitePatch {
   /** Upload for Primary logo image for the site */
   logoUpload?: File;
 }
-export interface UpdateSchemaInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Schema` being updated. */
-  schemaPatch: SchemaPatch;
-}
-/** Represents an update to a `Schema`. Fields that are set will be updated. */
-export interface SchemaPatch {
-  id?: string;
-  databaseId?: string;
-  name?: string;
-  schemaName?: string;
-  label?: string;
-  description?: string;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  isPublic?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface UpdateIndexInput {
   clientMutationId?: string;
   id: string;
@@ -6221,6 +6230,29 @@ export interface WebauthnSettingPatch {
   residentKey?: string;
   /** Challenge TTL in seconds (default 300 = 5 minutes) */
   challengeExpirySeconds?: string;
+}
+export interface UpdateSchemaInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Schema` being updated. */
+  schemaPatch: SchemaPatch;
+}
+/** Represents an update to a `Schema`. Fields that are set will be updated. */
+export interface SchemaPatch {
+  id?: string;
+  databaseId?: string;
+  name?: string;
+  schemaName?: string;
+  label?: string;
+  description?: string;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  scope?: number;
+  tags?: string[];
+  isPublic?: boolean;
+  apiExposure?: ApiExposureLevel;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface UpdateFieldInput {
   clientMutationId?: string;
@@ -6442,10 +6474,6 @@ export interface DeleteSiteInput {
   /** Unique identifier for this site */
   id: string;
 }
-export interface DeleteSchemaInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteIndexInput {
   clientMutationId?: string;
   id: string;
@@ -6461,6 +6489,10 @@ export interface DeleteEmbeddingChunkInput {
 export interface DeleteWebauthnSettingInput {
   clientMutationId?: string;
   /** Unique identifier for this WebAuthn settings record */
+  id: string;
+}
+export interface DeleteSchemaInput {
+  clientMutationId?: string;
   id: string;
 }
 export interface DeleteFieldInput {
@@ -6746,13 +6778,6 @@ export interface SiteConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Schema` values. */
-export interface SchemaConnection {
-  nodes: Schema[];
-  edges: SchemaEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `Index` values. */
 export interface IndexConnection {
   nodes: Index[];
@@ -6785,6 +6810,13 @@ export interface WebauthnSettingConnection {
 export interface AstMigrationConnection {
   nodes: AstMigration[];
   edges: AstMigrationEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Schema` values. */
+export interface SchemaConnection {
+  nodes: Schema[];
+  edges: SchemaEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -7062,12 +7094,6 @@ export interface CreateSitePayload {
   site?: Site | null;
   siteEdge?: SiteEdge | null;
 }
-export interface CreateSchemaPayload {
-  clientMutationId?: string | null;
-  /** The `Schema` that was created by this mutation. */
-  schema?: Schema | null;
-  schemaEdge?: SchemaEdge | null;
-}
 export interface CreateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was created by this mutation. */
@@ -7096,6 +7122,12 @@ export interface CreateAstMigrationPayload {
   clientMutationId?: string | null;
   /** The `AstMigration` that was created by this mutation. */
   astMigration?: AstMigration | null;
+}
+export interface CreateSchemaPayload {
+  clientMutationId?: string | null;
+  /** The `Schema` that was created by this mutation. */
+  schema?: Schema | null;
+  schemaEdge?: SchemaEdge | null;
 }
 export interface CreateFieldPayload {
   clientMutationId?: string | null;
@@ -7325,12 +7357,6 @@ export interface UpdateSitePayload {
   site?: Site | null;
   siteEdge?: SiteEdge | null;
 }
-export interface UpdateSchemaPayload {
-  clientMutationId?: string | null;
-  /** The `Schema` that was updated by this mutation. */
-  schema?: Schema | null;
-  schemaEdge?: SchemaEdge | null;
-}
 export interface UpdateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was updated by this mutation. */
@@ -7354,6 +7380,12 @@ export interface UpdateWebauthnSettingPayload {
   /** The `WebauthnSetting` that was updated by this mutation. */
   webauthnSetting?: WebauthnSetting | null;
   webauthnSettingEdge?: WebauthnSettingEdge | null;
+}
+export interface UpdateSchemaPayload {
+  clientMutationId?: string | null;
+  /** The `Schema` that was updated by this mutation. */
+  schema?: Schema | null;
+  schemaEdge?: SchemaEdge | null;
 }
 export interface UpdateFieldPayload {
   clientMutationId?: string | null;
@@ -7583,12 +7615,6 @@ export interface DeleteSitePayload {
   site?: Site | null;
   siteEdge?: SiteEdge | null;
 }
-export interface DeleteSchemaPayload {
-  clientMutationId?: string | null;
-  /** The `Schema` that was deleted by this mutation. */
-  schema?: Schema | null;
-  schemaEdge?: SchemaEdge | null;
-}
 export interface DeleteIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was deleted by this mutation. */
@@ -7612,6 +7638,12 @@ export interface DeleteWebauthnSettingPayload {
   /** The `WebauthnSetting` that was deleted by this mutation. */
   webauthnSetting?: WebauthnSetting | null;
   webauthnSettingEdge?: WebauthnSettingEdge | null;
+}
+export interface DeleteSchemaPayload {
+  clientMutationId?: string | null;
+  /** The `Schema` that was deleted by this mutation. */
+  schema?: Schema | null;
+  schemaEdge?: SchemaEdge | null;
 }
 export interface DeleteFieldPayload {
   clientMutationId?: string | null;
@@ -7878,12 +7910,6 @@ export interface SiteEdge {
   /** The `Site` at the end of the edge. */
   node?: Site | null;
 }
-/** A `Schema` edge in the connection. */
-export interface SchemaEdge {
-  cursor?: string | null;
-  /** The `Schema` at the end of the edge. */
-  node?: Schema | null;
-}
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
   cursor?: string | null;
@@ -7914,6 +7940,12 @@ export interface AstMigrationEdge {
   /** The `AstMigration` at the end of the edge. */
   node?: AstMigration | null;
 }
+/** A `Schema` edge in the connection. */
+export interface SchemaEdge {
+  cursor?: string | null;
+  /** The `Schema` at the end of the edge. */
+  node?: Schema | null;
+}
 /** A `Field` edge in the connection. */
 export interface FieldEdge {
   cursor?: string | null;
@@ -7939,6 +7971,14 @@ export interface MetaTable {
   relations: MetaRelations;
   inflection: MetaInflection;
   query: MetaQuery;
+  /** Storage metadata (null if not a storage table) */
+  storage?: MetaStorage | null;
+  /** Search metadata (null if no search configured) */
+  search?: MetaSearch | null;
+  /** i18n metadata (null if no @i18n tag) */
+  i18n?: MetaI18n | null;
+  /** Realtime metadata (null if no @realtime tag) */
+  realtime?: MetaRealtime | null;
 }
 export interface ProvisionDatabaseWithUserRecord {
   outDatabaseId?: string | null;
@@ -7963,6 +8003,8 @@ export interface MetaField {
   isPrimaryKey: boolean;
   isForeignKey: boolean;
   description?: string | null;
+  /** Enum metadata if this field has an enum type */
+  enumValues?: MetaEnum | null;
 }
 /** Information about a database index */
 export interface MetaIndex {
@@ -8028,6 +8070,36 @@ export interface MetaQuery {
   update?: string | null;
   delete?: string | null;
 }
+/** Storage metadata for a table */
+export interface MetaStorage {
+  /** Whether this table is a storage files table */
+  isFilesTable: boolean;
+  /** Whether this table is a storage buckets table */
+  isBucketsTable: boolean;
+}
+/** Search metadata for a table */
+export interface MetaSearch {
+  /** Active search algorithms on this table */
+  algorithms: string[];
+  /** Searchable columns with their algorithm */
+  columns: MetaSearchColumn[];
+  /** Whether unifiedSearch composite filter is available */
+  hasUnifiedSearch: boolean;
+  /** Per-table search configuration */
+  config?: MetaSearchConfig | null;
+}
+/** i18n metadata for a table with @i18n tag */
+export interface MetaI18n {
+  /** Name of the translation table */
+  translationTable: string;
+  /** Fields that are translatable */
+  translatableFields: MetaI18nField[];
+}
+/** Realtime metadata for a table with @realtime tag */
+export interface MetaRealtime {
+  /** The generated subscription field name (e.g. onPostChanged) */
+  subscriptionFieldName: string;
+}
 /** Information about a PostgreSQL type */
 export interface MetaType {
   pgType: string;
@@ -8036,6 +8108,13 @@ export interface MetaType {
   isNotNull?: boolean | null;
   hasDefault?: boolean | null;
   subtype?: string | null;
+}
+/** Information about a PostgreSQL enum type */
+export interface MetaEnum {
+  /** The PostgreSQL enum type name */
+  name: string;
+  /** Allowed values for this enum */
+  values: string[];
 }
 /** Reference to a related table */
 export interface MetaRefTable {
@@ -8069,4 +8148,29 @@ export interface MetaManyToManyRelation {
   leftKeyAttributes: MetaField[];
   rightKeyAttributes: MetaField[];
   rightTable: MetaRefTable;
+}
+/** A searchable column with its algorithm */
+export interface MetaSearchColumn {
+  /** Column name (camelCase) */
+  name: string;
+  /** Search algorithm: tsvector, bm25, trgm, or vector */
+  algorithm: string;
+}
+/** Per-table search configuration from @searchConfig smart tag */
+export interface MetaSearchConfig {
+  /** JSON-encoded per-adapter score weights */
+  weights?: string | null;
+  /** Whether recency boosting is enabled */
+  boostRecent: boolean;
+  /** Field used for recency decay */
+  boostRecencyField?: string | null;
+  /** Exponential decay factor per day */
+  boostRecencyDecay?: number | null;
+}
+/** A translatable field */
+export interface MetaI18nField {
+  /** GraphQL field name */
+  name: string;
+  /** PostgreSQL column type (text, citext) */
+  type: string;
 }

@@ -196,7 +196,8 @@ export class OrgLimitAggregateModel {
       'UpdateOrgLimitAggregateInput',
       'id',
       'orgLimitAggregatePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

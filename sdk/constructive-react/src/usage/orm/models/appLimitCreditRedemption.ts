@@ -198,7 +198,8 @@ export class AppLimitCreditRedemptionModel {
       'UpdateAppLimitCreditRedemptionInput',
       'id',
       'appLimitCreditRedemptionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

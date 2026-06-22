@@ -176,6 +176,7 @@ export class AppLimitEventModel {
       S,
       {
         id: string;
+        createdAt: string;
       },
       AppLimitEventPatch
     > & {
@@ -196,7 +197,10 @@ export class AppLimitEventModel {
       'UpdateAppLimitEventInput',
       'id',
       'appLimitEventPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      {
+        createdAt: args.where.createdAt,
+      }
     );
     return new QueryBuilder({
       client: this.client,
@@ -211,6 +215,7 @@ export class AppLimitEventModel {
     args: DeleteArgs<
       {
         id: string;
+        createdAt: string;
       },
       S
     > & {
@@ -227,6 +232,7 @@ export class AppLimitEventModel {
       'appLimitEvent',
       {
         id: args.where.id,
+        createdAt: args.where.createdAt,
       },
       'DeleteAppLimitEventInput',
       args.select,

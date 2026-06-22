@@ -196,7 +196,8 @@ export class InvitesModuleModel {
       'UpdateInvitesModuleInput',
       'id',
       'invitesModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

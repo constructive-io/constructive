@@ -196,7 +196,8 @@ export class WebauthnSettingModel {
       'UpdateWebauthnSettingInput',
       'id',
       'webauthnSettingPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

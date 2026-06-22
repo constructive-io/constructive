@@ -343,15 +343,6 @@ export const invitesModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...invitesModuleKeys.details(), id] as const,
 } as const;
-export const namespaceModuleKeys = {
-  /** All namespaceModule queries */ all: ['namespacemodule'] as const,
-  /** List query keys */ lists: () => [...namespaceModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...namespaceModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...namespaceModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...namespaceModuleKeys.details(), id] as const,
-} as const;
 export const computeLogModuleKeys = {
   /** All computeLogModule queries */ all: ['computelogmodule'] as const,
   /** List query keys */ lists: () => [...computeLogModuleKeys.all, 'list'] as const,
@@ -370,6 +361,15 @@ export const inferenceLogModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...inferenceLogModuleKeys.details(), id] as const,
 } as const;
+export const namespaceModuleKeys = {
+  /** All namespaceModule queries */ all: ['namespacemodule'] as const,
+  /** List query keys */ lists: () => [...namespaceModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...namespaceModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...namespaceModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...namespaceModuleKeys.details(), id] as const,
+} as const;
 export const storageLogModuleKeys = {
   /** All storageLogModule queries */ all: ['storagelogmodule'] as const,
   /** List query keys */ lists: () => [...storageLogModuleKeys.all, 'list'] as const,
@@ -387,6 +387,15 @@ export const transferLogModuleKeys = {
   /** Detail query keys */ details: () => [...transferLogModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...transferLogModuleKeys.details(), id] as const,
+} as const;
+export const functionDeploymentModuleKeys = {
+  /** All functionDeploymentModule queries */ all: ['functiondeploymentmodule'] as const,
+  /** List query keys */ lists: () => [...functionDeploymentModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...functionDeploymentModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...functionDeploymentModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...functionDeploymentModuleKeys.details(), id] as const,
 } as const;
 export const plansModuleKeys = {
   /** All plansModule queries */ all: ['plansmodule'] as const,
@@ -414,6 +423,15 @@ export const dbUsageModuleKeys = {
   /** Detail query keys */ details: () => [...dbUsageModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...dbUsageModuleKeys.details(), id] as const,
+} as const;
+export const graphExecutionModuleKeys = {
+  /** All graphExecutionModule queries */ all: ['graphexecutionmodule'] as const,
+  /** List query keys */ lists: () => [...graphExecutionModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...graphExecutionModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...graphExecutionModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...graphExecutionModuleKeys.details(), id] as const,
 } as const;
 export const hierarchyModuleKeys = {
   /** All hierarchyModule queries */ all: ['hierarchymodule'] as const,
@@ -602,14 +620,16 @@ export const queryKeys = {
   functionInvocationModule: functionInvocationModuleKeys,
   functionModule: functionModuleKeys,
   invitesModule: invitesModuleKeys,
-  namespaceModule: namespaceModuleKeys,
   computeLogModule: computeLogModuleKeys,
   inferenceLogModule: inferenceLogModuleKeys,
+  namespaceModule: namespaceModuleKeys,
   storageLogModule: storageLogModuleKeys,
   transferLogModule: transferLogModuleKeys,
+  functionDeploymentModule: functionDeploymentModuleKeys,
   plansModule: plansModuleKeys,
   billingProviderModule: billingProviderModuleKeys,
   dbUsageModule: dbUsageModuleKeys,
+  graphExecutionModule: graphExecutionModuleKeys,
   hierarchyModule: hierarchyModuleKeys,
   permissionsModule: permissionsModuleKeys,
   notificationsModule: notificationsModuleKeys,

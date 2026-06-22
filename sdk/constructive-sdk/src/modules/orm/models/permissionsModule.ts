@@ -196,7 +196,8 @@ export class PermissionsModuleModel {
       'UpdatePermissionsModuleInput',
       'id',
       'permissionsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

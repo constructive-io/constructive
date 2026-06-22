@@ -196,7 +196,8 @@ export class DatabaseTransferModel {
       'UpdateDatabaseTransferInput',
       'id',
       'databaseTransferPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

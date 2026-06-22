@@ -198,7 +198,8 @@ export class ConnectedAccountsModuleModel {
       'UpdateConnectedAccountsModuleInput',
       'id',
       'connectedAccountsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

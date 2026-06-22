@@ -378,15 +378,6 @@ export const invitesModuleMutationKeys = {
   /** Delete invitesModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'invitesmodule', 'delete', id] as const,
 } as const;
-export const namespaceModuleMutationKeys = {
-  /** All namespaceModule mutation keys */ all: ['mutation', 'namespacemodule'] as const,
-  /** Create namespaceModule mutation key */ create: () =>
-    ['mutation', 'namespacemodule', 'create'] as const,
-  /** Update namespaceModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'namespacemodule', 'update', id] as const,
-  /** Delete namespaceModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'namespacemodule', 'delete', id] as const,
-} as const;
 export const computeLogModuleMutationKeys = {
   /** All computeLogModule mutation keys */ all: ['mutation', 'computelogmodule'] as const,
   /** Create computeLogModule mutation key */ create: () =>
@@ -405,6 +396,15 @@ export const inferenceLogModuleMutationKeys = {
   /** Delete inferenceLogModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'inferencelogmodule', 'delete', id] as const,
 } as const;
+export const namespaceModuleMutationKeys = {
+  /** All namespaceModule mutation keys */ all: ['mutation', 'namespacemodule'] as const,
+  /** Create namespaceModule mutation key */ create: () =>
+    ['mutation', 'namespacemodule', 'create'] as const,
+  /** Update namespaceModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'namespacemodule', 'update', id] as const,
+  /** Delete namespaceModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'namespacemodule', 'delete', id] as const,
+} as const;
 export const storageLogModuleMutationKeys = {
   /** All storageLogModule mutation keys */ all: ['mutation', 'storagelogmodule'] as const,
   /** Create storageLogModule mutation key */ create: () =>
@@ -422,6 +422,18 @@ export const transferLogModuleMutationKeys = {
     ['mutation', 'transferlogmodule', 'update', id] as const,
   /** Delete transferLogModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'transferlogmodule', 'delete', id] as const,
+} as const;
+export const functionDeploymentModuleMutationKeys = {
+  /** All functionDeploymentModule mutation keys */ all: [
+    'mutation',
+    'functiondeploymentmodule',
+  ] as const,
+  /** Create functionDeploymentModule mutation key */ create: () =>
+    ['mutation', 'functiondeploymentmodule', 'create'] as const,
+  /** Update functionDeploymentModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'functiondeploymentmodule', 'update', id] as const,
+  /** Delete functionDeploymentModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'functiondeploymentmodule', 'delete', id] as const,
 } as const;
 export const plansModuleMutationKeys = {
   /** All plansModule mutation keys */ all: ['mutation', 'plansmodule'] as const,
@@ -452,6 +464,15 @@ export const dbUsageModuleMutationKeys = {
     ['mutation', 'dbusagemodule', 'update', id] as const,
   /** Delete dbUsageModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'dbusagemodule', 'delete', id] as const,
+} as const;
+export const graphExecutionModuleMutationKeys = {
+  /** All graphExecutionModule mutation keys */ all: ['mutation', 'graphexecutionmodule'] as const,
+  /** Create graphExecutionModule mutation key */ create: () =>
+    ['mutation', 'graphexecutionmodule', 'create'] as const,
+  /** Update graphExecutionModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'graphexecutionmodule', 'update', id] as const,
+  /** Delete graphExecutionModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'graphexecutionmodule', 'delete', id] as const,
 } as const;
 export const hierarchyModuleMutationKeys = {
   /** All hierarchyModule mutation keys */ all: ['mutation', 'hierarchymodule'] as const,
@@ -682,14 +703,16 @@ export const mutationKeys = {
   functionInvocationModule: functionInvocationModuleMutationKeys,
   functionModule: functionModuleMutationKeys,
   invitesModule: invitesModuleMutationKeys,
-  namespaceModule: namespaceModuleMutationKeys,
   computeLogModule: computeLogModuleMutationKeys,
   inferenceLogModule: inferenceLogModuleMutationKeys,
+  namespaceModule: namespaceModuleMutationKeys,
   storageLogModule: storageLogModuleMutationKeys,
   transferLogModule: transferLogModuleMutationKeys,
+  functionDeploymentModule: functionDeploymentModuleMutationKeys,
   plansModule: plansModuleMutationKeys,
   billingProviderModule: billingProviderModuleMutationKeys,
   dbUsageModule: dbUsageModuleMutationKeys,
+  graphExecutionModule: graphExecutionModuleMutationKeys,
   hierarchyModule: hierarchyModuleMutationKeys,
   permissionsModule: permissionsModuleMutationKeys,
   notificationsModule: notificationsModuleMutationKeys,

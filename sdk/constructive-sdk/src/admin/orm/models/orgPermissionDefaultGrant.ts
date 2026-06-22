@@ -198,7 +198,8 @@ export class OrgPermissionDefaultGrantModel {
       'UpdateOrgPermissionDefaultGrantInput',
       'id',
       'orgPermissionDefaultGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

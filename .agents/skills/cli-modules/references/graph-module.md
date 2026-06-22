@@ -12,8 +12,8 @@ csdk graph-module list --where.<field>.<op> <value> --orderBy <values>
 csdk graph-module list --limit 10 --after <cursor>
 csdk graph-module find-first --where.<field>.<op> <value>
 csdk graph-module get --id <UUID>
-csdk graph-module create --databaseId <UUID> --merkleStoreModuleId <UUID> [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--scope <String>] [--prefix <String>] [--graphsTableId <UUID>] [--executionsTableId <UUID>] [--outputsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
-csdk graph-module update --id <UUID> [--databaseId <UUID>] [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--scope <String>] [--prefix <String>] [--merkleStoreModuleId <UUID>] [--graphsTableId <UUID>] [--executionsTableId <UUID>] [--outputsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk graph-module create --databaseId <UUID> --merkleStoreModuleId <UUID> [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--scope <String>] [--prefix <String>] [--graphsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk graph-module update --id <UUID> [--databaseId <UUID>] [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--scope <String>] [--prefix <String>] [--merkleStoreModuleId <UUID>] [--graphsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
 csdk graph-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk graph-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a graphModule
 
 ```bash
-csdk graph-module create --databaseId <UUID> --merkleStoreModuleId <UUID> [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--scope <String>] [--prefix <String>] [--graphsTableId <UUID>] [--executionsTableId <UUID>] [--outputsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk graph-module create --databaseId <UUID> --merkleStoreModuleId <UUID> [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--scope <String>] [--prefix <String>] [--graphsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
 ```
 
 ### Get a graphModule by id

@@ -51,14 +51,16 @@ import {
   functionInvocationModuleKeys,
   functionModuleKeys,
   invitesModuleKeys,
-  namespaceModuleKeys,
   computeLogModuleKeys,
   inferenceLogModuleKeys,
+  namespaceModuleKeys,
   storageLogModuleKeys,
   transferLogModuleKeys,
+  functionDeploymentModuleKeys,
   plansModuleKeys,
   billingProviderModuleKeys,
   dbUsageModuleKeys,
+  graphExecutionModuleKeys,
   hierarchyModuleKeys,
   permissionsModuleKeys,
   notificationsModuleKeys,
@@ -705,23 +707,6 @@ export const invalidate = {
         queryKey: invitesModuleKeys.detail(id),
       }),
   },
-  /** Invalidate namespaceModule queries */ namespaceModule: {
-    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.all,
-      }),
-    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.lists(),
-      }),
-    /** Invalidate a specific namespaceModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate computeLogModule queries */ computeLogModule: {
     /** Invalidate all computeLogModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -756,6 +741,23 @@ export const invalidate = {
         queryKey: inferenceLogModuleKeys.detail(id),
       }),
   },
+  /** Invalidate namespaceModule queries */ namespaceModule: {
+    /** Invalidate all namespaceModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.all,
+      }),
+    /** Invalidate namespaceModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.lists(),
+      }),
+    /** Invalidate a specific namespaceModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate storageLogModule queries */ storageLogModule: {
     /** Invalidate all storageLogModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -788,6 +790,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: transferLogModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionDeploymentModule queries */ functionDeploymentModule: {
+    /** Invalidate all functionDeploymentModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentModuleKeys.all,
+      }),
+    /** Invalidate functionDeploymentModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentModuleKeys.lists(),
+      }),
+    /** Invalidate a specific functionDeploymentModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentModuleKeys.detail(id),
       }),
   },
   /** Invalidate plansModule queries */ plansModule: {
@@ -839,6 +858,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: dbUsageModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate graphExecutionModule queries */ graphExecutionModule: {
+    /** Invalidate all graphExecutionModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: graphExecutionModuleKeys.all,
+      }),
+    /** Invalidate graphExecutionModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: graphExecutionModuleKeys.lists(),
+      }),
+    /** Invalidate a specific graphExecutionModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: graphExecutionModuleKeys.detail(id),
       }),
   },
   /** Invalidate hierarchyModule queries */ hierarchyModule: {
@@ -1357,14 +1393,6 @@ export const remove = {
       queryKey: invitesModuleKeys.detail(id),
     });
   },
-  /** Remove namespaceModule from cache */ namespaceModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: namespaceModuleKeys.detail(id),
-    });
-  },
   /** Remove computeLogModule from cache */ computeLogModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1381,6 +1409,14 @@ export const remove = {
       queryKey: inferenceLogModuleKeys.detail(id),
     });
   },
+  /** Remove namespaceModule from cache */ namespaceModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: namespaceModuleKeys.detail(id),
+    });
+  },
   /** Remove storageLogModule from cache */ storageLogModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1395,6 +1431,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: transferLogModuleKeys.detail(id),
+    });
+  },
+  /** Remove functionDeploymentModule from cache */ functionDeploymentModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionDeploymentModuleKeys.detail(id),
     });
   },
   /** Remove plansModule from cache */ plansModule: (
@@ -1419,6 +1463,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: dbUsageModuleKeys.detail(id),
+    });
+  },
+  /** Remove graphExecutionModule from cache */ graphExecutionModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: graphExecutionModuleKeys.detail(id),
     });
   },
   /** Remove hierarchyModule from cache */ hierarchyModule: (

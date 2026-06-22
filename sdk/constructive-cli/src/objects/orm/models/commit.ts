@@ -176,6 +176,7 @@ export class CommitModel {
       S,
       {
         id: string;
+        databaseId: string;
       },
       CommitPatch
     > & {
@@ -196,7 +197,10 @@ export class CommitModel {
       'UpdateCommitInput',
       'id',
       'commitPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      {
+        databaseId: args.where.databaseId,
+      }
     );
     return new QueryBuilder({
       client: this.client,
@@ -211,6 +215,7 @@ export class CommitModel {
     args: DeleteArgs<
       {
         id: string;
+        databaseId: string;
       },
       S
     > & {
@@ -227,6 +232,7 @@ export class CommitModel {
       'commit',
       {
         id: args.where.id,
+        databaseId: args.where.databaseId,
       },
       'DeleteCommitInput',
       args.select,

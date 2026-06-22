@@ -196,7 +196,8 @@ export class OrgLimitCapModel {
       'UpdateOrgLimitCapInput',
       'id',
       'orgLimitCapPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

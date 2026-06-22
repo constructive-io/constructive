@@ -196,7 +196,8 @@ export class AppModel {
       'UpdateAppInput',
       'id',
       'appPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

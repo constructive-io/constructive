@@ -196,7 +196,8 @@ export class AgentModuleModel {
       'UpdateAgentModuleInput',
       'id',
       'agentModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

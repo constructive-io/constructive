@@ -196,7 +196,8 @@ export class CryptoAuthModuleModel {
       'UpdateCryptoAuthModuleInput',
       'id',
       'cryptoAuthModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

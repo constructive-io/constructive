@@ -196,7 +196,8 @@ export class AgentPlanModel {
       'UpdateAgentPlanInput',
       'id',
       'agentPlanPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

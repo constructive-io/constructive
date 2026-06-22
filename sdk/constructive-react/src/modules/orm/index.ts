@@ -41,14 +41,16 @@ import { WebauthnAuthModuleModel } from './models/webauthnAuthModule';
 import { FunctionInvocationModuleModel } from './models/functionInvocationModule';
 import { FunctionModuleModel } from './models/functionModule';
 import { InvitesModuleModel } from './models/invitesModule';
-import { NamespaceModuleModel } from './models/namespaceModule';
 import { ComputeLogModuleModel } from './models/computeLogModule';
 import { InferenceLogModuleModel } from './models/inferenceLogModule';
+import { NamespaceModuleModel } from './models/namespaceModule';
 import { StorageLogModuleModel } from './models/storageLogModule';
 import { TransferLogModuleModel } from './models/transferLogModule';
+import { FunctionDeploymentModuleModel } from './models/functionDeploymentModule';
 import { PlansModuleModel } from './models/plansModule';
 import { BillingProviderModuleModel } from './models/billingProviderModule';
 import { DbUsageModuleModel } from './models/dbUsageModule';
+import { GraphExecutionModuleModel } from './models/graphExecutionModule';
 import { HierarchyModuleModel } from './models/hierarchyModule';
 import { PermissionsModuleModel } from './models/permissionsModule';
 import { NotificationsModuleModel } from './models/notificationsModule';
@@ -133,14 +135,16 @@ export function createClient(config: OrmClientConfig) {
     functionInvocationModule: new FunctionInvocationModuleModel(client),
     functionModule: new FunctionModuleModel(client),
     invitesModule: new InvitesModuleModel(client),
-    namespaceModule: new NamespaceModuleModel(client),
     computeLogModule: new ComputeLogModuleModel(client),
     inferenceLogModule: new InferenceLogModuleModel(client),
+    namespaceModule: new NamespaceModuleModel(client),
     storageLogModule: new StorageLogModuleModel(client),
     transferLogModule: new TransferLogModuleModel(client),
+    functionDeploymentModule: new FunctionDeploymentModuleModel(client),
     plansModule: new PlansModuleModel(client),
     billingProviderModule: new BillingProviderModuleModel(client),
     dbUsageModule: new DbUsageModuleModel(client),
+    graphExecutionModule: new GraphExecutionModuleModel(client),
     hierarchyModule: new HierarchyModuleModel(client),
     permissionsModule: new PermissionsModuleModel(client),
     notificationsModule: new NotificationsModuleModel(client),

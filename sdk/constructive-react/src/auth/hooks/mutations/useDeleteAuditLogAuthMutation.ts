@@ -41,6 +41,7 @@ export function useDeleteAuditLogAuthMutation<S extends AuditLogAuthSelect>(
       Error,
       {
         id: string;
+        createdAt: string;
       }
     >,
     'mutationFn'
@@ -54,6 +55,7 @@ export function useDeleteAuditLogAuthMutation<S extends AuditLogAuthSelect>(
   Error,
   {
     id: string;
+    createdAt: string;
   }
 >;
 export function useDeleteAuditLogAuthMutation(
@@ -65,6 +67,7 @@ export function useDeleteAuditLogAuthMutation(
       Error,
       {
         id: string;
+        createdAt: string;
       }
     >,
     'mutationFn'
@@ -76,11 +79,12 @@ export function useDeleteAuditLogAuthMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: auditLogAuthMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
+    mutationFn: ({ id, createdAt }: { id: string; createdAt: string }) =>
       getClient()
         .auditLogAuth.delete({
           where: {
             id,
+            createdAt,
           },
           select: args.select,
         })

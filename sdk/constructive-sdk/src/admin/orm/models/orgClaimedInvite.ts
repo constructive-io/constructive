@@ -196,7 +196,8 @@ export class OrgClaimedInviteModel {
       'UpdateOrgClaimedInviteInput',
       'id',
       'orgClaimedInvitePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

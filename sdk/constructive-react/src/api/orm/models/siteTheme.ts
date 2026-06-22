@@ -196,7 +196,8 @@ export class SiteThemeModel {
       'UpdateSiteThemeInput',
       'id',
       'siteThemePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

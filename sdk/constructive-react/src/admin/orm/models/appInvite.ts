@@ -196,7 +196,8 @@ export class AppInviteModel {
       'UpdateAppInviteInput',
       'id',
       'appInvitePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

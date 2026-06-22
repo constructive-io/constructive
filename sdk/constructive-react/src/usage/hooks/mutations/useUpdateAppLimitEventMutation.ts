@@ -49,6 +49,7 @@ export function useUpdateAppLimitEventMutation<S extends AppLimitEventSelect>(
       Error,
       {
         id: string;
+        createdAt: string;
         appLimitEventPatch: AppLimitEventPatch;
       }
     >,
@@ -63,6 +64,7 @@ export function useUpdateAppLimitEventMutation<S extends AppLimitEventSelect>(
   Error,
   {
     id: string;
+    createdAt: string;
     appLimitEventPatch: AppLimitEventPatch;
   }
 >;
@@ -75,6 +77,7 @@ export function useUpdateAppLimitEventMutation(
       Error,
       {
         id: string;
+        createdAt: string;
         appLimitEventPatch: AppLimitEventPatch;
       }
     >,
@@ -89,15 +92,18 @@ export function useUpdateAppLimitEventMutation(
     mutationKey: appLimitEventMutationKeys.all,
     mutationFn: ({
       id,
+      createdAt,
       appLimitEventPatch,
     }: {
       id: string;
+      createdAt: string;
       appLimitEventPatch: AppLimitEventPatch;
     }) =>
       getClient()
         .appLimitEvent.update({
           where: {
             id,
+            createdAt,
           },
           data: appLimitEventPatch,
           select: args.select,

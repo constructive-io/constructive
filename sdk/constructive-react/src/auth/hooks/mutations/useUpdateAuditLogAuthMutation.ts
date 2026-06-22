@@ -49,6 +49,7 @@ export function useUpdateAuditLogAuthMutation<S extends AuditLogAuthSelect>(
       Error,
       {
         id: string;
+        createdAt: string;
         auditLogAuthPatch: AuditLogAuthPatch;
       }
     >,
@@ -63,6 +64,7 @@ export function useUpdateAuditLogAuthMutation<S extends AuditLogAuthSelect>(
   Error,
   {
     id: string;
+    createdAt: string;
     auditLogAuthPatch: AuditLogAuthPatch;
   }
 >;
@@ -75,6 +77,7 @@ export function useUpdateAuditLogAuthMutation(
       Error,
       {
         id: string;
+        createdAt: string;
         auditLogAuthPatch: AuditLogAuthPatch;
       }
     >,
@@ -87,11 +90,20 @@ export function useUpdateAuditLogAuthMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: auditLogAuthMutationKeys.all,
-    mutationFn: ({ id, auditLogAuthPatch }: { id: string; auditLogAuthPatch: AuditLogAuthPatch }) =>
+    mutationFn: ({
+      id,
+      createdAt,
+      auditLogAuthPatch,
+    }: {
+      id: string;
+      createdAt: string;
+      auditLogAuthPatch: AuditLogAuthPatch;
+    }) =>
       getClient()
         .auditLogAuth.update({
           where: {
             id,
+            createdAt,
           },
           data: auditLogAuthPatch,
           select: args.select,

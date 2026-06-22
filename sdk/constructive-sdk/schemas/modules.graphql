@@ -836,6 +836,35 @@ type Query {
     orderBy: [ConfigSecretsModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): ConfigSecretsModuleConnection
 
+  """Reads and enables pagination through a set of `GraphModule`."""
+  graphModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: GraphModuleFilter
+
+    """The method to use when ordering `GraphModule`."""
+    orderBy: [GraphModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GraphModuleConnection
+
   """Reads and enables pagination through a set of `RateLimitMetersModule`."""
   rateLimitMetersModules(
     """Only read the first `n` values of the set."""
@@ -1012,35 +1041,6 @@ type Query {
     orderBy: [InvitesModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): InvitesModuleConnection
 
-  """Reads and enables pagination through a set of `NamespaceModule`."""
-  namespaceModules(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: NamespaceModuleFilter
-
-    """The method to use when ordering `NamespaceModule`."""
-    orderBy: [NamespaceModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): NamespaceModuleConnection
-
   """Reads and enables pagination through a set of `ComputeLogModule`."""
   computeLogModules(
     """Only read the first `n` values of the set."""
@@ -1070,35 +1070,6 @@ type Query {
     orderBy: [ComputeLogModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): ComputeLogModuleConnection
 
-  """Reads and enables pagination through a set of `GraphModule`."""
-  graphModules(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: GraphModuleFilter
-
-    """The method to use when ordering `GraphModule`."""
-    orderBy: [GraphModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): GraphModuleConnection
-
   """Reads and enables pagination through a set of `InferenceLogModule`."""
   inferenceLogModules(
     """Only read the first `n` values of the set."""
@@ -1127,6 +1098,35 @@ type Query {
     """The method to use when ordering `InferenceLogModule`."""
     orderBy: [InferenceLogModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): InferenceLogModuleConnection
+
+  """Reads and enables pagination through a set of `NamespaceModule`."""
+  namespaceModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: NamespaceModuleFilter
+
+    """The method to use when ordering `NamespaceModule`."""
+    orderBy: [NamespaceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamespaceModuleConnection
 
   """Reads and enables pagination through a set of `StorageLogModule`."""
   storageLogModules(
@@ -1185,6 +1185,37 @@ type Query {
     """The method to use when ordering `TransferLogModule`."""
     orderBy: [TransferLogModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): TransferLogModuleConnection
+
+  """
+  Reads and enables pagination through a set of `FunctionDeploymentModule`.
+  """
+  functionDeploymentModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionDeploymentModuleFilter
+
+    """The method to use when ordering `FunctionDeploymentModule`."""
+    orderBy: [FunctionDeploymentModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FunctionDeploymentModuleConnection
 
   """Reads and enables pagination through a set of `PlansModule`."""
   plansModules(
@@ -1272,6 +1303,35 @@ type Query {
     """The method to use when ordering `DbUsageModule`."""
     orderBy: [DbUsageModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): DbUsageModuleConnection
+
+  """Reads and enables pagination through a set of `GraphExecutionModule`."""
+  graphExecutionModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: GraphExecutionModuleFilter
+
+    """The method to use when ordering `GraphExecutionModule`."""
+    orderBy: [GraphExecutionModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GraphExecutionModuleConnection
 
   """Reads and enables pagination through a set of `HierarchyModule`."""
   hierarchyModules(
@@ -5646,8 +5706,6 @@ type GraphModule {
   prefix: String!
   merkleStoreModuleId: UUID!
   graphsTableId: UUID!
-  executionsTableId: UUID!
-  outputsTableId: UUID!
   apiName: String
   privateApiName: String
   entityTableId: UUID
@@ -5704,12 +5762,6 @@ input GraphModuleFilter {
 
   """Filter by the object’s `graphsTableId` field."""
   graphsTableId: UUIDFilter
-
-  """Filter by the object’s `executionsTableId` field."""
-  executionsTableId: UUIDFilter
-
-  """Filter by the object’s `outputsTableId` field."""
-  outputsTableId: UUIDFilter
 
   """Filter by the object’s `apiName` field."""
   apiName: StringFilter
@@ -5852,10 +5904,6 @@ enum GraphModuleOrderBy {
   MERKLE_STORE_MODULE_ID_DESC
   GRAPHS_TABLE_ID_ASC
   GRAPHS_TABLE_ID_DESC
-  EXECUTIONS_TABLE_ID_ASC
-  EXECUTIONS_TABLE_ID_DESC
-  OUTPUTS_TABLE_ID_ASC
-  OUTPUTS_TABLE_ID_DESC
   API_NAME_ASC
   API_NAME_DESC
   PRIVATE_API_NAME_ASC
@@ -7154,166 +7202,6 @@ enum InvitesModuleOrderBy {
   PRIVATE_API_NAME_DESC
 }
 
-"""A connection to a list of `NamespaceModule` values."""
-type NamespaceModuleConnection {
-  """A list of `NamespaceModule` objects."""
-  nodes: [NamespaceModule]!
-
-  """
-  A list of edges which contains the `NamespaceModule` and cursor to aid in pagination.
-  """
-  edges: [NamespaceModuleEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `NamespaceModule` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type NamespaceModule {
-  id: UUID!
-  databaseId: UUID!
-  schemaId: UUID!
-  privateSchemaId: UUID!
-  publicSchemaName: String
-  privateSchemaName: String
-  namespacesTableId: UUID!
-  namespaceEventsTableId: UUID!
-  namespacesTableName: String!
-  namespaceEventsTableName: String!
-  apiName: String
-  privateApiName: String
-  scope: String!
-  prefix: String!
-  entityTableId: UUID
-  policies: JSON
-  provisions: JSON
-  defaultPermissions: [String]
-}
-
-"""A `NamespaceModule` edge in the connection."""
-type NamespaceModuleEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `NamespaceModule` at the end of the edge."""
-  node: NamespaceModule
-}
-
-"""
-A filter to be used against `NamespaceModule` object types. All fields are combined with a logical ‘and.’
-"""
-input NamespaceModuleFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `schemaId` field."""
-  schemaId: UUIDFilter
-
-  """Filter by the object’s `privateSchemaId` field."""
-  privateSchemaId: UUIDFilter
-
-  """Filter by the object’s `publicSchemaName` field."""
-  publicSchemaName: StringFilter
-
-  """Filter by the object’s `privateSchemaName` field."""
-  privateSchemaName: StringFilter
-
-  """Filter by the object’s `namespacesTableId` field."""
-  namespacesTableId: UUIDFilter
-
-  """Filter by the object’s `namespaceEventsTableId` field."""
-  namespaceEventsTableId: UUIDFilter
-
-  """Filter by the object’s `namespacesTableName` field."""
-  namespacesTableName: StringFilter
-
-  """Filter by the object’s `namespaceEventsTableName` field."""
-  namespaceEventsTableName: StringFilter
-
-  """Filter by the object’s `apiName` field."""
-  apiName: StringFilter
-
-  """Filter by the object’s `privateApiName` field."""
-  privateApiName: StringFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: StringFilter
-
-  """Filter by the object’s `prefix` field."""
-  prefix: StringFilter
-
-  """Filter by the object’s `entityTableId` field."""
-  entityTableId: UUIDFilter
-
-  """Filter by the object’s `policies` field."""
-  policies: JSONFilter
-
-  """Filter by the object’s `provisions` field."""
-  provisions: JSONFilter
-
-  """Filter by the object’s `defaultPermissions` field."""
-  defaultPermissions: StringListFilter
-
-  """Checks for all expressions in this list."""
-  and: [NamespaceModuleFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [NamespaceModuleFilter!]
-
-  """Negates the expression."""
-  not: NamespaceModuleFilter
-}
-
-"""Methods to use when ordering `NamespaceModule`."""
-enum NamespaceModuleOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  SCHEMA_ID_ASC
-  SCHEMA_ID_DESC
-  PRIVATE_SCHEMA_ID_ASC
-  PRIVATE_SCHEMA_ID_DESC
-  PUBLIC_SCHEMA_NAME_ASC
-  PUBLIC_SCHEMA_NAME_DESC
-  PRIVATE_SCHEMA_NAME_ASC
-  PRIVATE_SCHEMA_NAME_DESC
-  NAMESPACES_TABLE_ID_ASC
-  NAMESPACES_TABLE_ID_DESC
-  NAMESPACE_EVENTS_TABLE_ID_ASC
-  NAMESPACE_EVENTS_TABLE_ID_DESC
-  NAMESPACES_TABLE_NAME_ASC
-  NAMESPACES_TABLE_NAME_DESC
-  NAMESPACE_EVENTS_TABLE_NAME_ASC
-  NAMESPACE_EVENTS_TABLE_NAME_DESC
-  API_NAME_ASC
-  API_NAME_DESC
-  PRIVATE_API_NAME_ASC
-  PRIVATE_API_NAME_DESC
-  SCOPE_ASC
-  SCOPE_DESC
-  PREFIX_ASC
-  PREFIX_DESC
-  ENTITY_TABLE_ID_ASC
-  ENTITY_TABLE_ID_DESC
-  POLICIES_ASC
-  POLICIES_DESC
-  PROVISIONS_ASC
-  PROVISIONS_DESC
-  DEFAULT_PERMISSIONS_ASC
-  DEFAULT_PERMISSIONS_DESC
-}
-
 """A connection to a list of `ComputeLogModule` values."""
 type ComputeLogModuleConnection {
   """A list of `ComputeLogModule` objects."""
@@ -7646,6 +7534,172 @@ enum InferenceLogModuleOrderBy {
   PRIVATE_API_NAME_DESC
 }
 
+"""A connection to a list of `NamespaceModule` values."""
+type NamespaceModuleConnection {
+  """A list of `NamespaceModule` objects."""
+  nodes: [NamespaceModule]!
+
+  """
+  A list of edges which contains the `NamespaceModule` and cursor to aid in pagination.
+  """
+  edges: [NamespaceModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `NamespaceModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type NamespaceModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  privateSchemaId: UUID!
+  publicSchemaName: String
+  privateSchemaName: String
+  namespacesTableId: UUID!
+  namespaceEventsTableId: UUID!
+  namespacesTableName: String!
+  namespaceEventsTableName: String!
+  apiName: String
+  privateApiName: String
+  scope: String!
+  prefix: String!
+  entityTableId: UUID
+  platformNamespacesTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+}
+
+"""A `NamespaceModule` edge in the connection."""
+type NamespaceModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NamespaceModule` at the end of the edge."""
+  node: NamespaceModule
+}
+
+"""
+A filter to be used against `NamespaceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input NamespaceModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `namespacesTableId` field."""
+  namespacesTableId: UUIDFilter
+
+  """Filter by the object’s `namespaceEventsTableId` field."""
+  namespaceEventsTableId: UUIDFilter
+
+  """Filter by the object’s `namespacesTableName` field."""
+  namespacesTableName: StringFilter
+
+  """Filter by the object’s `namespaceEventsTableName` field."""
+  namespaceEventsTableName: StringFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `platformNamespacesTableId` field."""
+  platformNamespacesTableId: UUIDFilter
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Checks for all expressions in this list."""
+  and: [NamespaceModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [NamespaceModuleFilter!]
+
+  """Negates the expression."""
+  not: NamespaceModuleFilter
+}
+
+"""Methods to use when ordering `NamespaceModule`."""
+enum NamespaceModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  NAMESPACES_TABLE_ID_ASC
+  NAMESPACES_TABLE_ID_DESC
+  NAMESPACE_EVENTS_TABLE_ID_ASC
+  NAMESPACE_EVENTS_TABLE_ID_DESC
+  NAMESPACES_TABLE_NAME_ASC
+  NAMESPACES_TABLE_NAME_DESC
+  NAMESPACE_EVENTS_TABLE_NAME_ASC
+  NAMESPACE_EVENTS_TABLE_NAME_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  PLATFORM_NAMESPACES_TABLE_ID_ASC
+  PLATFORM_NAMESPACES_TABLE_ID_DESC
+  POLICIES_ASC
+  POLICIES_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+}
+
 """A connection to a list of `StorageLogModule` values."""
 type StorageLogModuleConnection {
   """A list of `StorageLogModule` objects."""
@@ -7976,6 +8030,200 @@ enum TransferLogModuleOrderBy {
   API_NAME_DESC
   PRIVATE_API_NAME_ASC
   PRIVATE_API_NAME_DESC
+}
+
+"""A connection to a list of `FunctionDeploymentModule` values."""
+type FunctionDeploymentModuleConnection {
+  """A list of `FunctionDeploymentModule` objects."""
+  nodes: [FunctionDeploymentModule]!
+
+  """
+  A list of edges which contains the `FunctionDeploymentModule` and cursor to aid in pagination.
+  """
+  edges: [FunctionDeploymentModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `FunctionDeploymentModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type FunctionDeploymentModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  privateSchemaId: UUID!
+  publicSchemaName: String
+  privateSchemaName: String
+  deploymentsTableId: UUID!
+  deploymentEventsTableId: UUID!
+  deploymentsTableName: String!
+  deploymentEventsTableName: String!
+  apiName: String
+  privateApiName: String
+  scope: String!
+  prefix: String!
+  entityTableId: UUID
+  functionModuleId: UUID
+  namespaceModuleId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+
+  """
+  Reads a single `FunctionModule` that is related to this `FunctionDeploymentModule`.
+  """
+  functionModule: FunctionModule
+
+  """
+  Reads a single `NamespaceModule` that is related to this `FunctionDeploymentModule`.
+  """
+  namespaceModule: NamespaceModule
+}
+
+"""A `FunctionDeploymentModule` edge in the connection."""
+type FunctionDeploymentModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FunctionDeploymentModule` at the end of the edge."""
+  node: FunctionDeploymentModule
+}
+
+"""
+A filter to be used against `FunctionDeploymentModule` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionDeploymentModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `deploymentsTableId` field."""
+  deploymentsTableId: UUIDFilter
+
+  """Filter by the object’s `deploymentEventsTableId` field."""
+  deploymentEventsTableId: UUIDFilter
+
+  """Filter by the object’s `deploymentsTableName` field."""
+  deploymentsTableName: StringFilter
+
+  """Filter by the object’s `deploymentEventsTableName` field."""
+  deploymentEventsTableName: StringFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `functionModuleId` field."""
+  functionModuleId: UUIDFilter
+
+  """Filter by the object’s `namespaceModuleId` field."""
+  namespaceModuleId: UUIDFilter
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Checks for all expressions in this list."""
+  and: [FunctionDeploymentModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [FunctionDeploymentModuleFilter!]
+
+  """Negates the expression."""
+  not: FunctionDeploymentModuleFilter
+
+  """Filter by the object’s `functionModule` relation."""
+  functionModule: FunctionModuleFilter
+
+  """A related `functionModule` exists."""
+  functionModuleExists: Boolean
+
+  """Filter by the object’s `namespaceModule` relation."""
+  namespaceModule: NamespaceModuleFilter
+
+  """A related `namespaceModule` exists."""
+  namespaceModuleExists: Boolean
+}
+
+"""Methods to use when ordering `FunctionDeploymentModule`."""
+enum FunctionDeploymentModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  DEPLOYMENTS_TABLE_ID_ASC
+  DEPLOYMENTS_TABLE_ID_DESC
+  DEPLOYMENT_EVENTS_TABLE_ID_ASC
+  DEPLOYMENT_EVENTS_TABLE_ID_DESC
+  DEPLOYMENTS_TABLE_NAME_ASC
+  DEPLOYMENTS_TABLE_NAME_DESC
+  DEPLOYMENT_EVENTS_TABLE_NAME_ASC
+  DEPLOYMENT_EVENTS_TABLE_NAME_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  FUNCTION_MODULE_ID_ASC
+  FUNCTION_MODULE_ID_DESC
+  NAMESPACE_MODULE_ID_ASC
+  NAMESPACE_MODULE_ID_DESC
+  POLICIES_ASC
+  POLICIES_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
 }
 
 """A connection to a list of `PlansModule` values."""
@@ -8518,6 +8766,198 @@ enum DbUsageModuleOrderBy {
   API_NAME_DESC
   PRIVATE_API_NAME_ASC
   PRIVATE_API_NAME_DESC
+}
+
+"""A connection to a list of `GraphExecutionModule` values."""
+type GraphExecutionModuleConnection {
+  """A list of `GraphExecutionModule` objects."""
+  nodes: [GraphExecutionModule]!
+
+  """
+  A list of edges which contains the `GraphExecutionModule` and cursor to aid in pagination.
+  """
+  edges: [GraphExecutionModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `GraphExecutionModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type GraphExecutionModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  privateSchemaId: UUID!
+  publicSchemaName: String
+  privateSchemaName: String
+  graphModuleId: UUID!
+  scope: String!
+  prefix: String!
+  executionsTableId: UUID!
+  outputsTableId: UUID!
+  nodeStatesTableId: UUID!
+  executionsTableName: String!
+  outputsTableName: String!
+  nodeStatesTableName: String!
+  apiName: String
+  privateApiName: String
+  entityTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+  createdAt: Datetime!
+
+  """
+  Reads a single `GraphModule` that is related to this `GraphExecutionModule`.
+  """
+  graphModule: GraphModule
+}
+
+"""A `GraphExecutionModule` edge in the connection."""
+type GraphExecutionModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GraphExecutionModule` at the end of the edge."""
+  node: GraphExecutionModule
+}
+
+"""
+A filter to be used against `GraphExecutionModule` object types. All fields are combined with a logical ‘and.’
+"""
+input GraphExecutionModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `graphModuleId` field."""
+  graphModuleId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `executionsTableId` field."""
+  executionsTableId: UUIDFilter
+
+  """Filter by the object’s `outputsTableId` field."""
+  outputsTableId: UUIDFilter
+
+  """Filter by the object’s `nodeStatesTableId` field."""
+  nodeStatesTableId: UUIDFilter
+
+  """Filter by the object’s `executionsTableName` field."""
+  executionsTableName: StringFilter
+
+  """Filter by the object’s `outputsTableName` field."""
+  outputsTableName: StringFilter
+
+  """Filter by the object’s `nodeStatesTableName` field."""
+  nodeStatesTableName: StringFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [GraphExecutionModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [GraphExecutionModuleFilter!]
+
+  """Negates the expression."""
+  not: GraphExecutionModuleFilter
+
+  """Filter by the object’s `graphModule` relation."""
+  graphModule: GraphModuleFilter
+}
+
+"""Methods to use when ordering `GraphExecutionModule`."""
+enum GraphExecutionModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  GRAPH_MODULE_ID_ASC
+  GRAPH_MODULE_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  EXECUTIONS_TABLE_ID_ASC
+  EXECUTIONS_TABLE_ID_DESC
+  OUTPUTS_TABLE_ID_ASC
+  OUTPUTS_TABLE_ID_DESC
+  NODE_STATES_TABLE_ID_ASC
+  NODE_STATES_TABLE_ID_DESC
+  EXECUTIONS_TABLE_NAME_ASC
+  EXECUTIONS_TABLE_NAME_DESC
+  OUTPUTS_TABLE_NAME_ASC
+  OUTPUTS_TABLE_NAME_DESC
+  NODE_STATES_TABLE_NAME_ASC
+  NODE_STATES_TABLE_NAME_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  POLICIES_ASC
+  POLICIES_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
 }
 
 """A connection to a list of `HierarchyModule` values."""
@@ -12072,6 +12512,18 @@ type MetaTable {
   relations: MetaRelations!
   inflection: MetaInflection!
   query: MetaQuery!
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
 }
 
 """Information about a table field/column"""
@@ -12083,6 +12535,9 @@ type MetaField {
   isPrimaryKey: Boolean!
   isForeignKey: Boolean!
   description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
 }
 
 """Information about a PostgreSQL type"""
@@ -12093,6 +12548,15 @@ type MetaType {
   isNotNull: Boolean
   hasDefault: Boolean
   subtype: String
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
 }
 
 """Information about a database index"""
@@ -12202,6 +12666,78 @@ type MetaQuery {
   create: String
   update: String
   delete: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Column name (camelCase)"""
+  name: String!
+
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Name of the translation table"""
+  translationTable: String!
+
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
 }
 
 """
@@ -12522,6 +13058,14 @@ type Mutation {
     input: CreateConfigSecretsModuleInput!
   ): CreateConfigSecretsModulePayload
 
+  """Creates a single `GraphModule`."""
+  createGraphModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateGraphModuleInput!
+  ): CreateGraphModulePayload
+
   """Creates a single `RateLimitMetersModule`."""
   createRateLimitMetersModule(
     """
@@ -12570,14 +13114,6 @@ type Mutation {
     input: CreateInvitesModuleInput!
   ): CreateInvitesModulePayload
 
-  """Creates a single `NamespaceModule`."""
-  createNamespaceModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateNamespaceModuleInput!
-  ): CreateNamespaceModulePayload
-
   """Creates a single `ComputeLogModule`."""
   createComputeLogModule(
     """
@@ -12586,14 +13122,6 @@ type Mutation {
     input: CreateComputeLogModuleInput!
   ): CreateComputeLogModulePayload
 
-  """Creates a single `GraphModule`."""
-  createGraphModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateGraphModuleInput!
-  ): CreateGraphModulePayload
-
   """Creates a single `InferenceLogModule`."""
   createInferenceLogModule(
     """
@@ -12601,6 +13129,14 @@ type Mutation {
     """
     input: CreateInferenceLogModuleInput!
   ): CreateInferenceLogModulePayload
+
+  """Creates a single `NamespaceModule`."""
+  createNamespaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNamespaceModuleInput!
+  ): CreateNamespaceModulePayload
 
   """Creates a single `StorageLogModule`."""
   createStorageLogModule(
@@ -12617,6 +13153,14 @@ type Mutation {
     """
     input: CreateTransferLogModuleInput!
   ): CreateTransferLogModulePayload
+
+  """Creates a single `FunctionDeploymentModule`."""
+  createFunctionDeploymentModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateFunctionDeploymentModuleInput!
+  ): CreateFunctionDeploymentModulePayload
 
   """Creates a single `PlansModule`."""
   createPlansModule(
@@ -12641,6 +13185,14 @@ type Mutation {
     """
     input: CreateDbUsageModuleInput!
   ): CreateDbUsageModulePayload
+
+  """Creates a single `GraphExecutionModule`."""
+  createGraphExecutionModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateGraphExecutionModuleInput!
+  ): CreateGraphExecutionModulePayload
 
   """Creates a single `HierarchyModule`."""
   createHierarchyModule(
@@ -13004,6 +13556,14 @@ type Mutation {
     input: UpdateConfigSecretsModuleInput!
   ): UpdateConfigSecretsModulePayload
 
+  """Updates a single `GraphModule` using a unique key and a patch."""
+  updateGraphModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGraphModuleInput!
+  ): UpdateGraphModulePayload
+
   """
   Updates a single `RateLimitMetersModule` using a unique key and a patch.
   """
@@ -13056,14 +13616,6 @@ type Mutation {
     input: UpdateInvitesModuleInput!
   ): UpdateInvitesModulePayload
 
-  """Updates a single `NamespaceModule` using a unique key and a patch."""
-  updateNamespaceModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateNamespaceModuleInput!
-  ): UpdateNamespaceModulePayload
-
   """Updates a single `ComputeLogModule` using a unique key and a patch."""
   updateComputeLogModule(
     """
@@ -13072,14 +13624,6 @@ type Mutation {
     input: UpdateComputeLogModuleInput!
   ): UpdateComputeLogModulePayload
 
-  """Updates a single `GraphModule` using a unique key and a patch."""
-  updateGraphModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateGraphModuleInput!
-  ): UpdateGraphModulePayload
-
   """Updates a single `InferenceLogModule` using a unique key and a patch."""
   updateInferenceLogModule(
     """
@@ -13087,6 +13631,14 @@ type Mutation {
     """
     input: UpdateInferenceLogModuleInput!
   ): UpdateInferenceLogModulePayload
+
+  """Updates a single `NamespaceModule` using a unique key and a patch."""
+  updateNamespaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNamespaceModuleInput!
+  ): UpdateNamespaceModulePayload
 
   """Updates a single `StorageLogModule` using a unique key and a patch."""
   updateStorageLogModule(
@@ -13103,6 +13655,16 @@ type Mutation {
     """
     input: UpdateTransferLogModuleInput!
   ): UpdateTransferLogModulePayload
+
+  """
+  Updates a single `FunctionDeploymentModule` using a unique key and a patch.
+  """
+  updateFunctionDeploymentModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFunctionDeploymentModuleInput!
+  ): UpdateFunctionDeploymentModulePayload
 
   """Updates a single `PlansModule` using a unique key and a patch."""
   updatePlansModule(
@@ -13129,6 +13691,16 @@ type Mutation {
     """
     input: UpdateDbUsageModuleInput!
   ): UpdateDbUsageModulePayload
+
+  """
+  Updates a single `GraphExecutionModule` using a unique key and a patch.
+  """
+  updateGraphExecutionModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGraphExecutionModuleInput!
+  ): UpdateGraphExecutionModulePayload
 
   """Updates a single `HierarchyModule` using a unique key and a patch."""
   updateHierarchyModule(
@@ -13466,6 +14038,14 @@ type Mutation {
     input: DeleteConfigSecretsModuleInput!
   ): DeleteConfigSecretsModulePayload
 
+  """Deletes a single `GraphModule` using a unique key."""
+  deleteGraphModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGraphModuleInput!
+  ): DeleteGraphModulePayload
+
   """Deletes a single `RateLimitMetersModule` using a unique key."""
   deleteRateLimitMetersModule(
     """
@@ -13514,14 +14094,6 @@ type Mutation {
     input: DeleteInvitesModuleInput!
   ): DeleteInvitesModulePayload
 
-  """Deletes a single `NamespaceModule` using a unique key."""
-  deleteNamespaceModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteNamespaceModuleInput!
-  ): DeleteNamespaceModulePayload
-
   """Deletes a single `ComputeLogModule` using a unique key."""
   deleteComputeLogModule(
     """
@@ -13530,14 +14102,6 @@ type Mutation {
     input: DeleteComputeLogModuleInput!
   ): DeleteComputeLogModulePayload
 
-  """Deletes a single `GraphModule` using a unique key."""
-  deleteGraphModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteGraphModuleInput!
-  ): DeleteGraphModulePayload
-
   """Deletes a single `InferenceLogModule` using a unique key."""
   deleteInferenceLogModule(
     """
@@ -13545,6 +14109,14 @@ type Mutation {
     """
     input: DeleteInferenceLogModuleInput!
   ): DeleteInferenceLogModulePayload
+
+  """Deletes a single `NamespaceModule` using a unique key."""
+  deleteNamespaceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNamespaceModuleInput!
+  ): DeleteNamespaceModulePayload
 
   """Deletes a single `StorageLogModule` using a unique key."""
   deleteStorageLogModule(
@@ -13561,6 +14133,14 @@ type Mutation {
     """
     input: DeleteTransferLogModuleInput!
   ): DeleteTransferLogModulePayload
+
+  """Deletes a single `FunctionDeploymentModule` using a unique key."""
+  deleteFunctionDeploymentModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFunctionDeploymentModuleInput!
+  ): DeleteFunctionDeploymentModulePayload
 
   """Deletes a single `PlansModule` using a unique key."""
   deletePlansModule(
@@ -13585,6 +14165,14 @@ type Mutation {
     """
     input: DeleteDbUsageModuleInput!
   ): DeleteDbUsageModulePayload
+
+  """Deletes a single `GraphExecutionModule` using a unique key."""
+  deleteGraphExecutionModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGraphExecutionModuleInput!
+  ): DeleteGraphExecutionModulePayload
 
   """Deletes a single `HierarchyModule` using a unique key."""
   deleteHierarchyModule(
@@ -15499,6 +16087,62 @@ input ConfigSecretsModuleInput {
   hasConfig: Boolean
 }
 
+"""The output of our create `GraphModule` mutation."""
+type CreateGraphModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GraphModule` that was created by this mutation."""
+  graphModule: GraphModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `GraphModule`. May be used by Relay 1."""
+  graphModuleEdge(
+    """The method to use when ordering `GraphModule`."""
+    orderBy: [GraphModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GraphModuleEdge
+}
+
+"""All input for the create `GraphModule` mutation."""
+input CreateGraphModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `GraphModule` to be created by this mutation."""
+  graphModule: GraphModuleInput!
+}
+
+"""An input for mutations affecting `GraphModule`"""
+input GraphModuleInput {
+  id: UUID
+  databaseId: UUID!
+  publicSchemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  scope: String
+  prefix: String
+  merkleStoreModuleId: UUID!
+  graphsTableId: UUID
+  apiName: String
+  privateApiName: String
+  entityTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+  createdAt: Datetime
+}
+
 """The output of our create `RateLimitMetersModule` mutation."""
 type CreateRateLimitMetersModulePayload {
   """
@@ -15834,63 +16478,6 @@ input InvitesModuleInput {
   privateApiName: String
 }
 
-"""The output of our create `NamespaceModule` mutation."""
-type CreateNamespaceModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `NamespaceModule` that was created by this mutation."""
-  namespaceModule: NamespaceModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `NamespaceModule`. May be used by Relay 1."""
-  namespaceModuleEdge(
-    """The method to use when ordering `NamespaceModule`."""
-    orderBy: [NamespaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): NamespaceModuleEdge
-}
-
-"""All input for the create `NamespaceModule` mutation."""
-input CreateNamespaceModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `NamespaceModule` to be created by this mutation."""
-  namespaceModule: NamespaceModuleInput!
-}
-
-"""An input for mutations affecting `NamespaceModule`"""
-input NamespaceModuleInput {
-  id: UUID
-  databaseId: UUID!
-  schemaId: UUID
-  privateSchemaId: UUID
-  publicSchemaName: String
-  privateSchemaName: String
-  namespacesTableId: UUID
-  namespaceEventsTableId: UUID
-  namespacesTableName: String
-  namespaceEventsTableName: String
-  apiName: String
-  privateApiName: String
-  scope: String
-  prefix: String
-  entityTableId: UUID
-  policies: JSON
-  provisions: JSON
-  defaultPermissions: [String]
-}
-
 """The output of our create `ComputeLogModule` mutation."""
 type CreateComputeLogModulePayload {
   """
@@ -15949,64 +16536,6 @@ input ComputeLogModuleInput {
   privateApiName: String
 }
 
-"""The output of our create `GraphModule` mutation."""
-type CreateGraphModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `GraphModule` that was created by this mutation."""
-  graphModule: GraphModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `GraphModule`. May be used by Relay 1."""
-  graphModuleEdge(
-    """The method to use when ordering `GraphModule`."""
-    orderBy: [GraphModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): GraphModuleEdge
-}
-
-"""All input for the create `GraphModule` mutation."""
-input CreateGraphModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `GraphModule` to be created by this mutation."""
-  graphModule: GraphModuleInput!
-}
-
-"""An input for mutations affecting `GraphModule`"""
-input GraphModuleInput {
-  id: UUID
-  databaseId: UUID!
-  publicSchemaId: UUID
-  privateSchemaId: UUID
-  publicSchemaName: String
-  privateSchemaName: String
-  scope: String
-  prefix: String
-  merkleStoreModuleId: UUID!
-  graphsTableId: UUID
-  executionsTableId: UUID
-  outputsTableId: UUID
-  apiName: String
-  privateApiName: String
-  entityTableId: UUID
-  policies: JSON
-  provisions: JSON
-  defaultPermissions: [String]
-  createdAt: Datetime
-}
-
 """The output of our create `InferenceLogModule` mutation."""
 type CreateInferenceLogModulePayload {
   """
@@ -16063,6 +16592,64 @@ input InferenceLogModuleInput {
   prefix: String
   apiName: String
   privateApiName: String
+}
+
+"""The output of our create `NamespaceModule` mutation."""
+type CreateNamespaceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NamespaceModule` that was created by this mutation."""
+  namespaceModule: NamespaceModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NamespaceModule`. May be used by Relay 1."""
+  namespaceModuleEdge(
+    """The method to use when ordering `NamespaceModule`."""
+    orderBy: [NamespaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceModuleEdge
+}
+
+"""All input for the create `NamespaceModule` mutation."""
+input CreateNamespaceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `NamespaceModule` to be created by this mutation."""
+  namespaceModule: NamespaceModuleInput!
+}
+
+"""An input for mutations affecting `NamespaceModule`"""
+input NamespaceModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  namespacesTableId: UUID
+  namespaceEventsTableId: UUID
+  namespacesTableName: String
+  namespaceEventsTableName: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  prefix: String
+  entityTableId: UUID
+  platformNamespacesTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
 }
 
 """The output of our create `StorageLogModule` mutation."""
@@ -16179,6 +16766,65 @@ input TransferLogModuleInput {
   prefix: String
   apiName: String
   privateApiName: String
+}
+
+"""The output of our create `FunctionDeploymentModule` mutation."""
+type CreateFunctionDeploymentModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionDeploymentModule` that was created by this mutation."""
+  functionDeploymentModule: FunctionDeploymentModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FunctionDeploymentModule`. May be used by Relay 1."""
+  functionDeploymentModuleEdge(
+    """The method to use when ordering `FunctionDeploymentModule`."""
+    orderBy: [FunctionDeploymentModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionDeploymentModuleEdge
+}
+
+"""All input for the create `FunctionDeploymentModule` mutation."""
+input CreateFunctionDeploymentModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `FunctionDeploymentModule` to be created by this mutation."""
+  functionDeploymentModule: FunctionDeploymentModuleInput!
+}
+
+"""An input for mutations affecting `FunctionDeploymentModule`"""
+input FunctionDeploymentModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  deploymentsTableId: UUID
+  deploymentEventsTableId: UUID
+  deploymentsTableName: String
+  deploymentEventsTableName: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  prefix: String
+  entityTableId: UUID
+  functionModuleId: UUID
+  namespaceModuleId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
 }
 
 """The output of our create `PlansModule` mutation."""
@@ -16361,6 +17007,67 @@ input DbUsageModuleInput {
   defaultPermissions: [String]
   apiName: String
   privateApiName: String
+}
+
+"""The output of our create `GraphExecutionModule` mutation."""
+type CreateGraphExecutionModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GraphExecutionModule` that was created by this mutation."""
+  graphExecutionModule: GraphExecutionModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `GraphExecutionModule`. May be used by Relay 1."""
+  graphExecutionModuleEdge(
+    """The method to use when ordering `GraphExecutionModule`."""
+    orderBy: [GraphExecutionModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GraphExecutionModuleEdge
+}
+
+"""All input for the create `GraphExecutionModule` mutation."""
+input CreateGraphExecutionModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `GraphExecutionModule` to be created by this mutation."""
+  graphExecutionModule: GraphExecutionModuleInput!
+}
+
+"""An input for mutations affecting `GraphExecutionModule`"""
+input GraphExecutionModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  graphModuleId: UUID!
+  scope: String
+  prefix: String
+  executionsTableId: UUID
+  outputsTableId: UUID
+  nodeStatesTableId: UUID
+  executionsTableName: String
+  outputsTableName: String
+  nodeStatesTableName: String
+  apiName: String
+  privateApiName: String
+  entityTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+  createdAt: Datetime
 }
 
 """The output of our create `HierarchyModule` mutation."""
@@ -19435,6 +20142,67 @@ input ConfigSecretsModulePatch {
   hasConfig: Boolean
 }
 
+"""The output of our update `GraphModule` mutation."""
+type UpdateGraphModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GraphModule` that was updated by this mutation."""
+  graphModule: GraphModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `GraphModule`. May be used by Relay 1."""
+  graphModuleEdge(
+    """The method to use when ordering `GraphModule`."""
+    orderBy: [GraphModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GraphModuleEdge
+}
+
+"""All input for the `updateGraphModule` mutation."""
+input UpdateGraphModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `GraphModule` being updated.
+  """
+  graphModulePatch: GraphModulePatch!
+}
+
+"""
+Represents an update to a `GraphModule`. Fields that are set will be updated.
+"""
+input GraphModulePatch {
+  id: UUID
+  databaseId: UUID
+  publicSchemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  scope: String
+  prefix: String
+  merkleStoreModuleId: UUID
+  graphsTableId: UUID
+  apiName: String
+  privateApiName: String
+  entityTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+  createdAt: Datetime
+}
+
 """The output of our update `RateLimitMetersModule` mutation."""
 type UpdateRateLimitMetersModulePayload {
   """
@@ -19800,68 +20568,6 @@ input InvitesModulePatch {
   privateApiName: String
 }
 
-"""The output of our update `NamespaceModule` mutation."""
-type UpdateNamespaceModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `NamespaceModule` that was updated by this mutation."""
-  namespaceModule: NamespaceModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `NamespaceModule`. May be used by Relay 1."""
-  namespaceModuleEdge(
-    """The method to use when ordering `NamespaceModule`."""
-    orderBy: [NamespaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): NamespaceModuleEdge
-}
-
-"""All input for the `updateNamespaceModule` mutation."""
-input UpdateNamespaceModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `NamespaceModule` being updated.
-  """
-  namespaceModulePatch: NamespaceModulePatch!
-}
-
-"""
-Represents an update to a `NamespaceModule`. Fields that are set will be updated.
-"""
-input NamespaceModulePatch {
-  id: UUID
-  databaseId: UUID
-  schemaId: UUID
-  privateSchemaId: UUID
-  publicSchemaName: String
-  privateSchemaName: String
-  namespacesTableId: UUID
-  namespaceEventsTableId: UUID
-  namespacesTableName: String
-  namespaceEventsTableName: String
-  apiName: String
-  privateApiName: String
-  scope: String
-  prefix: String
-  entityTableId: UUID
-  policies: JSON
-  provisions: JSON
-  defaultPermissions: [String]
-}
-
 """The output of our update `ComputeLogModule` mutation."""
 type UpdateComputeLogModulePayload {
   """
@@ -19925,69 +20631,6 @@ input ComputeLogModulePatch {
   privateApiName: String
 }
 
-"""The output of our update `GraphModule` mutation."""
-type UpdateGraphModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `GraphModule` that was updated by this mutation."""
-  graphModule: GraphModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `GraphModule`. May be used by Relay 1."""
-  graphModuleEdge(
-    """The method to use when ordering `GraphModule`."""
-    orderBy: [GraphModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): GraphModuleEdge
-}
-
-"""All input for the `updateGraphModule` mutation."""
-input UpdateGraphModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `GraphModule` being updated.
-  """
-  graphModulePatch: GraphModulePatch!
-}
-
-"""
-Represents an update to a `GraphModule`. Fields that are set will be updated.
-"""
-input GraphModulePatch {
-  id: UUID
-  databaseId: UUID
-  publicSchemaId: UUID
-  privateSchemaId: UUID
-  publicSchemaName: String
-  privateSchemaName: String
-  scope: String
-  prefix: String
-  merkleStoreModuleId: UUID
-  graphsTableId: UUID
-  executionsTableId: UUID
-  outputsTableId: UUID
-  apiName: String
-  privateApiName: String
-  entityTableId: UUID
-  policies: JSON
-  provisions: JSON
-  defaultPermissions: [String]
-  createdAt: Datetime
-}
-
 """The output of our update `InferenceLogModule` mutation."""
 type UpdateInferenceLogModulePayload {
   """
@@ -20049,6 +20692,69 @@ input InferenceLogModulePatch {
   prefix: String
   apiName: String
   privateApiName: String
+}
+
+"""The output of our update `NamespaceModule` mutation."""
+type UpdateNamespaceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NamespaceModule` that was updated by this mutation."""
+  namespaceModule: NamespaceModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NamespaceModule`. May be used by Relay 1."""
+  namespaceModuleEdge(
+    """The method to use when ordering `NamespaceModule`."""
+    orderBy: [NamespaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceModuleEdge
+}
+
+"""All input for the `updateNamespaceModule` mutation."""
+input UpdateNamespaceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `NamespaceModule` being updated.
+  """
+  namespaceModulePatch: NamespaceModulePatch!
+}
+
+"""
+Represents an update to a `NamespaceModule`. Fields that are set will be updated.
+"""
+input NamespaceModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  namespacesTableId: UUID
+  namespaceEventsTableId: UUID
+  namespacesTableName: String
+  namespaceEventsTableName: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  prefix: String
+  entityTableId: UUID
+  platformNamespacesTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
 }
 
 """The output of our update `StorageLogModule` mutation."""
@@ -20175,6 +20881,70 @@ input TransferLogModulePatch {
   prefix: String
   apiName: String
   privateApiName: String
+}
+
+"""The output of our update `FunctionDeploymentModule` mutation."""
+type UpdateFunctionDeploymentModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionDeploymentModule` that was updated by this mutation."""
+  functionDeploymentModule: FunctionDeploymentModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FunctionDeploymentModule`. May be used by Relay 1."""
+  functionDeploymentModuleEdge(
+    """The method to use when ordering `FunctionDeploymentModule`."""
+    orderBy: [FunctionDeploymentModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionDeploymentModuleEdge
+}
+
+"""All input for the `updateFunctionDeploymentModule` mutation."""
+input UpdateFunctionDeploymentModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `FunctionDeploymentModule` being updated.
+  """
+  functionDeploymentModulePatch: FunctionDeploymentModulePatch!
+}
+
+"""
+Represents an update to a `FunctionDeploymentModule`. Fields that are set will be updated.
+"""
+input FunctionDeploymentModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  deploymentsTableId: UUID
+  deploymentEventsTableId: UUID
+  deploymentsTableName: String
+  deploymentEventsTableName: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  prefix: String
+  entityTableId: UUID
+  functionModuleId: UUID
+  namespaceModuleId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
 }
 
 """The output of our update `PlansModule` mutation."""
@@ -20372,6 +21142,72 @@ input DbUsageModulePatch {
   defaultPermissions: [String]
   apiName: String
   privateApiName: String
+}
+
+"""The output of our update `GraphExecutionModule` mutation."""
+type UpdateGraphExecutionModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GraphExecutionModule` that was updated by this mutation."""
+  graphExecutionModule: GraphExecutionModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `GraphExecutionModule`. May be used by Relay 1."""
+  graphExecutionModuleEdge(
+    """The method to use when ordering `GraphExecutionModule`."""
+    orderBy: [GraphExecutionModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GraphExecutionModuleEdge
+}
+
+"""All input for the `updateGraphExecutionModule` mutation."""
+input UpdateGraphExecutionModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `GraphExecutionModule` being updated.
+  """
+  graphExecutionModulePatch: GraphExecutionModulePatch!
+}
+
+"""
+Represents an update to a `GraphExecutionModule`. Fields that are set will be updated.
+"""
+input GraphExecutionModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  graphModuleId: UUID
+  scope: String
+  prefix: String
+  executionsTableId: UUID
+  outputsTableId: UUID
+  nodeStatesTableId: UUID
+  executionsTableName: String
+  outputsTableName: String
+  nodeStatesTableName: String
+  apiName: String
+  privateApiName: String
+  entityTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+  createdAt: Datetime
 }
 
 """The output of our update `HierarchyModule` mutation."""
@@ -22804,6 +23640,39 @@ input DeleteConfigSecretsModuleInput {
   id: UUID!
 }
 
+"""The output of our delete `GraphModule` mutation."""
+type DeleteGraphModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GraphModule` that was deleted by this mutation."""
+  graphModule: GraphModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `GraphModule`. May be used by Relay 1."""
+  graphModuleEdge(
+    """The method to use when ordering `GraphModule`."""
+    orderBy: [GraphModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GraphModuleEdge
+}
+
+"""All input for the `deleteGraphModule` mutation."""
+input DeleteGraphModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `RateLimitMetersModule` mutation."""
 type DeleteRateLimitMetersModulePayload {
   """
@@ -23002,39 +23871,6 @@ input DeleteInvitesModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `NamespaceModule` mutation."""
-type DeleteNamespaceModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `NamespaceModule` that was deleted by this mutation."""
-  namespaceModule: NamespaceModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `NamespaceModule`. May be used by Relay 1."""
-  namespaceModuleEdge(
-    """The method to use when ordering `NamespaceModule`."""
-    orderBy: [NamespaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): NamespaceModuleEdge
-}
-
-"""All input for the `deleteNamespaceModule` mutation."""
-input DeleteNamespaceModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `ComputeLogModule` mutation."""
 type DeleteComputeLogModulePayload {
   """
@@ -23068,39 +23904,6 @@ input DeleteComputeLogModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `GraphModule` mutation."""
-type DeleteGraphModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `GraphModule` that was deleted by this mutation."""
-  graphModule: GraphModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `GraphModule`. May be used by Relay 1."""
-  graphModuleEdge(
-    """The method to use when ordering `GraphModule`."""
-    orderBy: [GraphModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): GraphModuleEdge
-}
-
-"""All input for the `deleteGraphModule` mutation."""
-input DeleteGraphModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `InferenceLogModule` mutation."""
 type DeleteInferenceLogModulePayload {
   """
@@ -23126,6 +23929,39 @@ type DeleteInferenceLogModulePayload {
 
 """All input for the `deleteInferenceLogModule` mutation."""
 input DeleteInferenceLogModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `NamespaceModule` mutation."""
+type DeleteNamespaceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NamespaceModule` that was deleted by this mutation."""
+  namespaceModule: NamespaceModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NamespaceModule`. May be used by Relay 1."""
+  namespaceModuleEdge(
+    """The method to use when ordering `NamespaceModule`."""
+    orderBy: [NamespaceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NamespaceModuleEdge
+}
+
+"""All input for the `deleteNamespaceModule` mutation."""
+input DeleteNamespaceModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -23192,6 +24028,39 @@ type DeleteTransferLogModulePayload {
 
 """All input for the `deleteTransferLogModule` mutation."""
 input DeleteTransferLogModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `FunctionDeploymentModule` mutation."""
+type DeleteFunctionDeploymentModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionDeploymentModule` that was deleted by this mutation."""
+  functionDeploymentModule: FunctionDeploymentModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FunctionDeploymentModule`. May be used by Relay 1."""
+  functionDeploymentModuleEdge(
+    """The method to use when ordering `FunctionDeploymentModule`."""
+    orderBy: [FunctionDeploymentModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionDeploymentModuleEdge
+}
+
+"""All input for the `deleteFunctionDeploymentModule` mutation."""
+input DeleteFunctionDeploymentModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -23291,6 +24160,39 @@ type DeleteDbUsageModulePayload {
 
 """All input for the `deleteDbUsageModule` mutation."""
 input DeleteDbUsageModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `GraphExecutionModule` mutation."""
+type DeleteGraphExecutionModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GraphExecutionModule` that was deleted by this mutation."""
+  graphExecutionModule: GraphExecutionModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `GraphExecutionModule`. May be used by Relay 1."""
+  graphExecutionModuleEdge(
+    """The method to use when ordering `GraphExecutionModule`."""
+    orderBy: [GraphExecutionModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GraphExecutionModuleEdge
+}
+
+"""All input for the `deleteGraphExecutionModule` mutation."""
+input DeleteGraphExecutionModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.

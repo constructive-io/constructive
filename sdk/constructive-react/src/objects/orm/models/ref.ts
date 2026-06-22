@@ -176,6 +176,7 @@ export class RefModel {
       S,
       {
         id: string;
+        databaseId: string;
       },
       RefPatch
     > & {
@@ -196,7 +197,10 @@ export class RefModel {
       'UpdateRefInput',
       'id',
       'refPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      {
+        databaseId: args.where.databaseId,
+      }
     );
     return new QueryBuilder({
       client: this.client,
@@ -211,6 +215,7 @@ export class RefModel {
     args: DeleteArgs<
       {
         id: string;
+        databaseId: string;
       },
       S
     > & {
@@ -227,6 +232,7 @@ export class RefModel {
       'ref',
       {
         id: args.where.id,
+        databaseId: args.where.databaseId,
       },
       'DeleteRefInput',
       args.select,

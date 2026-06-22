@@ -57,14 +57,16 @@ const db = createClient({
 | `functionInvocationModule` | findMany, findOne, create, update, delete |
 | `functionModule` | findMany, findOne, create, update, delete |
 | `invitesModule` | findMany, findOne, create, update, delete |
-| `namespaceModule` | findMany, findOne, create, update, delete |
 | `computeLogModule` | findMany, findOne, create, update, delete |
 | `inferenceLogModule` | findMany, findOne, create, update, delete |
+| `namespaceModule` | findMany, findOne, create, update, delete |
 | `storageLogModule` | findMany, findOne, create, update, delete |
 | `transferLogModule` | findMany, findOne, create, update, delete |
+| `functionDeploymentModule` | findMany, findOne, create, update, delete |
 | `plansModule` | findMany, findOne, create, update, delete |
 | `billingProviderModule` | findMany, findOne, create, update, delete |
 | `dbUsageModule` | findMany, findOne, create, update, delete |
+| `graphExecutionModule` | findMany, findOne, create, update, delete |
 | `hierarchyModule` | findMany, findOne, create, update, delete |
 | `permissionsModule` | findMany, findOne, create, update, delete |
 | `notificationsModule` | findMany, findOne, create, update, delete |
@@ -1113,8 +1115,6 @@ CRUD operations for GraphModule records.
 | `prefix` | String | Yes |
 | `merkleStoreModuleId` | UUID | Yes |
 | `graphsTableId` | UUID | Yes |
-| `executionsTableId` | UUID | Yes |
-| `outputsTableId` | UUID | Yes |
 | `apiName` | String | Yes |
 | `privateApiName` | String | Yes |
 | `entityTableId` | UUID | Yes |
@@ -1127,13 +1127,13 @@ CRUD operations for GraphModule records.
 
 ```typescript
 // List all graphModule records
-const items = await db.graphModule.findMany({ select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, executionsTableId: true, outputsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
+const items = await db.graphModule.findMany({ select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.graphModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, executionsTableId: true, outputsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
+const item = await db.graphModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
 
 // Create
-const created = await db.graphModule.create({ data: { databaseId: '<UUID>', publicSchemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', scope: '<String>', prefix: '<String>', merkleStoreModuleId: '<UUID>', graphsTableId: '<UUID>', executionsTableId: '<UUID>', outputsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
+const created = await db.graphModule.create({ data: { databaseId: '<UUID>', publicSchemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', scope: '<String>', prefix: '<String>', merkleStoreModuleId: '<UUID>', graphsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.graphModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -1498,52 +1498,6 @@ const updated = await db.invitesModule.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.invitesModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.namespaceModule`
-
-CRUD operations for NamespaceModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `schemaId` | UUID | Yes |
-| `privateSchemaId` | UUID | Yes |
-| `publicSchemaName` | String | Yes |
-| `privateSchemaName` | String | Yes |
-| `namespacesTableId` | UUID | Yes |
-| `namespaceEventsTableId` | UUID | Yes |
-| `namespacesTableName` | String | Yes |
-| `namespaceEventsTableName` | String | Yes |
-| `apiName` | String | Yes |
-| `privateApiName` | String | Yes |
-| `scope` | String | Yes |
-| `prefix` | String | Yes |
-| `entityTableId` | UUID | Yes |
-| `policies` | JSON | Yes |
-| `provisions` | JSON | Yes |
-| `defaultPermissions` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all namespaceModule records
-const items = await db.namespaceModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, namespacesTableId: true, namespaceEventsTableId: true, namespacesTableName: true, namespaceEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
-
-// Get one by id
-const item = await db.namespaceModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, namespacesTableId: true, namespaceEventsTableId: true, namespacesTableName: true, namespaceEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
-
-// Create
-const created = await db.namespaceModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', namespacesTableId: '<UUID>', namespaceEventsTableId: '<UUID>', namespacesTableName: '<String>', namespaceEventsTableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.namespaceModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.namespaceModule.delete({ where: { id: '<UUID>' } }).execute();
-```
-
 ### `db.computeLogModule`
 
 CRUD operations for ComputeLogModule records.
@@ -1638,6 +1592,53 @@ const updated = await db.inferenceLogModule.update({ where: { id: '<UUID>' }, da
 const deleted = await db.inferenceLogModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.namespaceModule`
+
+CRUD operations for NamespaceModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `publicSchemaName` | String | Yes |
+| `privateSchemaName` | String | Yes |
+| `namespacesTableId` | UUID | Yes |
+| `namespaceEventsTableId` | UUID | Yes |
+| `namespacesTableName` | String | Yes |
+| `namespaceEventsTableName` | String | Yes |
+| `apiName` | String | Yes |
+| `privateApiName` | String | Yes |
+| `scope` | String | Yes |
+| `prefix` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `platformNamespacesTableId` | UUID | Yes |
+| `policies` | JSON | Yes |
+| `provisions` | JSON | Yes |
+| `defaultPermissions` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all namespaceModule records
+const items = await db.namespaceModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, namespacesTableId: true, namespaceEventsTableId: true, namespacesTableName: true, namespaceEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, platformNamespacesTableId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
+
+// Get one by id
+const item = await db.namespaceModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, namespacesTableId: true, namespaceEventsTableId: true, namespacesTableName: true, namespaceEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, platformNamespacesTableId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
+
+// Create
+const created = await db.namespaceModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', namespacesTableId: '<UUID>', namespaceEventsTableId: '<UUID>', namespacesTableName: '<String>', namespaceEventsTableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', platformNamespacesTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.namespaceModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.namespaceModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.storageLogModule`
 
 CRUD operations for StorageLogModule records.
@@ -1730,6 +1731,54 @@ const updated = await db.transferLogModule.update({ where: { id: '<UUID>' }, dat
 
 // Delete
 const deleted = await db.transferLogModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.functionDeploymentModule`
+
+CRUD operations for FunctionDeploymentModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `publicSchemaName` | String | Yes |
+| `privateSchemaName` | String | Yes |
+| `deploymentsTableId` | UUID | Yes |
+| `deploymentEventsTableId` | UUID | Yes |
+| `deploymentsTableName` | String | Yes |
+| `deploymentEventsTableName` | String | Yes |
+| `apiName` | String | Yes |
+| `privateApiName` | String | Yes |
+| `scope` | String | Yes |
+| `prefix` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `functionModuleId` | UUID | Yes |
+| `namespaceModuleId` | UUID | Yes |
+| `policies` | JSON | Yes |
+| `provisions` | JSON | Yes |
+| `defaultPermissions` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all functionDeploymentModule records
+const items = await db.functionDeploymentModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, deploymentsTableId: true, deploymentEventsTableId: true, deploymentsTableName: true, deploymentEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, functionModuleId: true, namespaceModuleId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
+
+// Get one by id
+const item = await db.functionDeploymentModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, deploymentsTableId: true, deploymentEventsTableId: true, deploymentsTableName: true, deploymentEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, functionModuleId: true, namespaceModuleId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
+
+// Create
+const created = await db.functionDeploymentModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', deploymentsTableId: '<UUID>', deploymentEventsTableId: '<UUID>', deploymentsTableName: '<String>', deploymentEventsTableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', functionModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.functionDeploymentModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.functionDeploymentModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.plansModule`
@@ -1879,6 +1928,56 @@ const updated = await db.dbUsageModule.update({ where: { id: '<UUID>' }, data: {
 
 // Delete
 const deleted = await db.dbUsageModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.graphExecutionModule`
+
+CRUD operations for GraphExecutionModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `publicSchemaName` | String | Yes |
+| `privateSchemaName` | String | Yes |
+| `graphModuleId` | UUID | Yes |
+| `scope` | String | Yes |
+| `prefix` | String | Yes |
+| `executionsTableId` | UUID | Yes |
+| `outputsTableId` | UUID | Yes |
+| `nodeStatesTableId` | UUID | Yes |
+| `executionsTableName` | String | Yes |
+| `outputsTableName` | String | Yes |
+| `nodeStatesTableName` | String | Yes |
+| `apiName` | String | Yes |
+| `privateApiName` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `policies` | JSON | Yes |
+| `provisions` | JSON | Yes |
+| `defaultPermissions` | String | Yes |
+| `createdAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all graphExecutionModule records
+const items = await db.graphExecutionModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, graphModuleId: true, scope: true, prefix: true, executionsTableId: true, outputsTableId: true, nodeStatesTableId: true, executionsTableName: true, outputsTableName: true, nodeStatesTableName: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
+
+// Get one by id
+const item = await db.graphExecutionModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, graphModuleId: true, scope: true, prefix: true, executionsTableId: true, outputsTableId: true, nodeStatesTableId: true, executionsTableName: true, outputsTableName: true, nodeStatesTableName: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
+
+// Create
+const created = await db.graphExecutionModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', graphModuleId: '<UUID>', scope: '<String>', prefix: '<String>', executionsTableId: '<UUID>', outputsTableId: '<UUID>', nodeStatesTableId: '<UUID>', executionsTableName: '<String>', outputsTableName: '<String>', nodeStatesTableName: '<String>', apiName: '<String>', privateApiName: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.graphExecutionModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.graphExecutionModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.hierarchyModule`

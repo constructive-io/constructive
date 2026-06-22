@@ -1104,35 +1104,6 @@ type Query {
     orderBy: [SiteOrderBy!] = [PRIMARY_KEY_ASC]
   ): SiteConnection
 
-  """Reads and enables pagination through a set of `Schema`."""
-  schemas(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: SchemaFilter
-
-    """The method to use when ordering `Schema`."""
-    orderBy: [SchemaOrderBy!] = [PRIMARY_KEY_ASC]
-  ): SchemaConnection
-
   """Reads and enables pagination through a set of `Index`."""
   indices(
     """Only read the first `n` values of the set."""
@@ -1277,6 +1248,35 @@ type Query {
     """The method to use when ordering `AstMigration`."""
     orderBy: [AstMigrationOrderBy!] = [NATURAL]
   ): AstMigrationConnection
+
+  """Reads and enables pagination through a set of `Schema`."""
+  schemas(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SchemaFilter
+
+    """The method to use when ordering `Schema`."""
+    orderBy: [SchemaOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SchemaConnection
 
   """Reads and enables pagination through a set of `Field`."""
   fields(
@@ -2516,6 +2516,7 @@ type Schema {
   scope: Int
   tags: [String]!
   isPublic: Boolean!
+  apiExposure: ApiExposureLevel!
   createdAt: Datetime
   updatedAt: Datetime
 
@@ -2762,6 +2763,12 @@ enum ObjectCategory {
   AUTH
   MEMBERSHIPS
   APP
+}
+
+enum ApiExposureLevel {
+  EXPOSABLE
+  INTERNAL_ONLY
+  NEVER_EXPOSE
 }
 
 """A connection to a list of `Table` values."""
@@ -4227,6 +4234,9 @@ input SchemaFilter {
   """Filter by the object’s `isPublic` field."""
   isPublic: BooleanFilter
 
+  """Filter by the object’s `apiExposure` field."""
+  apiExposure: ApiExposureLevelFilter
+
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
@@ -4334,6 +4344,48 @@ input BooleanFilter {
 
   """Greater than or equal to the specified value."""
   greaterThanOrEqualTo: Boolean
+}
+
+"""
+A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’
+"""
+input ApiExposureLevelFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: ApiExposureLevel
+
+  """Not equal to the specified value."""
+  notEqualTo: ApiExposureLevel
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ApiExposureLevel
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ApiExposureLevel
+
+  """Included in the specified list."""
+  in: [ApiExposureLevel!]
+
+  """Not included in the specified list."""
+  notIn: [ApiExposureLevel!]
+
+  """Less than the specified value."""
+  lessThan: ApiExposureLevel
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ApiExposureLevel
+
+  """Greater than the specified value."""
+  greaterThan: ApiExposureLevel
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ApiExposureLevel
 }
 
 """
@@ -11029,6 +11081,8 @@ enum SchemaOrderBy {
   TAGS_DESC
   IS_PUBLIC_ASC
   IS_PUBLIC_DESC
+  API_EXPOSURE_ASC
+  API_EXPOSURE_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -12534,6 +12588,18 @@ type MetaTable {
   relations: MetaRelations!
   inflection: MetaInflection!
   query: MetaQuery!
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
 }
 
 """Information about a table field/column"""
@@ -12545,6 +12611,9 @@ type MetaField {
   isPrimaryKey: Boolean!
   isForeignKey: Boolean!
   description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
 }
 
 """Information about a PostgreSQL type"""
@@ -12555,6 +12624,15 @@ type MetaType {
   isNotNull: Boolean
   hasDefault: Boolean
   subtype: String
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
 }
 
 """Information about a database index"""
@@ -12664,6 +12742,78 @@ type MetaQuery {
   create: String
   update: String
   delete: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Column name (camelCase)"""
+  name: String!
+
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Name of the translation table"""
+  translationTable: String!
+
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
 }
 
 """
@@ -13025,14 +13175,6 @@ type Mutation {
     input: CreateSiteInput!
   ): CreateSitePayload
 
-  """Creates a single `Schema`."""
-  createSchema(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateSchemaInput!
-  ): CreateSchemaPayload
-
   """Creates a single `Index`."""
   createIndex(
     """
@@ -13072,6 +13214,14 @@ type Mutation {
     """
     input: CreateAstMigrationInput!
   ): CreateAstMigrationPayload
+
+  """Creates a single `Schema`."""
+  createSchema(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSchemaInput!
+  ): CreateSchemaPayload
 
   """Creates a single `Field`."""
   createField(
@@ -13379,14 +13529,6 @@ type Mutation {
     input: UpdateSiteInput!
   ): UpdateSitePayload
 
-  """Updates a single `Schema` using a unique key and a patch."""
-  updateSchema(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateSchemaInput!
-  ): UpdateSchemaPayload
-
   """Updates a single `Index` using a unique key and a patch."""
   updateIndex(
     """
@@ -13420,6 +13562,14 @@ type Mutation {
     """
     input: UpdateWebauthnSettingInput!
   ): UpdateWebauthnSettingPayload
+
+  """Updates a single `Schema` using a unique key and a patch."""
+  updateSchema(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSchemaInput!
+  ): UpdateSchemaPayload
 
   """Updates a single `Field` using a unique key and a patch."""
   updateField(
@@ -13725,14 +13875,6 @@ type Mutation {
     input: DeleteSiteInput!
   ): DeleteSitePayload
 
-  """Deletes a single `Schema` using a unique key."""
-  deleteSchema(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteSchemaInput!
-  ): DeleteSchemaPayload
-
   """Deletes a single `Index` using a unique key."""
   deleteIndex(
     """
@@ -13764,6 +13906,14 @@ type Mutation {
     """
     input: DeleteWebauthnSettingInput!
   ): DeleteWebauthnSettingPayload
+
+  """Deletes a single `Schema` using a unique key."""
+  deleteSchema(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSchemaInput!
+  ): DeleteSchemaPayload
 
   """Deletes a single `Field` using a unique key."""
   deleteField(
@@ -16146,58 +16296,6 @@ input SiteInput {
   dbname: String
 }
 
-"""The output of our create `Schema` mutation."""
-type CreateSchemaPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Schema` that was created by this mutation."""
-  schema: Schema
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Schema`. May be used by Relay 1."""
-  schemaEdge(
-    """The method to use when ordering `Schema`."""
-    orderBy: [SchemaOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SchemaEdge
-}
-
-"""All input for the create `Schema` mutation."""
-input CreateSchemaInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Schema` to be created by this mutation."""
-  schema: SchemaInput!
-}
-
-"""An input for mutations affecting `Schema`"""
-input SchemaInput {
-  id: UUID
-  databaseId: UUID!
-  name: String!
-  schemaName: String!
-  label: String
-  description: String
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  isPublic: Boolean
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `Index` mutation."""
 type CreateIndexPayload {
   """
@@ -16517,6 +16615,59 @@ input AstMigrationInput {
   action: String
   actionId: UUID
   actorId: UUID
+}
+
+"""The output of our create `Schema` mutation."""
+type CreateSchemaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Schema` that was created by this mutation."""
+  schema: Schema
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Schema`. May be used by Relay 1."""
+  schemaEdge(
+    """The method to use when ordering `Schema`."""
+    orderBy: [SchemaOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SchemaEdge
+}
+
+"""All input for the create `Schema` mutation."""
+input CreateSchemaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Schema` to be created by this mutation."""
+  schema: SchemaInput!
+}
+
+"""An input for mutations affecting `Schema`"""
+input SchemaInput {
+  id: UUID
+  databaseId: UUID!
+  name: String!
+  schemaName: String!
+  label: String
+  description: String
+  smartTags: JSON
+  category: ObjectCategory
+  scope: Int
+  tags: [String]
+  isPublic: Boolean
+  apiExposure: ApiExposureLevel
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our create `Field` mutation."""
@@ -18866,63 +19017,6 @@ input SitePatch {
   logoUpload: Upload
 }
 
-"""The output of our update `Schema` mutation."""
-type UpdateSchemaPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Schema` that was updated by this mutation."""
-  schema: Schema
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Schema`. May be used by Relay 1."""
-  schemaEdge(
-    """The method to use when ordering `Schema`."""
-    orderBy: [SchemaOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SchemaEdge
-}
-
-"""All input for the `updateSchema` mutation."""
-input UpdateSchemaInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Schema` being updated.
-  """
-  schemaPatch: SchemaPatch!
-}
-
-"""
-Represents an update to a `Schema`. Fields that are set will be updated.
-"""
-input SchemaPatch {
-  id: UUID
-  databaseId: UUID
-  name: String
-  schemaName: String
-  label: String
-  description: String
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  isPublic: Boolean
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our update `Index` mutation."""
 type UpdateIndexPayload {
   """
@@ -19218,6 +19312,64 @@ input WebauthnSettingPatch {
 
   """Challenge TTL in seconds (default 300 = 5 minutes)"""
   challengeExpirySeconds: BigInt
+}
+
+"""The output of our update `Schema` mutation."""
+type UpdateSchemaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Schema` that was updated by this mutation."""
+  schema: Schema
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Schema`. May be used by Relay 1."""
+  schemaEdge(
+    """The method to use when ordering `Schema`."""
+    orderBy: [SchemaOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SchemaEdge
+}
+
+"""All input for the `updateSchema` mutation."""
+input UpdateSchemaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Schema` being updated.
+  """
+  schemaPatch: SchemaPatch!
+}
+
+"""
+Represents an update to a `Schema`. Fields that are set will be updated.
+"""
+input SchemaPatch {
+  id: UUID
+  databaseId: UUID
+  name: String
+  schemaName: String
+  label: String
+  description: String
+  smartTags: JSON
+  category: ObjectCategory
+  scope: Int
+  tags: [String]
+  isPublic: Boolean
+  apiExposure: ApiExposureLevel
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our update `Field` mutation."""
@@ -20568,39 +20720,6 @@ input DeleteSiteInput {
   id: UUID!
 }
 
-"""The output of our delete `Schema` mutation."""
-type DeleteSchemaPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Schema` that was deleted by this mutation."""
-  schema: Schema
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Schema`. May be used by Relay 1."""
-  schemaEdge(
-    """The method to use when ordering `Schema`."""
-    orderBy: [SchemaOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SchemaEdge
-}
-
-"""All input for the `deleteSchema` mutation."""
-input DeleteSchemaInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `Index` mutation."""
 type DeleteIndexPayload {
   """
@@ -20732,6 +20851,39 @@ input DeleteWebauthnSettingInput {
   clientMutationId: String
 
   """Unique identifier for this WebAuthn settings record"""
+  id: UUID!
+}
+
+"""The output of our delete `Schema` mutation."""
+type DeleteSchemaPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Schema` that was deleted by this mutation."""
+  schema: Schema
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Schema`. May be used by Relay 1."""
+  schemaEdge(
+    """The method to use when ordering `Schema`."""
+    orderBy: [SchemaOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SchemaEdge
+}
+
+"""All input for the `deleteSchema` mutation."""
+input DeleteSchemaInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
   id: UUID!
 }
 

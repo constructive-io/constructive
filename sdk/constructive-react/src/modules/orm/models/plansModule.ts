@@ -196,7 +196,8 @@ export class PlansModuleModel {
       'UpdatePlansModuleInput',
       'id',
       'plansModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

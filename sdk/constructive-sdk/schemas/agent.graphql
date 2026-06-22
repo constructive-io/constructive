@@ -2420,7 +2420,8 @@ input AgentResourceFilter {
   """
   Composite unified search. Provide a search string and it will be dispatched to
   all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  simultaneously. When the LLM plugin is active, pgvector also participates via
+  auto-embedding. Rows matching ANY algorithm are returned. All matching score
   fields are populated.
   """
   unifiedSearch: String
@@ -2647,6 +2648,11 @@ input VectorNearbyInput {
   When true (default for tables with @hasChunks), transparently queries the chunks table and returns the minimum distance across parent + all chunks. Set to false to only search the parent embedding.
   """
   includeChunks: Boolean
+
+  """
+  Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  text: String
 }
 
 """Similarity metric for vector search"""
@@ -2857,6 +2863,18 @@ type MetaTable {
   relations: MetaRelations!
   inflection: MetaInflection!
   query: MetaQuery!
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
 }
 
 """Information about a table field/column"""
@@ -2868,6 +2886,9 @@ type MetaField {
   isPrimaryKey: Boolean!
   isForeignKey: Boolean!
   description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
 }
 
 """Information about a PostgreSQL type"""
@@ -2878,6 +2899,15 @@ type MetaType {
   isNotNull: Boolean
   hasDefault: Boolean
   subtype: String
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
 }
 
 """Information about a database index"""
@@ -2987,6 +3017,78 @@ type MetaQuery {
   create: String
   update: String
   delete: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Column name (camelCase)"""
+  name: String!
+
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Name of the translation table"""
+  translationTable: String!
+
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
 }
 
 """
@@ -3590,6 +3692,11 @@ input AgentResourceChunkInput {
   metadata: JSON
   createdAt: Datetime
   updatedAt: Datetime
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
 }
 
 """The output of our create `AgentPersona` mutation."""
@@ -3811,6 +3918,11 @@ input AgentResourceInput {
 
   """@@behavior -insert -update"""
   embeddingUpdatedAt: Datetime
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
 }
 
 """The output of our update `AgentPlan` mutation."""
@@ -4210,6 +4322,11 @@ input AgentResourceChunkPatch {
   metadata: JSON
   createdAt: Datetime
   updatedAt: Datetime
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
 }
 
 """The output of our update `AgentPersona` mutation."""
@@ -4446,6 +4563,11 @@ input AgentResourcePatch {
 
   """@@behavior -insert -update"""
   embeddingUpdatedAt: Datetime
+
+  """
+  Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider.
+  """
+  embeddingText: String
 }
 
 """The output of our delete `AgentPlan` mutation."""

@@ -1092,7 +1092,8 @@ export interface AgentResourceFilter {
   /**
    * Composite unified search. Provide a search string and it will be dispatched to
    * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
   unifiedSearch?: string;
@@ -1569,6 +1570,7 @@ export interface CreateAgentResourceChunkInput {
     chunkIndex?: number;
     embedding?: number[];
     metadata?: Record<string, unknown>;
+    embeddingText?: string;
   };
 }
 export interface AgentResourceChunkPatch {
@@ -1577,6 +1579,7 @@ export interface AgentResourceChunkPatch {
   chunkIndex?: number | null;
   embedding?: number[] | null;
   metadata?: Record<string, unknown> | null;
+  embeddingText?: string | null;
 }
 export interface UpdateAgentResourceChunkInput {
   clientMutationId?: string;
@@ -1638,6 +1641,7 @@ export interface CreateAgentResourceInput {
     archivedAt?: string;
     embedding?: number[];
     embeddingUpdatedAt?: string;
+    embeddingText?: string;
   };
 }
 export interface AgentResourcePatch {
@@ -1655,6 +1659,7 @@ export interface AgentResourcePatch {
   archivedAt?: string | null;
   embedding?: number[] | null;
   embeddingUpdatedAt?: string | null;
+  embeddingText?: string | null;
 }
 export interface UpdateAgentResourceInput {
   clientMutationId?: string;
@@ -1770,6 +1775,8 @@ export interface VectorNearbyInput {
   distance?: number;
   /** When true (default for tables with @hasChunks), transparently queries the chunks table and returns the minimum distance across parent + all chunks. Set to false to only search the parent embedding. */
   includeChunks?: boolean;
+  /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  text?: string;
 }
 /** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPersonaToManyAgentFilter {
@@ -2021,6 +2028,8 @@ export interface AgentResourceChunkInput {
   metadata?: Record<string, unknown>;
   createdAt?: string;
   updatedAt?: string;
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
 }
 /** An input for mutations affecting `AgentPersona` */
 export interface AgentPersonaInput {
@@ -2073,6 +2082,8 @@ export interface AgentResourceInput {
   archivedAt?: string;
   embedding?: number[];
   embeddingUpdatedAt?: string;
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
 }
 /** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentTaskFilter {
@@ -2721,7 +2732,8 @@ export interface AgentResourceFilter {
   /**
    * Composite unified search. Provide a search string and it will be dispatched to
    * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
   unifiedSearch?: string;

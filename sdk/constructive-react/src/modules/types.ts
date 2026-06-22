@@ -326,8 +326,6 @@ export interface GraphModule {
   prefix: string | null;
   merkleStoreModuleId: string | null;
   graphsTableId: string | null;
-  executionsTableId: string | null;
-  outputsTableId: string | null;
   apiName: string | null;
   privateApiName: string | null;
   entityTableId: string | null;
@@ -484,26 +482,6 @@ export interface InvitesModule {
   apiName: string | null;
   privateApiName: string | null;
 }
-export interface NamespaceModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  publicSchemaName: string | null;
-  privateSchemaName: string | null;
-  namespacesTableId: string | null;
-  namespaceEventsTableId: string | null;
-  namespacesTableName: string | null;
-  namespaceEventsTableName: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-  scope: string | null;
-  prefix: string | null;
-  entityTableId: string | null;
-  policies: unknown | null;
-  provisions: unknown | null;
-  defaultPermissions: string[] | null;
-}
 export interface ComputeLogModule {
   id: string | null;
   databaseId: string | null;
@@ -546,6 +524,27 @@ export interface InferenceLogModule {
   apiName: string | null;
   privateApiName: string | null;
 }
+export interface NamespaceModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  namespacesTableId: string | null;
+  namespaceEventsTableId: string | null;
+  namespacesTableName: string | null;
+  namespaceEventsTableName: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  scope: string | null;
+  prefix: string | null;
+  entityTableId: string | null;
+  platformNamespacesTableId: string | null;
+  policies: unknown | null;
+  provisions: unknown | null;
+  defaultPermissions: string[] | null;
+}
 export interface StorageLogModule {
   id: string | null;
   databaseId: string | null;
@@ -587,6 +586,28 @@ export interface TransferLogModule {
   prefix: string | null;
   apiName: string | null;
   privateApiName: string | null;
+}
+export interface FunctionDeploymentModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  deploymentsTableId: string | null;
+  deploymentEventsTableId: string | null;
+  deploymentsTableName: string | null;
+  deploymentEventsTableName: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  scope: string | null;
+  prefix: string | null;
+  entityTableId: string | null;
+  functionModuleId: string | null;
+  namespaceModuleId: string | null;
+  policies: unknown | null;
+  provisions: unknown | null;
+  defaultPermissions: string[] | null;
 }
 export interface PlansModule {
   id: string | null;
@@ -658,6 +679,30 @@ export interface DbUsageModule {
   defaultPermissions: string[] | null;
   apiName: string | null;
   privateApiName: string | null;
+}
+export interface GraphExecutionModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  graphModuleId: string | null;
+  scope: string | null;
+  prefix: string | null;
+  executionsTableId: string | null;
+  outputsTableId: string | null;
+  nodeStatesTableId: string | null;
+  executionsTableName: string | null;
+  outputsTableName: string | null;
+  nodeStatesTableName: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  entityTableId: string | null;
+  policies: unknown | null;
+  provisions: unknown | null;
+  defaultPermissions: string[] | null;
+  createdAt: string | null;
 }
 export interface HierarchyModule {
   id: string | null;

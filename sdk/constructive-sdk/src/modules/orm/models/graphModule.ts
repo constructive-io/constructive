@@ -196,7 +196,8 @@ export class GraphModuleModel {
       'UpdateGraphModuleInput',
       'id',
       'graphModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

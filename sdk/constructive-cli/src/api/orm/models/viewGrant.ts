@@ -196,7 +196,8 @@ export class ViewGrantModel {
       'UpdateViewGrantInput',
       'id',
       'viewGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

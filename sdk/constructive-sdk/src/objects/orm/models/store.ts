@@ -196,7 +196,8 @@ export class StoreModel {
       'UpdateStoreInput',
       'id',
       'storePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

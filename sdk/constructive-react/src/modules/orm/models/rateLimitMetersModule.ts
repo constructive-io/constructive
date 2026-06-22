@@ -198,7 +198,8 @@ export class RateLimitMetersModuleModel {
       'UpdateRateLimitMetersModuleInput',
       'id',
       'rateLimitMetersModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

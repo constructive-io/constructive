@@ -14,6 +14,8 @@
 | agent | - | ORM, CLI | [./src/agent/README.md](./src/agent/README.md) |
 | api | - | ORM, CLI | [./src/api/README.md](./src/api/README.md) |
 | auth | - | ORM, CLI | [./src/auth/README.md](./src/auth/README.md) |
+| compute | - | ORM, CLI | [./src/compute/README.md](./src/compute/README.md) |
+| config | - | ORM, CLI | [./src/config/README.md](./src/config/README.md) |
 | modules | - | ORM, CLI | [./src/modules/README.md](./src/modules/README.md) |
 | objects | - | ORM, CLI | [./src/objects/README.md](./src/objects/README.md) |
 | usage | - | ORM, CLI | [./src/usage/README.md](./src/usage/README.md) |
