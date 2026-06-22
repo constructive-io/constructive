@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.27.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.27.10...@constructive-io/graphql-query@3.27.11) (2026-06-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
 ## [3.27.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.27.9...@constructive-io/graphql-query@3.27.10) (2026-06-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-query
