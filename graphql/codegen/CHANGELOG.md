@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.47.16](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.15...@constructive-io/graphql-codegen@4.47.16) (2026-06-23)
+
+### Bug Fixes
+
+- handle composite PK where clauses in CLI codegen ([da2afae](https://github.com/constructive-io/constructive/commit/da2afae4e4050d6dda03b0a90a8eac50c6d9f380))
+
 ## [4.47.15](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.47.14...@constructive-io/graphql-codegen@4.47.15) (2026-06-22)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
