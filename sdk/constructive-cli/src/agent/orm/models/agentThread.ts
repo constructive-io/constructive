@@ -196,7 +196,8 @@ export class AgentThreadModel {
       'UpdateAgentThreadInput',
       'id',
       'agentThreadPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -196,7 +196,8 @@ export class SiteModuleModel {
       'UpdateSiteModuleInput',
       'id',
       'siteModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

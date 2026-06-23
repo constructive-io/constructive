@@ -808,7 +808,8 @@ export interface UserFilter {
   /**
    * Composite unified search. Provide a search string and it will be dispatched to
    * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
   unifiedSearch?: string;
@@ -2221,7 +2222,8 @@ export interface UserFilter {
   /**
    * Composite unified search. Provide a search string and it will be dispatched to
    * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
   unifiedSearch?: string;

@@ -196,7 +196,8 @@ export class PolicyModel {
       'UpdatePolicyInput',
       'id',
       'policyPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

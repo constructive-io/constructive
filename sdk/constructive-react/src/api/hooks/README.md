@@ -320,20 +320,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>' });
 ```typescript
 // List all schemas
 const { data, isLoading } = useSchemasQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one schema
 const { data: item } = useSchemaQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a schema
 const { mutate: create } = useCreateSchemaMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>' });
+create({ databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>', apiExposure: '<ApiExposureLevel>' });
 ```
 
 ### Table

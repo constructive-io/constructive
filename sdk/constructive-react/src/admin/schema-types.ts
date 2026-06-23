@@ -3771,6 +3771,14 @@ export interface MetaTable {
   relations: MetaRelations;
   inflection: MetaInflection;
   query: MetaQuery;
+  /** Storage metadata (null if not a storage table) */
+  storage?: MetaStorage | null;
+  /** Search metadata (null if no search configured) */
+  search?: MetaSearch | null;
+  /** i18n metadata (null if no @i18n tag) */
+  i18n?: MetaI18n | null;
+  /** Realtime metadata (null if no @realtime tag) */
+  realtime?: MetaRealtime | null;
 }
 /** Information about a table field/column */
 export interface MetaField {
@@ -3781,6 +3789,8 @@ export interface MetaField {
   isPrimaryKey: boolean;
   isForeignKey: boolean;
   description?: string | null;
+  /** Enum metadata if this field has an enum type */
+  enumValues?: MetaEnum | null;
 }
 /** Information about a database index */
 export interface MetaIndex {
@@ -3846,6 +3856,36 @@ export interface MetaQuery {
   update?: string | null;
   delete?: string | null;
 }
+/** Storage metadata for a table */
+export interface MetaStorage {
+  /** Whether this table is a storage files table */
+  isFilesTable: boolean;
+  /** Whether this table is a storage buckets table */
+  isBucketsTable: boolean;
+}
+/** Search metadata for a table */
+export interface MetaSearch {
+  /** Active search algorithms on this table */
+  algorithms: string[];
+  /** Searchable columns with their algorithm */
+  columns: MetaSearchColumn[];
+  /** Whether unifiedSearch composite filter is available */
+  hasUnifiedSearch: boolean;
+  /** Per-table search configuration */
+  config?: MetaSearchConfig | null;
+}
+/** i18n metadata for a table with @i18n tag */
+export interface MetaI18n {
+  /** Name of the translation table */
+  translationTable: string;
+  /** Fields that are translatable */
+  translatableFields: MetaI18nField[];
+}
+/** Realtime metadata for a table with @realtime tag */
+export interface MetaRealtime {
+  /** The generated subscription field name (e.g. onPostChanged) */
+  subscriptionFieldName: string;
+}
 /** Information about a PostgreSQL type */
 export interface MetaType {
   pgType: string;
@@ -3854,6 +3894,13 @@ export interface MetaType {
   isNotNull?: boolean | null;
   hasDefault?: boolean | null;
   subtype?: string | null;
+}
+/** Information about a PostgreSQL enum type */
+export interface MetaEnum {
+  /** The PostgreSQL enum type name */
+  name: string;
+  /** Allowed values for this enum */
+  values: string[];
 }
 /** Reference to a related table */
 export interface MetaRefTable {
@@ -3887,4 +3934,29 @@ export interface MetaManyToManyRelation {
   leftKeyAttributes: MetaField[];
   rightKeyAttributes: MetaField[];
   rightTable: MetaRefTable;
+}
+/** A searchable column with its algorithm */
+export interface MetaSearchColumn {
+  /** Column name (camelCase) */
+  name: string;
+  /** Search algorithm: tsvector, bm25, trgm, or vector */
+  algorithm: string;
+}
+/** Per-table search configuration from @searchConfig smart tag */
+export interface MetaSearchConfig {
+  /** JSON-encoded per-adapter score weights */
+  weights?: string | null;
+  /** Whether recency boosting is enabled */
+  boostRecent: boolean;
+  /** Field used for recency decay */
+  boostRecencyField?: string | null;
+  /** Exponential decay factor per day */
+  boostRecencyDecay?: number | null;
+}
+/** A translatable field */
+export interface MetaI18nField {
+  /** GraphQL field name */
+  name: string;
+  /** PostgreSQL column type (text, citext) */
+  type: string;
 }

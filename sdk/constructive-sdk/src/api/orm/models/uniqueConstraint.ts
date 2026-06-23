@@ -196,7 +196,8 @@ export class UniqueConstraintModel {
       'UpdateUniqueConstraintInput',
       'id',
       'uniqueConstraintPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

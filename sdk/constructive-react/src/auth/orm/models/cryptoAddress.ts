@@ -196,7 +196,8 @@ export class CryptoAddressModel {
       'UpdateCryptoAddressInput',
       'id',
       'cryptoAddressPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

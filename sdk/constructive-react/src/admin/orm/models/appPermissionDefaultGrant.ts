@@ -198,7 +198,8 @@ export class AppPermissionDefaultGrantModel {
       'UpdateAppPermissionDefaultGrantInput',
       'id',
       'appPermissionDefaultGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

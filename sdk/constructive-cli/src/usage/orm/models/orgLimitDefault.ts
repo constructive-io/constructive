@@ -196,7 +196,8 @@ export class OrgLimitDefaultModel {
       'UpdateOrgLimitDefaultInput',
       'id',
       'orgLimitDefaultPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

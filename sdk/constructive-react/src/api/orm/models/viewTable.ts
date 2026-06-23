@@ -196,7 +196,8 @@ export class ViewTableModel {
       'UpdateViewTableInput',
       'id',
       'viewTablePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -196,7 +196,8 @@ export class IndexModel {
       'UpdateIndexInput',
       'id',
       'indexPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

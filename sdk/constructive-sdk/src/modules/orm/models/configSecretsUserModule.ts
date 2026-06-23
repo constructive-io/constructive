@@ -198,7 +198,8 @@ export class ConfigSecretsUserModuleModel {
       'UpdateConfigSecretsUserModuleInput',
       'id',
       'configSecretsUserModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

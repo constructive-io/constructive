@@ -231,6 +231,7 @@ export interface UUIDListFilter {
   anyGreaterThanOrEqualTo?: string;
 }
 // ============ Enum Types ============
+export type ApiExposureLevel = 'EXPOSABLE' | 'INTERNAL_ONLY' | 'NEVER_EXPOSE';
 export type ObjectCategory = 'CORE' | 'MODULE' | 'PERMISSIONS' | 'AUTH' | 'MEMBERSHIPS' | 'APP';
 // ============ Custom Scalar Types ============
 export type ConstructiveInternalTypeAttachment = unknown;
@@ -257,6 +258,7 @@ export interface Schema {
   scope?: number | null;
   tags?: string[] | null;
   isPublic?: boolean | null;
+  apiExposure?: ApiExposureLevel | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -1329,6 +1331,7 @@ export type SchemaSelect = {
   scope?: boolean;
   tags?: boolean;
   isPublic?: boolean;
+  apiExposure?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   database?: {
@@ -2718,6 +2721,8 @@ export interface SchemaFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `apiExposure` field. */
+  apiExposure?: ApiExposureLevelFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -4652,6 +4657,8 @@ export type SchemaOrderBy =
   | 'TAGS_DESC'
   | 'IS_PUBLIC_ASC'
   | 'IS_PUBLIC_DESC'
+  | 'API_EXPOSURE_ASC'
+  | 'API_EXPOSURE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -5804,6 +5811,7 @@ export interface CreateSchemaInput {
     scope?: number;
     tags?: string[];
     isPublic?: boolean;
+    apiExposure?: ApiExposureLevel;
   };
 }
 export interface SchemaPatch {
@@ -5817,6 +5825,7 @@ export interface SchemaPatch {
   scope?: number | null;
   tags?: string[] | null;
   isPublic?: boolean | null;
+  apiExposure?: ApiExposureLevel | null;
 }
 export interface UpdateSchemaInput {
   clientMutationId?: string;
@@ -7497,6 +7506,31 @@ export interface ObjectCategoryFilter {
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: ObjectCategory;
 }
+/** A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’ */
+export interface ApiExposureLevelFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ApiExposureLevel;
+  /** Not equal to the specified value. */
+  notEqualTo?: ApiExposureLevel;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ApiExposureLevel;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ApiExposureLevel;
+  /** Included in the specified list. */
+  in?: ApiExposureLevel[];
+  /** Not included in the specified list. */
+  notIn?: ApiExposureLevel[];
+  /** Less than the specified value. */
+  lessThan?: ApiExposureLevel;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ApiExposureLevel;
+  /** Greater than the specified value. */
+  greaterThan?: ApiExposureLevel;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ApiExposureLevel;
+}
 /** A filter to be used against many `Table` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManyTableFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -8457,6 +8491,7 @@ export interface SchemaInput {
   scope?: number;
   tags?: string[];
   isPublic?: boolean;
+  apiExposure?: ApiExposureLevel;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -10346,6 +10381,8 @@ export interface SchemaFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `apiExposure` field. */
+  apiExposure?: ApiExposureLevelFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */

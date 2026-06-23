@@ -196,7 +196,8 @@ export class ApiSettingModel {
       'UpdateApiSettingInput',
       'id',
       'apiSettingPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

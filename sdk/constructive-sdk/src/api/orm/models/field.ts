@@ -196,7 +196,8 @@ export class FieldModel {
       'UpdateFieldInput',
       'id',
       'fieldPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -196,7 +196,8 @@ export class SchemaModel {
       'UpdateSchemaInput',
       'id',
       'schemaPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

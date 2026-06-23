@@ -473,7 +473,8 @@ export function buildUpdateByPkDocument<TSelect, TData>(
   inputTypeName: string,
   idFieldName: string,
   patchFieldName: string,
-  connectionFieldsMap?: Record<string, Record<string, string>>
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+  extraKeys?: Record<string, unknown>
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
@@ -494,6 +495,7 @@ export function buildUpdateByPkDocument<TSelect, TData>(
     variables: {
       input: {
         [idFieldName]: id,
+        ...extraKeys,
         [patchFieldName]: data,
       },
     },

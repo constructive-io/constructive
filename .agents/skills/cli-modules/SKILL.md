@@ -1,13 +1,13 @@
 ---
 name: cli-modules
-description: CLI tool (csdk) for the modules API — provides CRUD commands for 57 tables and 12 custom operations
+description: CLI tool (csdk) for the modules API — provides CRUD commands for 59 tables and 12 custom operations
 ---
 
 # cli-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the modules API — provides CRUD commands for 57 tables and 12 custom operations
+CLI tool (csdk) for the modules API — provides CRUD commands for 59 tables and 12 custom operations
 
 ## Usage
 
@@ -92,14 +92,16 @@ See the `references/` directory for detailed per-entity API documentation:
 - [function-invocation-module](references/function-invocation-module.md)
 - [function-module](references/function-module.md)
 - [invites-module](references/invites-module.md)
-- [namespace-module](references/namespace-module.md)
 - [compute-log-module](references/compute-log-module.md)
 - [inference-log-module](references/inference-log-module.md)
+- [namespace-module](references/namespace-module.md)
 - [storage-log-module](references/storage-log-module.md)
 - [transfer-log-module](references/transfer-log-module.md)
+- [function-deployment-module](references/function-deployment-module.md)
 - [plans-module](references/plans-module.md)
 - [billing-provider-module](references/billing-provider-module.md)
 - [db-usage-module](references/db-usage-module.md)
+- [graph-execution-module](references/graph-execution-module.md)
 - [hierarchy-module](references/hierarchy-module.md)
 - [permissions-module](references/permissions-module.md)
 - [notifications-module](references/notifications-module.md)

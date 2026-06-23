@@ -196,7 +196,8 @@ export class OrgLimitWarningModel {
       'UpdateOrgLimitWarningInput',
       'id',
       'orgLimitWarningPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

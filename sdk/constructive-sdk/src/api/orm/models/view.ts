@@ -196,7 +196,8 @@ export class ViewModel {
       'UpdateViewInput',
       'id',
       'viewPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

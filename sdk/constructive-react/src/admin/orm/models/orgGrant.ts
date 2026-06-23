@@ -196,7 +196,8 @@ export class OrgGrantModel {
       'UpdateOrgGrantInput',
       'id',
       'orgGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

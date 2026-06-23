@@ -196,7 +196,8 @@ export class SiteMetadatumModel {
       'UpdateSiteMetadatumInput',
       'id',
       'siteMetadatumPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -162,6 +162,7 @@ export class ObjectModel {
       S,
       {
         id: string;
+        databaseId: string;
       },
       ObjectPatch
     > & {
@@ -182,7 +183,10 @@ export class ObjectModel {
       'UpdateObjectInput',
       'id',
       'objectPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      {
+        databaseId: args.where.databaseId,
+      }
     );
     return new QueryBuilder({
       client: this.client,
@@ -197,6 +201,7 @@ export class ObjectModel {
     args: DeleteArgs<
       {
         id: string;
+        databaseId: string;
       },
       S
     > & {
@@ -213,6 +218,7 @@ export class ObjectModel {
       'object',
       {
         id: args.where.id,
+        databaseId: args.where.databaseId,
       },
       'DeleteObjectInput',
       args.select,

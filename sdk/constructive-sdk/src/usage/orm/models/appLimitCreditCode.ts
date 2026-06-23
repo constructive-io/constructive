@@ -196,7 +196,8 @@ export class AppLimitCreditCodeModel {
       'UpdateAppLimitCreditCodeInput',
       'id',
       'appLimitCreditCodePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

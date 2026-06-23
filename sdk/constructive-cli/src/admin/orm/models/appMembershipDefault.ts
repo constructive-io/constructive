@@ -198,7 +198,8 @@ export class AppMembershipDefaultModel {
       'UpdateAppMembershipDefaultInput',
       'id',
       'appMembershipDefaultPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

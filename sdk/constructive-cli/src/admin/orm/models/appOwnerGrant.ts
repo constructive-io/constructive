@@ -196,7 +196,8 @@ export class AppOwnerGrantModel {
       'UpdateAppOwnerGrantInput',
       'id',
       'appOwnerGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

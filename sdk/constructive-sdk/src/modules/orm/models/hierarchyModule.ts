@@ -196,7 +196,8 @@ export class HierarchyModuleModel {
       'UpdateHierarchyModuleInput',
       'id',
       'hierarchyModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

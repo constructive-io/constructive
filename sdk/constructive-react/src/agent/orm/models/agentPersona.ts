@@ -196,7 +196,8 @@ export class AgentPersonaModel {
       'UpdateAgentPersonaInput',
       'id',
       'agentPersonaPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -41,6 +41,7 @@ export function useUpdateObjectMutation<S extends ObjectSelect>(
       Error,
       {
         id: string;
+        databaseId: string;
         objectPatch: ObjectPatch;
       }
     >,
@@ -55,6 +56,7 @@ export function useUpdateObjectMutation<S extends ObjectSelect>(
   Error,
   {
     id: string;
+    databaseId: string;
     objectPatch: ObjectPatch;
   }
 >;
@@ -67,6 +69,7 @@ export function useUpdateObjectMutation(
       Error,
       {
         id: string;
+        databaseId: string;
         objectPatch: ObjectPatch;
       }
     >,
@@ -79,11 +82,20 @@ export function useUpdateObjectMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: objectMutationKeys.all,
-    mutationFn: ({ id, objectPatch }: { id: string; objectPatch: ObjectPatch }) =>
+    mutationFn: ({
+      id,
+      databaseId,
+      objectPatch,
+    }: {
+      id: string;
+      databaseId: string;
+      objectPatch: ObjectPatch;
+    }) =>
       getClient()
         .object.update({
           where: {
             id,
+            databaseId,
           },
           data: objectPatch,
           select: args.select,

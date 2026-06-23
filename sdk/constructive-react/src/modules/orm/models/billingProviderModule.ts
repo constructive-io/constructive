@@ -198,7 +198,8 @@ export class BillingProviderModuleModel {
       'UpdateBillingProviderModuleInput',
       'id',
       'billingProviderModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

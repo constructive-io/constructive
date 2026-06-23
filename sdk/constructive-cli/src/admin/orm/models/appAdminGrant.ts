@@ -196,7 +196,8 @@ export class AppAdminGrantModel {
       'UpdateAppAdminGrantInput',
       'id',
       'appAdminGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

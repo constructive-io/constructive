@@ -196,7 +196,8 @@ export class PhoneNumberModel {
       'UpdatePhoneNumberInput',
       'id',
       'phoneNumberPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

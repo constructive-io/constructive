@@ -196,7 +196,8 @@ export class WebauthnAuthModuleModel {
       'UpdateWebauthnAuthModuleInput',
       'id',
       'webauthnAuthModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

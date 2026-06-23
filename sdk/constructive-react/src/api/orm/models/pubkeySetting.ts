@@ -196,7 +196,8 @@ export class PubkeySettingModel {
       'UpdatePubkeySettingInput',
       'id',
       'pubkeySettingPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,
