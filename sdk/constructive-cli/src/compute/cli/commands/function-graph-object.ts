@@ -241,7 +241,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'databaseId',
         message: 'databaseId',
-        required: false,
+        required: true,
       },
       {
         type: 'text',
@@ -272,9 +272,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       .update({
         where: {
           id: answers.id as string,
+          databaseId: answers.databaseId as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
           data: cleanedData.data,
@@ -307,6 +307,12 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'id',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient();
@@ -314,6 +320,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       .delete({
         where: {
           id: answers.id as string,
+          databaseId: answers.databaseId as string,
         },
         select: {
           id: true,
