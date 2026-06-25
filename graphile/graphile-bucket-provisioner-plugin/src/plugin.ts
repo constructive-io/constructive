@@ -55,20 +55,17 @@ const log = new Logger('graphile-bucket-provisioner:plugin');
  */
 const APP_STORAGE_MODULE_QUERY = `
   SELECT
-    sm.id,
-    sm.scope,
-    sm.entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  WHERE sm.database_id = $1
-    AND sm.scope = 'app'
+    id,
+    scope,
+    entity_table_id,
+    buckets_schema,
+    buckets_table,
+    endpoint,
+    public_url_prefix,
+    provider,
+    allowed_origins
+  FROM metaschema_modules_public.resolve_storage_modules($1)
+  WHERE scope = 'app'
   LIMIT 1
 `;
 
@@ -77,23 +74,18 @@ const APP_STORAGE_MODULE_QUERY = `
  */
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
-    sm.id,
-    sm.scope,
-    sm.entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins,
-    es.schema_name AS entity_schema,
-    et.name AS entity_table
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  LEFT JOIN metaschema_public.table et ON et.id = sm.entity_table_id
-  LEFT JOIN metaschema_public.schema es ON es.id = et.schema_id
-  WHERE sm.database_id = $1
+    id,
+    scope,
+    entity_table_id,
+    buckets_schema,
+    buckets_table,
+    endpoint,
+    public_url_prefix,
+    provider,
+    allowed_origins,
+    entity_schema,
+    entity_table
+  FROM metaschema_modules_public.resolve_storage_modules($1)
 `;
 
 interface StorageModuleRow {
@@ -360,6 +352,17 @@ export function createBucketProvisionerPlugin(
         Omit for app-level (database-wide) storage.
         """
         ownerId: UUID
+        """
+        Access type used only when the bucket row does not yet exist:
+        "public", "private", or "temp". Defaults to "private"
+        (or "public" when isPublic is true).
+        """
+        type: String
+        """
+        Whether the bucket is publicly readable, used only when creating
+        the row. Defaults to false unless type is "public".
+        """
+        isPublic: Boolean
       }
 
       type ProvisionBucketPayload {
@@ -402,7 +405,7 @@ export function createBucketProvisionerPlugin(
           });
 
           return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
-            const { bucketKey, ownerId } = input;
+            const { bucketKey, ownerId, type: requestedType, isPublic: requestedIsPublic } = input;
 
             if (!bucketKey || typeof bucketKey !== 'string') {
               throw new Error('INVALID_BUCKET_KEY');
@@ -428,6 +431,26 @@ export function createBucketProvisionerPlugin(
               // Look up the bucket row (RLS enforced via pgSettings)
               const hasOwner = ownerId && storageModule.scope !== 'app';
               const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
+
+              // Ensure the bucket row exists (privileged create-on-demand for the
+              // post-provision Storage panel / re-provision flow). Runs under the
+              // same role/connection as the lookup below; ON CONFLICT keeps it
+              // idempotent so an existing bucket is left untouched. database_id and
+              // actor_id are populated by the buckets table's own triggers.
+              const ensureType = requestedType || (requestedIsPublic ? 'public' : 'private');
+              const ensureIsPublic =
+                typeof requestedIsPublic === 'boolean' ? requestedIsPublic : ensureType === 'public';
+              await pgClient.query(
+                hasOwner
+                  ? `INSERT INTO ${bucketsTable} (key, type, is_public, owner_id)
+                     VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING`
+                  : `INSERT INTO ${bucketsTable} (key, type, is_public)
+                     VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+                hasOwner
+                  ? [bucketKey, ensureType, ensureIsPublic, ownerId]
+                  : [bucketKey, ensureType, ensureIsPublic],
+              );
+
               const bucketResult = await pgClient.query(
                 hasOwner
                   ? `SELECT id, key, type, is_public, allowed_origins
