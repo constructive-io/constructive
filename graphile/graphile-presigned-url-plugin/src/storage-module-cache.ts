@@ -43,34 +43,29 @@ const storageModuleCache = new LRUCache<string, StorageModuleConfig>({
  */
 const APP_STORAGE_MODULE_QUERY = `
   SELECT
-    sm.id,
-    sm.scope,
-    sm.entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    fs.schema_name AS files_schema,
-    ft.name AS files_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins,
-    sm.upload_url_expiry_seconds,
-    sm.download_url_expiry_seconds,
-    sm.default_max_file_size,
-    sm.max_filename_length,
-    sm.cache_ttl_seconds,
-    sm.max_bulk_files,
-    sm.max_bulk_total_size,
-    sm.has_path_shares,
-    NULL AS entity_schema,
-    NULL AS entity_table
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
-  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
-  WHERE sm.database_id = $1
-    AND sm.scope = 'app'
+    id,
+    scope,
+    entity_table_id,
+    buckets_schema,
+    buckets_table,
+    files_schema,
+    files_table,
+    endpoint,
+    public_url_prefix,
+    provider,
+    allowed_origins,
+    upload_url_expiry_seconds,
+    download_url_expiry_seconds,
+    default_max_file_size,
+    max_filename_length,
+    cache_ttl_seconds,
+    max_bulk_files,
+    max_bulk_total_size,
+    has_path_shares,
+    entity_schema,
+    entity_table
+  FROM metaschema_modules_public.resolve_storage_modules($1)
+  WHERE scope = 'app'
   LIMIT 1
 `;
 
@@ -82,35 +77,28 @@ const APP_STORAGE_MODULE_QUERY = `
  */
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
-    sm.id,
-    sm.scope,
-    sm.entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    fs.schema_name AS files_schema,
-    ft.name AS files_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins,
-    sm.upload_url_expiry_seconds,
-    sm.download_url_expiry_seconds,
-    sm.default_max_file_size,
-    sm.max_filename_length,
-    sm.cache_ttl_seconds,
-    sm.max_bulk_files,
-    sm.max_bulk_total_size,
-    sm.has_path_shares,
-    es.schema_name AS entity_schema,
-    et.name AS entity_table
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
-  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
-  LEFT JOIN metaschema_public.table et ON et.id = sm.entity_table_id
-  LEFT JOIN metaschema_public.schema es ON es.id = et.schema_id
-  WHERE sm.database_id = $1
+    id,
+    scope,
+    entity_table_id,
+    buckets_schema,
+    buckets_table,
+    files_schema,
+    files_table,
+    endpoint,
+    public_url_prefix,
+    provider,
+    allowed_origins,
+    upload_url_expiry_seconds,
+    download_url_expiry_seconds,
+    default_max_file_size,
+    max_filename_length,
+    cache_ttl_seconds,
+    max_bulk_files,
+    max_bulk_total_size,
+    has_path_shares,
+    entity_schema,
+    entity_table
+  FROM metaschema_modules_public.resolve_storage_modules($1)
 `;
 
 interface StorageModuleRow {

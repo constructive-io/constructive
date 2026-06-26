@@ -100,7 +100,7 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
     'jwt_private.current_database_id': {
       rows: [{ id: 'db-uuid-123' }],
     },
-    'metaschema_modules_public.storage_module': {
+    'metaschema_modules_public.resolve_storage_modules': {
       rows: [{
         id: 'sm-uuid-456',
         buckets_schema: 'app_public',
@@ -369,7 +369,7 @@ describe('createBucketProvisionerPlugin', () => {
       createBucketProvisionerPlugin(createDefaultOptions());
 
       const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': { rows: [] },
+        'metaschema_modules_public.resolve_storage_modules': { rows: [] },
       });
       const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
         callback(pgClient),
@@ -428,7 +428,7 @@ describe('createBucketProvisionerPlugin', () => {
       createBucketProvisionerPlugin(createDefaultOptions());
 
       const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': {
+        'metaschema_modules_public.resolve_storage_modules': {
           rows: [{
             id: 'sm-uuid-456',
             buckets_schema: 'app_public',
@@ -485,7 +485,7 @@ describe('createBucketProvisionerPlugin', () => {
       createBucketProvisionerPlugin(createDefaultOptions());
 
       const pgClient = createMockPgClient({
-        'metaschema_modules_public.storage_module': {
+        'metaschema_modules_public.resolve_storage_modules': {
           rows: [{
             id: 'sm-uuid-456',
             buckets_schema: 'app_public',
@@ -1026,7 +1026,7 @@ describe('CORS resolution hierarchy', () => {
           allowed_origins: ['*'],
         }],
       },
-      'metaschema_modules_public.storage_module': {
+      'metaschema_modules_public.resolve_storage_modules': {
         rows: [{
           id: 'sm-uuid-456',
           buckets_schema: 'app_public',
@@ -1083,7 +1083,7 @@ describe('CORS resolution hierarchy', () => {
           allowed_origins: null, // No bucket-level override
         }],
       },
-      'metaschema_modules_public.storage_module': {
+      'metaschema_modules_public.resolve_storage_modules': {
         rows: [{
           id: 'sm-uuid-456',
           buckets_schema: 'app_public',
@@ -1142,7 +1142,7 @@ describe('CORS resolution hierarchy', () => {
           allowed_origins: null,
         }],
       },
-      'metaschema_modules_public.storage_module': {
+      'metaschema_modules_public.resolve_storage_modules': {
         rows: [{
           id: 'sm-uuid-456',
           buckets_schema: 'app_public',
