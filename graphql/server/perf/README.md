@@ -57,6 +57,7 @@ These are orchestration wrappers around the two primary use cases. They are not 
 - `pnpm --dir graphql/server perf run`
 - `pnpm --dir graphql/server perf sweep`
 - `pnpm --dir graphql/server perf stress`
+- `pnpm --dir graphql/server perf e2e-matrix`
 
 Options such as shape variants, sweeps, stress matrices, prewarm, and longer duration runs are modifiers of the two maintained flows above.
 
@@ -75,6 +76,7 @@ Target command surface:
 | `perf public-load` | Run DBPM-backed business load | `node graphql/server/perf/phase2-load.mjs` |
 | `perf run` | Run preflight + load for one run directory | `node graphql/server/perf/run-test-spec.mjs` |
 | `perf sweep` | Run repeated K/tenant-count sweeps | `node graphql/server/perf/run-k-sweep.mjs` |
+| `perf e2e-matrix` | Run public/private × old/new verification matrix | no direct legacy equivalent |
 | `perf summarize-shapes` | Summarize DBPM shape variants | `node graphql/server/perf/summarize-shapes.mjs` |
 | `perf prepare-public-access` | Prepare public grants for perf business tables | `node graphql/server/perf/prepare-public-test-access.mjs` |
 | `perf reset-business-data` | Truncate generated business workload table data | `node graphql/server/perf/reset-business-test-data.mjs` |
@@ -364,6 +366,86 @@ The public access preparation should only prepare schemas whose names start with
 
 For longer loads, increase `--workers` and `--duration-seconds`, and remove `--disable-prewarm` after the short correctness run passes.
 
+## Full E2E Matrix: public/private × old/new
+
+Use `e2e-matrix` for the full verification shape discussed in this branch:
+
+```text
+routing modes: private, public
+cache modes:   old, new
+k:             10
+duration:      300s
+```
+
+Recommended first full run:
+
+```bash
+pnpm --dir graphql/server perf e2e-matrix \
+  --routing-modes private,public \
+  --cache-modes old,new \
+  --k 10 \
+  --duration-seconds 300 \
+  --workers 4 \
+  --manage-server
+```
+
+If that passes, run a higher-concurrency comparison:
+
+```bash
+pnpm --dir graphql/server perf e2e-matrix \
+  --routing-modes private,public \
+  --cache-modes old,new \
+  --k 10 \
+  --duration-seconds 300 \
+  --workers 10 \
+  --manage-server
+```
+
+`--manage-server` is recommended for this full matrix. In managed mode the wrapper starts one server process per case, waits for `/debug/memory`, runs the case, captures memory before/after, then stops only the process that it started.
+
+Manual mode is still available by omitting `--manage-server`, but it does not switch an already-running server between old/new or public/private modes. In manual mode the operator must restart the server with the correct environment before each case; otherwise `MODE=old|new` may only label the benchmark output while all requests hit the same server configuration.
+
+The matrix provisions the public DBPM setup once before measured public load. For public old/new comparisons it resets generated business table data between cache modes by default. Disable that only for debugging with:
+
+```bash
+--no-reset-between-public-cache-modes
+```
+
+For local `constructive-hub` runs, pass the real Postgres password from `docker-compose.yml` (or your real environment), not a redacted placeholder. A safe local pattern is:
+
+```bash
+PGPASSWORD="$(node -e "const fs=require('fs'); const s=fs.readFileSync('docker-compose.yml','utf8'); const m=s.match(/POSTGRES_PASSWORD:\\s*([^\\s]+)/); process.stdout.write(m[1]);")" \
+  pnpm --dir graphql/server perf e2e-matrix ...
+```
+
+For public smoke/debug runs, token keyspace route keys may collapse to `auth.localhost` even when tenant/profile counts are healthy. Keep tenant count gates strict, but lower only the token route-key gate when needed:
+
+```bash
+--keyspace-min-route-keys 1
+```
+
+The wrapper writes a summary to:
+
+```text
+<run-dir>/reports/e2e-matrix-summary.json
+```
+
+Hard pass gates:
+
+- every requested case completed
+- private benchmark `errors = 0`
+- public load `load.failed = 0`
+- case result reports exist
+- `/debug/memory` before/after snapshots were captured
+- public reset between cache modes succeeded when enabled
+
+Soft observations:
+
+- new-mode heap delta should generally be lower than old-mode heap delta
+- new-mode QPS does not need to be a hard pass condition
+- p95/p99 should not regress dramatically
+- handler/cache counts in `/debug/memory` should match the expected cache mode
+
 ## Longer Runs
 
 ### Stress suite
@@ -457,6 +539,7 @@ node graphql/server/perf/summarize-shapes.mjs \
 | Public lane | `perf public-load` | `phase2-load.mjs` | Sustained profile-driven GraphQL business load |
 | Wrapper | `perf run` | `run-test-spec.mjs` | Preflight + load orchestration |
 | Wrapper | `perf sweep` | `run-k-sweep.mjs` | Repeated K/tenant-count orchestration |
+| Wrapper | `perf e2e-matrix` | none | public/private × old/new verification matrix with managed-server option |
 | Public helper | `perf prepare-public-access` | `prepare-public-test-access.mjs` | Grant preparation for public business tables |
 | Public helper | `perf reset-business-data` | `reset-business-test-data.mjs` | Truncates business workload table data |
 | Public helper | internal library | `public-test-access-lib.mjs` | Shared public access helper logic |

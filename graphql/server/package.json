@@ -28,6 +28,8 @@
     "dev:watch": "nodemon --watch src --ext ts --exec ts-node src/run.ts",
     "debug:memory:analyze": "node scripts/analyze-debug-logs.mjs",
     "debug:heap:capture": "node scripts/capture-heap-snapshot.mjs",
+    "perf": "ts-node perf/src/cli.ts",
+    "perf:typecheck": "tsc -p perf/tsconfig.json --noEmit",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
