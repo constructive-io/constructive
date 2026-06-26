@@ -23,11 +23,9 @@ export {
 } from './providers';
 
 export {
-  createOAuthMiddleware,
-  OAuthMiddlewareConfig,
-  OAuthCallbackContext,
-  OAuthErrorContext,
-  OAuthRouteHandlers,
-  generateState,
-  verifyState,
-} from './middleware/express';
+  CreateSignedStateOptions,
+  VerifySignedStateOptions,
+  SignedStatePayload,
+  createSignedState,
+  verifySignedState,
+} from './utils/signed-state';

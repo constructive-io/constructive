@@ -79,6 +79,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
       "useTx": false,
     },
   },
+  "oauth": {},
   "pg": {
     "database": "config-db",
     "host": "override-host",

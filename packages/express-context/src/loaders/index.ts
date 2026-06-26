@@ -12,6 +12,9 @@
  *   - pubkeyChallengeSettings (services_public.pubkey_settings)
  *   - webauthnSettings(services_public.webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
+ *   - userAuthModule  (metaschema_modules_public.user_auth_module)
+ *   - identityProviders (metaschema_modules_public.identity_providers_module + providers Map)
+ *   - connectedAccountsModule (metaschema_modules_public.connected_accounts_module)
  *
  * To add a new per-db lookup, implement a ModuleLoader and register it:
  *
@@ -47,6 +50,9 @@ export { authSettingsLoader } from './auth-settings';
 export { billingLoader } from './billing';
 export { inferenceLogLoader } from './inference-log';
 export { agentChatLoader } from './agent-chat';
+export { userAuthModuleLoader } from './user-auth-module';
+export { identityProvidersLoader } from './identity-providers';
+export { connectedAccountsModuleLoader } from './connected-accounts-module';
 export { llmLoader } from './llm';
 
 /**
@@ -62,6 +68,9 @@ import { authSettingsLoader } from './auth-settings';
 import { billingLoader } from './billing';
 import { inferenceLogLoader } from './inference-log';
 import { agentChatLoader } from './agent-chat';
+import { userAuthModuleLoader } from './user-auth-module';
+import { identityProvidersLoader } from './identity-providers';
+import { connectedAccountsModuleLoader } from './connected-accounts-module';
 import { llmLoader } from './llm';
 
 export function createDefaultRegistry() {
@@ -75,6 +84,9 @@ export function createDefaultRegistry() {
   registry.register(billingLoader);
   registry.register(inferenceLogLoader);
   registry.register(agentChatLoader);
+  registry.register(userAuthModuleLoader);
+  registry.register(identityProvidersLoader);
+  registry.register(connectedAccountsModuleLoader);
   registry.register(llmLoader);
   return registry;
 }

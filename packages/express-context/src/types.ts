@@ -88,16 +88,31 @@ export interface RlsModule {
   currentUserAgent: string;
 }
 
+export interface PgInterval {
+  years?: number;
+  months?: number;
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  milliseconds?: number;
+}
+
 export interface AuthSettings {
+  allowIdentitySignIn?: boolean;
+  allowIdentitySignUp?: boolean;
   cookieSecure?: boolean;
   cookieSamesite?: string;
   cookieDomain?: string | null;
   cookieHttponly?: boolean;
-  cookieMaxAge?: string | null;
+  cookieMaxAge?: string | PgInterval | null;
   cookiePath?: string;
-  rememberMeDuration?: string | null;
+  rememberMeDuration?: string | PgInterval | null;
   enableCaptcha?: boolean;
   captchaSiteKey?: string | null;
+  oauthStateMaxAge?: string | PgInterval | null;
+  oauthRequireVerifiedEmail?: boolean;
+  oauthErrorRedirectPath?: string | null;
 }
 
 export interface ApiStructure {
@@ -154,6 +169,111 @@ export interface AgentChatConfig {
   taskTableName: string | null;
 }
 
+// ─── OAuth / Identity Types ─────────────────────────────────────────────────
+
+export interface UserAuthModuleConfig {
+  schemaName: string;
+  sessionCredentialsSchemaName: string;
+  signInFunction: string;
+  signUpFunction: string;
+  signInIdentityFunction: string;
+  signUpIdentityFunction: string;
+  signOutFunction: string;
+  signInCrossOriginFunction: string | null;
+  requestCrossOriginTokenFunction: string | null;
+  extendTokenExpires: string;
+}
+
+export interface UserAuthModuleRow {
+  schema_name: string;
+  session_credentials_schema_name: string | null;
+  sign_in_function: string;
+  sign_up_function: string;
+  sign_out_function: string;
+  sign_in_cross_origin_function: string | null;
+  request_cross_origin_token_function: string | null;
+  extend_token_expires: string;
+}
+
+export interface AuthSettingsRow {
+  allow_identity_sign_in: boolean;
+  allow_identity_sign_up: boolean;
+  cookie_secure: boolean;
+  cookie_samesite: string;
+  cookie_domain: string | null;
+  cookie_httponly: boolean;
+  cookie_max_age: string | PgInterval | null;
+  cookie_path: string;
+  remember_me_duration: string | PgInterval | null;
+  enable_captcha: boolean;
+  captcha_site_key: string | null;
+  oauth_state_max_age: string | PgInterval | null;
+  oauth_require_verified_email: boolean;
+  oauth_error_redirect_path: string | null;
+}
+
+export interface IdentityProviderFullConfig {
+  slug: string;
+  kind: 'oauth2' | 'oidc';
+  displayName: string;
+  enabled: boolean;
+  clientId: string;
+  clientSecret: string;
+  authorizationUrl: string | null;
+  tokenUrl: string | null;
+  userinfoUrl: string | null;
+  scopes: string[];
+  pkceEnabled: boolean;
+}
+
+export type IdentityProviderConfigMap = Map<string, IdentityProviderFullConfig>;
+
+export interface IdentityProvidersConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+  prefix: string;
+  rotateSecretFunction: string;
+  providers: IdentityProviderConfigMap;
+}
+
+export interface IdentityProvidersModuleRow {
+  schema_name: string;
+  private_schema_name: string;
+  table_name: string;
+  prefix: string;
+}
+
+export interface PlatformDatabaseRow {
+  database_id: string;
+}
+
+export interface ProviderRow {
+  slug: string;
+  kind: 'oauth2' | 'oidc';
+  display_name: string;
+  enabled: boolean;
+  client_id: string;
+  client_secret: string | null;
+  authorization_url: string | null;
+  token_url: string | null;
+  userinfo_url: string | null;
+  scopes: string[] | null;
+  pkce_enabled: boolean | null;
+}
+
+export interface ConnectedAccountsModuleConfig {
+  schemaName: string;
+  privateSchemaName: string;
+  tableName: string;
+}
+
+export interface ConnectedAccountsModuleRow {
+  schema_name: string;
+  private_schema_name: string;
+  table_name: string;
+}
+
 export interface LlmConfig {
   embeddingProvider: string;
   embeddingModel: string;
@@ -187,6 +307,9 @@ export interface BuiltinModuleMap {
   billing: BillingConfig;
   inferenceLog: InferenceLogConfig;
   agentChat: AgentChatConfig;
+  userAuthModule: UserAuthModuleConfig;
+  identityProviders: IdentityProvidersConfig;
+  connectedAccountsModule: ConnectedAccountsModuleConfig;
   llm: LlmConfig;
 }
 
@@ -198,6 +321,8 @@ export interface BuiltinModuleMap {
  */
 export type WithPgClient = <T>(
   fn: (client: PoolClient) => Promise<T>,
+  /** Per-call settings merged over the request pgSettings before SET LOCAL. */
+  pgSettingsOverrides?: Record<string, string>,
 ) => Promise<T>;
 
 /**

@@ -11,6 +11,7 @@ export type {
   CorsModuleData,
   DatabaseSettings,
   GenericModuleData,
+  PgInterval,
   PubkeyChallengeSettings,
   PublicKeyChallengeData,
   RlsModule,

@@ -128,6 +128,14 @@ export interface CDNOptions {
 }
 
 /**
+ * OAuth configuration options
+ */
+export interface OAuthOptions {
+    /** Secret key for signing OAuth state tokens (HMAC-SHA256) */
+    secret?: string;
+}
+
+/**
  * SMTP email configuration options
  */
 export interface SmtpOptions {
@@ -255,6 +263,8 @@ export interface PgpmOptions {
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
+    /** OAuth configuration */
+    oauth?: OAuthOptions;
 }
 
 /**
