@@ -449,11 +449,11 @@ export class TestUtils {
   }
 
   /** Set the authenticated JWT context on the client. */
-  setUserContext(user_id: string): void {
+  setUserContext(user_id: string, principal_id?: string): void {
     this.client.setContext({
       role: 'authenticated',
       'jwt.claims.user_id': user_id,
-      'jwt.claims.principal_id': user_id,
+      'jwt.claims.principal_id': principal_id ?? user_id,
       'jwt.claims.database_id': this.database_id,
     });
   }
