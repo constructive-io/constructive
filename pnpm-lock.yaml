@@ -2941,15 +2941,6 @@ importers:
 
   postgres/constructive-test:
     dependencies:
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
-      deepmerge:
-        specifier: ^4.3.1
-        version: 4.3.1
-      pg-env:
-        specifier: workspace:^
-        version: link:../pg-env/dist
       pgsql-test:
         specifier: workspace:^
         version: link:../pgsql-test/dist
