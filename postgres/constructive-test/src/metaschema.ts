@@ -19,15 +19,6 @@ export interface CreateTableOptions {
   name: string;
 }
 
-/**
- * Options for creating a field.
- */
-export interface CreateFieldOptions {
-  table_id: string;
-  name: string;
-  type?: Record<string, unknown> | string;
-  is_required?: boolean;
-}
 
 /**
  * Get schema ID by name.
@@ -94,33 +85,6 @@ export async function createTable(
   return result.id;
 }
 
-/**
- * Create a field on a table. Returns the field ID.
- */
-export async function createField(
-  pg: PgTestClient,
-  options: CreateFieldOptions
-): Promise<string> {
-  const {
-    table_id,
-    name,
-    type = { name: 'text' },
-    is_required = false,
-  } = options;
-
-  const fieldType = typeof type === 'object' ? JSON.stringify(type) : JSON.stringify({ name: type });
-  const result = await pg.one<{ id: string }>(
-    `SELECT metaschema.create_field(
-       table_id := $1::uuid,
-       name := $2,
-       type := $3::jsonb,
-       is_required := $4
-     ) as id`,
-    [table_id, name, fieldType, is_required]
-  );
-
-  return result.id;
-}
 
 /**
  * Get table metadata (category, scope).
