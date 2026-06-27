@@ -9,15 +9,6 @@ export function uniqueName(prefix: string): string {
   return `${prefix}-${randomUUID().slice(0, 12)}`;
 }
 
-/**
- * Default test user IDs for consistent test setup.
- */
-export const TEST_USER_IDS = {
-  USER_1: '00000000-0000-0000-0000-000000000001',
-  USER_2: '00000000-0000-0000-0000-000000000002',
-  USER_3: '00000000-0000-0000-0000-000000000003',
-} as const;
-
 /** Module entry: either a plain string or a [name, options] tuple. */
 export type ModuleEntry = string | [string, Record<string, unknown>];
 
