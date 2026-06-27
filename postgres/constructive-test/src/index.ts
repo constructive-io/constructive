@@ -9,11 +9,20 @@ export type { GetConnectionOpts, GetConnectionResult } from './connect';
 export { snapshot } from 'pgsql-test';
 
 // Table client (uses AST-backed QueryBuilder)
-export { TableClient } from './table-client';
+export { TableClient, ident } from './table-client';
 
 // Re-export QueryBuilder and types for direct use
 export { QueryBuilder } from '@constructive-io/query-builder';
 export type { QueryOutput, SqlValue } from '@constructive-io/query-builder';
+
+// TestUtils — dynamically-resolved test utility class
+export {
+  TestUtils,
+  UsersClient,
+  MembershipsClient,
+  ProfilesClient,
+  PermissionsClient,
+} from './test-utils';
 
 // Helpers
 export * from './helpers';
@@ -27,10 +36,7 @@ export * from './metaschema';
 // Context
 export * from './context';
 
-// Profiles
-export * from './profiles';
-
-// Membership
+// Membership (resolution helpers, no hardcoded schemas)
 export * from './membership';
 
 // Blueprint

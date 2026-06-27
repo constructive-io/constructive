@@ -14,16 +14,6 @@ export interface ProvisionDatabaseOptions {
 }
 
 /**
- * Options for creating a test user.
- */
-export interface CreateUserOptions {
-  id: string;
-  username?: string;
-  display_name?: string;
-  type?: number;
-}
-
-/**
  * Options for seeding a database user.
  */
 export interface SeedDatabaseUserOptions {
@@ -66,45 +56,6 @@ function resolveModuleTable(module_name: string): string {
 }
 
 /**
- * Create a test user in constructive_users_public.users.
- * Uses pg (superuser) to bypass RLS.
- */
-export async function createTestUser(
-  pg: PgTestClient,
-  options: CreateUserOptions
-): Promise<void> {
-  const {
-    id,
-    username = 'test_user',
-    display_name,
-    type,
-  } = options;
-
-  const columns = ['id', 'username'];
-  const values: unknown[] = [id, username];
-  const placeholders = ['$1', '$2'];
-
-  if (display_name !== undefined) {
-    columns.push('display_name');
-    values.push(display_name);
-    placeholders.push(`$${values.length}`);
-  }
-
-  if (type !== undefined) {
-    columns.push('type');
-    values.push(type);
-    placeholders.push(`$${values.length}`);
-  }
-
-  await pg.query(
-    `INSERT INTO constructive_users_public.users (${columns.join(', ')})
-     VALUES (${placeholders.join(', ')})
-     ON CONFLICT (id) DO NOTHING`,
-    values
-  );
-}
-
-/**
  * Provision a database using metaschema_generators.provision_database.
  * Returns the database_id.
  */
@@ -138,11 +89,12 @@ export async function provisionDatabase(
 
 /**
  * Get the module table info for seeding data into module-backed tables.
+ * Resolves schema and table names dynamically from metaschema.
  */
 export async function getModuleTableInfo(
   pg: PgTestClient,
   database_id: string,
-  module_name: 'users' | 'emails' | 'config_secrets_user' | 'secrets' | 'tokens'
+  module_name: string
 ): Promise<ModuleTableInfo> {
   const module_table = resolveModuleTable(module_name);
   const scope = MODULE_SCOPE_MAP[module_name];
@@ -163,7 +115,7 @@ export async function getModuleTableInfo(
 
 /**
  * Seed a user into a provisioned database's users table.
- * Uses pg (superuser) to bypass RLS.
+ * Resolves the users table dynamically from metaschema.
  */
 export async function seedDatabaseUser(
   pg: PgTestClient,
@@ -184,7 +136,7 @@ export async function seedDatabaseUser(
 
 /**
  * Seed an email for a user in a provisioned database.
- * Uses pg (superuser) to bypass RLS.
+ * Resolves the emails table dynamically from metaschema.
  */
 export async function seedUserEmail(
   pg: PgTestClient,
@@ -205,7 +157,7 @@ export async function seedUserEmail(
 
 /**
  * Set a password for a user in a provisioned database.
- * Uses pg (superuser) to bypass RLS.
+ * Resolves the credentials table dynamically from metaschema.
  */
 export async function setUserPassword(
   pg: PgTestClient,

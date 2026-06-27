@@ -3,6 +3,29 @@ import { QueryBuilder } from '@constructive-io/query-builder';
 import type { SqlValue } from '@constructive-io/query-builder';
 
 /**
+ * Quote a SQL identifier only when necessary.
+ */
+function quoteIfNeeded(identifier: string): string {
+  if (identifier.startsWith('"') && identifier.endsWith('"')) {
+    const unquoted = identifier.slice(1, -1).replace(/""/g, '"');
+    return `"${unquoted.replace(/"/g, '""')}"`;
+  }
+  const needsQuoting =
+    /[^a-z0-9_]/.test(identifier) ||
+    /^[0-9]/.test(identifier) ||
+    identifier !== identifier.toLowerCase();
+  if (needsQuoting) {
+    return `"${identifier.replace(/"/g, '""')}"`;
+  }
+  return identifier;
+}
+
+/** Returns a properly quoted `"schema"."name"` identifier. */
+export function ident(...identifiers: string[]): string {
+  return identifiers.map(quoteIfNeeded).join('.');
+}
+
+/**
  * Lightweight client for a single provisioned table.
  *
  * Captures `PgTestClient` + resolved `schema`/`table` at construction time

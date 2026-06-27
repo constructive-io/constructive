@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { PresetFull } from 'node-type-registry/src/module-presets';
+import { PresetFull } from 'node-type-registry';
 
 /**
  * Generate a unique name with UUID suffix.
@@ -132,12 +132,3 @@ export function appendModules(preset: string, ...modules: string[]): string {
   return JSON.stringify(arr);
 }
 
-/**
- * Permission mask constants (bit(64)).
- */
-export const PERMISSION_MASKS = {
-  CREATE_ENTITY: '0000000000000000000000000000000000000000000000000000000000010000',
-  MANAGE_DATABASE: '0000000000000000000000000000000000000000000000000000100000000000',
-  MANAGE_SERVICES: '0000000000000000000000000000000000000000000000000001000000000000',
-  MANAGE_SITES: '0000000000000000000000000000000000000000000000000010000000000000',
-} as const;
