@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.6.1...@constructive-io/express-context@0.7.0) (2026-06-27)
+
+### Features
+
+- propagate principal_id through Express middleware and PostGraphile pgSettings ([59e2eda](https://github.com/constructive-io/constructive/commit/59e2edae80134b8f5275ed699ba1eb57a199676d)), closes [constructive-planning#1074](https://github.com/constructive-planning/issues/1074)
+
 ## [0.6.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.6.0...@constructive-io/express-context@0.6.1) (2026-06-22)
 
 **Note:** Version bump only for package @constructive-io/express-context
