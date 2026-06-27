@@ -1,0 +1,48 @@
+{
+  "name": "@constructive-io/test-utils",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Dynamic metaschema-aware test utilities for Constructive apps — module resolution, membership setup, context management, RLS assertions",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "constructive",
+    "postgres",
+    "testing",
+    "metaschema",
+    "rls",
+    "membership",
+    "module-resolution",
+    "integration-tests",
+    "pgsql-test"
+  ],
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "makage": "^0.3.0"
+  },
+  "dependencies": {
+    "pgsql-test": "workspace:^"
+  },
+  "peerDependencies": {
+    "pgsql-test": ">=4.16.0"
+  }
+}
