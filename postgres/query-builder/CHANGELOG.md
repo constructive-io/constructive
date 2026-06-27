@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.18.0...@constructive-io/query-builder@2.19.0) (2026-06-27)
+
+### Features
+
+- AST-backed query-builder + TableClient for constructive-test ([d9ca8c4](https://github.com/constructive-io/constructive/commit/d9ca8c47ec1617d092a46c0e1d31cbdba1182c3f)), closes [#1078](https://github.com/constructive-io/constructive/issues/1078)
+
 # [2.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.17.1...@constructive-io/query-builder@2.18.0) (2026-05-30)
 
 **Note:** Version bump only for package @constructive-io/query-builder
