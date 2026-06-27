@@ -46,7 +46,7 @@
     "@pgsql/types": "^17.6.2",
     "@pgsql/utils": "^17.8.17",
     "csv-parser": "^3.2.1",
-    "inquirerer": "^4.8.1",
+    "inquirerer": "^4.9.0",
     "js-yaml": "^4.1.0",
     "pgsql-deparser": "^17.18.3"
   }
