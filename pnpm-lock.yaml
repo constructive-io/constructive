@@ -2555,17 +2555,6 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
-  packages/query-builder:
-    dependencies:
-      '@pgsql/quotes':
-        specifier: ^17.1.0
-        version: 17.1.0
-    devDependencies:
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-    publishDirectory: dist
-
   packages/safegres:
     dependencies:
       '@inquirerer/utils':
@@ -3244,6 +3233,20 @@ importers:
       '@types/pg-copy-streams':
         specifier: ^1.2.5
         version: 1.2.5
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
+  postgres/query-builder:
+    dependencies:
+      pg-ast:
+        specifier: workspace:^
+        version: link:../pg-ast/dist
+      pgsql-deparser:
+        specifier: ^17.18.3
+        version: 17.18.3
+    devDependencies:
       makage:
         specifier: ^0.3.0
         version: 0.3.0
