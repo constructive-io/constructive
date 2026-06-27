@@ -46,6 +46,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@constructive-io/query-builder": "workspace:^",
+    "node-type-registry": "workspace:^",
     "pgsql-test": "workspace:^"
   },
   "devDependencies": {
