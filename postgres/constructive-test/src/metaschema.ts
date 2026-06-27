@@ -186,37 +186,6 @@ export async function getTablesByScope(
 }
 
 /**
- * Get a field on a table by name. Returns null if not found.
- */
-export async function getFieldByName(
-  pg: PgTestClient,
-  table_id: string,
-  field_name: string
-): Promise<{ id: string; name: string; type: string; description: string | null } | null> {
-  return pg.oneOrNone<{ id: string; name: string; type: string; description: string | null }>(
-    `SELECT id, name, ast_validate.deparse_field_type(type) AS type, description FROM metaschema_public.field
-     WHERE table_id = $1 AND name = $2`,
-    [table_id, field_name]
-  );
-}
-
-/**
- * Get multiple fields on a table by name list.
- */
-export async function getFieldsByNames(
-  pg: PgTestClient,
-  table_id: string,
-  field_names: string[]
-): Promise<{ name: string; type: string }[]> {
-  return pg.any<{ name: string; type: string }>(
-    `SELECT name, ast_validate.deparse_field_type(type) AS type FROM metaschema_public.field
-     WHERE table_id = $1 AND name = ANY($2)
-     ORDER BY name`,
-    [table_id, field_names]
-  );
-}
-
-/**
  * Get field names for a table from metaschema.
  */
 export async function getFieldNames(
