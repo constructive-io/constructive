@@ -1,34 +1,655 @@
 # constructive-test
 
-Extends `pgsql-test` with Constructive platform defaults.
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+  <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE">
+    <img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/>
+  </a>
+  <a href="https://www.npmjs.com/package/constructive-test">
+    <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=postgres%2Fconstructive-test%2Fpackage.json"/>
+  </a>
+</p>
+
+`constructive-test` is a Constructive-optimized version of [`pgsql-test`](https://www.npmjs.com/package/pgsql-test) with Constructive platform conventions baked in. It provides instant, isolated PostgreSQL databases for testing with automatic transaction rollbacks, context switching, and clean seeding — configured for the Constructive platform's principal-based identity model.
+
+## Install
+
+```sh
+npm install constructive-test
+```
 
 ## Features
 
-- Auto-derives `jwt.claims.principal_id` from `jwt.claims.user_id` on every `setContext()` call
-- Bakes in Constructive role mappings (`anonymous`, `authenticated`, `administrator`)
-- Drop-in replacement for `pgsql-test` — re-exports everything
+* ⚡ **Instant test DBs** — each one seeded, isolated, and UUID-named
+* 🔄 **Per-test rollback** — every test runs in its own transaction or savepoint
+* 🛡 **RLS-friendly** — test with role-based auth via `.setContext()`
+* 👤 **Principal-aware** — automatically derives `principal_id` from `user_id` for testing principals (agents, API keys, humans, etc.)
+* 🌱 **Flexible seeding** — run `.sql` files, programmatic seeds, or even load fixtures
+* 🧪 **Compatible with any async runner** — works with `Jest`, `Mocha`, etc.
+* 🧹 **Auto teardown** — no residue, no reboots, just clean exits
 
-## Usage
+### pgpm migrations
 
-```typescript
+Part of the [pgpm](https://pgpm.io) ecosystem, `constructive-test` is built to pair seamlessly with our TypeScript-based package manager and migration tool. `pgpm` gives you modular Postgres packages, deterministic plans, and tag-aware releases — perfect for authoring the migrations that `constructive-test` runs.
+
+## Table of Contents
+
+1. [Install](#install)
+2. [Features](#features)
+3. [Quick Start](#-quick-start)
+4. [Principal Identity](#-principal-identity)
+5. [`getConnections()` Overview](#getconnections-overview)
+6. [PgTestClient API Overview](#pgtestclient-api-overview)
+7. [Usage Examples](#usage-examples)
+   * [Basic Setup](#-basic-setup)
+   * [Role-Based Context](#-role-based-context)
+   * [Seeding System](#-seeding-system)
+   * [SQL File Seeding](#-sql-file-seeding)
+   * [Programmatic Seeding](#-programmatic-seeding)
+   * [CSV Seeding](#-csv-seeding)
+   * [JSON Seeding](#-json-seeding)
+   * [pgpm Seeding](#-pgpm-seeding)
+8. [`getConnections() Options`](#getconnections-options)
+9. [Disclaimer](#disclaimer)
+
+
+## ✨ Quick Start
+
+```ts
 import { getConnections } from 'constructive-test';
 
 let db, teardown;
+
 beforeAll(async () => {
   ({ db, teardown } = await getConnections());
+  await db.query(`SELECT 1`); // ✅ Ready to run queries
 });
+
 afterAll(() => teardown());
+```
+
+## 👤 Principal Identity
+
+The Constructive platform uses a principal-based identity model where every actor — whether a human user, an API key, or an agent — is represented as a principal. RLS policies enforce access based on `jwt.claims.principal_id`.
+
+`constructive-test` handles this automatically: when you call `setContext()` with a `user_id`, the `principal_id` is derived for you. No manual setup, no boilerplate.
+
+```ts
+db.setContext({
+  role: 'authenticated',
+  'jwt.claims.user_id': '123',
+  'jwt.claims.database_id': 'abc'
+  // jwt.claims.principal_id is automatically set to '123'
+});
+```
+
+When testing non-human principals (API keys, agents), set `principal_id` explicitly:
+
+```ts
+db.setContext({
+  role: 'authenticated',
+  'jwt.claims.user_id': '123',
+  'jwt.claims.principal_id': 'agent-456',
+  'jwt.claims.database_id': 'abc'
+});
+```
+
+## `getConnections()` Overview
+
+```ts
+import { getConnections } from 'constructive-test';
+
+// Complete object destructuring
+const { pg, db, admin, teardown, manager } = await getConnections();
+
+// Most common pattern
+const { db, teardown } = await getConnections();
+```
+
+The `getConnections()` helper sets up a fresh PostgreSQL test database and returns a structured object with:
+
+* `pg`: a `PgTestClient` connected as the root or superuser — useful for administrative setup or introspection
+* `db`: a `PgTestClient` connected as the app-level user — used for running tests with RLS and granted permissions
+* `admin`: a `DbAdmin` utility for managing database state, extensions, roles, and templates
+* `teardown()`: a function that shuts down the test environment and database pool
+* `manager`: a shared connection pool manager (`PgTestConnector`) behind both clients
+
+Together, these allow fast, isolated, role-aware test environments with per-test rollback and full control over setup and teardown.
+
+The `PgTestClient` returned by `getConnections()` is a fully-featured wrapper around `pg.Pool`. It provides:
+
+* Automatic transaction and savepoint management for test isolation
+* Easy switching of role-based contexts for RLS testing
+* A clean, high-level API for integration testing PostgreSQL systems
+
+## `PgTestClient` API Overview
+
+```ts
+let pg: PgTestClient;
+let teardown: () => Promise<void>;
+
+beforeAll(async () => {
+  ({ pg, teardown } = await getConnections());
+});
+
+beforeEach(() => pg.beforeEach());
+afterEach(() => pg.afterEach());
+afterAll(() => teardown());
+```
+
+The `PgTestClient` returned by `getConnections()` wraps a `pg.Client` and provides convenient helpers for query execution, test isolation, and context switching.
+
+### Common Methods
+
+* `query(sql, values?)` – Run a raw SQL query and get the `QueryResult`
+* `beforeEach()` – Begins a transaction and sets a savepoint (called at the start of each test)
+* `afterEach()` – Rolls back to the savepoint and commits the outer transaction (cleans up test state)
+* `setContext({ key: value })` – Sets PostgreSQL config variables (like `role`) to simulate RLS contexts
+* `any`, `one`, `oneOrNone`, `many`, `manyOrNone`, `none`, `result` – Typed query helpers for specific result expectations
+
+These methods make it easier to build expressive and isolated integration tests with strong typing and error handling.
+
+## Usage Examples
+
+### ⚡ Basic Setup
+
+```ts
+import { getConnections } from 'constructive-test';
+
+let db; // A fully wrapped PgTestClient using pg.Pool with savepoint-based rollback per test
+let teardown;
+
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections());
+
+  await db.query(`
+    CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT);
+    CREATE TABLE posts (id SERIAL PRIMARY KEY, user_id INT REFERENCES users(id), content TEXT);
+
+    INSERT INTO users (name) VALUES ('Alice'), ('Bob');
+    INSERT INTO posts (user_id, content) VALUES (1, 'Hello world!'), (2, 'Graphile is cool!');
+  `);
+});
+
+afterAll(() => teardown());
+
 beforeEach(() => db.beforeEach());
 afterEach(() => db.afterEach());
 
-test('principal_id is auto-set', async () => {
-  db.setContext({
-    role: 'authenticated',
-    'jwt.claims.user_id': '123',
-    'jwt.claims.database_id': 'abc'
-    // principal_id is automatically set to '123'
-  });
-  const result = await db.one('SELECT current_setting(\'jwt.claims.principal_id\')');
-  expect(result.current_setting).toBe('123');
+test('user count starts at 2', async () => {
+  const res = await db.query('SELECT COUNT(*) FROM users');
+  expect(res.rows[0].count).toBe('2');
 });
 ```
+
+### 🔐 Role-Based Context
+
+
+The `constructive-test` framework provides powerful tools to simulate authentication contexts during tests, which is particularly useful when testing Row-Level Security (RLS) policies.
+
+#### Setting Test Context
+
+Use `setContext()` to simulate different user roles and JWT claims:
+
+```ts
+db.setContext({
+  role: 'authenticated',
+  'jwt.claims.user_id': '123',
+  'jwt.claims.org_id': 'acme'
+});
+```
+
+This applies the settings using `SET LOCAL` statements, ensuring they persist only for the current transaction and maintain proper isolation between tests.
+
+#### Testing Role-Based Access
+
+```ts
+describe('authenticated role', () => {
+  beforeEach(async () => {
+    db.setContext({ role: 'authenticated' });
+    await db.beforeEach();
+  });
+
+  afterEach(() => db.afterEach());
+
+  it('runs as authenticated', async () => {
+    const res = await db.query(`SELECT current_setting('role', true) AS role`);
+    expect(res.rows[0].role).toBe('authenticated');
+  });
+});
+```
+
+#### Database Connection Options
+
+For non-superuser testing, use the connection options described in the [options](#getconnections-options) section. The `db.connection` property allows you to customize the non-privileged user account for your tests.
+
+Use `setContext()` to simulate Role-Based Access Control (RBAC) during tests. This is useful when testing Row-Level Security (RLS) policies. Your actual server should manage role/user claims via secure tokens (e.g., setting `current_setting('jwt.claims.user_id')`), but this interface helps emulate those behaviors in test environments.
+
+#### Common Testing Scenarios
+
+This approach enables testing various access patterns:
+- Authenticated vs. anonymous user access
+- Per-user data filtering
+- Admin privilege bypass behavior
+- Custom claim-based restrictions (organization membership, admin status)
+- Principal-based access control (agents, API keys, human users)
+
+> **Note:** While this interface helps simulate RBAC for testing, your production server should manage user/role claims via secure authentication tokens, typically by setting values like `current_setting('jwt.claims.user_id')` through proper authentication middleware.
+
+### 🌱 Seeding System
+
+The second argument to `getConnections()` is an optional array of `SeedAdapter` objects:
+
+```ts
+const { db, teardown } = await getConnections(getConnectionOptions, seedAdapters);
+```
+
+This array lets you fully customize how your test database is seeded. You can compose multiple strategies:
+
+* [`seed.sqlfile()`](#-sql-file-seeding) – Execute raw `.sql` files from disk
+* [`seed.fn()`](#-programmatic-seeding) – Run JavaScript/TypeScript logic to programmatically insert data
+* [`seed.csv()`](#-csv-seeding) – Load tabular data from CSV files
+* [`seed.json()`](#-json-seeding) – Use in-memory objects as seed data
+* [`seed.pgpm()`](#-pgpm-seeding) – Apply a PGPM project or set of packages (compatible with sqitch)
+
+> ✨ **Default Behavior:** If no `SeedAdapter[]` is passed, pgpm seeding is assumed. This makes `constructive-test` zero-config for pgpm-based projects.
+
+This composable system allows you to mix-and-match data setup strategies for flexible, realistic, and fast database tests.
+
+#### Two Seeding Patterns
+
+You can seed data using either approach:
+
+**1. Adapter Pattern** (setup phase via `getConnections`)
+```ts
+const { db, teardown } = await getConnections({}, [
+  seed.json({ 'users': [{ id: 1, name: 'Alice' }] })
+]);
+```
+
+**2. Direct Load Methods** (runtime via `PgTestClient`)
+```ts
+await db.loadJson({ 'users': [{ id: 1, name: 'Alice' }] });
+await db.loadCsv({ 'users': '/path/to/users.csv' });
+await db.loadSql(['/path/to/schema.sql']);
+```
+
+> **Note:** `loadCsv()` and `loadPgpm()` do not apply RLS context (PostgreSQL limitation). Use `loadJson()` or `loadSql()` for RLS-aware seeding.
+
+### 🔌 SQL File Seeding
+
+**Adapter Pattern:**
+```ts
+const { db, teardown } = await getConnections({}, [
+  seed.sqlfile(['schema.sql', 'fixtures.sql'])
+]);
+```
+
+**Direct Load Method:**
+```ts
+await db.loadSql(['schema.sql', 'fixtures.sql']);
+```
+
+<details>
+<summary>Full example</summary>
+
+```ts
+import path from 'path';
+import { getConnections, seed } from 'constructive-test';
+
+const sql = (f: string) => path.join(__dirname, 'sql', f);
+
+let db;
+let teardown;
+
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections({}, [
+      seed.sqlfile([
+        sql('schema.sql'),
+        sql('fixtures.sql')
+      ])
+  ]));
+});
+
+afterAll(async () => {
+  await teardown();
+});
+```
+
+</details>
+
+### 🧠 Programmatic Seeding
+
+**Adapter Pattern:**
+```ts
+const { db, teardown } = await getConnections({}, [
+  seed.fn(async ({ pg }) => {
+    await pg.query(`INSERT INTO users (name) VALUES ('Seeded User')`);
+  })
+]);
+```
+
+**Direct Load Method:**
+```ts
+// Use any PgTestClient method directly
+await db.query(`INSERT INTO users (name) VALUES ('Seeded User')`);
+```
+
+<details>
+<summary>Full example</summary>
+
+```ts
+import { getConnections, seed } from 'constructive-test';
+
+let db;
+let teardown;
+
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections({}, [
+    seed.fn(async ({ pg }) => {
+      await pg.query(`
+        INSERT INTO users (name) VALUES ('Seeded User');
+      `);
+    })
+  ]));
+});
+```
+
+</details>
+
+## 🗃 CSV Seeding
+
+**Adapter Pattern:**
+```ts
+const { db, teardown } = await getConnections({}, [
+  seed.csv({
+    'users': '/path/to/users.csv',
+    'posts': '/path/to/posts.csv'
+  })
+]);
+```
+
+**Direct Load Method:**
+```ts
+await db.loadCsv({
+  'users': '/path/to/users.csv',
+  'posts': '/path/to/posts.csv'
+});
+```
+
+> **Note:** CSV loading uses PostgreSQL COPY which does not support RLS context.
+
+<details>
+<summary>Full example</summary>
+
+You can load tables from CSV files using `seed.csv({ ... })`. CSV headers must match the table column names exactly. This is useful for loading stable fixture data for integration tests or CI environments.
+
+```ts
+import path from 'path';
+import { getConnections, seed } from 'constructive-test';
+
+const csv = (file: string) => path.resolve(__dirname, '../csv', file);
+
+let db;
+let teardown;
+
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections({}, [
+    // Create schema
+    seed.fn(async ({ pg }) => {
+      await pg.query(`
+        CREATE TABLE users (
+          id SERIAL PRIMARY KEY,
+          name TEXT NOT NULL
+        );
+
+        CREATE TABLE posts (
+          id SERIAL PRIMARY KEY,
+          user_id INT REFERENCES users(id),
+          content TEXT NOT NULL
+        );
+      `);
+    }),
+    // Load from CSV
+    seed.csv({
+      users: csv('users.csv'),
+      posts: csv('posts.csv')
+    }),
+    // Adjust SERIAL sequences to avoid conflicts
+    seed.fn(async ({ pg }) => {
+      await pg.query(`SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));`);
+      await pg.query(`SELECT setval(pg_get_serial_sequence('posts', 'id'), (SELECT MAX(id) FROM posts));`);
+    })
+  ]));
+});
+
+afterAll(() => teardown());
+
+it('has loaded rows', async () => {
+  const res = await db.query('SELECT COUNT(*) FROM users');
+  expect(+res.rows[0].count).toBeGreaterThan(0);
+});
+```
+
+</details>
+
+## 🗃 JSON Seeding
+
+**Adapter Pattern:**
+```ts
+const { db, teardown } = await getConnections({}, [
+  seed.json({
+    'custom.users': [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' }
+    ]
+  })
+]);
+```
+
+**Direct Load Method:**
+```ts
+await db.loadJson({
+  'custom.users': [
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' }
+  ]
+});
+```
+
+<details>
+<summary>Full example</summary>
+
+You can seed tables using in-memory JSON objects. This is useful when you want fast, inline fixtures without managing external files.
+
+```ts
+import { getConnections, seed } from 'constructive-test';
+
+let db;
+let teardown;
+
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections({}, [
+    // Create schema
+    seed.fn(async ({ pg }) => {
+      await pg.query(`
+        CREATE SCHEMA custom;
+        CREATE TABLE custom.users (
+          id SERIAL PRIMARY KEY,
+          name TEXT NOT NULL
+        );
+
+        CREATE TABLE custom.posts (
+          id SERIAL PRIMARY KEY,
+          user_id INT REFERENCES custom.users(id),
+          content TEXT NOT NULL
+        );
+      `);
+    }),
+    // Seed with in-memory JSON
+    seed.json({
+      'custom.users': [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' }
+      ],
+      'custom.posts': [
+        { id: 1, user_id: 1, content: 'Hello world!' },
+        { id: 2, user_id: 2, content: 'Graphile is cool!' }
+      ]
+    }),
+    // Fix SERIAL sequences
+    seed.fn(async ({ pg }) => {
+      await pg.query(`SELECT setval(pg_get_serial_sequence('custom.users', 'id'), (SELECT MAX(id) FROM custom.users));`);
+      await pg.query(`SELECT setval(pg_get_serial_sequence('custom.posts', 'id'), (SELECT MAX(id) FROM custom.posts));`);
+    })
+  ]));
+});
+
+afterAll(() => teardown());
+
+it('has loaded rows', async () => {
+  const res = await db.query('SELECT COUNT(*) FROM custom.users');
+  expect(+res.rows[0].count).toBeGreaterThan(0);
+});
+```
+
+</details>
+
+## 🚀 pgpm Seeding
+
+**Zero Configuration (Default):**
+```ts
+// pgpm migrate is used automatically
+const { db, teardown } = await getConnections();
+```
+
+**Adapter Pattern (Custom Path):**
+```ts
+const { db, teardown } = await getConnections({}, [
+  seed.pgpm('/path/to/your-pgpm-workspace', true) // with cache
+]);
+```
+
+**Direct Load Method:**
+```ts
+await db.loadPgpm('/path/to/your-pgpm-workspace', true); // with cache
+```
+
+> **Note:** pgpm deployment has its own client handling and does not apply RLS context.
+
+<details>
+<summary>Full example</summary>
+
+If your project uses pgpm modules with a precompiled `pgpm.plan`, you can use `constructive-test` with **zero configuration**. Just call `getConnections()` — and it *just works*:
+
+```ts
+import { getConnections } from 'constructive-test';
+
+let db, teardown;
+
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections()); // pgpm module is deployed automatically
+});
+```
+
+pgpm uses Sqitch-compatible syntax with a TypeScript-based migration engine. By default, `constructive-test` automatically deploys any pgpm module found in the current working directory (`process.cwd()`).
+
+To specify a custom path to your pgpm module, use `seed.pgpm()` explicitly:
+
+```ts
+import path from 'path';
+import { getConnections, seed } from 'constructive-test';
+
+const cwd = path.resolve(__dirname, '../path/to/pgpm-workspace');
+
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections({}, [
+    seed.pgpm(cwd)
+  ]));
+});
+```
+
+</details>
+
+## Why PGPM's Approach?
+
+pgpm provides the best of both worlds:
+
+1. **Sqitch Compatibility**: Keep your familiar Sqitch syntax and migration approach
+2. **TypeScript Performance**: Our TS-rewritten deployment engine delivers up to 10x faster schema deployments
+3. **Developer Experience**: Tight feedback loops with near-instant schema setup for tests
+4. **CI Optimization**: Dramatically reduced test suite run times with optimized deployment
+
+By maintaining Sqitch compatibility while supercharging performance, pgpm enables you to keep your existing migration patterns while enjoying the speed benefits of our TypeScript engine.
+
+## `getConnections` Options
+
+This table documents the available options for the `getConnections` function. The options are passed as a combination of `pg` and `db` configuration objects.
+
+### `db` Options (PgTestConnectionOptions)
+
+| Option                   | Type       | Default          | Description                                                         |
+| ------------------------ | ---------- | ---------------- | ------------------------------------------------------------------- |
+| `db.extensions`          | `string[]` | `[]`             | Array of PostgreSQL extensions to include in the test database      |
+| `db.cwd`                 | `string`   | `process.cwd()`  | Working directory used for PGPM or Sqitch projects                  |
+| `db.connection.user`     | `string`   | `'app_user'`     | User for simulating RLS via `setContext()`                          |
+| `db.connection.password` | `string`   | `'app_password'` | Password for RLS test user                                         |
+| `db.connection.role`     | `string`   | `'anonymous'`    | Default role used during `setContext()`                             |
+| `db.template`            | `string`   | `undefined`      | Template database used for faster test DB creation                  |
+| `db.rootDb`              | `string`   | `'postgres'`     | Root database used for administrative operations (e.g., creating databases) |
+| `db.prefix`              | `string`   | `'db-'`          | Prefix used when generating test database names                    |
+
+### `pg` Options (PgConfig)
+
+Environment variables will override these options when available:
+
+* `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
+
+| Option        | Type     | Default       | Description                                    |
+| ------------- | -------- | ------------- | ---------------------------------------------- |
+| `pg.user`     | `string` | `'postgres'`  | Superuser for PostgreSQL                       |
+| `pg.password` | `string` | `'password'`  | Password for the PostgreSQL superuser          |
+| `pg.host`     | `string` | `'localhost'` | Hostname for PostgreSQL                        |
+| `pg.port`     | `number` | `5432`        | Port for PostgreSQL                            |
+| `pg.database` | `string` | `'postgres'`  | Default database used when connecting initially |
+
+### Usage
+
+```ts
+const { conn, db, teardown } = await getConnections({
+  pg: { user: 'postgres', password: 'secret' },
+  db: {
+    extensions: ['uuid-ossp'],
+    cwd: '/path/to/project',
+    connection: { user: 'test_user', password: 'secret', role: 'authenticated' },
+    template: 'test_template',
+    prefix: 'test_',
+    rootDb: 'postgres'
+  }
+});
+```
+
+## Snapshot Utilities
+
+The `constructive-test/utils` module provides utilities for sanitizing query results for snapshot testing. These helpers replace dynamic values (IDs, UUIDs, dates, hashes) with stable placeholders, making snapshots deterministic.
+
+```ts
+import { snapshot } from 'constructive-test/utils';
+
+const result = await db.any('SELECT * FROM users');
+expect(snapshot(result)).toMatchSnapshot();
+```
+
+See [`pgsql-test` Snapshot Utilities](https://www.npmjs.com/package/pgsql-test#snapshot-utilities) for the full API reference.
+
+## Disclaimer
+
+AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
+
+No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
