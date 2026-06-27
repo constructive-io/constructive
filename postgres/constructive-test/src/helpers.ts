@@ -20,15 +20,6 @@ export function toJsonbModules(modules: readonly ModuleEntry[]): string {
 }
 
 /**
- * Membership scope constants.
- */
-export const SCOPE = {
-  APP: 1,
-  ORG: 2,
-  GROUP: 3,
-} as const;
-
-/**
  * Common module combinations for provision_database.
  *
  * Sourced from node-type-registry module presets.
@@ -93,15 +84,7 @@ export const MODULE_PRESETS = {
     ['memberships_module', { scope: 'org' }],
   ]),
 
-  GROUP_LEVEL: JSON.stringify([
-    'users_module', 'membership_types_module',
-    ['permissions_module', { scope: 'app' }], ['limits_module', { scope: 'app' }],
-    ['memberships_module', { scope: 'app' }],
-    ['permissions_module', { scope: 'group' }], ['limits_module', { scope: 'group' }],
-    ['memberships_module', { scope: 'group' }],
-  ]),
-
-  /**
+/**
    * Every standard module — sourced from PresetFull in node-type-registry.
    * Usage logging modules are NOT included — they are opt-in.
    */
