@@ -30,36 +30,6 @@ export interface CreateFieldOptions {
 }
 
 /**
- * Get the public schema ID for a database.
- */
-export async function getPublicSchemaId(
-  pg: PgTestClient,
-  database_id: string
-): Promise<string> {
-  const result = await pg.one<{ id: string }>(
-    `SELECT id FROM metaschema_public.schema 
-     WHERE database_id = $1 AND name = 'public'`,
-    [database_id]
-  );
-  return result.id;
-}
-
-/**
- * Get the private schema ID for a database.
- */
-export async function getPrivateSchemaId(
-  pg: PgTestClient,
-  database_id: string
-): Promise<string> {
-  const result = await pg.one<{ id: string }>(
-    `SELECT id FROM metaschema_public.schema 
-     WHERE database_id = $1 AND name = 'private'`,
-    [database_id]
-  );
-  return result.id;
-}
-
-/**
  * Get schema ID by name.
  */
 export async function getSchemaId(
