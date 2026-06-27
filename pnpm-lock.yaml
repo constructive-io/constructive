@@ -2933,6 +2933,9 @@ importers:
       '@constructive-io/query-builder':
         specifier: workspace:^
         version: link:../query-builder/dist
+      '@pgsql/quotes':
+        specifier: ^17.1.0
+        version: 17.1.0
       node-type-registry:
         specifier: workspace:^
         version: link:../../packages/node-type-registry/dist
