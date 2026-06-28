@@ -41,16 +41,17 @@ import {
   cryptoAuthModuleKeys,
   sessionsModuleKeys,
   secureTableProvisionKeys,
-  merkleStoreModuleKeys,
-  graphModuleKeys,
   databaseProvisionModuleKeys,
   configSecretsModuleKeys,
+  graphModuleKeys,
+  merkleStoreModuleKeys,
   rateLimitMetersModuleKeys,
   realtimeModuleKeys,
   webauthnAuthModuleKeys,
   functionInvocationModuleKeys,
   functionModuleKeys,
   invitesModuleKeys,
+  principalAuthModuleKeys,
   computeLogModuleKeys,
   inferenceLogModuleKeys,
   namespaceModuleKeys,
@@ -537,40 +538,6 @@ export const invalidate = {
         queryKey: secureTableProvisionKeys.detail(id),
       }),
   },
-  /** Invalidate merkleStoreModule queries */ merkleStoreModule: {
-    /** Invalidate all merkleStoreModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: merkleStoreModuleKeys.all,
-      }),
-    /** Invalidate merkleStoreModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: merkleStoreModuleKeys.lists(),
-      }),
-    /** Invalidate a specific merkleStoreModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: merkleStoreModuleKeys.detail(id),
-      }),
-  },
-  /** Invalidate graphModule queries */ graphModule: {
-    /** Invalidate all graphModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: graphModuleKeys.all,
-      }),
-    /** Invalidate graphModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: graphModuleKeys.lists(),
-      }),
-    /** Invalidate a specific graphModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: graphModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate databaseProvisionModule queries */ databaseProvisionModule: {
     /** Invalidate all databaseProvisionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -603,6 +570,40 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: configSecretsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate graphModule queries */ graphModule: {
+    /** Invalidate all graphModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: graphModuleKeys.all,
+      }),
+    /** Invalidate graphModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: graphModuleKeys.lists(),
+      }),
+    /** Invalidate a specific graphModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: graphModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate merkleStoreModule queries */ merkleStoreModule: {
+    /** Invalidate all merkleStoreModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: merkleStoreModuleKeys.all,
+      }),
+    /** Invalidate merkleStoreModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: merkleStoreModuleKeys.lists(),
+      }),
+    /** Invalidate a specific merkleStoreModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: merkleStoreModuleKeys.detail(id),
       }),
   },
   /** Invalidate rateLimitMetersModule queries */ rateLimitMetersModule: {
@@ -705,6 +706,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: invitesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate principalAuthModule queries */ principalAuthModule: {
+    /** Invalidate all principalAuthModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalAuthModuleKeys.all,
+      }),
+    /** Invalidate principalAuthModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalAuthModuleKeys.lists(),
+      }),
+    /** Invalidate a specific principalAuthModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalAuthModuleKeys.detail(id),
       }),
   },
   /** Invalidate computeLogModule queries */ computeLogModule: {
@@ -1313,22 +1331,6 @@ export const remove = {
       queryKey: secureTableProvisionKeys.detail(id),
     });
   },
-  /** Remove merkleStoreModule from cache */ merkleStoreModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: merkleStoreModuleKeys.detail(id),
-    });
-  },
-  /** Remove graphModule from cache */ graphModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: graphModuleKeys.detail(id),
-    });
-  },
   /** Remove databaseProvisionModule from cache */ databaseProvisionModule: (
     queryClient: QueryClient,
     id: string | number
@@ -1343,6 +1345,22 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: configSecretsModuleKeys.detail(id),
+    });
+  },
+  /** Remove graphModule from cache */ graphModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: graphModuleKeys.detail(id),
+    });
+  },
+  /** Remove merkleStoreModule from cache */ merkleStoreModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: merkleStoreModuleKeys.detail(id),
     });
   },
   /** Remove rateLimitMetersModule from cache */ rateLimitMetersModule: (
@@ -1391,6 +1409,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: invitesModuleKeys.detail(id),
+    });
+  },
+  /** Remove principalAuthModule from cache */ principalAuthModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: principalAuthModuleKeys.detail(id),
     });
   },
   /** Remove computeLogModule from cache */ computeLogModule: (

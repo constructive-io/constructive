@@ -128,6 +128,15 @@ export const functionExecutionLogKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionExecutionLogKeys.details(), id] as const,
 } as const;
+export const functionGraphKeys = {
+  /** All functionGraph queries */ all: ['functiongraph'] as const,
+  /** List query keys */ lists: () => [...functionGraphKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...functionGraphKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...functionGraphKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...functionGraphKeys.details(), id] as const,
+} as const;
 export const functionGraphExecutionNodeStateKeys = {
   /** All functionGraphExecutionNodeState queries */ all: [
     'functiongraphexecutionnodestate',
@@ -139,15 +148,6 @@ export const functionGraphExecutionNodeStateKeys = {
     [...functionGraphExecutionNodeStateKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphExecutionNodeStateKeys.details(), id] as const,
-} as const;
-export const functionGraphKeys = {
-  /** All functionGraph queries */ all: ['functiongraph'] as const,
-  /** List query keys */ lists: () => [...functionGraphKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...functionGraphKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...functionGraphKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...functionGraphKeys.details(), id] as const,
 } as const;
 export const orgFunctionInvocationKeys = {
   /** All orgFunctionInvocation queries */ all: ['orgfunctioninvocation'] as const,
@@ -229,8 +229,8 @@ export const queryKeys = {
   functionGraphCommit: functionGraphCommitKeys,
   secretDefinition: secretDefinitionKeys,
   functionExecutionLog: functionExecutionLogKeys,
-  functionGraphExecutionNodeState: functionGraphExecutionNodeStateKeys,
   functionGraph: functionGraphKeys,
+  functionGraphExecutionNodeState: functionGraphExecutionNodeStateKeys,
   orgFunctionInvocation: orgFunctionInvocationKeys,
   functionInvocation: functionInvocationKeys,
   functionGraphExecution: functionGraphExecutionKeys,

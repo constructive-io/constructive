@@ -444,6 +444,33 @@ export interface FunctionExecutionLog {
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
 }
+/** Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store */
+export interface FunctionGraph {
+  /** Unique graph identifier */
+  id: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string | null;
+  /** Graph store (Merkle store) holding the graph definition */
+  storeId?: string | null;
+  /** Evaluator/runtime context (function, js, sql, system) */
+  context?: string | null;
+  /** Graph name (unique per database) */
+  name?: string | null;
+  /** Human-readable description of the graph */
+  description?: string | null;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string | null;
+  /** Whether graph passes structural validation */
+  isValid?: boolean | null;
+  /** Array of validation error objects when is_valid = false */
+  validationErrors?: Record<string, unknown> | null;
+  /** Actor who created this graph */
+  createdBy?: string | null;
+  /** Timestamp of graph creation */
+  createdAt?: string | null;
+  /** Timestamp of last modification */
+  updatedAt?: string | null;
+}
 /** Per-node execution state — tracks individual node lifecycle for debugging */
 export interface FunctionGraphExecutionNodeState {
   /** Timestamp of node state creation (partition key) */
@@ -470,35 +497,6 @@ export interface FunctionGraphExecutionNodeState {
   errorMessage?: string | null;
   /** FK to execution_outputs — content-addressed output blob for this node */
   outputId?: string | null;
-}
-/** Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store */
-export interface FunctionGraph {
-  /** Unique graph identifier */
-  id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string | null;
-  /** Graph store (Merkle store) holding the graph definition */
-  storeId?: string | null;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string | null;
-  /** Evaluator/runtime context (function, js, sql, system) */
-  context?: string | null;
-  /** Graph name (unique per database) */
-  name?: string | null;
-  /** Human-readable description of the graph */
-  description?: string | null;
-  /** Pinned definitions store commit for deterministic evaluation */
-  definitionsCommitId?: string | null;
-  /** Whether graph passes structural validation */
-  isValid?: boolean | null;
-  /** Array of validation error objects when is_valid = false */
-  validationErrors?: Record<string, unknown> | null;
-  /** Actor who created this graph */
-  createdBy?: string | null;
-  /** Timestamp of graph creation */
-  createdAt?: string | null;
-  /** Timestamp of last modification */
-  updatedAt?: string | null;
 }
 /** Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. */
 export interface OrgFunctionInvocation {
@@ -576,8 +574,6 @@ export interface FunctionGraphExecution {
   invocationId?: string | null;
   /** Scope for multi-tenant isolation */
   databaseId?: string | null;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string | null;
   /** Target output boundary node name to resolve */
   outputNode?: string | null;
   /** Target output port name (default: value) */
@@ -702,8 +698,8 @@ export interface FunctionGraphExecutionOutputRelations {}
 export interface FunctionGraphCommitRelations {}
 export interface SecretDefinitionRelations {}
 export interface FunctionExecutionLogRelations {}
-export interface FunctionGraphExecutionNodeStateRelations {}
 export interface FunctionGraphRelations {}
+export interface FunctionGraphExecutionNodeStateRelations {}
 export interface OrgFunctionInvocationRelations {}
 export interface FunctionInvocationRelations {}
 export interface FunctionGraphExecutionRelations {
@@ -730,9 +726,9 @@ export type FunctionGraphCommitWithRelations = FunctionGraphCommit & FunctionGra
 export type SecretDefinitionWithRelations = SecretDefinition & SecretDefinitionRelations;
 export type FunctionExecutionLogWithRelations = FunctionExecutionLog &
   FunctionExecutionLogRelations;
+export type FunctionGraphWithRelations = FunctionGraph & FunctionGraphRelations;
 export type FunctionGraphExecutionNodeStateWithRelations = FunctionGraphExecutionNodeState &
   FunctionGraphExecutionNodeStateRelations;
-export type FunctionGraphWithRelations = FunctionGraph & FunctionGraphRelations;
 export type OrgFunctionInvocationWithRelations = OrgFunctionInvocation &
   OrgFunctionInvocationRelations;
 export type FunctionInvocationWithRelations = FunctionInvocation & FunctionInvocationRelations;
@@ -862,6 +858,20 @@ export type FunctionExecutionLogSelect = {
   actorId?: boolean;
   databaseId?: boolean;
 };
+export type FunctionGraphSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  storeId?: boolean;
+  context?: boolean;
+  name?: boolean;
+  description?: boolean;
+  definitionsCommitId?: boolean;
+  isValid?: boolean;
+  validationErrors?: boolean;
+  createdBy?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+};
 export type FunctionGraphExecutionNodeStateSelect = {
   createdAt?: boolean;
   id?: boolean;
@@ -875,21 +885,6 @@ export type FunctionGraphExecutionNodeStateSelect = {
   errorCode?: boolean;
   errorMessage?: boolean;
   outputId?: boolean;
-};
-export type FunctionGraphSelect = {
-  id?: boolean;
-  databaseId?: boolean;
-  storeId?: boolean;
-  entityId?: boolean;
-  context?: boolean;
-  name?: boolean;
-  description?: boolean;
-  definitionsCommitId?: boolean;
-  isValid?: boolean;
-  validationErrors?: boolean;
-  createdBy?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
 };
 export type OrgFunctionInvocationSelect = {
   createdAt?: boolean;
@@ -930,7 +925,6 @@ export type FunctionGraphExecutionSelect = {
   graphId?: boolean;
   invocationId?: boolean;
   databaseId?: boolean;
-  entityId?: boolean;
   outputNode?: boolean;
   outputPort?: boolean;
   status?: boolean;
@@ -1276,6 +1270,38 @@ export interface FunctionExecutionLogFilter {
   /** Negates the expression. */
   not?: FunctionExecutionLogFilter;
 }
+export interface FunctionGraphFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `context` field. */
+  context?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `definitionsCommitId` field. */
+  definitionsCommitId?: UUIDFilter;
+  /** Filter by the object’s `isValid` field. */
+  isValid?: BooleanFilter;
+  /** Filter by the object’s `validationErrors` field. */
+  validationErrors?: JSONFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphFilter[];
+  /** Negates the expression. */
+  not?: FunctionGraphFilter;
+}
 export interface FunctionGraphExecutionNodeStateFilter {
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
@@ -1307,40 +1333,6 @@ export interface FunctionGraphExecutionNodeStateFilter {
   or?: FunctionGraphExecutionNodeStateFilter[];
   /** Negates the expression. */
   not?: FunctionGraphExecutionNodeStateFilter;
-}
-export interface FunctionGraphFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `context` field. */
-  context?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `definitionsCommitId` field. */
-  definitionsCommitId?: UUIDFilter;
-  /** Filter by the object’s `isValid` field. */
-  isValid?: BooleanFilter;
-  /** Filter by the object’s `validationErrors` field. */
-  validationErrors?: JSONFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphFilter;
 }
 export interface OrgFunctionInvocationFilter {
   /** Filter by the object’s `createdAt` field. */
@@ -1427,8 +1419,6 @@ export interface FunctionGraphExecutionFilter {
   invocationId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
   /** Filter by the object’s `outputNode` field. */
   outputNode?: StringFilter;
   /** Filter by the object’s `outputPort` field. */
@@ -1777,6 +1767,34 @@ export type FunctionExecutionLogOrderBy =
   | 'ACTOR_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC';
+export type FunctionGraphOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'CONTEXT_ASC'
+  | 'CONTEXT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'IS_VALID_ASC'
+  | 'IS_VALID_DESC'
+  | 'VALIDATION_ERRORS_ASC'
+  | 'VALIDATION_ERRORS_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type FunctionGraphExecutionNodeStateOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1805,36 +1823,6 @@ export type FunctionGraphExecutionNodeStateOrderBy =
   | 'ERROR_MESSAGE_DESC'
   | 'OUTPUT_ID_ASC'
   | 'OUTPUT_ID_DESC';
-export type FunctionGraphOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'CONTEXT_ASC'
-  | 'CONTEXT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DEFINITIONS_COMMIT_ID_ASC'
-  | 'DEFINITIONS_COMMIT_ID_DESC'
-  | 'IS_VALID_ASC'
-  | 'IS_VALID_DESC'
-  | 'VALIDATION_ERRORS_ASC'
-  | 'VALIDATION_ERRORS_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 export type OrgFunctionInvocationOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1915,8 +1903,6 @@ export type FunctionGraphExecutionOrderBy =
   | 'INVOCATION_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
   | 'OUTPUT_NODE_ASC'
   | 'OUTPUT_NODE_DESC'
   | 'OUTPUT_PORT_ASC'
@@ -2350,6 +2336,40 @@ export interface DeleteFunctionExecutionLogInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateFunctionGraphInput {
+  clientMutationId?: string;
+  functionGraph: {
+    databaseId: string;
+    storeId: string;
+    context?: string;
+    name?: string;
+    description?: string;
+    definitionsCommitId: string;
+    isValid?: boolean;
+    validationErrors?: Record<string, unknown>;
+    createdBy?: string;
+  };
+}
+export interface FunctionGraphPatch {
+  databaseId?: string | null;
+  storeId?: string | null;
+  context?: string | null;
+  name?: string | null;
+  description?: string | null;
+  definitionsCommitId?: string | null;
+  isValid?: boolean | null;
+  validationErrors?: Record<string, unknown> | null;
+  createdBy?: string | null;
+}
+export interface UpdateFunctionGraphInput {
+  clientMutationId?: string;
+  id: string;
+  functionGraphPatch: FunctionGraphPatch;
+}
+export interface DeleteFunctionGraphInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFunctionGraphExecutionNodeStateInput {
   clientMutationId?: string;
   functionGraphExecutionNodeState: {
@@ -2383,42 +2403,6 @@ export interface UpdateFunctionGraphExecutionNodeStateInput {
   functionGraphExecutionNodeStatePatch: FunctionGraphExecutionNodeStatePatch;
 }
 export interface DeleteFunctionGraphExecutionNodeStateInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateFunctionGraphInput {
-  clientMutationId?: string;
-  functionGraph: {
-    databaseId: string;
-    storeId: string;
-    entityId: string;
-    context?: string;
-    name?: string;
-    description?: string;
-    definitionsCommitId: string;
-    isValid?: boolean;
-    validationErrors?: Record<string, unknown>;
-    createdBy?: string;
-  };
-}
-export interface FunctionGraphPatch {
-  databaseId?: string | null;
-  storeId?: string | null;
-  entityId?: string | null;
-  context?: string | null;
-  name?: string | null;
-  description?: string | null;
-  definitionsCommitId?: string | null;
-  isValid?: boolean | null;
-  validationErrors?: Record<string, unknown> | null;
-  createdBy?: string | null;
-}
-export interface UpdateFunctionGraphInput {
-  clientMutationId?: string;
-  id: string;
-  functionGraphPatch: FunctionGraphPatch;
-}
-export interface DeleteFunctionGraphInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2511,7 +2495,6 @@ export interface CreateFunctionGraphExecutionInput {
     graphId: string;
     invocationId?: string;
     databaseId: string;
-    entityId?: string;
     outputNode: string;
     outputPort?: string;
     status?: string;
@@ -2537,7 +2520,6 @@ export interface FunctionGraphExecutionPatch {
   graphId?: string | null;
   invocationId?: string | null;
   databaseId?: string | null;
-  entityId?: string | null;
   outputNode?: string | null;
   outputPort?: string | null;
   status?: string | null;
@@ -2695,6 +2677,16 @@ export interface AddNodeAndSaveInput {
   meta?: Record<string, unknown>;
   message?: string;
 }
+export interface ImportGraphJsonInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  name?: string;
+  graphJson?: Record<string, unknown>;
+  context?: string;
+  description?: string;
+  createdBy?: string;
+  definitionsCommitId?: string;
+}
 export interface AddEdgeInput {
   clientMutationId?: string;
   databaseId?: string;
@@ -2716,17 +2708,6 @@ export interface AddNodeInput {
   graphName?: string;
   props?: Record<string, unknown>;
   meta?: Record<string, unknown>;
-}
-export interface ImportGraphJsonInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  name?: string;
-  graphJson?: Record<string, unknown>;
-  context?: string;
-  description?: string;
-  entityId?: string;
-  createdBy?: string;
-  definitionsCommitId?: string;
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
@@ -3102,8 +3083,6 @@ export interface FunctionGraphExecutionInput {
   invocationId?: string;
   /** Scope for multi-tenant isolation */
   databaseId: string;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string;
   /** Target output boundary node name to resolve */
   outputNode: string;
   /** Target output port name (default: value) */
@@ -3680,6 +3659,14 @@ export type AddNodeAndSavePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface ImportGraphJsonPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type ImportGraphJsonPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface AddEdgePayload {
   clientMutationId?: string | null;
   result?: string | null;
@@ -3693,14 +3680,6 @@ export interface AddNodePayload {
   result?: string | null;
 }
 export type AddNodePayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ImportGraphJsonPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ImportGraphJsonPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -4237,6 +4216,44 @@ export type DeleteFunctionExecutionLogPayloadSelect = {
     select: FunctionExecutionLogEdgeSelect;
   };
 };
+export interface CreateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CreateFunctionGraphPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface UpdateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraph` that was updated by this mutation. */
+  functionGraph?: FunctionGraph | null;
+  functionGraphEdge?: FunctionGraphEdge | null;
+}
+export type UpdateFunctionGraphPayloadSelect = {
+  clientMutationId?: boolean;
+  functionGraph?: {
+    select: FunctionGraphSelect;
+  };
+  functionGraphEdge?: {
+    select: FunctionGraphEdgeSelect;
+  };
+};
+export interface DeleteFunctionGraphPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraph` that was deleted by this mutation. */
+  functionGraph?: FunctionGraph | null;
+  functionGraphEdge?: FunctionGraphEdge | null;
+}
+export type DeleteFunctionGraphPayloadSelect = {
+  clientMutationId?: boolean;
+  functionGraph?: {
+    select: FunctionGraphSelect;
+  };
+  functionGraphEdge?: {
+    select: FunctionGraphEdgeSelect;
+  };
+};
 export interface CreateFunctionGraphExecutionNodeStatePayload {
   clientMutationId?: string | null;
   /** The `FunctionGraphExecutionNodeState` that was created by this mutation. */
@@ -4280,44 +4297,6 @@ export type DeleteFunctionGraphExecutionNodeStatePayloadSelect = {
   };
   functionGraphExecutionNodeStateEdge?: {
     select: FunctionGraphExecutionNodeStateEdgeSelect;
-  };
-};
-export interface CreateFunctionGraphPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type CreateFunctionGraphPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface UpdateFunctionGraphPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraph` that was updated by this mutation. */
-  functionGraph?: FunctionGraph | null;
-  functionGraphEdge?: FunctionGraphEdge | null;
-}
-export type UpdateFunctionGraphPayloadSelect = {
-  clientMutationId?: boolean;
-  functionGraph?: {
-    select: FunctionGraphSelect;
-  };
-  functionGraphEdge?: {
-    select: FunctionGraphEdgeSelect;
-  };
-};
-export interface DeleteFunctionGraphPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraph` that was deleted by this mutation. */
-  functionGraph?: FunctionGraph | null;
-  functionGraphEdge?: FunctionGraphEdge | null;
-}
-export type DeleteFunctionGraphPayloadSelect = {
-  clientMutationId?: boolean;
-  functionGraph?: {
-    select: FunctionGraphSelect;
-  };
-  functionGraphEdge?: {
-    select: FunctionGraphEdgeSelect;
   };
 };
 export interface CreateOrgFunctionInvocationPayload {
@@ -4632,18 +4611,6 @@ export type FunctionExecutionLogEdgeSelect = {
     select: FunctionExecutionLogSelect;
   };
 };
-/** A `FunctionGraphExecutionNodeState` edge in the connection. */
-export interface FunctionGraphExecutionNodeStateEdge {
-  cursor?: string | null;
-  /** The `FunctionGraphExecutionNodeState` at the end of the edge. */
-  node?: FunctionGraphExecutionNodeState | null;
-}
-export type FunctionGraphExecutionNodeStateEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: FunctionGraphExecutionNodeStateSelect;
-  };
-};
 /** A `FunctionGraph` edge in the connection. */
 export interface FunctionGraphEdge {
   cursor?: string | null;
@@ -4654,6 +4621,18 @@ export type FunctionGraphEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: FunctionGraphSelect;
+  };
+};
+/** A `FunctionGraphExecutionNodeState` edge in the connection. */
+export interface FunctionGraphExecutionNodeStateEdge {
+  cursor?: string | null;
+  /** The `FunctionGraphExecutionNodeState` at the end of the edge. */
+  node?: FunctionGraphExecutionNodeState | null;
+}
+export type FunctionGraphExecutionNodeStateEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: FunctionGraphExecutionNodeStateSelect;
   };
 };
 /** A `OrgFunctionInvocation` edge in the connection. */

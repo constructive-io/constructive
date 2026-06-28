@@ -32,25 +32,6 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
-      new QueryBuilder<{
-        currentIpAddress: string | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'CurrentIpAddress',
-        fieldName: 'currentIpAddress',
-        ...buildCustomDocument(
-          'query',
-          'CurrentIpAddress',
-          'currentIpAddress',
-          options?.select,
-          undefined,
-          [],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
     currentUserId: (options?: { select?: Record<string, unknown> }) =>
       new QueryBuilder<{
         currentUserId: string | null;
@@ -63,6 +44,25 @@ export function createQueryOperations(client: OrmClient) {
           'query',
           'CurrentUserId',
           'currentUserId',
+          options?.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
+      new QueryBuilder<{
+        currentIpAddress: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'CurrentIpAddress',
+        fieldName: 'currentIpAddress',
+        ...buildCustomDocument(
+          'query',
+          'CurrentIpAddress',
+          'currentIpAddress',
           options?.select,
           undefined,
           [],

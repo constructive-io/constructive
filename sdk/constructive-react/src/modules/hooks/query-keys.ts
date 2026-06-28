@@ -253,24 +253,6 @@ export const secureTableProvisionKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...secureTableProvisionKeys.details(), id] as const,
 } as const;
-export const merkleStoreModuleKeys = {
-  /** All merkleStoreModule queries */ all: ['merklestoremodule'] as const,
-  /** List query keys */ lists: () => [...merkleStoreModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...merkleStoreModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...merkleStoreModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...merkleStoreModuleKeys.details(), id] as const,
-} as const;
-export const graphModuleKeys = {
-  /** All graphModule queries */ all: ['graphmodule'] as const,
-  /** List query keys */ lists: () => [...graphModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...graphModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...graphModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...graphModuleKeys.details(), id] as const,
-} as const;
 export const databaseProvisionModuleKeys = {
   /** All databaseProvisionModule queries */ all: ['databaseprovisionmodule'] as const,
   /** List query keys */ lists: () => [...databaseProvisionModuleKeys.all, 'list'] as const,
@@ -288,6 +270,24 @@ export const configSecretsModuleKeys = {
   /** Detail query keys */ details: () => [...configSecretsModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...configSecretsModuleKeys.details(), id] as const,
+} as const;
+export const graphModuleKeys = {
+  /** All graphModule queries */ all: ['graphmodule'] as const,
+  /** List query keys */ lists: () => [...graphModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...graphModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...graphModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...graphModuleKeys.details(), id] as const,
+} as const;
+export const merkleStoreModuleKeys = {
+  /** All merkleStoreModule queries */ all: ['merklestoremodule'] as const,
+  /** List query keys */ lists: () => [...merkleStoreModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...merkleStoreModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...merkleStoreModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...merkleStoreModuleKeys.details(), id] as const,
 } as const;
 export const rateLimitMetersModuleKeys = {
   /** All rateLimitMetersModule queries */ all: ['ratelimitmetersmodule'] as const,
@@ -342,6 +342,15 @@ export const invitesModuleKeys = {
   /** Detail query keys */ details: () => [...invitesModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...invitesModuleKeys.details(), id] as const,
+} as const;
+export const principalAuthModuleKeys = {
+  /** All principalAuthModule queries */ all: ['principalauthmodule'] as const,
+  /** List query keys */ lists: () => [...principalAuthModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...principalAuthModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...principalAuthModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...principalAuthModuleKeys.details(), id] as const,
 } as const;
 export const computeLogModuleKeys = {
   /** All computeLogModule queries */ all: ['computelogmodule'] as const,
@@ -610,16 +619,17 @@ export const queryKeys = {
   cryptoAuthModule: cryptoAuthModuleKeys,
   sessionsModule: sessionsModuleKeys,
   secureTableProvision: secureTableProvisionKeys,
-  merkleStoreModule: merkleStoreModuleKeys,
-  graphModule: graphModuleKeys,
   databaseProvisionModule: databaseProvisionModuleKeys,
   configSecretsModule: configSecretsModuleKeys,
+  graphModule: graphModuleKeys,
+  merkleStoreModule: merkleStoreModuleKeys,
   rateLimitMetersModule: rateLimitMetersModuleKeys,
   realtimeModule: realtimeModuleKeys,
   webauthnAuthModule: webauthnAuthModuleKeys,
   functionInvocationModule: functionInvocationModuleKeys,
   functionModule: functionModuleKeys,
   invitesModule: invitesModuleKeys,
+  principalAuthModule: principalAuthModuleKeys,
   computeLogModule: computeLogModuleKeys,
   inferenceLogModule: inferenceLogModuleKeys,
   namespaceModule: namespaceModuleKeys,

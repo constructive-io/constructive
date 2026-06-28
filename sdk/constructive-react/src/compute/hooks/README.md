@@ -89,16 +89,16 @@ function App() {
 | `useCreateFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useUpdateFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useDeleteFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
-| `useFunctionGraphExecutionNodeStatesQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useFunctionGraphExecutionNodeStateQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useCreateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useUpdateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useDeleteFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
 | `useFunctionGraphsQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useFunctionGraphQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useCreateFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useUpdateFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useDeleteFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
+| `useFunctionGraphExecutionNodeStatesQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useFunctionGraphExecutionNodeStateQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useCreateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useUpdateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useDeleteFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
 | `useOrgFunctionInvocationsQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
 | `useOrgFunctionInvocationQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
 | `useCreateOrgFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
@@ -128,9 +128,9 @@ function App() {
 | `useSaveGraphMutation` | Mutation | saveGraph |
 | `useAddEdgeAndSaveMutation` | Mutation | addEdgeAndSave |
 | `useAddNodeAndSaveMutation` | Mutation | addNodeAndSave |
+| `useImportGraphJsonMutation` | Mutation | importGraphJson |
 | `useAddEdgeMutation` | Mutation | addEdge |
 | `useAddNodeMutation` | Mutation | addNode |
-| `useImportGraphJsonMutation` | Mutation | importGraphJson |
 | `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
 | `useStartExecutionMutation` | Mutation | startExecution |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
@@ -386,6 +386,27 @@ const { mutate: create } = useCreateFunctionExecutionLogMutation({
 create({ invocationId: '<UUID>', taskIdentifier: '<String>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', actorId: '<UUID>', databaseId: '<UUID>' });
 ```
 
+### FunctionGraph
+
+```typescript
+// List all functionGraphs
+const { data, isLoading } = useFunctionGraphsQuery({
+  selection: { fields: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one functionGraph
+const { data: item } = useFunctionGraphQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a functionGraph
+const { mutate: create } = useCreateFunctionGraphMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', storeId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' });
+```
+
 ### FunctionGraphExecutionNodeState
 
 ```typescript
@@ -405,27 +426,6 @@ const { mutate: create } = useCreateFunctionGraphExecutionNodeStateMutation({
   selection: { fields: { id: true } },
 });
 create({ executionId: '<UUID>', databaseId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' });
-```
-
-### FunctionGraph
-
-```typescript
-// List all functionGraphs
-const { data, isLoading } = useFunctionGraphsQuery({
-  selection: { fields: { id: true, databaseId: true, storeId: true, entityId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one functionGraph
-const { data: item } = useFunctionGraphQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, storeId: true, entityId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a functionGraph
-const { mutate: create } = useCreateFunctionGraphMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', storeId: '<UUID>', entityId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' });
 ```
 
 ### OrgFunctionInvocation
@@ -475,20 +475,20 @@ create({ actorId: '<UUID>', databaseId: '<UUID>', taskIdentifier: '<String>', pa
 ```typescript
 // List all functionGraphExecutions
 const { data, isLoading } = useFunctionGraphExecutionsQuery({
-  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, entityId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
+  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
 });
 
 // Get one functionGraphExecution
 const { data: item } = useFunctionGraphExecutionQuery({
   id: '<UUID>',
-  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, entityId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
+  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
 });
 
 // Create a functionGraphExecution
 const { mutate: create } = useCreateFunctionGraphExecutionMutation({
   selection: { fields: { id: true } },
 });
-create({ startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', databaseId: '<UUID>', entityId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' });
+create({ startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', databaseId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' });
 ```
 
 ### FunctionDefinition
@@ -613,6 +613,17 @@ addNodeAndSave
   |----------|------|
   | `input` | AddNodeAndSaveInput (required) |
 
+### `useImportGraphJsonMutation`
+
+importGraphJson
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ImportGraphJsonInput (required) |
+
 ### `useAddEdgeMutation`
 
 addEdge
@@ -634,17 +645,6 @@ addNode
   | Argument | Type |
   |----------|------|
   | `input` | AddNodeInput (required) |
-
-### `useImportGraphJsonMutation`
-
-importGraphJson
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ImportGraphJsonInput (required) |
 
 ### `useInsertNodeAtPathMutation`
 

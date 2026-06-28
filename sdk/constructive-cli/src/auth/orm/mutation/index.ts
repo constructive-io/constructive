@@ -10,12 +10,14 @@ import type {
   SignOutInput,
   SendAccountDeletionEmailInput,
   CheckPasswordInput,
+  DeleteOrgPrincipalInput,
   DisconnectAccountInput,
   RevokeApiKeyInput,
   RevokeSessionInput,
   VerifyPasswordInput,
   VerifyTotpInput,
   ConfirmDeleteAccountInput,
+  RevokeOrgApiKeyInput,
   SetPasswordInput,
   VerifyEmailInput,
   ProvisionNewUserInput,
@@ -26,7 +28,9 @@ import type {
   SignUpInput,
   SignInInput,
   LinkIdentityInput,
+  CreateOrgPrincipalInput,
   ExtendTokenExpiresInput,
+  CreateOrgApiKeyInput,
   CreateApiKeyInput,
   RequestCrossOriginTokenInput,
   ForgotPasswordInput,
@@ -35,12 +39,14 @@ import type {
   SignOutPayload,
   SendAccountDeletionEmailPayload,
   CheckPasswordPayload,
+  DeleteOrgPrincipalPayload,
   DisconnectAccountPayload,
   RevokeApiKeyPayload,
   RevokeSessionPayload,
   VerifyPasswordPayload,
   VerifyTotpPayload,
   ConfirmDeleteAccountPayload,
+  RevokeOrgApiKeyPayload,
   SetPasswordPayload,
   VerifyEmailPayload,
   ProvisionNewUserPayload,
@@ -51,7 +57,9 @@ import type {
   SignUpPayload,
   SignInPayload,
   LinkIdentityPayload,
+  CreateOrgPrincipalPayload,
   ExtendTokenExpiresPayload,
+  CreateOrgApiKeyPayload,
   CreateApiKeyPayload,
   RequestCrossOriginTokenPayload,
   ForgotPasswordPayload,
@@ -60,12 +68,14 @@ import type {
   SignOutPayloadSelect,
   SendAccountDeletionEmailPayloadSelect,
   CheckPasswordPayloadSelect,
+  DeleteOrgPrincipalPayloadSelect,
   DisconnectAccountPayloadSelect,
   RevokeApiKeyPayloadSelect,
   RevokeSessionPayloadSelect,
   VerifyPasswordPayloadSelect,
   VerifyTotpPayloadSelect,
   ConfirmDeleteAccountPayloadSelect,
+  RevokeOrgApiKeyPayloadSelect,
   SetPasswordPayloadSelect,
   VerifyEmailPayloadSelect,
   ProvisionNewUserPayloadSelect,
@@ -76,7 +86,9 @@ import type {
   SignUpPayloadSelect,
   SignInPayloadSelect,
   LinkIdentityPayloadSelect,
+  CreateOrgPrincipalPayloadSelect,
   ExtendTokenExpiresPayloadSelect,
+  CreateOrgApiKeyPayloadSelect,
   CreateApiKeyPayloadSelect,
   RequestCrossOriginTokenPayloadSelect,
   ForgotPasswordPayloadSelect,
@@ -92,6 +104,9 @@ export interface SendAccountDeletionEmailVariables {
 }
 export interface CheckPasswordVariables {
   input: CheckPasswordInput;
+}
+export interface DeleteOrgPrincipalVariables {
+  input: DeleteOrgPrincipalInput;
 }
 export interface DisconnectAccountVariables {
   input: DisconnectAccountInput;
@@ -110,6 +125,9 @@ export interface VerifyTotpVariables {
 }
 export interface ConfirmDeleteAccountVariables {
   input: ConfirmDeleteAccountInput;
+}
+export interface RevokeOrgApiKeyVariables {
+  input: RevokeOrgApiKeyInput;
 }
 export interface SetPasswordVariables {
   input: SetPasswordInput;
@@ -141,8 +159,14 @@ export interface SignInVariables {
 export interface LinkIdentityVariables {
   input: LinkIdentityInput;
 }
+export interface CreateOrgPrincipalVariables {
+  input: CreateOrgPrincipalInput;
+}
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
+}
+export interface CreateOrgApiKeyVariables {
+  input: CreateOrgApiKeyInput;
 }
 export interface CreateApiKeyVariables {
   input: CreateApiKeyInput;
@@ -253,6 +277,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CheckPasswordPayload'
+        ),
+      }),
+    deleteOrgPrincipal: <S extends DeleteOrgPrincipalPayloadSelect>(
+      args: DeleteOrgPrincipalVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DeleteOrgPrincipalPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        deleteOrgPrincipal: InferSelectResult<DeleteOrgPrincipalPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DeleteOrgPrincipal',
+        fieldName: 'deleteOrgPrincipal',
+        ...buildCustomDocument(
+          'mutation',
+          'DeleteOrgPrincipal',
+          'deleteOrgPrincipal',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DeleteOrgPrincipalInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DeleteOrgPrincipalPayload'
         ),
       }),
     disconnectAccount: <S extends DisconnectAccountPayloadSelect>(
@@ -427,6 +480,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ConfirmDeleteAccountPayload'
+        ),
+      }),
+    revokeOrgApiKey: <S extends RevokeOrgApiKeyPayloadSelect>(
+      args: RevokeOrgApiKeyVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RevokeOrgApiKeyPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        revokeOrgApiKey: InferSelectResult<RevokeOrgApiKeyPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RevokeOrgApiKey',
+        fieldName: 'revokeOrgApiKey',
+        ...buildCustomDocument(
+          'mutation',
+          'RevokeOrgApiKey',
+          'revokeOrgApiKey',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RevokeOrgApiKeyInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RevokeOrgApiKeyPayload'
         ),
       }),
     setPassword: <S extends SetPasswordPayloadSelect>(
@@ -719,6 +801,35 @@ export function createMutationOperations(client: OrmClient) {
           'LinkIdentityPayload'
         ),
       }),
+    createOrgPrincipal: <S extends CreateOrgPrincipalPayloadSelect>(
+      args: CreateOrgPrincipalVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CreateOrgPrincipalPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        createOrgPrincipal: InferSelectResult<CreateOrgPrincipalPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CreateOrgPrincipal',
+        fieldName: 'createOrgPrincipal',
+        ...buildCustomDocument(
+          'mutation',
+          'CreateOrgPrincipal',
+          'createOrgPrincipal',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CreateOrgPrincipalInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CreateOrgPrincipalPayload'
+        ),
+      }),
     extendTokenExpires: <S extends ExtendTokenExpiresPayloadSelect>(
       args: ExtendTokenExpiresVariables,
       options: {
@@ -746,6 +857,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ExtendTokenExpiresPayload'
+        ),
+      }),
+    createOrgApiKey: <S extends CreateOrgApiKeyPayloadSelect>(
+      args: CreateOrgApiKeyVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CreateOrgApiKeyPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        createOrgApiKey: InferSelectResult<CreateOrgApiKeyPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CreateOrgApiKey',
+        fieldName: 'createOrgApiKey',
+        ...buildCustomDocument(
+          'mutation',
+          'CreateOrgApiKey',
+          'createOrgApiKey',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CreateOrgApiKeyInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CreateOrgApiKeyPayload'
         ),
       }),
     createApiKey: <S extends CreateApiKeyPayloadSelect>(

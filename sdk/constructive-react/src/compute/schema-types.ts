@@ -277,6 +277,35 @@ export type FunctionExecutionLogOrderBy =
   | 'ACTOR_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC';
+/** Methods to use when ordering `FunctionGraph`. */
+export type FunctionGraphOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'CONTEXT_ASC'
+  | 'CONTEXT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'IS_VALID_ASC'
+  | 'IS_VALID_DESC'
+  | 'VALIDATION_ERRORS_ASC'
+  | 'VALIDATION_ERRORS_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `FunctionGraphExecutionNodeState`. */
 export type FunctionGraphExecutionNodeStateOrderBy =
   | 'NATURAL'
@@ -306,37 +335,6 @@ export type FunctionGraphExecutionNodeStateOrderBy =
   | 'ERROR_MESSAGE_DESC'
   | 'OUTPUT_ID_ASC'
   | 'OUTPUT_ID_DESC';
-/** Methods to use when ordering `FunctionGraph`. */
-export type FunctionGraphOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'CONTEXT_ASC'
-  | 'CONTEXT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DEFINITIONS_COMMIT_ID_ASC'
-  | 'DEFINITIONS_COMMIT_ID_DESC'
-  | 'IS_VALID_ASC'
-  | 'IS_VALID_DESC'
-  | 'VALIDATION_ERRORS_ASC'
-  | 'VALIDATION_ERRORS_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `OrgFunctionInvocation`. */
 export type OrgFunctionInvocationOrderBy =
   | 'NATURAL'
@@ -420,8 +418,6 @@ export type FunctionGraphExecutionOrderBy =
   | 'INVOCATION_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
   | 'OUTPUT_NODE_ASC'
   | 'OUTPUT_NODE_DESC'
   | 'OUTPUT_PORT_ASC'
@@ -910,6 +906,39 @@ export interface FunctionExecutionLogFilter {
   /** Negates the expression. */
   not?: FunctionExecutionLogFilter;
 }
+/** A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionGraphFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `context` field. */
+  context?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `definitionsCommitId` field. */
+  definitionsCommitId?: UUIDFilter;
+  /** Filter by the object’s `isValid` field. */
+  isValid?: BooleanFilter;
+  /** Filter by the object’s `validationErrors` field. */
+  validationErrors?: JSONFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphFilter[];
+  /** Negates the expression. */
+  not?: FunctionGraphFilter;
+}
 /** A filter to be used against `FunctionGraphExecutionNodeState` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionGraphExecutionNodeStateFilter {
   /** Filter by the object’s `createdAt` field. */
@@ -942,41 +971,6 @@ export interface FunctionGraphExecutionNodeStateFilter {
   or?: FunctionGraphExecutionNodeStateFilter[];
   /** Negates the expression. */
   not?: FunctionGraphExecutionNodeStateFilter;
-}
-/** A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionGraphFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `context` field. */
-  context?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `definitionsCommitId` field. */
-  definitionsCommitId?: UUIDFilter;
-  /** Filter by the object’s `isValid` field. */
-  isValid?: BooleanFilter;
-  /** Filter by the object’s `validationErrors` field. */
-  validationErrors?: JSONFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionGraphFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionGraphFilter[];
-  /** Negates the expression. */
-  not?: FunctionGraphFilter;
 }
 /** A filter to be used against `OrgFunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgFunctionInvocationFilter {
@@ -1066,8 +1060,6 @@ export interface FunctionGraphExecutionFilter {
   invocationId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
   /** Filter by the object’s `outputNode` field. */
   outputNode?: StringFilter;
   /** Filter by the object’s `outputPort` field. */
@@ -1172,7 +1164,16 @@ export interface CreateFunctionGraphInput {
   name?: string;
   context?: string;
   description?: string;
-  entityId?: string;
+  createdBy?: string;
+  definitionsCommitId?: string;
+}
+export interface ImportGraphJsonInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  name?: string;
+  graphJson?: unknown;
+  context?: string;
+  description?: string;
   createdBy?: string;
   definitionsCommitId?: string;
 }
@@ -1197,17 +1198,6 @@ export interface AddNodeInput {
   graphName?: string;
   props?: unknown;
   meta?: unknown;
-}
-export interface ImportGraphJsonInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  name?: string;
-  graphJson?: unknown;
-  context?: string;
-  description?: string;
-  entityId?: string;
-  createdBy?: string;
-  definitionsCommitId?: string;
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
@@ -1633,8 +1623,6 @@ export interface FunctionGraphExecutionInput {
   invocationId?: string;
   /** Scope for multi-tenant isolation */
   databaseId: string;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string;
   /** Target output boundary node name to resolve */
   outputNode: string;
   /** Target output port name (default: value) */
@@ -1986,6 +1974,40 @@ export interface FunctionExecutionLogPatch {
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
 }
+export interface UpdateFunctionGraphInput {
+  clientMutationId?: string;
+  /** Unique graph identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `FunctionGraph` being updated. */
+  functionGraphPatch: FunctionGraphPatch;
+}
+/** Represents an update to a `FunctionGraph`. Fields that are set will be updated. */
+export interface FunctionGraphPatch {
+  /** Unique graph identifier */
+  id?: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string;
+  /** Graph store (Merkle store) holding the graph definition */
+  storeId?: string;
+  /** Evaluator/runtime context (function, js, sql, system) */
+  context?: string;
+  /** Graph name (unique per database) */
+  name?: string;
+  /** Human-readable description of the graph */
+  description?: string;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string;
+  /** Whether graph passes structural validation */
+  isValid?: boolean;
+  /** Array of validation error objects when is_valid = false */
+  validationErrors?: unknown;
+  /** Actor who created this graph */
+  createdBy?: string;
+  /** Timestamp of graph creation */
+  createdAt?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+}
 export interface UpdateFunctionGraphExecutionNodeStateInput {
   clientMutationId?: string;
   /** Timestamp of node state creation (partition key) */
@@ -2021,42 +2043,6 @@ export interface FunctionGraphExecutionNodeStatePatch {
   errorMessage?: string;
   /** FK to execution_outputs — content-addressed output blob for this node */
   outputId?: string;
-}
-export interface UpdateFunctionGraphInput {
-  clientMutationId?: string;
-  /** Unique graph identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `FunctionGraph` being updated. */
-  functionGraphPatch: FunctionGraphPatch;
-}
-/** Represents an update to a `FunctionGraph`. Fields that are set will be updated. */
-export interface FunctionGraphPatch {
-  /** Unique graph identifier */
-  id?: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string;
-  /** Graph store (Merkle store) holding the graph definition */
-  storeId?: string;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string;
-  /** Evaluator/runtime context (function, js, sql, system) */
-  context?: string;
-  /** Graph name (unique per database) */
-  name?: string;
-  /** Human-readable description of the graph */
-  description?: string;
-  /** Pinned definitions store commit for deterministic evaluation */
-  definitionsCommitId?: string;
-  /** Whether graph passes structural validation */
-  isValid?: boolean;
-  /** Array of validation error objects when is_valid = false */
-  validationErrors?: unknown;
-  /** Actor who created this graph */
-  createdBy?: string;
-  /** Timestamp of graph creation */
-  createdAt?: string;
-  /** Timestamp of last modification */
-  updatedAt?: string;
 }
 export interface UpdateOrgFunctionInvocationInput {
   clientMutationId?: string;
@@ -2209,8 +2195,6 @@ export interface FunctionGraphExecutionPatch {
   invocationId?: string;
   /** Scope for multi-tenant isolation */
   databaseId?: string;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string;
   /** Target output boundary node name to resolve */
   outputNode?: string;
   /** Target output port name (default: value) */
@@ -2374,16 +2358,16 @@ export interface DeleteFunctionExecutionLogInput {
   /** Unique log entry identifier */
   id: string;
 }
+export interface DeleteFunctionGraphInput {
+  clientMutationId?: string;
+  /** Unique graph identifier */
+  id: string;
+}
 export interface DeleteFunctionGraphExecutionNodeStateInput {
   clientMutationId?: string;
   /** Timestamp of node state creation (partition key) */
   createdAt: string;
   /** Unique node state identifier */
-  id: string;
-}
-export interface DeleteFunctionGraphInput {
-  clientMutationId?: string;
-  /** Unique graph identifier */
   id: string;
 }
 export interface DeleteOrgFunctionInvocationInput {
@@ -2501,17 +2485,17 @@ export interface FunctionExecutionLogConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `FunctionGraphExecutionNodeState` values. */
-export interface FunctionGraphExecutionNodeStateConnection {
-  nodes: FunctionGraphExecutionNodeState[];
-  edges: FunctionGraphExecutionNodeStateEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `FunctionGraph` values. */
 export interface FunctionGraphConnection {
   nodes: FunctionGraph[];
   edges: FunctionGraphEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionGraphExecutionNodeState` values. */
+export interface FunctionGraphExecutionNodeStateConnection {
+  nodes: FunctionGraphExecutionNodeState[];
+  edges: FunctionGraphExecutionNodeStateEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2588,15 +2572,15 @@ export interface CreateFunctionGraphPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface ImportGraphJsonPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
 export interface AddEdgePayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
 export interface AddNodePayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export interface ImportGraphJsonPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -2764,17 +2748,17 @@ export interface UpdateFunctionExecutionLogPayload {
   functionExecutionLog?: FunctionExecutionLog | null;
   functionExecutionLogEdge?: FunctionExecutionLogEdge | null;
 }
-export interface UpdateFunctionGraphExecutionNodeStatePayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionNodeState` that was updated by this mutation. */
-  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
-  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
-}
 export interface UpdateFunctionGraphPayload {
   clientMutationId?: string | null;
   /** The `FunctionGraph` that was updated by this mutation. */
   functionGraph?: FunctionGraph | null;
   functionGraphEdge?: FunctionGraphEdge | null;
+}
+export interface UpdateFunctionGraphExecutionNodeStatePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecutionNodeState` that was updated by this mutation. */
+  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
+  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
 }
 export interface UpdateOrgFunctionInvocationPayload {
   clientMutationId?: string | null;
@@ -2866,17 +2850,17 @@ export interface DeleteFunctionExecutionLogPayload {
   functionExecutionLog?: FunctionExecutionLog | null;
   functionExecutionLogEdge?: FunctionExecutionLogEdge | null;
 }
-export interface DeleteFunctionGraphExecutionNodeStatePayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraphExecutionNodeState` that was deleted by this mutation. */
-  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
-  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
-}
 export interface DeleteFunctionGraphPayload {
   clientMutationId?: string | null;
   /** The `FunctionGraph` that was deleted by this mutation. */
   functionGraph?: FunctionGraph | null;
   functionGraphEdge?: FunctionGraphEdge | null;
+}
+export interface DeleteFunctionGraphExecutionNodeStatePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraphExecutionNodeState` that was deleted by this mutation. */
+  functionGraphExecutionNodeState?: FunctionGraphExecutionNodeState | null;
+  functionGraphExecutionNodeStateEdge?: FunctionGraphExecutionNodeStateEdge | null;
 }
 export interface DeleteOrgFunctionInvocationPayload {
   clientMutationId?: string | null;
@@ -2999,17 +2983,17 @@ export interface FunctionExecutionLogEdge {
   /** The `FunctionExecutionLog` at the end of the edge. */
   node?: FunctionExecutionLog | null;
 }
-/** A `FunctionGraphExecutionNodeState` edge in the connection. */
-export interface FunctionGraphExecutionNodeStateEdge {
-  cursor?: string | null;
-  /** The `FunctionGraphExecutionNodeState` at the end of the edge. */
-  node?: FunctionGraphExecutionNodeState | null;
-}
 /** A `FunctionGraph` edge in the connection. */
 export interface FunctionGraphEdge {
   cursor?: string | null;
   /** The `FunctionGraph` at the end of the edge. */
   node?: FunctionGraph | null;
+}
+/** A `FunctionGraphExecutionNodeState` edge in the connection. */
+export interface FunctionGraphExecutionNodeStateEdge {
+  cursor?: string | null;
+  /** The `FunctionGraphExecutionNodeState` at the end of the edge. */
+  node?: FunctionGraphExecutionNodeState | null;
 }
 /** A `OrgFunctionInvocation` edge in the connection. */
 export interface OrgFunctionInvocationEdge {

@@ -7,7 +7,7 @@ React Query mutation hook for createApiKey
 ## Usage
 
 ```typescript
-const { mutate } = useCreateApiKeyMutation(); mutate({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>' } });
+const { mutate } = useCreateApiKeyMutation(); mutate({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>', principalId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useCreateApiKeyMutation(); mutate({ input: { keyName: '<Strin
 
 ```typescript
 const { mutate, isLoading } = useCreateApiKeyMutation();
-mutate({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>' } });
+mutate({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>', principalId: '<UUID>' } });
 ```

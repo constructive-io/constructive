@@ -32,6 +32,21 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
+| `usePrincipalsQuery` | Query | Scoped sub-identities (API keys and agents) with precomputed SPRT |
+| `usePrincipalQuery` | Query | Scoped sub-identities (API keys and agents) with precomputed SPRT |
+| `useCreatePrincipalMutation` | Mutation | Scoped sub-identities (API keys and agents) with precomputed SPRT |
+| `useUpdatePrincipalMutation` | Mutation | Scoped sub-identities (API keys and agents) with precomputed SPRT |
+| `useDeletePrincipalMutation` | Mutation | Scoped sub-identities (API keys and agents) with precomputed SPRT |
+| `usePrincipalEntitiesQuery` | Query | Association table scoping principals to specific organizations |
+| `usePrincipalEntityQuery` | Query | Association table scoping principals to specific organizations |
+| `useCreatePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
+| `useUpdatePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
+| `useDeletePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
+| `usePrincipalScopeOverridesQuery` | Query | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
+| `usePrincipalScopeOverrideQuery` | Query | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
+| `useCreatePrincipalScopeOverrideMutation` | Mutation | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
+| `useUpdatePrincipalScopeOverrideMutation` | Mutation | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
+| `useDeletePrincipalScopeOverrideMutation` | Mutation | Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. |
 | `useEmailsQuery` | Query | User email addresses with verification and primary-email management |
 | `useEmailQuery` | Query | User email addresses with verification and primary-email management |
 | `useCreateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
@@ -69,25 +84,32 @@ function App() {
 | `useCreateUserConnectedAccountMutation` | Mutation | Create a userConnectedAccount |
 | `useUpdateUserConnectedAccountMutation` | Mutation | Update a userConnectedAccount |
 | `useDeleteUserConnectedAccountMutation` | Mutation | Delete a userConnectedAccount |
+| `useOrgApiKeyListsQuery` | Query | List all orgApiKeyLists |
+| `useOrgApiKeyListQuery` | Query | Get one orgApiKeyList |
+| `useCreateOrgApiKeyListMutation` | Mutation | Create a orgApiKeyList |
+| `useUpdateOrgApiKeyListMutation` | Mutation | Update a orgApiKeyList |
+| `useDeleteOrgApiKeyListMutation` | Mutation | Delete a orgApiKeyList |
 | `useUsersQuery` | Query | List all users |
 | `useUserQuery` | Query | Get one user |
 | `useCreateUserMutation` | Mutation | Create a user |
 | `useUpdateUserMutation` | Mutation | Update a user |
 | `useDeleteUserMutation` | Mutation | Delete a user |
 | `useCurrentUserAgentQuery` | Query | currentUserAgent |
-| `useCurrentIpAddressQuery` | Query | currentIpAddress |
 | `useCurrentUserIdQuery` | Query | currentUserId |
+| `useCurrentIpAddressQuery` | Query | currentIpAddress |
 | `useRequireStepUpQuery` | Query | requireStepUp |
 | `useCurrentUserQuery` | Query | currentUser |
 | `useSignOutMutation` | Mutation | signOut |
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
+| `useDeleteOrgPrincipalMutation` | Mutation | deleteOrgPrincipal |
 | `useDisconnectAccountMutation` | Mutation | disconnectAccount |
 | `useRevokeApiKeyMutation` | Mutation | revokeApiKey |
 | `useRevokeSessionMutation` | Mutation | revokeSession |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
 | `useVerifyTotpMutation` | Mutation | verifyTotp |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
+| `useRevokeOrgApiKeyMutation` | Mutation | revokeOrgApiKey |
 | `useSetPasswordMutation` | Mutation | setPassword |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useProvisionNewUserMutation` | Mutation | provisionNewUser |
@@ -98,7 +120,9 @@ function App() {
 | `useSignUpMutation` | Mutation | signUp |
 | `useSignInMutation` | Mutation | signIn |
 | `useLinkIdentityMutation` | Mutation | linkIdentity |
+| `useCreateOrgPrincipalMutation` | Mutation | createOrgPrincipal |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
+| `useCreateOrgApiKeyMutation` | Mutation | createOrgApiKey |
 | `useCreateApiKeyMutation` | Mutation | createApiKey |
 | `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
@@ -109,6 +133,69 @@ the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
 
 ## Table Hooks
+
+### Principal
+
+```typescript
+// List all principals
+const { data, isLoading } = usePrincipalsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } },
+});
+
+// Get one principal
+const { data: item } = usePrincipalQuery({
+  principalId: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } },
+});
+
+// Create a principal
+const { mutate: create } = useCreatePrincipalMutation({
+  selection: { fields: { principalId: true } },
+});
+create({ id: '<UUID>', ownerId: '<UUID>', userId: '<UUID>', name: '<String>', allowedMask: '<BitString>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' });
+```
+
+### PrincipalEntity
+
+```typescript
+// List all principalEntities
+const { data, isLoading } = usePrincipalEntitiesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, entityId: true, ownerId: true } },
+});
+
+// Get one principalEntity
+const { data: item } = usePrincipalEntityQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, entityId: true, ownerId: true } },
+});
+
+// Create a principalEntity
+const { mutate: create } = useCreatePrincipalEntityMutation({
+  selection: { fields: { id: true } },
+});
+create({ principalId: '<UUID>', entityId: '<UUID>', ownerId: '<UUID>' });
+```
+
+### PrincipalScopeOverride
+
+```typescript
+// List all principalScopeOverrides
+const { data, isLoading } = usePrincipalScopeOverridesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } },
+});
+
+// Get one principalScopeOverride
+const { data: item } = usePrincipalScopeOverrideQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } },
+});
+
+// Create a principalScopeOverride
+const { mutate: create } = useCreatePrincipalScopeOverrideMutation({
+  selection: { fields: { id: true } },
+});
+create({ principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', isAdmin: '<Boolean>', isReadOnly: '<Boolean>' });
+```
 
 ### Email
 
@@ -272,6 +359,27 @@ const { mutate: create } = useCreateUserConnectedAccountMutation({
 create({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
 ```
 
+### OrgApiKeyList
+
+```typescript
+// List all orgApiKeyLists
+const { data, isLoading } = useOrgApiKeyListsQuery({
+  selection: { fields: { id: true, keyId: true, name: true, principalId: true, orgId: true, expiresAt: true, revokedAt: true, lastUsedAt: true, mfaLevel: true, accessLevel: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one orgApiKeyList
+const { data: item } = useOrgApiKeyListQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, keyId: true, name: true, principalId: true, orgId: true, expiresAt: true, revokedAt: true, lastUsedAt: true, mfaLevel: true, accessLevel: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a orgApiKeyList
+const { mutate: create } = useCreateOrgApiKeyListMutation({
+  selection: { fields: { id: true } },
+});
+create({ keyId: '<String>', name: '<String>', principalId: '<UUID>', orgId: '<UUID>', expiresAt: '<Datetime>', revokedAt: '<Datetime>', lastUsedAt: '<Datetime>', mfaLevel: '<String>', accessLevel: '<String>' });
+```
+
 ### User
 
 ```typescript
@@ -302,16 +410,16 @@ currentUserAgent
 - **Type:** query
 - **Arguments:** none
 
-### `useCurrentIpAddressQuery`
+### `useCurrentUserIdQuery`
 
-currentIpAddress
+currentUserId
 
 - **Type:** query
 - **Arguments:** none
 
-### `useCurrentUserIdQuery`
+### `useCurrentIpAddressQuery`
 
-currentUserId
+currentIpAddress
 
 - **Type:** query
 - **Arguments:** none
@@ -366,6 +474,17 @@ checkPassword
   | Argument | Type |
   |----------|------|
   | `input` | CheckPasswordInput (required) |
+
+### `useDeleteOrgPrincipalMutation`
+
+deleteOrgPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DeleteOrgPrincipalInput (required) |
 
 ### `useDisconnectAccountMutation`
 
@@ -432,6 +551,17 @@ confirmDeleteAccount
   | Argument | Type |
   |----------|------|
   | `input` | ConfirmDeleteAccountInput (required) |
+
+### `useRevokeOrgApiKeyMutation`
+
+revokeOrgApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeOrgApiKeyInput (required) |
 
 ### `useSetPasswordMutation`
 
@@ -543,6 +673,17 @@ linkIdentity
   |----------|------|
   | `input` | LinkIdentityInput (required) |
 
+### `useCreateOrgPrincipalMutation`
+
+createOrgPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateOrgPrincipalInput (required) |
+
 ### `useExtendTokenExpiresMutation`
 
 extendTokenExpires
@@ -553,6 +694,17 @@ extendTokenExpires
   | Argument | Type |
   |----------|------|
   | `input` | ExtendTokenExpiresInput (required) |
+
+### `useCreateOrgApiKeyMutation`
+
+createOrgApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateOrgApiKeyInput (required) |
 
 ### `useCreateApiKeyMutation`
 

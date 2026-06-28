@@ -5,6 +5,9 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { PrincipalModel } from './models/principal';
+import { PrincipalEntityModel } from './models/principalEntity';
+import { PrincipalScopeOverrideModel } from './models/principalScopeOverride';
 import { EmailModel } from './models/email';
 import { PhoneNumberModel } from './models/phoneNumber';
 import { CryptoAddressModel } from './models/cryptoAddress';
@@ -13,6 +16,7 @@ import { AuditLogAuthModel } from './models/auditLogAuth';
 import { IdentityProviderModel } from './models/identityProvider';
 import { RoleTypeModel } from './models/roleType';
 import { UserConnectedAccountModel } from './models/userConnectedAccount';
+import { OrgApiKeyListModel } from './models/orgApiKeyList';
 import { UserModel } from './models/user';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -49,6 +53,9 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    principal: new PrincipalModel(client),
+    principalEntity: new PrincipalEntityModel(client),
+    principalScopeOverride: new PrincipalScopeOverrideModel(client),
     email: new EmailModel(client),
     phoneNumber: new PhoneNumberModel(client),
     cryptoAddress: new CryptoAddressModel(client),
@@ -57,6 +64,7 @@ export function createClient(config: OrmClientConfig) {
     identityProvider: new IdentityProviderModel(client),
     roleType: new RoleTypeModel(client),
     userConnectedAccount: new UserConnectedAccountModel(client),
+    orgApiKeyList: new OrgApiKeyListModel(client),
     user: new UserModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

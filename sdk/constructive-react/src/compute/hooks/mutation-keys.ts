@@ -135,6 +135,15 @@ export const functionExecutionLogMutationKeys = {
   /** Delete functionExecutionLog mutation key */ delete: (id: string | number) =>
     ['mutation', 'functionexecutionlog', 'delete', id] as const,
 } as const;
+export const functionGraphMutationKeys = {
+  /** All functionGraph mutation keys */ all: ['mutation', 'functiongraph'] as const,
+  /** Create functionGraph mutation key */ create: () =>
+    ['mutation', 'functiongraph', 'create'] as const,
+  /** Update functionGraph mutation key */ update: (id: string | number) =>
+    ['mutation', 'functiongraph', 'update', id] as const,
+  /** Delete functionGraph mutation key */ delete: (id: string | number) =>
+    ['mutation', 'functiongraph', 'delete', id] as const,
+} as const;
 export const functionGraphExecutionNodeStateMutationKeys = {
   /** All functionGraphExecutionNodeState mutation keys */ all: [
     'mutation',
@@ -146,15 +155,6 @@ export const functionGraphExecutionNodeStateMutationKeys = {
     ['mutation', 'functiongraphexecutionnodestate', 'update', id] as const,
   /** Delete functionGraphExecutionNodeState mutation key */ delete: (id: string | number) =>
     ['mutation', 'functiongraphexecutionnodestate', 'delete', id] as const,
-} as const;
-export const functionGraphMutationKeys = {
-  /** All functionGraph mutation keys */ all: ['mutation', 'functiongraph'] as const,
-  /** Create functionGraph mutation key */ create: () =>
-    ['mutation', 'functiongraph', 'create'] as const,
-  /** Update functionGraph mutation key */ update: (id: string | number) =>
-    ['mutation', 'functiongraph', 'update', id] as const,
-  /** Delete functionGraph mutation key */ delete: (id: string | number) =>
-    ['mutation', 'functiongraph', 'delete', id] as const,
 } as const;
 export const orgFunctionInvocationMutationKeys = {
   /** All orgFunctionInvocation mutation keys */ all: [
@@ -236,6 +236,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'addNodeAndSave', identifier] as const)
       : (['mutation', 'addNodeAndSave'] as const),
+  /** Mutation key for importGraphJson */ importGraphJson: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'importGraphJson', identifier] as const)
+      : (['mutation', 'importGraphJson'] as const),
   /** Mutation key for addEdge */ addEdge: (identifier?: string) =>
     identifier
       ? (['mutation', 'addEdge', identifier] as const)
@@ -244,10 +248,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'addNode', identifier] as const)
       : (['mutation', 'addNode'] as const),
-  /** Mutation key for importGraphJson */ importGraphJson: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'importGraphJson', identifier] as const)
-      : (['mutation', 'importGraphJson'] as const),
   /** Mutation key for insertNodeAtPath */ insertNodeAtPath: (identifier?: string) =>
     identifier
       ? (['mutation', 'insertNodeAtPath', identifier] as const)
@@ -296,8 +296,8 @@ export const mutationKeys = {
   functionGraphCommit: functionGraphCommitMutationKeys,
   secretDefinition: secretDefinitionMutationKeys,
   functionExecutionLog: functionExecutionLogMutationKeys,
-  functionGraphExecutionNodeState: functionGraphExecutionNodeStateMutationKeys,
   functionGraph: functionGraphMutationKeys,
+  functionGraphExecutionNodeState: functionGraphExecutionNodeStateMutationKeys,
   orgFunctionInvocation: orgFunctionInvocationMutationKeys,
   functionInvocation: functionInvocationMutationKeys,
   functionGraphExecution: functionGraphExecutionMutationKeys,
