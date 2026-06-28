@@ -18,6 +18,35 @@
 // Entity Mutation Keys
 // ============================================================================
 
+export const principalMutationKeys = {
+  /** All principal mutation keys */ all: ['mutation', 'principal'] as const,
+  /** Create principal mutation key */ create: () => ['mutation', 'principal', 'create'] as const,
+  /** Update principal mutation key */ update: (id: string | number) =>
+    ['mutation', 'principal', 'update', id] as const,
+  /** Delete principal mutation key */ delete: (id: string | number) =>
+    ['mutation', 'principal', 'delete', id] as const,
+} as const;
+export const principalEntityMutationKeys = {
+  /** All principalEntity mutation keys */ all: ['mutation', 'principalentity'] as const,
+  /** Create principalEntity mutation key */ create: () =>
+    ['mutation', 'principalentity', 'create'] as const,
+  /** Update principalEntity mutation key */ update: (id: string | number) =>
+    ['mutation', 'principalentity', 'update', id] as const,
+  /** Delete principalEntity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'principalentity', 'delete', id] as const,
+} as const;
+export const principalScopeOverrideMutationKeys = {
+  /** All principalScopeOverride mutation keys */ all: [
+    'mutation',
+    'principalscopeoverride',
+  ] as const,
+  /** Create principalScopeOverride mutation key */ create: () =>
+    ['mutation', 'principalscopeoverride', 'create'] as const,
+  /** Update principalScopeOverride mutation key */ update: (id: string | number) =>
+    ['mutation', 'principalscopeoverride', 'update', id] as const,
+  /** Delete principalScopeOverride mutation key */ delete: (id: string | number) =>
+    ['mutation', 'principalscopeoverride', 'delete', id] as const,
+} as const;
 export const emailMutationKeys = {
   /** All email mutation keys */ all: ['mutation', 'email'] as const,
   /** Create email mutation key */ create: () => ['mutation', 'email', 'create'] as const,
@@ -88,6 +117,15 @@ export const userConnectedAccountMutationKeys = {
   /** Delete userConnectedAccount mutation key */ delete: (id: string | number) =>
     ['mutation', 'userconnectedaccount', 'delete', id] as const,
 } as const;
+export const orgApiKeyListMutationKeys = {
+  /** All orgApiKeyList mutation keys */ all: ['mutation', 'orgapikeylist'] as const,
+  /** Create orgApiKeyList mutation key */ create: () =>
+    ['mutation', 'orgapikeylist', 'create'] as const,
+  /** Update orgApiKeyList mutation key */ update: (id: string | number) =>
+    ['mutation', 'orgapikeylist', 'update', id] as const,
+  /** Delete orgApiKeyList mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orgapikeylist', 'delete', id] as const,
+} as const;
 export const userMutationKeys = {
   /** All user mutation keys */ all: ['mutation', 'user'] as const,
   /** Create user mutation key */ create: () => ['mutation', 'user', 'create'] as const,
@@ -116,6 +154,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'checkPassword', identifier] as const)
       : (['mutation', 'checkPassword'] as const),
+  /** Mutation key for deleteOrgPrincipal */ deleteOrgPrincipal: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'deleteOrgPrincipal', identifier] as const)
+      : (['mutation', 'deleteOrgPrincipal'] as const),
   /** Mutation key for disconnectAccount */ disconnectAccount: (identifier?: string) =>
     identifier
       ? (['mutation', 'disconnectAccount', identifier] as const)
@@ -140,6 +182,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'confirmDeleteAccount', identifier] as const)
       : (['mutation', 'confirmDeleteAccount'] as const),
+  /** Mutation key for revokeOrgApiKey */ revokeOrgApiKey: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'revokeOrgApiKey', identifier] as const)
+      : (['mutation', 'revokeOrgApiKey'] as const),
   /** Mutation key for setPassword */ setPassword: (identifier?: string) =>
     identifier
       ? (['mutation', 'setPassword', identifier] as const)
@@ -176,10 +222,18 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'linkIdentity', identifier] as const)
       : (['mutation', 'linkIdentity'] as const),
+  /** Mutation key for createOrgPrincipal */ createOrgPrincipal: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'createOrgPrincipal', identifier] as const)
+      : (['mutation', 'createOrgPrincipal'] as const),
   /** Mutation key for extendTokenExpires */ extendTokenExpires: (identifier?: string) =>
     identifier
       ? (['mutation', 'extendTokenExpires', identifier] as const)
       : (['mutation', 'extendTokenExpires'] as const),
+  /** Mutation key for createOrgApiKey */ createOrgApiKey: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'createOrgApiKey', identifier] as const)
+      : (['mutation', 'createOrgApiKey'] as const),
   /** Mutation key for createApiKey */ createApiKey: (identifier?: string) =>
     identifier
       ? (['mutation', 'createApiKey', identifier] as const)
@@ -224,6 +278,9 @@ export const customMutationKeys = {
  * ```
  */
 export const mutationKeys = {
+  principal: principalMutationKeys,
+  principalEntity: principalEntityMutationKeys,
+  principalScopeOverride: principalScopeOverrideMutationKeys,
   email: emailMutationKeys,
   phoneNumber: phoneNumberMutationKeys,
   cryptoAddress: cryptoAddressMutationKeys,
@@ -232,6 +289,7 @@ export const mutationKeys = {
   identityProvider: identityProviderMutationKeys,
   roleType: roleTypeMutationKeys,
   userConnectedAccount: userConnectedAccountMutationKeys,
+  orgApiKeyList: orgApiKeyListMutationKeys,
   user: userMutationKeys,
   custom: customMutationKeys,
 } as const;

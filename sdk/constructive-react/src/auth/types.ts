@@ -7,6 +7,35 @@ export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
+export interface Principal {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  ownerId: string | null;
+  userId: string | null;
+  name: string | null;
+  allowedMask: string | null;
+  isReadOnly: boolean | null;
+  bypassStepUp: boolean | null;
+}
+export interface PrincipalEntity {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  principalId: string | null;
+  entityId: string | null;
+  ownerId: string | null;
+}
+export interface PrincipalScopeOverride {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  principalId: string | null;
+  membershipType: number | null;
+  allowedMask: string | null;
+  isAdmin: boolean | null;
+  isReadOnly: boolean | null;
+}
 export interface Email {
   id: string | null;
   ownerId: string | null;
@@ -82,6 +111,20 @@ export interface UserConnectedAccount {
   identifier: string | null;
   details: unknown | null;
   isVerified: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface OrgApiKeyList {
+  id: string | null;
+  keyId: string | null;
+  name: string | null;
+  principalId: string | null;
+  orgId: string | null;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  lastUsedAt: string | null;
+  mfaLevel: string | null;
+  accessLevel: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 }

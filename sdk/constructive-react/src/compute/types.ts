@@ -121,6 +121,20 @@ export interface FunctionExecutionLog {
   actorId: string | null;
   databaseId: string | null;
 }
+export interface FunctionGraph {
+  id: string | null;
+  databaseId: string | null;
+  storeId: string | null;
+  context: string | null;
+  name: string | null;
+  description: string | null;
+  definitionsCommitId: string | null;
+  isValid: boolean | null;
+  validationErrors: unknown | null;
+  createdBy: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface FunctionGraphExecutionNodeState {
   createdAt: string | null;
   id: string | null;
@@ -134,21 +148,6 @@ export interface FunctionGraphExecutionNodeState {
   errorCode: string | null;
   errorMessage: string | null;
   outputId: string | null;
-}
-export interface FunctionGraph {
-  id: string | null;
-  databaseId: string | null;
-  storeId: string | null;
-  entityId: string | null;
-  context: string | null;
-  name: string | null;
-  description: string | null;
-  definitionsCommitId: string | null;
-  isValid: boolean | null;
-  validationErrors: unknown | null;
-  createdBy: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
 }
 export interface OrgFunctionInvocation {
   createdAt: string | null;
@@ -189,7 +188,6 @@ export interface FunctionGraphExecution {
   graphId: string | null;
   invocationId: string | null;
   databaseId: string | null;
-  entityId: string | null;
   outputNode: string | null;
   outputPort: string | null;
   status: string | null;

@@ -279,24 +279,6 @@ export const secureTableProvisionMutationKeys = {
   /** Delete secureTableProvision mutation key */ delete: (id: string | number) =>
     ['mutation', 'securetableprovision', 'delete', id] as const,
 } as const;
-export const merkleStoreModuleMutationKeys = {
-  /** All merkleStoreModule mutation keys */ all: ['mutation', 'merklestoremodule'] as const,
-  /** Create merkleStoreModule mutation key */ create: () =>
-    ['mutation', 'merklestoremodule', 'create'] as const,
-  /** Update merkleStoreModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'merklestoremodule', 'update', id] as const,
-  /** Delete merkleStoreModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'merklestoremodule', 'delete', id] as const,
-} as const;
-export const graphModuleMutationKeys = {
-  /** All graphModule mutation keys */ all: ['mutation', 'graphmodule'] as const,
-  /** Create graphModule mutation key */ create: () =>
-    ['mutation', 'graphmodule', 'create'] as const,
-  /** Update graphModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'graphmodule', 'update', id] as const,
-  /** Delete graphModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'graphmodule', 'delete', id] as const,
-} as const;
 export const databaseProvisionModuleMutationKeys = {
   /** All databaseProvisionModule mutation keys */ all: [
     'mutation',
@@ -317,6 +299,24 @@ export const configSecretsModuleMutationKeys = {
     ['mutation', 'configsecretsmodule', 'update', id] as const,
   /** Delete configSecretsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'configsecretsmodule', 'delete', id] as const,
+} as const;
+export const graphModuleMutationKeys = {
+  /** All graphModule mutation keys */ all: ['mutation', 'graphmodule'] as const,
+  /** Create graphModule mutation key */ create: () =>
+    ['mutation', 'graphmodule', 'create'] as const,
+  /** Update graphModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'graphmodule', 'update', id] as const,
+  /** Delete graphModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'graphmodule', 'delete', id] as const,
+} as const;
+export const merkleStoreModuleMutationKeys = {
+  /** All merkleStoreModule mutation keys */ all: ['mutation', 'merklestoremodule'] as const,
+  /** Create merkleStoreModule mutation key */ create: () =>
+    ['mutation', 'merklestoremodule', 'create'] as const,
+  /** Update merkleStoreModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'merklestoremodule', 'update', id] as const,
+  /** Delete merkleStoreModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'merklestoremodule', 'delete', id] as const,
 } as const;
 export const rateLimitMetersModuleMutationKeys = {
   /** All rateLimitMetersModule mutation keys */ all: [
@@ -377,6 +377,15 @@ export const invitesModuleMutationKeys = {
     ['mutation', 'invitesmodule', 'update', id] as const,
   /** Delete invitesModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'invitesmodule', 'delete', id] as const,
+} as const;
+export const principalAuthModuleMutationKeys = {
+  /** All principalAuthModule mutation keys */ all: ['mutation', 'principalauthmodule'] as const,
+  /** Create principalAuthModule mutation key */ create: () =>
+    ['mutation', 'principalauthmodule', 'create'] as const,
+  /** Update principalAuthModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'principalauthmodule', 'update', id] as const,
+  /** Delete principalAuthModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'principalauthmodule', 'delete', id] as const,
 } as const;
 export const computeLogModuleMutationKeys = {
   /** All computeLogModule mutation keys */ all: ['mutation', 'computelogmodule'] as const,
@@ -693,16 +702,17 @@ export const mutationKeys = {
   cryptoAuthModule: cryptoAuthModuleMutationKeys,
   sessionsModule: sessionsModuleMutationKeys,
   secureTableProvision: secureTableProvisionMutationKeys,
-  merkleStoreModule: merkleStoreModuleMutationKeys,
-  graphModule: graphModuleMutationKeys,
   databaseProvisionModule: databaseProvisionModuleMutationKeys,
   configSecretsModule: configSecretsModuleMutationKeys,
+  graphModule: graphModuleMutationKeys,
+  merkleStoreModule: merkleStoreModuleMutationKeys,
   rateLimitMetersModule: rateLimitMetersModuleMutationKeys,
   realtimeModule: realtimeModuleMutationKeys,
   webauthnAuthModule: webauthnAuthModuleMutationKeys,
   functionInvocationModule: functionInvocationModuleMutationKeys,
   functionModule: functionModuleMutationKeys,
   invitesModule: invitesModuleMutationKeys,
+  principalAuthModule: principalAuthModuleMutationKeys,
   computeLogModule: computeLogModuleMutationKeys,
   inferenceLogModule: inferenceLogModuleMutationKeys,
   namespaceModule: namespaceModuleMutationKeys,

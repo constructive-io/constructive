@@ -26,6 +26,9 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `principal` | principal CRUD operations |
+| `principal-entity` | principalEntity CRUD operations |
+| `principal-scope-override` | principalScopeOverride CRUD operations |
 | `email` | email CRUD operations |
 | `phone-number` | phoneNumber CRUD operations |
 | `crypto-address` | cryptoAddress CRUD operations |
@@ -34,21 +37,24 @@ csdk auth set-token <your-token>
 | `identity-provider` | identityProvider CRUD operations |
 | `role-type` | roleType CRUD operations |
 | `user-connected-account` | userConnectedAccount CRUD operations |
+| `org-api-key-list` | orgApiKeyList CRUD operations |
 | `user` | user CRUD operations |
 | `current-user-agent` | currentUserAgent |
-| `current-ip-address` | currentIpAddress |
 | `current-user-id` | currentUserId |
+| `current-ip-address` | currentIpAddress |
 | `require-step-up` | requireStepUp |
 | `current-user` | currentUser |
 | `sign-out` | signOut |
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `check-password` | checkPassword |
+| `delete-org-principal` | deleteOrgPrincipal |
 | `disconnect-account` | disconnectAccount |
 | `revoke-api-key` | revokeApiKey |
 | `revoke-session` | revokeSession |
 | `verify-password` | verifyPassword |
 | `verify-totp` | verifyTotp |
 | `confirm-delete-account` | confirmDeleteAccount |
+| `revoke-org-api-key` | revokeOrgApiKey |
 | `set-password` | setPassword |
 | `verify-email` | verifyEmail |
 | `provision-new-user` | provisionNewUser |
@@ -59,7 +65,9 @@ csdk auth set-token <your-token>
 | `sign-up` | signUp |
 | `sign-in` | signIn |
 | `link-identity` | linkIdentity |
+| `create-org-principal` | createOrgPrincipal |
 | `extend-token-expires` | extendTokenExpires |
+| `create-org-api-key` | createOrgApiKey |
 | `create-api-key` | createApiKey |
 | `request-cross-origin-token` | requestCrossOriginToken |
 | `forgot-password` | forgotPassword |
@@ -109,6 +117,89 @@ Manage per-context key-value configuration variables.
 Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
+
+### `principal`
+
+CRUD operations for Principal records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all principal records |
+| `find-first` | Find first matching principal record |
+| `get` | Get a principal by principalId |
+| `create` | Create a new principal |
+| `update` | Update an existing principal |
+| `delete` | Delete a principal |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `ownerId` | UUID |
+| `userId` | UUID |
+| `name` | String |
+| `allowedMask` | BitString |
+| `isReadOnly` | Boolean |
+| `bypassStepUp` | Boolean |
+
+**Required create fields:** `id`, `ownerId`, `userId`, `name`, `allowedMask`, `isReadOnly`, `bypassStepUp`
+
+### `principal-entity`
+
+CRUD operations for PrincipalEntity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all principalEntity records |
+| `find-first` | Find first matching principalEntity record |
+| `get` | Get a principalEntity by id |
+| `create` | Create a new principalEntity |
+| `update` | Update an existing principalEntity |
+| `delete` | Delete a principalEntity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `principalId` | UUID |
+| `entityId` | UUID |
+| `ownerId` | UUID |
+
+**Required create fields:** `principalId`, `entityId`, `ownerId`
+
+### `principal-scope-override`
+
+CRUD operations for PrincipalScopeOverride records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all principalScopeOverride records |
+| `find-first` | Find first matching principalScopeOverride record |
+| `get` | Get a principalScopeOverride by id |
+| `create` | Create a new principalScopeOverride |
+| `update` | Update an existing principalScopeOverride |
+| `delete` | Delete a principalScopeOverride |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `principalId` | UUID |
+| `membershipType` | Int |
+| `allowedMask` | BitString |
+| `isAdmin` | Boolean |
+| `isReadOnly` | Boolean |
+
+**Required create fields:** `principalId`, `membershipType`, `allowedMask`, `isAdmin`, `isReadOnly`
 
 ### `email`
 
@@ -337,6 +428,38 @@ CRUD operations for UserConnectedAccount records.
 
 **Optional create fields (backend defaults):** `ownerId`, `service`, `identifier`, `details`, `isVerified`
 
+### `org-api-key-list`
+
+CRUD operations for OrgApiKeyList records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgApiKeyList records |
+| `find-first` | Find first matching orgApiKeyList record |
+| `get` | Get a orgApiKeyList by id |
+| `create` | Create a new orgApiKeyList |
+| `update` | Update an existing orgApiKeyList |
+| `delete` | Delete a orgApiKeyList |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `keyId` | String |
+| `name` | String |
+| `principalId` | UUID |
+| `orgId` | UUID |
+| `expiresAt` | Datetime |
+| `revokedAt` | Datetime |
+| `lastUsedAt` | Datetime |
+| `mfaLevel` | String |
+| `accessLevel` | String |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Optional create fields (backend defaults):** `keyId`, `name`, `principalId`, `orgId`, `expiresAt`, `revokedAt`, `lastUsedAt`, `mfaLevel`, `accessLevel`
+
 ### `user`
 
 CRUD operations for User records.
@@ -404,16 +527,16 @@ currentUserAgent
 - **Type:** query
 - **Arguments:** none
 
-### `current-ip-address`
+### `current-user-id`
 
-currentIpAddress
+currentUserId
 
 - **Type:** query
 - **Arguments:** none
 
-### `current-user-id`
+### `current-ip-address`
 
-currentUserId
+currentIpAddress
 
 - **Type:** query
 - **Arguments:** none
@@ -469,6 +592,18 @@ checkPassword
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.password` | String |
+
+### `delete-org-principal`
+
+deleteOrgPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.principalId` | UUID |
 
 ### `disconnect-account`
 
@@ -542,6 +677,19 @@ confirmDeleteAccount
   | `--input.clientMutationId` | String |
   | `--input.userId` | UUID |
   | `--input.token` | String |
+
+### `revoke-org-api-key`
+
+revokeOrgApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.keyId` | UUID (required) |
+  | `--input.orgId` | UUID (required) |
 
 ### `set-password`
 
@@ -689,6 +837,22 @@ linkIdentity
   | `--input.identifier` | String (required) |
   | `--input.details` | JSON |
 
+### `create-org-principal`
+
+createOrgPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.name` | String |
+  | `--input.orgId` | UUID |
+  | `--input.allowedMask` | BitString |
+  | `--input.isReadOnly` | Boolean |
+  | `--input.bypassStepUp` | Boolean |
+
 ### `extend-token-expires`
 
 extendTokenExpires
@@ -700,6 +864,23 @@ extendTokenExpires
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.amount` | IntervalInput |
+
+### `create-org-api-key`
+
+createOrgApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.orgId` | UUID |
+  | `--input.principalId` | UUID |
+  | `--input.keyName` | String |
+  | `--input.accessLevel` | String |
+  | `--input.mfaLevel` | String |
+  | `--input.expiresIn` | IntervalInput |
 
 ### `create-api-key`
 
@@ -715,6 +896,7 @@ createApiKey
   | `--input.accessLevel` | String |
   | `--input.mfaLevel` | String |
   | `--input.expiresIn` | IntervalInput |
+  | `--input.principalId` | UUID |
 
 ### `request-cross-origin-token`
 

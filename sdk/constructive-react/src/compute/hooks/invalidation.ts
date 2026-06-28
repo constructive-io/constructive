@@ -27,8 +27,8 @@ import {
   functionGraphCommitKeys,
   secretDefinitionKeys,
   functionExecutionLogKeys,
-  functionGraphExecutionNodeStateKeys,
   functionGraphKeys,
+  functionGraphExecutionNodeStateKeys,
   orgFunctionInvocationKeys,
   functionInvocationKeys,
   functionGraphExecutionKeys,
@@ -258,6 +258,23 @@ export const invalidate = {
         queryKey: functionExecutionLogKeys.detail(id),
       }),
   },
+  /** Invalidate functionGraph queries */ functionGraph: {
+    /** Invalidate all functionGraph queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.all,
+      }),
+    /** Invalidate functionGraph list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraph */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.detail(id),
+      }),
+  },
   /** Invalidate functionGraphExecutionNodeState queries */ functionGraphExecutionNodeState: {
     /** Invalidate all functionGraphExecutionNodeState queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -275,23 +292,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: functionGraphExecutionNodeStateKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionGraph queries */ functionGraph: {
-    /** Invalidate all functionGraph queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.all,
-      }),
-    /** Invalidate functionGraph list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.lists(),
-      }),
-    /** Invalidate a specific functionGraph */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.detail(id),
       }),
   },
   /** Invalidate orgFunctionInvocation queries */ orgFunctionInvocation: {
@@ -471,20 +471,20 @@ export const remove = {
       queryKey: functionExecutionLogKeys.detail(id),
     });
   },
-  /** Remove functionGraphExecutionNodeState from cache */ functionGraphExecutionNodeState: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionGraphExecutionNodeStateKeys.detail(id),
-    });
-  },
   /** Remove functionGraph from cache */ functionGraph: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: functionGraphKeys.detail(id),
+    });
+  },
+  /** Remove functionGraphExecutionNodeState from cache */ functionGraphExecutionNodeState: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphExecutionNodeStateKeys.detail(id),
     });
   },
   /** Remove orgFunctionInvocation from cache */ orgFunctionInvocation: (

@@ -297,43 +297,6 @@ export interface SecureTableProvision {
   policies: unknown | null;
   outFields: string[] | null;
 }
-export interface MerkleStoreModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  publicSchemaName: string | null;
-  privateSchemaName: string | null;
-  objectTableId: string | null;
-  storeTableId: string | null;
-  commitTableId: string | null;
-  refTableId: string | null;
-  prefix: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-  scope: string | null;
-  functionPrefix: string | null;
-  createdAt: string | null;
-}
-export interface GraphModule {
-  id: string | null;
-  databaseId: string | null;
-  publicSchemaId: string | null;
-  privateSchemaId: string | null;
-  publicSchemaName: string | null;
-  privateSchemaName: string | null;
-  scope: string | null;
-  prefix: string | null;
-  merkleStoreModuleId: string | null;
-  graphsTableId: string | null;
-  apiName: string | null;
-  privateApiName: string | null;
-  entityTableId: string | null;
-  policies: unknown | null;
-  provisions: unknown | null;
-  defaultPermissions: string[] | null;
-  createdAt: string | null;
-}
 export interface DatabaseProvisionModule {
   id: string | null;
   databaseName: string | null;
@@ -368,6 +331,44 @@ export interface ConfigSecretsModule {
   policies: unknown | null;
   provisions: unknown | null;
   hasConfig: boolean | null;
+}
+export interface GraphModule {
+  id: string | null;
+  databaseId: string | null;
+  publicSchemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  scope: string | null;
+  prefix: string | null;
+  merkleStoreModuleId: string | null;
+  graphsTableId: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  entityTableId: string | null;
+  policies: unknown | null;
+  provisions: unknown | null;
+  defaultPermissions: string[] | null;
+  createdAt: string | null;
+}
+export interface MerkleStoreModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  publicSchemaName: string | null;
+  privateSchemaName: string | null;
+  objectTableId: string | null;
+  storeTableId: string | null;
+  commitTableId: string | null;
+  refTableId: string | null;
+  prefix: string | null;
+  apiName: string | null;
+  privateApiName: string | null;
+  scope: string | null;
+  functionPrefix: string | null;
+  permissionKey: string | null;
+  createdAt: string | null;
 }
 export interface RateLimitMetersModule {
   id: string | null;
@@ -481,6 +482,26 @@ export interface InvitesModule {
   entityTableId: string | null;
   apiName: string | null;
   privateApiName: string | null;
+}
+export interface PrincipalAuthModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  principalsTableId: string | null;
+  principalEntitiesTableId: string | null;
+  principalScopeOverridesTableId: string | null;
+  usersTableId: string | null;
+  sessionsTableId: string | null;
+  sessionCredentialsTableId: string | null;
+  auditsTableId: string | null;
+  principalsTableName: string | null;
+  createPrincipalFunction: string | null;
+  deletePrincipalFunction: string | null;
+  createOrgPrincipalFunction: string | null;
+  deleteOrgPrincipalFunction: string | null;
+  createOrgApiKeyFunction: string | null;
+  revokeOrgApiKeyFunction: string | null;
+  apiName: string | null;
 }
 export interface ComputeLogModule {
   id: string | null;

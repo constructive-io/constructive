@@ -1,13 +1,13 @@
 ---
 name: hooks-modules
-description: React Query hooks for the modules API — provides typed query and mutation hooks for 59 tables and 12 custom operations
+description: React Query hooks for the modules API — provides typed query and mutation hooks for 60 tables and 12 custom operations
 ---
 
 # hooks-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the modules API — provides typed query and mutation hooks for 59 tables and 12 custom operations
+React Query hooks for the modules API — provides typed query and mutation hooks for 60 tables and 12 custom operations
 
 ## Usage
 
@@ -64,16 +64,17 @@ See the `references/` directory for detailed per-entity API documentation:
 - [crypto-auth-module](references/crypto-auth-module.md)
 - [sessions-module](references/sessions-module.md)
 - [secure-table-provision](references/secure-table-provision.md)
-- [merkle-store-module](references/merkle-store-module.md)
-- [graph-module](references/graph-module.md)
 - [database-provision-module](references/database-provision-module.md)
 - [config-secrets-module](references/config-secrets-module.md)
+- [graph-module](references/graph-module.md)
+- [merkle-store-module](references/merkle-store-module.md)
 - [rate-limit-meters-module](references/rate-limit-meters-module.md)
 - [realtime-module](references/realtime-module.md)
 - [webauthn-auth-module](references/webauthn-auth-module.md)
 - [function-invocation-module](references/function-invocation-module.md)
 - [function-module](references/function-module.md)
 - [invites-module](references/invites-module.md)
+- [principal-auth-module](references/principal-auth-module.md)
 - [compute-log-module](references/compute-log-module.md)
 - [inference-log-module](references/inference-log-module.md)
 - [namespace-module](references/namespace-module.md)

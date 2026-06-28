@@ -17,8 +17,8 @@ import { FunctionGraphExecutionOutputModel } from './models/functionGraphExecuti
 import { FunctionGraphCommitModel } from './models/functionGraphCommit';
 import { SecretDefinitionModel } from './models/secretDefinition';
 import { FunctionExecutionLogModel } from './models/functionExecutionLog';
-import { FunctionGraphExecutionNodeStateModel } from './models/functionGraphExecutionNodeState';
 import { FunctionGraphModel } from './models/functionGraph';
+import { FunctionGraphExecutionNodeStateModel } from './models/functionGraphExecutionNodeState';
 import { OrgFunctionInvocationModel } from './models/orgFunctionInvocation';
 import { FunctionInvocationModel } from './models/functionInvocation';
 import { FunctionGraphExecutionModel } from './models/functionGraphExecution';
@@ -70,8 +70,8 @@ export function createClient(config: OrmClientConfig) {
     functionGraphCommit: new FunctionGraphCommitModel(client),
     secretDefinition: new SecretDefinitionModel(client),
     functionExecutionLog: new FunctionExecutionLogModel(client),
-    functionGraphExecutionNodeState: new FunctionGraphExecutionNodeStateModel(client),
     functionGraph: new FunctionGraphModel(client),
+    functionGraphExecutionNodeState: new FunctionGraphExecutionNodeStateModel(client),
     orgFunctionInvocation: new OrgFunctionInvocationModel(client),
     functionInvocation: new FunctionInvocationModel(client),
     functionGraphExecution: new FunctionGraphExecutionModel(client),

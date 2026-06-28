@@ -317,6 +317,35 @@ type Query {
     orderBy: [FunctionExecutionLogOrderBy!] = [PRIMARY_KEY_ASC]
   ): FunctionExecutionLogConnection
 
+  """Reads and enables pagination through a set of `FunctionGraph`."""
+  functionGraphs(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionGraphFilter
+
+    """The method to use when ordering `FunctionGraph`."""
+    orderBy: [FunctionGraphOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FunctionGraphConnection
+
   """
   Reads and enables pagination through a set of `FunctionGraphExecutionNodeState`.
   """
@@ -347,35 +376,6 @@ type Query {
     """The method to use when ordering `FunctionGraphExecutionNodeState`."""
     orderBy: [FunctionGraphExecutionNodeStateOrderBy!] = [PRIMARY_KEY_ASC]
   ): FunctionGraphExecutionNodeStateConnection
-
-  """Reads and enables pagination through a set of `FunctionGraph`."""
-  functionGraphs(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: FunctionGraphFilter
-
-    """The method to use when ordering `FunctionGraph`."""
-    orderBy: [FunctionGraphOrderBy!] = [PRIMARY_KEY_ASC]
-  ): FunctionGraphConnection
 
   """Reads and enables pagination through a set of `OrgFunctionInvocation`."""
   orgFunctionInvocations(
@@ -2752,6 +2752,154 @@ enum FunctionExecutionLogOrderBy {
   DATABASE_ID_DESC
 }
 
+"""A connection to a list of `FunctionGraph` values."""
+type FunctionGraphConnection {
+  """A list of `FunctionGraph` objects."""
+  nodes: [FunctionGraph]!
+
+  """
+  A list of edges which contains the `FunctionGraph` and cursor to aid in pagination.
+  """
+  edges: [FunctionGraphEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `FunctionGraph` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
+"""
+type FunctionGraph {
+  """Unique graph identifier"""
+  id: UUID!
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Graph store (Merkle store) holding the graph definition"""
+  storeId: UUID!
+
+  """Evaluator/runtime context (function, js, sql, system)"""
+  context: String!
+
+  """Graph name (unique per database)"""
+  name: String!
+
+  """Human-readable description of the graph"""
+  description: String
+
+  """Pinned definitions store commit for deterministic evaluation"""
+  definitionsCommitId: UUID
+
+  """Whether graph passes structural validation"""
+  isValid: Boolean!
+
+  """Array of validation error objects when is_valid = false"""
+  validationErrors: JSON
+
+  """Actor who created this graph"""
+  createdBy: UUID
+
+  """Timestamp of graph creation"""
+  createdAt: Datetime!
+
+  """Timestamp of last modification"""
+  updatedAt: Datetime!
+}
+
+"""A `FunctionGraph` edge in the connection."""
+type FunctionGraphEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FunctionGraph` at the end of the edge."""
+  node: FunctionGraph
+}
+
+"""
+A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionGraphFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `context` field."""
+  context: StringFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `definitionsCommitId` field."""
+  definitionsCommitId: UUIDFilter
+
+  """Filter by the object’s `isValid` field."""
+  isValid: BooleanFilter
+
+  """Filter by the object’s `validationErrors` field."""
+  validationErrors: JSONFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [FunctionGraphFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [FunctionGraphFilter!]
+
+  """Negates the expression."""
+  not: FunctionGraphFilter
+}
+
+"""Methods to use when ordering `FunctionGraph`."""
+enum FunctionGraphOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+  CONTEXT_ASC
+  CONTEXT_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  DEFINITIONS_COMMIT_ID_ASC
+  DEFINITIONS_COMMIT_ID_DESC
+  IS_VALID_ASC
+  IS_VALID_DESC
+  VALIDATION_ERRORS_ASC
+  VALIDATION_ERRORS_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
 """A connection to a list of `FunctionGraphExecutionNodeState` values."""
 type FunctionGraphExecutionNodeStateConnection {
   """A list of `FunctionGraphExecutionNodeState` objects."""
@@ -2902,162 +3050,6 @@ enum FunctionGraphExecutionNodeStateOrderBy {
   ERROR_MESSAGE_DESC
   OUTPUT_ID_ASC
   OUTPUT_ID_DESC
-}
-
-"""A connection to a list of `FunctionGraph` values."""
-type FunctionGraphConnection {
-  """A list of `FunctionGraph` objects."""
-  nodes: [FunctionGraph]!
-
-  """
-  A list of edges which contains the `FunctionGraph` and cursor to aid in pagination.
-  """
-  edges: [FunctionGraphEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `FunctionGraph` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
-"""
-type FunctionGraph {
-  """Unique graph identifier"""
-  id: UUID!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-
-  """Graph store (Merkle store) holding the graph definition"""
-  storeId: UUID!
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
-
-  """Evaluator/runtime context (function, js, sql, system)"""
-  context: String!
-
-  """Graph name (unique per database)"""
-  name: String!
-
-  """Human-readable description of the graph"""
-  description: String
-
-  """Pinned definitions store commit for deterministic evaluation"""
-  definitionsCommitId: UUID
-
-  """Whether graph passes structural validation"""
-  isValid: Boolean!
-
-  """Array of validation error objects when is_valid = false"""
-  validationErrors: JSON
-
-  """Actor who created this graph"""
-  createdBy: UUID
-
-  """Timestamp of graph creation"""
-  createdAt: Datetime!
-
-  """Timestamp of last modification"""
-  updatedAt: Datetime!
-}
-
-"""A `FunctionGraph` edge in the connection."""
-type FunctionGraphEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `FunctionGraph` at the end of the edge."""
-  node: FunctionGraph
-}
-
-"""
-A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’
-"""
-input FunctionGraphFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `storeId` field."""
-  storeId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `context` field."""
-  context: StringFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `definitionsCommitId` field."""
-  definitionsCommitId: UUIDFilter
-
-  """Filter by the object’s `isValid` field."""
-  isValid: BooleanFilter
-
-  """Filter by the object’s `validationErrors` field."""
-  validationErrors: JSONFilter
-
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [FunctionGraphFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [FunctionGraphFilter!]
-
-  """Negates the expression."""
-  not: FunctionGraphFilter
-}
-
-"""Methods to use when ordering `FunctionGraph`."""
-enum FunctionGraphOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  STORE_ID_ASC
-  STORE_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  CONTEXT_ASC
-  CONTEXT_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  DEFINITIONS_COMMIT_ID_ASC
-  DEFINITIONS_COMMIT_ID_DESC
-  IS_VALID_ASC
-  IS_VALID_DESC
-  VALIDATION_ERRORS_ASC
-  VALIDATION_ERRORS_DESC
-  CREATED_BY_ASC
-  CREATED_BY_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
 }
 
 """A connection to a list of `OrgFunctionInvocation` values."""
@@ -3489,9 +3481,6 @@ type FunctionGraphExecution {
   """Scope for multi-tenant isolation"""
   databaseId: UUID!
 
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
-
   """Target output boundary node name to resolve"""
   outputNode: String!
 
@@ -3582,9 +3571,6 @@ input FunctionGraphExecutionFilter {
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
   """Filter by the object’s `outputNode` field."""
   outputNode: StringFilter
 
@@ -3667,8 +3653,6 @@ enum FunctionGraphExecutionOrderBy {
   INVOCATION_ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
   OUTPUT_NODE_ASC
   OUTPUT_NODE_DESC
   OUTPUT_PORT_ASC
@@ -4104,6 +4088,12 @@ type Mutation {
     """
     input: CreateFunctionGraphInput!
   ): CreateFunctionGraphPayload
+  importGraphJson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ImportGraphJsonInput!
+  ): ImportGraphJsonPayload
   addEdge(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4116,12 +4106,6 @@ type Mutation {
     """
     input: AddNodeInput!
   ): AddNodePayload
-  importGraphJson(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ImportGraphJsonInput!
-  ): ImportGraphJsonPayload
   insertNodeAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4351,6 +4335,14 @@ type Mutation {
     input: UpdateFunctionExecutionLogInput!
   ): UpdateFunctionExecutionLogPayload
 
+  """Updates a single `FunctionGraph` using a unique key and a patch."""
+  updateFunctionGraph(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFunctionGraphInput!
+  ): UpdateFunctionGraphPayload
+
   """
   Updates a single `FunctionGraphExecutionNodeState` using a unique key and a patch.
   """
@@ -4360,14 +4352,6 @@ type Mutation {
     """
     input: UpdateFunctionGraphExecutionNodeStateInput!
   ): UpdateFunctionGraphExecutionNodeStatePayload
-
-  """Updates a single `FunctionGraph` using a unique key and a patch."""
-  updateFunctionGraph(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateFunctionGraphInput!
-  ): UpdateFunctionGraphPayload
 
   """
   Updates a single `OrgFunctionInvocation` using a unique key and a patch.
@@ -4493,14 +4477,6 @@ type Mutation {
     input: DeleteFunctionExecutionLogInput!
   ): DeleteFunctionExecutionLogPayload
 
-  """Deletes a single `FunctionGraphExecutionNodeState` using a unique key."""
-  deleteFunctionGraphExecutionNodeState(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteFunctionGraphExecutionNodeStateInput!
-  ): DeleteFunctionGraphExecutionNodeStatePayload
-
   """Deletes a single `FunctionGraph` using a unique key."""
   deleteFunctionGraph(
     """
@@ -4508,6 +4484,14 @@ type Mutation {
     """
     input: DeleteFunctionGraphInput!
   ): DeleteFunctionGraphPayload
+
+  """Deletes a single `FunctionGraphExecutionNodeState` using a unique key."""
+  deleteFunctionGraphExecutionNodeState(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFunctionGraphExecutionNodeStateInput!
+  ): DeleteFunctionGraphExecutionNodeStatePayload
 
   """Deletes a single `OrgFunctionInvocation` using a unique key."""
   deleteOrgFunctionInvocation(
@@ -4808,7 +4792,37 @@ input CreateFunctionGraphInput {
   name: String
   context: String
   description: String
-  entityId: UUID
+  createdBy: UUID
+  definitionsCommitId: UUID
+}
+
+"""The output of our `importGraphJson` mutation."""
+type ImportGraphJsonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `importGraphJson` mutation."""
+input ImportGraphJsonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  name: String
+  graphJson: JSON
+  context: String
+  description: String
   createdBy: UUID
   definitionsCommitId: UUID
 }
@@ -4875,38 +4889,6 @@ input AddNodeInput {
   graphName: String
   props: JSON
   meta: JSON
-}
-
-"""The output of our `importGraphJson` mutation."""
-type ImportGraphJsonPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `importGraphJson` mutation."""
-input ImportGraphJsonInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  name: String
-  graphJson: JSON
-  context: String
-  description: String
-  entityId: UUID
-  createdBy: UUID
-  definitionsCommitId: UUID
 }
 
 """The output of our `insertNodeAtPath` mutation."""
@@ -5991,9 +5973,6 @@ input FunctionGraphExecutionInput {
   """Scope for multi-tenant isolation"""
   databaseId: UUID!
 
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
-
   """Target output boundary node name to resolve"""
   outputNode: String!
 
@@ -6879,6 +6858,87 @@ input FunctionExecutionLogPatch {
   databaseId: UUID
 }
 
+"""The output of our update `FunctionGraph` mutation."""
+type UpdateFunctionGraphPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionGraph` that was updated by this mutation."""
+  functionGraph: FunctionGraph
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FunctionGraph`. May be used by Relay 1."""
+  functionGraphEdge(
+    """The method to use when ordering `FunctionGraph`."""
+    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionGraphEdge
+}
+
+"""All input for the `updateFunctionGraph` mutation."""
+input UpdateFunctionGraphInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique graph identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `FunctionGraph` being updated.
+  """
+  functionGraphPatch: FunctionGraphPatch!
+}
+
+"""
+Represents an update to a `FunctionGraph`. Fields that are set will be updated.
+"""
+input FunctionGraphPatch {
+  """Unique graph identifier"""
+  id: UUID
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID
+
+  """Graph store (Merkle store) holding the graph definition"""
+  storeId: UUID
+
+  """Evaluator/runtime context (function, js, sql, system)"""
+  context: String
+
+  """Graph name (unique per database)"""
+  name: String
+
+  """Human-readable description of the graph"""
+  description: String
+
+  """Pinned definitions store commit for deterministic evaluation"""
+  definitionsCommitId: UUID
+
+  """Whether graph passes structural validation"""
+  isValid: Boolean
+
+  """Array of validation error objects when is_valid = false"""
+  validationErrors: JSON
+
+  """Actor who created this graph"""
+  createdBy: UUID
+
+  """Timestamp of graph creation"""
+  createdAt: Datetime
+
+  """Timestamp of last modification"""
+  updatedAt: Datetime
+}
+
 """The output of our update `FunctionGraphExecutionNodeState` mutation."""
 type UpdateFunctionGraphExecutionNodeStatePayload {
   """
@@ -6967,90 +7027,6 @@ input FunctionGraphExecutionNodeStatePatch {
 
   """FK to execution_outputs — content-addressed output blob for this node"""
   outputId: UUID
-}
-
-"""The output of our update `FunctionGraph` mutation."""
-type UpdateFunctionGraphPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `FunctionGraph` that was updated by this mutation."""
-  functionGraph: FunctionGraph
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `FunctionGraph`. May be used by Relay 1."""
-  functionGraphEdge(
-    """The method to use when ordering `FunctionGraph`."""
-    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): FunctionGraphEdge
-}
-
-"""All input for the `updateFunctionGraph` mutation."""
-input UpdateFunctionGraphInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique graph identifier"""
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `FunctionGraph` being updated.
-  """
-  functionGraphPatch: FunctionGraphPatch!
-}
-
-"""
-Represents an update to a `FunctionGraph`. Fields that are set will be updated.
-"""
-input FunctionGraphPatch {
-  """Unique graph identifier"""
-  id: UUID
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID
-
-  """Graph store (Merkle store) holding the graph definition"""
-  storeId: UUID
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
-
-  """Evaluator/runtime context (function, js, sql, system)"""
-  context: String
-
-  """Graph name (unique per database)"""
-  name: String
-
-  """Human-readable description of the graph"""
-  description: String
-
-  """Pinned definitions store commit for deterministic evaluation"""
-  definitionsCommitId: UUID
-
-  """Whether graph passes structural validation"""
-  isValid: Boolean
-
-  """Array of validation error objects when is_valid = false"""
-  validationErrors: JSON
-
-  """Actor who created this graph"""
-  createdBy: UUID
-
-  """Timestamp of graph creation"""
-  createdAt: Datetime
-
-  """Timestamp of last modification"""
-  updatedAt: Datetime
 }
 
 """The output of our update `OrgFunctionInvocation` mutation."""
@@ -7412,9 +7388,6 @@ input FunctionGraphExecutionPatch {
 
   """Scope for multi-tenant isolation"""
   databaseId: UUID
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
 
   """Target output boundary node name to resolve"""
   outputNode: String
@@ -7995,6 +7968,41 @@ input DeleteFunctionExecutionLogInput {
   id: UUID!
 }
 
+"""The output of our delete `FunctionGraph` mutation."""
+type DeleteFunctionGraphPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionGraph` that was deleted by this mutation."""
+  functionGraph: FunctionGraph
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FunctionGraph`. May be used by Relay 1."""
+  functionGraphEdge(
+    """The method to use when ordering `FunctionGraph`."""
+    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionGraphEdge
+}
+
+"""All input for the `deleteFunctionGraph` mutation."""
+input DeleteFunctionGraphInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique graph identifier"""
+  id: UUID!
+}
+
 """The output of our delete `FunctionGraphExecutionNodeState` mutation."""
 type DeleteFunctionGraphExecutionNodeStatePayload {
   """
@@ -8034,41 +8042,6 @@ input DeleteFunctionGraphExecutionNodeStateInput {
   createdAt: Datetime!
 
   """Unique node state identifier"""
-  id: UUID!
-}
-
-"""The output of our delete `FunctionGraph` mutation."""
-type DeleteFunctionGraphPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `FunctionGraph` that was deleted by this mutation."""
-  functionGraph: FunctionGraph
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `FunctionGraph`. May be used by Relay 1."""
-  functionGraphEdge(
-    """The method to use when ordering `FunctionGraph`."""
-    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): FunctionGraphEdge
-}
-
-"""All input for the `deleteFunctionGraph` mutation."""
-input DeleteFunctionGraphInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique graph identifier"""
   id: UUID!
 }
 

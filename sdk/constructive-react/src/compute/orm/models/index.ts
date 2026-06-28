@@ -15,8 +15,8 @@ export { FunctionGraphExecutionOutputModel } from './functionGraphExecutionOutpu
 export { FunctionGraphCommitModel } from './functionGraphCommit';
 export { SecretDefinitionModel } from './secretDefinition';
 export { FunctionExecutionLogModel } from './functionExecutionLog';
-export { FunctionGraphExecutionNodeStateModel } from './functionGraphExecutionNodeState';
 export { FunctionGraphModel } from './functionGraph';
+export { FunctionGraphExecutionNodeStateModel } from './functionGraphExecutionNodeState';
 export { OrgFunctionInvocationModel } from './orgFunctionInvocation';
 export { FunctionInvocationModel } from './functionInvocation';
 export { FunctionGraphExecutionModel } from './functionGraphExecution';
