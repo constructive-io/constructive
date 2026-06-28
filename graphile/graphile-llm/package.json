@@ -40,7 +40,7 @@
     "graphile-build": "5.0.2",
     "graphile-build-pg": "5.0.2",
     "graphile-config": "1.0.1",
-    "graphile-search": "workspace:^",
+    "graphile-search": "^1.18.0",
     "graphile-utils": "5.0.0",
     "graphql": "16.13.0",
     "pg-sql2": "5.0.1",
