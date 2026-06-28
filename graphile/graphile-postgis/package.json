@@ -46,7 +46,7 @@
     "graphile-build": "5.0.2",
     "graphile-build-pg": "5.0.2",
     "graphile-config": "1.0.1",
-    "graphile-connection-filter": "workspace:^",
+    "graphile-connection-filter": "^1.13.0",
     "graphql": "16.13.0",
     "pg-sql2": "5.0.1",
     "postgraphile": "5.0.3"
