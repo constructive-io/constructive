@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { getNumberFlag, getStringFlag, hasFlag, parseArgs, parseCsv } from '../lib/args';
-import { DEFAULT_BASE_URL, serverEnv, withLocalhostNoProxy, redactEnv } from '../lib/config';
+import { serverEnv, withLocalhostNoProxy, redactEnv } from '../lib/config';
 import { getJson, waitForJsonOk } from '../lib/http';
 import { defaultRunDir, ensureRunDirs, writeJson } from '../lib/run-dir';
 import { runProcess } from '../lib/process';
@@ -107,7 +107,8 @@ async function startManagedServer({
   const log = await fs.open(logPath, 'a');
   const requireFromServer = createRequire(path.join(ctx.paths.serverDir, 'package.json'));
   const tsNodeBin = requireFromServer.resolve('ts-node/dist/bin.js');
-  const child = spawn(process.execPath, [tsNodeBin, 'src/run.ts'], {
+  const workspaceResolver = path.join(ctx.paths.perfDir, 'src', 'register-workspace-packages.cjs');
+  const child = spawn(process.execPath, ['-r', workspaceResolver, tsNodeBin, 'src/run.ts'], {
     cwd: ctx.paths.serverDir,
     env,
     stdio: ['ignore', log.fd, log.fd],
@@ -248,9 +249,10 @@ async function runPublicCase({
     await removeIfExists(resultPath);
   }
   await runProcess(
-    process.execPath,
+    'npx',
     [
-      path.join(ctx.paths.perfDir, 'phase2-load.mjs'),
+      'ts-node',
+      path.join(ctx.paths.perfDir, 'src', 'legacy', 'phase2-load.ts'),
       '--run-dir',
       runDir,
       '--base-url',
@@ -351,9 +353,10 @@ async function provisionPublicIfRequested({
     return;
   }
   await runProcess(
-    process.execPath,
+    'npx',
     [
-      path.join(ctx.paths.perfDir, 'phase1-preflight.mjs'),
+      'ts-node',
+      path.join(ctx.paths.perfDir, 'src', 'legacy', 'phase1-preflight.ts'),
       '--run-dir',
       runDir,
       '--base-url',
@@ -513,7 +516,7 @@ export async function e2eMatrix(ctx: CommandContext): Promise<void> {
   const workers = getNumberFlag(parsed.flags, '--workers', 4);
   const port = getNumberFlag(parsed.flags, '--port', 3000);
   const keyspaceMinRouteKeys = getNumberFlag(parsed.flags, '--keyspace-min-route-keys', k);
-  const baseUrl = getStringFlag(parsed.flags, '--base-url', DEFAULT_BASE_URL) || DEFAULT_BASE_URL;
+  const baseUrl = getStringFlag(parsed.flags, '--base-url') || `http://localhost:${port}`;
   const runDir = path.resolve(getStringFlag(parsed.flags, '--run-dir', defaultRunDir('e2e-matrix')) || defaultRunDir('e2e-matrix'));
   const manageServer = hasFlag(parsed.flags, '--manage-server');
   const skipPublicPreflight = hasFlag(parsed.flags, '--skip-public-preflight');

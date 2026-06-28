@@ -37,6 +37,7 @@ export function serverEnv({
     NODE_ENV: 'development',
     GRAPHILE_ENV: 'development',
     GRAPHQL_OBSERVABILITY_ENABLED: 'true',
+    TS_NODE_TRANSPILE_ONLY: 'true',
     API_IS_PUBLIC: routingMode === 'public' ? 'true' : 'false',
     PORT: String(port),
   });

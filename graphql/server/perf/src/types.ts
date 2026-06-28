@@ -26,6 +26,12 @@ export interface CommandDefinition {
   run: (ctx: CommandContext) => Promise<void>;
 }
 
+export interface PerfCliOptions {
+  paths?: PerfPaths;
+  stdout?: NodeJS.WritableStream;
+  stderr?: NodeJS.WritableStream;
+}
+
 export interface RunProcessOptions {
   cwd: string;
   env?: NodeJS.ProcessEnv;

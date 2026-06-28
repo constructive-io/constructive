@@ -1,9 +1,9 @@
 #!/usr/bin/env node
+// @ts-nocheck
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import { Pool } from 'pg';
 
 import {
@@ -18,7 +18,7 @@ import {
   postJson,
   stableStringify,
   writeJson,
-} from './common.mjs';
+} from './common';
 
 const args = process.argv.slice(2);
 
@@ -238,12 +238,13 @@ const buildBootstrapCredentials = ({ readyProfiles }) => {
 };
 
 const runTokenBuilder = async () => {
-  const scriptPath = fileURLToPath(new URL('./build-token-pool.mjs', import.meta.url));
+  const scriptPath = path.join(__dirname, 'build-token-pool.ts');
 
   return await new Promise((resolve) => {
     const child = spawn(
-      process.execPath,
+      'npx',
       [
+        'ts-node',
         scriptPath,
         '--run-dir',
         runDir,
@@ -279,12 +280,13 @@ const runTokenBuilder = async () => {
 };
 
 const runDbpmTechValidationScript = async () => {
-  const scriptPath = fileURLToPath(new URL('./phase1-tech-validate-dbpm.mjs', import.meta.url));
+  const scriptPath = path.join(__dirname, 'phase1-tech-validate-dbpm.ts');
 
   return await new Promise((resolve) => {
     const child = spawn(
-      process.execPath,
+      'npx',
       [
+        'ts-node',
         scriptPath,
         '--run-dir',
         runDir,
@@ -342,12 +344,13 @@ const runDbpmTechValidationScript = async () => {
 };
 
 const runBusinessProfileBuilder = async () => {
-  const scriptPath = fileURLToPath(new URL('./build-business-op-profiles.mjs', import.meta.url));
+  const scriptPath = path.join(__dirname, 'build-business-op-profiles.ts');
 
   return await new Promise((resolve) => {
     const child = spawn(
-      process.execPath,
+      'npx',
       [
+        'ts-node',
         scriptPath,
         '--run-dir',
         runDir,
@@ -393,9 +396,10 @@ const runBusinessProfileBuilder = async () => {
 };
 
 const runKeyspaceBuilder = async () => {
-  const scriptPath = fileURLToPath(new URL('./build-keyspace-profiles.mjs', import.meta.url));
+  const scriptPath = path.join(__dirname, 'build-keyspace-profiles.ts');
 
   const cmd = [
+    'ts-node',
     scriptPath,
     '--run-dir',
     runDir,
@@ -422,7 +426,7 @@ const runKeyspaceBuilder = async () => {
   }
 
   return await new Promise((resolve) => {
-    const child = spawn(process.execPath, cmd, {
+    const child = spawn('npx', cmd, {
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 

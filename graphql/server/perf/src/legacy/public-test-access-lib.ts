@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Pool } from 'pg';
 
 const quoteIdent = (value) => `"${String(value).replace(/"/g, '""')}"`;

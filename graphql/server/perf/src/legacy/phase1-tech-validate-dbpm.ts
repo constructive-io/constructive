@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-nocheck
 
 import path from 'node:path';
 import { Pool } from 'pg';
@@ -12,7 +13,7 @@ import {
   postJson,
   sleep,
   writeJson,
-} from './common.mjs';
+} from './common';
 
 const args = process.argv.slice(2);
 

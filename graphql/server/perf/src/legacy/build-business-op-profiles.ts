@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-nocheck
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -11,7 +12,7 @@ import {
   getArgValue,
   makeRunId,
   writeJson,
-} from './common.mjs';
+} from './common';
 
 const args = process.argv.slice(2);
 

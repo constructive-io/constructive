@@ -75,3 +75,28 @@ export function mapAliases(args: string[], aliases: Record<string, string>): str
   }
   return out;
 }
+
+export function stripFlags(args: string[], names: string[]): string[] {
+  const remove = new Set(names);
+  const out: string[] = [];
+
+  for (let i = 0; i < args.length; i += 1) {
+    const token = args[i];
+    if (!token.startsWith('--')) {
+      out.push(token);
+      continue;
+    }
+
+    const name = token.includes('=') ? token.slice(0, token.indexOf('=')) : token;
+    if (!remove.has(name)) {
+      out.push(token);
+      continue;
+    }
+
+    if (!token.includes('=') && args[i + 1] != null && !args[i + 1].startsWith('--')) {
+      i += 1;
+    }
+  }
+
+  return out;
+}

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+// @ts-nocheck
 
+import fsSync from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -7,19 +9,18 @@ import { spawn } from 'node:child_process';
 import {
   DEFAULT_BASE_URL,
   DEFAULT_TMP_ROOT,
-  ensureRunDirs,
   getArgValue,
   getJson,
   parseIntArg,
   postJson,
   sleep,
   writeJson,
-} from './common.mjs';
+} from './common';
 import {
   buildTargetsFromProfiles,
   ensurePublicAccessForTargets,
   getUnsafeTargets,
-} from './public-test-access-lib.mjs';
+} from './public-test-access-lib';
 
 const args = process.argv.slice(2);
 
@@ -30,7 +31,18 @@ const runDir = path.resolve(
     path.join(DEFAULT_TMP_ROOT, getArgValue(args, '--run-id', 'graphile-cache-leak-manual-run')),
   ),
 );
-const dirs = await ensureRunDirs(runDir);
+const dirs = {
+  runDir,
+  logsDir: path.join(runDir, 'logs'),
+  samplerDir: path.join(runDir, 'logs', 'sampler'),
+  heapDir: path.join(runDir, 'logs', 'heap'),
+  dataDir: path.join(runDir, 'data'),
+  reportsDir: path.join(runDir, 'reports'),
+  tmpScriptsDir: path.join(runDir, 'tmp-scripts'),
+};
+for (const dir of Object.values(dirs)) {
+  fsSync.mkdirSync(dir, { recursive: true });
+}
 
 const baseUrl = getArgValue(args, '--base-url', DEFAULT_BASE_URL);
 const workers = parseIntArg(getArgValue(args, '--workers', '16'), 16);
@@ -1284,7 +1296,7 @@ const tryCaptureHeap = async () => {
     return { attempted: false, reason: 'heap pid not provided' };
   }
 
-  const scriptPath = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', 'scripts', 'capture-heap-snapshot.mjs');
+  const scriptPath = path.resolve(__dirname, '..', '..', '..', 'scripts', 'capture-heap-snapshot.mjs');
 
   return await new Promise((resolve) => {
     const child = spawn(process.execPath, [scriptPath, '--pid', String(heapPid), '--dir', dirs.heapDir, '--timeout-ms', '60000'], {
@@ -1317,7 +1329,7 @@ const analyzeSampler = async ({ windowStart, windowEnd }) => {
     return { attempted: false, reason: 'skip analyze enabled' };
   }
 
-  const scriptPath = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', 'scripts', 'analyze-debug-logs.mjs');
+  const scriptPath = path.resolve(__dirname, '..', '..', '..', 'scripts', 'analyze-debug-logs.mjs');
   const childArgs = [scriptPath, '--dir', dirs.samplerDir, '--json', '--start', windowStart, '--end', windowEnd];
   return await new Promise((resolve) => {
     const child = spawn(process.execPath, childArgs, {

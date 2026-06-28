@@ -3,16 +3,16 @@ import { mapAliases } from '../lib/args';
 import { runProcess } from '../lib/process';
 import type { CommandContext } from '../types';
 
-export async function runNodeLegacyScript(
+export async function runMigratedTsScript(
   ctx: CommandContext,
   scriptName: string,
   args = ctx.args,
 ): Promise<void> {
-  await runProcess(process.execPath, [path.join(ctx.paths.perfDir, scriptName), ...args], {
+  await runProcess('npx', ['ts-node', path.join(ctx.paths.perfDir, 'src', 'legacy', scriptName), ...args], {
     cwd: ctx.paths.repoRoot,
     env: process.env,
     dryRun: ctx.dryRun,
-    label: scriptName,
+    label: `src/legacy/${scriptName}`,
   });
 }
 

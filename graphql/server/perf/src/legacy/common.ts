@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from 'node:fs/promises';
 import http from 'node:http';
 import https from 'node:https';

@@ -1,6 +1,6 @@
-import { runNodeLegacyScript } from './legacy';
+import { runMigratedTsScript } from './legacy';
 import type { CommandContext } from '../types';
 
 export async function publicPreflight(ctx: CommandContext): Promise<void> {
-  await runNodeLegacyScript(ctx, 'phase1-preflight.mjs');
+  await runMigratedTsScript(ctx, 'phase1-preflight.ts');
 }

@@ -2,7 +2,7 @@
 
 This directory is the home for GraphQL server performance tooling around the multi-tenancy cache work.
 
-This README is written for the intended TypeScript perf toolkit shape. The current branch still contains legacy `.mjs` and `.sh` scripts; until the TypeScript CLI refactor lands, use the legacy equivalents called out in each section.
+This README documents the TypeScript perf CLI surface. Public DBPM and wrapper flows run through `perf/src/cli.ts`; private comparison and stress commands still delegate to the existing lightweight harnesses while their internals are migrated.
 
 ## What This Tests
 
@@ -32,7 +32,7 @@ The maintained use cases are intentionally small.
 - server env: `API_IS_PUBLIC=false`
 - data setup: synthetic route profiles, no DBPM tenant provisioning
 - main purpose: quick old/new cache comparison
-- target TS commands:
+- commands:
   - `pnpm --dir graphql/server perf private-benchmark`
   - `pnpm --dir graphql/server perf private-compare`
 
@@ -46,7 +46,7 @@ The maintained use cases are intentionally small.
   - `modules.localhost` for DBPM provisioning mutations
   - `api-dbpm-*.localhost` for provisioned business-table GraphQL
 - main purpose: realistic tenant/business workload
-- target TS commands:
+- commands:
   - `pnpm --dir graphql/server perf public-preflight`
   - `pnpm --dir graphql/server perf public-load`
 
@@ -61,30 +61,31 @@ These are orchestration wrappers around the two primary use cases. They are not 
 
 Options such as shape variants, sweeps, stress matrices, prewarm, and longer duration runs are modifiers of the two maintained flows above.
 
-## TypeScript CLI Target
+## TypeScript CLI Surface
 
-The refactor should converge the current loose script set into a TypeScript CLI and library.
+The CLI is the stable operator interface for perf runs. Some implementations still delegate to compatibility modules or existing private harnesses, but callers should use the `perf` command surface.
 
-Target command surface:
+Command surface:
 
-| Target command | Purpose | Legacy equivalent today |
+| Command | Purpose | Backing implementation today |
 |---|---|---|
-| `perf private-benchmark` | Run a lightweight private/header-routing HTTP benchmark | `npx ts-node graphql/server/perf/e2e-benchmark.ts` |
-| `perf private-compare` | Run old/new private-routing comparison | `bash graphql/server/perf/run-comparison.sh` |
-| `perf stress` | Run the curated private comparison stress matrix | `bash graphql/server/perf/run-stress-suite.sh` |
-| `perf public-preflight` | Provision/validate DBPM tenants and generate profiles | `node graphql/server/perf/phase1-preflight.mjs` |
-| `perf public-load` | Run DBPM-backed business load | `node graphql/server/perf/phase2-load.mjs` |
-| `perf run` | Run preflight + load for one run directory | `node graphql/server/perf/run-test-spec.mjs` |
-| `perf sweep` | Run repeated K/tenant-count sweeps | `node graphql/server/perf/run-k-sweep.mjs` |
-| `perf e2e-matrix` | Run public/private × old/new verification matrix | no direct legacy equivalent |
-| `perf summarize-shapes` | Summarize DBPM shape variants | `node graphql/server/perf/summarize-shapes.mjs` |
-| `perf prepare-public-access` | Prepare public grants for perf business tables | `node graphql/server/perf/prepare-public-test-access.mjs` |
-| `perf reset-business-data` | Truncate generated business workload table data | `node graphql/server/perf/reset-business-test-data.mjs` |
+| `perf private-benchmark` | Run a lightweight private/header-routing HTTP benchmark | `perf/e2e-benchmark.ts` |
+| `perf private-compare` | Run old/new private-routing comparison | `perf/run-comparison.sh` |
+| `perf stress` | Run the curated private comparison stress matrix | `perf/run-stress-suite.sh` |
+| `perf public-preflight` | Provision/validate DBPM tenants and generate profiles | `perf/src/legacy/phase1-preflight.ts` |
+| `perf public-load` | Run DBPM-backed business load | `perf/src/legacy/phase2-load.ts` |
+| `perf run` | Run preflight + load for one run directory | `perf/src/commands/run.ts` |
+| `perf sweep` | Run repeated K/tenant-count sweeps | `perf/src/commands/sweep.ts` |
+| `perf e2e-matrix` | Run public/private x old/new verification matrix | `perf/src/commands/e2e-matrix.ts` |
+| `perf summarize-shapes` | Summarize DBPM shape variants | `perf/src/commands/summarize-shapes.ts` |
+| `perf prepare-public-access` | Prepare public grants for perf business tables | `perf/src/commands/prepare-public-access.ts` |
+| `perf reset-business-data` | Truncate generated business workload table data | `perf/src/commands/reset-business-data.ts` |
 
 Target library boundaries:
 
 ```text
 perf/src/cli.ts
+perf/src/commands.ts
 perf/src/commands/*
 perf/src/lib/args.ts
 perf/src/lib/config.ts
@@ -98,10 +99,11 @@ perf/src/lib/reports.ts
 perf/src/lib/profiles/*
 perf/src/lib/dbpm/*
 perf/src/lib/public-access.ts
+perf/src/utils/*
 perf/src/types.ts
 ```
 
-The CLI should make the public/private lane split explicit. It should not keep every legacy script as an equally important top-level concept.
+The CLI keeps the public/private lane split explicit. It does not expose every helper as an equally important top-level concept.
 
 ## Prerequisites
 
@@ -138,10 +140,10 @@ For the new multi-tenancy cache path, useful debug fields include `multiTenancyC
 
 ## Perf Lanes
 
-| Lane | Routing | Data | Main use | Target entrypoints | Legacy entrypoints today |
+| Lane | Routing | Data | Main use | Entrypoints | Backing implementation today |
 |---|---|---|---|---|---|
 | Lightweight HTTP comparison | private header routing, `API_IS_PUBLIC=false` | synthetic route profiles | old/new cache comparison | `perf private-benchmark`, `perf private-compare`, `perf stress` | `e2e-benchmark.ts`, `run-comparison.sh`, `run-stress-suite.sh` |
-| DBPM-backed multitenant | public host routing, `API_IS_PUBLIC=true` | real provisioned tenants | realistic tenant/business load | `perf public-preflight`, `perf public-load`, `perf run`, `perf sweep` | `phase1-preflight.mjs`, `phase2-load.mjs`, `run-test-spec.mjs`, `run-k-sweep.mjs` |
+| DBPM-backed multitenant | public host routing, `API_IS_PUBLIC=true` | real provisioned tenants | realistic tenant/business load | `perf public-preflight`, `perf public-load`, `perf run`, `perf sweep` | `perf/src/legacy/phase1-preflight.ts`, `perf/src/legacy/phase2-load.ts`, `perf/src/commands/run.ts`, `perf/src/commands/sweep.ts` |
 
 Do not treat every helper script as a separate product surface. Most helpers exist to support one of these two lanes.
 
@@ -208,16 +210,10 @@ For old-mode comparisons, enlarge `GRAPHILE_CACHE_MAX` so dedicated-instance mod
 
 ## Quick Start: Lightweight Private Comparison
 
-Target TS command:
+Command:
 
 ```bash
 pnpm --dir graphql/server perf private-compare --k 20 --duration 300 --workers 8
-```
-
-Legacy command today:
-
-```bash
-bash graphql/server/perf/run-comparison.sh --k 20 --duration 300 --workers 8
 ```
 
 This comparison runs:
@@ -228,23 +224,10 @@ This comparison runs:
 
 For a very small single-mode smoke test, start the server in the desired cache mode and run:
 
-Target TS command:
+Command:
 
 ```bash
 pnpm --dir graphql/server perf private-benchmark --mode new --k 2 --duration 2 --workers 1
-```
-
-Legacy command today:
-
-```bash
-MODE=new \
-K=2 \
-DURATION=2 \
-WORKERS=1 \
-SERVER_PORT=3000 \
-NO_PROXY=localhost,127.0.0.1,::1 \
-no_proxy=localhost,127.0.0.1,::1 \
-npx ts-node graphql/server/perf/e2e-benchmark.ts
 ```
 
 For this branch's exact-match buildKey cache, multiple synthetic tenants with the same connection, schemas, roles, and settings should map to one handler build. Use `/debug/memory` to confirm cache behavior.
@@ -255,35 +238,12 @@ The public lane requires DBPM-backed setup. `API_IS_PUBLIC=true` alone is not en
 
 ### Phase 1: provision tenants and profiles
 
-Target TS command:
+Command:
 
 ```bash
 RUN_DIR=/tmp/constructive-perf/dbpm-$(date +%Y%m%d-%H%M%S)
 
 pnpm --dir graphql/server perf public-preflight \
-  --run-dir "$RUN_DIR" \
-  --base-url http://localhost:3000 \
-  --dbpm-tenant-count 2 \
-  --dbpm-shape-variants 1 \
-  --auth-host auth.localhost \
-  --provision-host modules.localhost \
-  --business-routing-mode public \
-  --business-compat-routing-mode public \
-  --business-public-api-name api \
-  --business-public-subdomain-prefix api-dbpm- \
-  --allow-underprovisioned \
-  --min-token-tenants 1 \
-  --keyspace-min-route-keys 1
-```
-
-Legacy command today:
-
-```bash
-RUN_DIR=/tmp/constructive-perf/dbpm-$(date +%Y%m%d-%H%M%S)
-
-NO_PROXY=localhost,127.0.0.1,::1 \
-no_proxy=localhost,127.0.0.1,::1 \
-node graphql/server/perf/phase1-preflight.mjs \
   --run-dir "$RUN_DIR" \
   --base-url http://localhost:3000 \
   --dbpm-tenant-count 2 \
@@ -317,27 +277,10 @@ Warnings about `min-tenant-count`, recommended token scale, or keyspace route co
 
 ### Phase 2: short correctness load
 
-Target TS command:
+Command:
 
 ```bash
 pnpm --dir graphql/server perf public-load \
-  --run-dir "$RUN_DIR" \
-  --base-url http://localhost:3000 \
-  --profiles "$RUN_DIR/data/business-op-profiles.json" \
-  --workers 1 \
-  --duration-seconds 3 \
-  --idle-seconds 0 \
-  --allow-underprovisioned \
-  --min-tenant-count 1 \
-  --disable-prewarm \
-  --skip-analyze \
-  --public-role anonymous
-```
-
-Legacy command today:
-
-```bash
-node graphql/server/perf/phase2-load.mjs \
   --run-dir "$RUN_DIR" \
   --base-url http://localhost:3000 \
   --profiles "$RUN_DIR/data/business-op-profiles.json" \
@@ -450,35 +393,20 @@ Soft observations:
 
 ### Stress suite
 
-Target TS command:
+Command:
 
 ```bash
 pnpm --dir graphql/server perf stress
-```
-
-Legacy command today:
-
-```bash
-bash graphql/server/perf/run-stress-suite.sh
 ```
 
 The stress suite is a curated multi-run private comparison harness.
 
 ### K / tenant-count sweep
 
-Target TS command:
+Command:
 
 ```bash
 pnpm --dir graphql/server perf sweep \
-  --k-values 3,7 \
-  --duration-seconds 600 \
-  --workers 16
-```
-
-Legacy command today:
-
-```bash
-node graphql/server/perf/run-k-sweep.mjs \
   --k-values 3,7 \
   --duration-seconds 600 \
   --workers 16
@@ -501,28 +429,12 @@ pnpm --dir graphql/server perf public-preflight \
   --dbpm-shape-variants 3
 ```
 
-Legacy command today:
-
-```bash
-node graphql/server/perf/phase1-preflight.mjs \
-  --run-dir "$RUN_DIR" \
-  --dbpm-tenant-count 20 \
-  --dbpm-shape-variants 3
-```
-
 Summarize generated shapes:
 
-Target TS command:
+Command:
 
 ```bash
 pnpm --dir graphql/server perf summarize-shapes \
-  --manifest "$RUN_DIR/data/business-table-manifest.json"
-```
-
-Legacy command today:
-
-```bash
-node graphql/server/perf/summarize-shapes.mjs \
   --manifest "$RUN_DIR/data/business-table-manifest.json"
 ```
 
@@ -530,23 +442,23 @@ node graphql/server/perf/summarize-shapes.mjs \
 
 ## Scripts and Helpers
 
-| Group | Target command | Legacy file today | Notes |
+| Group | Command | Backing implementation today | Notes |
 |---|---|---|---|
 | Private lane | `perf private-benchmark` | `e2e-benchmark.ts` | Lightweight HTTP benchmark through Express -> PostGraphile -> Grafast -> PostgreSQL |
 | Private lane | `perf private-compare` | `run-comparison.sh` | Old/new comparison with tuned old-mode cache max |
 | Private lane | `perf stress` | `run-stress-suite.sh` | Curated private stress matrix |
-| Public lane | `perf public-preflight` | `phase1-preflight.mjs` | DBPM validation, tenant provisioning, token/profile setup |
-| Public lane | `perf public-load` | `phase2-load.mjs` | Sustained profile-driven GraphQL business load |
-| Wrapper | `perf run` | `run-test-spec.mjs` | Preflight + load orchestration |
-| Wrapper | `perf sweep` | `run-k-sweep.mjs` | Repeated K/tenant-count orchestration |
-| Wrapper | `perf e2e-matrix` | none | public/private × old/new verification matrix with managed-server option |
-| Public helper | `perf prepare-public-access` | `prepare-public-test-access.mjs` | Grant preparation for public business tables |
-| Public helper | `perf reset-business-data` | `reset-business-test-data.mjs` | Truncates business workload table data |
-| Public helper | internal library | `public-test-access-lib.mjs` | Shared public access helper logic |
-| Profile helper | internal library | `build-token-pool.mjs` | Token generation for DBPM profiles |
-| Profile helper | internal library | `build-keyspace-profiles.mjs` | Route/keyspace expansion |
-| Profile helper | internal library | `build-business-op-profiles.mjs` | Business operation profile construction |
-| Diagnostics | `perf summarize-shapes` | `summarize-shapes.mjs` | Name-agnostic structural shape summary |
+| Public lane | `perf public-preflight` | `src/legacy/phase1-preflight.ts` | DBPM validation, tenant provisioning, token/profile setup |
+| Public lane | `perf public-load` | `src/legacy/phase2-load.ts` | Sustained profile-driven GraphQL business load |
+| Wrapper | `perf run` | `src/commands/run.ts` | Preflight + load orchestration |
+| Wrapper | `perf sweep` | `src/commands/sweep.ts` | Repeated K/tenant-count orchestration |
+| Wrapper | `perf e2e-matrix` | `src/commands/e2e-matrix.ts` | public/private x old/new verification matrix with managed-server option |
+| Public helper | `perf prepare-public-access` | `src/commands/prepare-public-access.ts` | Grant preparation for public business tables |
+| Public helper | `perf reset-business-data` | `src/commands/reset-business-data.ts` | Truncates business workload table data |
+| Public helper | internal library | `src/legacy/public-test-access-lib.ts` | Shared public access helper logic |
+| Profile helper | internal library | `src/legacy/build-token-pool.ts` | Token generation for DBPM profiles |
+| Profile helper | internal library | `src/legacy/build-keyspace-profiles.ts` | Route/keyspace expansion |
+| Profile helper | internal library | `src/legacy/build-business-op-profiles.ts` | Business operation profile construction |
+| Diagnostics | `perf summarize-shapes` | `src/commands/summarize-shapes.ts` | Name-agnostic structural shape summary |
 
 ## Output Layout
 
@@ -573,16 +485,10 @@ Typical artifacts include:
 
 ## Cleanup
 
-Target TS command:
+Command:
 
 ```bash
 pnpm --dir graphql/server perf reset-business-data --run-dir "$RUN_DIR"
-```
-
-Legacy command today:
-
-```bash
-node graphql/server/perf/reset-business-test-data.mjs --run-dir "$RUN_DIR"
 ```
 
 Cleanup semantics:
