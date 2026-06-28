@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/ollama@2.1.0...@agentic-kit/ollama@2.2.0) (2026-06-28)
+
+**Note:** Version bump only for package @agentic-kit/ollama
+
 # 2.1.0 (2026-06-14)
 
 ### Features

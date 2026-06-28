@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.19.0](https://github.com/constructive-io/constructive/compare/etag-hash@2.18.0...etag-hash@2.19.0) (2026-06-28)
+
+**Note:** Version bump only for package etag-hash
+
 # [2.18.0](https://github.com/constructive-io/constructive/compare/etag-hash@2.17.1...etag-hash@2.18.0) (2026-05-30)
 
 **Note:** Version bump only for package etag-hash

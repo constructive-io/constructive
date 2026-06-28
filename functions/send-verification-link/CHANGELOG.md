@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.14.1...@constructive-io/send-verification-link-fn@2.15.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/send-verification-link-fn
+
 ## [2.14.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-verification-link-fn@2.14.0...@constructive-io/send-verification-link-fn@2.14.1) (2026-06-22)
 
 **Note:** Version bump only for package @constructive-io/send-verification-link-fn
