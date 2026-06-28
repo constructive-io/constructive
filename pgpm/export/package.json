@@ -50,7 +50,7 @@
     "csv-to-pg": "workspace:^",
     "glob": "^13.0.6",
     "inflekt": "^0.7.1",
-    "inquirerer": "^4.9.0",
+    "inquirerer": "^4.9.1",
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^"
