@@ -41,11 +41,11 @@
     "constructive"
   ],
   "dependencies": {
-    "@inquirerer/utils": "^3.3.8",
+    "@inquirerer/utils": "^3.3.9",
     "@pgpmjs/logger": "workspace:^",
     "@pgsql/traverse": "^17.2.6",
     "@pgsql/types": "^17.6.2",
-    "inquirerer": "^4.9.0",
+    "inquirerer": "^4.9.1",
     "pg": "^8.21.0",
     "pg-env": "workspace:^",
     "pgsql-deparser": "^17.18.3",
