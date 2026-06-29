@@ -1,0 +1,25 @@
+{
+  "name": "k10-5min",
+  "connectionPolicy": "reuse",
+  "routingModes": [
+    "private",
+    "public"
+  ],
+  "cacheModes": [
+    "old",
+    "new"
+  ],
+  "scaleProfile": {
+    "name": "k10-5min",
+    "k": 10,
+    "durationSeconds": 300,
+    "workers": 4
+  },
+  "workloadProfiles": {
+    "private": "metadata-read",
+    "public": "business-crud"
+  },
+  "publicPreflight": {
+    "allowUnderProvisioned": false
+  }
+}
