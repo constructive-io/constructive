@@ -13,6 +13,34 @@ The implementation is centered on Jest and `getConnections()`. A benchmark run o
 - The implementation must not shell out to external benchmark CLIs or shell scripts.
 - Preflight is not a standalone command. It is an internal step used by public-routing cases before measured load starts.
 - The benchmark suite is local / opt-in and must not be part of the default test path or CI unless a future perf job explicitly opts in.
+- Implementation must be derived from this spec and `README.md`.
+- Exploratory implementation branches may be used as validation evidence and API examples, but they do not define additional requirements.
+
+## Reference implementation branch
+
+The exploratory implementation that validated the `constructive-local` DBPM strategy is preserved on branch:
+
+```text
+perf/constructive-local-dbpm-reference
+```
+
+That branch is a technical reference for API shape and failure modes only. A new implementation should not infer requirements from it when this spec says otherwise.
+
+## Constructive-local baseline
+
+The benchmark baseline is the `constructive-local` pgpm service from the companion `constructive-db` checkout.
+
+Required behavior:
+
+- `getConnections()` must create an isolated temporary test database.
+- Before the benchmark server starts, setup must install `constructive-local` through pgpm seed/bootstrap.
+- After the server starts, setup and workload operations must use GraphQL where the product surface can express the operation.
+- The implementation must not hard-code a developer-specific absolute path to `constructive-local`.
+- Path resolution must support `PERF_CONSTRUCTIVE_LOCAL_PATH`.
+- Without an explicit path override, path resolution should discover `constructive-db/services/constructive-local` from the local repository layout, for example by checking sibling or ancestor directories around the current `constructive` checkout.
+- If `constructive-local` cannot be found, the benchmark must fail with an actionable error before measured load.
+
+The implementation must not fall back to older simple fixtures for the public benchmark matrix. SQL/bootstrap work is allowed only to install the baseline service before GraphQL can serve requests, or for benchmark-owned reset boundaries described later in this spec.
 
 ## Matrix dimensions
 
@@ -31,7 +59,7 @@ For the first version, `k` is shared across routing modes:
 Default workload profiles:
 
 - `private`: metadata/read-oriented workload
-- `public`: business CRUD-oriented workload
+- `public`: DBPM-backed business-table workload
 
 ## Initial config groups
 
@@ -70,13 +98,16 @@ Public preflight should run these stages in order:
 
 2. **DBPM provision**
    - Provision the DBPM-backed tenants, APIs, public hosts, and business API/table metadata needed by the selected `k`.
+   - Use the `constructive-local` DBPM GraphQL surface through a private admin GraphQL route connected to the same temporary test database.
    - Run inside the active benchmark context.
    - Do not depend on a manually started external server.
    - Do not expose DBPM provision as a standalone benchmark command.
 
 3. **Business workload preparation**
-   - Ensure the public business workload has tables/data suitable for create, get-by-id, update-by-id, and list-recent style operations.
-   - Prepare benchmark-owned schemas/tables only.
+   - Ensure the public business workload has benchmark-owned tables/data suitable for the selected operation mix.
+   - The first accepted public workload floor is list/read traffic against the benchmark-owned table plus route sanity operations.
+   - Full create/update/delete traffic may be added when the public GraphQL mutation shape is stable for the benchmark.
+   - Prepare benchmark-owned schemas/tables/data only.
 
 4. **Access preparation**
    - Prepare role/grant access required by the public workload.
@@ -118,6 +149,19 @@ Execution model:
 
 The DBPM provision helper should be callable code used by preflight. It can have focused implementation tests, but benchmark users should not run it directly as the public benchmark interface.
 
+The validated `constructive-local` DBPM flow is:
+
+1. acquire a public benchmark context through `getConnections()`;
+2. create or use a private admin GraphQL surface against the same test database and pg connection settings;
+3. call private GraphQL DBPM provision, such as `createDatabaseProvisionModule`, to create a benchmark-owned tenant/database/public API host;
+4. inspect generated service metadata through private GraphQL, including services and metaschema metadata;
+5. identify the generated public `api` host and `app_public` schema for the provisioned tenant;
+6. create a benchmark-owned business table through private GraphQL, such as `provisionTable`;
+7. introspect the generated public host schema through public host routing;
+8. derive public request profiles and operation metadata from the actual generated host/table shape.
+
+The private admin GraphQL surface is an internal preflight helper. It must use the same isolated temporary database as the public benchmark server. It must not be a manually started external service and must not become a public benchmark entrypoint.
+
 Required DBPM provision output:
 
 - public tenant / host profiles usable by the load runner;
@@ -132,10 +176,12 @@ Public preflight hard gates:
 
 - DBPM provision completed without unexpected errors;
 - provisioned tenant/host/profile counts satisfy the selected `k`, unless under-provisioning is explicitly allowed;
+- provisioned benchmark-owned business table count satisfies the selected `k`, unless under-provisioning is explicitly allowed;
 - generated request profiles are non-empty;
 - generated operation profiles are non-empty;
 - public access preparation did not touch non-benchmark objects;
 - route probes completed successfully;
+- route probes succeed for every probed generated profile;
 - GraphQL responses contain zero unexpected errors;
 - the preflight artifact was written.
 
@@ -163,6 +209,7 @@ interface PublicPreflightResult {
   operationProfiles: OperationProfile[];
   artifactPath: string;
   hardGateFailures: string[];
+  errorSamples: RedactedErrorSample[];
 }
 ```
 
@@ -334,7 +381,6 @@ Initial target layout:
 ```text
 graphql/server-test/perf/
   README.md
-  README.bak
   SPEC.md
   jest.config.js
   e2e-matrix.perf.ts
@@ -553,6 +599,7 @@ is required only if a future CI perf job intentionally runs these benchmarks und
 | `PERF_SPEC` | unset | Optional JSON spec path. When provided, it overlays the selected config group. |
 | `PERF_RUN_DIR` | generated under `/tmp/constructive-perf/` | Artifact output directory |
 | `PERF_CONNECTION_POLICY` | `reuse` | `reuse` or `per-case` |
+| `PERF_CONSTRUCTIVE_LOCAL_PATH` | auto-discovered | Explicit path to `constructive-db/services/constructive-local` |
 
 ### 5.3 Matrix overrides
 
@@ -739,6 +786,8 @@ interface PreflightReport {
     businessTableCount: number;
     reportPath?: string;
     errors: RedactedErrorSample[];
+    source: 'graphql' | 'unavailable';
+    warnings: string[];
   };
   profiles: {
     requestProfileCount: number;
@@ -750,7 +799,32 @@ interface PreflightReport {
 }
 ```
 
-### 6.5 Load report
+### 6.5 Request profile metadata
+
+Public request profiles generated from DBPM preflight must preserve enough metadata to audit and operate against the generated public target.
+
+Minimum public profile metadata:
+
+```ts
+interface PublicRequestProfileMetadata {
+  source: 'constructive-local-dbpm-graphql';
+  host: string;
+  apiId: string;
+  domainId: string;
+  databaseId: string;
+  schemaId: string;
+  schemaName: string;
+  tableName: string;
+  tableId: string;
+  listField: string;
+  createField?: string;
+  updateField?: string;
+}
+```
+
+The public workload must use the generated metadata rather than hard-coded public field names when the table/field names are run- or case-scoped.
+
+### 6.6 Load report
 
 Minimum shape embedded in the case report:
 
@@ -782,7 +856,18 @@ interface LoadReport {
 }
 ```
 
-### 6.6 Hard gates vs observations
+### 6.7 Load/statistics robustness
+
+The load runner and statistics code must handle long local runs and high request counts.
+
+Required robustness behavior:
+
+- do not use JavaScript argument spreading such as `Math.max(...values)` or `Math.min(...values)` on latency arrays that can grow with request count;
+- compute latency min/max/percentiles in a way that does not hit call stack or argument-count limits;
+- if load or statistics throws, the case should still write a case report and error artifact when possible;
+- thrown failures must be represented as hard gate failures.
+
+### 6.8 Hard gates vs observations
 
 Hard gates fail a case. Initial hard gates are:
 
@@ -815,7 +900,10 @@ The implementation is considered complete when:
 - the target directory/file layout exists;
 - the Jest perf entrypoint runs config groups through the matrix runner;
 - `smoke`, `public-smoke`, `private-cache-compare`, and `k10-5min` are represented as built-in config groups or specs;
-- public cases run DBPM provision through public preflight;
+- `getConnections()` installs `constructive-local` for the benchmark baseline;
+- public cases run DBPM provision through public preflight using the private GraphQL DBPM surface on the same test database;
+- `public-smoke` can provision enough public profiles for its selected `k` and complete measured load through public host routing;
+- public/new `k10-5min` can provision `k=10` public profiles and complete the selected measured load duration through public host routing;
 - setup after server start is GraphQL-first;
 - connection policy defaults to `reuse` and supports `per-case`;
 - per-case and aggregate JSON reports are written;
@@ -853,3 +941,5 @@ Generated artifacts should stay out of git.
 - No strict QPS/latency regression threshold by default.
 - No sweep/stress command surface in the first version.
 - No shape-variant dimension unless explicitly added later.
+- No developer-specific absolute path to `constructive-local`.
+- No requirement that the first public workload exercise full create/update/delete mutations before those mutation shapes are explicitly stabilized for the benchmark.

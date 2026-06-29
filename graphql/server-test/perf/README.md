@@ -4,13 +4,11 @@ This directory is for the new `graphql/server-test` performance benchmark rewrit
 
 The confirmed implementation details live in [`SPEC.md`](./SPEC.md). This README and `SPEC.md` are the source of truth for the new implementation. Do not infer requirements from older perf code or compatibility scripts.
 
-The earlier exploratory draft is preserved in [`README.bak`](./README.bak) for history only. Do not implement from it unless a section is explicitly promoted into this README or `SPEC.md`.
-
 ## Status
 
-Draft / design in progress.
+Design confirmed; implementation target ready.
 
-We are confirming the benchmark scope, file layout, and execution model before implementing the Jest perf runner.
+The `constructive-local` DBPM strategy has been validated by an exploratory implementation. That code is preserved on the reference branch `perf/constructive-local-dbpm-reference` for implementation reference only. Future work should implement from this README and `SPEC.md`; the reference branch is not a source of additional requirements.
 
 ## Confirmed decisions
 
@@ -25,6 +23,10 @@ We are confirming the benchmark scope, file layout, and execution model before i
 - Preflight is part of the benchmark implementation, not a separately exposed command; it is only needed for public-routing cases.
 - A benchmark run should be selected through config groups/specs that determine which matrix dimensions are exercised in that run.
 - Benchmark execution must stay inside the new Jest / `getConnections()` implementation and must not shell out to external benchmark CLIs or shell scripts.
+- The benchmark baseline seed is the `constructive-local` pgpm service from the companion `constructive-db` checkout.
+- `constructive-local` must be resolved from the local repository layout or `PERF_CONSTRUCTIVE_LOCAL_PATH`; implementation must not hard-code a developer-specific absolute path.
+- Public-route preflight uses a private GraphQL DBPM surface against the same test database to provision public tenants, hosts, and benchmark-owned business tables.
+- Public measured load must go through real public host routing after preflight succeeds.
 
 ## Benchmark scope
 
@@ -47,7 +49,7 @@ For the first version, `k` is a single shared scale value. Its concrete meaning 
 For the first version, the default workload profiles are:
 
 - `private`: metadata/read-oriented workload
-- `public`: business CRUD-oriented workload
+- `public`: DBPM-backed business-table workload
 
 ## Config groups
 
@@ -63,6 +65,43 @@ Initial config groups:
 | `k10-5min` | `private,public` | `old,new` | `k=10`, `duration=5min` | First full local benchmark matrix |
 
 Additional config groups can be added later, but they should not expand the default scope until the first matrix is stable.
+
+## Constructive-local DBPM strategy
+
+The perf suite uses `constructive-local` as the shared local baseline for both private and public benchmark cases.
+
+`getConnections()` must create the temporary test database, install `constructive-local`, start a real `@constructive-io/graphql-server` HTTP server, and provide teardown. The implementation may discover the companion `constructive-db/services/constructive-local` path by walking local ancestor/sibling repository directories, and it must allow an explicit `PERF_CONSTRUCTIVE_LOCAL_PATH` override for non-standard checkouts.
+
+For public-routing cases, preflight prepares the public profiles through GraphQL:
+
+- start with the public benchmark context from `getConnections()`;
+- use a private admin GraphQL surface connected to the same test database;
+- provision DBPM tenants/databases through private GraphQL;
+- inspect generated services metadata through GraphQL;
+- create benchmark-owned public business tables through GraphQL;
+- introspect the generated public host schema;
+- generate request profiles from the actual public host/table metadata;
+- probe those profiles through public host routing before measured load begins.
+
+This private-then-public flow is part of public preflight. It is not a separate user-facing command and must not shell out to legacy DBPM or perf scripts.
+
+## Validation evidence
+
+The exploratory implementation validated these behaviors on June 29, 2026:
+
+- default Jest discovery did not include `perf/e2e-matrix.perf.ts`;
+- perf unit tests passed;
+- private smoke passed through the `constructive-local` private metadata routes;
+- public smoke provisioned one DBPM public profile and completed measured load;
+- public/new `k10-5min` provisioned 10 DBPM tenants, 10 public hosts, and 10 benchmark-owned business tables, then completed a 5 minute measured load with zero failed requests.
+
+These results are evidence for the selected design, not fixed performance thresholds. QPS and latency are observations unless `SPEC.md` adds explicit threshold behavior later.
+
+## Current public workload floor
+
+The first implementation must prove public host routing against benchmark-owned DBPM business tables. The minimum accepted public operation mix is list/read traffic against the provisioned benchmark table plus lightweight route sanity operations.
+
+Full create/update/delete mutation traffic can be added once the public GraphQL mutation shape is treated as stable for the benchmark. Until then, the `business-crud` workload name should be understood as the public business-table workload, not a promise that every CRUD mutation is exercised.
 
 ## Target details
 
