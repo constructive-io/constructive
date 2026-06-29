@@ -8,7 +8,7 @@ The implementation is centered on Jest and `getConnections()`. A benchmark run o
 
 - `README.md` and this spec are the source of truth for the new implementation.
 - Do not infer requirements from older perf code, compatibility scripts, or historical drafts.
-- The public interface is a Jest benchmark runner selected by config groups/specs.
+- The public interface is a Jest benchmark runner selected by config groups and optional config overlays.
 - Benchmark execution must stay inside this new Jest / `getConnections()` implementation.
 - The implementation must not shell out to external benchmark CLIs or shell scripts.
 - Preflight is not a standalone command. It is an internal step used by public-routing cases before measured load starts.
@@ -58,8 +58,19 @@ For the first version, `k` is shared across routing modes:
 
 Default workload profiles:
 
-- `private`: metadata/read-oriented workload
-- `public`: DBPM-backed business-table workload
+- `private`: `metadata-read` for smoke; `cache-key-shared` for cache comparison matrices
+- `public`: `business-crud`, a DBPM-backed business-table workload
+
+Private workload profiles:
+
+- `metadata-read`: reads constructive-local metadata routes.
+- `cache-key-shared`: creates `k` distinct private svc_key routes with identical build inputs, so new cache mode can dedupe them to fewer buildKey handlers.
+- `cache-key-distinct`: creates `k` distinct private svc_key routes with different schema combinations where possible, for no-dedupe cache comparison.
+
+Public workload profiles:
+
+- `business-crud`: runs create/getById/update/list traffic against the benchmark-owned DBPM table plus low-weight route sanity traffic.
+- `business-read`: optional read-only public table workload for debugging.
 
 ## Initial config groups
 
@@ -67,7 +78,8 @@ Default workload profiles:
 | --- | --- | --- | --- | --- |
 | `smoke` | `private` | `new` | very small / short | Fast runner and private-route sanity check |
 | `public-smoke` | `public` | `new` | very small / short | Fast public-route sanity check with internal preflight |
-| `private-cache-compare` | `private` | `old,new` | about 1 minute | Lightweight old/new cache comparison for private routing |
+| `private-cache-compare` | `private` | `old,new` | about 1 minute | Shared-buildKey old/new cache comparison for private routing |
+| `private-cache-distinct` | `private` | `old,new` | about 1 minute | Distinct-buildKey old/new cache comparison for private routing |
 | `k10-5min` | `private,public` | `old,new` | `k=10`, `duration=5min` | First full local benchmark matrix |
 
 ## 1. Public preflight spec
@@ -105,8 +117,8 @@ Public preflight should run these stages in order:
 
 3. **Business workload preparation**
    - Ensure the public business workload has benchmark-owned tables/data suitable for the selected operation mix.
-   - The first accepted public workload floor is list/read traffic against the benchmark-owned table plus route sanity operations.
-   - Full create/update/delete traffic may be added when the public GraphQL mutation shape is stable for the benchmark.
+   - The `business-crud` workload must exercise create/getById/update/list traffic against the benchmark-owned table plus route sanity operations.
+   - The public GraphQL list/create/update shape must be discovered from schema introspection instead of hard-coded developer-local names.
    - Prepare benchmark-owned schemas/tables/data only.
 
 4. **Access preparation**
@@ -384,10 +396,11 @@ graphql/server-test/perf/
   SPEC.md
   jest.config.js
   e2e-matrix.perf.ts
-  specs/
+  config-groups/
     smoke.json
     public-smoke.json
     private-cache-compare.json
+    private-cache-distinct.json
     k10-5min.json
   reports/
     .gitignore
@@ -571,7 +584,7 @@ Preferred cleanup order:
 
 ## 5. Parameter interface and override precedence
 
-The first implementation should use environment variables plus optional JSON specs. This keeps Jest invocation simple and avoids relying on custom Jest CLI flags.
+The first implementation should use environment variables plus optional JSON config overlays. This keeps Jest invocation simple and avoids relying on custom Jest CLI flags.
 
 ### 5.1 Required opt-in
 
@@ -595,8 +608,9 @@ is required only if a future CI perf job intentionally runs these benchmarks und
 
 | Env var | Default | Meaning |
 | --- | --- | --- |
-| `PERF_CONFIG_GROUP` | `smoke` | Built-in config group to run: `smoke`, `public-smoke`, `private-cache-compare`, or `k10-5min` |
-| `PERF_SPEC` | unset | Optional JSON spec path. When provided, it overlays the selected config group. |
+| `PERF_CONFIG_GROUP` | `smoke` | Built-in config group to run: `smoke`, `public-smoke`, `private-cache-compare`, `private-cache-distinct`, or `k10-5min` |
+| `PERF_CONFIG_PATH` | unset | Optional JSON config overlay path. When provided, it overlays the selected config group. |
+| `PERF_SPEC` | unset | Legacy alias for `PERF_CONFIG_PATH`; do not use for new commands. |
 | `PERF_RUN_DIR` | generated under `/tmp/constructive-perf/` | Artifact output directory |
 | `PERF_CONNECTION_POLICY` | `reuse` | `reuse` or `per-case` |
 | `PERF_CONSTRUCTIVE_LOCAL_PATH` | auto-discovered | Explicit path to `constructive-db/services/constructive-local` |
@@ -613,6 +627,9 @@ is required only if a future CI perf job intentionally runs these benchmarks und
 | `PERF_PRIVATE_WORKLOAD` | Override private workload profile name |
 | `PERF_PUBLIC_WORKLOAD` | Override public workload profile name |
 | `PERF_ALLOW_UNDERPROVISIONED` | If `1`, allow explicit under-provisioning for smoke/debug runs |
+| `PERF_GRAPHILE_CACHE_MAX` | Set and record `GRAPHILE_CACHE_MAX` for the benchmark server process |
+| `PERF_MULTI_TENANCY_CACHE_MAX` | Set and record `GRAPHILE_MULTI_TENANCY_CACHE_MAX` for the benchmark server process |
+| `PERF_PG_CACHE_MAX` | Set and record `PG_CACHE_MAX` for the benchmark server process |
 
 ### 5.4 Runtime behavior overrides
 
@@ -631,15 +648,15 @@ Config is resolved in this order:
 ```text
 built-in defaults
   < built-in config group
-  < PERF_SPEC JSON overlay
+  < PERF_CONFIG_PATH JSON overlay
   < PERF_* environment overrides
 ```
 
-The normalized config written to `summary.json` must include both the resolved values and enough source metadata to explain which group/spec/overrides produced the run.
+The normalized config written to `summary.json` must include both the resolved values and enough source metadata to explain which group/config overlay/env overrides produced the run.
 
-### 5.6 JSON spec shape
+### 5.6 JSON config overlay shape
 
-A JSON spec may override any normalized config field, but should keep the same concepts as the built-in groups.
+A JSON config overlay may override any normalized config field, but should keep the same concepts as the built-in groups.
 
 Minimal shape:
 
@@ -656,8 +673,13 @@ Minimal shape:
     "workers": 4
   },
   "workloadProfiles": {
-    "private": "metadata-read",
+    "private": "cache-key-shared",
     "public": "business-crud"
+  },
+  "cacheSizes": {
+    "graphileCacheMax": 50,
+    "multiTenancyCacheMax": 50,
+    "pgCacheMax": 50
   },
   "publicPreflight": {
     "allowUnderProvisioned": false
@@ -687,7 +709,7 @@ interface PerfRunSummary {
   runId: string;
   runDir: string;
   configGroup: string;
-  specPath?: string;
+  configPath?: string;
   startedAt: string;
   finishedAt: string;
   pass: boolean;
@@ -899,7 +921,7 @@ The implementation is considered complete when:
 
 - the target directory/file layout exists;
 - the Jest perf entrypoint runs config groups through the matrix runner;
-- `smoke`, `public-smoke`, `private-cache-compare`, and `k10-5min` are represented as built-in config groups or specs;
+- `smoke`, `public-smoke`, `private-cache-compare`, `private-cache-distinct`, and `k10-5min` are represented as built-in config groups or specs;
 - `getConnections()` installs `constructive-local` for the benchmark baseline;
 - public cases run DBPM provision through public preflight using the private GraphQL DBPM surface on the same test database;
 - `public-smoke` can provision enough public profiles for its selected `k` and complete measured load through public host routing;

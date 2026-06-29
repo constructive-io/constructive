@@ -1,0 +1,19 @@
+{
+  "name": "smoke",
+  "connectionPolicy": "reuse",
+  "routingModes": ["private"],
+  "cacheModes": ["new"],
+  "scaleProfile": {
+    "name": "smoke",
+    "k": 1,
+    "durationSeconds": 5,
+    "workers": 1
+  },
+  "workloadProfiles": {
+    "private": "metadata-read",
+    "public": "business-crud"
+  },
+  "publicPreflight": {
+    "allowUnderProvisioned": false
+  }
+}

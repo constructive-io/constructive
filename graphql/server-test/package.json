@@ -26,7 +26,8 @@
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:perf": "jest --config perf/jest.config.js --runInBand"
   },
   "devDependencies": {
     "@0no-co/graphql.web": "^1.2.0",

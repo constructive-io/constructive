@@ -1,0 +1,19 @@
+{
+  "name": "private-cache-distinct",
+  "connectionPolicy": "reuse",
+  "routingModes": ["private"],
+  "cacheModes": ["old", "new"],
+  "scaleProfile": {
+    "name": "private-cache-distinct",
+    "k": 10,
+    "durationSeconds": 60,
+    "workers": 2
+  },
+  "workloadProfiles": {
+    "private": "cache-key-distinct",
+    "public": "business-crud"
+  },
+  "publicPreflight": {
+    "allowUnderProvisioned": false
+  }
+}
