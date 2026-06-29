@@ -1,23 +1,16 @@
-import path from 'path';
-
 import type { GetConnectionsResult } from '../../src/types';
 
-import { DEFAULT_DATABASE_ID, META_SCHEMAS, SIMPLE_PETS_SCHEMAS } from './operations';
+import {
+  CONSTRUCTIVE_LOCAL_SEED_PATH,
+  CONSTRUCTIVE_SCHEMAS,
+  DEFAULT_DATABASE_ID,
+  META_SCHEMAS,
+} from './operations';
 import type { BenchmarkContext, MatrixCase, PerfRunConfig } from './types';
 
-const seedRoot = path.join(__dirname, '..', '..', '..', '..', '__fixtures__', 'seed');
-const shared = (...segments: string[]) => path.join(seedRoot, ...segments);
-
-const servicesSeedAdapters = () => {
+const constructiveLocalSeedAdapters = () => {
   const { seed } = require('../../src') as typeof import('../../src');
-  return [
-    seed.sqlfile([
-      shared('services', 'setup.sql'),
-      shared('app-schemas', 'simple-pets', 'schema.sql'),
-      shared('services', 'test-data.sql'),
-      shared('app-schemas', 'simple-pets', 'test-data.sql'),
-    ]),
-  ];
+  return [seed.pgpm(CONSTRUCTIVE_LOCAL_SEED_PATH, true)];
 };
 
 interface ManagedContext {
@@ -38,7 +31,7 @@ export class BenchmarkContextManager {
     return [
       `routing=${matrixCase.routingMode}`,
       `cache=${matrixCase.cacheMode}`,
-      'seed=simple-pets-services',
+      'seed=constructive-local',
       `memory=${this.config.captureMemory ? 'capture' : 'skip'}`,
     ].join('|');
   }
@@ -113,10 +106,11 @@ export class BenchmarkContextManager {
   private async createContext(matrixCase: MatrixCase, compatibilityKey: string): Promise<BenchmarkContext> {
     this.patchObservabilityEnv();
 
-    const { getConnections } = require('../../src') as typeof import('../../src');
+    const { createSuperTestAgent, createTestServer, getConnections } = require('../../src') as typeof import('../../src');
+    const { getEnvOptions } = require('@constructive-io/graphql-env') as typeof import('@constructive-io/graphql-env');
     const conn: GetConnectionsResult = await getConnections(
       {
-        schemas: SIMPLE_PETS_SCHEMAS,
+        schemas: CONSTRUCTIVE_SCHEMAS,
         authRole: 'anonymous',
         server: {
           api: {
@@ -128,8 +122,29 @@ export class BenchmarkContextManager {
           } as any,
         },
       },
-      servicesSeedAdapters()
+      constructiveLocalSeedAdapters()
     );
+
+    let privateServer: any;
+    let privateRequest: any;
+    if (matrixCase.routingMode === 'public') {
+      privateServer = await createTestServer(
+        getEnvOptions({
+          pg: conn.pg.config,
+          api: {
+            enableServicesApi: true,
+            isPublic: false,
+            metaSchemas: META_SCHEMAS,
+            defaultDatabaseId: DEFAULT_DATABASE_ID,
+            exposedSchemas: META_SCHEMAS,
+            anonRole: 'anonymous',
+            roleName: 'anonymous',
+            useMultiTenancyCache: matrixCase.cacheMode === 'new',
+          } as any,
+        })
+      );
+      privateRequest = createSuperTestAgent(privateServer);
+    }
 
     const id = `ctx-${this.nextId++}`;
     return {
@@ -140,6 +155,9 @@ export class BenchmarkContextManager {
       serverUrl: conn.server.url,
       graphqlUrl: conn.server.graphqlUrl,
       conn,
+      privateServer,
+      privateRequest,
+      privateServerUrl: privateServer?.url,
     };
   }
 
@@ -147,6 +165,9 @@ export class BenchmarkContextManager {
     const managed = this.contexts.get(key);
     if (!managed) return;
     this.contexts.delete(key);
+    if (managed.context.privateServer) {
+      await managed.context.privateServer.stop();
+    }
     await managed.context.conn.teardown();
   }
 }

@@ -2,8 +2,8 @@ import type { LoadReport, RequestOutcome } from './types';
 
 export const percentile = (values: number[], p: number): number | null => {
   if (values.length === 0) return null;
-  if (p <= 0) return Math.min(...values);
-  if (p >= 1) return Math.max(...values);
+  if (p <= 0) return values.reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
+  if (p >= 1) return values.reduce((max, value) => Math.max(max, value), Number.NEGATIVE_INFINITY);
   const sorted = [...values].sort((a, b) => a - b);
   const index = Math.max(0, Math.ceil(p * sorted.length) - 1);
   return sorted[index];

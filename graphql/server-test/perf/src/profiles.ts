@@ -2,10 +2,8 @@ import {
   buildPrivateOperationProfiles,
   buildPublicOperationProfiles,
   metaHeaders,
-  privateApiHeaders,
-  privateSchemataHeaders,
-  publicHostHeaders,
-  PUBLIC_HOST,
+  privateModulesHeaders,
+  privateServicesHeaders,
 } from './operations';
 import type {
   DbpmProvisionResult,
@@ -17,31 +15,31 @@ import type {
 
 const basePrivateProfiles = (): RequestProfile[] => [
   {
-    id: 'private-api',
+    id: 'private-services',
     routingMode: 'private',
-    routeKey: 'api:simple-pets:private',
-    headers: privateApiHeaders(),
-    description: 'Private services API route selected by X-Api-Name.',
+    routeKey: 'schemata:services_public,metaschema_public',
+    headers: privateServicesHeaders(),
+    description: 'Constructive-local services/metaschema route selected by X-Schemata.',
     benchmarkOwned: false,
-    metadata: { source: 'simple-seed-services' },
+    metadata: { source: 'constructive-local' },
   },
   {
-    id: 'private-schemata',
+    id: 'private-modules',
     routingMode: 'private',
-    routeKey: 'schemata:simple-pets-public,simple-pets-pets-public',
-    headers: privateSchemataHeaders(),
-    description: 'Private direct schema route selected by X-Schemata.',
+    routeKey: 'schemata:metaschema_modules_public',
+    headers: privateModulesHeaders(),
+    description: 'Constructive-local DBPM modules route selected by X-Schemata.',
     benchmarkOwned: false,
-    metadata: { source: 'simple-seed-services' },
+    metadata: { source: 'constructive-local' },
   },
   {
     id: 'private-meta',
     routingMode: 'private',
-    routeKey: 'metaschema:simple-pets',
+    routeKey: 'metaschema:constructive-local',
     headers: metaHeaders(),
     description: 'Private metadata route selected by X-Meta-Schema.',
     benchmarkOwned: false,
-    metadata: { source: 'simple-seed-services' },
+    metadata: { source: 'constructive-local' },
   },
 ];
 
@@ -85,18 +83,6 @@ export const buildPublicProfilesFromProvision = (
   provision: Pick<DbpmProvisionResult, 'requestProfiles'>,
   matrixCase: MatrixCase
 ): { requestProfiles: RequestProfile[]; operationProfiles: RuntimeOperationProfile[] } => ({
-  requestProfiles: provision.requestProfiles.length
-    ? provision.requestProfiles
-    : [
-        {
-          id: 'public-app',
-          routingMode: 'public',
-          routeKey: PUBLIC_HOST,
-          headers: publicHostHeaders(),
-          description: 'Public app host route from simple-seed-services.',
-          benchmarkOwned: false,
-          metadata: { host: PUBLIC_HOST, source: 'simple-seed-services' },
-        },
-      ],
+  requestProfiles: provision.requestProfiles,
   operationProfiles: buildPublicOperationProfiles(matrixCase.workloadProfile),
 });

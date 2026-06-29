@@ -1,5 +1,3 @@
-import type { Response } from 'supertest';
-
 import { toRedactedErrorSample } from './artifacts';
 import type {
   BenchmarkContext,
@@ -11,13 +9,22 @@ import type {
   RuntimeOperationProfile,
 } from './types';
 
-export const DEFAULT_DATABASE_ID = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
-export const SIMPLE_PETS_SCHEMAS = ['simple-pets-public', 'simple-pets-pets-public'];
-export const META_SCHEMAS = ['services_public', 'metaschema_public', 'metaschema_modules_public'];
-export const PUBLIC_HOST = 'app.test.constructive.io';
+export const DEFAULT_DATABASE_ID = '028752cb-510b-1438-2f39-64534bd1cbd7';
+export const CONSTRUCTIVE_LOCAL_SEED_PATH =
+  process.env.PERF_CONSTRUCTIVE_LOCAL_PATH ||
+  '/Users/zeta/Projects/interweb/src/agents/constructive-db/services/constructive-local';
+export const CONSTRUCTIVE_SCHEMAS = ['constructive_public'];
+export const META_SCHEMAS = [
+  'services_public',
+  'metaschema_public',
+  'metaschema_modules_public',
+  'constructive_auth_public',
+];
+export const SERVICES_SCHEMATA = 'services_public,metaschema_public';
+export const MODULES_SCHEMATA = 'metaschema_modules_public';
+export const PUBLIC_HOST = 'api.localhost';
 export const PRIVATE_API_NAME = 'private';
-export const PRIVATE_SCHEMATA = SIMPLE_PETS_SCHEMAS.join(',');
-export const BENCHMARK_ANIMAL_ID = 'a0000001-0000-0000-0000-000000000001';
+export const PRIVATE_SCHEMATA = SERVICES_SCHEMATA;
 
 export interface GraphqlHttpResult<T = any> {
   status: number;
@@ -34,9 +41,13 @@ export const executeGraphql = async <T = any>(
     query: string;
     variables?: Record<string, unknown>;
     headers?: Record<string, string>;
+    surface?: 'public' | 'private';
   }
 ): Promise<GraphqlHttpResult<T>> => {
-  let req = context.conn.request
+  const request = input.surface === 'private' && context.privateRequest
+    ? context.privateRequest
+    : context.conn.request;
+  let req = request
     .post('/graphql')
     .set('Content-Type', 'application/json');
 
@@ -67,6 +78,16 @@ export const privateSchemataHeaders = (): Record<string, string> => ({
   'X-Schemata': PRIVATE_SCHEMATA,
 });
 
+export const privateServicesHeaders = (): Record<string, string> => ({
+  'X-Database-Id': DEFAULT_DATABASE_ID,
+  'X-Schemata': SERVICES_SCHEMATA,
+});
+
+export const privateModulesHeaders = (): Record<string, string> => ({
+  'X-Database-Id': DEFAULT_DATABASE_ID,
+  'X-Schemata': MODULES_SCHEMATA,
+});
+
 export const publicHostHeaders = (host = PUBLIC_HOST): Record<string, string> => ({ Host: host });
 
 const metadataQuery = `query PerfMetadataRead {
@@ -75,29 +96,20 @@ const metadataQuery = `query PerfMetadataRead {
   apis(first: 5) { nodes { id name isPublic databaseId } }
 }`;
 
-const animalsListQuery = `query PerfAnimalsList($first: Int!) {
-  animals(first: $first) { nodes { id name species } }
-}`;
-
-const createAnimalMutation = `mutation PerfCreateAnimal($input: CreateAnimalInput!) {
-  createAnimal(input: $input) { animal { id name species } }
-}`;
-
-const updateAnimalMutation = `mutation PerfUpdateAnimal($input: UpdateAnimalInput!) {
-  updateAnimal(input: $input) { animal { id name species } }
+const modulesQuery = `query PerfModulesRead($first: Int!) {
+  databaseProvisionModules(first: $first) { nodes { id status databaseId completedAt } }
 }`;
 
 export const buildPrivateOperationProfiles = (workloadProfile: string): RuntimeOperationProfile[] => [
   {
-    id: 'private-animals-list',
-    name: 'private.animals.list',
+    id: 'private-services-metadata',
+    name: 'private.services.metadata',
     weight: 5,
     workloadProfile,
-    description: 'Read app animals through private service routing.',
+    description: 'Read Constructive services metadata through private direct schema routing.',
     mutates: false,
-    compatibleRequestProfileIds: ['private-api', 'private-schemata'],
-    query: animalsListQuery,
-    variables: { first: 5 },
+    compatibleRequestProfileIds: ['private-services', 'private-meta'],
+    query: metadataQuery,
   },
   {
     id: 'private-typename',
@@ -106,65 +118,47 @@ export const buildPrivateOperationProfiles = (workloadProfile: string): RuntimeO
     workloadProfile,
     description: 'Tiny private schema sanity query.',
     mutates: false,
-    compatibleRequestProfileIds: ['private-api', 'private-schemata'],
+    compatibleRequestProfileIds: ['private-services', 'private-modules', 'private-meta'],
     query: '{ __typename }',
   },
   {
-    id: 'private-metadata-read',
-    name: 'private.metadata.read',
+    id: 'private-modules-dbpm-read',
+    name: 'private.modules.dbpmRead',
     weight: 3,
     workloadProfile,
-    description: 'Read metadata through X-Meta-Schema private route.',
+    description: 'Read DBPM module records through private modules schema routing.',
     mutates: false,
-    compatibleRequestProfileIds: ['private-meta'],
-    query: metadataQuery,
+    compatibleRequestProfileIds: ['private-modules'],
+    query: modulesQuery,
+    variables: { first: 3 },
   },
 ];
 
 export const buildPublicOperationProfiles = (workloadProfile: string): RuntimeOperationProfile[] => [
   {
-    id: 'public-animals-list',
-    name: 'public.animals.list',
+    id: 'public-business-list',
+    name: 'public.business.list',
     weight: 8,
     workloadProfile,
-    description: 'List business animals through public host routing.',
+    description: 'List benchmark-owned DBPM business table rows through public host routing.',
     mutates: false,
-    query: animalsListQuery,
+    query: '{ __typename }',
+    buildQuery: ({ requestProfile }) => {
+      const listField = requestProfile.metadata.listField;
+      return typeof listField === 'string' && listField
+        ? `query PerfPublicBusinessList($first: Int!) { ${listField}(first: $first) { nodes { id label } } }`
+        : '{ __typename }';
+    },
     variables: { first: 5 },
   },
   {
-    id: 'public-animal-create',
-    name: 'public.animals.create',
-    weight: 1,
+    id: 'public-typename',
+    name: 'public.typename',
+    weight: 2,
     workloadProfile,
-    description: 'Create benchmark-owned business animal rows through GraphQL.',
-    mutates: true,
-    query: createAnimalMutation,
-    buildVariables: ({ sequence, config, matrixCase, requestProfile }) => ({
-      input: {
-        animal: {
-          name: `${config.benchmarkOwnedPrefix}_${matrixCase.caseId}_${requestProfile.id}_${sequence}`.slice(0, 240),
-          species: 'Perf',
-        },
-      },
-    }),
-  },
-  {
-    id: 'public-animal-update',
-    name: 'public.animals.update',
-    weight: 1,
-    workloadProfile,
-    description: 'Update a benchmark-owned business animal through GraphQL.',
-    mutates: true,
-    query: updateAnimalMutation,
-    buildVariables: ({ sequence, config, matrixCase, requestProfile }) => ({
-      input: {
-        id: requestProfile.metadata.benchmarkAnimalId,
-        animalPatch: {
-          name: `${config.benchmarkOwnedPrefix}_${matrixCase.caseId}_${requestProfile.id}_update_${sequence}`.slice(0, 240),
-        },
-      },
-    }),
+    description: 'Tiny public route sanity query.',
+    mutates: false,
+    query: '{ __typename }',
   },
 ];
 
@@ -201,8 +195,11 @@ export const executeOperation = async (input: {
     const variables = operation.buildVariables
       ? operation.buildVariables({ sequence, requestProfile, config, matrixCase })
       : operation.variables;
+    const query = operation.buildQuery
+      ? operation.buildQuery({ sequence, requestProfile, config, matrixCase })
+      : operation.query;
     response = await executeGraphql(context, {
-      query: operation.query,
+      query,
       variables,
       headers: requestProfile.headers,
     });

@@ -1,4 +1,3 @@
-import { toRedactedErrorSample } from './artifacts';
 import type { BenchmarkContext, MatrixCase, PerfRunConfig, RedactedErrorSample } from './types';
 
 export interface ResetResult {
@@ -13,23 +12,13 @@ export const resetBenchmarkOwnedData = async (input: {
   matrixCase: MatrixCase;
   config: PerfRunConfig;
 }): Promise<ResetResult> => {
-  const { context, matrixCase, config } = input;
-  if (!matrixCase.mutates) return { ok: true, skipped: true, errors: [] };
+  void input.context;
+  void input.matrixCase;
+  void input.config;
 
-  const prefix = `${config.benchmarkOwnedPrefix}_${matrixCase.caseId}_%`;
-  try {
-    const result = await context.conn.pg.query(
-      'DELETE FROM "simple-pets-pets-public".animals WHERE name LIKE $1',
-      [prefix]
-    );
-    return { ok: true, skipped: false, deletedRows: result.rowCount ?? 0, errors: [] };
-  } catch (error) {
-    return {
-      ok: false,
-      skipped: false,
-      errors: [
-        toRedactedErrorSample(error, { operation: 'reset.benchmarkOwnedAnimals' }) as RedactedErrorSample,
-      ],
-    };
-  }
+  // The current constructive-local DBPM public workload provisions case-scoped,
+  // benchmark-owned tenant databases/tables and uses read/list operations only.
+  // The temp database is dropped during context teardown, so no SQL reset is
+  // required between cases.
+  return { ok: true, skipped: true, errors: [] };
 };

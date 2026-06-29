@@ -175,5 +175,6 @@ export const runPublicPreflight = async (input: {
     operationProfiles,
     artifactPath,
     hardGateFailures,
+    errorSamples: [...provision.errors, ...setup.errors, ...routeProbe.errorSamples],
   };
 };

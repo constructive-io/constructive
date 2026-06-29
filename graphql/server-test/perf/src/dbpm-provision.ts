@@ -1,8 +1,8 @@
 import { toRedactedErrorSample } from './artifacts';
 import {
-  DEFAULT_DATABASE_ID,
   executeGraphql,
-  PUBLIC_HOST,
+  privateModulesHeaders,
+  privateServicesHeaders,
   publicHostHeaders,
   responseErrorSample,
   responseHasUnexpectedErrors,
@@ -17,240 +17,325 @@ import type {
   RequestProfile,
 } from './types';
 
+interface DbpmNode {
+  id: string;
+  databaseName: string;
+  ownerId: string;
+  subdomain: string;
+  domain: string;
+  status: string;
+  errorMessage?: string | null;
+  databaseId?: string | null;
+  completedAt?: string | null;
+}
+
 interface ApiNode {
   id: string;
   databaseId: string;
   name: string;
-  dbname?: string;
   isPublic: boolean;
-  roleName?: string;
-  anonRole?: string;
 }
 
 interface DomainNode {
   id: string;
   databaseId: string;
-  apiId?: string;
+  apiId?: string | null;
   subdomain?: string | null;
   domain?: string | null;
 }
 
-interface ApiSchemaNode {
+interface SchemaNode {
   id: string;
   databaseId: string;
-  apiId: string;
-  schemaId: string;
+  name: string;
+  schemaName: string;
+  isPublic: boolean;
 }
 
 interface ServicesSnapshot {
   apis?: { nodes: ApiNode[] };
   domains?: { nodes: DomainNode[] };
-  apiSchemas?: { nodes: ApiSchemaNode[] };
+  schemas?: { nodes: SchemaNode[] };
 }
 
+const SUDO_USER_ID = '00000000-0000-0000-0000-000000000002';
+const DBPM_MODULES = ['users_module'];
+
+const createDatabaseProvisionModuleMutation = `mutation PerfCreateDbpm($input: CreateDatabaseProvisionModuleInput!) {
+  createDatabaseProvisionModule(input: $input) {
+    databaseProvisionModule {
+      id
+      databaseName
+      ownerId
+      subdomain
+      domain
+      status
+      errorMessage
+      databaseId
+      completedAt
+    }
+  }
+}`;
+
 const servicesSnapshotQuery = `query PerfServicesSnapshot($first: Int!) {
-  apis(first: $first) { nodes { id databaseId name dbname isPublic roleName anonRole } }
+  apis(first: $first) { nodes { id databaseId name isPublic } }
   domains(first: $first) { nodes { id databaseId apiId subdomain domain } }
-  apiSchemas(first: $first) { nodes { id databaseId apiId schemaId } }
+  schemas(first: $first) { nodes { id databaseId name schemaName isPublic } }
 }`;
 
-const createApiMutation = `mutation PerfCreateApi($input: CreateApiInput!) {
-  createApi(input: $input) { api { id databaseId name dbname isPublic roleName anonRole } }
+const provisionTableMutation = `mutation PerfProvisionTable($input: ProvisionTableInput!) {
+  provisionTable(input: $input) {
+    result { outTableId outFields }
+  }
 }`;
 
-const createDomainMutation = `mutation PerfCreateDomain($input: CreateDomainInput!) {
-  createDomain(input: $input) { domain { id databaseId apiId subdomain domain } }
+const publicSchemaIntrospectionQuery = `query PerfPublicSchemaShape {
+  __schema {
+    queryType { fields { name } }
+    mutationType { fields { name } }
+  }
 }`;
 
-const createApiSchemaMutation = `mutation PerfCreateApiSchema($input: CreateApiSchemaInput!) {
-  createApiSchema(input: $input) { apiSchema { id databaseId apiId schemaId } }
-}`;
-
-const hostFromDomain = (domain: DomainNode): string | null => {
+const toHost = (domain: DomainNode): string | null => {
   if (!domain.domain) return null;
   return domain.subdomain ? `${domain.subdomain}.${domain.domain}` : domain.domain;
 };
 
-const profileFromDomain = (domain: DomainNode, index: number, benchmarkOwned: boolean): RequestProfile | null => {
-  const host = hostFromDomain(domain);
-  if (!host) return null;
-  return {
-    id: benchmarkOwned ? `public-benchmark-${index}` : 'public-app',
-    routingMode: 'public',
-    routeKey: host,
-    headers: publicHostHeaders(host),
-    description: benchmarkOwned
-      ? 'Benchmark-owned public host route provisioned for perf.'
-      : 'Pre-seeded public app host route from simple-seed-services.',
-    benchmarkOwned,
-    metadata: {
-      host,
-      domainId: domain.id,
-      apiId: domain.apiId,
-      databaseId: domain.databaseId,
-      source: benchmarkOwned ? 'graphql-provision' : 'simple-seed-services',
-    },
-  };
-};
+const safeLower = (value: string): string =>
+  value
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
 
-const publicProfilesFromSnapshot = (
-  snapshot: ServicesSnapshot,
-  config: PerfRunConfig,
-  matrixCase: MatrixCase
-): RequestProfile[] => {
-  const domains = snapshot.domains?.nodes || [];
-  const publicApis = new Map((snapshot.apis?.nodes || []).filter((api) => api.isPublic).map((api) => [api.id, api]));
-  const casePrefix = `${config.benchmarkOwnedPrefix}_${matrixCase.caseId}`.replace(/_/g, '-').toLowerCase();
+const safeDbName = (value: string): string =>
+  value
+    .replace(/[^a-zA-Z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toLowerCase();
 
-  const benchmarkDomains = domains.filter((domain) => {
-    const api = domain.apiId ? publicApis.get(domain.apiId) : undefined;
-    const host = hostFromDomain(domain) || '';
-    return Boolean(api && host.includes(casePrefix));
-  });
+const trimToken = (value: string, maxLength: number): string =>
+  value.slice(0, maxLength).replace(/[-_]+$/g, '');
 
-  const defaultApp = domains.find((domain) => {
-    const api = domain.apiId ? publicApis.get(domain.apiId) : undefined;
-    return api?.name === 'app' && hostFromDomain(domain) === PUBLIC_HOST;
-  });
+const uniqueBase = (config: PerfRunConfig, matrixCase: MatrixCase, index: number): string =>
+  trimToken(safeLower(`${config.benchmarkOwnedPrefix}-${index + 1}-${matrixCase.caseId}`), 48);
 
-  const profiles = benchmarkDomains
-    .map((domain, index) => profileFromDomain(domain, index + 1, true))
-    .filter(Boolean) as RequestProfile[];
+const tableStem = (base: string): string => trimToken(safeDbName(`perf_items_${base}`), 60);
 
-  if (defaultApp) {
-    profiles.unshift(profileFromDomain(defaultApp, 0, false)!);
-  }
-
-  return profiles;
-};
-
-const querySnapshotViaGraphql = async (
-  context: BenchmarkContext,
-  headers: Record<string, string>
-): Promise<{ snapshot?: ServicesSnapshot; errors: RedactedErrorSample[]; unavailable: boolean }> => {
+const queryServicesSnapshot = async (
+  context: BenchmarkContext
+): Promise<{ snapshot?: ServicesSnapshot; errors: RedactedErrorSample[] }> => {
   const response = await executeGraphql<ServicesSnapshot>(context, {
     query: servicesSnapshotQuery,
-    variables: { first: 200 },
-    headers,
+    variables: { first: 1000 },
+    headers: privateServicesHeaders(),
+    surface: 'private',
   });
 
   if (responseHasUnexpectedErrors(response)) {
-    return {
-      errors: [responseErrorSample(response, { operation: 'dbpm.snapshot' })],
-      unavailable: true,
-    };
+    return { errors: [responseErrorSample(response, { operation: 'dbpm.snapshot.private' })] };
   }
 
-  return { snapshot: response.body.data, errors: [], unavailable: false };
+  return { snapshot: response.body.data, errors: [] };
 };
 
-const tryGraphqlProvision = async (input: {
+const apiHostFor = (snapshot: ServicesSnapshot, databaseId: string): { host?: string; api?: ApiNode; domain?: DomainNode } => {
+  const apis = snapshot.apis?.nodes || [];
+  const domains = snapshot.domains?.nodes || [];
+  const api = apis.find((candidate) => candidate.databaseId === databaseId && candidate.name === 'api' && candidate.isPublic);
+  const domain = domains.find((candidate) => candidate.databaseId === databaseId && candidate.apiId === api?.id);
+  return { api, domain, host: domain ? toHost(domain) || undefined : undefined };
+};
+
+const appPublicSchemaFor = (snapshot: ServicesSnapshot, databaseId: string): SchemaNode | undefined =>
+  (snapshot.schemas?.nodes || []).find((schema) => schema.databaseId === databaseId && schema.name === 'app_public');
+
+const introspectPublicTableShape = async (input: {
   context: BenchmarkContext;
-  matrixCase: MatrixCase;
+  host: string;
+  tableName: string;
+}): Promise<{ listField?: string; createField?: string; updateField?: string; errors: RedactedErrorSample[] }> => {
+  const { context, host, tableName } = input;
+  const response = await executeGraphql<{
+    __schema?: {
+      queryType?: { fields?: Array<{ name: string }> };
+      mutationType?: { fields?: Array<{ name: string }> };
+    };
+  }>(context, {
+    query: publicSchemaIntrospectionQuery,
+    headers: publicHostHeaders(host),
+  });
+
+  if (responseHasUnexpectedErrors(response)) {
+    return { errors: [responseErrorSample(response, { operation: 'dbpm.public.introspect' })] };
+  }
+
+  const normalizedTable = tableName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+  const queryFields = response.body.data?.__schema?.queryType?.fields?.map((field) => field.name) || [];
+  const mutationFields = response.body.data?.__schema?.mutationType?.fields?.map((field) => field.name) || [];
+  const includesTable = (fieldName: string) =>
+    fieldName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().includes(normalizedTable);
+
+  return {
+    listField: queryFields.find((fieldName) => includesTable(fieldName)),
+    createField: mutationFields.find((fieldName) => fieldName.startsWith('create') && includesTable(fieldName)),
+    updateField: mutationFields.find((fieldName) => fieldName.startsWith('update') && includesTable(fieldName)),
+    errors: [],
+  };
+};
+
+const provisionOneTenant = async (input: {
+  context: BenchmarkContext;
   config: PerfRunConfig;
-  snapshot: ServicesSnapshot;
-  needed: number;
-}): Promise<{ createdIds: string[]; errors: RedactedErrorSample[] }> => {
-  const { context, matrixCase, config, snapshot, needed } = input;
+  matrixCase: MatrixCase;
+  index: number;
+}): Promise<{
+  requestProfile?: RequestProfile;
+  objectIds: string[];
+  businessTableCreated: boolean;
+  errors: RedactedErrorSample[];
+  warnings: string[];
+}> => {
+  const { context, config, matrixCase, index } = input;
   const errors: RedactedErrorSample[] = [];
-  const createdIds: string[] = [];
+  const warnings: string[] = [];
+  const objectIds: string[] = [];
+  const base = uniqueBase(config, matrixCase, index);
+  const subdomain = trimToken(`perf-${base}`, 60);
+  const databaseName = trimToken(safeDbName(`perf_dbpm_${base}`), 60);
+  const tableName = tableStem(base);
 
-  const appApi = (snapshot.apis?.nodes || []).find((api) => api.name === 'app' && api.isPublic);
-  const appSchemas = (snapshot.apiSchemas?.nodes || []).filter((apiSchema) => apiSchema.apiId === appApi?.id);
-  if (!appApi || appSchemas.length === 0) {
-    return {
-      createdIds,
-      errors: [
-        toRedactedErrorSample('Cannot provision public hosts: pre-seeded app API/schema metadata is unavailable.', {
-          operation: 'dbpm.provision.graphql',
-        }) as RedactedErrorSample,
-      ],
-    };
-  }
-
-  const casePrefix = `${config.benchmarkOwnedPrefix}_${matrixCase.caseId}`.replace(/_/g, '-').toLowerCase();
-  const dbname = appApi.dbname;
-  if (!dbname) {
-    return {
-      createdIds,
-      errors: [
-        toRedactedErrorSample('Cannot provision public hosts: app API dbname is empty.', {
-          operation: 'dbpm.provision.graphql',
-        }) as RedactedErrorSample,
-      ],
-    };
-  }
-
-  for (let index = 0; index < needed; index += 1) {
-    const apiName = `${casePrefix}-api-${index + 1}`.slice(0, 120);
-    const createApi = await executeGraphql<{ createApi?: { api?: ApiNode } }>(context, {
-      query: createApiMutation,
+  const createDbpm = await executeGraphql<{ createDatabaseProvisionModule?: { databaseProvisionModule?: DbpmNode } }>(
+    context,
+    {
+      query: createDatabaseProvisionModuleMutation,
       variables: {
         input: {
-          api: {
-            databaseId: DEFAULT_DATABASE_ID,
-            name: apiName,
-            dbname,
-            roleName: appApi.roleName || 'authenticated',
-            anonRole: appApi.anonRole || 'anonymous',
-            isPublic: true,
+          databaseProvisionModule: {
+            databaseName,
+            ownerId: SUDO_USER_ID,
+            subdomain,
+            domain: 'localhost',
+            modules: DBPM_MODULES,
+            options: {},
+            bootstrapUser: false,
           },
         },
       },
-      headers: publicHostHeaders(PUBLIC_HOST),
-    });
-
-    if (responseHasUnexpectedErrors(createApi) || !createApi.body.data?.createApi?.api?.id) {
-      errors.push(responseErrorSample(createApi, { operation: 'dbpm.provision.createApi' }));
-      break;
+      headers: privateModulesHeaders(),
+      surface: 'private',
     }
+  );
 
-    const api = createApi.body.data.createApi.api;
-    createdIds.push(api.id);
+  const provision = createDbpm.body.data?.createDatabaseProvisionModule?.databaseProvisionModule;
+  if (responseHasUnexpectedErrors(createDbpm) || !provision?.databaseId || provision.status !== 'completed') {
+    errors.push(responseErrorSample(createDbpm, { operation: 'dbpm.createDatabaseProvisionModule' }));
+    if (provision?.errorMessage) {
+      errors.push(
+        toRedactedErrorSample(provision.errorMessage, { operation: 'dbpm.createDatabaseProvisionModule.errorMessage' }) as RedactedErrorSample
+      );
+    }
+    return { objectIds, businessTableCreated: false, errors, warnings };
+  }
 
-    for (const apiSchema of appSchemas) {
-      const createApiSchema = await executeGraphql(context, {
-        query: createApiSchemaMutation,
-        variables: {
-          input: {
-            apiSchema: {
-              databaseId: DEFAULT_DATABASE_ID,
-              apiId: api.id,
-              schemaId: apiSchema.schemaId,
+  objectIds.push(provision.id, provision.databaseId);
+
+  const snapshotResult = await queryServicesSnapshot(context);
+  errors.push(...snapshotResult.errors);
+  const snapshot = snapshotResult.snapshot;
+  if (!snapshot) {
+    return { objectIds, businessTableCreated: false, errors, warnings };
+  }
+
+  const appSchema = appPublicSchemaFor(snapshot, provision.databaseId);
+  const route = apiHostFor(snapshot, provision.databaseId);
+  if (!appSchema?.id) {
+    errors.push(toRedactedErrorSample('DBPM provision did not expose an app_public schema.', {
+      operation: 'dbpm.findAppPublicSchema',
+    }) as RedactedErrorSample);
+  }
+  if (!route.host || !route.api?.id || !route.domain?.id) {
+    errors.push(toRedactedErrorSample('DBPM provision did not expose an api public host.', {
+      operation: 'dbpm.findApiHost',
+    }) as RedactedErrorSample);
+  }
+  if (!appSchema?.id || !route.host || !route.api || !route.domain) {
+    return { objectIds, businessTableCreated: false, errors, warnings };
+  }
+
+  const table = await executeGraphql<{ provisionTable?: { result?: Array<{ outTableId?: string; outFields?: string[] }> } }>(
+    context,
+    {
+      query: provisionTableMutation,
+      variables: {
+        input: {
+          databaseId: provision.databaseId,
+          schemaId: appSchema.id,
+          tableName,
+          nodes: [{ $type: 'DataId' }],
+          fields: [{ name: 'label', type: { name: 'text' } }],
+          useRls: false,
+          grants: [
+            {
+              roles: ['anonymous', 'authenticated'],
+              privileges: [['select', '*'], ['insert', '*'], ['update', '*'], ['delete', '*']],
             },
-          },
-        },
-        headers: publicHostHeaders(PUBLIC_HOST),
-      });
-      if (responseHasUnexpectedErrors(createApiSchema)) {
-        errors.push(responseErrorSample(createApiSchema, { operation: 'dbpm.provision.createApiSchema' }));
-        break;
-      }
-    }
-
-    const createDomain = await executeGraphql<{ createDomain?: { domain?: DomainNode } }>(context, {
-      query: createDomainMutation,
-      variables: {
-        input: {
-          domain: {
-            databaseId: DEFAULT_DATABASE_ID,
-            apiId: api.id,
-            subdomain: `${casePrefix}-${index + 1}`.slice(0, 120),
-            domain: 'constructive.io',
-          },
+          ],
         },
       },
-      headers: publicHostHeaders(PUBLIC_HOST),
-    });
-
-    if (responseHasUnexpectedErrors(createDomain) || !createDomain.body.data?.createDomain?.domain?.id) {
-      errors.push(responseErrorSample(createDomain, { operation: 'dbpm.provision.createDomain' }));
-      break;
+      headers: privateModulesHeaders(),
+      surface: 'private',
     }
-    createdIds.push(createDomain.body.data.createDomain.domain.id);
+  );
+
+  const tableResult = table.body.data?.provisionTable?.result?.[0];
+  if (responseHasUnexpectedErrors(table) || !tableResult?.outTableId) {
+    errors.push(responseErrorSample(table, { operation: 'dbpm.provisionTable' }));
+    return { objectIds, businessTableCreated: false, errors, warnings };
   }
 
-  return { createdIds, errors };
+  objectIds.push(tableResult.outTableId, ...(tableResult.outFields || []));
+
+  const publicShape = await introspectPublicTableShape({ context, host: route.host, tableName });
+  errors.push(...publicShape.errors);
+  if (!publicShape.listField) {
+    errors.push(toRedactedErrorSample(`Public API host ${route.host} did not expose benchmark table ${tableName}.`, {
+      operation: 'dbpm.public.tableShape',
+    }) as RedactedErrorSample);
+    return { objectIds, businessTableCreated: true, errors, warnings };
+  }
+  if (!publicShape.createField || !publicShape.updateField) {
+    warnings.push(`Public API host ${route.host} exposes list field ${publicShape.listField} but not full CRUD mutations.`);
+  }
+
+  return {
+    objectIds,
+    businessTableCreated: true,
+    errors,
+    warnings,
+    requestProfile: {
+      id: `public-dbpm-${index + 1}`,
+      routingMode: 'public',
+      routeKey: route.host,
+      headers: publicHostHeaders(route.host),
+      description: 'Benchmark-owned public DBPM host route provisioned through constructive-local private GraphQL.',
+      benchmarkOwned: true,
+      metadata: {
+        source: 'constructive-local-dbpm-graphql',
+        host: route.host,
+        apiId: route.api.id,
+        domainId: route.domain.id,
+        databaseId: provision.databaseId,
+        schemaId: appSchema.id,
+        schemaName: appSchema.schemaName,
+        tableName,
+        tableId: tableResult.outTableId,
+        outFieldIds: tableResult.outFields || [],
+        listField: publicShape.listField,
+        createField: publicShape.createField,
+        updateField: publicShape.updateField,
+      },
+    },
+  };
 };
 
 export const provisionDbpmPublic = async (input: {
@@ -261,115 +346,54 @@ export const provisionDbpmPublic = async (input: {
   const { context, matrixCase, config } = input;
   const errors: RedactedErrorSample[] = [];
   const warnings: string[] = [];
+  const requestProfiles: RequestProfile[] = [];
+  const objectIds: string[] = [];
+  let businessTableCount = 0;
 
-  // The server-test seed establishes one public app host before the benchmark
-  // server starts. That satisfies tiny public smoke without mutating shared
-  // metadata during preflight. Larger k still requires actual DBPM provisioning
-  // and must fail clearly if the current GraphQL surface cannot provide it.
-  if (matrixCase.scaleProfile.k <= 1) {
+  if (!context.privateRequest) {
+    const error = toRedactedErrorSample('Private admin GraphQL server is unavailable for DBPM provision.', {
+      operation: 'dbpm.privateAdmin',
+    }) as RedactedErrorSample;
     return {
-      ok: true,
-      completed: true,
-      source: 'fixture-preseeded',
-      tenantCount: 1,
-      publicHostCount: 1,
-      apiCount: 1,
-      businessTableCount: 1,
-      requestProfiles: [
-        {
-          id: 'public-app',
-          routingMode: 'public',
-          routeKey: PUBLIC_HOST,
-          headers: publicHostHeaders(PUBLIC_HOST),
-          description: 'Pre-seeded public app host route from simple-seed-services.',
-          benchmarkOwned: false,
-          metadata: { host: PUBLIC_HOST, databaseId: DEFAULT_DATABASE_ID, source: 'simple-seed-services' },
-        },
-      ],
+      ok: false,
+      completed: false,
+      source: 'unavailable',
+      tenantCount: 0,
+      publicHostCount: 0,
+      apiCount: 0,
+      businessTableCount: 0,
+      requestProfiles,
       operationProfiles: buildPublicOperationProfiles(matrixCase.workloadProfile),
       benchmarkOwnedObjectIds: [],
-      errors,
+      errors: [error],
       warnings,
     };
   }
 
-  // Public-mode servers cannot use X-Meta-Schema by design, so the first-version
-  // helper attempts GraphQL DBPM mutations through the pre-seeded public host when
-  // more profiles are required. If those mutations are not exposed by the current
-  // product schema, the report fails clearly instead of fabricating tenants.
-  const snapshotResult = await querySnapshotViaGraphql(context, publicHostHeaders(PUBLIC_HOST));
-
-  if (!snapshotResult.snapshot) {
-    warnings.push(
-      'Public host does not expose DBPM metadata GraphQL; using the pre-seeded public app host as the first-version fixture-backed route profile.'
-    );
-    warnings.push(...snapshotResult.errors.map((error) => error.message));
-    const fallbackProfile: RequestProfile = {
-      id: 'public-app',
-      routingMode: 'public',
-      routeKey: PUBLIC_HOST,
-      headers: publicHostHeaders(PUBLIC_HOST),
-      description: 'Pre-seeded public app host route from simple-seed-services; DBPM metadata is not exposed on public app schema.',
-      benchmarkOwned: false,
-      metadata: { host: PUBLIC_HOST, databaseId: DEFAULT_DATABASE_ID, source: 'simple-seed-services' },
-    };
-    return {
-      ok: matrixCase.scaleProfile.k <= 1,
-      completed: matrixCase.scaleProfile.k <= 1,
-      source: 'fixture-preseeded',
-      tenantCount: 1,
-      publicHostCount: 1,
-      apiCount: 1,
-      businessTableCount: 1,
-      requestProfiles: [fallbackProfile],
-      operationProfiles: buildPublicOperationProfiles(matrixCase.workloadProfile),
-      benchmarkOwnedObjectIds: [],
-      errors: matrixCase.scaleProfile.k <= 1 ? [] : snapshotResult.errors,
-      warnings,
-    };
+  for (let index = 0; index < matrixCase.scaleProfile.k; index += 1) {
+    const provisioned = await provisionOneTenant({ context, config, matrixCase, index });
+    objectIds.push(...provisioned.objectIds);
+    errors.push(...provisioned.errors);
+    warnings.push(...provisioned.warnings);
+    if (provisioned.businessTableCreated) businessTableCount += 1;
+    if (provisioned.requestProfile) requestProfiles.push(provisioned.requestProfile);
   }
 
-  errors.push(...snapshotResult.errors);
-  let snapshot = snapshotResult.snapshot;
-  let requestProfiles = publicProfilesFromSnapshot(snapshot, config, matrixCase);
-  let source: DbpmProvisionResult['source'] = 'fixture-preseeded';
-  const needed = Math.max(0, matrixCase.scaleProfile.k - requestProfiles.length);
-  const createdIds: string[] = [];
-
-  if (needed > 0) {
-    const provision = await tryGraphqlProvision({ context, matrixCase, config, snapshot, needed });
-    createdIds.push(...provision.createdIds);
-    errors.push(...provision.errors);
-    source = provision.createdIds.length > 0 ? 'mixed' : 'unavailable';
-
-    if (provision.createdIds.length > 0) {
-      const refreshed = await querySnapshotViaGraphql(context, publicHostHeaders(PUBLIC_HOST));
-      errors.push(...refreshed.errors);
-      if (refreshed.snapshot) snapshot = refreshed.snapshot;
-      requestProfiles = publicProfilesFromSnapshot(snapshot, config, matrixCase);
-    }
-
-    if (requestProfiles.length < matrixCase.scaleProfile.k) {
-      warnings.push(
-        `Requested k=${matrixCase.scaleProfile.k} public profiles but only ${requestProfiles.length} are reachable via current GraphQL surface.`
-      );
-    }
+  if (requestProfiles.length < matrixCase.scaleProfile.k) {
+    warnings.push(`Requested k=${matrixCase.scaleProfile.k} public profiles but provisioned ${requestProfiles.length}.`);
   }
-
-  const publicApiIds = new Set((snapshot.apis?.nodes || []).filter((api) => api.isPublic).map((api) => api.id));
-  const publicHostCount = (snapshot.domains?.nodes || []).filter((domain) => domain.apiId && publicApiIds.has(domain.apiId)).length;
 
   return {
-    ok: errors.length === 0,
-    completed: errors.length === 0,
-    source,
-    tenantCount: new Set(requestProfiles.map((profile) => String(profile.metadata.databaseId || DEFAULT_DATABASE_ID))).size,
-    publicHostCount: requestProfiles.length || publicHostCount,
-    apiCount: publicApiIds.size,
-    businessTableCount: 1,
+    ok: errors.length === 0 && requestProfiles.length >= matrixCase.scaleProfile.k,
+    completed: errors.length === 0 && requestProfiles.length >= matrixCase.scaleProfile.k,
+    source: requestProfiles.length > 0 ? 'graphql' : 'unavailable',
+    tenantCount: new Set(requestProfiles.map((profile) => String(profile.metadata.databaseId))).size,
+    publicHostCount: requestProfiles.length,
+    apiCount: requestProfiles.length,
+    businessTableCount,
     requestProfiles,
     operationProfiles: buildPublicOperationProfiles(matrixCase.workloadProfile),
-    benchmarkOwnedObjectIds: createdIds,
+    benchmarkOwnedObjectIds: objectIds,
     errors,
     warnings,
   };

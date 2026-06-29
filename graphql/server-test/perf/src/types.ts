@@ -1,4 +1,6 @@
-import type { GetConnectionsResult } from '../../src/types';
+import type supertest from 'supertest';
+
+import type { GetConnectionsResult, ServerInfo } from '../../src/types';
 
 export const PERF_SCHEMA_VERSION = 1 as const;
 
@@ -88,6 +90,9 @@ export interface BenchmarkContext {
   serverUrl: string;
   graphqlUrl: string;
   conn: GetConnectionsResult;
+  privateServer?: ServerInfo;
+  privateRequest?: supertest.Agent;
+  privateServerUrl?: string;
 }
 
 export interface RequestProfile {
@@ -113,6 +118,12 @@ export interface OperationProfile {
 }
 
 export interface RuntimeOperationProfile extends OperationProfile {
+  buildQuery?: (input: {
+    sequence: number;
+    requestProfile: RequestProfile;
+    config: PerfRunConfig;
+    matrixCase: MatrixCase;
+  }) => string;
   buildVariables?: (input: {
     sequence: number;
     requestProfile: RequestProfile;
@@ -170,6 +181,7 @@ export interface PublicPreflightResult {
   operationProfiles: RuntimeOperationProfile[];
   artifactPath: string;
   hardGateFailures: string[];
+  errorSamples: RedactedErrorSample[];
 }
 
 export interface PreflightReport {

@@ -55,6 +55,7 @@
     "csv-to-pg": "workspace:^",
     "genomic": "^5.6.0",
     "glob": "^13.0.6",
+    "komoji": "^0.9.0",
     "minimatch": "^10.2.5",
     "parse-package-name": "^1.0.0",
     "pg": "^8.21.0",

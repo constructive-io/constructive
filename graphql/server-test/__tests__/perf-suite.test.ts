@@ -8,8 +8,16 @@ import { loadPerfConfig } from '../perf/src/config';
 import { BenchmarkContextManager } from '../perf/src/context';
 import { evaluateCaseGates } from '../perf/src/gates';
 import { expandMatrixCases } from '../perf/src/matrix';
+import { captureMemorySnapshot } from '../perf/src/memory';
 import { percentile, summarizeOutcomes } from '../perf/src/stats';
-import type { MatrixCase, PerfRunConfig, PublicPreflightResult, RouteProbeSummary } from '../perf/src/types';
+import type {
+  BenchmarkContext,
+  MatrixCase,
+  PerfRunConfig,
+  PublicPreflightResult,
+  RouteProbeSummary,
+  RunArtifactPaths,
+} from '../perf/src/types';
 
 const baseEnv = (overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv => ({
   PERF_BENCHMARK: '1',
@@ -109,10 +117,53 @@ describe('artifact redaction', () => {
   });
 });
 
+describe('memory artifacts', () => {
+  it('records unavailable debug endpoints without fabricating memory data', async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'constructive-perf-memory-'));
+    const config = loadPerfConfig(baseEnv({ PERF_RUN_DIR: dir }));
+    const artifacts: RunArtifactPaths = {
+      runDir: dir,
+      summaryPath: path.join(dir, 'summary.json'),
+      casesDir: path.join(dir, 'cases'),
+      preflightDir: path.join(dir, 'preflight'),
+      memoryDir: path.join(dir, 'memory'),
+      errorsDir: path.join(dir, 'errors'),
+    };
+    const context = {
+      id: 'ctx-test',
+      serverUrl: 'http://127.0.0.1:1',
+      conn: {
+        request: {
+          get: async () => ({ status: 404, text: 'not found', body: {} }),
+        },
+      },
+    } as unknown as BenchmarkContext;
+
+    const result = await captureMemorySnapshot({
+      context,
+      config,
+      artifacts,
+      caseId: 'case-test',
+      phase: 'before',
+    });
+
+    expect(result).toMatchObject({ ok: false, status: 'unavailable' });
+    const written = JSON.parse(await fs.readFile(path.join(dir, 'memory', 'case-test-before.json'), 'utf8'));
+    expect(written).toMatchObject({
+      schemaVersion: 1,
+      ok: false,
+      status: 'unavailable',
+      httpStatus: 404,
+    });
+    expect(written.snapshot).toBeUndefined();
+  });
+});
+
 describe('stats', () => {
   it('calculates percentiles and load summaries', () => {
     expect(percentile([10, 30, 20, 40], 0.5)).toBe(20);
     expect(percentile([10, 30, 20, 40], 0.95)).toBe(40);
+    expect(percentile(Array.from({ length: 200_000 }, (_, index) => index), 1)).toBe(199_999);
     const report = summarizeOutcomes({
       durationSeconds: 2,
       workers: 1,
@@ -144,6 +195,7 @@ describe('preflight hard gate evaluation', () => {
       ok: false,
       hardGateFailures: ['DBPM provision did not complete without unexpected errors'],
       routeProbe,
+      errorSamples: [],
     } as PublicPreflightResult;
 
     const gates = evaluateCaseGates({ preflight, routeProbe, captureMemory: false });

@@ -12,6 +12,7 @@ module.exports = {
   },
   testMatch: ['<rootDir>/perf/**/*.perf.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/', '<rootDir>/perf/reports/'],
   collectCoverage: false,
   verbose: true,

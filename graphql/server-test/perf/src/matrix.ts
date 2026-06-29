@@ -56,7 +56,7 @@ export const expandMatrixCases = (config: PerfRunConfig): MatrixCase[] => {
       cases.push({
         ...base,
         caseId: caseIdFor(base),
-        mutates: routingMode === 'public' && /crud|write|mutat/i.test(workloadProfile),
+        mutates: routingMode === 'public' && /write|mutat/i.test(workloadProfile),
       });
     }
   }
@@ -88,12 +88,12 @@ const writeErrorsIfAny = async (input: {
   preflight?: PublicPreflightResult;
 }): Promise<string | undefined> => {
   const errors = [
+    ...(input.preflight?.errorSamples || []),
     ...(input.preflight?.routeProbe.errorSamples || []),
     ...(input.routeProbe?.errorSamples || []),
     ...(input.loadErrors || []),
   ].slice(0, input.config.errorSampleLimit);
 
-  if (errors.length === 0) return undefined;
   const path = errorsReportPath(input.artifacts, input.caseId);
   await writeJsonArtifact(path, {
     schemaVersion: PERF_SCHEMA_VERSION,
@@ -142,9 +142,14 @@ const executeCase = async (input: {
   let caseReportFile = caseReportPath(artifacts, matrixCase.caseId);
   let errorsPath: string | undefined;
   let thrownFailure: string | undefined;
+  const recordThrownFailure = (prefix: string, error: unknown): void => {
+    const message = `${prefix}: ${error instanceof Error ? error.message : String(error)}`;
+    thrownFailure = thrownFailure ? `${thrownFailure}; ${message}` : message;
+  };
 
   try {
     context = await contextManager.acquire(matrixCase);
+    resetBefore = await resetBenchmarkOwnedData({ context, matrixCase, config });
 
     if (matrixCase.routingMode === 'public') {
       preflight = await runPublicPreflight({ context, matrixCase, config, artifacts });
@@ -160,7 +165,6 @@ const executeCase = async (input: {
     }
 
     if (!preflight || preflight.ok) {
-      resetBefore = await resetBenchmarkOwnedData({ context, matrixCase, config });
       memoryBefore = await captureMemorySnapshot({
         context,
         config,
@@ -179,14 +183,22 @@ const executeCase = async (input: {
         caseId: matrixCase.caseId,
         phase: 'after',
       });
-      resetAfter = await resetBenchmarkOwnedData({ context, matrixCase, config });
     }
   } catch (error) {
     thrownFailure = error instanceof Error ? error.message : String(error);
     routeProbe = routeProbe.ok ? routeProbe : emptyRouteProbe(thrownFailure);
   } finally {
     if (context) {
-      await contextManager.releaseCase(context);
+      try {
+        resetAfter = await resetBenchmarkOwnedData({ context, matrixCase, config });
+      } catch (error) {
+        recordThrownFailure('post-case benchmark-owned reset threw', error);
+      }
+      try {
+        await contextManager.releaseCase(context);
+      } catch (error) {
+        recordThrownFailure('context release threw', error);
+      }
     }
   }
 
@@ -246,14 +258,16 @@ const executeCase = async (input: {
       : undefined,
     routeProbe,
     load,
-    memory: {
-      beforePath: memoryBefore?.path,
-      afterPath: memoryAfter?.path,
-      beforeOk: memoryBefore?.ok ?? !config.captureMemory,
-      afterOk: memoryAfter?.ok ?? !config.captureMemory,
-      beforeStatus: memoryBefore?.status,
-      afterStatus: memoryAfter?.status,
-    },
+    memory: memoryBefore || memoryAfter || !config.captureMemory
+      ? {
+          beforePath: memoryBefore?.path,
+          afterPath: memoryAfter?.path,
+          beforeOk: memoryBefore?.ok ?? !config.captureMemory,
+          afterOk: memoryAfter?.ok ?? !config.captureMemory,
+          beforeStatus: memoryBefore?.status,
+          afterStatus: memoryAfter?.status,
+        }
+      : undefined,
     gates,
     artifacts: {
       caseReportPath: caseReportFile,
