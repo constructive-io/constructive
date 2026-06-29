@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.21.1](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.21.0...graphile-postgis@2.21.1) (2026-06-28)
+
+**Note:** Version bump only for package graphile-postgis
+
+# [2.21.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.20.0...graphile-postgis@2.21.0) (2026-06-28)
+
+### Bug Fixes
+
+- replace workspace:^ in peerDependencies with real version ranges ([17951e1](https://github.com/constructive-io/constructive/commit/17951e1c233eabe984dba28392f6eba13597d9ab))
+
+# [2.20.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.19.0...graphile-postgis@2.20.0) (2026-06-28)
+
+**Note:** Version bump only for package graphile-postgis
+
+# [2.19.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.18.5...graphile-postgis@2.19.0) (2026-06-27)
+
+**Note:** Version bump only for package graphile-postgis
+
 ## [2.18.5](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.18.4...graphile-postgis@2.18.5) (2026-06-22)
 
 **Note:** Version bump only for package graphile-postgis

@@ -126,6 +126,7 @@ export type ApiConfigResult = ApiStructure | ApiError | null;
 export type ConstructiveAPIToken = {
   id?: string;
   user_id?: string;
+  principal_id?: string;
   session_id?: string;
   access_level?: string;
   kind?: string;

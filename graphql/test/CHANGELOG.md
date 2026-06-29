@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.27.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.27.0...@constructive-io/graphql-test@4.27.1) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+# [4.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.26.0...@constructive-io/graphql-test@4.27.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+# [4.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.25.0...@constructive-io/graphql-test@4.26.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+# [4.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.24.0...@constructive-io/graphql-test@4.25.0) (2026-06-27)
+
+### Features
+
+- **graphql-test:** auto-derive principal_id from user_id in setContext ([ddbe497](https://github.com/constructive-io/constructive/commit/ddbe4974d9ead7eb6ba857d5c20cf775ebac376d))
+
+# [4.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.23.0...@constructive-io/graphql-test@4.24.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+# [4.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.22.3...@constructive-io/graphql-test@4.23.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
 ## [4.22.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.22.2...@constructive-io/graphql-test@4.22.3) (2026-06-23)
 
 **Note:** Version bump only for package @constructive-io/graphql-test
