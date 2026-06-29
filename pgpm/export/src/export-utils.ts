@@ -866,3 +866,141 @@ export const preparePackage = async ({
 export const normalizeOutdir = (outdir: string): string => {
   return outdir.endsWith(path.sep) ? outdir : outdir + path.sep;
 };
+
+// =============================================================================
+// Platform leakage filter
+// =============================================================================
+
+/** Mirror trigger function kinds stamped by the generator. */
+const MIRROR_KINDS = new Set([
+  'namespace_mirror_insert',
+  'namespace_mirror_delete'
+]);
+
+/** Deploy-path pattern for mirror trigger functions.
+ *  payload.kind is unreliable (the migrate() path drops it), so we
+ *  also seed from the deterministic deploy path. */
+const MIRROR_DEPLOY_PATH = /\/trigger_fns\/[^/]+_mirror_to_platform_(insert|delete)$/;
+
+/** Strips the `pkg:` prefix from a deploys/deps path. */
+const stripPkg = (p: string): string =>
+  typeof p === 'string' && p.includes(':') ? p.slice(p.indexOf(':') + 1) : p;
+
+/**
+ * Filters platform-integrated actions and cross-package requires from
+ * sql_actions rows before writing them as a per-tenant package.
+ *
+ * Step A — exclude mirror trigger functions by `payload.kind`, then
+ *          transitively exclude any row whose `deps` reference an
+ *          excluded change (catches the trigger rows).
+ * Step B — strip cross-package `deps` so `requires` directives only
+ *          reference schemas owned by this database.
+ */
+export const filterPlatformLeakage = (rows: any[], schema_names: string[]): any[] => {
+  const ownedPrefixes = schema_names.map(s => `schemas/${s}/`);
+
+  // Seed: mirror trigger functions — by deploy path (reliable) OR
+  // stamped payload.kind (fallback for rows that preserve it).
+  const excluded = new Set<string>();
+  for (const row of rows) {
+    if (typeof row.deploy !== 'string') continue;
+    const path = stripPkg(row.deploy);
+    const payload = typeof row.payload === 'string'
+      ? JSON.parse(row.payload)
+      : row.payload;
+    if (MIRROR_DEPLOY_PATH.test(path) || (payload && MIRROR_KINDS.has(payload.kind))) {
+      excluded.add(path);
+    }
+  }
+
+  // Closure: anything requiring an excluded change is also excluded.
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const row of rows) {
+      const deployPath = typeof row.deploy === 'string' ? stripPkg(row.deploy) : '';
+      if (!deployPath || excluded.has(deployPath)) continue;
+      if (Array.isArray(row.deps) && row.deps.some((d: string) => excluded.has(stripPkg(d)))) {
+        excluded.add(deployPath);
+        changed = true;
+      }
+    }
+  }
+
+  const filteredRows = rows
+    .filter((row: any) =>
+      !(typeof row.deploy === 'string' && excluded.has(stripPkg(row.deploy)))
+    )
+    .map((row: any) => {
+      if (Array.isArray(row.deps)) {
+        row.deps = row.deps.filter((dep: string) =>
+          ownedPrefixes.some(p => dep.includes(p))
+        );
+      }
+      return row;
+    });
+
+  return rewritePartmanMigrations(filteredRows);
+};
+
+/**
+ * Rewrites table/partman migrations to a self-contained
+ * partman.create_parent_with_retention() call instead of
+ * INSERT INTO metaschema_public.partition (hardcoded source-DB UUIDs).
+ * The control column is resolved at deploy time via pg_get_partkeydef(),
+ * so no DB lookups are needed at export time. Pure function.
+ */
+export const rewritePartmanMigrations = (rows: any[]): any[] => {
+  return rows.map((row: any) => {
+    if (typeof row.deploy !== 'string') return row;
+    const match = row.deploy.match(/schemas\/([^/]+)\/tables\/([^/]+)\/table\/partman$/);
+    if (!match) return row;
+
+    const [, schema, table] = match;
+    const parentTable = `${schema}.${table}`;
+
+    // Parse the VALUES (...) tuple positionally. Column order:
+    // id, database_id, table_id, strategy, partition_key_id,
+    // interval, retention, retention_keep_table, premake, naming_pattern
+    const content: string = row.content || '';
+    const tuple = content.match(/VALUES\s*\(([\s\S]*?)\)\s*ON CONFLICT/i);
+    const cols = tuple
+      ? tuple[1].split(',').map((s: string) => s.trim().replace(/^'|'$/g, ''))
+      : [];
+    const strategy  = cols[3] || 'range';
+    const interval  = cols[5] || '1 month';
+    const retention = cols[6] || '';
+    const keepTable = /^true$/i.test(cols[7] || 'true');
+    const premake   = parseInt(cols[8] || '2', 10);
+    const retentionSql = retention ? `'${retention}'` : 'NULL';
+
+    // SQL BODY ONLY — writeDeploy() adds the header + requires from row.deps.
+    row.content = `-- Rewritten at export time: replaces INSERT INTO
+-- metaschema_public.partition (hardcoded source-DB UUIDs) with a
+-- self-contained partman registration. Control column resolved at
+-- deploy time via pg_get_partkeydef(); guarded for idempotency.
+DO $$
+DECLARE
+  v_control text;
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM partman.part_config WHERE parent_table = '${parentTable}'
+  ) THEN
+    v_control := substring(
+      pg_get_partkeydef('${parentTable}'::regclass) FROM '\\(([^)]+)\\)'
+    );
+    PERFORM partman.create_parent_with_retention(
+      v_parent_table := '${parentTable}',
+      v_control := v_control,
+      v_type := '${strategy}',
+      partition_interval := '${interval}',
+      v_premake := ${premake},
+      v_retention := ${retentionSql},
+      v_retention_keep_table := ${keepTable}
+    );
+  END IF;
+END $$;
+`;
+    return row;
+  });
+};
