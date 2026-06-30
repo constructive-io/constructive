@@ -390,6 +390,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         () => createGraphileInstance({
           preset,
           cacheKey: key,
+          dbname,
           enableRealtime: api.databaseSettings?.enableRealtime,
         }),
         { enabled: observabilityEnabled },
