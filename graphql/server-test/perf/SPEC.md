@@ -272,10 +272,7 @@ Context compatibility should account for settings that affect the database/serve
 - DBPM provision state;
 - workload state when public mutations are involved.
 
-A reused context must not let one case's mutating workload invalidate another case's comparison. If public business data is reused across cases, the runner must either:
-
-- reset benchmark-owned data before the next measured case; or
-- provision case-scoped benchmark-owned data so cases do not collide.
+A reused context must not let one case's mutating workload invalidate another case's comparison. Public preflight should provision case-scoped benchmark-owned tenants, hosts, tables, and profiles for the active public case. Older benchmark-owned objects may remain in the temporary database until the context is torn down, but measured load must only target the profiles returned by the active case's preflight.
 
 ### 2.4 Case execution flow
 
@@ -288,33 +285,30 @@ Each matrix case should follow this flow:
    - For `public`, run public preflight.
    - For `private`, build private request profiles and run lightweight setup/probe logic.
 
-3. **Prepare isolation**
-   - If the context is reused and the workload mutates data, reset or isolate benchmark-owned data before measured load.
-
-4. **Capture memory/cache before**
+3. **Capture memory/cache before**
    - Capture `/debug/memory` or equivalent debug snapshot when available.
 
-5. **Run final route probe**
+4. **Run final route probe**
    - Confirm the selected request profiles still work immediately before measured load.
 
-6. **Run measured load**
+5. **Run measured load**
    - Run for the selected duration and worker count.
    - Distribute requests across profiles.
    - Select operations according to the workload profile.
    - Apply fail-fast rules.
 
-7. **Capture memory/cache after**
+6. **Capture memory/cache after**
    - Capture the same snapshot shape as the before snapshot.
 
-8. **Evaluate gates**
-   - Convert preflight, route probe, load, memory/report, and reset failures into hard gate failures.
+7. **Evaluate gates**
+   - Convert preflight, route probe, load, and memory/report failures into hard gate failures.
 
-9. **Write case report**
+8. **Write case report**
    - Include metrics, artifacts, context id, lifecycle policy, and hard gate failures.
 
-10. **Post-case cleanup**
-    - If reusing the context, leave it in a known state for the next compatible case.
-    - If using `per-case`, teardown immediately.
+9. **Post-case cleanup**
+   - If reusing the context, leave benchmark-owned objects in place and require later mutating cases to generate their own case-scoped profiles.
+   - If using `per-case`, teardown immediately.
 
 ### 2.5 Failure behavior
 
@@ -418,7 +412,6 @@ graphql/server-test/perf/
     operations.ts
     preflight.ts
     profiles.ts
-    reset.ts
     stats.ts
     types.ts
 ```
@@ -519,11 +512,6 @@ graphql/server-test/perf/
 - Writes JSON artifacts atomically where practical.
 - Owns artifact path conventions.
 
-`src/reset.ts`
-
-- Resets or isolates benchmark-owned data when a reused context would otherwise leak state across cases.
-- Must not touch non-benchmark objects by default.
-
 `src/types.ts`
 
 - Defines shared types for configs, matrix cases, contexts, profiles, preflight results, load results, reports, gates, and artifacts.
@@ -544,7 +532,6 @@ Direct SQL or seed adapters are allowed only for bootstrap boundaries such as:
 - creating roles, schemas, extensions, or baseline database objects required for the server to start;
 - installing minimal module/database structure that must exist before DBPM GraphQL operations are available;
 - creating benchmark-owned guard schemas/tables that cannot be created through GraphQL yet;
-- teardown/reset of benchmark-owned objects when the context manager reuses a context and GraphQL cannot safely reset the data;
 - test-only assertions against database state, when those assertions do not mutate non-benchmark objects.
 
 Direct SQL/bootstrap must not become the normal way to provision tenants, APIs, hosts, or business workload data after the server is running.
@@ -572,15 +559,11 @@ Benchmark-owned scope means:
 - generated data can be reset or discarded without affecting non-benchmark state;
 - reports include enough identifiers to audit what was created.
 
-### 4.4 Reused context cleanup
+### 4.4 Reused context isolation
 
 Because the default connection policy is `reuse`, context reuse must not leak mutating workload state into later cases.
 
-Preferred cleanup order:
-
-1. avoid collision by creating case-scoped benchmark-owned GraphQL data;
-2. reset benchmark-owned data through GraphQL operations when product APIs support it;
-3. use direct SQL reset only for benchmark-owned objects when GraphQL reset is not available or not reliable enough for the benchmark.
+Public preflight should avoid collisions by creating case-scoped benchmark-owned GraphQL data for each public case. Measured load must target only the profiles returned by the active case's preflight. Older benchmark-owned tenants, schemas, tables, and rows can remain in the temporary test database until context teardown; they are not part of later case profiles.
 
 ## 5. Parameter interface and override precedence
 
@@ -901,7 +884,7 @@ Hard gates fail a case. Initial hard gates are:
 - measured load had zero unexpected HTTP/network failures;
 - memory/cache snapshots were readable when capture is enabled;
 - reports were written successfully;
-- reused contexts did not leak mutating benchmark data across cases.
+- public cases used case-scoped preflight profiles for mutating workloads.
 
 Observations are recorded but do not fail by default:
 

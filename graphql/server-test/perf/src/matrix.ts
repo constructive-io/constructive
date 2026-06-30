@@ -11,7 +11,6 @@ import { runMeasuredLoad } from './load';
 import { captureMemorySnapshot } from './memory';
 import { buildPrivateProfiles } from './profiles';
 import { probeProfiles, runPublicPreflight } from './preflight';
-import { resetBenchmarkOwnedState } from './reset';
 import type {
   BenchmarkContext,
   CaseReport,
@@ -149,14 +148,10 @@ const runCase = async (input: {
 
     const readyForLoad = setupFailures.length === 0 && routeProbe.ok && requestProfiles.length > 0 && operationProfiles.length > 0;
     if (readyForLoad) {
-      const reset = await resetBenchmarkOwnedState({ context, matrixCase, config });
-      setupFailures.push(...reset.hardGateFailures);
-      if (reset.ok) {
-        const finalProbe = await probeProfiles({ context, matrixCase, config, requestProfiles, operationProfiles });
-        routeProbe = finalProbe;
-        if (finalProbe.ok) {
-          load = await runMeasuredLoad({ context, matrixCase, config, requestProfiles, operationProfiles });
-        }
+      const finalProbe = await probeProfiles({ context, matrixCase, config, requestProfiles, operationProfiles });
+      routeProbe = finalProbe;
+      if (finalProbe.ok) {
+        load = await runMeasuredLoad({ context, matrixCase, config, requestProfiles, operationProfiles });
       }
     }
 
