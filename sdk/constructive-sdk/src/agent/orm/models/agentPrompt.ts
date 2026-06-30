@@ -196,7 +196,8 @@ export class AgentPromptModel {
       'UpdateAgentPromptInput',
       'id',
       'agentPromptPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

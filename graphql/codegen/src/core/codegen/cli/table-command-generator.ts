@@ -17,6 +17,9 @@ import {
   getPatchTypeName,
   getFilterTypeName,
   getOrderByTypeName,
+  getExtraInputKeys,
+  getUpdateInputTypeName,
+  getDeleteInputTypeName,
 } from '../utils';
 import type { Table, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
@@ -959,26 +962,27 @@ function buildSearchHandler(
 function buildGetHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
-  const pk = pkFields[0];
   const selectObj = buildSelectObject(table, typeRegistry);
 
-  const promptQuestion = t.objectExpression([
-    t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
-    t.objectProperty(t.identifier('name'), t.stringLiteral(pk.name)),
-    t.objectProperty(t.identifier('message'), t.stringLiteral(pk.name)),
-    t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
-  ]);
-
-  const pkTsType = pk.gqlType === 'Int' || pk.gqlType === 'BigInt'
-    ? t.tsNumberKeyword()
-    : t.tsStringKeyword();
+  const promptQuestions = pkFields.map((pkField) =>
+    t.objectExpression([
+      t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+      t.objectProperty(t.identifier('name'), t.stringLiteral(pkField.name)),
+      t.objectProperty(t.identifier('message'), t.stringLiteral(pkField.name)),
+      t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
+    ]),
+  );
 
   const ormArgs = t.objectExpression([
-    t.objectProperty(
-      t.identifier(pk.name),
-      t.tsAsExpression(
-        t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-        pkTsType,
+    ...pkFields.map((pkField) =>
+      t.objectProperty(
+        t.identifier(pkField.name),
+        t.tsAsExpression(
+          t.memberExpression(t.identifier('answers'), t.identifier(pkField.name)),
+          pkField.gqlType === 'Int' || pkField.gqlType === 'BigInt'
+            ? t.tsNumberKeyword()
+            : t.tsStringKeyword(),
+        ),
       ),
     ),
     t.objectProperty(t.identifier('select'), selectObj),
@@ -994,7 +998,7 @@ function buildGetHandler(table: Table, targetName?: string, typeRegistry?: TypeR
               t.identifier('prompter'),
               t.identifier('prompt'),
             ),
-            [t.identifier('argv'), t.arrayExpression([promptQuestion])],
+            [t.identifier('argv'), t.arrayExpression(promptQuestions)],
           ),
         ),
       ),
@@ -1064,9 +1068,24 @@ function buildMutationHandler(
   typeRegistry?: TypeRegistry,
   ormTypes?: { createInputTypeName: string; innerFieldName: string; patchTypeName: string },
 ): t.FunctionDeclaration {
-  const { singularName } = getTableNames(table);
+  const { singularName, typeName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
-  const pk = pkFields[0];
+  const pkFieldNames = new Set(pkFields.map((p) => p.name));
+
+  // Discover extra required fields on mutation input types beyond the PK.
+  // For partitioned tables, PostGraphile adds the partition key (e.g. createdAt,
+  // databaseId) as a required field on the update/delete input types.
+  // These must be included in the CLI where clause to match the ORM's type.
+  const patchFieldName = table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
+  const updateExtraKeys = operation === 'update'
+    ? getExtraInputKeys(getUpdateInputTypeName(table), pkFieldNames, patchFieldName, typeRegistry)
+    : [];
+  const deleteExtraKeys = operation === 'delete'
+    ? getExtraInputKeys(getDeleteInputTypeName(table), pkFieldNames, null, typeRegistry)
+    : [];
+  const extraKeys = operation === 'update' ? updateExtraKeys : deleteExtraKeys;
+  // All fields that go in the where clause (PK fields + extra keys)
+  const allWhereFieldNames = new Set([...pkFieldNames, ...extraKeys.map((ek) => ek.name)]);
 
   // Get the set of writable field names from the type registry
   // This filters out computed fields (e.g. searchTsvRank, hashUuid) that exist
@@ -1077,7 +1096,7 @@ function buildMutationHandler(
   const fieldsWithDefaults = getFieldsWithDefaults(table, typeRegistry);
 
   // For create: include fields that are in the create input type.
-  // For update/delete: always exclude the PK (it goes in `where`, not `data`).
+  // For update/delete: always exclude ALL where-clause fields (PK + extra keys).
   // The ORM input-types generator always excludes these fields from create inputs
   // (see EXCLUDED_MUTATION_FIELDS in input-types-generator.ts). We must match this
   // to avoid generating data properties that don't exist on the ORM create type.
@@ -1086,11 +1105,11 @@ function buildMutationHandler(
   const ORM_EXCLUDED_FIELDS = ['id', 'createdAt', 'updatedAt', 'nodeId'];
   const editableFields = getScalarFields(table).filter(
     (f) =>
-      // For update/delete: always exclude PK (it goes in `where`, not `data`)
+      // For update/delete: always exclude ALL where-clause fields (PK + extra keys)
       // For create: exclude PK only if it's in the ORM exclusion list (e.g. 'id')
-      (f.name !== pk.name || (operation === 'create' && !ORM_EXCLUDED_FIELDS.includes(pk.name))) &&
-      // Always exclude ORM-excluded fields (except PK which is handled above)
-      (f.name === pk.name || !ORM_EXCLUDED_FIELDS.includes(f.name)) &&
+      (!allWhereFieldNames.has(f.name) || (operation === 'create' && !ORM_EXCLUDED_FIELDS.includes(f.name))) &&
+      // Always exclude ORM-excluded fields (except where-clause fields handled above)
+      (allWhereFieldNames.has(f.name) || !ORM_EXCLUDED_FIELDS.includes(f.name)) &&
       // If we have type registry info, only include fields that exist in the input type
       (writableFields === null || writableFields.has(f.name)),
   );
@@ -1098,14 +1117,28 @@ function buildMutationHandler(
   const questions: t.Expression[] = [];
 
   if (operation === 'update' || operation === 'delete') {
-    questions.push(
-      t.objectExpression([
-        t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
-        t.objectProperty(t.identifier('name'), t.stringLiteral(pk.name)),
-        t.objectProperty(t.identifier('message'), t.stringLiteral(pk.name)),
-        t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
-      ]),
-    );
+    // Prompt for all PK fields
+    for (const pkField of pkFields) {
+      questions.push(
+        t.objectExpression([
+          t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+          t.objectProperty(t.identifier('name'), t.stringLiteral(pkField.name)),
+          t.objectProperty(t.identifier('message'), t.stringLiteral(pkField.name)),
+          t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
+        ]),
+      );
+    }
+    // Prompt for extra key fields (e.g. partition keys like createdAt, databaseId)
+    for (const ek of extraKeys) {
+      questions.push(
+        t.objectExpression([
+          t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+          t.objectProperty(t.identifier('name'), t.stringLiteral(ek.name)),
+          t.objectProperty(t.identifier('message'), t.stringLiteral(ek.name)),
+          t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
+        ]),
+      );
+    }
   }
 
   if (operation !== 'delete') {
@@ -1146,9 +1179,11 @@ function buildMutationHandler(
 
   const selectObj =
     operation === 'delete'
-      ? t.objectExpression([
-          t.objectProperty(t.identifier(pk.name), t.booleanLiteral(true)),
-        ])
+      ? t.objectExpression(
+          pkFields.map((pkField) =>
+            t.objectProperty(t.identifier(pkField.name), t.booleanLiteral(true)),
+          ),
+        )
       : buildSelectObject(table, typeRegistry);
 
   let ormArgs: t.ObjectExpression;
@@ -1168,6 +1203,31 @@ function buildMutationHandler(
     );
 
 
+  const buildWhereProps = () => [
+    ...pkFields.map((pkField) =>
+      t.objectProperty(
+        t.identifier(pkField.name),
+        t.tsAsExpression(
+          t.memberExpression(t.identifier('answers'), t.identifier(pkField.name)),
+          pkField.gqlType === 'Int' || pkField.gqlType === 'BigInt'
+            ? t.tsNumberKeyword()
+            : t.tsStringKeyword(),
+        ),
+      ),
+    ),
+    ...extraKeys.map((ek) =>
+      t.objectProperty(
+        t.identifier(ek.name),
+        t.tsAsExpression(
+          t.memberExpression(t.identifier('answers'), t.identifier(ek.name)),
+          ek.tsType === 'number'
+            ? t.tsNumberKeyword()
+            : t.tsStringKeyword(),
+        ),
+      ),
+    ),
+  ];
+
   if (operation === 'create') {
     ormArgs = t.objectExpression([
       t.objectProperty(
@@ -1180,17 +1240,7 @@ function buildMutationHandler(
     ormArgs = t.objectExpression([
       t.objectProperty(
         t.identifier('where'),
-        t.objectExpression([
-          t.objectProperty(
-            t.identifier(pk.name),
-            t.tsAsExpression(
-              t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-              pk.gqlType === 'Int' || pk.gqlType === 'BigInt'
-                ? t.tsNumberKeyword()
-                : t.tsStringKeyword(),
-            ),
-          ),
-        ]),
+        t.objectExpression(buildWhereProps()),
       ),
       t.objectProperty(
         t.identifier('data'),
@@ -1202,17 +1252,7 @@ function buildMutationHandler(
     ormArgs = t.objectExpression([
       t.objectProperty(
         t.identifier('where'),
-        t.objectExpression([
-          t.objectProperty(
-            t.identifier(pk.name),
-            t.tsAsExpression(
-              t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-              pk.gqlType === 'Int' || pk.gqlType === 'BigInt'
-                ? t.tsNumberKeyword()
-                : t.tsStringKeyword(),
-            ),
-          ),
-        ]),
+        t.objectExpression(buildWhereProps()),
       ),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);

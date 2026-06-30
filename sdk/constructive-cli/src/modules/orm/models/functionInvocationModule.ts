@@ -198,7 +198,8 @@ export class FunctionInvocationModuleModel {
       'UpdateFunctionInvocationModuleInput',
       'id',
       'functionInvocationModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

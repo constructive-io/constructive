@@ -196,7 +196,8 @@ export class EmbeddingChunkModel {
       'UpdateEmbeddingChunkInput',
       'id',
       'embeddingChunkPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

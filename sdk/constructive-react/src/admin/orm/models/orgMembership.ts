@@ -196,7 +196,8 @@ export class OrgMembershipModel {
       'UpdateOrgMembershipInput',
       'id',
       'orgMembershipPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

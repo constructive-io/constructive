@@ -1,6 +1,6 @@
 {
   "name": "graphile-pg-aggregates",
-  "version": "1.5.4",
+  "version": "1.8.1",
   "description": "PostGraphile v5 aggregate plugin — sum, avg, min, max, stddev, variance, distinctCount, groupedAggregates with groupBy + having, orderBy relational aggregates",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -52,7 +52,7 @@
     "graphile-build": "5.0.2",
     "graphile-build-pg": "5.0.2",
     "graphile-config": "1.0.1",
-    "graphile-connection-filter": "workspace:^",
+    "graphile-connection-filter": "^1.13.0",
     "graphql": "16.13.0",
     "pg-sql2": "5.0.1",
     "postgraphile": "5.0.3"

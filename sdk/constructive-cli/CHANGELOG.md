@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.1](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.29.0...@constructive-sdk/cli@0.29.1) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.29.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.28.0...@constructive-sdk/cli@0.29.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.28.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.27.0...@constructive-sdk/cli@0.28.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.27.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.26.0...@constructive-sdk/cli@0.27.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.26.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.25.17...@constructive-sdk/cli@0.26.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [0.25.17](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.25.16...@constructive-sdk/cli@0.25.17) (2026-06-23)
+
+### Bug Fixes
+
+- handle composite PK where clauses in CLI codegen ([da2afae](https://github.com/constructive-io/constructive/commit/da2afae4e4050d6dda03b0a90a8eac50c6d9f380))
+
+## [0.25.16](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.25.15...@constructive-sdk/cli@0.25.16) (2026-06-22)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
 ## [0.25.15](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.25.14...@constructive-sdk/cli@0.25.15) (2026-06-18)
 
 **Note:** Version bump only for package @constructive-sdk/cli

@@ -196,7 +196,8 @@ export class FullTextSearchModel {
       'UpdateFullTextSearchInput',
       'id',
       'fullTextSearchPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

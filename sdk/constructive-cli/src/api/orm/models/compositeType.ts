@@ -196,7 +196,8 @@ export class CompositeTypeModel {
       'UpdateCompositeTypeInput',
       'id',
       'compositeTypePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

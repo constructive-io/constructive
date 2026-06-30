@@ -196,7 +196,8 @@ export class OrgChartEdgeGrantModel {
       'UpdateOrgChartEdgeGrantInput',
       'id',
       'orgChartEdgeGrantPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

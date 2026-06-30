@@ -196,7 +196,8 @@ export class TriggerModel {
       'UpdateTriggerInput',
       'id',
       'triggerPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

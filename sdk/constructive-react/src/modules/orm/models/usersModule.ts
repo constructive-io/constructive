@@ -196,7 +196,8 @@ export class UsersModuleModel {
       'UpdateUsersModuleInput',
       'id',
       'usersModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -195,11 +195,12 @@ CRUD operations for Schema records.
 | `scope` | Int |
 | `tags` | String |
 | `isPublic` | Boolean |
+| `apiExposure` | ApiExposureLevel |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `name`, `schemaName`
-**Optional create fields (backend defaults):** `label`, `description`, `smartTags`, `category`, `scope`, `tags`, `isPublic`
+**Optional create fields (backend defaults):** `label`, `description`, `smartTags`, `category`, `scope`, `tags`, `isPublic`, `apiExposure`
 
 ### `table`
 

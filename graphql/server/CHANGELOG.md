@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.40.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.40.0...@constructive-io/graphql-server@4.40.1) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.40.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.39.0...@constructive-io/graphql-server@4.40.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.39.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.38.0...@constructive-io/graphql-server@4.39.0) (2026-06-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.38.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.37.0...@constructive-io/graphql-server@4.38.0) (2026-06-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.37.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.36.4...@constructive-io/graphql-server@4.37.0) (2026-06-27)
+
+### Bug Fixes
+
+- add principal_id to local ConstructiveAPIToken type in graphql/server ([b9511e1](https://github.com/constructive-io/constructive/commit/b9511e11cc646471f5e03e287cf038ba37847770))
+- remove speculative is_read_only checks from graphile middleware ([880712b](https://github.com/constructive-io/constructive/commit/880712b41013f87014d521d069a01d3d41ec22ff))
+
+### Features
+
+- always set jwt.claims.principal_id in pgSettings ([89daf56](https://github.com/constructive-io/constructive/commit/89daf56d00619df79f27912690765ba65c104215))
+- propagate principal_id through Express middleware and PostGraphile pgSettings ([59e2eda](https://github.com/constructive-io/constructive/commit/59e2edae80134b8f5275ed699ba1eb57a199676d)), closes [constructive-planning#1074](https://github.com/constructive-planning/issues/1074)
+
+## [4.36.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.36.3...@constructive-io/graphql-server@4.36.4) (2026-06-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [4.36.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.36.2...@constructive-io/graphql-server@4.36.3) (2026-06-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

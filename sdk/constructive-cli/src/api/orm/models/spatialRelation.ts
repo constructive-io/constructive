@@ -196,7 +196,8 @@ export class SpatialRelationModel {
       'UpdateSpatialRelationInput',
       'id',
       'spatialRelationPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

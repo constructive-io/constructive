@@ -41,6 +41,7 @@ export function useDeleteRefMutation<S extends RefSelect>(
       Error,
       {
         id: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -54,6 +55,7 @@ export function useDeleteRefMutation<S extends RefSelect>(
   Error,
   {
     id: string;
+    databaseId: string;
   }
 >;
 export function useDeleteRefMutation(
@@ -65,6 +67,7 @@ export function useDeleteRefMutation(
       Error,
       {
         id: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -76,11 +79,12 @@ export function useDeleteRefMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: refMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) =>
+    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
       getClient()
         .ref.delete({
           where: {
             id,
+            databaseId,
           },
           select: args.select,
         })

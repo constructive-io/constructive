@@ -33,6 +33,16 @@ const createConnectionsBase = async (
   const conn: GetConnectionResult = await getPgConnections(input, seedAdapters);
   const { pg, db, teardown: dbTeardown } = conn;
 
+  // Auto-derive principal_id from user_id on every setContext call
+  // (same behavior as constructive-test for pgsql-test clients).
+  const origSetContext = db.setContext.bind(db);
+  db.setContext = (ctx: Record<string, string | null>) => {
+    if (ctx['jwt.claims.user_id'] && !('jwt.claims.principal_id' in ctx)) {
+      ctx = { ...ctx, 'jwt.claims.principal_id': ctx['jwt.claims.user_id'] };
+    }
+    origSetContext(ctx);
+  };
+
   const gqlContext = GraphQLTest(input, conn);
   await gqlContext.setup();
 

@@ -196,7 +196,8 @@ export class CheckConstraintModel {
       'UpdateCheckConstraintInput',
       'id',
       'checkConstraintPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -198,7 +198,8 @@ export class CryptoAddressesModuleModel {
       'UpdateCryptoAddressesModuleInput',
       'id',
       'cryptoAddressesModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -196,7 +196,8 @@ export class EntityTypeProvisionModel {
       'UpdateEntityTypeProvisionInput',
       'id',
       'entityTypeProvisionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

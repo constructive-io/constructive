@@ -27,6 +27,7 @@ const fieldSchema: FieldSchema = {
   scope: 'int',
   tags: 'string',
   isPublic: 'boolean',
+  apiExposure: 'string',
   createdAt: 'string',
   updatedAt: 'string',
 };
@@ -92,6 +93,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       scope: true,
       tags: true,
       isPublic: true,
+      apiExposure: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -125,6 +127,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       scope: true,
       tags: true,
       isPublic: true,
+      apiExposure: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -170,6 +173,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           scope: true,
           tags: true,
           isPublic: true,
+          apiExposure: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -254,6 +258,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'apiExposure',
+        message: 'apiExposure',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateSchemaInput['schema'];
@@ -271,6 +282,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: cleanedData.scope,
           tags: cleanedData.tags,
           isPublic: cleanedData.isPublic,
+          apiExposure: cleanedData.apiExposure,
         },
         select: {
           id: true,
@@ -284,6 +296,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: true,
           tags: true,
           isPublic: true,
+          apiExposure: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -374,6 +387,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'apiExposure',
+        message: 'apiExposure',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as SchemaPatch;
@@ -394,6 +414,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: cleanedData.scope,
           tags: cleanedData.tags,
           isPublic: cleanedData.isPublic,
+          apiExposure: cleanedData.apiExposure,
         },
         select: {
           id: true,
@@ -407,6 +428,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: true,
           tags: true,
           isPublic: true,
+          apiExposure: true,
           createdAt: true,
           updatedAt: true,
         },

@@ -1,0 +1,45 @@
+{
+  "name": "@constructive-io/query-builder",
+  "version": "2.20.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "PostgreSQL Query Builder",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "query",
+    "builder",
+    "sql",
+    "constructive",
+    "database"
+  ],
+  "devDependencies": {
+    "makage": "^0.3.0"
+  },
+  "dependencies": {
+    "pg-ast": "workspace:^",
+    "pgsql-deparser": "^17.18.3"
+  }
+}

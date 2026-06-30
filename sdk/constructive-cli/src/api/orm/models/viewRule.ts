@@ -196,7 +196,8 @@ export class ViewRuleModel {
       'UpdateViewRuleInput',
       'id',
       'viewRulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

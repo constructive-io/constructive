@@ -277,7 +277,10 @@ const buildPreset = (
             pgSettings['jwt.claims.kind'] = req.token.kind;
           }
 
-          // Enforce read-only transactions for read_only credentials (API keys, etc.)
+          // Principal identity — always set; equals user_id for human sessions
+          pgSettings['jwt.claims.principal_id'] = req.token.principal_id || req.token.user_id;
+
+          // Enforce read-only transactions for read_only credentials
           if (req.token.access_level === 'read_only') {
             pgSettings['default_transaction_read_only'] = 'on';
           }

@@ -198,7 +198,8 @@ export class UserCredentialsModuleModel {
       'UpdateUserCredentialsModuleInput',
       'id',
       'userCredentialsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

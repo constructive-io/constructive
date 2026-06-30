@@ -196,7 +196,8 @@ export class StorageLogModuleModel {
       'UpdateStorageLogModuleInput',
       'id',
       'storageLogModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

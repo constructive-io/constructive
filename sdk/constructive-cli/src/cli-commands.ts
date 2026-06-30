@@ -8,7 +8,7 @@
 import type { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { extractFirst, getPackageJson } from 'inquirerer';
 
-import { getConfigStore } from './config';
+import { getConfigStore } from './config-store';
 import { printSuccess, printError, printKeyValue, printTable } from './utils';
 
 const TOOL_NAME = 'csdk';

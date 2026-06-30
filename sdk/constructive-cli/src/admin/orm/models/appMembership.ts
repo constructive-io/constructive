@@ -196,7 +196,8 @@ export class AppMembershipModel {
       'UpdateAppMembershipInput',
       'id',
       'appMembershipPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

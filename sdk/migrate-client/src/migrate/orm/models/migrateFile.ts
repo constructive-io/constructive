@@ -196,7 +196,8 @@ export class MigrateFileModel {
       'UpdateMigrateFileInput',
       'id',
       'migrateFilePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -196,7 +196,8 @@ export class DevicesModuleModel {
       'UpdateDevicesModuleInput',
       'id',
       'devicesModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

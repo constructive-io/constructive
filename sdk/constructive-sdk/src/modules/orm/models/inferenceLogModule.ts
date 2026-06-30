@@ -196,7 +196,8 @@ export class InferenceLogModuleModel {
       'UpdateInferenceLogModuleInput',
       'id',
       'inferenceLogModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

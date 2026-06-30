@@ -9,7 +9,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "bucketName": "test-bucket",
     "endpoint": "http://localhost:9000",
     "provider": "minio",
-    "publicUrlPrefix": "http://localhost:9000/test-bucket",
+    "publicUrlPrefix": "http://localhost:9000",
   },
   "db": {
     "connections": {

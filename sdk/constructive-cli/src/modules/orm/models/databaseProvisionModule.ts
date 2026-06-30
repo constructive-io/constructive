@@ -198,7 +198,8 @@ export class DatabaseProvisionModuleModel {
       'UpdateDatabaseProvisionModuleInput',
       'id',
       'databaseProvisionModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

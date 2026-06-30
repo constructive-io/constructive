@@ -10,6 +10,8 @@ export * as admin from './admin';
 export * as agent from './agent';
 export * as api from './api';
 export * as auth from './auth';
+export * as compute from './compute';
+export * as config from './config';
 export * as modules from './modules';
 export * as objects from './objects';
 export * as usage from './usage';

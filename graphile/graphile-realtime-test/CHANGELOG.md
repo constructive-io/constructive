@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.1](https://github.com/constructive-io/constructive/compare/graphile-realtime-test@0.10.0...graphile-realtime-test@0.10.1) (2026-06-28)
+
+**Note:** Version bump only for package graphile-realtime-test
+
+# [0.10.0](https://github.com/constructive-io/constructive/compare/graphile-realtime-test@0.9.0...graphile-realtime-test@0.10.0) (2026-06-28)
+
+**Note:** Version bump only for package graphile-realtime-test
+
+# [0.9.0](https://github.com/constructive-io/constructive/compare/graphile-realtime-test@0.8.6...graphile-realtime-test@0.9.0) (2026-06-27)
+
+**Note:** Version bump only for package graphile-realtime-test
+
+## [0.8.6](https://github.com/constructive-io/constructive/compare/graphile-realtime-test@0.8.5...graphile-realtime-test@0.8.6) (2026-06-22)
+
+**Note:** Version bump only for package graphile-realtime-test
+
 ## [0.8.5](https://github.com/constructive-io/constructive/compare/graphile-realtime-test@0.8.4...graphile-realtime-test@0.8.5) (2026-06-14)
 
 **Note:** Version bump only for package graphile-realtime-test

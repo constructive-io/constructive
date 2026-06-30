@@ -121,6 +121,7 @@ CRUD operations for Schema records.
 | `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `isPublic` | Boolean | Yes |
+| `apiExposure` | ApiExposureLevel | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 
@@ -128,13 +129,13 @@ CRUD operations for Schema records.
 
 ```typescript
 // List all schema records
-const items = await db.schema.findMany({ select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.schema.findMany({ select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.schema.findOne({ id: '<UUID>', select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.schema.findOne({ id: '<UUID>', select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.schema.create({ data: { databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.schema.create({ data: { databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>', apiExposure: '<ApiExposureLevel>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.schema.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();

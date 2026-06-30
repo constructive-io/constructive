@@ -26,8 +26,10 @@ import type {
   EmailsModule,
   EntityTypeProvision,
   EventsModule,
+  FunctionDeploymentModule,
   FunctionInvocationModule,
   FunctionModule,
+  GraphExecutionModule,
   GraphModule,
   HierarchyModule,
   I18NModule,
@@ -719,10 +721,6 @@ export type GraphModuleOrderBy =
   | 'MERKLE_STORE_MODULE_ID_DESC'
   | 'GRAPHS_TABLE_ID_ASC'
   | 'GRAPHS_TABLE_ID_DESC'
-  | 'EXECUTIONS_TABLE_ID_ASC'
-  | 'EXECUTIONS_TABLE_ID_DESC'
-  | 'OUTPUTS_TABLE_ID_ASC'
-  | 'OUTPUTS_TABLE_ID_DESC'
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
   | 'PRIVATE_API_NAME_ASC'
@@ -1078,47 +1076,6 @@ export type InvitesModuleOrderBy =
   | 'API_NAME_DESC'
   | 'PRIVATE_API_NAME_ASC'
   | 'PRIVATE_API_NAME_DESC';
-/** Methods to use when ordering `NamespaceModule`. */
-export type NamespaceModuleOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'NAMESPACES_TABLE_ID_ASC'
-  | 'NAMESPACES_TABLE_ID_DESC'
-  | 'NAMESPACE_EVENTS_TABLE_ID_ASC'
-  | 'NAMESPACE_EVENTS_TABLE_ID_DESC'
-  | 'NAMESPACES_TABLE_NAME_ASC'
-  | 'NAMESPACES_TABLE_NAME_DESC'
-  | 'NAMESPACE_EVENTS_TABLE_NAME_ASC'
-  | 'NAMESPACE_EVENTS_TABLE_NAME_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC';
 /** Methods to use when ordering `ComputeLogModule`. */
 export type ComputeLogModuleOrderBy =
   | 'NATURAL'
@@ -1205,6 +1162,49 @@ export type InferenceLogModuleOrderBy =
   | 'API_NAME_DESC'
   | 'PRIVATE_API_NAME_ASC'
   | 'PRIVATE_API_NAME_DESC';
+/** Methods to use when ordering `NamespaceModule`. */
+export type NamespaceModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'NAMESPACES_TABLE_ID_ASC'
+  | 'NAMESPACES_TABLE_ID_DESC'
+  | 'NAMESPACE_EVENTS_TABLE_ID_ASC'
+  | 'NAMESPACE_EVENTS_TABLE_ID_DESC'
+  | 'NAMESPACES_TABLE_NAME_ASC'
+  | 'NAMESPACES_TABLE_NAME_DESC'
+  | 'NAMESPACE_EVENTS_TABLE_NAME_ASC'
+  | 'NAMESPACE_EVENTS_TABLE_NAME_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'PLATFORM_NAMESPACES_TABLE_ID_ASC'
+  | 'PLATFORM_NAMESPACES_TABLE_ID_DESC'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC';
 /** Methods to use when ordering `StorageLogModule`. */
 export type StorageLogModuleOrderBy =
   | 'NATURAL'
@@ -1291,6 +1291,51 @@ export type TransferLogModuleOrderBy =
   | 'API_NAME_DESC'
   | 'PRIVATE_API_NAME_ASC'
   | 'PRIVATE_API_NAME_DESC';
+/** Methods to use when ordering `FunctionDeploymentModule`. */
+export type FunctionDeploymentModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'DEPLOYMENTS_TABLE_ID_ASC'
+  | 'DEPLOYMENTS_TABLE_ID_DESC'
+  | 'DEPLOYMENT_EVENTS_TABLE_ID_ASC'
+  | 'DEPLOYMENT_EVENTS_TABLE_ID_DESC'
+  | 'DEPLOYMENTS_TABLE_NAME_ASC'
+  | 'DEPLOYMENTS_TABLE_NAME_DESC'
+  | 'DEPLOYMENT_EVENTS_TABLE_NAME_ASC'
+  | 'DEPLOYMENT_EVENTS_TABLE_NAME_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'FUNCTION_MODULE_ID_ASC'
+  | 'FUNCTION_MODULE_ID_DESC'
+  | 'NAMESPACE_MODULE_ID_ASC'
+  | 'NAMESPACE_MODULE_ID_DESC'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC';
 /** Methods to use when ordering `PlansModule`. */
 export type PlansModuleOrderBy =
   | 'NATURAL'
@@ -1436,6 +1481,55 @@ export type DbUsageModuleOrderBy =
   | 'API_NAME_DESC'
   | 'PRIVATE_API_NAME_ASC'
   | 'PRIVATE_API_NAME_DESC';
+/** Methods to use when ordering `GraphExecutionModule`. */
+export type GraphExecutionModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'GRAPH_MODULE_ID_ASC'
+  | 'GRAPH_MODULE_ID_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'EXECUTIONS_TABLE_ID_ASC'
+  | 'EXECUTIONS_TABLE_ID_DESC'
+  | 'OUTPUTS_TABLE_ID_ASC'
+  | 'OUTPUTS_TABLE_ID_DESC'
+  | 'NODE_STATES_TABLE_ID_ASC'
+  | 'NODE_STATES_TABLE_ID_DESC'
+  | 'EXECUTIONS_TABLE_NAME_ASC'
+  | 'EXECUTIONS_TABLE_NAME_DESC'
+  | 'OUTPUTS_TABLE_NAME_ASC'
+  | 'OUTPUTS_TABLE_NAME_DESC'
+  | 'NODE_STATES_TABLE_NAME_ASC'
+  | 'NODE_STATES_TABLE_NAME_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC';
 /** Methods to use when ordering `HierarchyModule`. */
 export type HierarchyModuleOrderBy =
   | 'NATURAL'
@@ -3177,10 +3271,6 @@ export interface GraphModuleFilter {
   merkleStoreModuleId?: UUIDFilter;
   /** Filter by the object’s `graphsTableId` field. */
   graphsTableId?: UUIDFilter;
-  /** Filter by the object’s `executionsTableId` field. */
-  executionsTableId?: UUIDFilter;
-  /** Filter by the object’s `outputsTableId` field. */
-  outputsTableId?: UUIDFilter;
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
   /** Filter by the object’s `privateApiName` field. */
@@ -3594,51 +3684,6 @@ export interface InvitesModuleFilter {
   /** Negates the expression. */
   not?: InvitesModuleFilter;
 }
-/** A filter to be used against `NamespaceModule` object types. All fields are combined with a logical ‘and.’ */
-export interface NamespaceModuleFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `schemaId` field. */
-  schemaId?: UUIDFilter;
-  /** Filter by the object’s `privateSchemaId` field. */
-  privateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `publicSchemaName` field. */
-  publicSchemaName?: StringFilter;
-  /** Filter by the object’s `privateSchemaName` field. */
-  privateSchemaName?: StringFilter;
-  /** Filter by the object’s `namespacesTableId` field. */
-  namespacesTableId?: UUIDFilter;
-  /** Filter by the object’s `namespaceEventsTableId` field. */
-  namespaceEventsTableId?: UUIDFilter;
-  /** Filter by the object’s `namespacesTableName` field. */
-  namespacesTableName?: StringFilter;
-  /** Filter by the object’s `namespaceEventsTableName` field. */
-  namespaceEventsTableName?: StringFilter;
-  /** Filter by the object’s `apiName` field. */
-  apiName?: StringFilter;
-  /** Filter by the object’s `privateApiName` field. */
-  privateApiName?: StringFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: StringFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Filter by the object’s `entityTableId` field. */
-  entityTableId?: UUIDFilter;
-  /** Filter by the object’s `policies` field. */
-  policies?: JSONFilter;
-  /** Filter by the object’s `provisions` field. */
-  provisions?: JSONFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
-  /** Checks for all expressions in this list. */
-  and?: NamespaceModuleFilter[];
-  /** Checks for any expressions in this list. */
-  or?: NamespaceModuleFilter[];
-  /** Negates the expression. */
-  not?: NamespaceModuleFilter;
-}
 /** A filter to be used against `ComputeLogModule` object types. All fields are combined with a logical ‘and.’ */
 export interface ComputeLogModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -3733,6 +3778,53 @@ export interface InferenceLogModuleFilter {
   /** Negates the expression. */
   not?: InferenceLogModuleFilter;
 }
+/** A filter to be used against `NamespaceModule` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `namespacesTableId` field. */
+  namespacesTableId?: UUIDFilter;
+  /** Filter by the object’s `namespaceEventsTableId` field. */
+  namespaceEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `namespacesTableName` field. */
+  namespacesTableName?: StringFilter;
+  /** Filter by the object’s `namespaceEventsTableName` field. */
+  namespaceEventsTableName?: StringFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `platformNamespacesTableId` field. */
+  platformNamespacesTableId?: UUIDFilter;
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: NamespaceModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: NamespaceModuleFilter[];
+  /** Negates the expression. */
+  not?: NamespaceModuleFilter;
+}
 /** A filter to be used against `StorageLogModule` object types. All fields are combined with a logical ‘and.’ */
 export interface StorageLogModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -3826,6 +3918,63 @@ export interface TransferLogModuleFilter {
   or?: TransferLogModuleFilter[];
   /** Negates the expression. */
   not?: TransferLogModuleFilter;
+}
+/** A filter to be used against `FunctionDeploymentModule` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionDeploymentModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `deploymentsTableId` field. */
+  deploymentsTableId?: UUIDFilter;
+  /** Filter by the object’s `deploymentEventsTableId` field. */
+  deploymentEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `deploymentsTableName` field. */
+  deploymentsTableName?: StringFilter;
+  /** Filter by the object’s `deploymentEventsTableName` field. */
+  deploymentEventsTableName?: StringFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionModuleId` field. */
+  functionModuleId?: UUIDFilter;
+  /** Filter by the object’s `namespaceModuleId` field. */
+  namespaceModuleId?: UUIDFilter;
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionDeploymentModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FunctionDeploymentModuleFilter[];
+  /** Negates the expression. */
+  not?: FunctionDeploymentModuleFilter;
+  /** Filter by the object’s `functionModule` relation. */
+  functionModule?: FunctionModuleFilter;
+  /** A related `functionModule` exists. */
+  functionModuleExists?: boolean;
+  /** Filter by the object’s `namespaceModule` relation. */
+  namespaceModule?: NamespaceModuleFilter;
+  /** A related `namespaceModule` exists. */
+  namespaceModuleExists?: boolean;
 }
 /** A filter to be used against `PlansModule` object types. All fields are combined with a logical ‘and.’ */
 export interface PlansModuleFilter {
@@ -3983,6 +4132,61 @@ export interface DbUsageModuleFilter {
   or?: DbUsageModuleFilter[];
   /** Negates the expression. */
   not?: DbUsageModuleFilter;
+}
+/** A filter to be used against `GraphExecutionModule` object types. All fields are combined with a logical ‘and.’ */
+export interface GraphExecutionModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `graphModuleId` field. */
+  graphModuleId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `executionsTableId` field. */
+  executionsTableId?: UUIDFilter;
+  /** Filter by the object’s `outputsTableId` field. */
+  outputsTableId?: UUIDFilter;
+  /** Filter by the object’s `nodeStatesTableId` field. */
+  nodeStatesTableId?: UUIDFilter;
+  /** Filter by the object’s `executionsTableName` field. */
+  executionsTableName?: StringFilter;
+  /** Filter by the object’s `outputsTableName` field. */
+  outputsTableName?: StringFilter;
+  /** Filter by the object’s `nodeStatesTableName` field. */
+  nodeStatesTableName?: StringFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: GraphExecutionModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: GraphExecutionModuleFilter[];
+  /** Negates the expression. */
+  not?: GraphExecutionModuleFilter;
+  /** Filter by the object’s `graphModule` relation. */
+  graphModule?: GraphModuleFilter;
 }
 /** A filter to be used against `HierarchyModule` object types. All fields are combined with a logical ‘and.’ */
 export interface HierarchyModuleFilter {
@@ -5530,6 +5734,31 @@ export interface ConfigSecretsModuleInput {
   provisions?: unknown;
   hasConfig?: boolean;
 }
+export interface CreateGraphModuleInput {
+  clientMutationId?: string;
+  /** The `GraphModule` to be created by this mutation. */
+  graphModule: GraphModuleInput;
+}
+/** An input for mutations affecting `GraphModule` */
+export interface GraphModuleInput {
+  id?: string;
+  databaseId: string;
+  publicSchemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  scope?: string;
+  prefix?: string;
+  merkleStoreModuleId: string;
+  graphsTableId?: string;
+  apiName?: string;
+  privateApiName?: string;
+  entityTableId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
+  createdAt?: string;
+}
 export interface CreateRateLimitMetersModuleInput {
   clientMutationId?: string;
   /** The `RateLimitMetersModule` to be created by this mutation. */
@@ -5679,32 +5908,6 @@ export interface InvitesModuleInput {
   apiName?: string;
   privateApiName?: string;
 }
-export interface CreateNamespaceModuleInput {
-  clientMutationId?: string;
-  /** The `NamespaceModule` to be created by this mutation. */
-  namespaceModule: NamespaceModuleInput;
-}
-/** An input for mutations affecting `NamespaceModule` */
-export interface NamespaceModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  publicSchemaName?: string;
-  privateSchemaName?: string;
-  namespacesTableId?: string;
-  namespaceEventsTableId?: string;
-  namespacesTableName?: string;
-  namespaceEventsTableName?: string;
-  apiName?: string;
-  privateApiName?: string;
-  scope?: string;
-  prefix?: string;
-  entityTableId?: string;
-  policies?: unknown;
-  provisions?: unknown;
-  defaultPermissions?: string[];
-}
 export interface CreateComputeLogModuleInput {
   clientMutationId?: string;
   /** The `ComputeLogModule` to be created by this mutation. */
@@ -5732,33 +5935,6 @@ export interface ComputeLogModuleInput {
   apiName?: string;
   privateApiName?: string;
 }
-export interface CreateGraphModuleInput {
-  clientMutationId?: string;
-  /** The `GraphModule` to be created by this mutation. */
-  graphModule: GraphModuleInput;
-}
-/** An input for mutations affecting `GraphModule` */
-export interface GraphModuleInput {
-  id?: string;
-  databaseId: string;
-  publicSchemaId?: string;
-  privateSchemaId?: string;
-  publicSchemaName?: string;
-  privateSchemaName?: string;
-  scope?: string;
-  prefix?: string;
-  merkleStoreModuleId: string;
-  graphsTableId?: string;
-  executionsTableId?: string;
-  outputsTableId?: string;
-  apiName?: string;
-  privateApiName?: string;
-  entityTableId?: string;
-  policies?: unknown;
-  provisions?: unknown;
-  defaultPermissions?: string[];
-  createdAt?: string;
-}
 export interface CreateInferenceLogModuleInput {
   clientMutationId?: string;
   /** The `InferenceLogModule` to be created by this mutation. */
@@ -5785,6 +5961,33 @@ export interface InferenceLogModuleInput {
   prefix?: string;
   apiName?: string;
   privateApiName?: string;
+}
+export interface CreateNamespaceModuleInput {
+  clientMutationId?: string;
+  /** The `NamespaceModule` to be created by this mutation. */
+  namespaceModule: NamespaceModuleInput;
+}
+/** An input for mutations affecting `NamespaceModule` */
+export interface NamespaceModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  namespacesTableId?: string;
+  namespaceEventsTableId?: string;
+  namespacesTableName?: string;
+  namespaceEventsTableName?: string;
+  apiName?: string;
+  privateApiName?: string;
+  scope?: string;
+  prefix?: string;
+  entityTableId?: string;
+  platformNamespacesTableId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
 }
 export interface CreateStorageLogModuleInput {
   clientMutationId?: string;
@@ -5839,6 +6042,34 @@ export interface TransferLogModuleInput {
   prefix?: string;
   apiName?: string;
   privateApiName?: string;
+}
+export interface CreateFunctionDeploymentModuleInput {
+  clientMutationId?: string;
+  /** The `FunctionDeploymentModule` to be created by this mutation. */
+  functionDeploymentModule: FunctionDeploymentModuleInput;
+}
+/** An input for mutations affecting `FunctionDeploymentModule` */
+export interface FunctionDeploymentModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  deploymentsTableId?: string;
+  deploymentEventsTableId?: string;
+  deploymentsTableName?: string;
+  deploymentEventsTableName?: string;
+  apiName?: string;
+  privateApiName?: string;
+  scope?: string;
+  prefix?: string;
+  entityTableId?: string;
+  functionModuleId?: string;
+  namespaceModuleId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
 }
 export interface CreatePlansModuleInput {
   clientMutationId?: string;
@@ -5928,6 +6159,36 @@ export interface DbUsageModuleInput {
   defaultPermissions?: string[];
   apiName?: string;
   privateApiName?: string;
+}
+export interface CreateGraphExecutionModuleInput {
+  clientMutationId?: string;
+  /** The `GraphExecutionModule` to be created by this mutation. */
+  graphExecutionModule: GraphExecutionModuleInput;
+}
+/** An input for mutations affecting `GraphExecutionModule` */
+export interface GraphExecutionModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  graphModuleId: string;
+  scope?: string;
+  prefix?: string;
+  executionsTableId?: string;
+  outputsTableId?: string;
+  nodeStatesTableId?: string;
+  executionsTableName?: string;
+  outputsTableName?: string;
+  nodeStatesTableName?: string;
+  apiName?: string;
+  privateApiName?: string;
+  entityTableId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
+  createdAt?: string;
 }
 export interface CreateHierarchyModuleInput {
   clientMutationId?: string;
@@ -7360,6 +7621,32 @@ export interface ConfigSecretsModulePatch {
   provisions?: unknown;
   hasConfig?: boolean;
 }
+export interface UpdateGraphModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `GraphModule` being updated. */
+  graphModulePatch: GraphModulePatch;
+}
+/** Represents an update to a `GraphModule`. Fields that are set will be updated. */
+export interface GraphModulePatch {
+  id?: string;
+  databaseId?: string;
+  publicSchemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  scope?: string;
+  prefix?: string;
+  merkleStoreModuleId?: string;
+  graphsTableId?: string;
+  apiName?: string;
+  privateApiName?: string;
+  entityTableId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
+  createdAt?: string;
+}
 export interface UpdateRateLimitMetersModuleInput {
   clientMutationId?: string;
   id: string;
@@ -7515,33 +7802,6 @@ export interface InvitesModulePatch {
   apiName?: string;
   privateApiName?: string;
 }
-export interface UpdateNamespaceModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `NamespaceModule` being updated. */
-  namespaceModulePatch: NamespaceModulePatch;
-}
-/** Represents an update to a `NamespaceModule`. Fields that are set will be updated. */
-export interface NamespaceModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  publicSchemaName?: string;
-  privateSchemaName?: string;
-  namespacesTableId?: string;
-  namespaceEventsTableId?: string;
-  namespacesTableName?: string;
-  namespaceEventsTableName?: string;
-  apiName?: string;
-  privateApiName?: string;
-  scope?: string;
-  prefix?: string;
-  entityTableId?: string;
-  policies?: unknown;
-  provisions?: unknown;
-  defaultPermissions?: string[];
-}
 export interface UpdateComputeLogModuleInput {
   clientMutationId?: string;
   id: string;
@@ -7570,34 +7830,6 @@ export interface ComputeLogModulePatch {
   apiName?: string;
   privateApiName?: string;
 }
-export interface UpdateGraphModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `GraphModule` being updated. */
-  graphModulePatch: GraphModulePatch;
-}
-/** Represents an update to a `GraphModule`. Fields that are set will be updated. */
-export interface GraphModulePatch {
-  id?: string;
-  databaseId?: string;
-  publicSchemaId?: string;
-  privateSchemaId?: string;
-  publicSchemaName?: string;
-  privateSchemaName?: string;
-  scope?: string;
-  prefix?: string;
-  merkleStoreModuleId?: string;
-  graphsTableId?: string;
-  executionsTableId?: string;
-  outputsTableId?: string;
-  apiName?: string;
-  privateApiName?: string;
-  entityTableId?: string;
-  policies?: unknown;
-  provisions?: unknown;
-  defaultPermissions?: string[];
-  createdAt?: string;
-}
 export interface UpdateInferenceLogModuleInput {
   clientMutationId?: string;
   id: string;
@@ -7625,6 +7857,34 @@ export interface InferenceLogModulePatch {
   prefix?: string;
   apiName?: string;
   privateApiName?: string;
+}
+export interface UpdateNamespaceModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `NamespaceModule` being updated. */
+  namespaceModulePatch: NamespaceModulePatch;
+}
+/** Represents an update to a `NamespaceModule`. Fields that are set will be updated. */
+export interface NamespaceModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  namespacesTableId?: string;
+  namespaceEventsTableId?: string;
+  namespacesTableName?: string;
+  namespaceEventsTableName?: string;
+  apiName?: string;
+  privateApiName?: string;
+  scope?: string;
+  prefix?: string;
+  entityTableId?: string;
+  platformNamespacesTableId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
 }
 export interface UpdateStorageLogModuleInput {
   clientMutationId?: string;
@@ -7681,6 +7941,35 @@ export interface TransferLogModulePatch {
   prefix?: string;
   apiName?: string;
   privateApiName?: string;
+}
+export interface UpdateFunctionDeploymentModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `FunctionDeploymentModule` being updated. */
+  functionDeploymentModulePatch: FunctionDeploymentModulePatch;
+}
+/** Represents an update to a `FunctionDeploymentModule`. Fields that are set will be updated. */
+export interface FunctionDeploymentModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  deploymentsTableId?: string;
+  deploymentEventsTableId?: string;
+  deploymentsTableName?: string;
+  deploymentEventsTableName?: string;
+  apiName?: string;
+  privateApiName?: string;
+  scope?: string;
+  prefix?: string;
+  entityTableId?: string;
+  functionModuleId?: string;
+  namespaceModuleId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
 }
 export interface UpdatePlansModuleInput {
   clientMutationId?: string;
@@ -7773,6 +8062,37 @@ export interface DbUsageModulePatch {
   defaultPermissions?: string[];
   apiName?: string;
   privateApiName?: string;
+}
+export interface UpdateGraphExecutionModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `GraphExecutionModule` being updated. */
+  graphExecutionModulePatch: GraphExecutionModulePatch;
+}
+/** Represents an update to a `GraphExecutionModule`. Fields that are set will be updated. */
+export interface GraphExecutionModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  graphModuleId?: string;
+  scope?: string;
+  prefix?: string;
+  executionsTableId?: string;
+  outputsTableId?: string;
+  nodeStatesTableId?: string;
+  executionsTableName?: string;
+  outputsTableName?: string;
+  nodeStatesTableName?: string;
+  apiName?: string;
+  privateApiName?: string;
+  entityTableId?: string;
+  policies?: unknown;
+  provisions?: unknown;
+  defaultPermissions?: string[];
+  createdAt?: string;
 }
 export interface UpdateHierarchyModuleInput {
   clientMutationId?: string;
@@ -8767,6 +9087,10 @@ export interface DeleteConfigSecretsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteGraphModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteRateLimitMetersModuleInput {
   clientMutationId?: string;
   id: string;
@@ -8791,19 +9115,15 @@ export interface DeleteInvitesModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteNamespaceModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteComputeLogModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteGraphModuleInput {
+export interface DeleteInferenceLogModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteInferenceLogModuleInput {
+export interface DeleteNamespaceModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -8812,6 +9132,10 @@ export interface DeleteStorageLogModuleInput {
   id: string;
 }
 export interface DeleteTransferLogModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteFunctionDeploymentModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -8824,6 +9148,10 @@ export interface DeleteBillingProviderModuleInput {
   id: string;
 }
 export interface DeleteDbUsageModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteGraphExecutionModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -9091,6 +9419,13 @@ export interface ConfigSecretsModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `GraphModule` values. */
+export interface GraphModuleConnection {
+  nodes: GraphModule[];
+  edges: GraphModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `RateLimitMetersModule` values. */
 export interface RateLimitMetersModuleConnection {
   nodes: RateLimitMetersModule[];
@@ -9133,13 +9468,6 @@ export interface InvitesModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `NamespaceModule` values. */
-export interface NamespaceModuleConnection {
-  nodes: NamespaceModule[];
-  edges: NamespaceModuleEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `ComputeLogModule` values. */
 export interface ComputeLogModuleConnection {
   nodes: ComputeLogModule[];
@@ -9147,17 +9475,17 @@ export interface ComputeLogModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `GraphModule` values. */
-export interface GraphModuleConnection {
-  nodes: GraphModule[];
-  edges: GraphModuleEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `InferenceLogModule` values. */
 export interface InferenceLogModuleConnection {
   nodes: InferenceLogModule[];
   edges: InferenceLogModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `NamespaceModule` values. */
+export interface NamespaceModuleConnection {
+  nodes: NamespaceModule[];
+  edges: NamespaceModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9172,6 +9500,13 @@ export interface StorageLogModuleConnection {
 export interface TransferLogModuleConnection {
   nodes: TransferLogModule[];
   edges: TransferLogModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `FunctionDeploymentModule` values. */
+export interface FunctionDeploymentModuleConnection {
+  nodes: FunctionDeploymentModule[];
+  edges: FunctionDeploymentModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9193,6 +9528,13 @@ export interface BillingProviderModuleConnection {
 export interface DbUsageModuleConnection {
   nodes: DbUsageModule[];
   edges: DbUsageModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `GraphExecutionModule` values. */
+export interface GraphExecutionModuleConnection {
+  nodes: GraphExecutionModule[];
+  edges: GraphExecutionModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -9500,6 +9842,12 @@ export interface CreateConfigSecretsModulePayload {
   configSecretsModule?: ConfigSecretsModule | null;
   configSecretsModuleEdge?: ConfigSecretsModuleEdge | null;
 }
+export interface CreateGraphModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphModule` that was created by this mutation. */
+  graphModule?: GraphModule | null;
+  graphModuleEdge?: GraphModuleEdge | null;
+}
 export interface CreateRateLimitMetersModulePayload {
   clientMutationId?: string | null;
   /** The `RateLimitMetersModule` that was created by this mutation. */
@@ -9536,29 +9884,23 @@ export interface CreateInvitesModulePayload {
   invitesModule?: InvitesModule | null;
   invitesModuleEdge?: InvitesModuleEdge | null;
 }
-export interface CreateNamespaceModulePayload {
-  clientMutationId?: string | null;
-  /** The `NamespaceModule` that was created by this mutation. */
-  namespaceModule?: NamespaceModule | null;
-  namespaceModuleEdge?: NamespaceModuleEdge | null;
-}
 export interface CreateComputeLogModulePayload {
   clientMutationId?: string | null;
   /** The `ComputeLogModule` that was created by this mutation. */
   computeLogModule?: ComputeLogModule | null;
   computeLogModuleEdge?: ComputeLogModuleEdge | null;
 }
-export interface CreateGraphModulePayload {
-  clientMutationId?: string | null;
-  /** The `GraphModule` that was created by this mutation. */
-  graphModule?: GraphModule | null;
-  graphModuleEdge?: GraphModuleEdge | null;
-}
 export interface CreateInferenceLogModulePayload {
   clientMutationId?: string | null;
   /** The `InferenceLogModule` that was created by this mutation. */
   inferenceLogModule?: InferenceLogModule | null;
   inferenceLogModuleEdge?: InferenceLogModuleEdge | null;
+}
+export interface CreateNamespaceModulePayload {
+  clientMutationId?: string | null;
+  /** The `NamespaceModule` that was created by this mutation. */
+  namespaceModule?: NamespaceModule | null;
+  namespaceModuleEdge?: NamespaceModuleEdge | null;
 }
 export interface CreateStorageLogModulePayload {
   clientMutationId?: string | null;
@@ -9571,6 +9913,12 @@ export interface CreateTransferLogModulePayload {
   /** The `TransferLogModule` that was created by this mutation. */
   transferLogModule?: TransferLogModule | null;
   transferLogModuleEdge?: TransferLogModuleEdge | null;
+}
+export interface CreateFunctionDeploymentModulePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDeploymentModule` that was created by this mutation. */
+  functionDeploymentModule?: FunctionDeploymentModule | null;
+  functionDeploymentModuleEdge?: FunctionDeploymentModuleEdge | null;
 }
 export interface CreatePlansModulePayload {
   clientMutationId?: string | null;
@@ -9589,6 +9937,12 @@ export interface CreateDbUsageModulePayload {
   /** The `DbUsageModule` that was created by this mutation. */
   dbUsageModule?: DbUsageModule | null;
   dbUsageModuleEdge?: DbUsageModuleEdge | null;
+}
+export interface CreateGraphExecutionModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphExecutionModule` that was created by this mutation. */
+  graphExecutionModule?: GraphExecutionModule | null;
+  graphExecutionModuleEdge?: GraphExecutionModuleEdge | null;
 }
 export interface CreateHierarchyModulePayload {
   clientMutationId?: string | null;
@@ -9842,6 +10196,12 @@ export interface UpdateConfigSecretsModulePayload {
   configSecretsModule?: ConfigSecretsModule | null;
   configSecretsModuleEdge?: ConfigSecretsModuleEdge | null;
 }
+export interface UpdateGraphModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphModule` that was updated by this mutation. */
+  graphModule?: GraphModule | null;
+  graphModuleEdge?: GraphModuleEdge | null;
+}
 export interface UpdateRateLimitMetersModulePayload {
   clientMutationId?: string | null;
   /** The `RateLimitMetersModule` that was updated by this mutation. */
@@ -9878,29 +10238,23 @@ export interface UpdateInvitesModulePayload {
   invitesModule?: InvitesModule | null;
   invitesModuleEdge?: InvitesModuleEdge | null;
 }
-export interface UpdateNamespaceModulePayload {
-  clientMutationId?: string | null;
-  /** The `NamespaceModule` that was updated by this mutation. */
-  namespaceModule?: NamespaceModule | null;
-  namespaceModuleEdge?: NamespaceModuleEdge | null;
-}
 export interface UpdateComputeLogModulePayload {
   clientMutationId?: string | null;
   /** The `ComputeLogModule` that was updated by this mutation. */
   computeLogModule?: ComputeLogModule | null;
   computeLogModuleEdge?: ComputeLogModuleEdge | null;
 }
-export interface UpdateGraphModulePayload {
-  clientMutationId?: string | null;
-  /** The `GraphModule` that was updated by this mutation. */
-  graphModule?: GraphModule | null;
-  graphModuleEdge?: GraphModuleEdge | null;
-}
 export interface UpdateInferenceLogModulePayload {
   clientMutationId?: string | null;
   /** The `InferenceLogModule` that was updated by this mutation. */
   inferenceLogModule?: InferenceLogModule | null;
   inferenceLogModuleEdge?: InferenceLogModuleEdge | null;
+}
+export interface UpdateNamespaceModulePayload {
+  clientMutationId?: string | null;
+  /** The `NamespaceModule` that was updated by this mutation. */
+  namespaceModule?: NamespaceModule | null;
+  namespaceModuleEdge?: NamespaceModuleEdge | null;
 }
 export interface UpdateStorageLogModulePayload {
   clientMutationId?: string | null;
@@ -9913,6 +10267,12 @@ export interface UpdateTransferLogModulePayload {
   /** The `TransferLogModule` that was updated by this mutation. */
   transferLogModule?: TransferLogModule | null;
   transferLogModuleEdge?: TransferLogModuleEdge | null;
+}
+export interface UpdateFunctionDeploymentModulePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDeploymentModule` that was updated by this mutation. */
+  functionDeploymentModule?: FunctionDeploymentModule | null;
+  functionDeploymentModuleEdge?: FunctionDeploymentModuleEdge | null;
 }
 export interface UpdatePlansModulePayload {
   clientMutationId?: string | null;
@@ -9931,6 +10291,12 @@ export interface UpdateDbUsageModulePayload {
   /** The `DbUsageModule` that was updated by this mutation. */
   dbUsageModule?: DbUsageModule | null;
   dbUsageModuleEdge?: DbUsageModuleEdge | null;
+}
+export interface UpdateGraphExecutionModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphExecutionModule` that was updated by this mutation. */
+  graphExecutionModule?: GraphExecutionModule | null;
+  graphExecutionModuleEdge?: GraphExecutionModuleEdge | null;
 }
 export interface UpdateHierarchyModulePayload {
   clientMutationId?: string | null;
@@ -10184,6 +10550,12 @@ export interface DeleteConfigSecretsModulePayload {
   configSecretsModule?: ConfigSecretsModule | null;
   configSecretsModuleEdge?: ConfigSecretsModuleEdge | null;
 }
+export interface DeleteGraphModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphModule` that was deleted by this mutation. */
+  graphModule?: GraphModule | null;
+  graphModuleEdge?: GraphModuleEdge | null;
+}
 export interface DeleteRateLimitMetersModulePayload {
   clientMutationId?: string | null;
   /** The `RateLimitMetersModule` that was deleted by this mutation. */
@@ -10220,29 +10592,23 @@ export interface DeleteInvitesModulePayload {
   invitesModule?: InvitesModule | null;
   invitesModuleEdge?: InvitesModuleEdge | null;
 }
-export interface DeleteNamespaceModulePayload {
-  clientMutationId?: string | null;
-  /** The `NamespaceModule` that was deleted by this mutation. */
-  namespaceModule?: NamespaceModule | null;
-  namespaceModuleEdge?: NamespaceModuleEdge | null;
-}
 export interface DeleteComputeLogModulePayload {
   clientMutationId?: string | null;
   /** The `ComputeLogModule` that was deleted by this mutation. */
   computeLogModule?: ComputeLogModule | null;
   computeLogModuleEdge?: ComputeLogModuleEdge | null;
 }
-export interface DeleteGraphModulePayload {
-  clientMutationId?: string | null;
-  /** The `GraphModule` that was deleted by this mutation. */
-  graphModule?: GraphModule | null;
-  graphModuleEdge?: GraphModuleEdge | null;
-}
 export interface DeleteInferenceLogModulePayload {
   clientMutationId?: string | null;
   /** The `InferenceLogModule` that was deleted by this mutation. */
   inferenceLogModule?: InferenceLogModule | null;
   inferenceLogModuleEdge?: InferenceLogModuleEdge | null;
+}
+export interface DeleteNamespaceModulePayload {
+  clientMutationId?: string | null;
+  /** The `NamespaceModule` that was deleted by this mutation. */
+  namespaceModule?: NamespaceModule | null;
+  namespaceModuleEdge?: NamespaceModuleEdge | null;
 }
 export interface DeleteStorageLogModulePayload {
   clientMutationId?: string | null;
@@ -10255,6 +10621,12 @@ export interface DeleteTransferLogModulePayload {
   /** The `TransferLogModule` that was deleted by this mutation. */
   transferLogModule?: TransferLogModule | null;
   transferLogModuleEdge?: TransferLogModuleEdge | null;
+}
+export interface DeleteFunctionDeploymentModulePayload {
+  clientMutationId?: string | null;
+  /** The `FunctionDeploymentModule` that was deleted by this mutation. */
+  functionDeploymentModule?: FunctionDeploymentModule | null;
+  functionDeploymentModuleEdge?: FunctionDeploymentModuleEdge | null;
 }
 export interface DeletePlansModulePayload {
   clientMutationId?: string | null;
@@ -10273,6 +10645,12 @@ export interface DeleteDbUsageModulePayload {
   /** The `DbUsageModule` that was deleted by this mutation. */
   dbUsageModule?: DbUsageModule | null;
   dbUsageModuleEdge?: DbUsageModuleEdge | null;
+}
+export interface DeleteGraphExecutionModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphExecutionModule` that was deleted by this mutation. */
+  graphExecutionModule?: GraphExecutionModule | null;
+  graphExecutionModuleEdge?: GraphExecutionModuleEdge | null;
 }
 export interface DeleteHierarchyModulePayload {
   clientMutationId?: string | null;
@@ -10551,6 +10929,12 @@ export interface ConfigSecretsModuleEdge {
   /** The `ConfigSecretsModule` at the end of the edge. */
   node?: ConfigSecretsModule | null;
 }
+/** A `GraphModule` edge in the connection. */
+export interface GraphModuleEdge {
+  cursor?: string | null;
+  /** The `GraphModule` at the end of the edge. */
+  node?: GraphModule | null;
+}
 /** A `RateLimitMetersModule` edge in the connection. */
 export interface RateLimitMetersModuleEdge {
   cursor?: string | null;
@@ -10587,29 +10971,23 @@ export interface InvitesModuleEdge {
   /** The `InvitesModule` at the end of the edge. */
   node?: InvitesModule | null;
 }
-/** A `NamespaceModule` edge in the connection. */
-export interface NamespaceModuleEdge {
-  cursor?: string | null;
-  /** The `NamespaceModule` at the end of the edge. */
-  node?: NamespaceModule | null;
-}
 /** A `ComputeLogModule` edge in the connection. */
 export interface ComputeLogModuleEdge {
   cursor?: string | null;
   /** The `ComputeLogModule` at the end of the edge. */
   node?: ComputeLogModule | null;
 }
-/** A `GraphModule` edge in the connection. */
-export interface GraphModuleEdge {
-  cursor?: string | null;
-  /** The `GraphModule` at the end of the edge. */
-  node?: GraphModule | null;
-}
 /** A `InferenceLogModule` edge in the connection. */
 export interface InferenceLogModuleEdge {
   cursor?: string | null;
   /** The `InferenceLogModule` at the end of the edge. */
   node?: InferenceLogModule | null;
+}
+/** A `NamespaceModule` edge in the connection. */
+export interface NamespaceModuleEdge {
+  cursor?: string | null;
+  /** The `NamespaceModule` at the end of the edge. */
+  node?: NamespaceModule | null;
 }
 /** A `StorageLogModule` edge in the connection. */
 export interface StorageLogModuleEdge {
@@ -10622,6 +11000,12 @@ export interface TransferLogModuleEdge {
   cursor?: string | null;
   /** The `TransferLogModule` at the end of the edge. */
   node?: TransferLogModule | null;
+}
+/** A `FunctionDeploymentModule` edge in the connection. */
+export interface FunctionDeploymentModuleEdge {
+  cursor?: string | null;
+  /** The `FunctionDeploymentModule` at the end of the edge. */
+  node?: FunctionDeploymentModule | null;
 }
 /** A `PlansModule` edge in the connection. */
 export interface PlansModuleEdge {
@@ -10640,6 +11024,12 @@ export interface DbUsageModuleEdge {
   cursor?: string | null;
   /** The `DbUsageModule` at the end of the edge. */
   node?: DbUsageModule | null;
+}
+/** A `GraphExecutionModule` edge in the connection. */
+export interface GraphExecutionModuleEdge {
+  cursor?: string | null;
+  /** The `GraphExecutionModule` at the end of the edge. */
+  node?: GraphExecutionModule | null;
 }
 /** A `HierarchyModule` edge in the connection. */
 export interface HierarchyModuleEdge {
@@ -10738,6 +11128,14 @@ export interface MetaTable {
   relations: MetaRelations;
   inflection: MetaInflection;
   query: MetaQuery;
+  /** Storage metadata (null if not a storage table) */
+  storage?: MetaStorage | null;
+  /** Search metadata (null if no search configured) */
+  search?: MetaSearch | null;
+  /** i18n metadata (null if no @i18n tag) */
+  i18n?: MetaI18n | null;
+  /** Realtime metadata (null if no @realtime tag) */
+  realtime?: MetaRealtime | null;
 }
 export interface ProvisionTableRecord {
   outTableId?: string | null;
@@ -10758,6 +11156,8 @@ export interface MetaField {
   isPrimaryKey: boolean;
   isForeignKey: boolean;
   description?: string | null;
+  /** Enum metadata if this field has an enum type */
+  enumValues?: MetaEnum | null;
 }
 /** Information about a database index */
 export interface MetaIndex {
@@ -10823,6 +11223,36 @@ export interface MetaQuery {
   update?: string | null;
   delete?: string | null;
 }
+/** Storage metadata for a table */
+export interface MetaStorage {
+  /** Whether this table is a storage files table */
+  isFilesTable: boolean;
+  /** Whether this table is a storage buckets table */
+  isBucketsTable: boolean;
+}
+/** Search metadata for a table */
+export interface MetaSearch {
+  /** Active search algorithms on this table */
+  algorithms: string[];
+  /** Searchable columns with their algorithm */
+  columns: MetaSearchColumn[];
+  /** Whether unifiedSearch composite filter is available */
+  hasUnifiedSearch: boolean;
+  /** Per-table search configuration */
+  config?: MetaSearchConfig | null;
+}
+/** i18n metadata for a table with @i18n tag */
+export interface MetaI18n {
+  /** Name of the translation table */
+  translationTable: string;
+  /** Fields that are translatable */
+  translatableFields: MetaI18nField[];
+}
+/** Realtime metadata for a table with @realtime tag */
+export interface MetaRealtime {
+  /** The generated subscription field name (e.g. onPostChanged) */
+  subscriptionFieldName: string;
+}
 /** Information about a PostgreSQL type */
 export interface MetaType {
   pgType: string;
@@ -10831,6 +11261,13 @@ export interface MetaType {
   isNotNull?: boolean | null;
   hasDefault?: boolean | null;
   subtype?: string | null;
+}
+/** Information about a PostgreSQL enum type */
+export interface MetaEnum {
+  /** The PostgreSQL enum type name */
+  name: string;
+  /** Allowed values for this enum */
+  values: string[];
 }
 /** Reference to a related table */
 export interface MetaRefTable {
@@ -10864,4 +11301,29 @@ export interface MetaManyToManyRelation {
   leftKeyAttributes: MetaField[];
   rightKeyAttributes: MetaField[];
   rightTable: MetaRefTable;
+}
+/** A searchable column with its algorithm */
+export interface MetaSearchColumn {
+  /** Column name (camelCase) */
+  name: string;
+  /** Search algorithm: tsvector, bm25, trgm, or vector */
+  algorithm: string;
+}
+/** Per-table search configuration from @searchConfig smart tag */
+export interface MetaSearchConfig {
+  /** JSON-encoded per-adapter score weights */
+  weights?: string | null;
+  /** Whether recency boosting is enabled */
+  boostRecent: boolean;
+  /** Field used for recency decay */
+  boostRecencyField?: string | null;
+  /** Exponential decay factor per day */
+  boostRecencyDecay?: number | null;
+}
+/** A translatable field */
+export interface MetaI18nField {
+  /** GraphQL field name */
+  name: string;
+  /** PostgreSQL column type (text, citext) */
+  type: string;
 }

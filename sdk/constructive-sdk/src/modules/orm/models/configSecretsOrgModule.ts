@@ -198,7 +198,8 @@ export class ConfigSecretsOrgModuleModel {
       'UpdateConfigSecretsOrgModuleInput',
       'id',
       'configSecretsOrgModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

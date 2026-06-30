@@ -196,7 +196,8 @@ export class EnumModel {
       'UpdateEnumInput',
       'id',
       'enumPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

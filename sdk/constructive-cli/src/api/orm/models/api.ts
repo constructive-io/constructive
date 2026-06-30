@@ -196,7 +196,8 @@ export class ApiModel {
       'UpdateApiInput',
       'id',
       'apiPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

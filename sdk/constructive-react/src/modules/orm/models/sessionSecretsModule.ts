@@ -198,7 +198,8 @@ export class SessionSecretsModuleModel {
       'UpdateSessionSecretsModuleInput',
       'id',
       'sessionSecretsModulePatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

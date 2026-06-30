@@ -196,7 +196,8 @@ export class SqlActionModel {
       'UpdateSqlActionInput',
       'id',
       'sqlActionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

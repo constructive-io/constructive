@@ -196,7 +196,8 @@ export class AgentResourceChunkModel {
       'UpdateAgentResourceChunkInput',
       'id',
       'agentResourceChunkPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

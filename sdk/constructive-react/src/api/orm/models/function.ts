@@ -196,7 +196,8 @@ export class FunctionModel {
       'UpdateFunctionInput',
       'id',
       'functionPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

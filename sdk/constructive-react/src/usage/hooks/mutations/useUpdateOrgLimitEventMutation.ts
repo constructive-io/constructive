@@ -49,6 +49,7 @@ export function useUpdateOrgLimitEventMutation<S extends OrgLimitEventSelect>(
       Error,
       {
         id: string;
+        createdAt: string;
         orgLimitEventPatch: OrgLimitEventPatch;
       }
     >,
@@ -63,6 +64,7 @@ export function useUpdateOrgLimitEventMutation<S extends OrgLimitEventSelect>(
   Error,
   {
     id: string;
+    createdAt: string;
     orgLimitEventPatch: OrgLimitEventPatch;
   }
 >;
@@ -75,6 +77,7 @@ export function useUpdateOrgLimitEventMutation(
       Error,
       {
         id: string;
+        createdAt: string;
         orgLimitEventPatch: OrgLimitEventPatch;
       }
     >,
@@ -89,15 +92,18 @@ export function useUpdateOrgLimitEventMutation(
     mutationKey: orgLimitEventMutationKeys.all,
     mutationFn: ({
       id,
+      createdAt,
       orgLimitEventPatch,
     }: {
       id: string;
+      createdAt: string;
       orgLimitEventPatch: OrgLimitEventPatch;
     }) =>
       getClient()
         .orgLimitEvent.update({
           where: {
             id,
+            createdAt,
           },
           data: orgLimitEventPatch,
           select: args.select,

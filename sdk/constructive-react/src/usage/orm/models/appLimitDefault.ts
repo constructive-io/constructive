@@ -196,7 +196,8 @@ export class AppLimitDefaultModel {
       'UpdateAppLimitDefaultInput',
       'id',
       'appLimitDefaultPatch',
-      connectionFieldsMap
+      connectionFieldsMap,
+      undefined
     );
     return new QueryBuilder({
       client: this.client,

@@ -62,14 +62,16 @@ csdk auth set-token <your-token>
 | `function-invocation-module` | functionInvocationModule CRUD operations |
 | `function-module` | functionModule CRUD operations |
 | `invites-module` | invitesModule CRUD operations |
-| `namespace-module` | namespaceModule CRUD operations |
 | `compute-log-module` | computeLogModule CRUD operations |
 | `inference-log-module` | inferenceLogModule CRUD operations |
+| `namespace-module` | namespaceModule CRUD operations |
 | `storage-log-module` | storageLogModule CRUD operations |
 | `transfer-log-module` | transferLogModule CRUD operations |
+| `function-deployment-module` | functionDeploymentModule CRUD operations |
 | `plans-module` | plansModule CRUD operations |
 | `billing-provider-module` | billingProviderModule CRUD operations |
 | `db-usage-module` | dbUsageModule CRUD operations |
+| `graph-execution-module` | graphExecutionModule CRUD operations |
 | `hierarchy-module` | hierarchyModule CRUD operations |
 | `permissions-module` | permissionsModule CRUD operations |
 | `notifications-module` | notificationsModule CRUD operations |
@@ -991,8 +993,6 @@ CRUD operations for GraphModule records.
 | `prefix` | String |
 | `merkleStoreModuleId` | UUID |
 | `graphsTableId` | UUID |
-| `executionsTableId` | UUID |
-| `outputsTableId` | UUID |
 | `apiName` | String |
 | `privateApiName` | String |
 | `entityTableId` | UUID |
@@ -1002,7 +1002,7 @@ CRUD operations for GraphModule records.
 | `createdAt` | Datetime |
 
 **Required create fields:** `databaseId`, `merkleStoreModuleId`
-**Optional create fields (backend defaults):** `publicSchemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `scope`, `prefix`, `graphsTableId`, `executionsTableId`, `outputsTableId`, `apiName`, `privateApiName`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
+**Optional create fields (backend defaults):** `publicSchemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `scope`, `prefix`, `graphsTableId`, `apiName`, `privateApiName`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
 
 ### `database-provision-module`
 
@@ -1304,45 +1304,6 @@ CRUD operations for InvitesModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `emailsTableId`, `usersTableId`, `invitesTableId`, `claimedInvitesTableId`, `invitesTableName`, `claimedInvitesTableName`, `submitInviteCodeFunction`, `scope`, `prefix`, `entityTableId`, `apiName`, `privateApiName`
 
-### `namespace-module`
-
-CRUD operations for NamespaceModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all namespaceModule records |
-| `find-first` | Find first matching namespaceModule record |
-| `get` | Get a namespaceModule by id |
-| `create` | Create a new namespaceModule |
-| `update` | Update an existing namespaceModule |
-| `delete` | Delete a namespaceModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `publicSchemaName` | String |
-| `privateSchemaName` | String |
-| `namespacesTableId` | UUID |
-| `namespaceEventsTableId` | UUID |
-| `namespacesTableName` | String |
-| `namespaceEventsTableName` | String |
-| `apiName` | String |
-| `privateApiName` | String |
-| `scope` | String |
-| `prefix` | String |
-| `entityTableId` | UUID |
-| `policies` | JSON |
-| `provisions` | JSON |
-| `defaultPermissions` | String |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `namespacesTableId`, `namespaceEventsTableId`, `namespacesTableName`, `namespaceEventsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
-
 ### `compute-log-module`
 
 CRUD operations for ComputeLogModule records.
@@ -1423,6 +1384,46 @@ CRUD operations for InferenceLogModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `inferenceLogTableId`, `inferenceLogTableName`, `usageDailyTableId`, `usageDailyTableName`, `interval`, `retention`, `premake`, `scope`, `actorFkTableId`, `entityFkTableId`, `prefix`, `apiName`, `privateApiName`
 
+### `namespace-module`
+
+CRUD operations for NamespaceModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all namespaceModule records |
+| `find-first` | Find first matching namespaceModule record |
+| `get` | Get a namespaceModule by id |
+| `create` | Create a new namespaceModule |
+| `update` | Update an existing namespaceModule |
+| `delete` | Delete a namespaceModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `publicSchemaName` | String |
+| `privateSchemaName` | String |
+| `namespacesTableId` | UUID |
+| `namespaceEventsTableId` | UUID |
+| `namespacesTableName` | String |
+| `namespaceEventsTableName` | String |
+| `apiName` | String |
+| `privateApiName` | String |
+| `scope` | String |
+| `prefix` | String |
+| `entityTableId` | UUID |
+| `platformNamespacesTableId` | UUID |
+| `policies` | JSON |
+| `provisions` | JSON |
+| `defaultPermissions` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `namespacesTableId`, `namespaceEventsTableId`, `namespacesTableName`, `namespaceEventsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `platformNamespacesTableId`, `policies`, `provisions`, `defaultPermissions`
+
 ### `storage-log-module`
 
 CRUD operations for StorageLogModule records.
@@ -1502,6 +1503,47 @@ CRUD operations for TransferLogModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `transferLogTableId`, `transferLogTableName`, `usageDailyTableId`, `usageDailyTableName`, `interval`, `retention`, `premake`, `scope`, `actorFkTableId`, `entityFkTableId`, `prefix`, `apiName`, `privateApiName`
+
+### `function-deployment-module`
+
+CRUD operations for FunctionDeploymentModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionDeploymentModule records |
+| `find-first` | Find first matching functionDeploymentModule record |
+| `get` | Get a functionDeploymentModule by id |
+| `create` | Create a new functionDeploymentModule |
+| `update` | Update an existing functionDeploymentModule |
+| `delete` | Delete a functionDeploymentModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `publicSchemaName` | String |
+| `privateSchemaName` | String |
+| `deploymentsTableId` | UUID |
+| `deploymentEventsTableId` | UUID |
+| `deploymentsTableName` | String |
+| `deploymentEventsTableName` | String |
+| `apiName` | String |
+| `privateApiName` | String |
+| `scope` | String |
+| `prefix` | String |
+| `entityTableId` | UUID |
+| `functionModuleId` | UUID |
+| `namespaceModuleId` | UUID |
+| `policies` | JSON |
+| `provisions` | JSON |
+| `defaultPermissions` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `deploymentsTableId`, `deploymentEventsTableId`, `deploymentsTableName`, `deploymentEventsTableName`, `apiName`, `privateApiName`, `scope`, `prefix`, `entityTableId`, `functionModuleId`, `namespaceModuleId`, `policies`, `provisions`, `defaultPermissions`
 
 ### `plans-module`
 
@@ -1630,6 +1672,49 @@ CRUD operations for DbUsageModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `tableStatsLogTableId`, `tableStatsLogTableName`, `tableStatsDailyTableId`, `tableStatsDailyTableName`, `queryStatsLogTableId`, `queryStatsLogTableName`, `queryStatsDailyTableId`, `queryStatsDailyTableName`, `interval`, `retention`, `premake`, `scope`, `prefix`, `defaultPermissions`, `apiName`, `privateApiName`
+
+### `graph-execution-module`
+
+CRUD operations for GraphExecutionModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all graphExecutionModule records |
+| `find-first` | Find first matching graphExecutionModule record |
+| `get` | Get a graphExecutionModule by id |
+| `create` | Create a new graphExecutionModule |
+| `update` | Update an existing graphExecutionModule |
+| `delete` | Delete a graphExecutionModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `publicSchemaName` | String |
+| `privateSchemaName` | String |
+| `graphModuleId` | UUID |
+| `scope` | String |
+| `prefix` | String |
+| `executionsTableId` | UUID |
+| `outputsTableId` | UUID |
+| `nodeStatesTableId` | UUID |
+| `executionsTableName` | String |
+| `outputsTableName` | String |
+| `nodeStatesTableName` | String |
+| `apiName` | String |
+| `privateApiName` | String |
+| `entityTableId` | UUID |
+| `policies` | JSON |
+| `provisions` | JSON |
+| `defaultPermissions` | String |
+| `createdAt` | Datetime |
+
+**Required create fields:** `databaseId`, `graphModuleId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `publicSchemaName`, `privateSchemaName`, `scope`, `prefix`, `executionsTableId`, `outputsTableId`, `nodeStatesTableId`, `executionsTableName`, `outputsTableName`, `nodeStatesTableName`, `apiName`, `privateApiName`, `entityTableId`, `policies`, `provisions`, `defaultPermissions`
 
 ### `hierarchy-module`
 
