@@ -15,6 +15,8 @@
 
 // --- computeBuildKey tests (pure function, no mocking needed) ---
 
+import { defaultPgConfig } from 'pg-env';
+
 import { computeBuildKey } from '../multi-tenancy-cache';
 
 /**
@@ -695,6 +697,19 @@ describe('connectionString-based pool identity', () => {
     expect(key).toBe(
       JSON.stringify({
         conn: 'myhost:5432/mydb@myuser',
+        schemas: ['public'],
+        anonRole: 'anon',
+        roleName: 'auth',
+      }),
+    );
+  });
+
+  it('should apply pg-env defaults when individual pool fields are omitted', () => {
+    const pool = { options: { host: 'myhost' } } as unknown as import('pg').Pool;
+    const key = computeBuildKey(pool, ['public'], 'anon', 'auth');
+    expect(key).toBe(
+      JSON.stringify({
+        conn: `myhost:${defaultPgConfig.port}/${defaultPgConfig.database}@${defaultPgConfig.user}`,
         schemas: ['public'],
         anonRole: 'anon',
         roleName: 'auth',
