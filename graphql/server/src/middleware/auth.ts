@@ -35,7 +35,7 @@ export const createAuthenticateMiddleware = (
     next: NextFunction
   ): Promise<void> => {
     const api = req.api;
-    log.info(`[auth] middleware called, api=${api ? 'present' : 'missing'}`);
+    log.debug(`[auth] middleware called, api=${api ? 'present' : 'missing'}`);
     if (!api) {
       res.status(500).send('Missing API info');
       return;
@@ -47,7 +47,7 @@ export const createAuthenticateMiddleware = (
     });
     const rlsModule = api.rlsModule;
 
-    log.info(
+    log.debug(
       `[auth] rlsModule=${rlsModule ? 'present' : 'missing'}, ` +
         `authenticate=${rlsModule?.authenticate ?? 'none'}, ` +
         `authenticateStrict=${rlsModule?.authenticateStrict ?? 'none'}, ` +
@@ -55,7 +55,7 @@ export const createAuthenticateMiddleware = (
     );
 
     if (!rlsModule) {
-      log.info('[auth] No RLS module configured, skipping auth');
+      log.debug('[auth] No RLS module configured, skipping auth');
       return next();
     }
 
@@ -63,7 +63,7 @@ export const createAuthenticateMiddleware = (
       ? rlsModule.authenticateStrict
       : rlsModule.authenticate;
 
-    log.info(
+    log.debug(
       `[auth] strictAuth=${opts.server?.strictAuth ?? false}, authFn=${authFn ?? 'none'}`
     );
 
@@ -72,7 +72,7 @@ export const createAuthenticateMiddleware = (
       const [authType, authToken] = authorization.split(' ');
       let token: any = {};
 
-      log.info(
+      log.debug(
         `[auth] authorization header present=${!!authorization}, ` +
           `authType=${authType ?? 'none'}, hasToken=${!!authToken}`
       );
@@ -85,7 +85,7 @@ export const createAuthenticateMiddleware = (
       const tokenSource = (authType?.toLowerCase() === 'bearer' && authToken) ? 'bearer' : (cookieToken ? 'cookie' : 'none');
 
       if (effectiveToken) {
-        log.info(`[auth] Processing ${tokenSource} authentication`);
+        log.debug(`[auth] Processing ${tokenSource} authentication`);
         const context: Record<string, any> = {
           'jwt.claims.ip_address': req.clientIp,
         };
@@ -98,7 +98,7 @@ export const createAuthenticateMiddleware = (
         }
 
         const authQuery = `SELECT * FROM "${rlsModule.privateSchema.schemaName}"."${authFn}"($1)`;
-        log.info(`[auth] Executing auth query: ${authQuery}`);
+        log.debug(`[auth] Executing auth query: ${authQuery}`);
 
         try {
           const result = await pgQueryContext({
@@ -108,10 +108,10 @@ export const createAuthenticateMiddleware = (
             variables: [effectiveToken],
           });
 
-          log.info(`[auth] Query result: rowCount=${result?.rowCount}`);
+          log.debug(`[auth] Query result: rowCount=${result?.rowCount}`);
 
           if (result?.rowCount === 0) {
-            log.info('[auth] No rows returned, returning UNAUTHENTICATED');
+            log.debug('[auth] No rows returned, returning UNAUTHENTICATED');
             res.status(200).json({
               errors: [{ extensions: { code: 'UNAUTHENTICATED' } }],
             });
@@ -119,7 +119,7 @@ export const createAuthenticateMiddleware = (
           }
 
           token = result.rows[0];
-          log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
+          log.debug(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
         } catch (e: any) {
           log.error('[auth] Auth error:', e.message);
           res.status(200).json({
@@ -135,12 +135,12 @@ export const createAuthenticateMiddleware = (
           return;
         }
       } else {
-        log.info('[auth] No credential provided (no bearer token or session cookie), using anonymous auth');
+        log.debug('[auth] No credential provided (no bearer token or session cookie), using anonymous auth');
       }
 
       req.token = token;
     } else {
-      log.info(
+      log.debug(
         `[auth] Skipping auth: authFn=${authFn ?? 'none'}, ` +
           `privateSchema=${rlsModule.privateSchema?.schemaName ?? 'none'}`
       );
@@ -150,7 +150,7 @@ export const createAuthenticateMiddleware = (
     const deviceToken = parseCookieToken(req, DEVICE_TOKEN_COOKIE_NAME);
     if (deviceToken) {
       req.deviceToken = deviceToken;
-      log.info('[auth] Device token cookie present');
+      log.debug('[auth] Device token cookie present');
     }
 
     next();

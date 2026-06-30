@@ -13,3 +13,4 @@ postgres/pgsql-test/output/
 .env.local
 graphql/server/logs/
 graphql/server/*.heapsnapshot
+graphql/server/perf/results/

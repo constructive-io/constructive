@@ -2,6 +2,7 @@ import os from 'node:os';
 import v8 from 'node:v8';
 import { svcCache, SVC_CACHE_TTL_MS } from '@pgpmjs/server-utils';
 import { getCacheStats } from 'graphile-cache';
+import { getMultiTenancyCacheStats } from 'graphile-multi-tenancy-cache';
 import { getInFlightCount, getInFlightKeys } from '../middleware/graphile';
 import { getGraphileBuildStats } from '../middleware/observability/graphile-build-stats';
 
@@ -41,6 +42,7 @@ export interface DebugMemorySnapshot {
     }>;
   };
   graphileCache: ReturnType<typeof getCacheStats>;
+  multiTenancyCache: ReturnType<typeof getMultiTenancyCacheStats>;
   svcCache: {
     size: number;
     max: number;
@@ -95,6 +97,7 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
       heapSpaces,
     },
     graphileCache: getCacheStats(),
+    multiTenancyCache: getMultiTenancyCacheStats(),
     svcCache: {
       size: svcCache.size,
       max: svcCache.max,
