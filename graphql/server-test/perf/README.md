@@ -72,6 +72,83 @@ Initial config groups:
 
 Additional config groups can be added later, but they should not expand the default scope until the first matrix is stable.
 
+## Usage
+
+Run commands from the Constructive repo root. Perf benchmarks are opt-in and are not included in default `pnpm test` or default Jest discovery.
+
+Every perf run must set:
+
+```sh
+PERF_BENCHMARK=1
+```
+
+If a perf job is intentionally run under `CI=true`, it must also set:
+
+```sh
+ALLOW_PERF_IN_CI=1
+```
+
+Run a config group with:
+
+```sh
+PERF_BENCHMARK=1 PERF_CONFIG_GROUP=<group> pnpm --dir graphql/server-test test:perf
+```
+
+Examples:
+
+```sh
+PERF_BENCHMARK=1 PERF_CONFIG_GROUP=smoke pnpm --dir graphql/server-test test:perf
+PERF_BENCHMARK=1 PERF_CONFIG_GROUP=public-smoke pnpm --dir graphql/server-test test:perf
+PERF_BENCHMARK=1 PERF_CONFIG_GROUP=private-cache-compare pnpm --dir graphql/server-test test:perf
+PERF_BENCHMARK=1 PERF_CONFIG_GROUP=private-cache-distinct pnpm --dir graphql/server-test test:perf
+PERF_BENCHMARK=1 PERF_CONFIG_GROUP=k10-5min pnpm --dir graphql/server-test test:perf
+```
+
+Use env overrides to narrow or resize a run:
+
+```sh
+PERF_BENCHMARK=1 \
+PERF_CONFIG_GROUP=k10-5min \
+PERF_ROUTING_MODES=public \
+PERF_CACHE_MODES=new \
+PERF_DURATION_SECONDS=30 \
+PERF_WORKERS=2 \
+pnpm --dir graphql/server-test test:perf
+```
+
+Common overrides:
+
+- `PERF_ROUTING_MODES=private,public`
+- `PERF_CACHE_MODES=old,new`
+- `PERF_K=10`
+- `PERF_DURATION_SECONDS=300`
+- `PERF_WORKERS=4`
+- `PERF_CAPTURE_MEMORY=0`
+- `PERF_CONNECTION_POLICY=reuse` or `PERF_CONNECTION_POLICY=per-case`
+- `PERF_RUN_DIR=/tmp/my-perf-run`
+- `PERF_CONSTRUCTIVE_LOCAL_PATH=/path/to/constructive-db/services/constructive-local`
+
+Config groups can also be overlaid with JSON:
+
+```sh
+PERF_BENCHMARK=1 \
+PERF_CONFIG_GROUP=k10-5min \
+PERF_CONFIG_PATH=/path/to/perf-overlay.json \
+pnpm --dir graphql/server-test test:perf
+```
+
+Artifacts are written under `PERF_RUN_DIR` or a generated `/tmp/constructive-perf/<group>-<run-id>/` directory. The most useful entry point is:
+
+```sh
+jq '{pass, totals, cases, runDir}' /tmp/constructive-perf/<run>/summary.json
+```
+
+Public preflight details are in:
+
+```sh
+jq '{ok, provision, routeProbe}' /tmp/constructive-perf/<run>/preflight/<case-id>.json
+```
+
 ## Constructive-local DBPM strategy
 
 The perf suite uses `constructive-local` as the shared local baseline for both private and public benchmark cases.
