@@ -17,8 +17,7 @@ export {
   normalizeOutdir,
   detectMissingModules,
   installMissingModules,
-  filterPlatformLeakage,
-  rewritePartmanMigrations
+  filterPlatformLeakage
 } from './export-utils';
 export type {
   FieldType,
