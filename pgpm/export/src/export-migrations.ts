@@ -14,7 +14,8 @@ import {
   installMissingModules,
   makeReplacer,
   preparePackage,
-  normalizeOutdir
+  normalizeOutdir,
+  filterPlatformLeakage
 } from './export-utils';
 
 interface ExportMigrationsToDiskOptions {
@@ -148,6 +149,14 @@ const exportMigrationsToDisk = async ({
     [databaseId]
   );
 
+  // =========================================================================
+  // Platform leakage filter — strip platform-integrated actions and
+  // cross-package requires from the exported package. See
+  // filterPlatformLeakage() in export-utils.ts for details.
+  // =========================================================================
+  const filteredRows = filterPlatformLeakage(results?.rows ?? [], schema_names);
+
+
   const opts: SqlWriteOptions = {
     name,
     replacer,
@@ -158,7 +167,7 @@ const exportMigrationsToDisk = async ({
   // Build description for the database extension package
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
 
-  if (results?.rows?.length > 0) {
+  if (filteredRows.length > 0) {
     // Detect missing modules at workspace level and prompt user
     const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter, argv);
 
@@ -180,8 +189,8 @@ const exportMigrationsToDisk = async ({
       await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
     }
 
-    writePgpmPlan(results.rows, opts);
-    writePgpmFiles(results.rows, opts);
+    writePgpmPlan(filteredRows, opts);
+    writePgpmFiles(filteredRows, opts);
   } else {
     console.log('No sql_actions found — skipping database module. Meta/service module will still be exported.');
   }

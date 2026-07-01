@@ -866,3 +866,34 @@ export const preparePackage = async ({
 export const normalizeOutdir = (outdir: string): string => {
   return outdir.endsWith(path.sep) ? outdir : outdir + path.sep;
 };
+
+// =============================================================================
+// Platform leakage filter
+// =============================================================================
+
+/**
+ * Filters cross-package deps from sql_actions rows before writing them
+ * as a per-tenant package. Strips deps that reference schemas not owned
+ * by this database so requires directives only reference tenant-owned
+ * schemas.
+ *
+ * Mirror trigger exclusion is handled upstream via the category mechanism:
+ * create_trigger_function(v_category := 'platform_mirror') → insert_action
+ * → depase_ast trigger → db_migrate.sql_actions.category = 'platform_mirror'.
+ * The server sets export.exclude_categories = 'platform_mirror' (via the
+ * X-Exclude-Categories header → pgSettings GUC) which activates the
+ * export_category_filter RLS policy, making those rows invisible at the
+ * SQL layer before the export code sees them.
+ */
+export const filterPlatformLeakage = (rows: any[], schema_names: string[]): any[] => {
+  const ownedPrefixes = schema_names.map(s => `schemas/${s}/`);
+
+  return rows.map((row: any) => {
+    if (Array.isArray(row.deps)) {
+      row.deps = row.deps.filter((dep: string) =>
+        ownedPrefixes.some(p => dep.includes(p))
+      );
+    }
+    return row;
+  });
+};

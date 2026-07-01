@@ -25,7 +25,8 @@ import {
   installMissingModules,
   makeReplacer,
   preparePackage,
-  normalizeOutdir
+  normalizeOutdir,
+  filterPlatformLeakage
 } from './export-utils';
 
 // =============================================================================
@@ -204,8 +205,9 @@ export const exportGraphQL = async ({
       await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
     }
 
-    writePgpmPlan(sqlActionRows as unknown as PgpmRow[], opts);
-    writePgpmFiles(sqlActionRows as unknown as PgpmRow[], opts);
+    const filteredRows = filterPlatformLeakage(sqlActionRows as unknown as any[], schema_names);
+    writePgpmPlan(filteredRows as unknown as PgpmRow[], opts);
+    writePgpmFiles(filteredRows as unknown as PgpmRow[], opts);
   } else {
     console.log('No sql_actions found. Skipping database module export.');
   }

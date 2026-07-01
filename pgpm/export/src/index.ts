@@ -16,7 +16,8 @@ export {
   preparePackage,
   normalizeOutdir,
   detectMissingModules,
-  installMissingModules
+  installMissingModules,
+  filterPlatformLeakage
 } from './export-utils';
 export type {
   FieldType,
