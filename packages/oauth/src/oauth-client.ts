@@ -4,12 +4,14 @@ import {
   ResolvedOAuthProvider,
   TokenResponse,
   AuthorizationUrlParams,
+  AuthorizationUrlResult,
   CallbackParams,
   createOAuthError,
 } from './types';
-import { getProvider, GITHUB_EMAILS_URL, selectGitHubEmail } from './providers';
+import { getProvider, selectGitHubEmail } from './providers';
 import { resolveOAuthProvider } from './provider-resolver';
 import { generateState } from './utils/state';
+import { deriveCodeChallenge, generateCodeVerifier } from './utils/pkce';
 
 const AUTHORIZATION_PARAM_RESERVED_KEYS = new Set([
   'client_id',
@@ -46,6 +48,34 @@ function applyAdditionalParams(
   }
 }
 
+function requireClientSecret(
+  clientSecret: string | undefined,
+  providerId: string,
+): string {
+  if (!clientSecret) {
+    throw createOAuthError(
+      `Provider ${providerId} missing required config: clientSecret`,
+      'PROVIDER_CONFIG_INVALID',
+      providerId,
+    );
+  }
+  return clientSecret;
+}
+
+function createBasicAuthorizationHeader(
+  clientId: string,
+  clientSecret: string,
+): string {
+  return `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
+}
+
+function deriveGitHubEmailsUrl(userinfoUrl: string): string {
+  const url = new URL(userinfoUrl);
+  const pathname = url.pathname.replace(/\/$/, '');
+  url.pathname = `${pathname}/emails`;
+  return url.toString();
+}
+
 export class OAuthClient {
   private config: OAuthClientConfig;
 
@@ -58,13 +88,14 @@ export class OAuthClient {
     };
   }
 
-  getAuthorizationUrl(params: AuthorizationUrlParams): { url: string; state: string } {
+  getAuthorizationUrl(params: AuthorizationUrlParams): AuthorizationUrlResult {
     const { provider: providerId, state: customState, redirectUri, scopes } = params;
     const { config } = this.resolveProvider(providerId);
 
     const state = customState || generateState();
     const callbackUrl = this.getCallbackUrl(providerId, redirectUri || config.redirectUri);
     const effectiveScopes = scopes || config.scopes;
+    const codeVerifier = config.pkceEnabled ? generateCodeVerifier() : undefined;
 
     const url = new URL(config.authorizationUrl);
     url.searchParams.set('client_id', config.clientId);
@@ -72,33 +103,67 @@ export class OAuthClient {
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('scope', effectiveScopes.join(' '));
     url.searchParams.set('state', state);
+    if (codeVerifier) {
+      url.searchParams.set('code_challenge', deriveCodeChallenge(codeVerifier));
+      url.searchParams.set('code_challenge_method', 'S256');
+    }
     applyAdditionalParams(
       url.searchParams,
       config.authorizationParams,
       AUTHORIZATION_PARAM_RESERVED_KEYS,
     );
 
-    return { url: url.toString(), state };
+    return { url: url.toString(), state, codeVerifier };
   }
 
   async exchangeCode(params: CallbackParams): Promise<TokenResponse> {
-    const { provider: providerId, code, redirectUri } = params;
+    const { provider: providerId, code, redirectUri, codeVerifier } = params;
 
     const { config } = this.resolveProvider(providerId);
+    if (config.tokenEndpointAuthMethod === 'private_key_jwt') {
+      throw createOAuthError(
+        'Token endpoint auth method private_key_jwt is not supported',
+        'TOKEN_AUTH_UNSUPPORTED',
+        providerId,
+      );
+    }
+
+    if (config.pkceEnabled && !codeVerifier) {
+      throw createOAuthError(
+        `PKCE code verifier is required for provider: ${providerId}`,
+        'PKCE_VERIFIER_REQUIRED',
+        providerId,
+      );
+    }
+
     const callbackUrl = this.getCallbackUrl(providerId, redirectUri || config.redirectUri);
 
     const body: Record<string, string> = {
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
       code,
       redirect_uri: callbackUrl,
       grant_type: 'authorization_code',
     };
-    applyAdditionalParams(body, config.tokenParams, TOKEN_PARAM_RESERVED_KEYS);
 
     const headers: Record<string, string> = {
       Accept: 'application/json',
     };
+
+    if (config.tokenEndpointAuthMethod === 'client_secret_basic') {
+      headers.Authorization = createBasicAuthorizationHeader(
+        config.clientId,
+        requireClientSecret(config.clientSecret, providerId),
+      );
+    } else {
+      body.client_id = config.clientId;
+      if (config.tokenEndpointAuthMethod === 'client_secret_post') {
+        body.client_secret = requireClientSecret(config.clientSecret, providerId);
+      }
+    }
+
+    if (config.pkceEnabled && codeVerifier) {
+      body.code_verifier = codeVerifier;
+    }
+    applyAdditionalParams(body, config.tokenParams, TOKEN_PARAM_RESERVED_KEYS);
 
     let requestBody: string;
     if (config.tokenRequestContentType === 'json') {
@@ -169,7 +234,7 @@ export class OAuthClient {
     const profile = provider.mapProfile(data);
 
     if (providerId === 'github') {
-      return this.fetchGitHubEmail(accessToken, profile);
+      return this.fetchGitHubEmail(accessToken, profile, config.userinfoUrl);
     }
 
     return profile;
@@ -208,10 +273,11 @@ export class OAuthClient {
 
   private async fetchGitHubEmail(
     accessToken: string,
-    profile: OAuthProfile
+    profile: OAuthProfile,
+    userinfoUrl: string,
   ): Promise<OAuthProfile> {
     try {
-      const response = await fetch(GITHUB_EMAILS_URL, {
+      const response = await fetch(deriveGitHubEmailsUrl(userinfoUrl), {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           Accept: 'application/json',
