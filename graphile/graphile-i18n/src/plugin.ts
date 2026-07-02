@@ -239,10 +239,22 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
             .map(f => `coalesce(v."${f.column}", b."${f.column}") as "${f.column}"`)
             .join(', ');
 
+          // When the instance is built for blueprint pooling
+          // (schema.constructiveUnqualified), emit search_path-relative table
+          // references so the per-request search_path resolves the tenant schema.
+          // Default (flag absent): fully schema-qualified, byte-identical output.
+          const constructiveUnqualified = !!(build.options as any).constructiveUnqualified;
+          const baseTableRef = constructiveUnqualified
+            ? `"${baseTable}"`
+            : `"${schemaName}"."${baseTable}"`;
+          const translationTableRef = constructiveUnqualified
+            ? `"${translationTable}"`
+            : `"${schemaName}"."${translationTable}"`;
+
           // Build the SQL query template
           const sqlQuery = `SELECT v."${langCodeColumn}" AS "lang_code", ${coalescedCols}
-             FROM "${schemaName}"."${baseTable}" b
-             LEFT JOIN "${schemaName}"."${translationTable}" v
+             FROM ${baseTableRef} b
+             LEFT JOIN ${translationTableRef} v
                ON v."${fkColumn}" = b."${pkColumn}"
                AND array_position($2::text[], v."${langCodeColumn}") IS NOT NULL
              WHERE b."${pkColumn}" = $1::${pkType}

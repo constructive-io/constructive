@@ -169,26 +169,37 @@ export function createBm25Adapter(
       alias: SQL,
       column: SearchableColumn,
       filterValue: any,
-      _build: any,
+      build: any,
     ): FilterApplyResult | null {
       if (filterValue == null) return null;
 
       const { query, threshold, includeChunks } = filterValue;
       if (!query || typeof query !== 'string' || query.trim().length === 0) return null;
 
+      // When the instance is built for blueprint pooling
+      // (schema.constructiveUnqualified), emit search_path-relative references for
+      // tenant-data tables/indexes so the per-request search_path resolves the
+      // tenant schema. Default (flag absent): fully schema-qualified, byte-identical.
+      const constructiveUnqualified = !!((build as any)?.options?.constructiveUnqualified);
+
       const columnData = column.adapterData as Bm25ColumnData;
       const bm25Index = columnData.bm25Index;
       const columnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
 
-      // Use quoteQualifiedIdentifier to produce the qualified index name
-      const qualifiedIndexName = `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
-      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
+      // Index names resolve via search_path just like tables, so under blueprint
+      // pooling we hand to_bm25query the UNQUALIFIED index name. The store lookup
+      // (getBm25IndexForAttribute) still keys off the build-time codec schema —
+      // correct, because the store was populated by the same representative gather.
+      const indexNameArg = constructiveUnqualified
+        ? `"${bm25Index.indexName}"`
+        : `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
+      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(indexNameArg)})`;
       const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
 
       // Check for chunk-aware querying
       const chunksInfo = columnData.chunksInfo;
       if (chunksInfo && chunksInfo.searchIndexes.includes('bm25') && (includeChunks !== false)) {
-        const chunksTableRef = chunksInfo.chunksSchema
+        const chunksTableRef = (chunksInfo.chunksSchema && !constructiveUnqualified)
           ? sql`${sql.identifier(chunksInfo.chunksSchema)}.${sql.identifier(chunksInfo.chunksTableName)}`
           : sql`${sql.identifier(chunksInfo.chunksTableName)}`;
         const parentFk = sql.identifier(chunksInfo.parentFkField);
@@ -199,7 +210,9 @@ export function createBm25Adapter(
         // BM25 on chunks requires an index name on the chunks table.
         // We construct it from the chunks table schema + a conventional index name.
         // The BM25 index on chunks is named: {chunks_table}_{content_field}_bm25_idx
-        const chunksIndexName = `"${chunksInfo.chunksSchema || bm25Index.schemaName}"."${chunksInfo.chunksTableName}_${chunksInfo.contentField}_bm25_idx"`;
+        const chunksIndexName = constructiveUnqualified
+          ? `"${chunksInfo.chunksTableName}_${chunksInfo.contentField}_bm25_idx"`
+          : `"${chunksInfo.chunksSchema || bm25Index.schemaName}"."${chunksInfo.chunksTableName}_${chunksInfo.contentField}_bm25_idx"`;
         const chunkBm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(chunksIndexName)})`;
         const chunkScoreExpr = sql`(${chunksAlias}.${chunkContentField} <@> ${chunkBm25queryExpr})`;
 

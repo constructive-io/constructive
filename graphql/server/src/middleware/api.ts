@@ -14,6 +14,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
+import { stripSchemaHashPrefix } from './blueprint';
 import './types';
 
 const log = new Logger('api');
@@ -266,6 +267,7 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleS
   anonRole: row.anon_role || 'anon',
   roleName: row.role_name || 'authenticated',
   schema: row.schemas || [],
+  logicalSchemas: (row.schemas || []).map(stripSchemaHashPrefix),
   apiModules: [],
   rlsModule: settings.rlsModule,
   domains: [],

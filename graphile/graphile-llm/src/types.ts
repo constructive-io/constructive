@@ -184,6 +184,14 @@ export interface ChunkTableInfo {
   embeddingField: string;
   /** Text content column on chunks table (the actual chunk text) */
   contentField: string;
+  /**
+   * When true, reference the chunks table UNQUALIFIED (bare table name) at
+   * runtime so the per-request search_path resolves the tenant schema.
+   * Threaded from `build.options.constructiveUnqualified` (blueprint pooling)
+   * during discovery. Defaults to false/undefined — schema-qualified references
+   * (existing behavior) are used.
+   */
+  unqualified?: boolean;
 }
 
 // ─── Metering Types ─────────────────────────────────────────────────────────

@@ -187,12 +187,18 @@ export function createPgvectorAdapter(
       alias: SQL,
       column: SearchableColumn,
       filterValue: any,
-      _build: any,
+      build: any,
     ): FilterApplyResult | null {
       if (filterValue == null) return null;
 
       const { vector, metric, distance, includeChunks } = filterValue;
       if (!vector || !Array.isArray(vector) || vector.length === 0) return null;
+
+      // When the instance is built for blueprint pooling
+      // (schema.constructiveUnqualified), emit search_path-relative references for
+      // tenant-data tables so the per-request search_path resolves the tenant
+      // schema. Default (flag absent): fully schema-qualified, byte-identical.
+      const constructiveUnqualified = !!((build as any)?.options?.constructiveUnqualified);
 
       const resolvedMetric = metric || defaultMetric;
       const vectorString = `[${vector.join(',')}]`;
@@ -205,7 +211,7 @@ export function createPgvectorAdapter(
       if (chunksInfo && (includeChunks !== false)) {
         // Chunk-aware query: find the closest chunk for each parent row
         // Uses a lateral subquery to get the minimum distance across all chunks
-        const chunksTableRef = chunksInfo.chunksSchema
+        const chunksTableRef = (chunksInfo.chunksSchema && !constructiveUnqualified)
           ? sql`${sql.identifier(chunksInfo.chunksSchema)}.${sql.identifier(chunksInfo.chunksTableName)}`
           : sql`${sql.identifier(chunksInfo.chunksTableName)}`;
         const parentFk = sql.identifier(chunksInfo.parentFkField);

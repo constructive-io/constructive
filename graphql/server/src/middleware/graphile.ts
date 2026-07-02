@@ -4,6 +4,7 @@ import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
+import type { Pool } from 'pg';
 import {
   createGraphileInstance,
   ensureCacheHeadroom,
@@ -16,11 +17,17 @@ import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
+import { isBlueprintPoolingEnabled, quoteSearchPath } from './blueprint';
+import { resolvePoolDecision } from './pooling-decision';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 import type { DatabaseSettings } from '../types';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+
+// Re-exported so flush.ts (and other callers) can invalidate pooling decisions
+// through the graphile module surface.
+export { clearPoolDecisions } from './pooling-decision';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -249,13 +256,17 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
  * (everything on except aggregates).
  */
 const buildPreset = (
-  pool: import('pg').Pool,
+  pool: Pool,
   schemas: string[],
   anonRole: string,
   roleName: string,
   databaseSettings?: DatabaseSettings,
+  options?: { pooling?: boolean },
 ): GraphileConfig.Preset => {
-  return {
+  // When pooling, the instance is shared across tenants of the same schema-shape
+  // and routed per request via a search_path pgSetting (see grafast.context below).
+  const pooling = options?.pooling === true;
+  const preset: GraphileConfig.Preset = {
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [AuthCookiePlugin],
   pgServices: [
@@ -280,6 +291,13 @@ const buildPreset = (
       const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
       const context: Record<string, string> = {};
 
+      // De-closure the role names: read them from the resolved API on the request
+      // so a shared (pooled) instance uses the REQUESTING tenant's roles rather than
+      // whichever tenant happened to build it. Falls back to the build-time params.
+      const api = req?.api;
+      const role = api?.roleName ?? roleName;
+      const anon = api?.anonRole ?? anonRole;
+
       if (req) {
         if (req.databaseId) {
           context['jwt.claims.database_id'] = req.databaseId;
@@ -299,7 +317,7 @@ const buildPreset = (
 
         if (req.token?.user_id) {
           const pgSettings: Record<string, string> = {
-            role: roleName,
+            role,
             'jwt.claims.token_id': req.token.id,
             'jwt.claims.user_id': req.token.user_id,
             ...context,
@@ -330,16 +348,27 @@ const buildPreset = (
             pgSettings['request.id'] = req.requestId;
           }
 
+          // Pooled instances emit search_path-relative SQL; route this request to
+          // the REQUESTING tenant's physical schemas. Never set when not pooling.
+          if (pooling && api?.schema?.length) {
+            pgSettings['search_path'] = quoteSearchPath(api.schema);
+          }
+
           return { pgSettings };
         }
       }
 
       const anonSettings: Record<string, string> = {
-        role: anonRole,
+        role: anon,
         ...context,
       };
       if (req?.requestId) {
         anonSettings['request.id'] = req.requestId;
+      }
+      // Pooled instances emit search_path-relative SQL; route this request to
+      // the REQUESTING tenant's physical schemas. Never set when not pooling.
+      if (pooling && api?.schema?.length) {
+        anonSettings['search_path'] = quoteSearchPath(api.schema);
       }
 
       return {
@@ -347,7 +376,17 @@ const buildPreset = (
       };
     },
   },
-};
+  };
+
+  if (pooling) {
+    // Stock unqualified-identifier gather + our schema flag so Constructive
+    // plugins emit search_path-relative SQL for tenant-data references. Cast:
+    // `constructiveUnqualified` is our custom schema option, absent from base types.
+    (preset as any).gather = { pgIdentifiers: 'unqualified' };
+    (preset as any).schema = { constructiveUnqualified: true };
+  }
+
+  return preset;
 };
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
@@ -361,13 +400,37 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         log.error(`${label} Missing API info`);
         return res.status(500).send('Missing API info');
       }
-      const key = req.svc_key;
-      if (!key) {
+      const svcKey = req.svc_key;
+      if (!svcKey) {
         log.error(`${label} Missing service cache key`);
         return res.status(500).send('Missing service cache key');
       }
       const { dbname, anonRole, roleName, schema } = api;
       const schemaLabel = schema?.join(',') || 'unknown';
+
+      // =========================================================================
+      // Blueprint Pooling Decision (opt-in via GRAPHILE_BLUEPRINT_POOLING)
+      //
+      // When enabled, resolve a shared blueprint key so tenants of the same
+      // schema-shape attach to ONE instance, routed per request via search_path
+      // (set in grafast.context). Decisions are memoized per svc_key and cleared
+      // on flush. When the flag is OFF this block is skipped entirely: `key` stays
+      // exactly req.svc_key and no extra pool or queries are touched.
+      // =========================================================================
+      const pgConfig = getPgEnvOptions({ ...opts.pg, database: dbname });
+      let key = svcKey;
+      let pooling = false;
+      let pool: Pool | undefined;
+      if (isBlueprintPoolingEnabled() && api) {
+        // Blueprint keying needs the tenant pool to fingerprint the schema shape.
+        pool = getPgPool(pgConfig);
+        const decision = await resolvePoolDecision(svcKey, api, pool);
+        key = decision.key;
+        pooling = decision.pooling;
+        if (pooling) {
+          log.info(`[pooling] svc=${svcKey} → ${key}`);
+        }
+      }
 
       // =========================================================================
       // Phase A: Cache Check (fast path)
@@ -432,17 +495,14 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`,
       );
 
-      const pgConfig = getPgEnvOptions({
-        ...opts.pg,
-        database: dbname,
-      });
-
       // Route through pg-cache so the pool is tracked and can be cleaned up
-      // properly, preventing leaked connections during database teardown.
-      const pool = getPgPool(pgConfig);
+      // properly, preventing leaked connections during database teardown. When the
+      // pooling decision above already resolved the pool, reuse it (pg-cache memoizes
+      // regardless); otherwise resolve it here exactly as before (flag-off path).
+      const activePool = pool ?? getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings);
+      const preset = buildPreset(activePool, schema || [], anonRole, roleName, api.databaseSettings, { pooling });
       const creationPromise = (async (): Promise<GraphileCacheEntry> => {
         // Serialize builds process-wide: each build transiently allocates hundreds of MB,
         // and only same-key builds are deduped by the single-flight map above.

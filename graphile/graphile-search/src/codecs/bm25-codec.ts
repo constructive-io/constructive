@@ -36,6 +36,15 @@ export interface Bm25IndexInfo {
  *
  * Key: "schemaName.tableName.columnName"
  * Value: Bm25IndexInfo
+ *
+ * NOTE (blueprint pooling): this store is process-global and is cleared +
+ * repopulated per introspection run (see pgIntrospection_introspection).
+ * Concurrent gathers are serialized by the server's build semaphore, so a
+ * single global store is tolerated for now. Under blueprint pooling the store
+ * is keyed by the representative tenant's schema; the BM25 adapter reads the
+ * index NAME from these entries and, when schema.constructiveUnqualified is set,
+ * passes it unqualified to to_bm25query so the per-request search_path resolves
+ * the correct tenant index at query time.
  */
 export const bm25IndexStore = new Map<string, Bm25IndexInfo>();
 
