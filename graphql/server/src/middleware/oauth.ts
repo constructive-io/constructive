@@ -508,7 +508,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
 
         const userAgent = req.get('user-agent') || '';
         const { connectedAccountsModule, userAuthModule } = modules;
-        const authPrivateSchema = userAuthModule.schemaName;
+        const authPrivateSchema = userAuthModule.identityFunctionSchemaName;
         const signInFn = userAuthModule.signInIdentityFunction;
         const signUpFn = userAuthModule.signUpIdentityFunction;
         const emailVerified = isEmailVerified(profile);

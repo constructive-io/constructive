@@ -188,6 +188,7 @@ export interface LlmConfig {
 
 export interface UserAuthModuleConfig {
   schemaName: string;
+  identityFunctionSchemaName: string;
   sessionCredentialsSchemaName: string;
   signInFunction: string;
   signUpFunction: string;

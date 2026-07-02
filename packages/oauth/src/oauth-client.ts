@@ -62,11 +62,18 @@ function requireClientSecret(
   return clientSecret;
 }
 
+function formEncodeCredential(value: string): string {
+  const encoded = new URLSearchParams([['value', value]]).toString();
+  return encoded.slice('value='.length);
+}
+
 function createBasicAuthorizationHeader(
   clientId: string,
   clientSecret: string,
 ): string {
-  return `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
+  const encodedClientId = formEncodeCredential(clientId);
+  const encodedClientSecret = formEncodeCredential(clientSecret);
+  return `Basic ${Buffer.from(`${encodedClientId}:${encodedClientSecret}`).toString('base64')}`;
 }
 
 function deriveGitHubEmailsUrl(userinfoUrl: string): string {
