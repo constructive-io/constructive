@@ -15,6 +15,7 @@ import { getPgPool } from 'pg-cache';
 import requestIp from 'request-ip';
 
 import type { DebugSamplerHandle } from './diagnostics/debug-sampler';
+import { installConnectionErrorGuard } from './diagnostics/connection-error-guard';
 import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
 import {
   isDevelopmentObservabilityMode,
@@ -84,6 +85,7 @@ class Server {
   private metricsSampler: MetricsSamplerHandle | null = null;
 
   constructor(opts: ConstructiveOptions) {
+    installConnectionErrorGuard();
     this.opts = getEnvOptions(opts);
     const effectiveOpts = this.opts;
     const observabilityRequested = isGraphqlObservabilityRequested();
