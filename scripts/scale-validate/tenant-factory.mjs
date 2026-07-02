@@ -253,9 +253,17 @@ async function createTenant(pool, ref, opts, index) {
       try {
         await client.query('ROLLBACK');
       } catch {}
-      const retriable = err && (err.code === '40P01' || err.code === '40001');
+      // 40P01/40001: deadlock/serialization. 57P01/08006/08003/53300 + message
+      // sniff: connection-class (e.g. PG crash recovery) — retry after a long
+      // backoff so the run survives a server restart.
+      const connLost =
+        ['57P01', '08006', '08003', '53300'].includes(err && err.code) ||
+        /connection terminated|terminating connection|server closed the connection/i.test(
+          (err && err.message) || ''
+        );
+      const retriable = connLost || (err && (err.code === '40P01' || err.code === '40001'));
       if (retriable && attempt <= opts.maxRetries) {
-        const backoff = 100 * attempt + Math.floor(Math.random() * 100);
+        const backoff = (connLost ? 10000 : 100) * attempt + Math.floor(Math.random() * 100);
         console.error(`  [${name}] ${err.code} (attempt ${attempt}) — retrying in ${backoff}ms`);
         await new Promise((r) => setTimeout(r, backoff));
         continue;
@@ -321,6 +329,8 @@ async function validateShape(pool, opts) {
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const pool = new Pool({ ...PG, max: Math.max(2, opts.concurrency + 1) });
+  // An idle pooled client dying (PG crash/restart) must not take down the run.
+  pool.on('error', (e) => console.error(`  [pool] idle client error (continuing): ${e.message}`));
 
   try {
     if (opts.validate) {

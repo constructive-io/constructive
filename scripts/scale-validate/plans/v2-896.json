@@ -1,0 +1,18 @@
+{
+  "port": 3345,
+  "defaults": {
+    "heapMb": 896,
+    "rps": 10,
+    "durationSec": 420,
+    "shape": "uniform",
+    "auth": 1,
+    "mix": "read:0.7,write:0.25,meta:0.05"
+  },
+  "steps": [
+    { "name": "div-k1", "fleet": "out/fleet-k1.json" },
+    { "name": "div-k3", "fleet": "out/fleet-k3.json" },
+    { "name": "div-k5", "fleet": "out/fleet-k5.json" },
+    { "name": "ten-10", "fleet": "out/fleet-t10.json", "shape": "zipf", "rps": 15 },
+    { "name": "ten-33", "fleet": "out/fleet-t33.json", "shape": "zipf", "rps": 15 }
+  ]
+}
