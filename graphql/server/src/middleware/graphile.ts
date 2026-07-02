@@ -3,7 +3,11 @@ import { getNodeEnv } from '@pgpmjs/env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
+// Type-only import of the canonical GraphQL error types. Imported from 'graphql'
+// (a direct, version-pinned dependency) rather than the 'grafast/graphql' subpath so
+// the types resolve under every moduleResolution mode — including ts-jest, which type-
+// checks this file transitively via the diagnostics metrics sampler. Erased at runtime.
+import type { GraphQLError, GraphQLFormattedError } from 'graphql';
 import type { Pool } from 'pg';
 import {
   createGraphileInstance,
@@ -234,6 +238,11 @@ class BuildSemaphore {
     const wake = this.waiters.shift();
     if (wake) wake();
   }
+
+  /** Number of builds currently queued (blocked on a free slot). */
+  get queueDepth(): number {
+    return this.waiters.length;
+  }
 }
 
 const parseBuildConcurrency = (): number => {
@@ -243,6 +252,45 @@ const parseBuildConcurrency = (): number => {
 };
 
 const buildSemaphore = new BuildSemaphore(parseBuildConcurrency());
+
+/**
+ * Returns the number of PostGraphile schema builds currently queued behind the
+ * build-concurrency semaphore. A persistently non-zero depth means builds are
+ * arriving faster than they can be serialized — a leading indicator of build
+ * backpressure under load. Exposed for the metrics sampler.
+ */
+export function getBuildQueueDepth(): number {
+  return buildSemaphore.queueDepth;
+}
+
+// =============================================================================
+// In-Process Build Counters (metrics)
+// =============================================================================
+
+export interface GraphileCounters {
+  /** Total PostGraphile schema builds started (past coalescing + the semaphore). */
+  builds: number;
+  /** Requests routed to a shared blueprint (pooling) instance. */
+  poolingAttaches: number;
+  /** Builds that were pooled (shared-blueprint) builds. */
+  poolingBuilds: number;
+}
+
+/**
+ * Cumulative in-process build counters for the metrics sampler. Mutated where a build
+ * starts and where a [pooling] attach/build happens. Zero overhead when the sampler is
+ * off — these are integer bumps on paths that already do real build work.
+ */
+const graphileCounters: GraphileCounters = {
+  builds: 0,
+  poolingAttaches: 0,
+  poolingBuilds: 0
+};
+
+/** Snapshot the build counters. Returns a copy so callers cannot mutate live state. */
+export function getGraphileCounters(): GraphileCounters {
+  return { ...graphileCounters };
+}
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
@@ -430,6 +478,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         key = decision.key;
         pooling = decision.pooling;
         if (pooling) {
+          graphileCounters.poolingAttaches += 1;
           log.info(`[pooling] svc=${svcKey} → ${key}`);
         }
       }
@@ -518,6 +567,12 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           // Evict the LRU instance BEFORE building so the build peak lands on freed
           // headroom instead of stacking on a full cache.
           ensureCacheHeadroom(1);
+          // A build genuinely starts here: past single-flight coalescing, past the
+          // build semaphore, and past the built-meanwhile re-check.
+          graphileCounters.builds += 1;
+          if (pooling) {
+            graphileCounters.poolingBuilds += 1;
+          }
           return await observeGraphileBuild(
             {
               cacheKey: key,

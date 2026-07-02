@@ -1,0 +1,91 @@
+[1m[graphile-cache][22m [36mINFO:[39m [36mgraphileCache max=3 instances (heap-aware default); heap limit ~2240MB. Each query-serving instance retains ~0.5GB; raise --max-old-space-size or lower GRAPHILE_CACHE_MAX if memory-constrained.[39m
+[1m[server][22m [36mINFO:[39m [36m🔧 Constructive GraphQL Server Configuration:[39m
+[36m[39m
+[1m[server][22m [33mWARN:[39m [33mCORS wildcard ("*") provided via --origin in production: this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.[39m
+[1m[server][22m [32mSUCCESS:[39m [32m✅ Selected Configuration:[39m
+[1m[server][22m [32mSUCCESS:[39m [32m🚀 Launching Server...[39m
+[32m[39m
+[1m[server][22m [36mINFO:[39m [36m[server] Starting with config:[39m [36m{[39m
+[36m  "database": "constructive",[39m
+[36m  "host": "localhost",[39m
+[36m  "port": 5433,[39m
+[36m  "serverHost": "localhost",[39m
+[36m  "serverPort": 3333,[39m
+[36m  "apiIsPublic": true,[39m
+[36m  "enableServicesApi": true,[39m
+[36m  "metaSchemas": "services_public,metaschema_public,metaschema_modules_public",[39m
+[36m  "exposedSchemas": "none",[39m
+[36m  "anonRole": "administrator",[39m
+[36m  "roleName": "administrator",[39m
+[36m  "observabilityEnabled": false[39m
+[36m}[39m
+[1m[server][22m [33mWARN:[39m [33mCORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.[39m
+[1m[server][22m [36mINFO:[39m [36mlistening at http://localhost:3333[39m
+[1m[server][22m [36mINFO:[39m [36mconnected and listening for changes...[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=marketplace-db-tenant1-5e6b13b2-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=api-a51-fat-violet-wallaby.localhost → bp:e931be92066e85ba654f24b254a0dd0154cd1161939578aa1ac87c85166343d2[39m
+[1m[graphile][22m [36mINFO:[39m [36m[066d6c21-3087-4965-8852-6af5826f555b] Building PostGraphile v5 handler key=bp:e931be92066e85ba654f24b254a0dd0154cd1161939578aa1ac87c85166343d2 db=constructive schemas=marketplace-db-tenant1-5e6b13b2-app-public,marketplace-db-tenant1-5e6b13b2-public role=authenticated anon=anonymous[39m
+[1m[graphile][22m [36mINFO:[39m [36m[066d6c21-3087-4965-8852-6af5826f555b] Cached PostGraphile v5 handler key=bp:e931be92066e85ba654f24b254a0dd0154cd1161939578aa1ac87c85166343d2 db=constructive[39m
+[graphile-llm] Embedder configured — LLM text fields will be enabled
+[graphile-llm] Chat completer configured — RAG queries will be enabled
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=factory1-18a1fb14-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=api-factory1-26c6da94.localhost → bp:e931be92066e85ba654f24b254a0dd0154cd1161939578aa1ac87c85166343d2[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=factory1-18a1fb14-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=auth-factory1-26c6da94.localhost → bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea[39m
+[1m[graphile][22m [36mINFO:[39m [36m[97c70700-2884-49df-a2b2-7652b9fc6c80] Building PostGraphile v5 handler key=bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea db=constructive schemas=factory1-18a1fb14-users-public,factory1-18a1fb14-auth-public,factory1-18a1fb14-user-identifiers-public,factory1-18a1fb14-logging-public role=authenticated anon=anonymous[39m
+[1m[graphile][22m [36mINFO:[39m [36m[97c70700-2884-49df-a2b2-7652b9fc6c80] Cached PostGraphile v5 handler key=bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea db=constructive[39m
+[graphile-llm] Embedder configured — LLM text fields will be enabled
+[graphile-llm] Chat completer configured — RAG queries will be enabled
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=marketplace-db-tenant1-5e6b13b2-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=auth-a51-fat-violet-wallaby.localhost → bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=factory1-18a1fb14-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=auth-factory1-26c6da94.localhost → bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=factory1-18a1fb14-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=auth-factory1-26c6da94.localhost → bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=marketplace-db-tenant1-5e6b13b2-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=auth-a51-fat-violet-wallaby.localhost → bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=factory1-18a1fb14-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=false, authType=, hasToken=false[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] No credential provided (no bearer token or session cookie), using anonymous auth[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=auth-factory1-26c6da94.localhost → bp:e9fee53dbe5d558f0d2ed0fc8e9551d94645cd636a40e04593c3689298e8ceea[39m
+[1m[auth-cookie][22m [36mINFO:[39m [36m[auth-cookie] Sign-in mutation succeeded, setting session cookie (rememberMe=false)[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] middleware called, api=present[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] rlsModule=present, authenticate=authenticate, authenticateStrict=authenticate_strict, privateSchema=factory1-18a1fb14-auth-private[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] strictAuth=false, authFn=authenticate[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] authorization header present=true, authType=Bearer, hasToken=true[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] Processing bearer authentication[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] Executing auth query: SELECT * FROM "factory1-18a1fb14-auth-private"."authenticate"($1)[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] Query result: rowCount=1[39m
+[1m[auth][22m [36mINFO:[39m [36m[auth] Auth success: role=undefined, user_id=019f2167-cdcb-7224-b521-d8359bc437ef[39m
+[1m[graphile][22m [36mINFO:[39m [36m[pooling] svc=api-factory1-26c6da94.localhost → bp:e931be92066e85ba654f24b254a0dd0154cd1161939578aa1ac87c85166343d2[39m
+[1m[pg-cache][22m [36mINFO:[39m [36mReceived SIGTERM[39m

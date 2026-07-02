@@ -25,6 +25,11 @@ export {
   CacheStats,
   getCacheStats,
 
+  // In-process metrics counters
+  CacheCounters,
+  cacheCounters,
+  getCacheCounters,
+
   // In-flight refcounting + pre-build headroom
   invokeEntryHandler,
   ensureCacheHeadroom,

@@ -23,6 +23,38 @@ const SIX_HOURS_MS = ONE_HOUR_MS * 6;
 // --- Eviction Types ---
 export type EvictionReason = 'lru' | 'ttl' | 'manual';
 
+// --- Cache Counters (in-process metrics) ---
+export interface CacheCounters {
+  evictions: { lru: number; ttl: number; manual: number };
+  disposals: number;
+  drainTimeouts: number;
+}
+
+/**
+ * Cumulative in-process cache counters for the metrics sampler. Mutated in the LRU
+ * dispose callback (by eviction reason), in disposeEntry (each distinct disposal), and
+ * in the drain-timeout warning branch. Zero overhead when the sampler is disabled — the
+ * increments are a handful of integer bumps on paths that already do real teardown work.
+ * Read a stable snapshot via getCacheCounters().
+ */
+export const cacheCounters: CacheCounters = {
+  evictions: { lru: 0, ttl: 0, manual: 0 },
+  disposals: 0,
+  drainTimeouts: 0
+};
+
+/**
+ * Snapshot the cache counters. Returns a deep copy so callers cannot mutate the live
+ * counters through the returned object.
+ */
+export function getCacheCounters(): CacheCounters {
+  return {
+    evictions: { ...cacheCounters.evictions },
+    disposals: cacheCounters.disposals,
+    drainTimeouts: cacheCounters.drainTimeouts
+  };
+}
+
 // --- Cache Event Emitter ---
 export interface CacheEvictionEvent {
   key: string;
@@ -196,6 +228,7 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
     return;
   }
   disposedEntries.add(entry);
+  cacheCounters.disposals += 1;
   entry.disposing = true;
 
   // Drain in-flight requests before tearing the instance down. The entry is already
@@ -208,6 +241,7 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   if ((entry.inflight ?? 0) > 0) {
+    cacheCounters.drainTimeouts += 1;
     log.warn(
       `Disposing PostGraphile[${key}] with ${entry.inflight} request(s) still in flight after ${drainTimeoutMs}ms drain timeout`,
     );
@@ -287,6 +321,7 @@ export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
   dispose: (entry, key) => {
     // Determine eviction reason before disposal
     const reason = getEvictionReason(key, entry);
+    cacheCounters.evictions[reason] += 1;
 
     // Emit eviction event
     cacheEvents.emitEviction({ key, reason, entry });

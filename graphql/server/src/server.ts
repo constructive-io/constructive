@@ -40,6 +40,7 @@ import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { createAgenticRouter } from 'agentic-server';
 import { createContextMiddleware, requestIdMiddleware } from '@constructive-io/express-context';
 import { startDebugSampler } from './diagnostics/debug-sampler';
+import { type MetricsSamplerHandle, startMetricsSampler } from './diagnostics/metrics-sampler';
 
 const log = new Logger('server');
 
@@ -80,6 +81,7 @@ class Server {
   private closed = false;
   private httpServer: HttpServer | null = null;
   private debugSampler: DebugSamplerHandle | null = null;
+  private metricsSampler: MetricsSamplerHandle | null = null;
 
   constructor(opts: ConstructiveOptions) {
     this.opts = getEnvOptions(opts);
@@ -209,6 +211,10 @@ class Server {
 
     this.app = app;
     this.debugSampler = observabilityEnabled ? startDebugSampler(effectiveOpts) : null;
+    // Gated purely on GRAPHILE_DEBUG_METRICS (not dev-only observability): this JSON-line
+    // sampler is designed for long production soak analysis and is a true no-op when the
+    // env flag is off.
+    this.metricsSampler = startMetricsSampler();
   }
 
   listen(): HttpServer {
@@ -319,6 +325,10 @@ class Server {
     if (this.debugSampler) {
       await this.debugSampler.stop();
       this.debugSampler = null;
+    }
+    if (this.metricsSampler) {
+      this.metricsSampler.stop();
+      this.metricsSampler = null;
     }
     if (this.httpServer?.listening) {
       await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
