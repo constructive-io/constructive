@@ -2,9 +2,11 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
-import { graphileCache } from 'graphile-cache';
+import { clearMatchingEntries, graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 import './types'; // for Request type
+import { isBlueprintPoolingEnabled } from './blueprint';
+import { clearPoolDecisions } from './pooling-decision';
 
 const log = new Logger('flush');
 
@@ -17,6 +19,12 @@ export const flush = async (
     // TODO: check bearer for a flush / special key
     graphileCache.delete((req as any).svc_key);
     svcCache.delete((req as any).svc_key);
+    // Under pooling the serving instance is stored under a `bp:` key, which the
+    // svc_key delete above cannot reach — mirror flushService's v1 semantics.
+    if (isBlueprintPoolingEnabled()) {
+      clearMatchingEntries(/^bp:/);
+      clearPoolDecisions();
+    }
     res.status(200).send('OK');
     return;
   }
@@ -29,6 +37,18 @@ export const flushService = async (
 ): Promise<void> => {
   const pgPool = getPgPool(opts.pg);
   log.info('flushing db ' + databaseId);
+
+  // Blueprint pooling (v1): a schema change in ANY tenant can alter a shape that
+  // pooled instances share, so flush ALL pooled (`bp:`) instances — rebuilds are
+  // cheap — and drop cached pooling decisions so the next request re-derives the
+  // fingerprint/key. Runs regardless of isPublic since pooling targets the public API.
+  if (isBlueprintPoolingEnabled()) {
+    const cleared = clearMatchingEntries(/^bp:/);
+    clearPoolDecisions();
+    if (cleared > 0) {
+      log.info(`[pooling] flushed ${cleared} pooled instance(s) after change to db ${databaseId}`);
+    }
+  }
 
   const api = new RegExp(`^api:${databaseId}:.*`);
   const schemata = new RegExp(`^schemata:${databaseId}:.*`);

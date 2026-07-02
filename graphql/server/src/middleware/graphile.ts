@@ -4,17 +4,30 @@ import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
-import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
+import type { Pool } from 'pg';
+import {
+  createGraphileInstance,
+  ensureCacheHeadroom,
+  type GraphileCacheEntry,
+  graphileCache,
+  invokeEntryHandler,
+} from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
+import { isBlueprintPoolingEnabled, tenantSearchPath } from './blueprint';
+import { resolvePoolDecision } from './pooling-decision';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 import type { DatabaseSettings } from '../types';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+
+// Re-exported so flush.ts (and other callers) can invalidate pooling decisions
+// through the graphile module surface.
+export { clearPoolDecisions } from './pooling-decision';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -191,6 +204,46 @@ export function clearInFlightMap(): void {
   creating.clear();
 }
 
+// =============================================================================
+// Build Admission Control
+// =============================================================================
+
+/**
+ * Bounds how many PostGraphile schema builds run concurrently across ALL cache
+ * keys (the single-flight map only dedups builds for the SAME key). Each build
+ * transiently allocates hundreds of MB, so concurrent builds of different
+ * tenants stack those peaks on top of the resident cache — the OOM shape.
+ * Default 1: builds queue and run serially. Override with GRAPHILE_BUILD_CONCURRENCY.
+ */
+class BuildSemaphore {
+  private active = 0;
+  private waiters: Array<() => void> = [];
+  constructor(private readonly capacity: number) {}
+
+  async acquire(): Promise<void> {
+    if (this.active < this.capacity) {
+      this.active++;
+      return;
+    }
+    await new Promise<void>((resolve) => this.waiters.push(resolve));
+    this.active++;
+  }
+
+  release(): void {
+    this.active = Math.max(0, this.active - 1);
+    const wake = this.waiters.shift();
+    if (wake) wake();
+  }
+}
+
+const parseBuildConcurrency = (): number => {
+  const raw = process.env.GRAPHILE_BUILD_CONCURRENCY;
+  const n = raw ? parseInt(raw, 10) : 1;
+  return Number.isFinite(n) && n > 0 ? n : 1;
+};
+
+const buildSemaphore = new BuildSemaphore(parseBuildConcurrency());
+
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
 
@@ -203,13 +256,17 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
  * (everything on except aggregates).
  */
 const buildPreset = (
-  pool: import('pg').Pool,
+  pool: Pool,
   schemas: string[],
   anonRole: string,
   roleName: string,
   databaseSettings?: DatabaseSettings,
+  options?: { pooling?: boolean },
 ): GraphileConfig.Preset => {
-  return {
+  // When pooling, the instance is shared across tenants of the same schema-shape
+  // and routed per request via a search_path pgSetting (see grafast.context below).
+  const pooling = options?.pooling === true;
+  const preset: GraphileConfig.Preset = {
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [AuthCookiePlugin],
   pgServices: [
@@ -221,7 +278,9 @@ const buildPreset = (
   grafserv: {
     graphqlPath: '/graphql',
     graphiqlPath: '/graphiql',
-    graphiql: true,
+    // GraphiQL (ruru) assets/handlers are per-instance overhead and an unnecessary
+    // prod surface — enable only in development, or explicitly via GRAPHILE_GRAPHIQL=true.
+    graphiql: getNodeEnv() === 'development' || process.env.GRAPHILE_GRAPHIQL === 'true',
     graphiqlOnGraphQLGET: false,
     maskError,
   },
@@ -231,6 +290,13 @@ const buildPreset = (
       // In grafserv/express/v4, the request is available at requestContext.expressv4.req
       const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
       const context: Record<string, string> = {};
+
+      // De-closure the role names: read them from the resolved API on the request
+      // so a shared (pooled) instance uses the REQUESTING tenant's roles rather than
+      // whichever tenant happened to build it. Falls back to the build-time params.
+      const api = req?.api;
+      const role = api?.roleName ?? roleName;
+      const anon = api?.anonRole ?? anonRole;
 
       if (req) {
         if (req.databaseId) {
@@ -251,7 +317,7 @@ const buildPreset = (
 
         if (req.token?.user_id) {
           const pgSettings: Record<string, string> = {
-            role: roleName,
+            role,
             'jwt.claims.token_id': req.token.id,
             'jwt.claims.user_id': req.token.user_id,
             ...context,
@@ -282,16 +348,29 @@ const buildPreset = (
             pgSettings['request.id'] = req.requestId;
           }
 
+          // Pooled instances emit search_path-relative SQL; route this request to
+          // the REQUESTING tenant's physical schemas (+ shared `public` last — see
+          // tenantSearchPath). Never set when not pooling.
+          if (pooling && api?.schema?.length) {
+            pgSettings['search_path'] = tenantSearchPath(api.schema);
+          }
+
           return { pgSettings };
         }
       }
 
       const anonSettings: Record<string, string> = {
-        role: anonRole,
+        role: anon,
         ...context,
       };
       if (req?.requestId) {
         anonSettings['request.id'] = req.requestId;
+      }
+      // Pooled instances emit search_path-relative SQL; route this request to
+      // the REQUESTING tenant's physical schemas (+ shared `public` last — see
+      // tenantSearchPath). Never set when not pooling.
+      if (pooling && api?.schema?.length) {
+        anonSettings['search_path'] = tenantSearchPath(api.schema);
       }
 
       return {
@@ -299,7 +378,17 @@ const buildPreset = (
       };
     },
   },
-};
+  };
+
+  if (pooling) {
+    // Stock unqualified-identifier gather + our schema flag so Constructive
+    // plugins emit search_path-relative SQL for tenant-data references. Cast:
+    // `constructiveUnqualified` is our custom schema option, absent from base types.
+    (preset as any).gather = { pgIdentifiers: 'unqualified' };
+    (preset as any).schema = { constructiveUnqualified: true };
+  }
+
+  return preset;
 };
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
@@ -313,8 +402,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         log.error(`${label} Missing API info`);
         return res.status(500).send('Missing API info');
       }
-      const key = req.svc_key;
-      if (!key) {
+      const svcKey = req.svc_key;
+      if (!svcKey) {
         log.error(`${label} Missing service cache key`);
         return res.status(500).send('Missing service cache key');
       }
@@ -322,12 +411,40 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const schemaLabel = schema?.join(',') || 'unknown';
 
       // =========================================================================
+      // Blueprint Pooling Decision (opt-in via GRAPHILE_BLUEPRINT_POOLING)
+      //
+      // When enabled, resolve a shared blueprint key so tenants of the same
+      // schema-shape attach to ONE instance, routed per request via search_path
+      // (set in grafast.context). Decisions are memoized per svc_key and cleared
+      // on flush. When the flag is OFF this block is skipped entirely: `key` stays
+      // exactly req.svc_key and no extra pool or queries are touched.
+      // =========================================================================
+      const pgConfig = getPgEnvOptions({ ...opts.pg, database: dbname });
+      let key = svcKey;
+      let pooling = false;
+      let pool: Pool | undefined;
+      if (isBlueprintPoolingEnabled() && api) {
+        // Blueprint keying needs the tenant pool to fingerprint the schema shape.
+        pool = getPgPool(pgConfig);
+        const decision = await resolvePoolDecision(svcKey, api, pool);
+        key = decision.key;
+        pooling = decision.pooling;
+        if (pooling) {
+          log.info(`[pooling] svc=${svcKey} → ${key}`);
+        }
+      }
+
+      // =========================================================================
       // Phase A: Cache Check (fast path)
       // =========================================================================
       const cached = graphileCache.get(key);
       if (cached) {
-        log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
-        return cached.handler(req, res, next);
+        if (invokeEntryHandler(cached, req, res, next)) {
+          log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
+          return;
+        }
+        // Entry is mid-disposal — fall through and rebuild.
+        log.debug(`${label} PostGraphile cache hit on disposing entry key=${key}; rebuilding`);
       }
 
       log.debug(`${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
@@ -340,7 +457,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
         try {
           const instance = await inFlight;
-          return instance.handler(req, res, next);
+          if (invokeEntryHandler(instance, req, res, next)) {
+            return;
+          }
+          log.debug(`${label} Coalesced instance already disposing for PostGraphile[${key}], retrying`);
+          // Fall through to Phase C to retry creation
         } catch (error) {
           log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
           // Fall through to Phase C to retry creation
@@ -353,9 +474,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Re-check cache after coalesced request failure (another retry may have succeeded)
       const recheckedCache = graphileCache.get(key);
-      if (recheckedCache) {
+      if (recheckedCache && invokeEntryHandler(recheckedCache, req, res, next)) {
         log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
-        return recheckedCache.handler(req, res, next);
+        return;
       }
 
       // Re-check in-flight map (another retry may have started creation)
@@ -363,44 +484,71 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       if (retryInFlight) {
         log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
         const retryInstance = await retryInFlight;
-        return retryInstance.handler(req, res, next);
+        if (invokeEntryHandler(retryInstance, req, res, next)) {
+          return;
+        }
+        log.warn(`${label} Re-coalesced instance already disposing for PostGraphile[${key}]`);
+        return res.status(503).json({
+          error: { code: 'SERVICE_ROTATING', message: 'Service is restarting, please retry' }
+        });
       }
 
       log.info(
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`,
       );
 
-      const pgConfig = getPgEnvOptions({
-        ...opts.pg,
-        database: dbname,
-      });
-
       // Route through pg-cache so the pool is tracked and can be cleaned up
-      // properly, preventing leaked connections during database teardown.
-      const pool = getPgPool(pgConfig);
+      // properly, preventing leaked connections during database teardown. When the
+      // pooling decision above already resolved the pool, reuse it (pg-cache memoizes
+      // regardless); otherwise resolve it here exactly as before (flag-off path).
+      const activePool = pool ?? getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings);
-      const creationPromise = observeGraphileBuild(
-        {
-          cacheKey: key,
-          serviceKey: key,
-          databaseId: api.databaseId ?? null,
-        },
-        () => createGraphileInstance({
-          preset,
-          cacheKey: key,
-          enableRealtime: api.databaseSettings?.enableRealtime,
-        }),
-        { enabled: observabilityEnabled },
-      );
+      const preset = buildPreset(activePool, schema || [], anonRole, roleName, api.databaseSettings, { pooling });
+      const creationPromise = (async (): Promise<GraphileCacheEntry> => {
+        // Serialize builds process-wide: each build transiently allocates hundreds of MB,
+        // and only same-key builds are deduped by the single-flight map above.
+        await buildSemaphore.acquire();
+        try {
+          // While queued for the slot another request may have finished this key.
+          const builtMeanwhile = graphileCache.get(key);
+          if (builtMeanwhile) {
+            return builtMeanwhile;
+          }
+          // Evict the LRU instance BEFORE building so the build peak lands on freed
+          // headroom instead of stacking on a full cache.
+          ensureCacheHeadroom(1);
+          return await observeGraphileBuild(
+            {
+              cacheKey: key,
+              serviceKey: key,
+              databaseId: api.databaseId ?? null,
+            },
+            () => createGraphileInstance({
+              preset,
+              cacheKey: key,
+              dbname,
+              enableRealtime: api.databaseSettings?.enableRealtime,
+            }),
+            { enabled: observabilityEnabled },
+          );
+        } finally {
+          buildSemaphore.release();
+        }
+      })();
       creating.set(key, creationPromise);
 
       try {
         const instance = await creationPromise;
         graphileCache.set(key, instance);
         log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
-        return instance.handler(req, res, next);
+        if (invokeEntryHandler(instance, req, res, next)) {
+          return;
+        }
+        log.warn(`${label} Freshly built instance already disposing for PostGraphile[${key}]`);
+        return res.status(503).json({
+          error: { code: 'SERVICE_ROTATING', message: 'Service is restarting, please retry' }
+        });
       } catch (error) {
         log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
         throw new HandlerCreationError(

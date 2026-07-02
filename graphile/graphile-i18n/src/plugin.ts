@@ -74,7 +74,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
   // Closure-scoped state shared between init and field hooks
   let i18nRegistry: Record<string, I18nTableInfo> = {};
-  const localeTypeCache: Record<string, any> = {};
+  let localeTypeCache: Record<string, any> = {};
 
   return {
     name: 'I18nPlugin',
@@ -85,6 +85,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
         init: {
           callback(_, build) {
             i18nRegistry = {};
+            localeTypeCache = {};
 
             for (const [, codec] of Object.entries(build.input.pgRegistry.pgCodecs)) {
               const c = codec as PgCodecWithAttributes;
@@ -238,10 +239,22 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
             .map(f => `coalesce(v."${f.column}", b."${f.column}") as "${f.column}"`)
             .join(', ');
 
+          // When the instance is built for blueprint pooling
+          // (schema.constructiveUnqualified), emit search_path-relative table
+          // references so the per-request search_path resolves the tenant schema.
+          // Default (flag absent): fully schema-qualified, byte-identical output.
+          const constructiveUnqualified = !!(build.options as any).constructiveUnqualified;
+          const baseTableRef = constructiveUnqualified
+            ? `"${baseTable}"`
+            : `"${schemaName}"."${baseTable}"`;
+          const translationTableRef = constructiveUnqualified
+            ? `"${translationTable}"`
+            : `"${schemaName}"."${translationTable}"`;
+
           // Build the SQL query template
           const sqlQuery = `SELECT v."${langCodeColumn}" AS "lang_code", ${coalescedCols}
-             FROM "${schemaName}"."${baseTable}" b
-             LEFT JOIN "${schemaName}"."${translationTable}" v
+             FROM ${baseTableRef} b
+             LEFT JOIN ${translationTableRef} v
                ON v."${fkColumn}" = b."${pkColumn}"
                AND array_position($2::text[], v."${langCodeColumn}") IS NOT NULL
              WHERE b."${pkColumn}" = $1::${pkType}
@@ -265,18 +278,20 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                   $baseCols[column] = $parent.get(column);
                 }
                 const $withPgClient = (grafastContext() as any).get('withPgClient');
+                const $pgSettings = (grafastContext() as any).get('pgSettings');
                 const $langCodes = (grafastContext() as any).get('langCodes');
 
                 // Combine all inputs into a single step
                 const $input = object({
                   id: $id,
                   withPgClient: $withPgClient,
+                  pgSettings: $pgSettings,
                   langCodes: $langCodes,
                   ...$baseCols,
                 });
 
                 return lambda($input, async (input: any) => {
-                  const { id, withPgClient, langCodes: ctxLangCodes, ...baseCols } = input;
+                  const { id, withPgClient, pgSettings, langCodes: ctxLangCodes, ...baseCols } = input;
                   const langs: string[] = ctxLangCodes ?? defaultLanguages;
 
                   if (!withPgClient || !id) {
@@ -287,7 +302,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                     return result;
                   }
 
-                  const row = await withPgClient(null, async (client: any) => {
+                  const row = await withPgClient(pgSettings, async (client: any) => {
                     const { rows } = await client.query(sqlQuery, [id, langs]);
                     return rows[0] ?? null;
                   });

@@ -1,8 +1,14 @@
 import { EventEmitter } from 'events';
+import { getHeapStatistics } from 'node:v8';
 import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
-import type { Express } from 'express';
+import type {
+  Express,
+  NextFunction as ExpressNextFunction,
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from 'express';
 import type { Server as HttpServer } from 'http';
 import type { PostGraphileInstance } from 'postgraphile';
 import type { GrafservBase } from 'grafserv';
@@ -12,8 +18,7 @@ const log = new Logger('graphile-cache');
 // --- Time Constants ---
 export const ONE_HOUR_MS = 1000 * 60 * 60;
 export const FIVE_MINUTES_MS = 1000 * 60 * 5;
-const ONE_DAY = ONE_HOUR_MS * 24;
-const ONE_YEAR = ONE_DAY * 366;
+const SIX_HOURS_MS = ONE_HOUR_MS * 6;
 
 // --- Eviction Types ---
 export type EvictionReason = 'lru' | 'ttl' | 'manual';
@@ -44,29 +49,83 @@ export interface CacheConfig {
 }
 
 /**
+ * Empirically, a PostGraphile v5 instance that has served at least one GraphQL
+ * request retains ~0.5 GB of V8 heap (the fully-materialised GraphQL schema plus
+ * grafast's per-schema plan machinery; a build-only instance is far smaller, but
+ * every *cached* instance is, by definition, one that serves requests). The cache
+ * therefore CANNOT be bounded by entry count alone: `max` heavy instances need
+ * `max * ~0.5GB` of resident heap, and once that exceeds the V8 old-space limit the
+ * process OOMs as distinct hosts fill the cache. A fixed default of 50 implies
+ * ~24 GB of resident schemas — far beyond any normal heap — which is the root cause
+ * of the schema-builder OOM. We derive a heap-aware default that budgets a fraction
+ * of the heap for cached instances. Override explicitly with GRAPHILE_CACHE_MAX, and
+ * tune the per-instance estimate with GRAPHILE_CACHE_INSTANCE_HEAP_BYTES.
+ */
+// ~0.5 GB retained per query-serving instance (measured against real provisioned apps).
+const DEFAULT_INSTANCE_HEAP_BYTES = 512 * 1024 * 1024;
+// Fraction of the V8 heap budgeted for cached instances; the remainder is headroom
+// for transient schema builds (each build briefly allocates hundreds of MB) and
+// request processing.
+const CACHE_HEAP_FRACTION = 0.5;
+const MIN_CACHE_MAX = 3;
+const MAX_CACHE_MAX = 50;
+
+const parseEnvInt = (value: string | undefined, fallback: number): number => {
+  if (!value) return fallback;
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+};
+
+/**
+ * Heap-aware default for the maximum number of cached PostGraphile instances.
+ * cache_heap_budget = heap_size_limit * CACHE_HEAP_FRACTION
+ * max = clamp(floor(cache_heap_budget / per_instance_bytes), MIN, MAX)
+ */
+function computeHeapAwareMax(): number {
+  try {
+    const heapLimit = getHeapStatistics().heap_size_limit; // reflects --max-old-space-size
+    const perInstance = parseEnvInt(
+      process.env.GRAPHILE_CACHE_INSTANCE_HEAP_BYTES,
+      DEFAULT_INSTANCE_HEAP_BYTES,
+    );
+    const budgeted = Math.floor((heapLimit * CACHE_HEAP_FRACTION) / perInstance);
+    return Math.min(MAX_CACHE_MAX, Math.max(MIN_CACHE_MAX, budgeted));
+  } catch {
+    return MIN_CACHE_MAX;
+  }
+}
+
+/**
  * Get cache configuration from environment variables
  *
  * Supports:
- * - GRAPHILE_CACHE_MAX: Maximum number of entries (default: 50)
- * - GRAPHILE_CACHE_TTL_MS: TTL in milliseconds
- *   - Production default: ONE_YEAR
+ * - GRAPHILE_CACHE_MAX: Maximum number of entries. Default is heap-aware
+ *   (see computeHeapAwareMax) rather than a fixed 50, because each cached
+ *   instance retains ~0.5 GB and a count-only cap OOMs the process.
+ * - GRAPHILE_CACHE_INSTANCE_HEAP_BYTES: per-instance heap estimate for the
+ *   heap-aware default (default ~512 MB).
+ * - GRAPHILE_CACHE_TTL_MS: idle TTL in milliseconds (updateAgeOnGet refreshes it
+ *   on every hit, so this is an idle-expiry, not an absolute lifetime)
+ *   - Production default: SIX_HOURS_MS — an idle tenant's ~0.5 GB instance is
+ *     reclaimed within hours instead of pinned for a year; a later request
+ *     simply rebuilds it
  *   - Development default: FIVE_MINUTES_MS
  *
- * NOTE: This value should be <= PG_CACHE_MAX (also default: 50) so that
- * every cached PostGraphile instance has a live pool backing it.
+ * NOTE: This value should be <= PG_CACHE_MAX so that every cached PostGraphile
+ * instance has a live pool backing it.
  */
 export function getCacheConfig(): CacheConfig {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   const max = process.env.GRAPHILE_CACHE_MAX
-    ? parseInt(process.env.GRAPHILE_CACHE_MAX, 10)
-    : 50;
+    ? parseEnvInt(process.env.GRAPHILE_CACHE_MAX, computeHeapAwareMax())
+    : computeHeapAwareMax();
 
   const ttl = process.env.GRAPHILE_CACHE_TTL_MS
     ? parseInt(process.env.GRAPHILE_CACHE_TTL_MS, 10)
     : isDevelopment
       ? FIVE_MINUTES_MS
-      : ONE_YEAR;
+      : SIX_HOURS_MS;
 
   return { max, ttl };
 }
@@ -89,12 +148,32 @@ export interface GraphileCacheEntry {
   httpServer: HttpServer;
   cacheKey: string;
   createdAt: number;
+  /**
+   * Database name backing this instance's pg pool. Used to evict the entry when its
+   * pool is disposed (see the pgCache cleanup callback). Distinct from cacheKey, which
+   * on the public server is the request HOST, not the database.
+   */
+  dbname?: string;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
   realtimeManager?: { stop(): Promise<void> } | null;
+  /**
+   * Number of requests currently executing against this entry's handler.
+   * Maintained by invokeEntryHandler; disposeEntry drains to 0 (bounded by
+   * GRAPHILE_CACHE_DRAIN_TIMEOUT_MS) before releasing the instance so eviction
+   * cannot tear down a schema mid-request.
+   */
+  inflight?: number;
+  /** Set at the start of disposal; routing must treat the entry as a cache miss. */
+  disposing?: boolean;
 }
 
-// Track disposed entries to prevent double-disposal
-const disposedKeys = new Set<string>();
+// Track disposed entries to prevent double-disposal. Keyed by ENTRY IDENTITY (a WeakSet),
+// NOT by the cache key. A key-scoped guard caused a same-key disposal race: while entry A
+// for key K was mid `pgl.release()` (K parked in the guard), a rebuilt entry B for the SAME
+// key K could be evicted and its disposeEntry would short-circuit, silently skipping
+// B.pgl.release(). Guarding by entry identity disposes every distinct entry exactly once
+// while still allowing a rebuilt entry on the same key to be released.
+const disposedEntries = new WeakSet<GraphileCacheEntry>();
 
 // Track keys that are being manually evicted for accurate eviction reason
 const manualEvictionKeys = new Set<string>();
@@ -106,20 +185,42 @@ const manualEvictionKeys = new Set<string>();
  * 1. Closing the HTTP server if listening
  * 2. Releasing the PostGraphile instance (which internally releases grafserv)
  *
- * Uses disposedKeys set to prevent double-disposal when closeAllCaches()
- * explicitly disposes entries and then clear() triggers the dispose callback.
+ * Uses the disposedEntries WeakSet to prevent double-disposal of the same entry when
+ * closeAllCaches() explicitly disposes entries and then clear() triggers the dispose
+ * callback for the same entry.
  */
 const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<void> => {
-  // Prevent double-disposal
-  if (disposedKeys.has(key)) {
+  // Prevent double-disposal of the SAME entry (guard by identity, not by key — see the
+  // disposedEntries declaration for why).
+  if (disposedEntries.has(entry)) {
     return;
   }
-  disposedKeys.add(key);
+  disposedEntries.add(entry);
+  entry.disposing = true;
+
+  // Drain in-flight requests before tearing the instance down. The entry is already
+  // out of the cache (dispose fires post-removal), so no NEW requests can route here —
+  // invokeEntryHandler also refuses entries with `disposing` set. Bounded wait: a wedged
+  // request must not pin ~0.5 GB forever.
+  const drainTimeoutMs = parseEnvInt(process.env.GRAPHILE_CACHE_DRAIN_TIMEOUT_MS, 30_000);
+  const drainStart = Date.now();
+  while ((entry.inflight ?? 0) > 0 && Date.now() - drainStart < drainTimeoutMs) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if ((entry.inflight ?? 0) > 0) {
+    log.warn(
+      `Disposing PostGraphile[${key}] with ${entry.inflight} request(s) still in flight after ${drainTimeoutMs}ms drain timeout`,
+    );
+  }
 
   log.debug(`Disposing PostGraphile[${key}]`);
   try {
-    // Close HTTP server if it's listening
-    if (entry.httpServer?.listening) {
+    // Close the HTTP server. create-instance builds it via createServer() but never
+    // .listen()s it, so `.listening` is always false — the old guard meant close() never
+    // ran. Closing unconditionally detaches grafserv's 'upgrade' listener; when the server
+    // was never listening, close() simply invokes the callback with ERR_SERVER_NOT_RUNNING
+    // (a harmless no-op here), so the Promise always resolves.
+    if (entry.httpServer) {
       await new Promise<void>((resolve) => {
         entry.httpServer.close(() => resolve());
       });
@@ -138,9 +239,8 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
     }
   } catch (err) {
     log.error(`Error disposing PostGraphile[${key}]:`, err);
-  } finally {
-    disposedKeys.delete(key);
   }
+  // No key cleanup needed: the WeakSet entry is reclaimed together with the entry by GC.
 };
 
 /**
@@ -165,6 +265,20 @@ const getEvictionReason = (key: string, entry: GraphileCacheEntry): EvictionReas
 // Get initial cache configuration
 const initialConfig = getCacheConfig();
 
+// Surface the resolved instance cap once at startup. Because each cached PostGraphile
+// instance retains ~0.5 GB, an oversized cap (relative to the heap) is the primary cause
+// of schema-builder OOM — make the chosen value visible to operators.
+try {
+  const heapLimitMb = Math.round(getHeapStatistics().heap_size_limit / (1024 * 1024));
+  const source = process.env.GRAPHILE_CACHE_MAX ? 'GRAPHILE_CACHE_MAX' : 'heap-aware default';
+  log.info(
+    `graphileCache max=${initialConfig.max} instances (${source}); heap limit ~${heapLimitMb}MB. ` +
+      `Each query-serving instance retains ~0.5GB; raise --max-old-space-size or lower GRAPHILE_CACHE_MAX if memory-constrained.`,
+  );
+} catch {
+  // ignore — logging is best-effort
+}
+
 // --- Graphile Cache ---
 export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
   max: initialConfig.max,
@@ -186,6 +300,60 @@ export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
     });
   }
 });
+
+/**
+ * Invoke an entry's Express handler with in-flight refcounting.
+ *
+ * Returns false WITHOUT invoking when the entry is already being disposed —
+ * callers must treat that as a cache miss (rebuild) or retry. On invocation,
+ * the refcount is incremented and released exactly once when the response
+ * finishes or the connection closes, which is what disposeEntry drains on.
+ */
+export function invokeEntryHandler(
+  entry: GraphileCacheEntry,
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: ExpressNextFunction,
+): boolean {
+  if (entry.disposing) {
+    return false;
+  }
+  entry.inflight = (entry.inflight ?? 0) + 1;
+  let released = false;
+  const release = () => {
+    if (!released) {
+      released = true;
+      entry.inflight = Math.max(0, (entry.inflight ?? 1) - 1);
+    }
+  };
+  // 'close' fires after 'finish' and also on aborted connections; release is idempotent.
+  res.once('finish', release);
+  res.once('close', release);
+  entry.handler(req, res, next);
+  return true;
+}
+
+/**
+ * Evict least-recently-used entries until there is room for `slots` new entries
+ * under the configured max. Called BEFORE building a new instance so the build's
+ * transient allocation (hundreds of MB) lands on a cache that has already shed
+ * an instance, instead of stacking a full cache + a build peak (the OOM shape).
+ */
+export function ensureCacheHeadroom(slots = 1): number {
+  const { max } = getCacheConfig();
+  let evicted = 0;
+  while (graphileCache.size > Math.max(0, max - slots)) {
+    // rkeys() iterates least-recently-used first
+    const oldestKey = graphileCache.rkeys().next().value as string | undefined;
+    if (oldestKey === undefined) break;
+    graphileCache.delete(oldestKey);
+    evicted++;
+  }
+  if (evicted > 0) {
+    log.info(`Evicted ${evicted} instance(s) before build to keep heap headroom (max=${max})`);
+  }
+  return evicted;
+}
 
 // --- Cache Stats ---
 export interface CacheStats {
@@ -235,9 +403,12 @@ export function clearMatchingEntries(pattern: RegExp): number {
 const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
   log.debug(`pgPool[${pgPoolKey}] disposed - checking graphile entries`);
 
-  // Remove graphile entries that reference this pool key
+  // Remove graphile entries backed by this pool. Match on the entry's dbname (the pool is
+  // keyed by database name), NOT on cacheKey: on the public server cacheKey is the request
+  // HOST, which never contains the database name, so the old `cacheKey.includes(pgPoolKey)`
+  // test never matched and this safety valve was dead.
   graphileCache.forEach((entry, k) => {
-    if (entry.cacheKey.includes(pgPoolKey)) {
+    if (entry.dbname === pgPoolKey) {
       log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}] disposal`);
       manualEvictionKeys.add(k);
       graphileCache.delete(k);
@@ -281,11 +452,12 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
       // Wait for all disposals to complete
       await Promise.allSettled(disposePromises);
 
-      // Clear the cache after disposal (dispose callback will no-op due to disposedKeys)
+      // Clear the cache after disposal (dispose callback no-ops: each entry is already
+      // in the disposedEntries WeakSet from the explicit disposeEntry above).
       graphileCache.clear();
 
-      // Clear disposed keys tracking after full cleanup
-      disposedKeys.clear();
+      // The disposedEntries WeakSet needs no explicit clearing — entries are reclaimed by
+      // GC once the cache no longer references them.
       manualEvictionKeys.clear();
 
       // Close pg pools

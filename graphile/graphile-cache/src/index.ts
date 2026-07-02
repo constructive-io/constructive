@@ -25,6 +25,10 @@ export {
   CacheStats,
   getCacheStats,
 
+  // In-flight refcounting + pre-build headroom
+  invokeEntryHandler,
+  ensureCacheHeadroom,
+
   // Clear matching entries
   clearMatchingEntries
 } from './graphile-cache';

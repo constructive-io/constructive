@@ -115,11 +115,27 @@ function buildTableMeta(
   };
 }
 
+/**
+ * Strip the tenant hash prefix (`<dashed-dbname>-<8hex>-`) from a physical
+ * schema name, returning the logical name; names without a hash segment are
+ * returned unchanged. Local duplicate of the server-side helper to avoid a
+ * cross-package dependency.
+ */
+function stripSchemaHashPrefix(name: string): string {
+  const match = /-[0-9a-f]{8}-/.exec(name);
+  if (!match) return name;
+  return name.slice(match.index + match[0].length);
+}
+
 export function collectTablesMeta(build: MetaBuild): TableMeta[] {
   const configuredSchemas = getConfiguredSchemas(build);
   const context = createBuildContext(build);
   const seenCodecs = new Set<PgCodec>();
   const tablesMeta: TableMeta[] = [];
+  // Shared (pooled) instances serve many tenants: reporting the build-time
+  // PHYSICAL schema name would leak the representative tenant's hashed schema
+  // identifier to every other tenant via _meta — report the logical name.
+  const unqualified = !!(build.options as any)?.constructiveUnqualified;
 
   for (const resource of Object.values(build.input.pgRegistry.pgResources || {})) {
     if (!isTableResource(resource)) continue;
@@ -137,7 +153,9 @@ export function collectTablesMeta(build: MetaBuild): TableMeta[] {
       continue;
     }
 
-    tablesMeta.push(buildTableMeta(resource, schemaName, context));
+    tablesMeta.push(
+      buildTableMeta(resource, unqualified ? stripSchemaHashPrefix(schemaName) : schemaName, context)
+    );
   }
 
   return tablesMeta;
