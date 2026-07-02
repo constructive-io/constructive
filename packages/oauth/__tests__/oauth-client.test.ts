@@ -3,6 +3,7 @@ import { resolveOAuthProvider } from '../src/provider-resolver';
 import { GITHUB_EMAILS_URL, getProvider, getProviderIds } from '../src/providers';
 import { generateState, verifyState } from '../src/utils/state';
 import { createSignedState, verifySignedState } from '../src/utils/signed-state';
+import { deriveCodeChallenge } from '../src/utils/pkce';
 
 const originalFetch = global.fetch;
 
@@ -128,6 +129,32 @@ describe('OAuthClient', () => {
       expect(state).toBe('runtime-state');
     });
 
+    it('should add a PKCE challenge when runtime config enables PKCE', () => {
+      const client = createOAuthClient({
+        providers: {
+          google: {
+            clientId: 'runtime-google-client-id',
+            clientSecret: 'runtime-google-client-secret',
+            pkceEnabled: true,
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      const { url, codeVerifier } = client.getAuthorizationUrl({
+        provider: 'google',
+        state: 'pkce-state',
+      });
+      const parsed = new URL(url);
+
+      expect(codeVerifier).toBeDefined();
+      expect(codeVerifier).toHaveLength(43);
+      expect(parsed.searchParams.get('code_challenge')).toBe(
+        deriveCodeChallenge(codeVerifier!)
+      );
+      expect(parsed.searchParams.get('code_challenge_method')).toBe('S256');
+    });
+
     it('should throw error for unknown provider', () => {
       const client = createOAuthClient(config);
 
@@ -223,6 +250,136 @@ describe('OAuthClient', () => {
       expect(body.get('client_secret')).toBe('runtime-client-secret');
       expect(body.get('audience')).toBe('constructive-api');
       expect(body.get('code')).toBe('runtime-code');
+    });
+
+    it('should use client_secret_basic without leaking client_secret into the body', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(
+        jsonResponse({
+          access_token: 'basic-token',
+          token_type: 'bearer',
+        })
+      );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient({
+        providers: {
+          google: {
+            clientId: 'basic-client-id',
+            clientSecret: 'basic-client-secret',
+            tokenEndpointAuthMethod: 'client_secret_basic',
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      await client.exchangeCode({ provider: 'google', code: 'basic-code' });
+
+      const request = fetchMock.mock.calls[0][1] as RequestInit;
+      expect(request.headers).toMatchObject({
+        Authorization: `Basic ${Buffer.from('basic-client-id:basic-client-secret').toString('base64')}`,
+      });
+      const body = new URLSearchParams(request.body as string);
+      expect(body.get('client_secret')).toBeNull();
+      expect(body.get('code')).toBe('basic-code');
+    });
+
+    it('should allow token endpoint auth method none without a client secret', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(
+        jsonResponse({
+          access_token: 'public-token',
+          token_type: 'bearer',
+        })
+      );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient({
+        providers: {
+          google: {
+            clientId: 'public-client-id',
+            tokenEndpointAuthMethod: 'none',
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      const tokens = await client.exchangeCode({
+        provider: 'google',
+        code: 'public-code',
+      });
+
+      expect(tokens.access_token).toBe('public-token');
+      const request = fetchMock.mock.calls[0][1] as RequestInit;
+      const body = new URLSearchParams(request.body as string);
+      expect(body.get('client_id')).toBe('public-client-id');
+      expect(body.get('client_secret')).toBeNull();
+    });
+
+    it('should reject unsupported private_key_jwt token endpoint auth', async () => {
+      const client = createOAuthClient({
+        providers: {
+          google: {
+            clientId: 'jwt-client-id',
+            tokenEndpointAuthMethod: 'private_key_jwt',
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      await expect(
+        client.exchangeCode({ provider: 'google', code: 'jwt-code' })
+      ).rejects.toMatchObject({
+        code: 'TOKEN_AUTH_UNSUPPORTED',
+      });
+    });
+
+    it('should send PKCE code_verifier during token exchange', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(
+        jsonResponse({
+          access_token: 'pkce-token',
+          token_type: 'bearer',
+        })
+      );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient({
+        providers: {
+          google: {
+            clientId: 'pkce-client-id',
+            clientSecret: 'pkce-client-secret',
+            pkceEnabled: true,
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      await client.exchangeCode({
+        provider: 'google',
+        code: 'pkce-code',
+        codeVerifier: 'test-code-verifier',
+      });
+
+      const request = fetchMock.mock.calls[0][1] as RequestInit;
+      const body = new URLSearchParams(request.body as string);
+      expect(body.get('code_verifier')).toBe('test-code-verifier');
+    });
+
+    it('should require a PKCE code_verifier during token exchange when PKCE is enabled', async () => {
+      const client = createOAuthClient({
+        providers: {
+          google: {
+            clientId: 'pkce-client-id',
+            clientSecret: 'pkce-client-secret',
+            pkceEnabled: true,
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      await expect(
+        client.exchangeCode({ provider: 'google', code: 'pkce-code' })
+      ).rejects.toMatchObject({
+        code: 'PKCE_VERIFIER_REQUIRED',
+      });
     });
   });
 
@@ -541,6 +698,55 @@ describe('OAuthClient', () => {
         })
       );
     });
+
+    it('should derive the GitHub emails URL from runtime userinfo URL', async () => {
+      const fetchMock = jest
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            id: 12345,
+            login: 'octocat',
+            email: null,
+          })
+        )
+        .mockResolvedValueOnce(
+          jsonResponse([
+            {
+              email: 'enterprise@example.com',
+              primary: true,
+              verified: true,
+            },
+          ])
+        );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient({
+        providers: {
+          github: {
+            clientId: 'runtime-github-client-id',
+            clientSecret: 'runtime-github-client-secret',
+            userinfoUrl: 'https://github.enterprise.test/api/v3/user',
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+      const profile = await client.getUserProfile('github', 'runtime-github-token');
+
+      expect(profile.email).toBe('enterprise@example.com');
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        2,
+        'https://github.enterprise.test/api/v3/user/emails',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer runtime-github-token',
+          }),
+        })
+      );
+      expect(fetchMock).not.toHaveBeenCalledWith(
+        GITHUB_EMAILS_URL,
+        expect.anything()
+      );
+    });
   });
 });
 
@@ -612,6 +818,34 @@ describe('provider resolver', () => {
     });
 
     expect(resolved.config.scopes).toEqual(['user:email', 'read:user']);
+  });
+
+  it('should allow public client config without a client secret', () => {
+    const resolved = resolveOAuthProvider({
+      providerId: 'google',
+      runtimeConfig: {
+        slug: 'google',
+        kind: 'oidc',
+        clientId: 'public-client-id',
+        tokenEndpointAuthMethod: 'none',
+      },
+    });
+
+    expect(resolved.config.tokenEndpointAuthMethod).toBe('none');
+    expect(resolved.config.clientSecret).toBeUndefined();
+  });
+
+  it('should require a client secret for default confidential clients', () => {
+    expect(() =>
+      resolveOAuthProvider({
+        providerId: 'google',
+        runtimeConfig: {
+          slug: 'google',
+          kind: 'oidc',
+          clientId: 'confidential-client-id',
+        },
+      })
+    ).toThrow('missing required config: clientSecret');
   });
 
   it('should reject disabled providers', () => {

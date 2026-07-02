@@ -49,12 +49,19 @@ import { pgIntervalToMilliseconds } from '../utils/pg-interval';
 const log = new Logger('oauth');
 
 const OAUTH_STATE_COOKIE = 'oauth_state';
+const OAUTH_PKCE_COOKIE = 'oauth_pkce';
 const DEFAULT_OAUTH_STATE_MAX_AGE = 10 * 60 * 1000; // 10 minutes
 const DEFAULT_ERROR_REDIRECT_PATH = '/auth/error';
 
 interface OAuthStatePayload {
   redirect_uri: string;
   provider: string;
+}
+
+interface OAuthPkcePayload {
+  state: string;
+  provider: string;
+  code_verifier: string;
 }
 
 interface OAuthEnvConfig {
@@ -308,15 +315,27 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         },
       );
 
-      res.cookie(OAUTH_STATE_COOKIE, state, {
+      const oauthCookieOptions = {
         httpOnly: authSettings?.cookieHttponly ?? true,
         secure: authSettings?.cookieSecure ?? isProduction,
         maxAge: stateMaxAge,
         sameSite: (authSettings?.cookieSamesite as 'lax' | 'strict' | 'none') ?? 'lax',
-      });
+      };
+
+      res.cookie(OAUTH_STATE_COOKIE, state, oauthCookieOptions);
 
       const client = createOAuthClientForProvider(providerConfig, baseUrl);
-      const { url } = client.getAuthorizationUrl({ provider, state });
+      const { url, codeVerifier } = client.getAuthorizationUrl({ provider, state });
+      if (codeVerifier) {
+        const pkceState = createSignedState<OAuthPkcePayload>(
+          { state, provider, code_verifier: codeVerifier },
+          {
+            secret: requireStateSecret(),
+            maxAgeMs: stateMaxAge,
+          },
+        );
+        res.cookie(OAUTH_PKCE_COOKIE, pkceState, oauthCookieOptions);
+      }
       log.info(`[oauth] Initiating OAuth flow for provider: ${provider}`);
       res.redirect(url);
     } catch (error) {
@@ -345,7 +364,9 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
       const baseUrl = getBaseUrl(req);
 
       const storedState = parseCookieValue(req, OAUTH_STATE_COOKIE);
+      const storedPkce = parseCookieValue(req, OAUTH_PKCE_COOKIE);
       res.clearCookie(OAUTH_STATE_COOKIE);
+      res.clearCookie(OAUTH_PKCE_COOKIE);
 
       // Handle OAuth provider errors
       if (oauthError) {
@@ -450,10 +471,35 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
           );
         }
 
+        let codeVerifier: string | undefined;
+        if (providerConfig.pkceEnabled) {
+          const pkcePayload = verifySignedState<OAuthPkcePayload>(
+            storedPkce,
+            { secret: getStateSecret() },
+          );
+          if (
+            !pkcePayload ||
+            pkcePayload.state !== storedState ||
+            pkcePayload.provider !== provider ||
+            !pkcePayload.code_verifier
+          ) {
+            log.warn(`[oauth] Invalid PKCE verifier state for ${provider}`);
+            return redirectToError(
+              res,
+              baseUrl,
+              errorRedirectPath,
+              'INVALID_PKCE',
+              provider,
+            );
+          }
+          codeVerifier = pkcePayload.code_verifier;
+        }
+
         const client = createOAuthClientForProvider(providerConfig, baseUrl);
         const profile = await client.handleCallback({
           provider,
           code: code as string,
+          codeVerifier,
         });
         log.info(`[oauth] Got profile for ${provider}: ${profile.email}`);
 

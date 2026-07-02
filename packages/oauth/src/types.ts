@@ -55,7 +55,7 @@ export interface OAuthProviderResolvedConfig {
   enabled: boolean;
 
   clientId: string;
-  clientSecret: string;
+  clientSecret?: string;
   redirectUri?: string;
 
   authorizationUrl: string;
@@ -96,7 +96,24 @@ export interface OAuthCredentials {
   redirectUri?: string;
 }
 
-export type OAuthClientProviderConfig = OAuthProviderRuntimeConfig;
+type OAuthClientProviderConfigBase = Omit<
+  OAuthProviderRuntimeConfig,
+  'clientSecret' | 'tokenEndpointAuthMethod'
+>;
+
+export type OAuthClientProviderConfig =
+  | (OAuthClientProviderConfigBase & {
+      tokenEndpointAuthMethod?: 'client_secret_post' | 'client_secret_basic';
+      clientSecret: string;
+    })
+  | (OAuthClientProviderConfigBase & {
+      tokenEndpointAuthMethod: 'none';
+      clientSecret?: string;
+    })
+  | (OAuthClientProviderConfigBase & {
+      tokenEndpointAuthMethod: 'private_key_jwt';
+      clientSecret?: string;
+    });
 
 export interface OAuthClientConfig {
   providers: Record<string, OAuthClientProviderConfig>;
@@ -121,10 +138,17 @@ export interface AuthorizationUrlParams {
   scopes?: string[];
 }
 
+export interface AuthorizationUrlResult {
+  url: string;
+  state: string;
+  codeVerifier?: string;
+}
+
 export interface CallbackParams {
   provider: string;
   code: string;
   redirectUri?: string;
+  codeVerifier?: string;
 }
 
 export interface OAuthError extends Error {

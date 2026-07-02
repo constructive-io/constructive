@@ -12,6 +12,7 @@ export {
   OAuthClientConfig,
   TokenResponse,
   AuthorizationUrlParams,
+  AuthorizationUrlResult,
   CallbackParams,
   OAuthError,
   createOAuthError,
@@ -37,3 +38,5 @@ export {
   createSignedState,
   verifySignedState,
 } from './utils/signed-state';
+
+export { generateCodeVerifier, deriveCodeChallenge } from './utils/pkce';

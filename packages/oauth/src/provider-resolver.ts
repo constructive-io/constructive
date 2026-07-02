@@ -43,6 +43,18 @@ export function resolveOAuthProvider(ctx: {
     );
   }
 
+  const tokenEndpointAuthMethod =
+    runtimeConfig.tokenEndpointAuthMethod ?? 'client_secret_post';
+  const clientSecret =
+    tokenEndpointAuthMethod === 'client_secret_post' ||
+    tokenEndpointAuthMethod === 'client_secret_basic'
+      ? requireProviderConfigString(
+          runtimeConfig.clientSecret,
+          'clientSecret',
+          ctx.providerId
+        )
+      : runtimeConfig.clientSecret || undefined;
+
   const resolvedConfig: OAuthProviderResolvedConfig = {
     slug: runtimeConfig.slug,
     kind: runtimeConfig.kind || provider.kind,
@@ -53,11 +65,7 @@ export function resolveOAuthProvider(ctx: {
       'clientId',
       ctx.providerId
     ),
-    clientSecret: requireProviderConfigString(
-      runtimeConfig.clientSecret,
-      'clientSecret',
-      ctx.providerId
-    ),
+    clientSecret,
     redirectUri: runtimeConfig.redirectUri,
     authorizationUrl: requireProviderConfigString(
       runtimeConfig.authorizationUrl ?? provider.authorizationUrl,
@@ -81,8 +89,7 @@ export function resolveOAuthProvider(ctx: {
         ? provider.scopes
         : runtimeConfig.scopes,
     pkceEnabled: runtimeConfig.pkceEnabled ?? false,
-    tokenEndpointAuthMethod:
-      runtimeConfig.tokenEndpointAuthMethod ?? 'client_secret_post',
+    tokenEndpointAuthMethod,
     tokenRequestContentType:
       runtimeConfig.tokenRequestContentType ??
       provider.tokenRequestContentType ??
