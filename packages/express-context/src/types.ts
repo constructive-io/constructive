@@ -221,7 +221,8 @@ export interface IdentityProviderFullConfig {
   authorizationUrl: string | null;
   tokenUrl: string | null;
   userinfoUrl: string | null;
-  scopes: string[];
+  scopes: string[] | null;
+  authorizationParams: Record<string, string>;
   pkceEnabled: boolean;
 }
 
@@ -270,6 +271,7 @@ export interface ProviderRow {
   token_url: string | null;
   userinfo_url: string | null;
   scopes: string[] | null;
+  extra_authorization_params: Record<string, unknown> | null;
   pkce_enabled: boolean | null;
 }
 

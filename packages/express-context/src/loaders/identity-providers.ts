@@ -88,6 +88,7 @@ function buildProvidersSql(
       ip.token_url,
       ip.userinfo_url,
       ip.scopes,
+      ip.extra_authorization_params,
       ip.pkce_enabled
     FROM ${providersTable} ip
     LEFT JOIN ${secretsTableName} secrets
@@ -96,6 +97,19 @@ function buildProvidersSql(
       AND ip.client_id IS NOT NULL
       AND ip.client_secret_id IS NOT NULL
   `;
+}
+
+function normalizeStringParams(
+  params: Record<string, unknown> | null,
+): Record<string, string> {
+  if (!params) return {};
+  const normalized: Record<string, string> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (typeof value === 'string') {
+      normalized[key] = value;
+    }
+  }
+  return normalized;
 }
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
@@ -200,7 +214,8 @@ export async function resolveIdentityProvidersConfig(
       authorizationUrl: row.authorization_url,
       tokenUrl: row.token_url,
       userinfoUrl: row.userinfo_url,
-      scopes: row.scopes || [],
+      scopes: row.scopes,
+      authorizationParams: normalizeStringParams(row.extra_authorization_params),
       pkceEnabled: row.pkce_enabled ?? true,
     });
   }

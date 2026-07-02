@@ -22,7 +22,7 @@ export interface OAuthProviderConfig {
 }
 
 export interface OAuthProviderRuntimeConfig {
-  slug: string;
+  slug?: string;
   kind?: OAuthProviderKind;
   displayName?: string;
   enabled?: boolean;
@@ -96,8 +96,10 @@ export interface OAuthCredentials {
   redirectUri?: string;
 }
 
+export type OAuthClientProviderConfig = OAuthProviderRuntimeConfig;
+
 export interface OAuthClientConfig {
-  providers: Record<string, OAuthCredentials>;
+  providers: Record<string, OAuthClientProviderConfig>;
   baseUrl: string;
   callbackPath?: string;
   stateCookieName?: string;
