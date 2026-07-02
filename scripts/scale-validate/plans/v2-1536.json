@@ -1,7 +1,7 @@
 {
   "port": 3345,
   "defaults": {
-    "heapMb": 896,
+    "heapMb": 1536,
     "rps": 10,
     "durationSec": 300,
     "shape": "uniform",

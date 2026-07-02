@@ -150,27 +150,35 @@ async function stopServer(state) {
 // ---------------------------------------------------------------------------
 function startPgSampler() {
   const { Client } = resolvePg();
-  const state = { max: 0, last: 0, samples: 0, stop: false, err: null };
+  const state = { max: 0, last: 0, samples: 0, stop: false, err: null, reconnects: 0 };
   (async () => {
-    const client = new Client(PG);
-    try {
-      await client.connect();
-      while (!state.stop) {
-        const r = await client.query(
-          `SELECT count(*)::int AS c FROM pg_stat_activity
-            WHERE datname = current_database() AND pid <> pg_backend_pid()`
-        );
-        state.last = r.rows[0].c;
-        state.max = Math.max(state.max, state.last);
-        state.samples++;
-        await sleep(5000);
-      }
-    } catch (e) {
-      state.err = String(e && e.message ? e.message : e);
-    } finally {
+    // PG may crash-recover mid-step (introspection OOM inside its cgroup) —
+    // swallow client errors and reconnect rather than killing the executor.
+    while (!state.stop) {
+      let client;
       try {
-        await client.end();
-      } catch {}
+        client = new Client(PG);
+        client.on('error', () => {});
+        await client.connect();
+        while (!state.stop) {
+          const r = await client.query(
+            `SELECT count(*)::int AS c FROM pg_stat_activity
+              WHERE datname = current_database() AND pid <> pg_backend_pid()`
+          );
+          state.last = r.rows[0].c;
+          state.max = Math.max(state.max, state.last);
+          state.samples++;
+          await sleep(5000);
+        }
+      } catch (e) {
+        state.err = String(e && e.message ? e.message : e);
+        state.reconnects++;
+      } finally {
+        try {
+          await client?.end();
+        } catch {}
+      }
+      if (!state.stop) await sleep(5000);
     }
   })();
   return state;

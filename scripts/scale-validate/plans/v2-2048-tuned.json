@@ -10,9 +10,17 @@
     "serverEnv": { "GRAPHILE_CACHE_INSTANCE_HEAP_BYTES": "1450000000" }
   },
   "steps": [
+    { "name": "tuned-div-k1", "fleet": "out/fleet-k1.json" },
     { "name": "tuned-div-k2", "fleet": "out/fleet-k2.json" },
     { "name": "tuned-div-k3", "fleet": "out/fleet-k3.json" },
     { "name": "tuned-div-k5", "fleet": "out/fleet-k5.json" },
-    { "name": "tuned-ten-33", "fleet": "out/fleet-t33.json", "shape": "zipf", "rps": 15 }
+    { "name": "tuned-ten-10", "fleet": "out/fleet-t10.json", "shape": "zipf", "rps": 15 },
+    { "name": "tuned-ten-20", "fleet": "out/fleet-t20.json", "shape": "zipf", "rps": 15 },
+    { "name": "tuned-ten-33", "fleet": "out/fleet-t33.json", "shape": "zipf", "rps": 15 },
+    { "name": "tuned-rps-10", "fleet": "fleet.json", "shape": "zipf", "rps": 10, "durationSec": 300 },
+    { "name": "tuned-rps-25", "fleet": "fleet.json", "shape": "zipf", "rps": 25, "durationSec": 300 },
+    { "name": "tuned-rps-50", "fleet": "fleet.json", "shape": "zipf", "rps": 50, "durationSec": 300 },
+    { "name": "tuned-rps-100", "fleet": "fleet.json", "shape": "zipf", "rps": 100, "durationSec": 300 },
+    { "name": "tuned-cold-burst", "fleet": "out/fleet-burst.json", "coldBurst": true }
   ]
 }
