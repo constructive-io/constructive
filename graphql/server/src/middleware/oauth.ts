@@ -124,8 +124,18 @@ function createOAuthClientForProvider(
   return new OAuthClient({
     providers: {
       [providerConfig.slug]: {
+        slug: providerConfig.slug,
+        kind: providerConfig.kind,
+        displayName: providerConfig.displayName,
+        enabled: providerConfig.enabled,
         clientId: providerConfig.clientId,
         clientSecret: providerConfig.clientSecret,
+        authorizationUrl: providerConfig.authorizationUrl,
+        tokenUrl: providerConfig.tokenUrl,
+        userinfoUrl: providerConfig.userinfoUrl,
+        scopes: providerConfig.scopes,
+        authorizationParams: providerConfig.authorizationParams,
+        pkceEnabled: providerConfig.pkceEnabled,
       },
     },
     baseUrl,

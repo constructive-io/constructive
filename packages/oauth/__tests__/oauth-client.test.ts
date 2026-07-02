@@ -93,6 +93,41 @@ describe('OAuthClient', () => {
       expect(url).not.toContain('profile');
     });
 
+    it('should use runtime authorization URL, scopes, and extra params', () => {
+      const client = createOAuthClient({
+        providers: {
+          github: {
+            clientId: 'runtime-client-id',
+            clientSecret: 'runtime-client-secret',
+            authorizationUrl: 'https://github.enterprise.test/login/oauth/authorize',
+            tokenUrl: 'https://github.enterprise.test/login/oauth/access_token',
+            userinfoUrl: 'https://github.enterprise.test/api/user',
+            scopes: ['read:user'],
+            authorizationParams: {
+              prompt: 'select_account',
+              client_id: 'ignored-client-id',
+            },
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      const { url, state } = client.getAuthorizationUrl({
+        provider: 'github',
+        state: 'runtime-state',
+      });
+      const parsed = new URL(url);
+
+      expect(`${parsed.origin}${parsed.pathname}`).toBe(
+        'https://github.enterprise.test/login/oauth/authorize'
+      );
+      expect(parsed.searchParams.get('client_id')).toBe('runtime-client-id');
+      expect(parsed.searchParams.get('scope')).toBe('read:user');
+      expect(parsed.searchParams.get('prompt')).toBe('select_account');
+      expect(parsed.searchParams.get('state')).toBe('runtime-state');
+      expect(state).toBe('runtime-state');
+    });
+
     it('should throw error for unknown provider', () => {
       const client = createOAuthClient(config);
 
@@ -107,6 +142,87 @@ describe('OAuthClient', () => {
       expect(() => {
         client.getAuthorizationUrl({ provider: 'facebook' });
       }).toThrow('No credentials configured for provider: facebook');
+    });
+  });
+
+  describe('exchangeCode', () => {
+    it('should exchange legacy credential-only config with static provider defaults', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(
+        jsonResponse({
+          access_token: 'legacy-token',
+          token_type: 'bearer',
+        })
+      );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient(config);
+      const tokens = await client.exchangeCode({
+        provider: 'google',
+        code: 'legacy-code',
+      });
+
+      expect(tokens.access_token).toBe('legacy-token');
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://oauth2.googleapis.com/token',
+        expect.objectContaining({ method: 'POST' })
+      );
+      const request = fetchMock.mock.calls[0][1] as RequestInit;
+      expect(request.headers).toMatchObject({
+        'Content-Type': 'application/x-www-form-urlencoded',
+      });
+      const body = new URLSearchParams(request.body as string);
+      expect(body.get('client_id')).toBe('test-google-client-id');
+      expect(body.get('client_secret')).toBe('test-google-client-secret');
+      expect(body.get('code')).toBe('legacy-code');
+    });
+
+    it('should use runtime token URL, content type, and extra token params', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(
+        jsonResponse({
+          access_token: 'runtime-token',
+          token_type: 'bearer',
+        })
+      );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient({
+        providers: {
+          github: {
+            clientId: 'runtime-client-id',
+            clientSecret: 'runtime-client-secret',
+            authorizationUrl: 'https://github.enterprise.test/login/oauth/authorize',
+            tokenUrl: 'https://github.enterprise.test/login/oauth/access_token',
+            userinfoUrl: 'https://github.enterprise.test/api/user',
+            scopes: ['read:user'],
+            tokenRequestContentType: 'form',
+            tokenParams: {
+              audience: 'constructive-api',
+              client_secret: 'ignored-client-secret',
+            },
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+
+      const tokens = await client.exchangeCode({
+        provider: 'github',
+        code: 'runtime-code',
+      });
+
+      expect(tokens.access_token).toBe('runtime-token');
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://github.enterprise.test/login/oauth/access_token',
+        expect.objectContaining({ method: 'POST' })
+      );
+      const request = fetchMock.mock.calls[0][1] as RequestInit;
+      expect(request.headers).toMatchObject({
+        'Content-Type': 'application/x-www-form-urlencoded',
+      });
+      const body = new URLSearchParams(request.body as string);
+      expect(body.get('client_id')).toBe('runtime-client-id');
+      expect(body.get('client_secret')).toBe('runtime-client-secret');
+      expect(body.get('audience')).toBe('constructive-api');
+      expect(body.get('code')).toBe('runtime-code');
     });
   });
 
@@ -389,6 +505,41 @@ describe('OAuthClient', () => {
       expect(profile.email).toBe('test@gmail.com');
       expect(profile.emailVerified).toBe(true);
       expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should use runtime userinfo URL and method', async () => {
+      const fetchMock = jest.fn().mockResolvedValueOnce(
+        jsonResponse({
+          sub: 'runtime-google-id',
+          email: 'runtime@gmail.com',
+          email_verified: true,
+        })
+      );
+      global.fetch = fetchMock;
+
+      const client = createOAuthClient({
+        providers: {
+          google: {
+            clientId: 'runtime-google-client-id',
+            clientSecret: 'runtime-google-client-secret',
+            userinfoUrl: 'https://idp.example.test/oauth/userinfo',
+            userInfoMethod: 'POST',
+          },
+        },
+        baseUrl: 'https://api.example.com',
+      });
+      const profile = await client.getUserProfile('google', 'runtime-token');
+
+      expect(profile.email).toBe('runtime@gmail.com');
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://idp.example.test/oauth/userinfo',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            Authorization: 'Bearer runtime-token',
+          }),
+        })
+      );
     });
   });
 });

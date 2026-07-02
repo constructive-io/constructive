@@ -79,6 +79,7 @@ describe('identityProvidersLoader metadata resolution', () => {
             token_url: 'https://github.example/token',
             userinfo_url: 'https://github.example/user',
             scopes: ['read:user'],
+            extra_authorization_params: { prompt: 'select_account' },
             pkce_enabled: true,
           },
         ],
@@ -93,6 +94,7 @@ describe('identityProvidersLoader metadata resolution', () => {
       clientId: 'dummy-client-id',
       clientSecret: 'dummy-client-secret',
       authorizationUrl: 'https://github.example/authorize',
+      authorizationParams: { prompt: 'select_account' },
     });
     expect(services.queries[2].sql).toContain('config_secrets_module');
     expect(services.queries[2].values).toEqual(['platform-db', 'platform']);

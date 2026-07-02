@@ -8,6 +8,7 @@ export {
   ResolvedOAuthProvider,
   OAuthProfile,
   OAuthCredentials,
+  OAuthClientProviderConfig,
   OAuthClientConfig,
   TokenResponse,
   AuthorizationUrlParams,
