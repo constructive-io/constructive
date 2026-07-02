@@ -34,6 +34,15 @@ export {
   invokeEntryHandler,
   ensureCacheHeadroom,
 
+  // Capacity model + memory governor
+  computeCapacityFromBudget,
+  MemoryPressure,
+  MemoryPressureLevel,
+  getMemoryPressure,
+  shouldRefuseBuild,
+  startMemoryGovernor,
+  stopMemoryGovernor,
+
   // Clear matching entries
   clearMatchingEntries
 } from './graphile-cache';

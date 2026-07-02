@@ -21,13 +21,14 @@ export const FIVE_MINUTES_MS = 1000 * 60 * 5;
 const SIX_HOURS_MS = ONE_HOUR_MS * 6;
 
 // --- Eviction Types ---
-export type EvictionReason = 'lru' | 'ttl' | 'manual';
+export type EvictionReason = 'lru' | 'ttl' | 'manual' | 'governor';
 
 // --- Cache Counters (in-process metrics) ---
 export interface CacheCounters {
-  evictions: { lru: number; ttl: number; manual: number };
+  evictions: { lru: number; ttl: number; manual: number; governor: number };
   disposals: number;
   drainTimeouts: number;
+  buildRefusals: number;
 }
 
 /**
@@ -38,9 +39,10 @@ export interface CacheCounters {
  * Read a stable snapshot via getCacheCounters().
  */
 export const cacheCounters: CacheCounters = {
-  evictions: { lru: 0, ttl: 0, manual: 0 },
+  evictions: { lru: 0, ttl: 0, manual: 0, governor: 0 },
   disposals: 0,
-  drainTimeouts: 0
+  drainTimeouts: 0,
+  buildRefusals: 0
 };
 
 /**
@@ -51,7 +53,8 @@ export function getCacheCounters(): CacheCounters {
   return {
     evictions: { ...cacheCounters.evictions },
     disposals: cacheCounters.disposals,
-    drainTimeouts: cacheCounters.drainTimeouts
+    drainTimeouts: cacheCounters.drainTimeouts,
+    buildRefusals: cacheCounters.buildRefusals
   };
 }
 
@@ -93,18 +96,24 @@ export interface CacheConfig {
  * of the heap for cached instances. Override explicitly with GRAPHILE_CACHE_MAX, and
  * tune the per-instance estimate with GRAPHILE_CACHE_INSTANCE_HEAP_BYTES.
  */
-// ~0.5 GB retained per query-serving instance (measured against real provisioned apps).
+// ~0.5 GB retained per query-serving instance (measured against real provisioned apps
+// on a small catalog). NOTE: instance heap scales with the TOTAL pg catalog
+// (~21 KB per pg_class row measured) — on large multi-tenant catalogs set
+// GRAPHILE_CACHE_INSTANCE_HEAP_BYTES to a measured value (e.g. ~1.45 GB at 61k rows).
 const DEFAULT_INSTANCE_HEAP_BYTES = 512 * 1024 * 1024;
-// Fraction of the V8 heap budgeted for cached instances; the remainder is headroom
-// for transient schema builds (each build briefly allocates hundreds of MB) and
-// request processing.
-const CACHE_HEAP_FRACTION = 0.5;
+// Heap reserved for the server itself: express, pools, request working set
+// (~+250 MB was measured at 200 rps on top of the resident instance).
+const DEFAULT_BASE_RESERVE_BYTES = 256 * 1024 * 1024;
+// Heap reserved for ONE in-flight schema build's transient allocations
+// (introspection payload + gather + schema construction; >700 MB measured at a
+// 61k-pg_class catalog). Builds are serialized by the server's BuildSemaphore,
+// and ensureCacheHeadroom evicts down to (max - 1) residents before each build,
+// so exactly one transient of this size coexists with (max - 1) residents.
+const DEFAULT_BUILD_RESERVE_BYTES = 768 * 1024 * 1024;
 // At least one instance must be admitted or nothing can ever build — but never
-// more than the heap budget says fit: instance heap grows with the TOTAL pg
-// catalog (~21 KB per pg_class row, measured), so on a large catalog a 2 GB
-// heap genuinely holds only ONE ~1.3 GB instance. A floor of 3 admitted two
-// extra builds the heap could not hold and aborted the process (V8 heap-limit
-// SIGABRT) before eviction ever ran.
+// more than the heap budget says fit. A floor of 3 admitted two extra builds
+// the heap could not hold and aborted the process (V8 heap-limit SIGABRT)
+// before eviction ever ran.
 const MIN_CACHE_MAX = 1;
 const MAX_CACHE_MAX = 50;
 
@@ -115,9 +124,34 @@ const parseEnvInt = (value: string | undefined, fallback: number): number => {
 };
 
 /**
+ * Pure capacity math (exported for tests and diagnostics).
+ *
+ * Two constraints bound how many instances fit:
+ *   residency: max * perInstance + baseReserve            <= heapLimit
+ *   rebuild:   (max - 1) * perInstance + baseReserve
+ *              + buildReserve                             <= heapLimit
+ * (the rebuild constraint has (max - 1) residents because evict-before-build
+ * frees one slot before the transient allocation peaks — validated live: a
+ * 3584 MB heap holds TWO ~1.35 GB instances and still rebuilds safely).
+ */
+export function computeCapacityFromBudget(
+  heapLimit: number,
+  perInstance: number,
+  baseReserve: number = DEFAULT_BASE_RESERVE_BYTES,
+  buildReserve: number = DEFAULT_BUILD_RESERVE_BYTES,
+): number {
+  const byResidency = Math.floor((heapLimit - baseReserve) / perInstance);
+  const byRebuild = Math.floor((heapLimit - baseReserve - buildReserve) / perInstance) + 1;
+  const budgeted = Math.min(byResidency, byRebuild);
+  return Math.min(MAX_CACHE_MAX, Math.max(MIN_CACHE_MAX, budgeted));
+}
+
+/**
  * Heap-aware default for the maximum number of cached PostGraphile instances.
- * cache_heap_budget = heap_size_limit * CACHE_HEAP_FRACTION
- * max = clamp(floor(cache_heap_budget / per_instance_bytes), MIN, MAX)
+ * See computeCapacityFromBudget for the model. Tunables:
+ *   GRAPHILE_CACHE_INSTANCE_HEAP_BYTES — measured per-instance retained heap
+ *   GRAPHILE_CACHE_BASE_RESERVE_BYTES  — server base + request working set
+ *   GRAPHILE_CACHE_BUILD_RESERVE_BYTES — one build's transient peak
  */
 function computeHeapAwareMax(): number {
   try {
@@ -126,8 +160,15 @@ function computeHeapAwareMax(): number {
       process.env.GRAPHILE_CACHE_INSTANCE_HEAP_BYTES,
       DEFAULT_INSTANCE_HEAP_BYTES,
     );
-    const budgeted = Math.floor((heapLimit * CACHE_HEAP_FRACTION) / perInstance);
-    return Math.min(MAX_CACHE_MAX, Math.max(MIN_CACHE_MAX, budgeted));
+    const baseReserve = parseEnvInt(
+      process.env.GRAPHILE_CACHE_BASE_RESERVE_BYTES,
+      DEFAULT_BASE_RESERVE_BYTES,
+    );
+    const buildReserve = parseEnvInt(
+      process.env.GRAPHILE_CACHE_BUILD_RESERVE_BYTES,
+      DEFAULT_BUILD_RESERVE_BYTES,
+    );
+    return computeCapacityFromBudget(heapLimit, perInstance, baseReserve, buildReserve);
   } catch {
     return MIN_CACHE_MAX;
   }
@@ -216,6 +257,9 @@ const disposedEntries = new WeakSet<GraphileCacheEntry>();
 // Track keys that are being manually evicted for accurate eviction reason
 const manualEvictionKeys = new Set<string>();
 
+// Track keys evicted by the memory governor for accurate eviction reason
+const governorEvictionKeys = new Set<string>();
+
 /**
  * Dispose a PostGraphile v5 cache entry
  *
@@ -287,6 +331,10 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
  * Determine the eviction reason for a cache entry
  */
 const getEvictionReason = (key: string, entry: GraphileCacheEntry): EvictionReason => {
+  if (governorEvictionKeys.has(key)) {
+    governorEvictionKeys.delete(key);
+    return 'governor';
+  }
   if (manualEvictionKeys.has(key)) {
     manualEvictionKeys.delete(key);
     return 'manual';
@@ -394,6 +442,103 @@ export function ensureCacheHeadroom(slots = 1): number {
     log.info(`Evicted ${evicted} instance(s) before build to keep heap headroom (max=${max})`);
   }
   return evicted;
+}
+
+// --- Memory Governor ---
+export type MemoryPressureLevel = 'ok' | 'elevated' | 'critical';
+
+export interface MemoryPressure {
+  level: MemoryPressureLevel;
+  heapUsed: number;
+  heapLimit: number;
+  ratio: number;
+}
+
+const parseEnvFloat = (value: string | undefined, fallback: number): number => {
+  if (!value) return fallback;
+  const n = parseFloat(value);
+  return Number.isFinite(n) && n > 0 && n < 1 ? n : fallback;
+};
+
+/**
+ * Current heap pressure against the V8 old-space limit.
+ *
+ * elevated (default >=85%): proactively evict idle instances ahead of the LRU
+ * schedule. critical (default >=92%): additionally REFUSE to start new schema
+ * builds (the caller responds 503; resident instances keep serving). A build's
+ * transient allocations are the largest single spike the process makes — at
+ * critical pressure admitting one converts degraded service into a V8
+ * heap-limit abort for every tenant on the box.
+ * Tunables: GRAPHILE_MEMORY_GOVERNOR_ELEVATED / GRAPHILE_MEMORY_GOVERNOR_CRITICAL.
+ */
+export function getMemoryPressure(): MemoryPressure {
+  const heapLimit = getHeapStatistics().heap_size_limit;
+  const heapUsed = process.memoryUsage().heapUsed;
+  const ratio = heapLimit > 0 ? heapUsed / heapLimit : 0;
+  const elevated = parseEnvFloat(process.env.GRAPHILE_MEMORY_GOVERNOR_ELEVATED, 0.85);
+  const critical = parseEnvFloat(process.env.GRAPHILE_MEMORY_GOVERNOR_CRITICAL, 0.92);
+  const level: MemoryPressureLevel = ratio >= critical ? 'critical' : ratio >= elevated ? 'elevated' : 'ok';
+  return { level, heapUsed, heapLimit, ratio };
+}
+
+/**
+ * Gate for new schema builds. Returns the pressure snapshot; when
+ * `refuseBuild` is true the caller must not start a build (respond 503 and
+ * count it). Cheap enough for the request path: one memoryUsage() call.
+ */
+export function shouldRefuseBuild(): MemoryPressure & { refuseBuild: boolean } {
+  const pressure = getMemoryPressure();
+  const refuseBuild = pressure.level === 'critical';
+  if (refuseBuild) {
+    cacheCounters.buildRefusals += 1;
+    log.warn(
+      `Refusing new schema build at critical heap pressure ` +
+        `(${Math.round(pressure.ratio * 100)}% of ${Math.round(pressure.heapLimit / 1048576)}MB)`,
+    );
+  }
+  return { ...pressure, refuseBuild };
+}
+
+let governorTimer: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Periodic proactive eviction: at elevated/critical pressure, evict the
+ * least-recently-used instance (skipping in-flight ones) each tick until
+ * pressure clears. Disabled with GRAPHILE_MEMORY_GOVERNOR=0.
+ */
+export function startMemoryGovernor(intervalMs = 10_000): () => void {
+  if (process.env.GRAPHILE_MEMORY_GOVERNOR === '0') return () => {};
+  if (governorTimer) return stopMemoryGovernor;
+  governorTimer = setInterval(() => {
+    const pressure = getMemoryPressure();
+    if (pressure.level === 'ok') return;
+    // Evict ONE entry per tick, LRU first, preferring idle entries.
+    let victim: string | undefined;
+    for (const key of graphileCache.rkeys()) {
+      const entry = graphileCache.peek(key);
+      if (entry && !entry.disposing && (entry.inflight ?? 0) === 0) {
+        victim = key;
+        break;
+      }
+      if (victim === undefined) victim = key; // fall back to LRU even if busy
+    }
+    if (victim === undefined) return;
+    governorEvictionKeys.add(victim);
+    log.warn(
+      `Memory governor evicting PostGraphile[${victim}] at ${pressure.level} pressure ` +
+        `(heap ${Math.round(pressure.ratio * 100)}%)`,
+    );
+    graphileCache.delete(victim);
+  }, intervalMs);
+  if (typeof governorTimer.unref === 'function') governorTimer.unref();
+  return stopMemoryGovernor;
+}
+
+export function stopMemoryGovernor(): void {
+  if (governorTimer) {
+    clearInterval(governorTimer);
+    governorTimer = null;
+  }
 }
 
 // --- Cache Stats ---

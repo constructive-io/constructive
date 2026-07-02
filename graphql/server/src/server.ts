@@ -10,7 +10,7 @@ import express, { Express, NextFunction, Request, RequestHandler, Response } fro
 import type { Server as HttpServer } from 'http';
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
-import { graphileCache, closeAllCaches } from 'graphile-cache';
+import { closeAllCaches, getMemoryPressure, graphileCache, startMemoryGovernor } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 import requestIp from 'request-ip';
 
@@ -41,7 +41,7 @@ import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { createAgenticRouter } from 'agentic-server';
 import { createContextMiddleware, requestIdMiddleware } from '@constructive-io/express-context';
 import { startDebugSampler } from './diagnostics/debug-sampler';
-import { type MetricsSamplerHandle, startMetricsSampler } from './diagnostics/metrics-sampler';
+import { collectMetricsSample, type MetricsSamplerHandle, startMetricsSampler } from './diagnostics/metrics-sampler';
 
 const log = new Logger('server');
 
@@ -83,6 +83,7 @@ class Server {
   private httpServer: HttpServer | null = null;
   private debugSampler: DebugSamplerHandle | null = null;
   private metricsSampler: MetricsSamplerHandle | null = null;
+  private stopGovernor: (() => void) | null = null;
 
   constructor(opts: ConstructiveOptions) {
     installConnectionErrorGuard();
@@ -130,6 +131,15 @@ class Server {
     }
 
     healthz(app);
+    // Operational metrics endpoint (heap/rss, cache size, build/eviction/guard
+    // counters, memory pressure) — same sample shape as the JSON-line sampler.
+    // Env-gated and loopback-only by default; front it with internal routing in
+    // production if remote scrape access is needed.
+    if (process.env.GRAPHILE_METRICS_ENDPOINT === '1') {
+      app.get('/metrics', localObservabilityOnly, (_req, res) => {
+        res.json({ ...collectMetricsSample(), memoryPressure: getMemoryPressure() });
+      });
+    }
     if (observabilityEnabled) {
       app.get('/debug/memory', localObservabilityOnly, debugMemory);
       app.get('/debug/db', localObservabilityOnly, createDebugDatabaseMiddleware(effectiveOpts));
@@ -217,6 +227,10 @@ class Server {
     // sampler is designed for long production soak analysis and is a true no-op when the
     // env flag is off.
     this.metricsSampler = startMetricsSampler();
+    // Proactive heap-pressure eviction (85%) + critical build refusal (92%) —
+    // the request-path gate lives in the graphile dispatcher; this timer only
+    // does the background evictions. Disable with GRAPHILE_MEMORY_GOVERNOR=0.
+    this.stopGovernor = startMemoryGovernor();
   }
 
   listen(): HttpServer {
@@ -331,6 +345,10 @@ class Server {
     if (this.metricsSampler) {
       this.metricsSampler.stop();
       this.metricsSampler = null;
+    }
+    if (this.stopGovernor) {
+      this.stopGovernor();
+      this.stopGovernor = null;
     }
     if (this.httpServer?.listening) {
       await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));

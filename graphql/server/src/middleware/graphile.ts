@@ -15,6 +15,7 @@ import {
   type GraphileCacheEntry,
   graphileCache,
   invokeEntryHandler,
+  shouldRefuseBuild,
 } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
@@ -274,6 +275,8 @@ export interface GraphileCounters {
   poolingAttaches: number;
   /** Builds that were pooled (shared-blueprint) builds. */
   poolingBuilds: number;
+  /** Requests that gave up waiting on a build (GRAPHILE_BUILD_TIMEOUT_MS) and got 503. */
+  buildWaitTimeouts: number;
 }
 
 /**
@@ -284,7 +287,8 @@ export interface GraphileCounters {
 const graphileCounters: GraphileCounters = {
   builds: 0,
   poolingAttaches: 0,
-  poolingBuilds: 0
+  poolingBuilds: 0,
+  buildWaitTimeouts: 0
 };
 
 /** Snapshot the build counters. Returns a copy so callers cannot mutate live state. */
@@ -542,6 +546,20 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         });
       }
 
+      // Memory governor gate: at critical heap pressure a build's transient
+      // allocation (hundreds of MB to >700MB on large catalogs) would abort the
+      // whole process. Resident instances keep serving; only NEW builds refuse.
+      const pressure = shouldRefuseBuild();
+      if (pressure.refuseBuild) {
+        res.setHeader('Retry-After', '15');
+        return res.status(503).json({
+          error: {
+            code: 'SERVICE_OVERLOADED',
+            message: 'Server is at critical memory pressure; retry shortly'
+          }
+        });
+      }
+
       log.info(
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`,
       );
@@ -593,10 +611,42 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       })();
       creating.set(key, creationPromise);
 
+      // Populate the cache and clear the in-flight slot when the BUILD settles
+      // (not when this request finishes): a request that stops waiting
+      // (build-timeout below) must leave coalescing intact for followers, and
+      // the finished build must land in the cache for their retries.
+      creationPromise
+        .then((instance) => {
+          graphileCache.set(key, instance);
+          log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
+        })
+        .catch(() => {
+          /* logged by the awaiting branch (or a coalesced waiter) below */
+        })
+        .finally(() => {
+          creating.delete(key);
+        });
+
       try {
-        const instance = await creationPromise;
-        graphileCache.set(key, instance);
-        log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
+        // Bound how long a REQUEST waits on a build (queue time + build time).
+        // The build itself is not cancelled — makeSchema cannot be aborted —
+        // it completes in the background and fills the cache for retries.
+        const timeoutMs = (() => {
+          const n = parseInt(process.env.GRAPHILE_BUILD_TIMEOUT_MS || '', 10);
+          return Number.isFinite(n) && n > 0 ? n : 180_000;
+        })();
+        const instance = await Promise.race([
+          creationPromise,
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs).unref?.())
+        ]);
+        if (instance === null) {
+          graphileCounters.buildWaitTimeouts += 1;
+          log.warn(`${label} Request timed out after ${timeoutMs}ms waiting for PostGraphile[${key}] build`);
+          res.setHeader('Retry-After', '15');
+          return res.status(503).json({
+            error: { code: 'BUILD_TIMEOUT', message: 'Schema build in progress; retry shortly' }
+          });
+        }
         if (invokeEntryHandler(instance, req, res, next)) {
           return;
         }
@@ -613,9 +663,6 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
             cause: error instanceof Error ? error.message : String(error),
           },
         );
-      } finally {
-        // Always clean up in-flight tracker
-        creating.delete(key);
       }
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);
