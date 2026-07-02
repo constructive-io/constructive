@@ -13,6 +13,7 @@ interface GoogleProfile {
 export const googleProvider: OAuthProviderConfig = {
   id: 'google',
   name: 'Google',
+  kind: 'oidc',
   authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
   tokenUrl: 'https://oauth2.googleapis.com/token',
   userInfoUrl: 'https://openidconnect.googleapis.com/v1/userinfo',

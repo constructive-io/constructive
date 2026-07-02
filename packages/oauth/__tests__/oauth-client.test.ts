@@ -1,4 +1,5 @@
 import { OAuthClient, createOAuthClient } from '../src/oauth-client';
+import { resolveOAuthProvider } from '../src/provider-resolver';
 import { GITHUB_EMAILS_URL, getProvider, getProviderIds } from '../src/providers';
 import { generateState, verifyState } from '../src/utils/state';
 import { createSignedState, verifySignedState } from '../src/utils/signed-state';
@@ -412,6 +413,97 @@ describe('providers', () => {
   it('should return undefined for unknown provider', () => {
     const unknown = getProvider('unknown');
     expect(unknown).toBeUndefined();
+  });
+});
+
+describe('provider resolver', () => {
+  it('should merge runtime config over static provider defaults', () => {
+    const resolved = resolveOAuthProvider({
+      providerId: 'github',
+      runtimeConfig: {
+        slug: 'github',
+        kind: 'oauth2',
+        clientId: 'runtime-client-id',
+        clientSecret: 'runtime-client-secret',
+        authorizationUrl: 'https://github.enterprise.test/login/oauth/authorize',
+        tokenUrl: 'https://github.enterprise.test/login/oauth/access_token',
+        userinfoUrl: 'https://github.enterprise.test/api/user',
+        scopes: ['read:user'],
+        pkceEnabled: true,
+      },
+    });
+
+    expect(resolved.providerId).toBe('github');
+    expect(resolved.provider.id).toBe('github');
+    expect(resolved.config.authorizationUrl).toBe(
+      'https://github.enterprise.test/login/oauth/authorize'
+    );
+    expect(resolved.config.tokenUrl).toBe(
+      'https://github.enterprise.test/login/oauth/access_token'
+    );
+    expect(resolved.config.userinfoUrl).toBe(
+      'https://github.enterprise.test/api/user'
+    );
+    expect(resolved.config.scopes).toEqual(['read:user']);
+    expect(resolved.config.pkceEnabled).toBe(true);
+  });
+
+  it('should use static scopes when runtime scopes are not configured', () => {
+    const resolved = resolveOAuthProvider({
+      providerId: 'github',
+      runtimeConfig: {
+        slug: 'github',
+        kind: 'oauth2',
+        clientId: 'runtime-client-id',
+        clientSecret: 'runtime-client-secret',
+        scopes: null,
+      },
+    });
+
+    expect(resolved.config.scopes).toEqual(['user:email', 'read:user']);
+  });
+
+  it('should reject disabled providers', () => {
+    expect(() =>
+      resolveOAuthProvider({
+        providerId: 'github',
+        runtimeConfig: {
+          slug: 'github',
+          kind: 'oauth2',
+          enabled: false,
+          clientId: 'runtime-client-id',
+          clientSecret: 'runtime-client-secret',
+        },
+      })
+    ).toThrow('Provider github is disabled');
+  });
+
+  it('should reject kind mismatches for known providers', () => {
+    expect(() =>
+      resolveOAuthProvider({
+        providerId: 'github',
+        runtimeConfig: {
+          slug: 'github',
+          kind: 'oidc',
+          clientId: 'runtime-client-id',
+          clientSecret: 'runtime-client-secret',
+        },
+      })
+    ).toThrow('does not match provider kind');
+  });
+
+  it('should reject unknown providers', () => {
+    expect(() =>
+      resolveOAuthProvider({
+        providerId: 'unknown',
+        runtimeConfig: {
+          slug: 'unknown',
+          kind: 'oauth2',
+          clientId: 'runtime-client-id',
+          clientSecret: 'runtime-client-secret',
+        },
+      })
+    ).toThrow('Unknown provider: unknown');
   });
 });
 
