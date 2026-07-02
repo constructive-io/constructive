@@ -74,6 +74,27 @@ async function dropOne(row) {
       }
     }
 
+    // pg_partman registers partitioned tables by NAME in partman.part_config —
+    // not schema-scoped, not FK-cascaded — and schema hashes are deterministic
+    // per dbname, so a leftover row blocks re-provisioning a reused tenant name
+    // (unique_violation on parent_table). Clean them with the schemas.
+    if (schemas.length) {
+      const patterns = schemas.map((s) => `${s}.%`);
+      try {
+        await client.query(`DELETE FROM partman.part_config_sub WHERE sub_parent LIKE ANY($1)`, [patterns]);
+      } catch {
+        /* part_config_sub may not exist */
+      }
+      try {
+        const del = await client.query(`DELETE FROM partman.part_config WHERE parent_table LIKE ANY($1)`, [
+          patterns
+        ]);
+        if (del.rowCount) console.log(`  [${row.name}] cleaned ${del.rowCount} partman.part_config row(s)`);
+      } catch {
+        /* partman may not be installed */
+      }
+    }
+
     if (DRY) await client.query('ROLLBACK');
     else await client.query('COMMIT');
     console.log(
