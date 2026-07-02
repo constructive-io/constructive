@@ -1,0 +1,18 @@
+{
+  "port": 3345,
+  "defaults": {
+    "heapMb": 2048,
+    "rps": 10,
+    "durationSec": 480,
+    "shape": "uniform",
+    "auth": 1,
+    "mix": "read:0.7,write:0.25,meta:0.05",
+    "serverEnv": { "GRAPHILE_CACHE_INSTANCE_HEAP_BYTES": "1450000000" }
+  },
+  "steps": [
+    { "name": "tuned-div-k2", "fleet": "out/fleet-k2.json" },
+    { "name": "tuned-div-k3", "fleet": "out/fleet-k3.json" },
+    { "name": "tuned-div-k5", "fleet": "out/fleet-k5.json" },
+    { "name": "tuned-ten-33", "fleet": "out/fleet-t33.json", "shape": "zipf", "rps": 15 }
+  ]
+}

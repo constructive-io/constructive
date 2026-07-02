@@ -99,7 +99,7 @@ function readMetrics(file) {
     .filter(Boolean);
 }
 
-function startServer({ heapMb, cacheMax, metricsFile }) {
+function startServer({ heapMb, cacheMax, metricsFile, serverEnv }) {
   const child = spawn(
     'node',
     ['packages/cli/dist/index.js', 'server', '--port', String(PORT), '--origin', '*', '--simpleInflection', '--postgis', '--servicesApi'],
@@ -113,6 +113,7 @@ function startServer({ heapMb, cacheMax, metricsFile }) {
         GRAPHILE_DEBUG_METRICS_FILE: metricsFile,
         GRAPHILE_BLUEPRINT_POOLING: '1',
         ...(cacheMax ? { GRAPHILE_CACHE_MAX: String(cacheMax) } : {}),
+        ...(serverEnv || {}),
         PGHOST: PG.host,
         PGPORT: String(PG.port),
         PGUSER: PG.user,
@@ -251,7 +252,7 @@ const main = async () => {
 
     console.log(`\n===== STEP ${name}: heap=${cfg.heapMb}MB fleet=${step.fleet} ${step.coldBurst ? 'COLD-BURST' : `rps=${cfg.rps} dur=${cfg.durationSec}s shape=${cfg.shape}`} =====`);
     const record = { name: step.name, heapMb: cfg.heapMb, fleet: step.fleet, config: cfg, startedAt: new Date().toISOString() };
-    const server = startServer({ heapMb: cfg.heapMb, cacheMax: cfg.cacheMax, metricsFile });
+    const server = startServer({ heapMb: cfg.heapMb, cacheMax: cfg.cacheMax, metricsFile, serverEnv: cfg.serverEnv });
     const pgSampler = startPgSampler();
     const t0 = Date.now();
     try {

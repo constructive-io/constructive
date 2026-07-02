@@ -15,11 +15,11 @@
  * Writes drifted.json describing the assignment. Idempotent (IF NOT EXISTS).
  * Usage: node scripts/scale-validate/drift-tenants.mjs --groups 6 --per-group 4 --column-drift 2
  */
-import { createRequire } from 'node:module';
 import { writeFileSync } from 'node:fs';
 
-const require = createRequire(import.meta.url);
-const { Pool } = require('pg');
+import { resolvePg } from './_lib.mjs';
+
+const { Pool } = resolvePg();
 
 const arg = (name, dflt) => {
   const i = process.argv.indexOf(`--${name}`);
