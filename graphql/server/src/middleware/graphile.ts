@@ -17,7 +17,7 @@ import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
-import { isBlueprintPoolingEnabled, quoteSearchPath } from './blueprint';
+import { isBlueprintPoolingEnabled, tenantSearchPath } from './blueprint';
 import { resolvePoolDecision } from './pooling-decision';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
@@ -349,9 +349,10 @@ const buildPreset = (
           }
 
           // Pooled instances emit search_path-relative SQL; route this request to
-          // the REQUESTING tenant's physical schemas. Never set when not pooling.
+          // the REQUESTING tenant's physical schemas (+ shared `public` last — see
+          // tenantSearchPath). Never set when not pooling.
           if (pooling && api?.schema?.length) {
-            pgSettings['search_path'] = quoteSearchPath(api.schema);
+            pgSettings['search_path'] = tenantSearchPath(api.schema);
           }
 
           return { pgSettings };
@@ -366,9 +367,10 @@ const buildPreset = (
         anonSettings['request.id'] = req.requestId;
       }
       // Pooled instances emit search_path-relative SQL; route this request to
-      // the REQUESTING tenant's physical schemas. Never set when not pooling.
+      // the REQUESTING tenant's physical schemas (+ shared `public` last — see
+      // tenantSearchPath). Never set when not pooling.
       if (pooling && api?.schema?.length) {
-        anonSettings['search_path'] = quoteSearchPath(api.schema);
+        anonSettings['search_path'] = tenantSearchPath(api.schema);
       }
 
       return {

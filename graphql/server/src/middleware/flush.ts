@@ -19,6 +19,12 @@ export const flush = async (
     // TODO: check bearer for a flush / special key
     graphileCache.delete((req as any).svc_key);
     svcCache.delete((req as any).svc_key);
+    // Under pooling the serving instance is stored under a `bp:` key, which the
+    // svc_key delete above cannot reach — mirror flushService's v1 semantics.
+    if (isBlueprintPoolingEnabled()) {
+      clearMatchingEntries(/^bp:/);
+      clearPoolDecisions();
+    }
     res.status(200).send('OK');
     return;
   }

@@ -125,3 +125,40 @@ describe('computeBlueprintKey', () => {
     );
   });
 });
+
+describe('tenantSearchPath (W3 fix: keep shared public on the path)', () => {
+  const { tenantSearchPath } = require('../blueprint');
+
+  it('appends public after the tenant schemas', () => {
+    expect(tenantSearchPath(['t-5e6b13b2-app-public', 't-5e6b13b2-public'])).toBe(
+      '"t-5e6b13b2-app-public", "t-5e6b13b2-public", "public"'
+    );
+  });
+
+  it('does not duplicate an explicit public entry and keeps it last', () => {
+    expect(tenantSearchPath(['public', 'services_public'])).toBe('"services_public", "public"');
+  });
+});
+
+describe('computeBlueprintKey dbname isolation (W3 fix)', () => {
+  const { computeBlueprintKey } = require('../blueprint');
+  const base = {
+    logicalSchemas: ['app-public'],
+    shapeFingerprint: 'f'.repeat(64),
+    flags: undefined as Record<string, any> | undefined,
+    apiName: 'api',
+    mode: 'public'
+  };
+
+  it('same-shape tenants in DIFFERENT physical databases get DIFFERENT keys', () => {
+    const a = computeBlueprintKey({ ...base, dbname: 'db_a' });
+    const b = computeBlueprintKey({ ...base, dbname: 'db_b' });
+    expect(a).not.toBe(b);
+  });
+
+  it('same dbname yields a stable key', () => {
+    expect(computeBlueprintKey({ ...base, dbname: 'db_a' })).toBe(
+      computeBlueprintKey({ ...base, dbname: 'db_a' })
+    );
+  });
+});

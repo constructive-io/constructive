@@ -62,7 +62,7 @@ describe('computePoolDecision', () => {
 
     expect(decision.pooling).toBe(true);
     expect(decision.key).toMatch(/^bp:[0-9a-f]{64}$/);
-    expect(query).toHaveBeenCalledTimes(2); // fingerprint + collision probe
+    expect(query).toHaveBeenCalledTimes(1); // single catalog scan feeds fingerprint + collisions
   });
 
   it('produces the SAME bp: key for two different physical tenants of the same shape', async () => {
@@ -142,7 +142,7 @@ describe('computePoolDecision', () => {
 
     const decision = await computePoolDecision('svc-5', api, { query } as unknown as Pool);
 
-    expect(decision).toEqual({ key: 'svc-5', pooling: false });
+    expect(decision).toEqual({ key: 'svc-5', pooling: false, transient: true });
   });
 });
 
@@ -164,14 +164,13 @@ describe('resolvePoolDecision caching', () => {
 
     expect(first).toBe(second); // same cached object identity
     expect(first.pooling).toBe(true);
-    expect(query).toHaveBeenCalledTimes(2); // NOT 4 — second call served from cache
+    expect(query).toHaveBeenCalledTimes(1); // NOT 2 — second call served from cache
 
     // clearPoolDecisions() forces the next request to re-probe.
     clearPoolDecisions();
     query.mockResolvedValueOnce({ rows: [{ nspname: 'shop-5e6b13b2-app-public', relname: 'orders' }] });
-    query.mockResolvedValueOnce({ rows: [] });
     await resolvePoolDecision('svc-cache', api, pool);
-    expect(query).toHaveBeenCalledTimes(4);
+    expect(query).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -195,5 +194,30 @@ describe('blueprint pooling flag gate (flag-off ⇒ key stays svc_key in the dis
     expect(isBlueprintPoolingEnabled()).toBe(true);
     process.env.GRAPHILE_BLUEPRINT_POOLING = 'yes';
     expect(isBlueprintPoolingEnabled()).toBe(false);
+  });
+});
+
+describe('transient probe failures are not memoized (W3 fix)', () => {
+  afterEach(() => {
+    clearPoolDecisions();
+    jest.clearAllMocks();
+  });
+
+  it('re-probes on the next request after a thrown catalog probe', async () => {
+    const query = jest.fn();
+    query.mockRejectedValueOnce(new Error('connection reset'));
+    query.mockResolvedValueOnce({
+      rows: [{ nspname: 'shop-5e6b13b2-app-public', relname: 'orders' }]
+    });
+    const pool = { query } as unknown as Pool;
+    const api = makeApi({ schema: ['shop-5e6b13b2-app-public'] });
+
+    const first = await resolvePoolDecision('svc-transient', api, pool);
+    expect(first.pooling).toBe(false);
+    expect(first.transient).toBe(true);
+
+    const second = await resolvePoolDecision('svc-transient', api, pool);
+    expect(second.pooling).toBe(true); // re-probed and now poolable
+    expect(query).toHaveBeenCalledTimes(2);
   });
 });

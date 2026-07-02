@@ -3,9 +3,10 @@ import type { Pool } from 'pg';
 
 import type { ApiStructure } from '../types';
 import {
-  checkUnqualifiedCollisions,
+  collisionsFromRelations,
   computeBlueprintKey,
-  computeShapeFingerprint,
+  fetchSchemaRelations,
+  fingerprintFromRelations,
   stripSchemaHashPrefix
 } from './blueprint';
 
@@ -25,6 +26,13 @@ export interface PoolDecision {
   key: string;
   /** Whether this svc attaches to a shared, search_path-routed instance. */
   pooling: boolean;
+  /**
+   * True when the fallback came from a thrown catalog probe (a possibly
+   * transient DB error) rather than a structural opt-out. Transient decisions
+   * are NOT memoized, so the next request re-probes instead of permanently
+   * pinning the svc to a per-tenant instance until the next flush.
+   */
+  transient?: boolean;
 }
 
 /**
@@ -68,8 +76,9 @@ export const computePoolDecision = async (
   }
 
   try {
-    const shapeFingerprint = await computeShapeFingerprint(pool, api.schema);
-    const collisions = await checkUnqualifiedCollisions(pool, api.schema);
+    // One catalog scan feeds both the fingerprint and the collision check.
+    const relations = await fetchSchemaRelations(pool, api.schema);
+    const collisions = collisionsFromRelations(relations);
     if (collisions.length > 0) {
       log.warn(
         `svc=${svcKey} not poolable — unqualified relation collision(s): ${collisions.join(', ')}; using per-tenant instance`
@@ -79,17 +88,18 @@ export const computePoolDecision = async (
 
     const key = computeBlueprintKey({
       logicalSchemas: api.logicalSchemas ?? api.schema.map(stripSchemaHashPrefix),
-      shapeFingerprint,
+      shapeFingerprint: fingerprintFromRelations(relations),
       flags: api.databaseSettings as Record<string, any> | undefined,
       apiName: (api as { apiName?: string | null }).apiName ?? null,
-      mode: 'public'
+      mode: 'public',
+      dbname: api.dbname
     });
     return { key, pooling: true };
   } catch (err) {
     log.warn(
-      `svc=${svcKey} not poolable — shape/collision probe failed: ${err instanceof Error ? err.message : String(err)}; using per-tenant instance`
+      `svc=${svcKey} not poolable — shape/collision probe failed: ${err instanceof Error ? err.message : String(err)}; using per-tenant instance (not memoized)`
     );
-    return { key: svcKey, pooling: false };
+    return { key: svcKey, pooling: false, transient: true };
   }
 };
 
@@ -105,6 +115,8 @@ export const resolvePoolDecision = async (
   const cached = poolDecisions.get(svcKey);
   if (cached) return cached;
   const decision = await computePoolDecision(svcKey, api, pool);
-  poolDecisions.set(svcKey, decision);
+  if (!decision.transient) {
+    poolDecisions.set(svcKey, decision);
+  }
   return decision;
 };
