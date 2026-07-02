@@ -74,7 +74,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
   // Closure-scoped state shared between init and field hooks
   let i18nRegistry: Record<string, I18nTableInfo> = {};
-  const localeTypeCache: Record<string, any> = {};
+  let localeTypeCache: Record<string, any> = {};
 
   return {
     name: 'I18nPlugin',
@@ -85,6 +85,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
         init: {
           callback(_, build) {
             i18nRegistry = {};
+            localeTypeCache = {};
 
             for (const [, codec] of Object.entries(build.input.pgRegistry.pgCodecs)) {
               const c = codec as PgCodecWithAttributes;
@@ -265,18 +266,20 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                   $baseCols[column] = $parent.get(column);
                 }
                 const $withPgClient = (grafastContext() as any).get('withPgClient');
+                const $pgSettings = (grafastContext() as any).get('pgSettings');
                 const $langCodes = (grafastContext() as any).get('langCodes');
 
                 // Combine all inputs into a single step
                 const $input = object({
                   id: $id,
                   withPgClient: $withPgClient,
+                  pgSettings: $pgSettings,
                   langCodes: $langCodes,
                   ...$baseCols,
                 });
 
                 return lambda($input, async (input: any) => {
-                  const { id, withPgClient, langCodes: ctxLangCodes, ...baseCols } = input;
+                  const { id, withPgClient, pgSettings, langCodes: ctxLangCodes, ...baseCols } = input;
                   const langs: string[] = ctxLangCodes ?? defaultLanguages;
 
                   if (!withPgClient || !id) {
@@ -287,7 +290,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                     return result;
                   }
 
-                  const row = await withPgClient(null, async (client: any) => {
+                  const row = await withPgClient(pgSettings, async (client: any) => {
                     const { rows } = await client.query(sqlQuery, [id, langs]);
                     return rows[0] ?? null;
                   });
