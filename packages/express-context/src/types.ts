@@ -172,6 +172,7 @@ export interface AgentChatConfig {
 
 export interface UserAuthModuleConfig {
   schemaName: string;
+  identityFunctionSchemaName: string;
   sessionCredentialsSchemaName: string;
   signInFunction: string;
   signUpFunction: string;

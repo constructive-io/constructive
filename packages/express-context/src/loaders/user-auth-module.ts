@@ -30,8 +30,22 @@ const USER_AUTH_MODULE_SQL = `
   LIMIT 1
 `;
 
+const IDENTITY_FUNCTION_SCHEMA_SQL = `
+  SELECT n.nspname AS schema_name
+  FROM pg_proc p
+  JOIN pg_namespace n ON n.oid = p.pronamespace
+  WHERE p.proname = $1
+    AND p.pronargs = 7
+  ORDER BY CASE WHEN n.nspname = $2 THEN 0 ELSE 1 END, n.nspname
+  LIMIT 1
+`;
+
 const SIGN_IN_IDENTITY_FUNCTION = 'sign_in_identity';
 const SIGN_UP_IDENTITY_FUNCTION = 'sign_up_identity';
+
+interface FunctionSchemaRow {
+  schema_name: string;
+}
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
@@ -49,8 +63,16 @@ export const userAuthModuleLoader: ModuleLoader<UserAuthModuleConfig> =
       const row = result.rows[0];
       if (!row) return undefined;
 
+      const identitySchemaResult = await tenantPool.query<FunctionSchemaRow>(
+        IDENTITY_FUNCTION_SCHEMA_SQL,
+        [SIGN_IN_IDENTITY_FUNCTION, row.schema_name],
+      );
+      const identityFunctionSchemaName =
+        identitySchemaResult.rows[0]?.schema_name || row.schema_name;
+
       return {
         schemaName: row.schema_name,
+        identityFunctionSchemaName,
         sessionCredentialsSchemaName:
           row.session_credentials_schema_name || row.schema_name,
         signInFunction: row.sign_in_function,

@@ -264,8 +264,8 @@ describe('OAuthClient', () => {
       const client = createOAuthClient({
         providers: {
           google: {
-            clientId: 'basic-client-id',
-            clientSecret: 'basic-client-secret',
+            clientId: 'basic client/id:+',
+            clientSecret: 'basic secret:/+@',
             tokenEndpointAuthMethod: 'client_secret_basic',
           },
         },
@@ -276,9 +276,11 @@ describe('OAuthClient', () => {
 
       const request = fetchMock.mock.calls[0][1] as RequestInit;
       expect(request.headers).toMatchObject({
-        Authorization: `Basic ${Buffer.from('basic-client-id:basic-client-secret').toString('base64')}`,
+        Authorization:
+          'Basic YmFzaWMrY2xpZW50JTJGaWQlM0ElMkI6YmFzaWMrc2VjcmV0JTNBJTJGJTJCJTQw',
       });
       const body = new URLSearchParams(request.body as string);
+      expect(body.get('client_id')).toBeNull();
       expect(body.get('client_secret')).toBeNull();
       expect(body.get('code')).toBe('basic-code');
     });

@@ -158,12 +158,16 @@ describe('identityProvidersLoader metadata resolution', () => {
 });
 
 describe('userAuthModuleLoader', () => {
+  afterEach(() => {
+    userAuthModuleLoader.invalidate();
+  });
+
   it('continues resolving identity auth function constants', async () => {
     const tenant = createMockPool([
       () => ({
         rows: [
           {
-            schema_name: 'auth_private',
+            schema_name: 'auth_public',
             session_credentials_schema_name: 'session_private',
             sign_in_function: 'sign_in',
             sign_up_function: 'sign_up',
@@ -171,6 +175,13 @@ describe('userAuthModuleLoader', () => {
             sign_in_cross_origin_function: null,
             request_cross_origin_token_function: null,
             extend_token_expires: '1 hour',
+          },
+        ],
+      }),
+      () => ({
+        rows: [
+          {
+            schema_name: 'auth_private',
           },
         ],
       }),
@@ -182,10 +193,42 @@ describe('userAuthModuleLoader', () => {
     );
 
     expect(config).toMatchObject({
-      schemaName: 'auth_private',
+      schemaName: 'auth_public',
+      identityFunctionSchemaName: 'auth_private',
       sessionCredentialsSchemaName: 'session_private',
       signInIdentityFunction: 'sign_in_identity',
       signUpIdentityFunction: 'sign_up_identity',
+    });
+  });
+
+  it('falls back to the public auth schema when identity function schema is not discoverable', async () => {
+    const tenant = createMockPool([
+      () => ({
+        rows: [
+          {
+            schema_name: 'auth_public',
+            session_credentials_schema_name: null,
+            sign_in_function: 'sign_in',
+            sign_up_function: 'sign_up',
+            sign_out_function: 'sign_out',
+            sign_in_cross_origin_function: null,
+            request_cross_origin_token_function: null,
+            extend_token_expires: '1 hour',
+          },
+        ],
+      }),
+      () => ({ rows: [] }),
+    ]);
+    const services = createMockPool([]);
+
+    const config = await userAuthModuleLoader.resolve(
+      createContext(services.pool, tenant.pool, 'fallback-user-auth-db'),
+    );
+
+    expect(config).toMatchObject({
+      schemaName: 'auth_public',
+      identityFunctionSchemaName: 'auth_public',
+      sessionCredentialsSchemaName: 'auth_public',
     });
   });
 });
