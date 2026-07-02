@@ -43,8 +43,6 @@ import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { getRoutingSchema } from './middleware/routing';
 import { createOAuthRoutes } from './middleware/oauth';
-import { createIdentityProvidersRouter } from './middleware/identity-providers';
-import { createAppSettingsAuthRouter } from './middleware/app-settings-auth';
 
 const log = new Logger('server');
 
@@ -205,12 +203,6 @@ class Server {
     // OAuth / SSO routes — mounted before graphile so OAuth callbacks
     // are handled without going through PostGraphile
     app.use('/auth', createOAuthRoutes(effectiveOpts));
-
-    // Identity Providers API — mounted before graphile
-    app.use(createIdentityProvidersRouter());
-
-    // App Settings Auth API — mounted before graphile
-    app.use(createAppSettingsAuthRouter());
 
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile
