@@ -91,10 +91,25 @@ V4 budget formula, or a separate auth node at R=1).
 - BuildSemaphore(1) serendipitously serializes PG introspection spikes as well as
   node build transients — keep it.
 
-## Gaps / follow-ups
+## Follow-up probes (both PASS)
 
-- Single-blueprint rps ceiling (PG_POOL_MAX=5/dbname knee) — `plans/v2-2048-rps-single.json`.
-- True-capacity-2 confirmation at 3584MB — `plans/v2-3584-r2.json`.
+- **Capacity-2 at 3584MB** (`r2-div-k1`, estimate lowered to 896MB → cap 2):
+  builds=2, **evictions=0** (api + auth blueprints simultaneously resident),
+  errRate 0, p99 34ms, heapMax **2750MB** (= 2×1.35GB + base, as modeled),
+  rssMax 3.24GB, no crash. True capacity at 3584MB is 2; only the 0.5-fraction
+  budget formula holds it at 1 → V4 hardening: budget = heap − base −
+  buildTransient, divided by instance estimate.
+- **Single-blueprint rps ceiling** (2048MB, 32 tenants, zipf, authenticated
+  mixed workload): 50→100→200 target rps achieved 47/94.3/188.4, errRate 0
+  at every level, p99 34/21/21ms, pgConnMax stayed 5 (PG_POOL_MAX=5/dbname is
+  NOT a bottleneck ≤200rps; queries are 1-5ms). heapMax 1508→1588MB (request
+  working set ≈ +150-250MB over the resident instance at 200rps).
+  **Headline: a 2GB-heap node serves 32 pooled tenants at ≥188rps, p99 21ms,
+  zero errors.**
+
+## Remaining known limitations
+
 - Shape fingerprint covers relation names only (columns excluded — documented
   limitation; column-drift tenants share a blueprint by design).
+- rps ceiling beyond 200rps unmeasured (no knee found yet).
 - 24h longevity (V3) + memory governor / smarter budget / build timeout (V4).
