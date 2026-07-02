@@ -99,7 +99,13 @@ const DEFAULT_INSTANCE_HEAP_BYTES = 512 * 1024 * 1024;
 // for transient schema builds (each build briefly allocates hundreds of MB) and
 // request processing.
 const CACHE_HEAP_FRACTION = 0.5;
-const MIN_CACHE_MAX = 3;
+// At least one instance must be admitted or nothing can ever build — but never
+// more than the heap budget says fit: instance heap grows with the TOTAL pg
+// catalog (~21 KB per pg_class row, measured), so on a large catalog a 2 GB
+// heap genuinely holds only ONE ~1.3 GB instance. A floor of 3 admitted two
+// extra builds the heap could not hold and aborted the process (V8 heap-limit
+// SIGABRT) before eviction ever ran.
+const MIN_CACHE_MAX = 1;
 const MAX_CACHE_MAX = 50;
 
 const parseEnvInt = (value: string | undefined, fallback: number): number => {

@@ -85,17 +85,32 @@ describe('graphile-cache heap-aware capacity', () => {
   it('falls back to a bounded heap-aware default when unset', () => {
     delete process.env.GRAPHILE_CACHE_MAX;
     const { max } = getCacheConfig();
-    // Each cached instance retains ~0.5GB, so the default must be far below the legacy 50
-    // on a normal heap, but always within [3, 50].
-    expect(max).toBeGreaterThanOrEqual(3);
+    // Bounded within [1, 50]: at least one instance must be admitted, but the
+    // floor must never exceed what the heap budget says fits (a floor of 3
+    // over-admitted 1.3GB instances on a 2GB heap and aborted the process).
+    expect(max).toBeGreaterThanOrEqual(1);
     expect(max).toBeLessThanOrEqual(50);
   });
 
   it('ignores a non-numeric GRAPHILE_CACHE_MAX (falls back to heap-aware default)', () => {
     process.env.GRAPHILE_CACHE_MAX = 'not-a-number';
     const { max } = getCacheConfig();
-    expect(max).toBeGreaterThanOrEqual(3);
+    expect(max).toBeGreaterThanOrEqual(1);
     expect(max).toBeLessThanOrEqual(50);
+  });
+
+  it('admits only one instance when the per-instance estimate exceeds half the heap', () => {
+    delete process.env.GRAPHILE_CACHE_MAX;
+    const prevEstimate = process.env.GRAPHILE_CACHE_INSTANCE_HEAP_BYTES;
+    // Larger than any plausible test-runner heap budget => budgeted count is 0
+    // and the floor of 1 must win (never the old floor of 3).
+    process.env.GRAPHILE_CACHE_INSTANCE_HEAP_BYTES = String(64 * 1024 * 1024 * 1024);
+    try {
+      expect(getCacheConfig().max).toBe(1);
+    } finally {
+      if (prevEstimate === undefined) delete process.env.GRAPHILE_CACHE_INSTANCE_HEAP_BYTES;
+      else process.env.GRAPHILE_CACHE_INSTANCE_HEAP_BYTES = prevEstimate;
+    }
   });
 });
 
