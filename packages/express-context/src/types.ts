@@ -231,16 +231,28 @@ export interface IdentityProvidersConfig {
   schemaName: string;
   privateSchemaName: string;
   tableName: string;
+  scope: string;
   prefix: string;
   rotateSecretFunction: string;
   providers: IdentityProviderConfigMap;
 }
 
 export interface IdentityProvidersModuleRow {
+  database_id: string;
   schema_name: string;
   private_schema_name: string;
   table_name: string;
-  prefix: string;
+  scope: string;
+  prefix: string | null;
+}
+
+export interface ConfigSecretsModuleRow {
+  table_id: string;
+}
+
+export interface SchemaAndTableRow {
+  schema_name: string;
+  table_name: string;
 }
 
 export interface PlatformDatabaseRow {

@@ -57,12 +57,18 @@ interface OAuthStatePayload {
   provider: string;
 }
 
+interface OAuthEnvConfig {
+  oauth?: {
+    secret?: string;
+  };
+}
+
 function getStateSecret(): string | undefined {
-  return getEnvVars().oauth?.secret;
+  return (getEnvVars() as OAuthEnvConfig).oauth?.secret;
 }
 
 function requireStateSecret(): string {
-  const secret = getEnvVars().oauth?.secret;
+  const secret = getStateSecret();
   if (!secret) {
     throw new Error('OAUTH_SECRET environment variable is required');
   }
