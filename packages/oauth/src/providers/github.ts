@@ -17,6 +17,7 @@ export interface GitHubEmail {
 export const githubProvider: OAuthProviderConfig = {
   id: 'github',
   name: 'GitHub',
+  kind: 'oauth2',
   authorizationUrl: 'https://github.com/login/oauth/authorize',
   tokenUrl: 'https://github.com/login/oauth/access_token',
   userInfoUrl: 'https://api.github.com/user',

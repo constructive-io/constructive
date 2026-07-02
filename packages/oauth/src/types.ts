@@ -1,13 +1,82 @@
+export type OAuthProviderKind = 'oauth2' | 'oidc';
+
+export type OAuthTokenRequestContentType = 'json' | 'form';
+
+export type OAuthTokenEndpointAuthMethod =
+  | 'client_secret_post'
+  | 'client_secret_basic'
+  | 'private_key_jwt'
+  | 'none';
+
 export interface OAuthProviderConfig {
   id: string;
   name: string;
+  kind: OAuthProviderKind;
   authorizationUrl: string;
   tokenUrl: string;
   userInfoUrl: string;
   scopes: string[];
-  tokenRequestContentType?: 'json' | 'form';
+  tokenRequestContentType?: OAuthTokenRequestContentType;
   userInfoMethod?: 'GET' | 'POST';
   mapProfile: (data: unknown) => OAuthProfile;
+}
+
+export interface OAuthProviderRuntimeConfig {
+  slug: string;
+  kind?: OAuthProviderKind;
+  displayName?: string;
+  enabled?: boolean;
+
+  clientId: string;
+  clientSecret?: string;
+  clientSecretRef?: string;
+  redirectUri?: string;
+
+  authorizationUrl?: string | null;
+  tokenUrl?: string | null;
+  userinfoUrl?: string | null;
+  userInfoUrl?: string | null;
+
+  scopes?: string[] | null;
+  pkceEnabled?: boolean;
+  tokenEndpointAuthMethod?: OAuthTokenEndpointAuthMethod;
+  tokenRequestContentType?: OAuthTokenRequestContentType;
+  userInfoMethod?: 'GET' | 'POST';
+
+  authorizationParams?: Record<string, string>;
+  tokenParams?: Record<string, string>;
+  options?: Record<string, unknown>;
+}
+
+export interface OAuthProviderResolvedConfig {
+  slug: string;
+  kind: OAuthProviderKind;
+  displayName: string;
+  enabled: boolean;
+
+  clientId: string;
+  clientSecret: string;
+  redirectUri?: string;
+
+  authorizationUrl: string;
+  tokenUrl: string;
+  userinfoUrl: string;
+
+  scopes: string[];
+  pkceEnabled: boolean;
+  tokenEndpointAuthMethod: OAuthTokenEndpointAuthMethod;
+  tokenRequestContentType: OAuthTokenRequestContentType;
+  userInfoMethod: 'GET' | 'POST';
+
+  authorizationParams: Record<string, string>;
+  tokenParams: Record<string, string>;
+  options: Record<string, unknown>;
+}
+
+export interface ResolvedOAuthProvider {
+  providerId: string;
+  config: OAuthProviderResolvedConfig;
+  provider: OAuthProviderConfig;
 }
 
 export interface OAuthProfile {

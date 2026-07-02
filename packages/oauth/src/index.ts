@@ -1,5 +1,11 @@
 export {
   OAuthProviderConfig,
+  OAuthProviderKind,
+  OAuthTokenRequestContentType,
+  OAuthTokenEndpointAuthMethod,
+  OAuthProviderRuntimeConfig,
+  OAuthProviderResolvedConfig,
+  ResolvedOAuthProvider,
   OAuthProfile,
   OAuthCredentials,
   OAuthClientConfig,
@@ -11,6 +17,7 @@ export {
 } from './types';
 
 export { OAuthClient, createOAuthClient } from './oauth-client';
+export { resolveOAuthProvider } from './provider-resolver';
 
 export {
   providers,
