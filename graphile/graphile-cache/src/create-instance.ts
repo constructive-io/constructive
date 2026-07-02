@@ -60,6 +60,7 @@ export const createGraphileInstance = async (
     cacheKey,
     dbname,
     createdAt: Date.now(),
+    inflight: 0,
   };
 
   if (enableRealtime) {

@@ -1,4 +1,11 @@
-import { graphileCache, getCacheConfig, type GraphileCacheEntry } from '../graphile-cache';
+import { EventEmitter } from 'events';
+import {
+  ensureCacheHeadroom,
+  getCacheConfig,
+  graphileCache,
+  type GraphileCacheEntry,
+  invokeEntryHandler,
+} from '../graphile-cache';
 
 /**
  * Regression tests for the schema-builder OOM fix.
@@ -89,5 +96,91 @@ describe('graphile-cache heap-aware capacity', () => {
     const { max } = getCacheConfig();
     expect(max).toBeGreaterThanOrEqual(3);
     expect(max).toBeLessThanOrEqual(50);
+  });
+});
+
+// A minimal express-like response: an EventEmitter so invokeEntryHandler can hook
+// 'finish'/'close', cast to the express type it expects.
+const makeRes = () => new EventEmitter() as unknown as Parameters<typeof invokeEntryHandler>[2];
+const fakeReq = {} as Parameters<typeof invokeEntryHandler>[1];
+const fakeNext = (() => undefined) as Parameters<typeof invokeEntryHandler>[3];
+
+describe('invokeEntryHandler in-flight refcounting', () => {
+  it('increments while serving and releases exactly once across finish+close', () => {
+    const entry = makeEntry();
+    const handler = jest.fn();
+    entry.handler = handler as unknown as GraphileCacheEntry['handler'];
+
+    const res = makeRes();
+    expect(invokeEntryHandler(entry, fakeReq, res, fakeNext)).toBe(true);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(entry.inflight).toBe(1);
+
+    (res as unknown as EventEmitter).emit('finish');
+    expect(entry.inflight).toBe(0);
+    // 'close' always follows 'finish' in Node; the release must be idempotent.
+    (res as unknown as EventEmitter).emit('close');
+    expect(entry.inflight).toBe(0);
+  });
+
+  it('refuses a disposing entry without invoking the handler', () => {
+    const entry = makeEntry();
+    const handler = jest.fn();
+    entry.handler = handler as unknown as GraphileCacheEntry['handler'];
+    entry.disposing = true;
+
+    expect(invokeEntryHandler(entry, fakeReq, makeRes(), fakeNext)).toBe(false);
+    expect(handler).not.toHaveBeenCalled();
+  });
+});
+
+describe('disposeEntry drains in-flight requests before release', () => {
+  it('waits for inflight to reach 0, then releases exactly once', async () => {
+    const key = 'drain-key-1';
+    const entry = makeEntry(0);
+    entry.inflight = 1; // simulate a request mid-flight
+
+    graphileCache.set(key, entry);
+    graphileCache.delete(key); // disposal starts; must poll instead of releasing
+
+    await tick(120); // one poll cycle elapsed, request still in flight
+    expect((entry.pgl as unknown as { release: jest.Mock }).release).not.toHaveBeenCalled();
+
+    entry.inflight = 0; // request completes
+    await tick(250); // allow the next poll cycle to observe it
+
+    expect((entry.pgl as unknown as { release: jest.Mock }).release).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ensureCacheHeadroom', () => {
+  const prevMax = process.env.GRAPHILE_CACHE_MAX;
+  afterEach(() => {
+    if (prevMax === undefined) delete process.env.GRAPHILE_CACHE_MAX;
+    else process.env.GRAPHILE_CACHE_MAX = prevMax;
+    graphileCache.clear();
+  });
+
+  it('evicts least-recently-used entries until a build slot is free', async () => {
+    process.env.GRAPHILE_CACHE_MAX = '2';
+    const a = makeEntry(0);
+    const b = makeEntry(0);
+    graphileCache.set('headroom-a', a);
+    graphileCache.set('headroom-b', b);
+    graphileCache.get('headroom-a'); // touch a → b becomes LRU-oldest
+
+    const evicted = ensureCacheHeadroom(1);
+
+    expect(evicted).toBe(1);
+    expect(graphileCache.has('headroom-a')).toBe(true);
+    expect(graphileCache.has('headroom-b')).toBe(false);
+    await tick(); // let the fire-and-forget disposal settle before clear()
+  });
+
+  it('no-ops when under capacity', () => {
+    process.env.GRAPHILE_CACHE_MAX = '5';
+    graphileCache.set('headroom-c', makeEntry(0));
+    expect(ensureCacheHeadroom(1)).toBe(0);
+    expect(graphileCache.has('headroom-c')).toBe(true);
   });
 });

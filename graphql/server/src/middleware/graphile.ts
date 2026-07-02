@@ -4,7 +4,13 @@ import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
-import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
+import {
+  createGraphileInstance,
+  ensureCacheHeadroom,
+  type GraphileCacheEntry,
+  graphileCache,
+  invokeEntryHandler,
+} from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
@@ -191,6 +197,46 @@ export function clearInFlightMap(): void {
   creating.clear();
 }
 
+// =============================================================================
+// Build Admission Control
+// =============================================================================
+
+/**
+ * Bounds how many PostGraphile schema builds run concurrently across ALL cache
+ * keys (the single-flight map only dedups builds for the SAME key). Each build
+ * transiently allocates hundreds of MB, so concurrent builds of different
+ * tenants stack those peaks on top of the resident cache — the OOM shape.
+ * Default 1: builds queue and run serially. Override with GRAPHILE_BUILD_CONCURRENCY.
+ */
+class BuildSemaphore {
+  private active = 0;
+  private waiters: Array<() => void> = [];
+  constructor(private readonly capacity: number) {}
+
+  async acquire(): Promise<void> {
+    if (this.active < this.capacity) {
+      this.active++;
+      return;
+    }
+    await new Promise<void>((resolve) => this.waiters.push(resolve));
+    this.active++;
+  }
+
+  release(): void {
+    this.active = Math.max(0, this.active - 1);
+    const wake = this.waiters.shift();
+    if (wake) wake();
+  }
+}
+
+const parseBuildConcurrency = (): number => {
+  const raw = process.env.GRAPHILE_BUILD_CONCURRENCY;
+  const n = raw ? parseInt(raw, 10) : 1;
+  return Number.isFinite(n) && n > 0 ? n : 1;
+};
+
+const buildSemaphore = new BuildSemaphore(parseBuildConcurrency());
+
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
 
@@ -221,7 +267,9 @@ const buildPreset = (
   grafserv: {
     graphqlPath: '/graphql',
     graphiqlPath: '/graphiql',
-    graphiql: true,
+    // GraphiQL (ruru) assets/handlers are per-instance overhead and an unnecessary
+    // prod surface — enable only in development, or explicitly via GRAPHILE_GRAPHIQL=true.
+    graphiql: getNodeEnv() === 'development' || process.env.GRAPHILE_GRAPHIQL === 'true',
     graphiqlOnGraphQLGET: false,
     maskError,
   },
@@ -326,8 +374,12 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       const cached = graphileCache.get(key);
       if (cached) {
-        log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
-        return cached.handler(req, res, next);
+        if (invokeEntryHandler(cached, req, res, next)) {
+          log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
+          return;
+        }
+        // Entry is mid-disposal — fall through and rebuild.
+        log.debug(`${label} PostGraphile cache hit on disposing entry key=${key}; rebuilding`);
       }
 
       log.debug(`${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
@@ -340,7 +392,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
         try {
           const instance = await inFlight;
-          return instance.handler(req, res, next);
+          if (invokeEntryHandler(instance, req, res, next)) {
+            return;
+          }
+          log.debug(`${label} Coalesced instance already disposing for PostGraphile[${key}], retrying`);
+          // Fall through to Phase C to retry creation
         } catch (error) {
           log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
           // Fall through to Phase C to retry creation
@@ -353,9 +409,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Re-check cache after coalesced request failure (another retry may have succeeded)
       const recheckedCache = graphileCache.get(key);
-      if (recheckedCache) {
+      if (recheckedCache && invokeEntryHandler(recheckedCache, req, res, next)) {
         log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
-        return recheckedCache.handler(req, res, next);
+        return;
       }
 
       // Re-check in-flight map (another retry may have started creation)
@@ -363,7 +419,13 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       if (retryInFlight) {
         log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
         const retryInstance = await retryInFlight;
-        return retryInstance.handler(req, res, next);
+        if (invokeEntryHandler(retryInstance, req, res, next)) {
+          return;
+        }
+        log.warn(`${label} Re-coalesced instance already disposing for PostGraphile[${key}]`);
+        return res.status(503).json({
+          error: { code: 'SERVICE_ROTATING', message: 'Service is restarting, please retry' }
+        });
       }
 
       log.info(
@@ -381,27 +443,50 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings);
-      const creationPromise = observeGraphileBuild(
-        {
-          cacheKey: key,
-          serviceKey: key,
-          databaseId: api.databaseId ?? null,
-        },
-        () => createGraphileInstance({
-          preset,
-          cacheKey: key,
-          dbname,
-          enableRealtime: api.databaseSettings?.enableRealtime,
-        }),
-        { enabled: observabilityEnabled },
-      );
+      const creationPromise = (async (): Promise<GraphileCacheEntry> => {
+        // Serialize builds process-wide: each build transiently allocates hundreds of MB,
+        // and only same-key builds are deduped by the single-flight map above.
+        await buildSemaphore.acquire();
+        try {
+          // While queued for the slot another request may have finished this key.
+          const builtMeanwhile = graphileCache.get(key);
+          if (builtMeanwhile) {
+            return builtMeanwhile;
+          }
+          // Evict the LRU instance BEFORE building so the build peak lands on freed
+          // headroom instead of stacking on a full cache.
+          ensureCacheHeadroom(1);
+          return await observeGraphileBuild(
+            {
+              cacheKey: key,
+              serviceKey: key,
+              databaseId: api.databaseId ?? null,
+            },
+            () => createGraphileInstance({
+              preset,
+              cacheKey: key,
+              dbname,
+              enableRealtime: api.databaseSettings?.enableRealtime,
+            }),
+            { enabled: observabilityEnabled },
+          );
+        } finally {
+          buildSemaphore.release();
+        }
+      })();
       creating.set(key, creationPromise);
 
       try {
         const instance = await creationPromise;
         graphileCache.set(key, instance);
         log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
-        return instance.handler(req, res, next);
+        if (invokeEntryHandler(instance, req, res, next)) {
+          return;
+        }
+        log.warn(`${label} Freshly built instance already disposing for PostGraphile[${key}]`);
+        return res.status(503).json({
+          error: { code: 'SERVICE_ROTATING', message: 'Service is restarting, please retry' }
+        });
       } catch (error) {
         log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
         throw new HandlerCreationError(

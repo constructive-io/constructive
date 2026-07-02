@@ -3,7 +3,12 @@ import { getHeapStatistics } from 'node:v8';
 import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
-import type { Express } from 'express';
+import type {
+  Express,
+  NextFunction as ExpressNextFunction,
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from 'express';
 import type { Server as HttpServer } from 'http';
 import type { PostGraphileInstance } from 'postgraphile';
 import type { GrafservBase } from 'grafserv';
@@ -13,8 +18,7 @@ const log = new Logger('graphile-cache');
 // --- Time Constants ---
 export const ONE_HOUR_MS = 1000 * 60 * 60;
 export const FIVE_MINUTES_MS = 1000 * 60 * 5;
-const ONE_DAY = ONE_HOUR_MS * 24;
-const ONE_YEAR = ONE_DAY * 366;
+const SIX_HOURS_MS = ONE_HOUR_MS * 6;
 
 // --- Eviction Types ---
 export type EvictionReason = 'lru' | 'ttl' | 'manual';
@@ -100,8 +104,11 @@ function computeHeapAwareMax(): number {
  *   instance retains ~0.5 GB and a count-only cap OOMs the process.
  * - GRAPHILE_CACHE_INSTANCE_HEAP_BYTES: per-instance heap estimate for the
  *   heap-aware default (default ~512 MB).
- * - GRAPHILE_CACHE_TTL_MS: TTL in milliseconds
- *   - Production default: ONE_YEAR
+ * - GRAPHILE_CACHE_TTL_MS: idle TTL in milliseconds (updateAgeOnGet refreshes it
+ *   on every hit, so this is an idle-expiry, not an absolute lifetime)
+ *   - Production default: SIX_HOURS_MS — an idle tenant's ~0.5 GB instance is
+ *     reclaimed within hours instead of pinned for a year; a later request
+ *     simply rebuilds it
  *   - Development default: FIVE_MINUTES_MS
  *
  * NOTE: This value should be <= PG_CACHE_MAX so that every cached PostGraphile
@@ -118,7 +125,7 @@ export function getCacheConfig(): CacheConfig {
     ? parseInt(process.env.GRAPHILE_CACHE_TTL_MS, 10)
     : isDevelopment
       ? FIVE_MINUTES_MS
-      : ONE_YEAR;
+      : SIX_HOURS_MS;
 
   return { max, ttl };
 }
@@ -149,6 +156,15 @@ export interface GraphileCacheEntry {
   dbname?: string;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
   realtimeManager?: { stop(): Promise<void> } | null;
+  /**
+   * Number of requests currently executing against this entry's handler.
+   * Maintained by invokeEntryHandler; disposeEntry drains to 0 (bounded by
+   * GRAPHILE_CACHE_DRAIN_TIMEOUT_MS) before releasing the instance so eviction
+   * cannot tear down a schema mid-request.
+   */
+  inflight?: number;
+  /** Set at the start of disposal; routing must treat the entry as a cache miss. */
+  disposing?: boolean;
 }
 
 // Track disposed entries to prevent double-disposal. Keyed by ENTRY IDENTITY (a WeakSet),
@@ -180,6 +196,22 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
     return;
   }
   disposedEntries.add(entry);
+  entry.disposing = true;
+
+  // Drain in-flight requests before tearing the instance down. The entry is already
+  // out of the cache (dispose fires post-removal), so no NEW requests can route here —
+  // invokeEntryHandler also refuses entries with `disposing` set. Bounded wait: a wedged
+  // request must not pin ~0.5 GB forever.
+  const drainTimeoutMs = parseEnvInt(process.env.GRAPHILE_CACHE_DRAIN_TIMEOUT_MS, 30_000);
+  const drainStart = Date.now();
+  while ((entry.inflight ?? 0) > 0 && Date.now() - drainStart < drainTimeoutMs) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if ((entry.inflight ?? 0) > 0) {
+    log.warn(
+      `Disposing PostGraphile[${key}] with ${entry.inflight} request(s) still in flight after ${drainTimeoutMs}ms drain timeout`,
+    );
+  }
 
   log.debug(`Disposing PostGraphile[${key}]`);
   try {
@@ -268,6 +300,60 @@ export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
     });
   }
 });
+
+/**
+ * Invoke an entry's Express handler with in-flight refcounting.
+ *
+ * Returns false WITHOUT invoking when the entry is already being disposed —
+ * callers must treat that as a cache miss (rebuild) or retry. On invocation,
+ * the refcount is incremented and released exactly once when the response
+ * finishes or the connection closes, which is what disposeEntry drains on.
+ */
+export function invokeEntryHandler(
+  entry: GraphileCacheEntry,
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: ExpressNextFunction,
+): boolean {
+  if (entry.disposing) {
+    return false;
+  }
+  entry.inflight = (entry.inflight ?? 0) + 1;
+  let released = false;
+  const release = () => {
+    if (!released) {
+      released = true;
+      entry.inflight = Math.max(0, (entry.inflight ?? 1) - 1);
+    }
+  };
+  // 'close' fires after 'finish' and also on aborted connections; release is idempotent.
+  res.once('finish', release);
+  res.once('close', release);
+  entry.handler(req, res, next);
+  return true;
+}
+
+/**
+ * Evict least-recently-used entries until there is room for `slots` new entries
+ * under the configured max. Called BEFORE building a new instance so the build's
+ * transient allocation (hundreds of MB) lands on a cache that has already shed
+ * an instance, instead of stacking a full cache + a build peak (the OOM shape).
+ */
+export function ensureCacheHeadroom(slots = 1): number {
+  const { max } = getCacheConfig();
+  let evicted = 0;
+  while (graphileCache.size > Math.max(0, max - slots)) {
+    // rkeys() iterates least-recently-used first
+    const oldestKey = graphileCache.rkeys().next().value as string | undefined;
+    if (oldestKey === undefined) break;
+    graphileCache.delete(oldestKey);
+    evicted++;
+  }
+  if (evicted > 0) {
+    log.info(`Evicted ${evicted} instance(s) before build to keep heap headroom (max=${max})`);
+  }
+  return evicted;
+}
 
 // --- Cache Stats ---
 export interface CacheStats {
