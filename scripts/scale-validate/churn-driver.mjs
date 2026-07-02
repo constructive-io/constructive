@@ -45,8 +45,23 @@ async function main() {
   const { tenants } = loadFleet(args.fleet);
   const cfg = pgConfigFromArgs(args);
   const { Client } = resolvePg();
-  const client = new Client(cfg);
-  await client.connect();
+  // Fresh connection per query: with long NOTIFY intervals a persistent client
+  // gets reaped by idle_session_timeout (57P05) and its socket error would
+  // kill the driver mid-soak. Hourly connects are free.
+  const withClient = async (fn) => {
+    const client = new Client(cfg);
+    client.on('error', () => {});
+    await client.connect();
+    try {
+      return await fn(client);
+    } finally {
+      try {
+        await client.end();
+      } catch {
+        /* ignore */
+      }
+    }
+  };
 
   const emit = (obj) => process.stdout.write(`${JSON.stringify({ at: nowIso(), ...obj })}\n`);
   const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
@@ -63,7 +78,7 @@ async function main() {
     timers.push(setInterval(async () => {
       const tenant = pickTenant();
       try {
-        await client.query('SELECT pg_notify($1, $2)', [channel, tenant.databaseId]);
+        await withClient((client) => client.query('SELECT pg_notify($1, $2)', [channel, tenant.databaseId]));
         notifies++;
         emit({ t: 'notify', channel, databaseId: tenant.databaseId, dbname: tenant.dbname, seq: notifies });
       } catch (err) {
@@ -85,7 +100,7 @@ async function main() {
   const stop = async (reason) => {
     for (const t of timers) clearInterval(t);
     emit({ t: 'stop', reason, notifies, provisions, failures });
-    try { await client.end(); } catch { /* ignore */ }
+    // per-query connections — nothing persistent to close
   };
 
   let stopTimer = null;
