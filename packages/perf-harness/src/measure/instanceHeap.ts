@@ -25,7 +25,7 @@ import {
   resolveOutDir,
   resolveServerCmd
 } from '../core/config';
-import { readJsonl } from '../core/proc';
+import { ensureParentDir, readJsonl } from '../core/proc';
 import { spawnServer, SpawnedServer } from '../run/server';
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
@@ -199,6 +199,7 @@ export async function runInstanceHeap(argv: Argv): Promise<number> {
     }
   }
 
+  ensureParentDir(out);
   fs.appendFileSync(out, JSON.stringify(result) + '\n');
   console.error(`[${label}] result appended to ${out}`);
   return result.ok ? 0 : 1;

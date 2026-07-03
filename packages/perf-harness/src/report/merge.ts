@@ -22,7 +22,7 @@ import path from 'node:path';
 
 import { Argv } from '../core/args';
 import { resolveOutDir } from '../core/config';
-import { readJsonl } from '../core/proc';
+import { ensureParentDir, readJsonl } from '../core/proc';
 import { linregSlope } from '../measure/collector';
 
 const USAGE = `perf-harness report merge --metrics <metrics.jsonl> --harness-log <harness.jsonl> \\
@@ -369,6 +369,7 @@ export async function runMerge(argv: Argv): Promise<number> {
 
   const rd = mergeReport(sources);
   const outFile = path.join(outDir, 'report-data.json');
+  ensureParentDir(outFile);
   fs.writeFileSync(outFile, JSON.stringify(rd, null, 2) + '\n');
 
   // Machine artifact path to stderr; the human summary table to stdout.

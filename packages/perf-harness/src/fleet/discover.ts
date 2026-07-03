@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import { Argv, asBool, usageExit } from '../core/args';
 import { pgConfigFromArgv } from '../core/config';
 import { withFreshClient } from '../core/pgc';
+import { ensureParentDir } from '../core/proc';
 import { Tenant } from '../core/fleetfile';
 
 export const USAGE = `perf-harness fleet discover — emit JSON fleet manifest from the control-plane DB
@@ -90,6 +91,7 @@ export async function run(argv: Argv): Promise<number> {
 
     const json = JSON.stringify(manifest, null, pretty ? 2 : 0);
     if (typeof argv.out === 'string') {
+      ensureParentDir(argv.out);
       fs.writeFileSync(argv.out, `${json}\n`, 'utf8');
       process.stderr.write(`[fleet] wrote ${tenants.length} tenants to ${argv.out}\n`);
     } else {

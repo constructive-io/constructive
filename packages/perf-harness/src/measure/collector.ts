@@ -21,6 +21,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 
 import { Argv, asInt, usageExit } from '../core/args';
+import { ensureParentDir } from '../core/proc';
 
 // Tiny helpers the standalone script imported from _lib.mjs; core does not
 // re-export them (histogram folded round2 in privately), so inline them here
@@ -209,6 +210,7 @@ export async function runCollector(argv: Argv): Promise<number> {
         lastLine: lastMetricsObj
       }
     };
+    ensureParentDir(out);
     fs.writeFileSync(out, `${JSON.stringify(summary, null, 2)}\n`);
     emit({
       t: 'summary',

@@ -131,6 +131,10 @@ export function waitForPort(port: number, timeoutMs: number): Promise<void> {
 
 // Parse a JSON-lines file, skipping blank/corrupt lines (e.g. a half-flushed
 // final row from a process killed mid-write).
+export function ensureParentDir(file: string): void {
+  fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
+}
+
 export function readJsonl(file: string): any[] {
   let raw: string;
   try {

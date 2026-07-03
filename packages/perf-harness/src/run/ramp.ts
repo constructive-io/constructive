@@ -30,7 +30,7 @@ import { Argv, asBool, asInt } from '../core/args';
 import { assertPortAllowed, findRepoRoot, PgConfig, pgConfigFromArgv, resolveOutDir, resolveServerCmd } from '../core/config';
 import { loadFleet, Tenant } from '../core/fleetfile';
 import { getPg } from '../core/pgc';
-import { readJsonl } from '../core/proc';
+import { ensureParentDir, readJsonl } from '../core/proc';
 import { spawnServer, SpawnedServer } from './server';
 
 export const RAMP_USAGE = `perf-harness run ramp — V2 limits-discovery executor (fresh server per step)
@@ -366,6 +366,7 @@ export async function runRamp(argv: Argv): Promise<number> {
       record.pgBackends = { max: pgSampler.max, samples: pgSampler.samples, err: pgSampler.err };
       record.wallSec = Math.round((Date.now() - t0) / 1000);
       record.endedAt = new Date().toISOString();
+      ensureParentDir(outFile);
       fs.appendFileSync(outFile, JSON.stringify(record) + '\n');
       console.log(`[ramp] step ${name} done in ${record.wallSec}s -> ${outFile}`);
     }

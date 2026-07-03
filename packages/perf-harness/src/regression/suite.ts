@@ -30,7 +30,7 @@ import { Argv, asBool, asInt } from '../core/args';
 import { assertPortAllowed, findRepoRoot, pgConfigFromArgv, resolveOutDir, resolveServerCmd } from '../core/config';
 import { buildSubset, loadFleet, Tenant } from '../core/fleetfile';
 import { withFreshClient } from '../core/pgc';
-import { readJsonl } from '../core/proc';
+import { ensureParentDir, readJsonl } from '../core/proc';
 import { DEFAULT_BASELINE, getBaseline } from './baselines';
 import { compareToBaseline, MeasuredRegression, verdictFromChecks } from './compare';
 
@@ -82,6 +82,7 @@ function spawnCli(cliEntry: string, cliArgs: string[], env: Record<string, strin
   });
   const body = `$ ${cliArgs.join(' ')}\n${res.stdout || ''}${res.stderr || ''}\n`;
   try {
+    ensureParentDir(logFile);
     fs.appendFileSync(logFile, body);
   } catch {
     /* log best-effort */
@@ -91,6 +92,7 @@ function spawnCli(cliEntry: string, cliArgs: string[], env: Record<string, strin
 
 function writeFleetFile(dir: string, name: string, subset: any): string {
   const file = path.join(dir, `regression-fleet-${name}.json`);
+  ensureParentDir(file);
   fs.writeFileSync(file, JSON.stringify(subset, null, 2) + '\n');
   return file;
 }
@@ -223,6 +225,7 @@ export async function runRegression(argv: Argv): Promise<number> {
     steps
   };
   const planFile = path.join(outDir, 'regression-plan.json');
+  ensureParentDir(planFile);
   fs.writeFileSync(planFile, JSON.stringify(plan, null, 2) + '\n');
 
   // Common PG env for children (creds via env, not argv).
@@ -336,6 +339,7 @@ export async function runRegression(argv: Argv): Promise<number> {
     artifacts: { plan: planFile, rampResults: rampOut, log: logFile }
   };
   const resultsFile = path.join(outDir, 'regression-results.json');
+  ensureParentDir(resultsFile);
   fs.writeFileSync(resultsFile, JSON.stringify(results, null, 2) + '\n');
   err(`wrote ${resultsFile}`);
 

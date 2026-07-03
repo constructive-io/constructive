@@ -27,6 +27,7 @@ import {
   INTROSPECTION_QUERY, isRotating, isUnauthenticated, unwrapType
 } from '../core/gql';
 import { Histogram } from '../core/histogram';
+import { ensureParentDir } from '../core/proc';
 import { makeMixSampler, makeRng, makeZipfSampler } from '../core/rng';
 
 // Tiny helpers that lived inline in `_lib.mjs` and are not part of the core
@@ -709,6 +710,7 @@ export async function runHarness(argv: Argv): Promise<number> {
         note: M.sentinel.ok ? 'no cross-tenant bleed detected' : 'BLEED SENTINEL VIOLATION'
       }
     };
+    ensureParentDir(OUT);
     fs.writeFileSync(OUT, `${JSON.stringify(out, null, 2)}\n`);
     return out;
   }
