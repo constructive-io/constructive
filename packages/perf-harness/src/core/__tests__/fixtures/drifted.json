@@ -1,0 +1,6 @@
+{
+  "groups": {
+    "1": ["drift_a", "drift_b"]
+  },
+  "columnDrift": ["factory3"]
+}
