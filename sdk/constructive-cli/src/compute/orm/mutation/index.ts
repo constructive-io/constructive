@@ -15,9 +15,9 @@ import type {
   SaveGraphInput,
   AddEdgeAndSaveInput,
   AddNodeAndSaveInput,
+  ImportGraphJsonInput,
   AddEdgeInput,
   AddNodeInput,
-  ImportGraphJsonInput,
   InsertNodeAtPathInput,
   StartExecutionInput,
   ProvisionBucketInput,
@@ -29,9 +29,9 @@ import type {
   SaveGraphPayload,
   AddEdgeAndSavePayload,
   AddNodeAndSavePayload,
+  ImportGraphJsonPayload,
   AddEdgePayload,
   AddNodePayload,
-  ImportGraphJsonPayload,
   InsertNodeAtPathPayload,
   StartExecutionPayload,
   ProvisionBucketPayload,
@@ -43,9 +43,9 @@ import type {
   SaveGraphPayloadSelect,
   AddEdgeAndSavePayloadSelect,
   AddNodeAndSavePayloadSelect,
+  ImportGraphJsonPayloadSelect,
   AddEdgePayloadSelect,
   AddNodePayloadSelect,
-  ImportGraphJsonPayloadSelect,
   InsertNodeAtPathPayloadSelect,
   StartExecutionPayloadSelect,
   ProvisionBucketPayloadSelect,
@@ -75,14 +75,14 @@ export interface AddEdgeAndSaveVariables {
 export interface AddNodeAndSaveVariables {
   input: AddNodeAndSaveInput;
 }
+export interface ImportGraphJsonVariables {
+  input: ImportGraphJsonInput;
+}
 export interface AddEdgeVariables {
   input: AddEdgeInput;
 }
 export interface AddNodeVariables {
   input: AddNodeInput;
-}
-export interface ImportGraphJsonVariables {
-  input: ImportGraphJsonInput;
 }
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
@@ -334,6 +334,35 @@ export function createMutationOperations(client: OrmClient) {
           'AddNodeAndSavePayload'
         ),
       }),
+    importGraphJson: <S extends ImportGraphJsonPayloadSelect>(
+      args: ImportGraphJsonVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ImportGraphJsonPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        importGraphJson: InferSelectResult<ImportGraphJsonPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ImportGraphJson',
+        fieldName: 'importGraphJson',
+        ...buildCustomDocument(
+          'mutation',
+          'ImportGraphJson',
+          'importGraphJson',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ImportGraphJsonInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ImportGraphJsonPayload'
+        ),
+      }),
     addEdge: <S extends AddEdgePayloadSelect>(
       args: AddEdgeVariables,
       options: {
@@ -390,35 +419,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'AddNodePayload'
-        ),
-      }),
-    importGraphJson: <S extends ImportGraphJsonPayloadSelect>(
-      args: ImportGraphJsonVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ImportGraphJsonPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        importGraphJson: InferSelectResult<ImportGraphJsonPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ImportGraphJson',
-        fieldName: 'importGraphJson',
-        ...buildCustomDocument(
-          'mutation',
-          'ImportGraphJson',
-          'importGraphJson',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ImportGraphJsonInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ImportGraphJsonPayload'
         ),
       }),
     insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(

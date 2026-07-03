@@ -12,8 +12,8 @@ csdk check-constraint list --where.<field>.<op> <value> --orderBy <values>
 csdk check-constraint list --limit 10 --after <cursor>
 csdk check-constraint find-first --where.<field>.<op> <value>
 csdk check-constraint get --id <UUID>
-csdk check-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--expr <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
-csdk check-constraint update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--type <String>] [--fieldIds <UUID>] [--expr <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk check-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--expr <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
+csdk check-constraint update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--type <String>] [--fieldIds <UUID>] [--expr <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
 csdk check-constraint delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk check-constraint list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a checkConstraint
 
 ```bash
-csdk check-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--expr <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk check-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--expr <JSON>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
 ```
 
 ### Get a checkConstraint by id

@@ -31,19 +31,21 @@ import { BlueprintConstructionModel } from './models/blueprintConstruction';
 import { CryptoAuthModuleModel } from './models/cryptoAuthModule';
 import { SessionsModuleModel } from './models/sessionsModule';
 import { SecureTableProvisionModel } from './models/secureTableProvision';
-import { MerkleStoreModuleModel } from './models/merkleStoreModule';
-import { GraphModuleModel } from './models/graphModule';
 import { DatabaseProvisionModuleModel } from './models/databaseProvisionModule';
 import { ConfigSecretsModuleModel } from './models/configSecretsModule';
+import { GraphModuleModel } from './models/graphModule';
+import { MerkleStoreModuleModel } from './models/merkleStoreModule';
 import { RateLimitMetersModuleModel } from './models/rateLimitMetersModule';
 import { RealtimeModuleModel } from './models/realtimeModule';
 import { WebauthnAuthModuleModel } from './models/webauthnAuthModule';
 import { FunctionInvocationModuleModel } from './models/functionInvocationModule';
 import { FunctionModuleModel } from './models/functionModule';
 import { InvitesModuleModel } from './models/invitesModule';
+import { PrincipalAuthModuleModel } from './models/principalAuthModule';
 import { ComputeLogModuleModel } from './models/computeLogModule';
 import { InferenceLogModuleModel } from './models/inferenceLogModule';
 import { NamespaceModuleModel } from './models/namespaceModule';
+import { ResourceModuleModel } from './models/resourceModule';
 import { StorageLogModuleModel } from './models/storageLogModule';
 import { TransferLogModuleModel } from './models/transferLogModule';
 import { FunctionDeploymentModuleModel } from './models/functionDeploymentModule';
@@ -125,19 +127,21 @@ export function createClient(config: OrmClientConfig) {
     cryptoAuthModule: new CryptoAuthModuleModel(client),
     sessionsModule: new SessionsModuleModel(client),
     secureTableProvision: new SecureTableProvisionModel(client),
-    merkleStoreModule: new MerkleStoreModuleModel(client),
-    graphModule: new GraphModuleModel(client),
     databaseProvisionModule: new DatabaseProvisionModuleModel(client),
     configSecretsModule: new ConfigSecretsModuleModel(client),
+    graphModule: new GraphModuleModel(client),
+    merkleStoreModule: new MerkleStoreModuleModel(client),
     rateLimitMetersModule: new RateLimitMetersModuleModel(client),
     realtimeModule: new RealtimeModuleModel(client),
     webauthnAuthModule: new WebauthnAuthModuleModel(client),
     functionInvocationModule: new FunctionInvocationModuleModel(client),
     functionModule: new FunctionModuleModel(client),
     invitesModule: new InvitesModuleModel(client),
+    principalAuthModule: new PrincipalAuthModuleModel(client),
     computeLogModule: new ComputeLogModuleModel(client),
     inferenceLogModule: new InferenceLogModuleModel(client),
     namespaceModule: new NamespaceModuleModel(client),
+    resourceModule: new ResourceModuleModel(client),
     storageLogModule: new StorageLogModuleModel(client),
     transferLogModule: new TransferLogModuleModel(client),
     functionDeploymentModule: new FunctionDeploymentModuleModel(client),

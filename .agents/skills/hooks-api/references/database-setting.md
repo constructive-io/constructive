@@ -7,8 +7,8 @@ Database-wide feature flags and settings; controls which platform features are a
 ## Usage
 
 ```typescript
-useDatabaseSettingsQuery({ selection: { fields: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true } } })
-useDatabaseSettingQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true } } })
+useDatabaseSettingsQuery({ selection: { fields: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true, labels: true, annotations: true } } })
+useDatabaseSettingQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true, labels: true, annotations: true } } })
 useCreateDatabaseSettingMutation({ selection: { fields: { id: true } } })
 useUpdateDatabaseSettingMutation({ selection: { fields: { id: true } } })
 useDeleteDatabaseSettingMutation({})
@@ -20,7 +20,7 @@ useDeleteDatabaseSettingMutation({})
 
 ```typescript
 const { data, isLoading } = useDatabaseSettingsQuery({
-  selection: { fields: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true } },
+  selection: { fields: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true, labels: true, annotations: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDatabaseSettingsQuery({
 const { mutate } = useCreateDatabaseSettingMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', enableBulk: '<Boolean>', enableI18N: '<Boolean>', options: '<JSON>' });
+mutate({ databaseId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', enableBulk: '<Boolean>', enableI18N: '<Boolean>', options: '<JSON>', labels: '<JSON>', annotations: '<JSON>' });
 ```

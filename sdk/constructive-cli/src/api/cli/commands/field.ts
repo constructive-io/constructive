@@ -35,7 +35,6 @@ const fieldSchema: FieldSchema = {
   max: 'float',
   tags: 'string',
   category: 'string',
-  scope: 'int',
   createdAt: 'string',
   updatedAt: 'string',
 };
@@ -109,7 +108,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       max: true,
       tags: true,
       category: true,
-      scope: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -151,7 +149,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       max: true,
       tags: true,
       category: true,
-      scope: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -205,7 +202,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           max: true,
           tags: true,
           category: true,
-          scope: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -346,13 +342,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'scope',
-        message: 'scope',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateFieldInput['field'];
@@ -378,7 +367,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           max: cleanedData.max,
           tags: cleanedData.tags,
           category: cleanedData.category,
-          scope: cleanedData.scope,
         },
         select: {
           id: true,
@@ -400,7 +388,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           max: true,
           tags: true,
           category: true,
-          scope: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -547,13 +534,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'scope',
-        message: 'scope',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as FieldPatch;
@@ -582,7 +562,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           max: cleanedData.max,
           tags: cleanedData.tags,
           category: cleanedData.category,
-          scope: cleanedData.scope,
         },
         select: {
           id: true,
@@ -604,7 +583,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           max: true,
           tags: true,
           category: true,
-          scope: true,
           createdAt: true,
           updatedAt: true,
         },

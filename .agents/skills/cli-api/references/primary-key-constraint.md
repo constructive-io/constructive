@@ -12,8 +12,8 @@ csdk primary-key-constraint list --where.<field>.<op> <value> --orderBy <values>
 csdk primary-key-constraint list --limit 10 --after <cursor>
 csdk primary-key-constraint find-first --where.<field>.<op> <value>
 csdk primary-key-constraint get --id <UUID>
-csdk primary-key-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
-csdk primary-key-constraint update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--type <String>] [--fieldIds <UUID>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk primary-key-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
+csdk primary-key-constraint update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--type <String>] [--fieldIds <UUID>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
 csdk primary-key-constraint delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk primary-key-constraint list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a primaryKeyConstraint
 
 ```bash
-csdk primary-key-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--tags <String>]
+csdk primary-key-constraint create --tableId <UUID> --fieldIds <UUID> [--databaseId <UUID>] [--name <String>] [--type <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
 ```
 
 ### Get a primaryKeyConstraint by id

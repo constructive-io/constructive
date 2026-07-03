@@ -292,6 +292,38 @@ export interface FunctionDeployment {
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
 }
+/** Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace */
+export interface Resource {
+  id: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
+  namespaceId?: string | null;
+  /** Resource kind: Deployment, StatefulSet, Service, Ingress, Certificate */
+  kind?: string | null;
+  /** Human-readable resource name */
+  name?: string | null;
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug?: string | null;
+  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
+  spec?: Record<string, unknown> | null;
+  /** Resource lifecycle status: pending, provisioning, active, failed, draining, deleting */
+  status?: string | null;
+  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
+  statusObserved?: Record<string, unknown> | null;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string | null;
+  /** Cumulative error count for this resource */
+  errorCount?: number | null;
+  /** Key/value pairs for selecting and filtering resources */
+  labels?: Record<string, unknown> | null;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+}
 /** Branch heads — mutable pointers into the commit chain */
 export interface FunctionGraphRef {
   /** Unique ref identifier */
@@ -371,6 +403,25 @@ export interface OrgFunctionExecutionLog {
   /** User who triggered the execution (NULL for system/cron) */
   actorId?: string | null;
 }
+/** Resource lifecycle events — audit log of provisioning, updates, and failure events */
+export interface ResourceEvent {
+  /** Event timestamp (partition key) */
+  createdAt?: string | null;
+  /** Unique event identifier */
+  id: string;
+  /** Resource this event belongs to */
+  resourceId?: string | null;
+  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
+  eventType?: string | null;
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string | null;
+  /** Human-readable description of the event */
+  message?: string | null;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: Record<string, unknown> | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+}
 /** Content-addressed store for execution outputs — hash-referenced from node_outputs */
 export interface FunctionGraphExecutionOutput {
   /** Timestamp of output creation */
@@ -444,6 +495,33 @@ export interface FunctionExecutionLog {
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
 }
+/** Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store */
+export interface FunctionGraph {
+  /** Unique graph identifier */
+  id: string;
+  /** Database scope for multi-tenant isolation */
+  databaseId?: string | null;
+  /** Graph store (Merkle store) holding the graph definition */
+  storeId?: string | null;
+  /** Evaluator/runtime context (function, js, sql, system) */
+  context?: string | null;
+  /** Graph name (unique per database) */
+  name?: string | null;
+  /** Human-readable description of the graph */
+  description?: string | null;
+  /** Pinned definitions store commit for deterministic evaluation */
+  definitionsCommitId?: string | null;
+  /** Whether graph passes structural validation */
+  isValid?: boolean | null;
+  /** Array of validation error objects when is_valid = false */
+  validationErrors?: Record<string, unknown> | null;
+  /** Actor who created this graph */
+  createdBy?: string | null;
+  /** Timestamp of graph creation */
+  createdAt?: string | null;
+  /** Timestamp of last modification */
+  updatedAt?: string | null;
+}
 /** Per-node execution state — tracks individual node lifecycle for debugging */
 export interface FunctionGraphExecutionNodeState {
   /** Timestamp of node state creation (partition key) */
@@ -471,34 +549,31 @@ export interface FunctionGraphExecutionNodeState {
   /** FK to execution_outputs — content-addressed output blob for this node */
   outputId?: string | null;
 }
-/** Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store */
-export interface FunctionGraph {
-  /** Unique graph identifier */
+/** Logical namespace containers for grouping secrets, config, functions, and other resources */
+export interface PlatformNamespace {
   id: string;
-  /** Database scope for multi-tenant isolation */
-  databaseId?: string | null;
-  /** Graph store (Merkle store) holding the graph definition */
-  storeId?: string | null;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string | null;
-  /** Evaluator/runtime context (function, js, sql, system) */
-  context?: string | null;
-  /** Graph name (unique per database) */
-  name?: string | null;
-  /** Human-readable description of the graph */
-  description?: string | null;
-  /** Pinned definitions store commit for deterministic evaluation */
-  definitionsCommitId?: string | null;
-  /** Whether graph passes structural validation */
-  isValid?: boolean | null;
-  /** Array of validation error objects when is_valid = false */
-  validationErrors?: Record<string, unknown> | null;
-  /** Actor who created this graph */
-  createdBy?: string | null;
-  /** Timestamp of graph creation */
   createdAt?: string | null;
-  /** Timestamp of last modification */
   updatedAt?: string | null;
+  /** Human-readable namespace name (e.g. default, production, oauth) */
+  name?: string | null;
+  /** Globally unique computed namespace identifier via inflection.underscore */
+  namespaceName?: string | null;
+  /** Optional human-readable description of this namespace */
+  description?: string | null;
+  /** Whether this namespace is active (soft-disable for filtering) */
+  isActive?: boolean | null;
+  /** Key/value pairs for selecting and filtering namespaces */
+  labels?: Record<string, unknown> | null;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  /** Database that created this namespace (NULL for platform-native namespaces) */
+  sourceDatabaseId?: string | null;
+  /** Origin scope: platform, org, app — indicates where this namespace was created */
+  sourceScope?: string | null;
+  /** true = created by a child scope mirror trigger, false = platform-native */
+  isManaged?: boolean | null;
 }
 /** Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. */
 export interface OrgFunctionInvocation {
@@ -564,6 +639,39 @@ export interface FunctionInvocation {
   /** Groups all node invocations from a single flow graph execution */
   graphExecutionId?: string | null;
 }
+/** Namespace lifecycle events — audit log of creation, activation, deactivation, label changes */
+export interface PlatformNamespaceEvent {
+  /** Event timestamp (partition key) */
+  createdAt?: string | null;
+  /** Unique event identifier */
+  id: string;
+  /** Namespace this event belongs to */
+  namespaceId?: string | null;
+  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
+  eventType?: string | null;
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string | null;
+  /** Human-readable description of the event */
+  message?: string | null;
+  /** Structured context (old/new values, labels diff, etc.) */
+  metadata?: Record<string, unknown> | null;
+  /** CPU usage in millicores at time of event */
+  cpuMillicores?: number | null;
+  /** Memory usage in bytes at time of event */
+  memoryBytes?: string | null;
+  /** Storage usage in bytes at time of event */
+  storageBytes?: string | null;
+  /** Network ingress in bytes during event window */
+  networkIngressBytes?: string | null;
+  /** Network egress in bytes during event window */
+  networkEgressBytes?: string | null;
+  /** Number of active pods in the namespace at time of event */
+  podCount?: number | null;
+  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
+  metrics?: Record<string, unknown> | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+}
 /** Ephemeral execution state for flow graph evaluation */
 export interface FunctionGraphExecution {
   /** Execution start timestamp */
@@ -576,8 +684,6 @@ export interface FunctionGraphExecution {
   invocationId?: string | null;
   /** Scope for multi-tenant isolation */
   databaseId?: string | null;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string | null;
   /** Target output boundary node name to resolve */
   outputNode?: string | null;
   /** Target output port name (default: value) */
@@ -692,20 +798,30 @@ export interface FunctionApiBindingRelations {
 }
 export interface FunctionDeploymentRelations {
   functionDefinition?: FunctionDefinition | null;
+  namespace?: PlatformNamespace | null;
+}
+export interface ResourceRelations {
+  namespace?: PlatformNamespace | null;
 }
 export interface FunctionGraphRefRelations {}
 export interface FunctionGraphStoreRelations {}
 export interface FunctionGraphObjectRelations {}
 export interface FunctionDeploymentEventRelations {}
 export interface OrgFunctionExecutionLogRelations {}
+export interface ResourceEventRelations {}
 export interface FunctionGraphExecutionOutputRelations {}
 export interface FunctionGraphCommitRelations {}
 export interface SecretDefinitionRelations {}
 export interface FunctionExecutionLogRelations {}
-export interface FunctionGraphExecutionNodeStateRelations {}
 export interface FunctionGraphRelations {}
+export interface FunctionGraphExecutionNodeStateRelations {}
+export interface PlatformNamespaceRelations {
+  functionDeploymentsByNamespaceId?: ConnectionResult<FunctionDeployment>;
+  resourcesByNamespaceId?: ConnectionResult<Resource>;
+}
 export interface OrgFunctionInvocationRelations {}
 export interface FunctionInvocationRelations {}
+export interface PlatformNamespaceEventRelations {}
 export interface FunctionGraphExecutionRelations {
   graph?: FunctionGraph | null;
 }
@@ -717,6 +833,7 @@ export interface FunctionDefinitionRelations {
 export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type FunctionApiBindingWithRelations = FunctionApiBinding & FunctionApiBindingRelations;
 export type FunctionDeploymentWithRelations = FunctionDeployment & FunctionDeploymentRelations;
+export type ResourceWithRelations = Resource & ResourceRelations;
 export type FunctionGraphRefWithRelations = FunctionGraphRef & FunctionGraphRefRelations;
 export type FunctionGraphStoreWithRelations = FunctionGraphStore & FunctionGraphStoreRelations;
 export type FunctionGraphObjectWithRelations = FunctionGraphObject & FunctionGraphObjectRelations;
@@ -724,18 +841,22 @@ export type FunctionDeploymentEventWithRelations = FunctionDeploymentEvent &
   FunctionDeploymentEventRelations;
 export type OrgFunctionExecutionLogWithRelations = OrgFunctionExecutionLog &
   OrgFunctionExecutionLogRelations;
+export type ResourceEventWithRelations = ResourceEvent & ResourceEventRelations;
 export type FunctionGraphExecutionOutputWithRelations = FunctionGraphExecutionOutput &
   FunctionGraphExecutionOutputRelations;
 export type FunctionGraphCommitWithRelations = FunctionGraphCommit & FunctionGraphCommitRelations;
 export type SecretDefinitionWithRelations = SecretDefinition & SecretDefinitionRelations;
 export type FunctionExecutionLogWithRelations = FunctionExecutionLog &
   FunctionExecutionLogRelations;
+export type FunctionGraphWithRelations = FunctionGraph & FunctionGraphRelations;
 export type FunctionGraphExecutionNodeStateWithRelations = FunctionGraphExecutionNodeState &
   FunctionGraphExecutionNodeStateRelations;
-export type FunctionGraphWithRelations = FunctionGraph & FunctionGraphRelations;
+export type PlatformNamespaceWithRelations = PlatformNamespace & PlatformNamespaceRelations;
 export type OrgFunctionInvocationWithRelations = OrgFunctionInvocation &
   OrgFunctionInvocationRelations;
 export type FunctionInvocationWithRelations = FunctionInvocation & FunctionInvocationRelations;
+export type PlatformNamespaceEventWithRelations = PlatformNamespaceEvent &
+  PlatformNamespaceEventRelations;
 export type FunctionGraphExecutionWithRelations = FunctionGraphExecution &
   FunctionGraphExecutionRelations;
 export type FunctionDefinitionWithRelations = FunctionDefinition & FunctionDefinitionRelations;
@@ -778,6 +899,31 @@ export type FunctionDeploymentSelect = {
   databaseId?: boolean;
   functionDefinition?: {
     select: FunctionDefinitionSelect;
+  };
+  namespace?: {
+    select: PlatformNamespaceSelect;
+  };
+};
+export type ResourceSelect = {
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  createdBy?: boolean;
+  updatedBy?: boolean;
+  namespaceId?: boolean;
+  kind?: boolean;
+  name?: boolean;
+  slug?: boolean;
+  spec?: boolean;
+  status?: boolean;
+  statusObserved?: boolean;
+  lastError?: boolean;
+  errorCount?: boolean;
+  labels?: boolean;
+  annotations?: boolean;
+  databaseId?: boolean;
+  namespace?: {
+    select: PlatformNamespaceSelect;
   };
 };
 export type FunctionGraphRefSelect = {
@@ -822,6 +968,16 @@ export type OrgFunctionExecutionLogSelect = {
   metadata?: boolean;
   actorId?: boolean;
 };
+export type ResourceEventSelect = {
+  createdAt?: boolean;
+  id?: boolean;
+  resourceId?: boolean;
+  eventType?: boolean;
+  actorId?: boolean;
+  message?: boolean;
+  metadata?: boolean;
+  databaseId?: boolean;
+};
 export type FunctionGraphExecutionOutputSelect = {
   createdAt?: boolean;
   id?: boolean;
@@ -862,6 +1018,20 @@ export type FunctionExecutionLogSelect = {
   actorId?: boolean;
   databaseId?: boolean;
 };
+export type FunctionGraphSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  storeId?: boolean;
+  context?: boolean;
+  name?: boolean;
+  description?: boolean;
+  definitionsCommitId?: boolean;
+  isValid?: boolean;
+  validationErrors?: boolean;
+  createdBy?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+};
 export type FunctionGraphExecutionNodeStateSelect = {
   createdAt?: boolean;
   id?: boolean;
@@ -876,20 +1046,32 @@ export type FunctionGraphExecutionNodeStateSelect = {
   errorMessage?: boolean;
   outputId?: boolean;
 };
-export type FunctionGraphSelect = {
+export type PlatformNamespaceSelect = {
   id?: boolean;
-  databaseId?: boolean;
-  storeId?: boolean;
-  entityId?: boolean;
-  context?: boolean;
-  name?: boolean;
-  description?: boolean;
-  definitionsCommitId?: boolean;
-  isValid?: boolean;
-  validationErrors?: boolean;
-  createdBy?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
+  name?: boolean;
+  namespaceName?: boolean;
+  description?: boolean;
+  isActive?: boolean;
+  labels?: boolean;
+  annotations?: boolean;
+  databaseId?: boolean;
+  sourceDatabaseId?: boolean;
+  sourceScope?: boolean;
+  isManaged?: boolean;
+  functionDeploymentsByNamespaceId?: {
+    select: FunctionDeploymentSelect;
+    first?: number;
+    filter?: FunctionDeploymentFilter;
+    orderBy?: FunctionDeploymentOrderBy[];
+  };
+  resourcesByNamespaceId?: {
+    select: ResourceSelect;
+    first?: number;
+    filter?: ResourceFilter;
+    orderBy?: ResourceOrderBy[];
+  };
 };
 export type OrgFunctionInvocationSelect = {
   createdAt?: boolean;
@@ -924,13 +1106,29 @@ export type FunctionInvocationSelect = {
   parentInvocationId?: boolean;
   graphExecutionId?: boolean;
 };
+export type PlatformNamespaceEventSelect = {
+  createdAt?: boolean;
+  id?: boolean;
+  namespaceId?: boolean;
+  eventType?: boolean;
+  actorId?: boolean;
+  message?: boolean;
+  metadata?: boolean;
+  cpuMillicores?: boolean;
+  memoryBytes?: boolean;
+  storageBytes?: boolean;
+  networkIngressBytes?: boolean;
+  networkEgressBytes?: boolean;
+  podCount?: boolean;
+  metrics?: boolean;
+  databaseId?: boolean;
+};
 export type FunctionGraphExecutionSelect = {
   startedAt?: boolean;
   id?: boolean;
   graphId?: boolean;
   invocationId?: boolean;
   databaseId?: boolean;
-  entityId?: boolean;
   outputNode?: boolean;
   outputPort?: boolean;
   status?: boolean;
@@ -1075,6 +1273,52 @@ export interface FunctionDeploymentFilter {
   not?: FunctionDeploymentFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: FunctionDefinitionFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+}
+export interface ResourceFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `spec` field. */
+  spec?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `statusObserved` field. */
+  statusObserved?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ResourceFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ResourceFilter[];
+  /** Negates the expression. */
+  not?: ResourceFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
 }
 export interface FunctionGraphRefFilter {
   /** Filter by the object’s `id` field. */
@@ -1180,6 +1424,30 @@ export interface OrgFunctionExecutionLogFilter {
   /** Negates the expression. */
   not?: OrgFunctionExecutionLogFilter;
 }
+export interface ResourceEventFilter {
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `resourceId` field. */
+  resourceId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ResourceEventFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ResourceEventFilter[];
+  /** Negates the expression. */
+  not?: ResourceEventFilter;
+}
 export interface FunctionGraphExecutionOutputFilter {
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
@@ -1276,6 +1544,38 @@ export interface FunctionExecutionLogFilter {
   /** Negates the expression. */
   not?: FunctionExecutionLogFilter;
 }
+export interface FunctionGraphFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `context` field. */
+  context?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `definitionsCommitId` field. */
+  definitionsCommitId?: UUIDFilter;
+  /** Filter by the object’s `isValid` field. */
+  isValid?: BooleanFilter;
+  /** Filter by the object’s `validationErrors` field. */
+  validationErrors?: JSONFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionGraphFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FunctionGraphFilter[];
+  /** Negates the expression. */
+  not?: FunctionGraphFilter;
+}
 export interface FunctionGraphExecutionNodeStateFilter {
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
@@ -1308,39 +1608,47 @@ export interface FunctionGraphExecutionNodeStateFilter {
   /** Negates the expression. */
   not?: FunctionGraphExecutionNodeStateFilter;
 }
-export interface FunctionGraphFilter {
+export interface PlatformNamespaceFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `context` field. */
-  context?: StringFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `definitionsCommitId` field. */
-  definitionsCommitId?: UUIDFilter;
-  /** Filter by the object’s `isValid` field. */
-  isValid?: BooleanFilter;
-  /** Filter by the object’s `validationErrors` field. */
-  validationErrors?: JSONFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceName` field. */
+  namespaceName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `sourceDatabaseId` field. */
+  sourceDatabaseId?: UUIDFilter;
+  /** Filter by the object’s `sourceScope` field. */
+  sourceScope?: StringFilter;
+  /** Filter by the object’s `isManaged` field. */
+  isManaged?: BooleanFilter;
   /** Checks for all expressions in this list. */
-  and?: FunctionGraphFilter[];
+  and?: PlatformNamespaceFilter[];
   /** Checks for any expressions in this list. */
-  or?: FunctionGraphFilter[];
+  or?: PlatformNamespaceFilter[];
   /** Negates the expression. */
-  not?: FunctionGraphFilter;
+  not?: PlatformNamespaceFilter;
+  /** Filter by the object’s `functionDeploymentsByNamespaceId` relation. */
+  functionDeploymentsByNamespaceId?: PlatformNamespaceToManyFunctionDeploymentFilter;
+  /** `functionDeploymentsByNamespaceId` exist. */
+  functionDeploymentsByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `resourcesByNamespaceId` relation. */
+  resourcesByNamespaceId?: PlatformNamespaceToManyResourceFilter;
+  /** `resourcesByNamespaceId` exist. */
+  resourcesByNamespaceIdExist?: boolean;
 }
 export interface OrgFunctionInvocationFilter {
   /** Filter by the object’s `createdAt` field. */
@@ -1416,6 +1724,44 @@ export interface FunctionInvocationFilter {
   /** Negates the expression. */
   not?: FunctionInvocationFilter;
 }
+export interface PlatformNamespaceEventFilter {
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `cpuMillicores` field. */
+  cpuMillicores?: IntFilter;
+  /** Filter by the object’s `memoryBytes` field. */
+  memoryBytes?: BigIntFilter;
+  /** Filter by the object’s `storageBytes` field. */
+  storageBytes?: BigIntFilter;
+  /** Filter by the object’s `networkIngressBytes` field. */
+  networkIngressBytes?: BigIntFilter;
+  /** Filter by the object’s `networkEgressBytes` field. */
+  networkEgressBytes?: BigIntFilter;
+  /** Filter by the object’s `podCount` field. */
+  podCount?: IntFilter;
+  /** Filter by the object’s `metrics` field. */
+  metrics?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformNamespaceEventFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PlatformNamespaceEventFilter[];
+  /** Negates the expression. */
+  not?: PlatformNamespaceEventFilter;
+}
 export interface FunctionGraphExecutionFilter {
   /** Filter by the object’s `startedAt` field. */
   startedAt?: DatetimeFilter;
@@ -1427,8 +1773,6 @@ export interface FunctionGraphExecutionFilter {
   invocationId?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
   /** Filter by the object’s `outputNode` field. */
   outputNode?: StringFilter;
   /** Filter by the object’s `outputPort` field. */
@@ -1613,6 +1957,44 @@ export type FunctionDeploymentOrderBy =
   | 'ANNOTATIONS_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC';
+export type ResourceOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SPEC_ASC'
+  | 'SPEC_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'STATUS_OBSERVED_ASC'
+  | 'STATUS_OBSERVED_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'ERROR_COUNT_ASC'
+  | 'ERROR_COUNT_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
 export type FunctionGraphRefOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1697,6 +2079,26 @@ export type OrgFunctionExecutionLogOrderBy =
   | 'METADATA_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC';
+export type ResourceEventOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'RESOURCE_ID_ASC'
+  | 'RESOURCE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
 export type FunctionGraphExecutionOutputOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1777,6 +2179,34 @@ export type FunctionExecutionLogOrderBy =
   | 'ACTOR_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC';
+export type FunctionGraphOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'CONTEXT_ASC'
+  | 'CONTEXT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DEFINITIONS_COMMIT_ID_ASC'
+  | 'DEFINITIONS_COMMIT_ID_DESC'
+  | 'IS_VALID_ASC'
+  | 'IS_VALID_DESC'
+  | 'VALIDATION_ERRORS_ASC'
+  | 'VALIDATION_ERRORS_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type FunctionGraphExecutionNodeStateOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1805,36 +2235,36 @@ export type FunctionGraphExecutionNodeStateOrderBy =
   | 'ERROR_MESSAGE_DESC'
   | 'OUTPUT_ID_ASC'
   | 'OUTPUT_ID_DESC';
-export type FunctionGraphOrderBy =
+export type PlatformNamespaceOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'CONTEXT_ASC'
-  | 'CONTEXT_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DEFINITIONS_COMMIT_ID_ASC'
-  | 'DEFINITIONS_COMMIT_ID_DESC'
-  | 'IS_VALID_ASC'
-  | 'IS_VALID_DESC'
-  | 'VALIDATION_ERRORS_ASC'
-  | 'VALIDATION_ERRORS_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NAMESPACE_NAME_ASC'
+  | 'NAMESPACE_NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SOURCE_DATABASE_ID_ASC'
+  | 'SOURCE_DATABASE_ID_DESC'
+  | 'SOURCE_SCOPE_ASC'
+  | 'SOURCE_SCOPE_DESC'
+  | 'IS_MANAGED_ASC'
+  | 'IS_MANAGED_DESC';
 export type OrgFunctionInvocationOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1901,6 +2331,40 @@ export type FunctionInvocationOrderBy =
   | 'PARENT_INVOCATION_ID_DESC'
   | 'GRAPH_EXECUTION_ID_ASC'
   | 'GRAPH_EXECUTION_ID_DESC';
+export type PlatformNamespaceEventOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'CPU_MILLICORES_ASC'
+  | 'CPU_MILLICORES_DESC'
+  | 'MEMORY_BYTES_ASC'
+  | 'MEMORY_BYTES_DESC'
+  | 'STORAGE_BYTES_ASC'
+  | 'STORAGE_BYTES_DESC'
+  | 'NETWORK_INGRESS_BYTES_ASC'
+  | 'NETWORK_INGRESS_BYTES_DESC'
+  | 'NETWORK_EGRESS_BYTES_ASC'
+  | 'NETWORK_EGRESS_BYTES_DESC'
+  | 'POD_COUNT_ASC'
+  | 'POD_COUNT_DESC'
+  | 'METRICS_ASC'
+  | 'METRICS_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
 export type FunctionGraphExecutionOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1915,8 +2379,6 @@ export type FunctionGraphExecutionOrderBy =
   | 'INVOCATION_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
   | 'OUTPUT_NODE_ASC'
   | 'OUTPUT_NODE_DESC'
   | 'OUTPUT_PORT_ASC'
@@ -2112,6 +2574,50 @@ export interface DeleteFunctionDeploymentInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateResourceInput {
+  clientMutationId?: string;
+  resource: {
+    createdBy?: string;
+    updatedBy?: string;
+    namespaceId: string;
+    kind: string;
+    name: string;
+    slug: string;
+    spec?: Record<string, unknown>;
+    status?: string;
+    statusObserved?: Record<string, unknown>;
+    lastError?: string;
+    errorCount?: number;
+    labels?: Record<string, unknown>;
+    annotations?: Record<string, unknown>;
+    databaseId: string;
+  };
+}
+export interface ResourcePatch {
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  namespaceId?: string | null;
+  kind?: string | null;
+  name?: string | null;
+  slug?: string | null;
+  spec?: Record<string, unknown> | null;
+  status?: string | null;
+  statusObserved?: Record<string, unknown> | null;
+  lastError?: string | null;
+  errorCount?: number | null;
+  labels?: Record<string, unknown> | null;
+  annotations?: Record<string, unknown> | null;
+  databaseId?: string | null;
+}
+export interface UpdateResourceInput {
+  clientMutationId?: string;
+  id: string;
+  resourcePatch: ResourcePatch;
+}
+export interface DeleteResourceInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFunctionGraphRefInput {
   clientMutationId?: string;
   functionGraphRef: {
@@ -2238,6 +2744,34 @@ export interface DeleteOrgFunctionExecutionLogInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateResourceEventInput {
+  clientMutationId?: string;
+  resourceEvent: {
+    resourceId: string;
+    eventType: string;
+    actorId?: string;
+    message?: string;
+    metadata?: Record<string, unknown>;
+    databaseId: string;
+  };
+}
+export interface ResourceEventPatch {
+  resourceId?: string | null;
+  eventType?: string | null;
+  actorId?: string | null;
+  message?: string | null;
+  metadata?: Record<string, unknown> | null;
+  databaseId?: string | null;
+}
+export interface UpdateResourceEventInput {
+  clientMutationId?: string;
+  id: string;
+  resourceEventPatch: ResourceEventPatch;
+}
+export interface DeleteResourceEventInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFunctionGraphExecutionOutputInput {
   clientMutationId?: string;
   functionGraphExecutionOutput: {
@@ -2350,6 +2884,40 @@ export interface DeleteFunctionExecutionLogInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateFunctionGraphInput {
+  clientMutationId?: string;
+  functionGraph: {
+    databaseId: string;
+    storeId: string;
+    context?: string;
+    name?: string;
+    description?: string;
+    definitionsCommitId: string;
+    isValid?: boolean;
+    validationErrors?: Record<string, unknown>;
+    createdBy?: string;
+  };
+}
+export interface FunctionGraphPatch {
+  databaseId?: string | null;
+  storeId?: string | null;
+  context?: string | null;
+  name?: string | null;
+  description?: string | null;
+  definitionsCommitId?: string | null;
+  isValid?: boolean | null;
+  validationErrors?: Record<string, unknown> | null;
+  createdBy?: string | null;
+}
+export interface UpdateFunctionGraphInput {
+  clientMutationId?: string;
+  id: string;
+  functionGraphPatch: FunctionGraphPatch;
+}
+export interface DeleteFunctionGraphInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFunctionGraphExecutionNodeStateInput {
   clientMutationId?: string;
   functionGraphExecutionNodeState: {
@@ -2386,39 +2954,39 @@ export interface DeleteFunctionGraphExecutionNodeStateInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateFunctionGraphInput {
+export interface CreatePlatformNamespaceInput {
   clientMutationId?: string;
-  functionGraph: {
-    databaseId: string;
-    storeId: string;
-    entityId: string;
-    context?: string;
-    name?: string;
+  platformNamespace: {
+    name: string;
+    namespaceName: string;
     description?: string;
-    definitionsCommitId: string;
-    isValid?: boolean;
-    validationErrors?: Record<string, unknown>;
-    createdBy?: string;
+    isActive?: boolean;
+    labels?: Record<string, unknown>;
+    annotations?: Record<string, unknown>;
+    databaseId: string;
+    sourceDatabaseId?: string;
+    sourceScope?: string;
+    isManaged?: boolean;
   };
 }
-export interface FunctionGraphPatch {
-  databaseId?: string | null;
-  storeId?: string | null;
-  entityId?: string | null;
-  context?: string | null;
+export interface PlatformNamespacePatch {
   name?: string | null;
+  namespaceName?: string | null;
   description?: string | null;
-  definitionsCommitId?: string | null;
-  isValid?: boolean | null;
-  validationErrors?: Record<string, unknown> | null;
-  createdBy?: string | null;
+  isActive?: boolean | null;
+  labels?: Record<string, unknown> | null;
+  annotations?: Record<string, unknown> | null;
+  databaseId?: string | null;
+  sourceDatabaseId?: string | null;
+  sourceScope?: string | null;
+  isManaged?: boolean | null;
 }
-export interface UpdateFunctionGraphInput {
+export interface UpdatePlatformNamespaceInput {
   clientMutationId?: string;
   id: string;
-  functionGraphPatch: FunctionGraphPatch;
+  platformNamespacePatch: PlatformNamespacePatch;
 }
-export interface DeleteFunctionGraphInput {
+export interface DeletePlatformNamespaceInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2504,6 +3072,48 @@ export interface DeleteFunctionInvocationInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePlatformNamespaceEventInput {
+  clientMutationId?: string;
+  platformNamespaceEvent: {
+    namespaceId: string;
+    eventType: string;
+    actorId?: string;
+    message?: string;
+    metadata?: Record<string, unknown>;
+    cpuMillicores?: number;
+    memoryBytes?: string;
+    storageBytes?: string;
+    networkIngressBytes?: string;
+    networkEgressBytes?: string;
+    podCount?: number;
+    metrics?: Record<string, unknown>;
+    databaseId: string;
+  };
+}
+export interface PlatformNamespaceEventPatch {
+  namespaceId?: string | null;
+  eventType?: string | null;
+  actorId?: string | null;
+  message?: string | null;
+  metadata?: Record<string, unknown> | null;
+  cpuMillicores?: number | null;
+  memoryBytes?: string | null;
+  storageBytes?: string | null;
+  networkIngressBytes?: string | null;
+  networkEgressBytes?: string | null;
+  podCount?: number | null;
+  metrics?: Record<string, unknown> | null;
+  databaseId?: string | null;
+}
+export interface UpdatePlatformNamespaceEventInput {
+  clientMutationId?: string;
+  id: string;
+  platformNamespaceEventPatch: PlatformNamespaceEventPatch;
+}
+export interface DeletePlatformNamespaceEventInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateFunctionGraphExecutionInput {
   clientMutationId?: string;
   functionGraphExecution: {
@@ -2511,7 +3121,6 @@ export interface CreateFunctionGraphExecutionInput {
     graphId: string;
     invocationId?: string;
     databaseId: string;
-    entityId?: string;
     outputNode: string;
     outputPort?: string;
     status?: string;
@@ -2537,7 +3146,6 @@ export interface FunctionGraphExecutionPatch {
   graphId?: string | null;
   invocationId?: string | null;
   databaseId?: string | null;
-  entityId?: string | null;
   outputNode?: string | null;
   outputPort?: string | null;
   status?: string | null;
@@ -2636,6 +3244,10 @@ export interface DeleteFunctionDefinitionInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
+  PlatformNamespace: {
+    functionDeploymentsByNamespaceId: 'FunctionDeployment',
+    resourcesByNamespaceId: 'Resource',
+  },
   FunctionDefinition: {
     functionApiBindings: 'FunctionApiBinding',
     functionDeployments: 'FunctionDeployment',
@@ -2695,6 +3307,16 @@ export interface AddNodeAndSaveInput {
   meta?: Record<string, unknown>;
   message?: string;
 }
+export interface ImportGraphJsonInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  name?: string;
+  graphJson?: Record<string, unknown>;
+  context?: string;
+  description?: string;
+  createdBy?: string;
+  definitionsCommitId?: string;
+}
 export interface AddEdgeInput {
   clientMutationId?: string;
   databaseId?: string;
@@ -2716,17 +3338,6 @@ export interface AddNodeInput {
   graphName?: string;
   props?: Record<string, unknown>;
   meta?: Record<string, unknown>;
-}
-export interface ImportGraphJsonInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  name?: string;
-  graphJson?: Record<string, unknown>;
-  context?: string;
-  description?: string;
-  entityId?: string;
-  createdBy?: string;
-  definitionsCommitId?: string;
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
@@ -2774,6 +3385,24 @@ export interface Base64EncodedBinaryFilter {
   in?: Base64EncodedBinary[];
   /** Not included in the specified list. */
   notIn?: Base64EncodedBinary[];
+}
+/** A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyFunctionDeploymentFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FunctionDeploymentFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FunctionDeploymentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FunctionDeploymentFilter;
+}
+/** A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyResourceFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ResourceFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ResourceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ResourceFilter;
 }
 /** A filter to be used against many `FunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionDefinitionToManyFunctionApiBindingFilter {
@@ -2841,6 +3470,38 @@ export interface FunctionDeploymentInput {
   /** Cumulative error count for this deployment */
   errorCount?: number;
   /** Key/value pairs for selecting and filtering deployments */
+  labels?: Record<string, unknown>;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+}
+/** An input for mutations affecting `Resource` */
+export interface ResourceInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Namespace this resource belongs to (security boundary, maps to K8s namespace) */
+  namespaceId: string;
+  /** Resource kind: Deployment, StatefulSet, Service, Ingress, Certificate */
+  kind: string;
+  /** Human-readable resource name */
+  name: string;
+  /** URL-safe identifier, unique within (namespace_id, kind) */
+  slug: string;
+  /** Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s. */
+  spec?: Record<string, unknown>;
+  /** Resource lifecycle status: pending, provisioning, active, failed, draining, deleting */
+  status?: string;
+  /** Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.) */
+  statusObserved?: Record<string, unknown>;
+  /** Most recent provisioning or runtime error message */
+  lastError?: string;
+  /** Cumulative error count for this resource */
+  errorCount?: number;
+  /** Key/value pairs for selecting and filtering resources */
   labels?: Record<string, unknown>;
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown>;
@@ -2925,6 +3586,25 @@ export interface OrgFunctionExecutionLogInput {
   metadata?: Record<string, unknown>;
   /** User who triggered the execution (NULL for system/cron) */
   actorId?: string;
+}
+/** An input for mutations affecting `ResourceEvent` */
+export interface ResourceEventInput {
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Resource this event belongs to */
+  resourceId: string;
+  /** Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check */
+  eventType: string;
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, error details, etc.) */
+  metadata?: Record<string, unknown>;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
 }
 /** An input for mutations affecting `FunctionGraphExecutionOutput` */
 export interface FunctionGraphExecutionOutputInput {
@@ -3026,6 +3706,32 @@ export interface FunctionGraphExecutionNodeStateInput {
   /** FK to execution_outputs — content-addressed output blob for this node */
   outputId?: string;
 }
+/** An input for mutations affecting `PlatformNamespace` */
+export interface PlatformNamespaceInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** Human-readable namespace name (e.g. default, production, oauth) */
+  name: string;
+  /** Globally unique computed namespace identifier via inflection.underscore */
+  namespaceName: string;
+  /** Optional human-readable description of this namespace */
+  description?: string;
+  /** Whether this namespace is active (soft-disable for filtering) */
+  isActive?: boolean;
+  /** Key/value pairs for selecting and filtering namespaces */
+  labels?: Record<string, unknown>;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Database that created this namespace (NULL for platform-native namespaces) */
+  sourceDatabaseId?: string;
+  /** Origin scope: platform, org, app — indicates where this namespace was created */
+  sourceScope?: string;
+  /** true = created by a child scope mirror trigger, false = platform-native */
+  isManaged?: boolean;
+}
 /** An input for mutations affecting `OrgFunctionInvocation` */
 export interface OrgFunctionInvocationInput {
   /** Invocation creation timestamp (partition key) */
@@ -3090,6 +3796,39 @@ export interface FunctionInvocationInput {
   /** Groups all node invocations from a single flow graph execution */
   graphExecutionId?: string;
 }
+/** An input for mutations affecting `PlatformNamespaceEvent` */
+export interface PlatformNamespaceEventInput {
+  /** Event timestamp (partition key) */
+  createdAt?: string;
+  /** Unique event identifier */
+  id?: string;
+  /** Namespace this event belongs to */
+  namespaceId: string;
+  /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
+  eventType: string;
+  /** User who triggered this event (NULL for system/automated) */
+  actorId?: string;
+  /** Human-readable description of the event */
+  message?: string;
+  /** Structured context (old/new values, labels diff, etc.) */
+  metadata?: Record<string, unknown>;
+  /** CPU usage in millicores at time of event */
+  cpuMillicores?: number;
+  /** Memory usage in bytes at time of event */
+  memoryBytes?: string;
+  /** Storage usage in bytes at time of event */
+  storageBytes?: string;
+  /** Network ingress in bytes during event window */
+  networkIngressBytes?: string;
+  /** Network egress in bytes during event window */
+  networkEgressBytes?: string;
+  /** Number of active pods in the namespace at time of event */
+  podCount?: number;
+  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
+  metrics?: Record<string, unknown>;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+}
 /** An input for mutations affecting `FunctionGraphExecution` */
 export interface FunctionGraphExecutionInput {
   /** Execution start timestamp */
@@ -3102,8 +3841,6 @@ export interface FunctionGraphExecutionInput {
   invocationId?: string;
   /** Scope for multi-tenant isolation */
   databaseId: string;
-  /** Entity context (org/team) for scoped billing */
-  entityId?: string;
   /** Target output boundary node name to resolve */
   outputNode: string;
   /** Target output port name (default: value) */
@@ -3223,27 +3960,6 @@ export interface IntervalInput {
   /** A quantity of years. */
   years?: number;
 }
-/** A filter to be used against `FunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface FunctionApiBindingFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `functionDefinitionId` field. */
-  functionDefinitionId?: UUIDFilter;
-  /** Filter by the object’s `apiId` field. */
-  apiId?: UUIDFilter;
-  /** Filter by the object’s `alias` field. */
-  alias?: StringFilter;
-  /** Filter by the object’s `config` field. */
-  config?: JSONFilter;
-  /** Checks for all expressions in this list. */
-  and?: FunctionApiBindingFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FunctionApiBindingFilter[];
-  /** Negates the expression. */
-  not?: FunctionApiBindingFilter;
-  /** Filter by the object’s `functionDefinition` relation. */
-  functionDefinition?: FunctionDefinitionFilter;
-}
 /** A filter to be used against `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionDeploymentFilter {
   /** Filter by the object’s `id` field. */
@@ -3296,9 +4012,102 @@ export interface FunctionDeploymentFilter {
   not?: FunctionDeploymentFilter;
   /** Filter by the object’s `functionDefinition` relation. */
   functionDefinition?: FunctionDefinitionFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+}
+/** A filter to be used against `Resource` object types. All fields are combined with a logical ‘and.’ */
+export interface ResourceFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `spec` field. */
+  spec?: JSONFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `statusObserved` field. */
+  statusObserved?: JSONFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `errorCount` field. */
+  errorCount?: IntFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ResourceFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ResourceFilter[];
+  /** Negates the expression. */
+  not?: ResourceFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+}
+/** A filter to be used against `FunctionApiBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionApiBindingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `functionDefinitionId` field. */
+  functionDefinitionId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `alias` field. */
+  alias?: StringFilter;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: FunctionApiBindingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FunctionApiBindingFilter[];
+  /** Negates the expression. */
+  not?: FunctionApiBindingFilter;
+  /** Filter by the object’s `functionDefinition` relation. */
+  functionDefinition?: FunctionDefinitionFilter;
 }
 /** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
 export interface UUIDFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
   isNull?: boolean;
   /** Equal to the specified value. */
@@ -3398,6 +4207,31 @@ export interface StringFilter {
   greaterThanInsensitive?: string;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
+export interface IntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
 }
 /** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
 export interface JSONFilter {
@@ -3505,55 +4339,48 @@ export interface FunctionDefinitionFilter {
   /** `functionDeployments` exist. */
   functionDeploymentsExist?: boolean;
 }
-/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
-export interface DatetimeFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-}
-/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
-export interface IntFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: number;
-  /** Not equal to the specified value. */
-  notEqualTo?: number;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: number;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: number;
-  /** Included in the specified list. */
-  in?: number[];
-  /** Not included in the specified list. */
-  notIn?: number[];
-  /** Less than the specified value. */
-  lessThan?: number;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: number;
-  /** Greater than the specified value. */
-  greaterThan?: number;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: number;
+/** A filter to be used against `PlatformNamespace` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `namespaceName` field. */
+  namespaceName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `sourceDatabaseId` field. */
+  sourceDatabaseId?: UUIDFilter;
+  /** Filter by the object’s `sourceScope` field. */
+  sourceScope?: StringFilter;
+  /** Filter by the object’s `isManaged` field. */
+  isManaged?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformNamespaceFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PlatformNamespaceFilter[];
+  /** Negates the expression. */
+  not?: PlatformNamespaceFilter;
+  /** Filter by the object’s `functionDeploymentsByNamespaceId` relation. */
+  functionDeploymentsByNamespaceId?: PlatformNamespaceToManyFunctionDeploymentFilter;
+  /** `functionDeploymentsByNamespaceId` exist. */
+  functionDeploymentsByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `resourcesByNamespaceId` relation. */
+  resourcesByNamespaceId?: PlatformNamespaceToManyResourceFilter;
+  /** `resourcesByNamespaceId` exist. */
+  resourcesByNamespaceIdExist?: boolean;
 }
 /** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
 export interface BooleanFilter {
@@ -3680,6 +4507,14 @@ export type AddNodeAndSavePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface ImportGraphJsonPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type ImportGraphJsonPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface AddEdgePayload {
   clientMutationId?: string | null;
   result?: string | null;
@@ -3693,14 +4528,6 @@ export interface AddNodePayload {
   result?: string | null;
 }
 export type AddNodePayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface ImportGraphJsonPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type ImportGraphJsonPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -3830,6 +4657,51 @@ export type DeleteFunctionDeploymentPayloadSelect = {
   };
   functionDeploymentEdge?: {
     select: FunctionDeploymentEdgeSelect;
+  };
+};
+export interface CreateResourcePayload {
+  clientMutationId?: string | null;
+  /** The `Resource` that was created by this mutation. */
+  resource?: Resource | null;
+  resourceEdge?: ResourceEdge | null;
+}
+export type CreateResourcePayloadSelect = {
+  clientMutationId?: boolean;
+  resource?: {
+    select: ResourceSelect;
+  };
+  resourceEdge?: {
+    select: ResourceEdgeSelect;
+  };
+};
+export interface UpdateResourcePayload {
+  clientMutationId?: string | null;
+  /** The `Resource` that was updated by this mutation. */
+  resource?: Resource | null;
+  resourceEdge?: ResourceEdge | null;
+}
+export type UpdateResourcePayloadSelect = {
+  clientMutationId?: boolean;
+  resource?: {
+    select: ResourceSelect;
+  };
+  resourceEdge?: {
+    select: ResourceEdgeSelect;
+  };
+};
+export interface DeleteResourcePayload {
+  clientMutationId?: string | null;
+  /** The `Resource` that was deleted by this mutation. */
+  resource?: Resource | null;
+  resourceEdge?: ResourceEdge | null;
+}
+export type DeleteResourcePayloadSelect = {
+  clientMutationId?: boolean;
+  resource?: {
+    select: ResourceSelect;
+  };
+  resourceEdge?: {
+    select: ResourceEdgeSelect;
   };
 };
 export interface CreateFunctionGraphRefPayload {
@@ -4057,6 +4929,51 @@ export type DeleteOrgFunctionExecutionLogPayloadSelect = {
     select: OrgFunctionExecutionLogEdgeSelect;
   };
 };
+export interface CreateResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceEvent` that was created by this mutation. */
+  resourceEvent?: ResourceEvent | null;
+  resourceEventEdge?: ResourceEventEdge | null;
+}
+export type CreateResourceEventPayloadSelect = {
+  clientMutationId?: boolean;
+  resourceEvent?: {
+    select: ResourceEventSelect;
+  };
+  resourceEventEdge?: {
+    select: ResourceEventEdgeSelect;
+  };
+};
+export interface UpdateResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceEvent` that was updated by this mutation. */
+  resourceEvent?: ResourceEvent | null;
+  resourceEventEdge?: ResourceEventEdge | null;
+}
+export type UpdateResourceEventPayloadSelect = {
+  clientMutationId?: boolean;
+  resourceEvent?: {
+    select: ResourceEventSelect;
+  };
+  resourceEventEdge?: {
+    select: ResourceEventEdgeSelect;
+  };
+};
+export interface DeleteResourceEventPayload {
+  clientMutationId?: string | null;
+  /** The `ResourceEvent` that was deleted by this mutation. */
+  resourceEvent?: ResourceEvent | null;
+  resourceEventEdge?: ResourceEventEdge | null;
+}
+export type DeleteResourceEventPayloadSelect = {
+  clientMutationId?: boolean;
+  resourceEvent?: {
+    select: ResourceEventSelect;
+  };
+  resourceEventEdge?: {
+    select: ResourceEventEdgeSelect;
+  };
+};
 export interface CreateFunctionGraphExecutionOutputPayload {
   clientMutationId?: string | null;
   /** The `FunctionGraphExecutionOutput` that was created by this mutation. */
@@ -4237,6 +5154,44 @@ export type DeleteFunctionExecutionLogPayloadSelect = {
     select: FunctionExecutionLogEdgeSelect;
   };
 };
+export interface CreateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CreateFunctionGraphPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface UpdateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraph` that was updated by this mutation. */
+  functionGraph?: FunctionGraph | null;
+  functionGraphEdge?: FunctionGraphEdge | null;
+}
+export type UpdateFunctionGraphPayloadSelect = {
+  clientMutationId?: boolean;
+  functionGraph?: {
+    select: FunctionGraphSelect;
+  };
+  functionGraphEdge?: {
+    select: FunctionGraphEdgeSelect;
+  };
+};
+export interface DeleteFunctionGraphPayload {
+  clientMutationId?: string | null;
+  /** The `FunctionGraph` that was deleted by this mutation. */
+  functionGraph?: FunctionGraph | null;
+  functionGraphEdge?: FunctionGraphEdge | null;
+}
+export type DeleteFunctionGraphPayloadSelect = {
+  clientMutationId?: boolean;
+  functionGraph?: {
+    select: FunctionGraphSelect;
+  };
+  functionGraphEdge?: {
+    select: FunctionGraphEdgeSelect;
+  };
+};
 export interface CreateFunctionGraphExecutionNodeStatePayload {
   clientMutationId?: string | null;
   /** The `FunctionGraphExecutionNodeState` that was created by this mutation. */
@@ -4282,42 +5237,49 @@ export type DeleteFunctionGraphExecutionNodeStatePayloadSelect = {
     select: FunctionGraphExecutionNodeStateEdgeSelect;
   };
 };
-export interface CreateFunctionGraphPayload {
+export interface CreatePlatformNamespacePayload {
   clientMutationId?: string | null;
-  result?: string | null;
+  /** The `PlatformNamespace` that was created by this mutation. */
+  platformNamespace?: PlatformNamespace | null;
+  platformNamespaceEdge?: PlatformNamespaceEdge | null;
 }
-export type CreateFunctionGraphPayloadSelect = {
+export type CreatePlatformNamespacePayloadSelect = {
   clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface UpdateFunctionGraphPayload {
-  clientMutationId?: string | null;
-  /** The `FunctionGraph` that was updated by this mutation. */
-  functionGraph?: FunctionGraph | null;
-  functionGraphEdge?: FunctionGraphEdge | null;
-}
-export type UpdateFunctionGraphPayloadSelect = {
-  clientMutationId?: boolean;
-  functionGraph?: {
-    select: FunctionGraphSelect;
+  platformNamespace?: {
+    select: PlatformNamespaceSelect;
   };
-  functionGraphEdge?: {
-    select: FunctionGraphEdgeSelect;
+  platformNamespaceEdge?: {
+    select: PlatformNamespaceEdgeSelect;
   };
 };
-export interface DeleteFunctionGraphPayload {
+export interface UpdatePlatformNamespacePayload {
   clientMutationId?: string | null;
-  /** The `FunctionGraph` that was deleted by this mutation. */
-  functionGraph?: FunctionGraph | null;
-  functionGraphEdge?: FunctionGraphEdge | null;
+  /** The `PlatformNamespace` that was updated by this mutation. */
+  platformNamespace?: PlatformNamespace | null;
+  platformNamespaceEdge?: PlatformNamespaceEdge | null;
 }
-export type DeleteFunctionGraphPayloadSelect = {
+export type UpdatePlatformNamespacePayloadSelect = {
   clientMutationId?: boolean;
-  functionGraph?: {
-    select: FunctionGraphSelect;
+  platformNamespace?: {
+    select: PlatformNamespaceSelect;
   };
-  functionGraphEdge?: {
-    select: FunctionGraphEdgeSelect;
+  platformNamespaceEdge?: {
+    select: PlatformNamespaceEdgeSelect;
+  };
+};
+export interface DeletePlatformNamespacePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespace` that was deleted by this mutation. */
+  platformNamespace?: PlatformNamespace | null;
+  platformNamespaceEdge?: PlatformNamespaceEdge | null;
+}
+export type DeletePlatformNamespacePayloadSelect = {
+  clientMutationId?: boolean;
+  platformNamespace?: {
+    select: PlatformNamespaceSelect;
+  };
+  platformNamespaceEdge?: {
+    select: PlatformNamespaceEdgeSelect;
   };
 };
 export interface CreateOrgFunctionInvocationPayload {
@@ -4408,6 +5370,51 @@ export type DeleteFunctionInvocationPayloadSelect = {
   };
   functionInvocationEdge?: {
     select: FunctionInvocationEdgeSelect;
+  };
+};
+export interface CreatePlatformNamespaceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespaceEvent` that was created by this mutation. */
+  platformNamespaceEvent?: PlatformNamespaceEvent | null;
+  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export type CreatePlatformNamespaceEventPayloadSelect = {
+  clientMutationId?: boolean;
+  platformNamespaceEvent?: {
+    select: PlatformNamespaceEventSelect;
+  };
+  platformNamespaceEventEdge?: {
+    select: PlatformNamespaceEventEdgeSelect;
+  };
+};
+export interface UpdatePlatformNamespaceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespaceEvent` that was updated by this mutation. */
+  platformNamespaceEvent?: PlatformNamespaceEvent | null;
+  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export type UpdatePlatformNamespaceEventPayloadSelect = {
+  clientMutationId?: boolean;
+  platformNamespaceEvent?: {
+    select: PlatformNamespaceEventSelect;
+  };
+  platformNamespaceEventEdge?: {
+    select: PlatformNamespaceEventEdgeSelect;
+  };
+};
+export interface DeletePlatformNamespaceEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformNamespaceEvent` that was deleted by this mutation. */
+  platformNamespaceEvent?: PlatformNamespaceEvent | null;
+  platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export type DeletePlatformNamespaceEventPayloadSelect = {
+  clientMutationId?: boolean;
+  platformNamespaceEvent?: {
+    select: PlatformNamespaceEventSelect;
+  };
+  platformNamespaceEventEdge?: {
+    select: PlatformNamespaceEventEdgeSelect;
   };
 };
 export interface CreateFunctionGraphExecutionPayload {
@@ -4524,6 +5531,18 @@ export type FunctionDeploymentEdgeSelect = {
     select: FunctionDeploymentSelect;
   };
 };
+/** A `Resource` edge in the connection. */
+export interface ResourceEdge {
+  cursor?: string | null;
+  /** The `Resource` at the end of the edge. */
+  node?: Resource | null;
+}
+export type ResourceEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ResourceSelect;
+  };
+};
 /** A `FunctionGraphRef` edge in the connection. */
 export interface FunctionGraphRefEdge {
   cursor?: string | null;
@@ -4584,6 +5603,18 @@ export type OrgFunctionExecutionLogEdgeSelect = {
     select: OrgFunctionExecutionLogSelect;
   };
 };
+/** A `ResourceEvent` edge in the connection. */
+export interface ResourceEventEdge {
+  cursor?: string | null;
+  /** The `ResourceEvent` at the end of the edge. */
+  node?: ResourceEvent | null;
+}
+export type ResourceEventEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ResourceEventSelect;
+  };
+};
 /** A `FunctionGraphExecutionOutput` edge in the connection. */
 export interface FunctionGraphExecutionOutputEdge {
   cursor?: string | null;
@@ -4632,6 +5663,18 @@ export type FunctionExecutionLogEdgeSelect = {
     select: FunctionExecutionLogSelect;
   };
 };
+/** A `FunctionGraph` edge in the connection. */
+export interface FunctionGraphEdge {
+  cursor?: string | null;
+  /** The `FunctionGraph` at the end of the edge. */
+  node?: FunctionGraph | null;
+}
+export type FunctionGraphEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: FunctionGraphSelect;
+  };
+};
 /** A `FunctionGraphExecutionNodeState` edge in the connection. */
 export interface FunctionGraphExecutionNodeStateEdge {
   cursor?: string | null;
@@ -4644,16 +5687,16 @@ export type FunctionGraphExecutionNodeStateEdgeSelect = {
     select: FunctionGraphExecutionNodeStateSelect;
   };
 };
-/** A `FunctionGraph` edge in the connection. */
-export interface FunctionGraphEdge {
+/** A `PlatformNamespace` edge in the connection. */
+export interface PlatformNamespaceEdge {
   cursor?: string | null;
-  /** The `FunctionGraph` at the end of the edge. */
-  node?: FunctionGraph | null;
+  /** The `PlatformNamespace` at the end of the edge. */
+  node?: PlatformNamespace | null;
 }
-export type FunctionGraphEdgeSelect = {
+export type PlatformNamespaceEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: FunctionGraphSelect;
+    select: PlatformNamespaceSelect;
   };
 };
 /** A `OrgFunctionInvocation` edge in the connection. */
@@ -4678,6 +5721,18 @@ export type FunctionInvocationEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: FunctionInvocationSelect;
+  };
+};
+/** A `PlatformNamespaceEvent` edge in the connection. */
+export interface PlatformNamespaceEventEdge {
+  cursor?: string | null;
+  /** The `PlatformNamespaceEvent` at the end of the edge. */
+  node?: PlatformNamespaceEvent | null;
+}
+export type PlatformNamespaceEventEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformNamespaceEventSelect;
   };
 };
 /** A `FunctionGraphExecution` edge in the connection. */

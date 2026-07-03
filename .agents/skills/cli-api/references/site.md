@@ -12,8 +12,8 @@ csdk site list --where.<field>.<op> <value> --orderBy <values>
 csdk site list --limit 10 --after <cursor>
 csdk site find-first --where.<field>.<op> <value>
 csdk site get --id <UUID>
-csdk site create --databaseId <UUID> [--title <String>] [--description <String>] [--ogImage <Image>] [--favicon <Attachment>] [--appleTouchIcon <Image>] [--logo <Image>] [--dbname <String>]
-csdk site update --id <UUID> [--databaseId <UUID>] [--title <String>] [--description <String>] [--ogImage <Image>] [--favicon <Attachment>] [--appleTouchIcon <Image>] [--logo <Image>] [--dbname <String>]
+csdk site create --databaseId <UUID> [--title <String>] [--description <String>] [--ogImage <Image>] [--favicon <Attachment>] [--appleTouchIcon <Image>] [--logo <Image>] [--dbname <String>] [--labels <JSON>] [--annotations <JSON>]
+csdk site update --id <UUID> [--databaseId <UUID>] [--title <String>] [--description <String>] [--ogImage <Image>] [--favicon <Attachment>] [--appleTouchIcon <Image>] [--logo <Image>] [--dbname <String>] [--labels <JSON>] [--annotations <JSON>]
 csdk site delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk site list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a site
 
 ```bash
-csdk site create --databaseId <UUID> [--title <String>] [--description <String>] [--ogImage <Image>] [--favicon <Attachment>] [--appleTouchIcon <Image>] [--logo <Image>] [--dbname <String>]
+csdk site create --databaseId <UUID> [--title <String>] [--description <String>] [--ogImage <Image>] [--favicon <Attachment>] [--appleTouchIcon <Image>] [--logo <Image>] [--dbname <String>] [--labels <JSON>] [--annotations <JSON>]
 ```
 
 ### Get a site by id

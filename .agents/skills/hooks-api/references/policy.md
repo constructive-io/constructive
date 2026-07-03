@@ -7,8 +7,8 @@ React Query hooks for Policy data operations
 ## Usage
 
 ```typescript
-usePoliciesQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
-usePolicyQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
+usePoliciesQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } } })
+usePolicyQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } } })
 useCreatePolicyMutation({ selection: { fields: { id: true } } })
 useUpdatePolicyMutation({ selection: { fields: { id: true } } })
 useDeletePolicyMutation({})
@@ -20,7 +20,7 @@ useDeletePolicyMutation({})
 
 ```typescript
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePoliciesQuery({
 const { mutate } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' });
+mutate({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' });
 ```

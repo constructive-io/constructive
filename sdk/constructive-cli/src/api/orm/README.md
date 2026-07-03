@@ -118,7 +118,6 @@ CRUD operations for Schema records.
 | `description` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `isPublic` | Boolean | Yes |
 | `apiExposure` | ApiExposureLevel | Yes |
@@ -129,13 +128,13 @@ CRUD operations for Schema records.
 
 ```typescript
 // List all schema records
-const items = await db.schema.findMany({ select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.schema.findMany({ select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.schema.findOne({ id: '<UUID>', select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, scope: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.schema.findOne({ id: '<UUID>', select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, tags: true, isPublic: true, apiExposure: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.schema.create({ data: { databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>', isPublic: '<Boolean>', apiExposure: '<ApiExposureLevel>' }, select: { id: true } }).execute();
+const created = await db.schema.create({ data: { databaseId: '<UUID>', name: '<String>', schemaName: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>', isPublic: '<Boolean>', apiExposure: '<ApiExposureLevel>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.schema.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -160,7 +159,6 @@ CRUD operations for Table records.
 | `description` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `useRls` | Boolean | Yes |
 | `timestamps` | Boolean | Yes |
 | `peoplestamps` | Boolean | Yes |
@@ -179,13 +177,13 @@ CRUD operations for Table records.
 
 ```typescript
 // List all table records
-const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
+const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
 
 // Get one by id
-const item = await db.table.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
+const item = await db.table.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
 
 // Create
-const created = await db.table.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', useRls: '<Boolean>', timestamps: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', singularName: '<String>', tags: '<String>', partitioned: '<Boolean>', partitionStrategy: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', inheritsId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.table.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', useRls: '<Boolean>', timestamps: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', singularName: '<String>', tags: '<String>', partitioned: '<Boolean>', partitionStrategy: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', inheritsId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.table.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -211,7 +209,6 @@ CRUD operations for CheckConstraint records.
 | `expr` | JSON | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -220,13 +217,13 @@ CRUD operations for CheckConstraint records.
 
 ```typescript
 // List all checkConstraint records
-const items = await db.checkConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.checkConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.checkConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.checkConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.checkConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', expr: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.checkConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', expr: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.checkConstraint.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -262,7 +259,6 @@ CRUD operations for Field records.
 | `max` | Float | Yes |
 | `tags` | String | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 
@@ -270,13 +266,13 @@ CRUD operations for Field records.
 
 ```typescript
 // List all field records
-const items = await db.field.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, scope: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.field.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.field.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, scope: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.field.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.field.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', isRequired: '<Boolean>', apiRequired: '<Boolean>', defaultValue: '<JSON>', type: '<JSON>', fieldOrder: '<Int>', regexp: '<String>', chk: '<JSON>', chkExpr: '<JSON>', min: '<Float>', max: '<Float>', tags: '<String>', category: '<ObjectCategory>', scope: '<Int>' }, select: { id: true } }).execute();
+const created = await db.field.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', isRequired: '<Boolean>', apiRequired: '<Boolean>', defaultValue: '<JSON>', type: '<JSON>', fieldOrder: '<Int>', regexp: '<String>', chk: '<JSON>', chkExpr: '<JSON>', min: '<Float>', max: '<Float>', tags: '<String>', category: '<ObjectCategory>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.field.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -303,7 +299,6 @@ CRUD operations for SpatialRelation records.
 | `operator` | String | Yes |
 | `paramName` | String | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -312,13 +307,13 @@ CRUD operations for SpatialRelation records.
 
 ```typescript
 // List all spatialRelation records
-const items = await db.spatialRelation.findMany({ select: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.spatialRelation.findMany({ select: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.spatialRelation.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.spatialRelation.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.spatialRelation.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', refTableId: '<UUID>', refFieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.spatialRelation.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', refTableId: '<UUID>', refFieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.spatialRelation.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -348,7 +343,6 @@ CRUD operations for ForeignKeyConstraint records.
 | `deleteAction` | String | Yes |
 | `updateAction` | String | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -357,13 +351,13 @@ CRUD operations for ForeignKeyConstraint records.
 
 ```typescript
 // List all foreignKeyConstraint records
-const items = await db.foreignKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.foreignKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.foreignKeyConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.foreignKeyConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.foreignKeyConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', refTableId: '<UUID>', refFieldIds: '<UUID>', deleteAction: '<String>', updateAction: '<String>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.foreignKeyConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', refTableId: '<UUID>', refFieldIds: '<UUID>', deleteAction: '<String>', updateAction: '<String>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.foreignKeyConstraint.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -432,7 +426,6 @@ CRUD operations for Index records.
 | `opClasses` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -441,13 +434,13 @@ CRUD operations for Index records.
 
 ```typescript
 // List all index records
-const items = await db.index.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.index.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.index.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.index.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.index.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', fieldIds: '<UUID>', includeFieldIds: '<UUID>', accessMethod: '<String>', indexParams: '<JSON>', whereClause: '<JSON>', isUnique: '<Boolean>', options: '<JSON>', opClasses: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.index.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', fieldIds: '<UUID>', includeFieldIds: '<UUID>', accessMethod: '<String>', indexParams: '<JSON>', whereClause: '<JSON>', isUnique: '<Boolean>', options: '<JSON>', opClasses: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.index.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -476,7 +469,6 @@ CRUD operations for Policy records.
 | `data` | JSON | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -485,13 +477,13 @@ CRUD operations for Policy records.
 
 ```typescript
 // List all policy records
-const items = await db.policy.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.policy.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.policy.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.policy.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.policy.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.policy.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.policy.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -516,7 +508,6 @@ CRUD operations for PrimaryKeyConstraint records.
 | `fieldIds` | UUID | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -525,13 +516,13 @@ CRUD operations for PrimaryKeyConstraint records.
 
 ```typescript
 // List all primaryKeyConstraint records
-const items = await db.primaryKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.primaryKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.primaryKeyConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.primaryKeyConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.primaryKeyConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.primaryKeyConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.primaryKeyConstraint.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -593,7 +584,6 @@ CRUD operations for Trigger records.
 | `functionName` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -602,13 +592,13 @@ CRUD operations for Trigger records.
 
 ```typescript
 // List all trigger records
-const items = await db.trigger.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.trigger.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.trigger.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.trigger.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.trigger.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', event: '<String>', functionName: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.trigger.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', event: '<String>', functionName: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.trigger.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -634,7 +624,6 @@ CRUD operations for UniqueConstraint records.
 | `type` | String | Yes |
 | `fieldIds` | UUID | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
@@ -643,13 +632,13 @@ CRUD operations for UniqueConstraint records.
 
 ```typescript
 // List all uniqueConstraint records
-const items = await db.uniqueConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.uniqueConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.uniqueConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.uniqueConstraint.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.uniqueConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.uniqueConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.uniqueConstraint.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -679,20 +668,19 @@ CRUD operations for View records.
 | `isReadOnly` | Boolean | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all view records
-const items = await db.view.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, scope: true, tags: true } }).execute();
+const items = await db.view.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, tags: true } }).execute();
 
 // Get one by id
-const item = await db.view.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, scope: true, tags: true } }).execute();
+const item = await db.view.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, tags: true } }).execute();
 
 // Create
-const created = await db.view.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', tableId: '<UUID>', viewType: '<String>', data: '<JSON>', filterType: '<String>', filterData: '<JSON>', securityInvoker: '<Boolean>', isReadOnly: '<Boolean>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.view.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', tableId: '<UUID>', viewType: '<String>', data: '<JSON>', filterType: '<String>', filterData: '<JSON>', securityInvoker: '<Boolean>', isReadOnly: '<Boolean>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.view.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -938,20 +926,19 @@ CRUD operations for Enum records.
 | `values` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all enum records
-const items = await db.enum.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, scope: true, tags: true } }).execute();
+const items = await db.enum.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, tags: true } }).execute();
 
 // Get one by id
-const item = await db.enum.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, scope: true, tags: true } }).execute();
+const item = await db.enum.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, tags: true } }).execute();
 
 // Create
-const created = await db.enum.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.enum.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.enum.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -977,20 +964,19 @@ CRUD operations for CompositeType records.
 | `attributes` | JSON | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
-| `scope` | Int | Yes |
 | `tags` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all compositeType records
-const items = await db.compositeType.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, scope: true, tags: true } }).execute();
+const items = await db.compositeType.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, tags: true } }).execute();
 
 // Get one by id
-const item = await db.compositeType.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, scope: true, tags: true } }).execute();
+const item = await db.compositeType.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, tags: true } }).execute();
 
 // Create
-const created = await db.compositeType.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.compositeType.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.compositeType.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -1076,20 +1062,23 @@ CRUD operations for Domain records.
 | `databaseId` | UUID | Yes |
 | `apiId` | UUID | Yes |
 | `siteId` | UUID | Yes |
+| `serviceId` | UUID | Yes |
 | `subdomain` | ConstructiveInternalTypeHostname | Yes |
 | `domain` | ConstructiveInternalTypeHostname | Yes |
+| `labels` | JSON | Yes |
+| `annotations` | JSON | Yes |
 
 **Operations:**
 
 ```typescript
 // List all domain records
-const items = await db.domain.findMany({ select: { id: true, databaseId: true, apiId: true, siteId: true, subdomain: true, domain: true } }).execute();
+const items = await db.domain.findMany({ select: { id: true, databaseId: true, apiId: true, siteId: true, serviceId: true, subdomain: true, domain: true, labels: true, annotations: true } }).execute();
 
 // Get one by id
-const item = await db.domain.findOne({ id: '<UUID>', select: { id: true, databaseId: true, apiId: true, siteId: true, subdomain: true, domain: true } }).execute();
+const item = await db.domain.findOne({ id: '<UUID>', select: { id: true, databaseId: true, apiId: true, siteId: true, serviceId: true, subdomain: true, domain: true, labels: true, annotations: true } }).execute();
 
 // Create
-const created = await db.domain.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>', domain: '<Hostname>' }, select: { id: true } }).execute();
+const created = await db.domain.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', siteId: '<UUID>', serviceId: '<UUID>', subdomain: '<Hostname>', domain: '<Hostname>', labels: '<JSON>', annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.domain.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -1361,18 +1350,20 @@ CRUD operations for Api records.
 | `roleName` | String | Yes |
 | `anonRole` | String | Yes |
 | `isPublic` | Boolean | Yes |
+| `labels` | JSON | Yes |
+| `annotations` | JSON | Yes |
 
 **Operations:**
 
 ```typescript
 // List all api records
-const items = await db.api.findMany({ select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } }).execute();
+const items = await db.api.findMany({ select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true, labels: true, annotations: true } }).execute();
 
 // Get one by id
-const item = await db.api.findOne({ id: '<UUID>', select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } }).execute();
+const item = await db.api.findOne({ id: '<UUID>', select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true, labels: true, annotations: true } }).execute();
 
 // Create
-const created = await db.api.create({ data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.api.create({ data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>', labels: '<JSON>', annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.api.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -1398,18 +1389,20 @@ CRUD operations for Site records.
 | `appleTouchIcon` | ConstructiveInternalTypeImage | Yes |
 | `logo` | ConstructiveInternalTypeImage | Yes |
 | `dbname` | String | Yes |
+| `labels` | JSON | Yes |
+| `annotations` | JSON | Yes |
 
 **Operations:**
 
 ```typescript
 // List all site records
-const items = await db.site.findMany({ select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } }).execute();
+const items = await db.site.findMany({ select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, labels: true, annotations: true } }).execute();
 
 // Get one by id
-const item = await db.site.findOne({ id: '<UUID>', select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } }).execute();
+const item = await db.site.findOne({ id: '<UUID>', select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, labels: true, annotations: true } }).execute();
 
 // Create
-const created = await db.site.create({ data: { databaseId: '<UUID>', title: '<String>', description: '<String>', ogImage: '<Image>', favicon: '<Attachment>', appleTouchIcon: '<Image>', logo: '<Image>', dbname: '<String>' }, select: { id: true } }).execute();
+const created = await db.site.create({ data: { databaseId: '<UUID>', title: '<String>', description: '<String>', ogImage: '<Image>', favicon: '<Attachment>', appleTouchIcon: '<Image>', logo: '<Image>', dbname: '<String>', labels: '<JSON>', annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.site.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -1740,18 +1733,20 @@ CRUD operations for DatabaseSetting records.
 | `enableBulk` | Boolean | Yes |
 | `enableI18N` | Boolean | Yes |
 | `options` | JSON | Yes |
+| `labels` | JSON | Yes |
+| `annotations` | JSON | Yes |
 
 **Operations:**
 
 ```typescript
 // List all databaseSetting records
-const items = await db.databaseSetting.findMany({ select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true } }).execute();
+const items = await db.databaseSetting.findMany({ select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true, labels: true, annotations: true } }).execute();
 
 // Get one by id
-const item = await db.databaseSetting.findOne({ id: '<UUID>', select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true } }).execute();
+const item = await db.databaseSetting.findOne({ id: '<UUID>', select: { id: true, databaseId: true, enableAggregates: true, enablePostgis: true, enableSearch: true, enableDirectUploads: true, enablePresignedUploads: true, enableManyToMany: true, enableConnectionFilter: true, enableLtree: true, enableLlm: true, enableRealtime: true, enableBulk: true, enableI18N: true, options: true, labels: true, annotations: true } }).execute();
 
 // Create
-const created = await db.databaseSetting.create({ data: { databaseId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', enableBulk: '<Boolean>', enableI18N: '<Boolean>', options: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.databaseSetting.create({ data: { databaseId: '<UUID>', enableAggregates: '<Boolean>', enablePostgis: '<Boolean>', enableSearch: '<Boolean>', enableDirectUploads: '<Boolean>', enablePresignedUploads: '<Boolean>', enableManyToMany: '<Boolean>', enableConnectionFilter: '<Boolean>', enableLtree: '<Boolean>', enableLlm: '<Boolean>', enableRealtime: '<Boolean>', enableBulk: '<Boolean>', enableI18N: '<Boolean>', options: '<JSON>', labels: '<JSON>', annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.databaseSetting.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();

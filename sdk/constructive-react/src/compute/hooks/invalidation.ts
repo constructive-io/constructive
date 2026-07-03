@@ -18,19 +18,23 @@ import {
   getAllRecordKeys,
   functionApiBindingKeys,
   functionDeploymentKeys,
+  resourceKeys,
   functionGraphRefKeys,
   functionGraphStoreKeys,
   functionGraphObjectKeys,
   functionDeploymentEventKeys,
   orgFunctionExecutionLogKeys,
+  resourceEventKeys,
   functionGraphExecutionOutputKeys,
   functionGraphCommitKeys,
   secretDefinitionKeys,
   functionExecutionLogKeys,
-  functionGraphExecutionNodeStateKeys,
   functionGraphKeys,
+  functionGraphExecutionNodeStateKeys,
+  platformNamespaceKeys,
   orgFunctionInvocationKeys,
   functionInvocationKeys,
+  platformNamespaceEventKeys,
   functionGraphExecutionKeys,
   functionDefinitionKeys,
 } from './query-keys';
@@ -103,6 +107,20 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: functionDeploymentKeys.detail(id),
+      }),
+  },
+  /** Invalidate resource queries */ resource: {
+    /** Invalidate all resource queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceKeys.all,
+      }),
+    /** Invalidate resource list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceKeys.lists(),
+      }),
+    /** Invalidate a specific resource */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceKeys.detail(id),
       }),
   },
   /** Invalidate functionGraphRef queries */ functionGraphRef: {
@@ -190,6 +208,23 @@ export const invalidate = {
         queryKey: orgFunctionExecutionLogKeys.detail(id),
       }),
   },
+  /** Invalidate resourceEvent queries */ resourceEvent: {
+    /** Invalidate all resourceEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceEventKeys.all,
+      }),
+    /** Invalidate resourceEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceEventKeys.lists(),
+      }),
+    /** Invalidate a specific resourceEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: resourceEventKeys.detail(id),
+      }),
+  },
   /** Invalidate functionGraphExecutionOutput queries */ functionGraphExecutionOutput: {
     /** Invalidate all functionGraphExecutionOutput queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -258,6 +293,23 @@ export const invalidate = {
         queryKey: functionExecutionLogKeys.detail(id),
       }),
   },
+  /** Invalidate functionGraph queries */ functionGraph: {
+    /** Invalidate all functionGraph queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.all,
+      }),
+    /** Invalidate functionGraph list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraph */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.detail(id),
+      }),
+  },
   /** Invalidate functionGraphExecutionNodeState queries */ functionGraphExecutionNodeState: {
     /** Invalidate all functionGraphExecutionNodeState queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -277,21 +329,21 @@ export const invalidate = {
         queryKey: functionGraphExecutionNodeStateKeys.detail(id),
       }),
   },
-  /** Invalidate functionGraph queries */ functionGraph: {
-    /** Invalidate all functionGraph queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate platformNamespace queries */ platformNamespace: {
+    /** Invalidate all platformNamespace queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.all,
+        queryKey: platformNamespaceKeys.all,
       }),
-    /** Invalidate functionGraph list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate platformNamespace list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.lists(),
+        queryKey: platformNamespaceKeys.lists(),
       }),
-    /** Invalidate a specific functionGraph */ detail: (
+    /** Invalidate a specific platformNamespace */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.detail(id),
+        queryKey: platformNamespaceKeys.detail(id),
       }),
   },
   /** Invalidate orgFunctionInvocation queries */ orgFunctionInvocation: {
@@ -326,6 +378,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: functionInvocationKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformNamespaceEvent queries */ platformNamespaceEvent: {
+    /** Invalidate all platformNamespaceEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceEventKeys.all,
+      }),
+    /** Invalidate platformNamespaceEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceEventKeys.lists(),
+      }),
+    /** Invalidate a specific platformNamespaceEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceEventKeys.detail(id),
       }),
   },
   /** Invalidate functionGraphExecution queries */ functionGraphExecution: {
@@ -399,6 +468,11 @@ export const remove = {
       queryKey: functionDeploymentKeys.detail(id),
     });
   },
+  /** Remove resource from cache */ resource: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: resourceKeys.detail(id),
+    });
+  },
   /** Remove functionGraphRef from cache */ functionGraphRef: (
     queryClient: QueryClient,
     id: string | number
@@ -439,6 +513,14 @@ export const remove = {
       queryKey: orgFunctionExecutionLogKeys.detail(id),
     });
   },
+  /** Remove resourceEvent from cache */ resourceEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: resourceEventKeys.detail(id),
+    });
+  },
   /** Remove functionGraphExecutionOutput from cache */ functionGraphExecutionOutput: (
     queryClient: QueryClient,
     id: string | number
@@ -471,6 +553,14 @@ export const remove = {
       queryKey: functionExecutionLogKeys.detail(id),
     });
   },
+  /** Remove functionGraph from cache */ functionGraph: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphKeys.detail(id),
+    });
+  },
   /** Remove functionGraphExecutionNodeState from cache */ functionGraphExecutionNodeState: (
     queryClient: QueryClient,
     id: string | number
@@ -479,12 +569,12 @@ export const remove = {
       queryKey: functionGraphExecutionNodeStateKeys.detail(id),
     });
   },
-  /** Remove functionGraph from cache */ functionGraph: (
+  /** Remove platformNamespace from cache */ platformNamespace: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: functionGraphKeys.detail(id),
+      queryKey: platformNamespaceKeys.detail(id),
     });
   },
   /** Remove orgFunctionInvocation from cache */ orgFunctionInvocation: (
@@ -501,6 +591,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: functionInvocationKeys.detail(id),
+    });
+  },
+  /** Remove platformNamespaceEvent from cache */ platformNamespaceEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformNamespaceEventKeys.detail(id),
     });
   },
   /** Remove functionGraphExecution from cache */ functionGraphExecution: (

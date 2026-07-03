@@ -29,19 +29,23 @@ csdk auth set-token <your-token>
 | `get-all-record` | getAllRecord CRUD operations |
 | `function-api-binding` | functionApiBinding CRUD operations |
 | `function-deployment` | functionDeployment CRUD operations |
+| `resource` | resource CRUD operations |
 | `function-graph-ref` | functionGraphRef CRUD operations |
 | `function-graph-store` | functionGraphStore CRUD operations |
 | `function-graph-object` | functionGraphObject CRUD operations |
 | `function-deployment-event` | functionDeploymentEvent CRUD operations |
 | `org-function-execution-log` | orgFunctionExecutionLog CRUD operations |
+| `resource-event` | resourceEvent CRUD operations |
 | `function-graph-execution-output` | functionGraphExecutionOutput CRUD operations |
 | `function-graph-commit` | functionGraphCommit CRUD operations |
 | `secret-definition` | secretDefinition CRUD operations |
 | `function-execution-log` | functionExecutionLog CRUD operations |
-| `function-graph-execution-node-state` | functionGraphExecutionNodeState CRUD operations |
 | `function-graph` | functionGraph CRUD operations |
+| `function-graph-execution-node-state` | functionGraphExecutionNodeState CRUD operations |
+| `platform-namespace` | platformNamespace CRUD operations |
 | `org-function-invocation` | orgFunctionInvocation CRUD operations |
 | `function-invocation` | functionInvocation CRUD operations |
+| `platform-namespace-event` | platformNamespaceEvent CRUD operations |
 | `function-graph-execution` | functionGraphExecution CRUD operations |
 | `function-definition` | functionDefinition CRUD operations |
 | `read-function-graph` | readFunctionGraph |
@@ -53,9 +57,9 @@ csdk auth set-token <your-token>
 | `save-graph` | saveGraph |
 | `add-edge-and-save` | addEdgeAndSave |
 | `add-node-and-save` | addNodeAndSave |
+| `import-graph-json` | importGraphJson |
 | `add-edge` | addEdge |
 | `add-node` | addNode |
-| `import-graph-json` | importGraphJson |
 | `insert-node-at-path` | insertNodeAtPath |
 | `start-execution` | startExecution |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
@@ -194,6 +198,44 @@ CRUD operations for FunctionDeployment records.
 **Required create fields:** `functionDefinitionId`, `namespaceId`, `databaseId`
 **Optional create fields (backend defaults):** `status`, `serviceUrl`, `serviceName`, `revision`, `image`, `concurrency`, `scaleMin`, `scaleMax`, `timeoutSeconds`, `resources`, `lastError`, `lastErrorAt`, `errorCount`, `labels`, `annotations`
 
+### `resource`
+
+CRUD operations for Resource records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resource records |
+| `find-first` | Find first matching resource record |
+| `get` | Get a resource by id |
+| `create` | Create a new resource |
+| `update` | Update an existing resource |
+| `delete` | Delete a resource |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `namespaceId` | UUID |
+| `kind` | String |
+| `name` | String |
+| `slug` | String |
+| `spec` | JSON |
+| `status` | String |
+| `statusObserved` | JSON |
+| `lastError` | String |
+| `errorCount` | Int |
+| `labels` | JSON |
+| `annotations` | JSON |
+| `databaseId` | UUID |
+
+**Required create fields:** `namespaceId`, `kind`, `name`, `slug`, `databaseId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `spec`, `status`, `statusObserved`, `lastError`, `errorCount`, `labels`, `annotations`
+
 ### `function-graph-ref`
 
 CRUD operations for FunctionGraphRef records.
@@ -331,6 +373,35 @@ CRUD operations for OrgFunctionExecutionLog records.
 **Required create fields:** `message`
 **Optional create fields (backend defaults):** `invocationId`, `taskIdentifier`, `logLevel`, `metadata`, `actorId`
 
+### `resource-event`
+
+CRUD operations for ResourceEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceEvent records |
+| `find-first` | Find first matching resourceEvent record |
+| `get` | Get a resourceEvent by id |
+| `create` | Create a new resourceEvent |
+| `update` | Update an existing resourceEvent |
+| `delete` | Delete a resourceEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `resourceId` | UUID |
+| `eventType` | String |
+| `actorId` | UUID |
+| `message` | String |
+| `metadata` | JSON |
+| `databaseId` | UUID |
+
+**Required create fields:** `resourceId`, `eventType`, `databaseId`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
+
 ### `function-graph-execution-output`
 
 CRUD operations for FunctionGraphExecutionOutput records.
@@ -446,6 +517,38 @@ CRUD operations for FunctionExecutionLog records.
 **Required create fields:** `message`, `databaseId`
 **Optional create fields (backend defaults):** `invocationId`, `taskIdentifier`, `logLevel`, `metadata`, `actorId`
 
+### `function-graph`
+
+CRUD operations for FunctionGraph records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionGraph records |
+| `find-first` | Find first matching functionGraph record |
+| `get` | Get a functionGraph by id |
+| `create` | Create a new functionGraph |
+| `update` | Update an existing functionGraph |
+| `delete` | Delete a functionGraph |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `storeId` | UUID |
+| `context` | String |
+| `name` | String |
+| `description` | String |
+| `definitionsCommitId` | UUID |
+| `isValid` | Boolean |
+| `validationErrors` | JSON |
+| `createdBy` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `storeId`, `context`, `name`, `description`, `definitionsCommitId`, `isValid`, `validationErrors`, `createdBy`
+
 ### `function-graph-execution-node-state`
 
 CRUD operations for FunctionGraphExecutionNodeState records.
@@ -479,38 +582,39 @@ CRUD operations for FunctionGraphExecutionNodeState records.
 **Required create fields:** `executionId`, `databaseId`, `nodeName`
 **Optional create fields (backend defaults):** `nodePath`, `status`, `startedAt`, `completedAt`, `errorCode`, `errorMessage`, `outputId`
 
-### `function-graph`
+### `platform-namespace`
 
-CRUD operations for FunctionGraph records.
+CRUD operations for PlatformNamespace records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all functionGraph records |
-| `find-first` | Find first matching functionGraph record |
-| `get` | Get a functionGraph by id |
-| `create` | Create a new functionGraph |
-| `update` | Update an existing functionGraph |
-| `delete` | Delete a functionGraph |
+| `list` | List all platformNamespace records |
+| `find-first` | Find first matching platformNamespace record |
+| `get` | Get a platformNamespace by id |
+| `create` | Create a new platformNamespace |
+| `update` | Update an existing platformNamespace |
+| `delete` | Delete a platformNamespace |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `databaseId` | UUID |
-| `storeId` | UUID |
-| `entityId` | UUID |
-| `context` | String |
-| `name` | String |
-| `description` | String |
-| `definitionsCommitId` | UUID |
-| `isValid` | Boolean |
-| `validationErrors` | JSON |
-| `createdBy` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `name` | String |
+| `namespaceName` | String |
+| `description` | String |
+| `isActive` | Boolean |
+| `labels` | JSON |
+| `annotations` | JSON |
+| `databaseId` | UUID |
+| `sourceDatabaseId` | UUID |
+| `sourceScope` | String |
+| `isManaged` | Boolean |
 
-**Required create fields:** `databaseId`, `storeId`, `entityId`, `context`, `name`, `description`, `definitionsCommitId`, `isValid`, `validationErrors`, `createdBy`
+**Required create fields:** `name`, `namespaceName`, `databaseId`
+**Optional create fields (backend defaults):** `description`, `isActive`, `labels`, `annotations`, `sourceDatabaseId`, `sourceScope`, `isManaged`
 
 ### `org-function-invocation`
 
@@ -583,6 +687,42 @@ CRUD operations for FunctionInvocation records.
 **Required create fields:** `databaseId`, `taskIdentifier`
 **Optional create fields (backend defaults):** `actorId`, `payload`, `status`, `result`, `error`, `durationMs`, `jobId`, `startedAt`, `completedAt`, `parentInvocationId`, `graphExecutionId`
 
+### `platform-namespace-event`
+
+CRUD operations for PlatformNamespaceEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformNamespaceEvent records |
+| `find-first` | Find first matching platformNamespaceEvent record |
+| `get` | Get a platformNamespaceEvent by id |
+| `create` | Create a new platformNamespaceEvent |
+| `update` | Update an existing platformNamespaceEvent |
+| `delete` | Delete a platformNamespaceEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `namespaceId` | UUID |
+| `eventType` | String |
+| `actorId` | UUID |
+| `message` | String |
+| `metadata` | JSON |
+| `cpuMillicores` | Int |
+| `memoryBytes` | BigInt |
+| `storageBytes` | BigInt |
+| `networkIngressBytes` | BigInt |
+| `networkEgressBytes` | BigInt |
+| `podCount` | Int |
+| `metrics` | JSON |
+| `databaseId` | UUID |
+
+**Required create fields:** `namespaceId`, `eventType`, `databaseId`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`, `cpuMillicores`, `memoryBytes`, `storageBytes`, `networkIngressBytes`, `networkEgressBytes`, `podCount`, `metrics`
+
 ### `function-graph-execution`
 
 CRUD operations for FunctionGraphExecution records.
@@ -605,7 +745,6 @@ CRUD operations for FunctionGraphExecution records.
 | `graphId` | UUID |
 | `invocationId` | UUID |
 | `databaseId` | UUID |
-| `entityId` | UUID |
 | `outputNode` | String |
 | `outputPort` | String |
 | `status` | String |
@@ -626,7 +765,7 @@ CRUD operations for FunctionGraphExecution records.
 | `errorMessage` | String |
 
 **Required create fields:** `graphId`, `databaseId`, `outputNode`
-**Optional create fields (backend defaults):** `startedAt`, `invocationId`, `entityId`, `outputPort`, `status`, `inputPayload`, `outputPayload`, `nodeOutputs`, `executionPlan`, `currentWave`, `parentExecutionId`, `parentNodeName`, `definitionsCommitId`, `tickCount`, `completedAt`, `maxTicks`, `maxPendingJobs`, `timeoutAt`, `errorCode`, `errorMessage`
+**Optional create fields (backend defaults):** `startedAt`, `invocationId`, `outputPort`, `status`, `inputPayload`, `outputPayload`, `nodeOutputs`, `executionPlan`, `currentWave`, `parentExecutionId`, `parentNodeName`, `definitionsCommitId`, `tickCount`, `completedAt`, `maxTicks`, `maxPendingJobs`, `timeoutAt`, `errorCode`, `errorMessage`
 
 ### `function-definition`
 
@@ -808,6 +947,24 @@ addNodeAndSave
   | `--input.meta` | JSON |
   | `--input.message` | String |
 
+### `import-graph-json`
+
+importGraphJson
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.name` | String |
+  | `--input.graphJson` | JSON |
+  | `--input.context` | String |
+  | `--input.description` | String |
+  | `--input.createdBy` | UUID |
+  | `--input.definitionsCommitId` | UUID |
+
 ### `add-edge`
 
 addEdge
@@ -845,25 +1002,6 @@ addNode
   | `--input.graphName` | String |
   | `--input.props` | JSON |
   | `--input.meta` | JSON |
-
-### `import-graph-json`
-
-importGraphJson
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
-  | `--input.name` | String |
-  | `--input.graphJson` | JSON |
-  | `--input.context` | String |
-  | `--input.description` | String |
-  | `--input.entityId` | UUID |
-  | `--input.createdBy` | UUID |
-  | `--input.definitionsCommitId` | UUID |
 
 ### `insert-node-at-path`
 

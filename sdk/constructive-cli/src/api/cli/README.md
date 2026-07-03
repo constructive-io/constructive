@@ -192,7 +192,6 @@ CRUD operations for Schema records.
 | `description` | String |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `isPublic` | Boolean |
 | `apiExposure` | ApiExposureLevel |
@@ -200,7 +199,7 @@ CRUD operations for Schema records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `name`, `schemaName`
-**Optional create fields (backend defaults):** `label`, `description`, `smartTags`, `category`, `scope`, `tags`, `isPublic`, `apiExposure`
+**Optional create fields (backend defaults):** `label`, `description`, `smartTags`, `category`, `tags`, `isPublic`, `apiExposure`
 
 ### `table`
 
@@ -227,7 +226,6 @@ CRUD operations for Table records.
 | `description` | String |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `useRls` | Boolean |
 | `timestamps` | Boolean |
 | `peoplestamps` | Boolean |
@@ -243,7 +241,7 @@ CRUD operations for Table records.
 | `inheritsId` | UUID |
 
 **Required create fields:** `schemaId`, `name`
-**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `category`, `scope`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `partitioned`, `partitionStrategy`, `partitionKeyNames`, `partitionKeyTypes`, `inheritsId`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `category`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `partitioned`, `partitionStrategy`, `partitionKeyNames`, `partitionKeyTypes`, `inheritsId`
 
 ### `check-constraint`
 
@@ -271,13 +269,12 @@ CRUD operations for CheckConstraint records.
 | `expr` | JSON |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `fieldIds`
-**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `expr`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `expr`, `smartTags`, `category`, `tags`
 
 ### `field`
 
@@ -315,12 +312,11 @@ CRUD operations for Field records.
 | `max` | Float |
 | `tags` | String |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `name`, `type`
-**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `apiRequired`, `defaultValue`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`, `scope`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `apiRequired`, `defaultValue`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`
 
 ### `spatial-relation`
 
@@ -349,13 +345,12 @@ CRUD operations for SpatialRelation records.
 | `operator` | String |
 | `paramName` | String |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `fieldId`, `refTableId`, `refFieldId`, `name`, `operator`
-**Optional create fields (backend defaults):** `databaseId`, `paramName`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `paramName`, `category`, `tags`
 
 ### `foreign-key-constraint`
 
@@ -387,13 +382,12 @@ CRUD operations for ForeignKeyConstraint records.
 | `deleteAction` | String |
 | `updateAction` | String |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `fieldIds`, `refTableId`, `refFieldIds`
-**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `deleteAction`, `updateAction`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `deleteAction`, `updateAction`, `category`, `tags`
 
 ### `full-text-search`
 
@@ -457,13 +451,12 @@ CRUD operations for Index records.
 | `opClasses` | String |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `tableId`
-**Optional create fields (backend defaults):** `name`, `fieldIds`, `includeFieldIds`, `accessMethod`, `indexParams`, `whereClause`, `isUnique`, `options`, `opClasses`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `name`, `fieldIds`, `includeFieldIds`, `accessMethod`, `indexParams`, `whereClause`, `isUnique`, `options`, `opClasses`, `smartTags`, `category`, `tags`
 
 ### `policy`
 
@@ -494,13 +487,12 @@ CRUD operations for Policy records.
 | `data` | JSON |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`
-**Optional create fields (backend defaults):** `databaseId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `smartTags`, `category`, `tags`
 
 ### `primary-key-constraint`
 
@@ -527,13 +519,12 @@ CRUD operations for PrimaryKeyConstraint records.
 | `fieldIds` | UUID |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `fieldIds`
-**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `smartTags`, `category`, `tags`
 
 ### `table-grant`
 
@@ -590,13 +581,12 @@ CRUD operations for Trigger records.
 | `functionName` | String |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `name`
-**Optional create fields (backend defaults):** `databaseId`, `event`, `functionName`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `event`, `functionName`, `smartTags`, `category`, `tags`
 
 ### `unique-constraint`
 
@@ -624,13 +614,12 @@ CRUD operations for UniqueConstraint records.
 | `type` | String |
 | `fieldIds` | UUID |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `fieldIds`
-**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `category`, `tags`
 
 ### `view`
 
@@ -662,11 +651,10 @@ CRUD operations for View records.
 | `isReadOnly` | Boolean |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 
 **Required create fields:** `schemaId`, `name`, `viewType`
-**Optional create fields (backend defaults):** `databaseId`, `tableId`, `data`, `filterType`, `filterData`, `securityInvoker`, `isReadOnly`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `tableId`, `data`, `filterType`, `filterData`, `securityInvoker`, `isReadOnly`, `smartTags`, `category`, `tags`
 
 ### `view-table`
 
@@ -872,11 +860,10 @@ CRUD operations for Enum records.
 | `values` | String |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 
 **Required create fields:** `databaseId`, `schemaId`, `name`
-**Optional create fields (backend defaults):** `label`, `description`, `values`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `label`, `description`, `values`, `smartTags`, `category`, `tags`
 
 ### `composite-type`
 
@@ -904,11 +891,10 @@ CRUD operations for CompositeType records.
 | `attributes` | JSON |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
-| `scope` | Int |
 | `tags` | String |
 
 **Required create fields:** `databaseId`, `schemaId`, `name`
-**Optional create fields (backend defaults):** `label`, `description`, `attributes`, `smartTags`, `category`, `scope`, `tags`
+**Optional create fields (backend defaults):** `label`, `description`, `attributes`, `smartTags`, `category`, `tags`
 
 ### `api-schema`
 
@@ -980,11 +966,14 @@ CRUD operations for Domain records.
 | `databaseId` | UUID |
 | `apiId` | UUID |
 | `siteId` | UUID |
+| `serviceId` | UUID |
 | `subdomain` | Hostname |
 | `domain` | Hostname |
+| `labels` | JSON |
+| `annotations` | JSON |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `apiId`, `siteId`, `subdomain`, `domain`
+**Optional create fields (backend defaults):** `apiId`, `siteId`, `serviceId`, `subdomain`, `domain`, `labels`, `annotations`
 
 ### `site-metadatum`
 
@@ -1207,9 +1196,11 @@ CRUD operations for Api records.
 | `roleName` | String |
 | `anonRole` | String |
 | `isPublic` | Boolean |
+| `labels` | JSON |
+| `annotations` | JSON |
 
 **Required create fields:** `databaseId`, `name`
-**Optional create fields (backend defaults):** `dbname`, `roleName`, `anonRole`, `isPublic`
+**Optional create fields (backend defaults):** `dbname`, `roleName`, `anonRole`, `isPublic`, `labels`, `annotations`
 
 ### `site`
 
@@ -1237,9 +1228,11 @@ CRUD operations for Site records.
 | `appleTouchIcon` | Image |
 | `logo` | Image |
 | `dbname` | String |
+| `labels` | JSON |
+| `annotations` | JSON |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `title`, `description`, `ogImage`, `favicon`, `appleTouchIcon`, `logo`, `dbname`
+**Optional create fields (backend defaults):** `title`, `description`, `ogImage`, `favicon`, `appleTouchIcon`, `logo`, `dbname`, `labels`, `annotations`
 
 ### `app`
 
@@ -1513,9 +1506,11 @@ CRUD operations for DatabaseSetting records.
 | `enableBulk` | Boolean |
 | `enableI18N` | Boolean |
 | `options` | JSON |
+| `labels` | JSON |
+| `annotations` | JSON |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `enableI18N`, `options`
+**Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `enableI18N`, `options`, `labels`, `annotations`
 
 ### `webauthn-setting`
 

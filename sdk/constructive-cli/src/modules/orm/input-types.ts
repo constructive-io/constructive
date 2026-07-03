@@ -606,43 +606,6 @@ export interface SecureTableProvision {
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
   outFields?: string[] | null;
 }
-export interface MerkleStoreModule {
-  id: string;
-  databaseId?: string | null;
-  schemaId?: string | null;
-  privateSchemaId?: string | null;
-  publicSchemaName?: string | null;
-  privateSchemaName?: string | null;
-  objectTableId?: string | null;
-  storeTableId?: string | null;
-  commitTableId?: string | null;
-  refTableId?: string | null;
-  prefix?: string | null;
-  apiName?: string | null;
-  privateApiName?: string | null;
-  scope?: string | null;
-  functionPrefix?: string | null;
-  createdAt?: string | null;
-}
-export interface GraphModule {
-  id: string;
-  databaseId?: string | null;
-  publicSchemaId?: string | null;
-  privateSchemaId?: string | null;
-  publicSchemaName?: string | null;
-  privateSchemaName?: string | null;
-  scope?: string | null;
-  prefix?: string | null;
-  merkleStoreModuleId?: string | null;
-  graphsTableId?: string | null;
-  apiName?: string | null;
-  privateApiName?: string | null;
-  entityTableId?: string | null;
-  policies?: Record<string, unknown> | null;
-  provisions?: Record<string, unknown> | null;
-  defaultPermissions?: string[] | null;
-  createdAt?: string | null;
-}
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
   id: string;
@@ -692,6 +655,44 @@ export interface ConfigSecretsModule {
   policies?: Record<string, unknown> | null;
   provisions?: Record<string, unknown> | null;
   hasConfig?: boolean | null;
+}
+export interface GraphModule {
+  id: string;
+  databaseId?: string | null;
+  publicSchemaId?: string | null;
+  privateSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  privateSchemaName?: string | null;
+  scope?: string | null;
+  prefix?: string | null;
+  merkleStoreModuleId?: string | null;
+  graphsTableId?: string | null;
+  apiName?: string | null;
+  privateApiName?: string | null;
+  entityTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  provisions?: Record<string, unknown> | null;
+  defaultPermissions?: string[] | null;
+  createdAt?: string | null;
+}
+export interface MerkleStoreModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  privateSchemaName?: string | null;
+  objectTableId?: string | null;
+  storeTableId?: string | null;
+  commitTableId?: string | null;
+  refTableId?: string | null;
+  prefix?: string | null;
+  apiName?: string | null;
+  privateApiName?: string | null;
+  scope?: string | null;
+  functionPrefix?: string | null;
+  permissionKey?: string | null;
+  createdAt?: string | null;
 }
 export interface RateLimitMetersModule {
   id: string;
@@ -806,6 +807,27 @@ export interface InvitesModule {
   apiName?: string | null;
   privateApiName?: string | null;
 }
+/** Provisions the principals subsystem: a principals table, a principal_entities junction table, create/delete mutations, and org API key management. Supports both human-owned principals (AuthzDirectOwner, AuthzHumanOnly) and org-owned principals (AuthzEntityMembership with is_admin). Org principal and org API key functions are only generated when an org-scoped memberships_module exists for the database. */
+export interface PrincipalAuthModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  principalsTableId?: string | null;
+  principalEntitiesTableId?: string | null;
+  principalScopeOverridesTableId?: string | null;
+  usersTableId?: string | null;
+  sessionsTableId?: string | null;
+  sessionCredentialsTableId?: string | null;
+  auditsTableId?: string | null;
+  principalsTableName?: string | null;
+  createPrincipalFunction?: string | null;
+  deletePrincipalFunction?: string | null;
+  createOrgPrincipalFunction?: string | null;
+  deleteOrgPrincipalFunction?: string | null;
+  createOrgApiKeyFunction?: string | null;
+  revokeOrgApiKeyFunction?: string | null;
+  apiName?: string | null;
+}
 export interface ComputeLogModule {
   id: string;
   databaseId?: string | null;
@@ -865,6 +887,27 @@ export interface NamespaceModule {
   prefix?: string | null;
   entityTableId?: string | null;
   platformNamespacesTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  provisions?: Record<string, unknown> | null;
+  defaultPermissions?: string[] | null;
+}
+export interface ResourceModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  privateSchemaName?: string | null;
+  resourcesTableId?: string | null;
+  resourceEventsTableId?: string | null;
+  resourcesTableName?: string | null;
+  resourceEventsTableName?: string | null;
+  apiName?: string | null;
+  privateApiName?: string | null;
+  scope?: string | null;
+  prefix?: string | null;
+  entityTableId?: string | null;
+  namespaceModuleId?: string | null;
   policies?: Record<string, unknown> | null;
   provisions?: Record<string, unknown> | null;
   defaultPermissions?: string[] | null;
@@ -1831,23 +1874,27 @@ export interface BlueprintConstructionRelations {
 export interface CryptoAuthModuleRelations {}
 export interface SessionsModuleRelations {}
 export interface SecureTableProvisionRelations {}
-export interface MerkleStoreModuleRelations {
-  graphModules?: ConnectionResult<GraphModule>;
-}
+export interface DatabaseProvisionModuleRelations {}
+export interface ConfigSecretsModuleRelations {}
 export interface GraphModuleRelations {
   merkleStoreModule?: MerkleStoreModule | null;
 }
-export interface DatabaseProvisionModuleRelations {}
-export interface ConfigSecretsModuleRelations {}
+export interface MerkleStoreModuleRelations {
+  graphModules?: ConnectionResult<GraphModule>;
+}
 export interface RateLimitMetersModuleRelations {}
 export interface RealtimeModuleRelations {}
 export interface WebauthnAuthModuleRelations {}
 export interface FunctionInvocationModuleRelations {}
 export interface FunctionModuleRelations {}
 export interface InvitesModuleRelations {}
+export interface PrincipalAuthModuleRelations {}
 export interface ComputeLogModuleRelations {}
 export interface InferenceLogModuleRelations {}
 export interface NamespaceModuleRelations {}
+export interface ResourceModuleRelations {
+  namespaceModule?: NamespaceModule | null;
+}
 export interface StorageLogModuleRelations {}
 export interface TransferLogModuleRelations {}
 export interface FunctionDeploymentModuleRelations {
@@ -1912,11 +1959,11 @@ export type CryptoAuthModuleWithRelations = CryptoAuthModule & CryptoAuthModuleR
 export type SessionsModuleWithRelations = SessionsModule & SessionsModuleRelations;
 export type SecureTableProvisionWithRelations = SecureTableProvision &
   SecureTableProvisionRelations;
-export type MerkleStoreModuleWithRelations = MerkleStoreModule & MerkleStoreModuleRelations;
-export type GraphModuleWithRelations = GraphModule & GraphModuleRelations;
 export type DatabaseProvisionModuleWithRelations = DatabaseProvisionModule &
   DatabaseProvisionModuleRelations;
 export type ConfigSecretsModuleWithRelations = ConfigSecretsModule & ConfigSecretsModuleRelations;
+export type GraphModuleWithRelations = GraphModule & GraphModuleRelations;
+export type MerkleStoreModuleWithRelations = MerkleStoreModule & MerkleStoreModuleRelations;
 export type RateLimitMetersModuleWithRelations = RateLimitMetersModule &
   RateLimitMetersModuleRelations;
 export type RealtimeModuleWithRelations = RealtimeModule & RealtimeModuleRelations;
@@ -1925,9 +1972,11 @@ export type FunctionInvocationModuleWithRelations = FunctionInvocationModule &
   FunctionInvocationModuleRelations;
 export type FunctionModuleWithRelations = FunctionModule & FunctionModuleRelations;
 export type InvitesModuleWithRelations = InvitesModule & InvitesModuleRelations;
+export type PrincipalAuthModuleWithRelations = PrincipalAuthModule & PrincipalAuthModuleRelations;
 export type ComputeLogModuleWithRelations = ComputeLogModule & ComputeLogModuleRelations;
 export type InferenceLogModuleWithRelations = InferenceLogModule & InferenceLogModuleRelations;
 export type NamespaceModuleWithRelations = NamespaceModule & NamespaceModuleRelations;
+export type ResourceModuleWithRelations = ResourceModule & ResourceModuleRelations;
 export type StorageLogModuleWithRelations = StorageLogModule & StorageLogModuleRelations;
 export type TransferLogModuleWithRelations = TransferLogModule & TransferLogModuleRelations;
 export type FunctionDeploymentModuleWithRelations = FunctionDeploymentModule &
@@ -2273,52 +2322,6 @@ export type SecureTableProvisionSelect = {
   policies?: boolean;
   outFields?: boolean;
 };
-export type MerkleStoreModuleSelect = {
-  id?: boolean;
-  databaseId?: boolean;
-  schemaId?: boolean;
-  privateSchemaId?: boolean;
-  publicSchemaName?: boolean;
-  privateSchemaName?: boolean;
-  objectTableId?: boolean;
-  storeTableId?: boolean;
-  commitTableId?: boolean;
-  refTableId?: boolean;
-  prefix?: boolean;
-  apiName?: boolean;
-  privateApiName?: boolean;
-  scope?: boolean;
-  functionPrefix?: boolean;
-  createdAt?: boolean;
-  graphModules?: {
-    select: GraphModuleSelect;
-    first?: number;
-    filter?: GraphModuleFilter;
-    orderBy?: GraphModuleOrderBy[];
-  };
-};
-export type GraphModuleSelect = {
-  id?: boolean;
-  databaseId?: boolean;
-  publicSchemaId?: boolean;
-  privateSchemaId?: boolean;
-  publicSchemaName?: boolean;
-  privateSchemaName?: boolean;
-  scope?: boolean;
-  prefix?: boolean;
-  merkleStoreModuleId?: boolean;
-  graphsTableId?: boolean;
-  apiName?: boolean;
-  privateApiName?: boolean;
-  entityTableId?: boolean;
-  policies?: boolean;
-  provisions?: boolean;
-  defaultPermissions?: boolean;
-  createdAt?: boolean;
-  merkleStoreModule?: {
-    select: MerkleStoreModuleSelect;
-  };
-};
 export type DatabaseProvisionModuleSelect = {
   id?: boolean;
   databaseName?: boolean;
@@ -2353,6 +2356,53 @@ export type ConfigSecretsModuleSelect = {
   policies?: boolean;
   provisions?: boolean;
   hasConfig?: boolean;
+};
+export type GraphModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  publicSchemaId?: boolean;
+  privateSchemaId?: boolean;
+  publicSchemaName?: boolean;
+  privateSchemaName?: boolean;
+  scope?: boolean;
+  prefix?: boolean;
+  merkleStoreModuleId?: boolean;
+  graphsTableId?: boolean;
+  apiName?: boolean;
+  privateApiName?: boolean;
+  entityTableId?: boolean;
+  policies?: boolean;
+  provisions?: boolean;
+  defaultPermissions?: boolean;
+  createdAt?: boolean;
+  merkleStoreModule?: {
+    select: MerkleStoreModuleSelect;
+  };
+};
+export type MerkleStoreModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  privateSchemaId?: boolean;
+  publicSchemaName?: boolean;
+  privateSchemaName?: boolean;
+  objectTableId?: boolean;
+  storeTableId?: boolean;
+  commitTableId?: boolean;
+  refTableId?: boolean;
+  prefix?: boolean;
+  apiName?: boolean;
+  privateApiName?: boolean;
+  scope?: boolean;
+  functionPrefix?: boolean;
+  permissionKey?: boolean;
+  createdAt?: boolean;
+  graphModules?: {
+    select: GraphModuleSelect;
+    first?: number;
+    filter?: GraphModuleFilter;
+    orderBy?: GraphModuleOrderBy[];
+  };
 };
 export type RateLimitMetersModuleSelect = {
   id?: boolean;
@@ -2467,6 +2517,26 @@ export type InvitesModuleSelect = {
   apiName?: boolean;
   privateApiName?: boolean;
 };
+export type PrincipalAuthModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  principalsTableId?: boolean;
+  principalEntitiesTableId?: boolean;
+  principalScopeOverridesTableId?: boolean;
+  usersTableId?: boolean;
+  sessionsTableId?: boolean;
+  sessionCredentialsTableId?: boolean;
+  auditsTableId?: boolean;
+  principalsTableName?: boolean;
+  createPrincipalFunction?: boolean;
+  deletePrincipalFunction?: boolean;
+  createOrgPrincipalFunction?: boolean;
+  deleteOrgPrincipalFunction?: boolean;
+  createOrgApiKeyFunction?: boolean;
+  revokeOrgApiKeyFunction?: boolean;
+  apiName?: boolean;
+};
 export type ComputeLogModuleSelect = {
   id?: boolean;
   databaseId?: boolean;
@@ -2529,6 +2599,30 @@ export type NamespaceModuleSelect = {
   policies?: boolean;
   provisions?: boolean;
   defaultPermissions?: boolean;
+};
+export type ResourceModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  privateSchemaId?: boolean;
+  publicSchemaName?: boolean;
+  privateSchemaName?: boolean;
+  resourcesTableId?: boolean;
+  resourceEventsTableId?: boolean;
+  resourcesTableName?: boolean;
+  resourceEventsTableName?: boolean;
+  apiName?: boolean;
+  privateApiName?: boolean;
+  scope?: boolean;
+  prefix?: boolean;
+  entityTableId?: boolean;
+  namespaceModuleId?: boolean;
+  policies?: boolean;
+  provisions?: boolean;
+  defaultPermissions?: boolean;
+  namespaceModule?: {
+    select: NamespaceModuleSelect;
+  };
 };
 export type StorageLogModuleSelect = {
   id?: boolean;
@@ -3841,94 +3935,6 @@ export interface SecureTableProvisionFilter {
   /** Negates the expression. */
   not?: SecureTableProvisionFilter;
 }
-export interface MerkleStoreModuleFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `schemaId` field. */
-  schemaId?: UUIDFilter;
-  /** Filter by the object’s `privateSchemaId` field. */
-  privateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `publicSchemaName` field. */
-  publicSchemaName?: StringFilter;
-  /** Filter by the object’s `privateSchemaName` field. */
-  privateSchemaName?: StringFilter;
-  /** Filter by the object’s `objectTableId` field. */
-  objectTableId?: UUIDFilter;
-  /** Filter by the object’s `storeTableId` field. */
-  storeTableId?: UUIDFilter;
-  /** Filter by the object’s `commitTableId` field. */
-  commitTableId?: UUIDFilter;
-  /** Filter by the object’s `refTableId` field. */
-  refTableId?: UUIDFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Filter by the object’s `apiName` field. */
-  apiName?: StringFilter;
-  /** Filter by the object’s `privateApiName` field. */
-  privateApiName?: StringFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: StringFilter;
-  /** Filter by the object’s `functionPrefix` field. */
-  functionPrefix?: StringFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: MerkleStoreModuleFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MerkleStoreModuleFilter[];
-  /** Negates the expression. */
-  not?: MerkleStoreModuleFilter;
-  /** Filter by the object’s `graphModules` relation. */
-  graphModules?: MerkleStoreModuleToManyGraphModuleFilter;
-  /** `graphModules` exist. */
-  graphModulesExist?: boolean;
-}
-export interface GraphModuleFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `publicSchemaId` field. */
-  publicSchemaId?: UUIDFilter;
-  /** Filter by the object’s `privateSchemaId` field. */
-  privateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `publicSchemaName` field. */
-  publicSchemaName?: StringFilter;
-  /** Filter by the object’s `privateSchemaName` field. */
-  privateSchemaName?: StringFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: StringFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Filter by the object’s `merkleStoreModuleId` field. */
-  merkleStoreModuleId?: UUIDFilter;
-  /** Filter by the object’s `graphsTableId` field. */
-  graphsTableId?: UUIDFilter;
-  /** Filter by the object’s `apiName` field. */
-  apiName?: StringFilter;
-  /** Filter by the object’s `privateApiName` field. */
-  privateApiName?: StringFilter;
-  /** Filter by the object’s `entityTableId` field. */
-  entityTableId?: UUIDFilter;
-  /** Filter by the object’s `policies` field. */
-  policies?: JSONFilter;
-  /** Filter by the object’s `provisions` field. */
-  provisions?: JSONFilter;
-  /** Filter by the object’s `defaultPermissions` field. */
-  defaultPermissions?: StringListFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: GraphModuleFilter[];
-  /** Checks for any expressions in this list. */
-  or?: GraphModuleFilter[];
-  /** Negates the expression. */
-  not?: GraphModuleFilter;
-  /** Filter by the object’s `merkleStoreModule` relation. */
-  merkleStoreModule?: MerkleStoreModuleFilter;
-}
 export interface DatabaseProvisionModuleFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -4006,6 +4012,96 @@ export interface ConfigSecretsModuleFilter {
   or?: ConfigSecretsModuleFilter[];
   /** Negates the expression. */
   not?: ConfigSecretsModuleFilter;
+}
+export interface GraphModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaId` field. */
+  publicSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `merkleStoreModuleId` field. */
+  merkleStoreModuleId?: UUIDFilter;
+  /** Filter by the object’s `graphsTableId` field. */
+  graphsTableId?: UUIDFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: GraphModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: GraphModuleFilter[];
+  /** Negates the expression. */
+  not?: GraphModuleFilter;
+  /** Filter by the object’s `merkleStoreModule` relation. */
+  merkleStoreModule?: MerkleStoreModuleFilter;
+}
+export interface MerkleStoreModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `objectTableId` field. */
+  objectTableId?: UUIDFilter;
+  /** Filter by the object’s `storeTableId` field. */
+  storeTableId?: UUIDFilter;
+  /** Filter by the object’s `commitTableId` field. */
+  commitTableId?: UUIDFilter;
+  /** Filter by the object’s `refTableId` field. */
+  refTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `functionPrefix` field. */
+  functionPrefix?: StringFilter;
+  /** Filter by the object’s `permissionKey` field. */
+  permissionKey?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: MerkleStoreModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MerkleStoreModuleFilter[];
+  /** Negates the expression. */
+  not?: MerkleStoreModuleFilter;
+  /** Filter by the object’s `graphModules` relation. */
+  graphModules?: MerkleStoreModuleToManyGraphModuleFilter;
+  /** `graphModules` exist. */
+  graphModulesExist?: boolean;
 }
 export interface RateLimitMetersModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -4257,6 +4353,50 @@ export interface InvitesModuleFilter {
   /** Negates the expression. */
   not?: InvitesModuleFilter;
 }
+export interface PrincipalAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `principalsTableId` field. */
+  principalsTableId?: UUIDFilter;
+  /** Filter by the object’s `principalEntitiesTableId` field. */
+  principalEntitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `principalScopeOverridesTableId` field. */
+  principalScopeOverridesTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableId` field. */
+  auditsTableId?: UUIDFilter;
+  /** Filter by the object’s `principalsTableName` field. */
+  principalsTableName?: StringFilter;
+  /** Filter by the object’s `createPrincipalFunction` field. */
+  createPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `deletePrincipalFunction` field. */
+  deletePrincipalFunction?: StringFilter;
+  /** Filter by the object’s `createOrgPrincipalFunction` field. */
+  createOrgPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `deleteOrgPrincipalFunction` field. */
+  deleteOrgPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `createOrgApiKeyFunction` field. */
+  createOrgApiKeyFunction?: StringFilter;
+  /** Filter by the object’s `revokeOrgApiKeyFunction` field. */
+  revokeOrgApiKeyFunction?: StringFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrincipalAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrincipalAuthModuleFilter[];
+  /** Negates the expression. */
+  not?: PrincipalAuthModuleFilter;
+}
 export interface ComputeLogModuleFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -4394,6 +4534,56 @@ export interface NamespaceModuleFilter {
   or?: NamespaceModuleFilter[];
   /** Negates the expression. */
   not?: NamespaceModuleFilter;
+}
+export interface ResourceModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `resourcesTableId` field. */
+  resourcesTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceEventsTableId` field. */
+  resourceEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `resourcesTableName` field. */
+  resourcesTableName?: StringFilter;
+  /** Filter by the object’s `resourceEventsTableName` field. */
+  resourceEventsTableName?: StringFilter;
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `namespaceModuleId` field. */
+  namespaceModuleId?: UUIDFilter;
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: ResourceModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ResourceModuleFilter[];
+  /** Negates the expression. */
+  not?: ResourceModuleFilter;
+  /** Filter by the object’s `namespaceModule` relation. */
+  namespaceModule?: NamespaceModuleFilter;
+  /** A related `namespaceModule` exists. */
+  namespaceModuleExists?: boolean;
 }
 export interface StorageLogModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -6248,80 +6438,6 @@ export type SecureTableProvisionOrderBy =
   | 'POLICIES_DESC'
   | 'OUT_FIELDS_ASC'
   | 'OUT_FIELDS_DESC';
-export type MerkleStoreModuleOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'OBJECT_TABLE_ID_ASC'
-  | 'OBJECT_TABLE_ID_DESC'
-  | 'STORE_TABLE_ID_ASC'
-  | 'STORE_TABLE_ID_DESC'
-  | 'COMMIT_TABLE_ID_ASC'
-  | 'COMMIT_TABLE_ID_DESC'
-  | 'REF_TABLE_ID_ASC'
-  | 'REF_TABLE_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'FUNCTION_PREFIX_ASC'
-  | 'FUNCTION_PREFIX_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
-export type GraphModuleOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'PUBLIC_SCHEMA_ID_ASC'
-  | 'PUBLIC_SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'PUBLIC_SCHEMA_NAME_ASC'
-  | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'MERKLE_STORE_MODULE_ID_ASC'
-  | 'MERKLE_STORE_MODULE_ID_DESC'
-  | 'GRAPHS_TABLE_ID_ASC'
-  | 'GRAPHS_TABLE_ID_DESC'
-  | 'API_NAME_ASC'
-  | 'API_NAME_DESC'
-  | 'PRIVATE_API_NAME_ASC'
-  | 'PRIVATE_API_NAME_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'POLICIES_ASC'
-  | 'POLICIES_DESC'
-  | 'PROVISIONS_ASC'
-  | 'PROVISIONS_DESC'
-  | 'DEFAULT_PERMISSIONS_ASC'
-  | 'DEFAULT_PERMISSIONS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
 export type DatabaseProvisionModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -6392,6 +6508,82 @@ export type ConfigSecretsModuleOrderBy =
   | 'PROVISIONS_DESC'
   | 'HAS_CONFIG_ASC'
   | 'HAS_CONFIG_DESC';
+export type GraphModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'PUBLIC_SCHEMA_ID_ASC'
+  | 'PUBLIC_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'MERKLE_STORE_MODULE_ID_ASC'
+  | 'MERKLE_STORE_MODULE_ID_DESC'
+  | 'GRAPHS_TABLE_ID_ASC'
+  | 'GRAPHS_TABLE_ID_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC';
+export type MerkleStoreModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'OBJECT_TABLE_ID_ASC'
+  | 'OBJECT_TABLE_ID_DESC'
+  | 'STORE_TABLE_ID_ASC'
+  | 'STORE_TABLE_ID_DESC'
+  | 'COMMIT_TABLE_ID_ASC'
+  | 'COMMIT_TABLE_ID_DESC'
+  | 'REF_TABLE_ID_ASC'
+  | 'REF_TABLE_ID_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'FUNCTION_PREFIX_ASC'
+  | 'FUNCTION_PREFIX_DESC'
+  | 'PERMISSION_KEY_ASC'
+  | 'PERMISSION_KEY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC';
 export type RateLimitMetersModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -6618,6 +6810,46 @@ export type InvitesModuleOrderBy =
   | 'API_NAME_DESC'
   | 'PRIVATE_API_NAME_ASC'
   | 'PRIVATE_API_NAME_DESC';
+export type PrincipalAuthModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRINCIPALS_TABLE_ID_ASC'
+  | 'PRINCIPALS_TABLE_ID_DESC'
+  | 'PRINCIPAL_ENTITIES_TABLE_ID_ASC'
+  | 'PRINCIPAL_ENTITIES_TABLE_ID_DESC'
+  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_ASC'
+  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_DESC'
+  | 'USERS_TABLE_ID_ASC'
+  | 'USERS_TABLE_ID_DESC'
+  | 'SESSIONS_TABLE_ID_ASC'
+  | 'SESSIONS_TABLE_ID_DESC'
+  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
+  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
+  | 'AUDITS_TABLE_ID_ASC'
+  | 'AUDITS_TABLE_ID_DESC'
+  | 'PRINCIPALS_TABLE_NAME_ASC'
+  | 'PRINCIPALS_TABLE_NAME_DESC'
+  | 'CREATE_PRINCIPAL_FUNCTION_ASC'
+  | 'CREATE_PRINCIPAL_FUNCTION_DESC'
+  | 'DELETE_PRINCIPAL_FUNCTION_ASC'
+  | 'DELETE_PRINCIPAL_FUNCTION_DESC'
+  | 'CREATE_ORG_PRINCIPAL_FUNCTION_ASC'
+  | 'CREATE_ORG_PRINCIPAL_FUNCTION_DESC'
+  | 'DELETE_ORG_PRINCIPAL_FUNCTION_ASC'
+  | 'DELETE_ORG_PRINCIPAL_FUNCTION_DESC'
+  | 'CREATE_ORG_API_KEY_FUNCTION_ASC'
+  | 'CREATE_ORG_API_KEY_FUNCTION_DESC'
+  | 'REVOKE_ORG_API_KEY_FUNCTION_ASC'
+  | 'REVOKE_ORG_API_KEY_FUNCTION_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC';
 export type ComputeLogModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -6738,6 +6970,48 @@ export type NamespaceModuleOrderBy =
   | 'ENTITY_TABLE_ID_DESC'
   | 'PLATFORM_NAMESPACES_TABLE_ID_ASC'
   | 'PLATFORM_NAMESPACES_TABLE_ID_DESC'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC';
+export type ResourceModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'RESOURCES_TABLE_ID_ASC'
+  | 'RESOURCES_TABLE_ID_DESC'
+  | 'RESOURCE_EVENTS_TABLE_ID_ASC'
+  | 'RESOURCE_EVENTS_TABLE_ID_DESC'
+  | 'RESOURCES_TABLE_NAME_ASC'
+  | 'RESOURCES_TABLE_NAME_DESC'
+  | 'RESOURCE_EVENTS_TABLE_NAME_ASC'
+  | 'RESOURCE_EVENTS_TABLE_NAME_DESC'
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'NAMESPACE_MODULE_ID_ASC'
+  | 'NAMESPACE_MODULE_ID_DESC'
   | 'POLICIES_ASC'
   | 'POLICIES_DESC'
   | 'PROVISIONS_ASC'
@@ -8755,96 +9029,6 @@ export interface DeleteSecureTableProvisionInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateMerkleStoreModuleInput {
-  clientMutationId?: string;
-  merkleStoreModule: {
-    databaseId: string;
-    schemaId?: string;
-    privateSchemaId?: string;
-    publicSchemaName?: string;
-    privateSchemaName?: string;
-    objectTableId?: string;
-    storeTableId?: string;
-    commitTableId?: string;
-    refTableId?: string;
-    prefix?: string;
-    apiName?: string;
-    privateApiName?: string;
-    scope?: string;
-    functionPrefix?: string;
-  };
-}
-export interface MerkleStoreModulePatch {
-  databaseId?: string | null;
-  schemaId?: string | null;
-  privateSchemaId?: string | null;
-  publicSchemaName?: string | null;
-  privateSchemaName?: string | null;
-  objectTableId?: string | null;
-  storeTableId?: string | null;
-  commitTableId?: string | null;
-  refTableId?: string | null;
-  prefix?: string | null;
-  apiName?: string | null;
-  privateApiName?: string | null;
-  scope?: string | null;
-  functionPrefix?: string | null;
-}
-export interface UpdateMerkleStoreModuleInput {
-  clientMutationId?: string;
-  id: string;
-  merkleStoreModulePatch: MerkleStoreModulePatch;
-}
-export interface DeleteMerkleStoreModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateGraphModuleInput {
-  clientMutationId?: string;
-  graphModule: {
-    databaseId: string;
-    publicSchemaId?: string;
-    privateSchemaId?: string;
-    publicSchemaName?: string;
-    privateSchemaName?: string;
-    scope?: string;
-    prefix?: string;
-    merkleStoreModuleId: string;
-    graphsTableId?: string;
-    apiName?: string;
-    privateApiName?: string;
-    entityTableId?: string;
-    policies?: Record<string, unknown>;
-    provisions?: Record<string, unknown>;
-    defaultPermissions?: string[];
-  };
-}
-export interface GraphModulePatch {
-  databaseId?: string | null;
-  publicSchemaId?: string | null;
-  privateSchemaId?: string | null;
-  publicSchemaName?: string | null;
-  privateSchemaName?: string | null;
-  scope?: string | null;
-  prefix?: string | null;
-  merkleStoreModuleId?: string | null;
-  graphsTableId?: string | null;
-  apiName?: string | null;
-  privateApiName?: string | null;
-  entityTableId?: string | null;
-  policies?: Record<string, unknown> | null;
-  provisions?: Record<string, unknown> | null;
-  defaultPermissions?: string[] | null;
-}
-export interface UpdateGraphModuleInput {
-  clientMutationId?: string;
-  id: string;
-  graphModulePatch: GraphModulePatch;
-}
-export interface DeleteGraphModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateDatabaseProvisionModuleInput {
   clientMutationId?: string;
   databaseProvisionModule: {
@@ -8928,6 +9112,98 @@ export interface UpdateConfigSecretsModuleInput {
   configSecretsModulePatch: ConfigSecretsModulePatch;
 }
 export interface DeleteConfigSecretsModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateGraphModuleInput {
+  clientMutationId?: string;
+  graphModule: {
+    databaseId: string;
+    publicSchemaId?: string;
+    privateSchemaId?: string;
+    publicSchemaName?: string;
+    privateSchemaName?: string;
+    scope?: string;
+    prefix?: string;
+    merkleStoreModuleId: string;
+    graphsTableId?: string;
+    apiName?: string;
+    privateApiName?: string;
+    entityTableId?: string;
+    policies?: Record<string, unknown>;
+    provisions?: Record<string, unknown>;
+    defaultPermissions?: string[];
+  };
+}
+export interface GraphModulePatch {
+  databaseId?: string | null;
+  publicSchemaId?: string | null;
+  privateSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  privateSchemaName?: string | null;
+  scope?: string | null;
+  prefix?: string | null;
+  merkleStoreModuleId?: string | null;
+  graphsTableId?: string | null;
+  apiName?: string | null;
+  privateApiName?: string | null;
+  entityTableId?: string | null;
+  policies?: Record<string, unknown> | null;
+  provisions?: Record<string, unknown> | null;
+  defaultPermissions?: string[] | null;
+}
+export interface UpdateGraphModuleInput {
+  clientMutationId?: string;
+  id: string;
+  graphModulePatch: GraphModulePatch;
+}
+export interface DeleteGraphModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateMerkleStoreModuleInput {
+  clientMutationId?: string;
+  merkleStoreModule: {
+    databaseId: string;
+    schemaId?: string;
+    privateSchemaId?: string;
+    publicSchemaName?: string;
+    privateSchemaName?: string;
+    objectTableId?: string;
+    storeTableId?: string;
+    commitTableId?: string;
+    refTableId?: string;
+    prefix?: string;
+    apiName?: string;
+    privateApiName?: string;
+    scope?: string;
+    functionPrefix?: string;
+    permissionKey?: string;
+  };
+}
+export interface MerkleStoreModulePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  privateSchemaName?: string | null;
+  objectTableId?: string | null;
+  storeTableId?: string | null;
+  commitTableId?: string | null;
+  refTableId?: string | null;
+  prefix?: string | null;
+  apiName?: string | null;
+  privateApiName?: string | null;
+  scope?: string | null;
+  functionPrefix?: string | null;
+  permissionKey?: string | null;
+}
+export interface UpdateMerkleStoreModuleInput {
+  clientMutationId?: string;
+  id: string;
+  merkleStoreModulePatch: MerkleStoreModulePatch;
+}
+export interface DeleteMerkleStoreModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -9217,6 +9493,56 @@ export interface DeleteInvitesModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePrincipalAuthModuleInput {
+  clientMutationId?: string;
+  principalAuthModule: {
+    databaseId: string;
+    schemaId?: string;
+    principalsTableId?: string;
+    principalEntitiesTableId?: string;
+    principalScopeOverridesTableId?: string;
+    usersTableId?: string;
+    sessionsTableId?: string;
+    sessionCredentialsTableId?: string;
+    auditsTableId?: string;
+    principalsTableName?: string;
+    createPrincipalFunction?: string;
+    deletePrincipalFunction?: string;
+    createOrgPrincipalFunction?: string;
+    deleteOrgPrincipalFunction?: string;
+    createOrgApiKeyFunction?: string;
+    revokeOrgApiKeyFunction?: string;
+    apiName?: string;
+  };
+}
+export interface PrincipalAuthModulePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  principalsTableId?: string | null;
+  principalEntitiesTableId?: string | null;
+  principalScopeOverridesTableId?: string | null;
+  usersTableId?: string | null;
+  sessionsTableId?: string | null;
+  sessionCredentialsTableId?: string | null;
+  auditsTableId?: string | null;
+  principalsTableName?: string | null;
+  createPrincipalFunction?: string | null;
+  deletePrincipalFunction?: string | null;
+  createOrgPrincipalFunction?: string | null;
+  deleteOrgPrincipalFunction?: string | null;
+  createOrgApiKeyFunction?: string | null;
+  revokeOrgApiKeyFunction?: string | null;
+  apiName?: string | null;
+}
+export interface UpdatePrincipalAuthModuleInput {
+  clientMutationId?: string;
+  id: string;
+  principalAuthModulePatch: PrincipalAuthModulePatch;
+}
+export interface DeletePrincipalAuthModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateComputeLogModuleInput {
   clientMutationId?: string;
   computeLogModule: {
@@ -9370,6 +9696,58 @@ export interface UpdateNamespaceModuleInput {
   namespaceModulePatch: NamespaceModulePatch;
 }
 export interface DeleteNamespaceModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateResourceModuleInput {
+  clientMutationId?: string;
+  resourceModule: {
+    databaseId: string;
+    schemaId?: string;
+    privateSchemaId?: string;
+    publicSchemaName?: string;
+    privateSchemaName?: string;
+    resourcesTableId?: string;
+    resourceEventsTableId?: string;
+    resourcesTableName?: string;
+    resourceEventsTableName?: string;
+    apiName?: string;
+    privateApiName?: string;
+    scope?: string;
+    prefix?: string;
+    entityTableId?: string;
+    namespaceModuleId?: string;
+    policies?: Record<string, unknown>;
+    provisions?: Record<string, unknown>;
+    defaultPermissions?: string[];
+  };
+}
+export interface ResourceModulePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  publicSchemaName?: string | null;
+  privateSchemaName?: string | null;
+  resourcesTableId?: string | null;
+  resourceEventsTableId?: string | null;
+  resourcesTableName?: string | null;
+  resourceEventsTableName?: string | null;
+  apiName?: string | null;
+  privateApiName?: string | null;
+  scope?: string | null;
+  prefix?: string | null;
+  entityTableId?: string | null;
+  namespaceModuleId?: string | null;
+  policies?: Record<string, unknown> | null;
+  provisions?: Record<string, unknown> | null;
+  defaultPermissions?: string[] | null;
+}
+export interface UpdateResourceModuleInput {
+  clientMutationId?: string;
+  id: string;
+  resourceModulePatch: ResourceModulePatch;
+}
+export interface DeleteResourceModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -11348,45 +11726,6 @@ export interface SecureTableProvisionInput {
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
   outFields?: string[];
 }
-/** An input for mutations affecting `MerkleStoreModule` */
-export interface MerkleStoreModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  publicSchemaName?: string;
-  privateSchemaName?: string;
-  objectTableId?: string;
-  storeTableId?: string;
-  commitTableId?: string;
-  refTableId?: string;
-  prefix?: string;
-  apiName?: string;
-  privateApiName?: string;
-  scope?: string;
-  functionPrefix?: string;
-  createdAt?: string;
-}
-/** An input for mutations affecting `GraphModule` */
-export interface GraphModuleInput {
-  id?: string;
-  databaseId: string;
-  publicSchemaId?: string;
-  privateSchemaId?: string;
-  publicSchemaName?: string;
-  privateSchemaName?: string;
-  scope?: string;
-  prefix?: string;
-  merkleStoreModuleId: string;
-  graphsTableId?: string;
-  apiName?: string;
-  privateApiName?: string;
-  entityTableId?: string;
-  policies?: Record<string, unknown>;
-  provisions?: Record<string, unknown>;
-  defaultPermissions?: string[];
-  createdAt?: string;
-}
 /** An input for mutations affecting `DatabaseProvisionModule` */
 export interface DatabaseProvisionModuleInput {
   id?: string;
@@ -11432,6 +11771,46 @@ export interface ConfigSecretsModuleInput {
   policies?: Record<string, unknown>;
   provisions?: Record<string, unknown>;
   hasConfig?: boolean;
+}
+/** An input for mutations affecting `GraphModule` */
+export interface GraphModuleInput {
+  id?: string;
+  databaseId: string;
+  publicSchemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  scope?: string;
+  prefix?: string;
+  merkleStoreModuleId: string;
+  graphsTableId?: string;
+  apiName?: string;
+  privateApiName?: string;
+  entityTableId?: string;
+  policies?: Record<string, unknown>;
+  provisions?: Record<string, unknown>;
+  defaultPermissions?: string[];
+  createdAt?: string;
+}
+/** An input for mutations affecting `MerkleStoreModule` */
+export interface MerkleStoreModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  objectTableId?: string;
+  storeTableId?: string;
+  commitTableId?: string;
+  refTableId?: string;
+  prefix?: string;
+  apiName?: string;
+  privateApiName?: string;
+  scope?: string;
+  functionPrefix?: string;
+  permissionKey?: string;
+  createdAt?: string;
 }
 /** An input for mutations affecting `RateLimitMetersModule` */
 export interface RateLimitMetersModuleInput {
@@ -11552,6 +11931,27 @@ export interface InvitesModuleInput {
   apiName?: string;
   privateApiName?: string;
 }
+/** An input for mutations affecting `PrincipalAuthModule` */
+export interface PrincipalAuthModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  principalsTableId?: string;
+  principalEntitiesTableId?: string;
+  principalScopeOverridesTableId?: string;
+  usersTableId?: string;
+  sessionsTableId?: string;
+  sessionCredentialsTableId?: string;
+  auditsTableId?: string;
+  principalsTableName?: string;
+  createPrincipalFunction?: string;
+  deletePrincipalFunction?: string;
+  createOrgPrincipalFunction?: string;
+  deleteOrgPrincipalFunction?: string;
+  createOrgApiKeyFunction?: string;
+  revokeOrgApiKeyFunction?: string;
+  apiName?: string;
+}
 /** An input for mutations affecting `ComputeLogModule` */
 export interface ComputeLogModuleInput {
   id?: string;
@@ -11614,6 +12014,28 @@ export interface NamespaceModuleInput {
   prefix?: string;
   entityTableId?: string;
   platformNamespacesTableId?: string;
+  policies?: Record<string, unknown>;
+  provisions?: Record<string, unknown>;
+  defaultPermissions?: string[];
+}
+/** An input for mutations affecting `ResourceModule` */
+export interface ResourceModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  publicSchemaName?: string;
+  privateSchemaName?: string;
+  resourcesTableId?: string;
+  resourceEventsTableId?: string;
+  resourcesTableName?: string;
+  resourceEventsTableName?: string;
+  apiName?: string;
+  privateApiName?: string;
+  scope?: string;
+  prefix?: string;
+  entityTableId?: string;
+  namespaceModuleId?: string;
   policies?: Record<string, unknown>;
   provisions?: Record<string, unknown>;
   defaultPermissions?: string[];
@@ -12970,6 +13392,8 @@ export interface MerkleStoreModuleFilter {
   scope?: StringFilter;
   /** Filter by the object’s `functionPrefix` field. */
   functionPrefix?: StringFilter;
+  /** Filter by the object’s `permissionKey` field. */
+  permissionKey?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
@@ -14248,96 +14672,6 @@ export type DeleteSecureTableProvisionPayloadSelect = {
     select: SecureTableProvisionEdgeSelect;
   };
 };
-export interface CreateMerkleStoreModulePayload {
-  clientMutationId?: string | null;
-  /** The `MerkleStoreModule` that was created by this mutation. */
-  merkleStoreModule?: MerkleStoreModule | null;
-  merkleStoreModuleEdge?: MerkleStoreModuleEdge | null;
-}
-export type CreateMerkleStoreModulePayloadSelect = {
-  clientMutationId?: boolean;
-  merkleStoreModule?: {
-    select: MerkleStoreModuleSelect;
-  };
-  merkleStoreModuleEdge?: {
-    select: MerkleStoreModuleEdgeSelect;
-  };
-};
-export interface UpdateMerkleStoreModulePayload {
-  clientMutationId?: string | null;
-  /** The `MerkleStoreModule` that was updated by this mutation. */
-  merkleStoreModule?: MerkleStoreModule | null;
-  merkleStoreModuleEdge?: MerkleStoreModuleEdge | null;
-}
-export type UpdateMerkleStoreModulePayloadSelect = {
-  clientMutationId?: boolean;
-  merkleStoreModule?: {
-    select: MerkleStoreModuleSelect;
-  };
-  merkleStoreModuleEdge?: {
-    select: MerkleStoreModuleEdgeSelect;
-  };
-};
-export interface DeleteMerkleStoreModulePayload {
-  clientMutationId?: string | null;
-  /** The `MerkleStoreModule` that was deleted by this mutation. */
-  merkleStoreModule?: MerkleStoreModule | null;
-  merkleStoreModuleEdge?: MerkleStoreModuleEdge | null;
-}
-export type DeleteMerkleStoreModulePayloadSelect = {
-  clientMutationId?: boolean;
-  merkleStoreModule?: {
-    select: MerkleStoreModuleSelect;
-  };
-  merkleStoreModuleEdge?: {
-    select: MerkleStoreModuleEdgeSelect;
-  };
-};
-export interface CreateGraphModulePayload {
-  clientMutationId?: string | null;
-  /** The `GraphModule` that was created by this mutation. */
-  graphModule?: GraphModule | null;
-  graphModuleEdge?: GraphModuleEdge | null;
-}
-export type CreateGraphModulePayloadSelect = {
-  clientMutationId?: boolean;
-  graphModule?: {
-    select: GraphModuleSelect;
-  };
-  graphModuleEdge?: {
-    select: GraphModuleEdgeSelect;
-  };
-};
-export interface UpdateGraphModulePayload {
-  clientMutationId?: string | null;
-  /** The `GraphModule` that was updated by this mutation. */
-  graphModule?: GraphModule | null;
-  graphModuleEdge?: GraphModuleEdge | null;
-}
-export type UpdateGraphModulePayloadSelect = {
-  clientMutationId?: boolean;
-  graphModule?: {
-    select: GraphModuleSelect;
-  };
-  graphModuleEdge?: {
-    select: GraphModuleEdgeSelect;
-  };
-};
-export interface DeleteGraphModulePayload {
-  clientMutationId?: string | null;
-  /** The `GraphModule` that was deleted by this mutation. */
-  graphModule?: GraphModule | null;
-  graphModuleEdge?: GraphModuleEdge | null;
-}
-export type DeleteGraphModulePayloadSelect = {
-  clientMutationId?: boolean;
-  graphModule?: {
-    select: GraphModuleSelect;
-  };
-  graphModuleEdge?: {
-    select: GraphModuleEdgeSelect;
-  };
-};
 export interface CreateDatabaseProvisionModulePayload {
   clientMutationId?: string | null;
   /** The `DatabaseProvisionModule` that was created by this mutation. */
@@ -14426,6 +14760,96 @@ export type DeleteConfigSecretsModulePayloadSelect = {
   };
   configSecretsModuleEdge?: {
     select: ConfigSecretsModuleEdgeSelect;
+  };
+};
+export interface CreateGraphModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphModule` that was created by this mutation. */
+  graphModule?: GraphModule | null;
+  graphModuleEdge?: GraphModuleEdge | null;
+}
+export type CreateGraphModulePayloadSelect = {
+  clientMutationId?: boolean;
+  graphModule?: {
+    select: GraphModuleSelect;
+  };
+  graphModuleEdge?: {
+    select: GraphModuleEdgeSelect;
+  };
+};
+export interface UpdateGraphModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphModule` that was updated by this mutation. */
+  graphModule?: GraphModule | null;
+  graphModuleEdge?: GraphModuleEdge | null;
+}
+export type UpdateGraphModulePayloadSelect = {
+  clientMutationId?: boolean;
+  graphModule?: {
+    select: GraphModuleSelect;
+  };
+  graphModuleEdge?: {
+    select: GraphModuleEdgeSelect;
+  };
+};
+export interface DeleteGraphModulePayload {
+  clientMutationId?: string | null;
+  /** The `GraphModule` that was deleted by this mutation. */
+  graphModule?: GraphModule | null;
+  graphModuleEdge?: GraphModuleEdge | null;
+}
+export type DeleteGraphModulePayloadSelect = {
+  clientMutationId?: boolean;
+  graphModule?: {
+    select: GraphModuleSelect;
+  };
+  graphModuleEdge?: {
+    select: GraphModuleEdgeSelect;
+  };
+};
+export interface CreateMerkleStoreModulePayload {
+  clientMutationId?: string | null;
+  /** The `MerkleStoreModule` that was created by this mutation. */
+  merkleStoreModule?: MerkleStoreModule | null;
+  merkleStoreModuleEdge?: MerkleStoreModuleEdge | null;
+}
+export type CreateMerkleStoreModulePayloadSelect = {
+  clientMutationId?: boolean;
+  merkleStoreModule?: {
+    select: MerkleStoreModuleSelect;
+  };
+  merkleStoreModuleEdge?: {
+    select: MerkleStoreModuleEdgeSelect;
+  };
+};
+export interface UpdateMerkleStoreModulePayload {
+  clientMutationId?: string | null;
+  /** The `MerkleStoreModule` that was updated by this mutation. */
+  merkleStoreModule?: MerkleStoreModule | null;
+  merkleStoreModuleEdge?: MerkleStoreModuleEdge | null;
+}
+export type UpdateMerkleStoreModulePayloadSelect = {
+  clientMutationId?: boolean;
+  merkleStoreModule?: {
+    select: MerkleStoreModuleSelect;
+  };
+  merkleStoreModuleEdge?: {
+    select: MerkleStoreModuleEdgeSelect;
+  };
+};
+export interface DeleteMerkleStoreModulePayload {
+  clientMutationId?: string | null;
+  /** The `MerkleStoreModule` that was deleted by this mutation. */
+  merkleStoreModule?: MerkleStoreModule | null;
+  merkleStoreModuleEdge?: MerkleStoreModuleEdge | null;
+}
+export type DeleteMerkleStoreModulePayloadSelect = {
+  clientMutationId?: boolean;
+  merkleStoreModule?: {
+    select: MerkleStoreModuleSelect;
+  };
+  merkleStoreModuleEdge?: {
+    select: MerkleStoreModuleEdgeSelect;
   };
 };
 export interface CreateRateLimitMetersModulePayload {
@@ -14698,6 +15122,51 @@ export type DeleteInvitesModulePayloadSelect = {
     select: InvitesModuleEdgeSelect;
   };
 };
+export interface CreatePrincipalAuthModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalAuthModule` that was created by this mutation. */
+  principalAuthModule?: PrincipalAuthModule | null;
+  principalAuthModuleEdge?: PrincipalAuthModuleEdge | null;
+}
+export type CreatePrincipalAuthModulePayloadSelect = {
+  clientMutationId?: boolean;
+  principalAuthModule?: {
+    select: PrincipalAuthModuleSelect;
+  };
+  principalAuthModuleEdge?: {
+    select: PrincipalAuthModuleEdgeSelect;
+  };
+};
+export interface UpdatePrincipalAuthModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalAuthModule` that was updated by this mutation. */
+  principalAuthModule?: PrincipalAuthModule | null;
+  principalAuthModuleEdge?: PrincipalAuthModuleEdge | null;
+}
+export type UpdatePrincipalAuthModulePayloadSelect = {
+  clientMutationId?: boolean;
+  principalAuthModule?: {
+    select: PrincipalAuthModuleSelect;
+  };
+  principalAuthModuleEdge?: {
+    select: PrincipalAuthModuleEdgeSelect;
+  };
+};
+export interface DeletePrincipalAuthModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalAuthModule` that was deleted by this mutation. */
+  principalAuthModule?: PrincipalAuthModule | null;
+  principalAuthModuleEdge?: PrincipalAuthModuleEdge | null;
+}
+export type DeletePrincipalAuthModulePayloadSelect = {
+  clientMutationId?: boolean;
+  principalAuthModule?: {
+    select: PrincipalAuthModuleSelect;
+  };
+  principalAuthModuleEdge?: {
+    select: PrincipalAuthModuleEdgeSelect;
+  };
+};
 export interface CreateComputeLogModulePayload {
   clientMutationId?: string | null;
   /** The `ComputeLogModule` that was created by this mutation. */
@@ -14831,6 +15300,51 @@ export type DeleteNamespaceModulePayloadSelect = {
   };
   namespaceModuleEdge?: {
     select: NamespaceModuleEdgeSelect;
+  };
+};
+export interface CreateResourceModulePayload {
+  clientMutationId?: string | null;
+  /** The `ResourceModule` that was created by this mutation. */
+  resourceModule?: ResourceModule | null;
+  resourceModuleEdge?: ResourceModuleEdge | null;
+}
+export type CreateResourceModulePayloadSelect = {
+  clientMutationId?: boolean;
+  resourceModule?: {
+    select: ResourceModuleSelect;
+  };
+  resourceModuleEdge?: {
+    select: ResourceModuleEdgeSelect;
+  };
+};
+export interface UpdateResourceModulePayload {
+  clientMutationId?: string | null;
+  /** The `ResourceModule` that was updated by this mutation. */
+  resourceModule?: ResourceModule | null;
+  resourceModuleEdge?: ResourceModuleEdge | null;
+}
+export type UpdateResourceModulePayloadSelect = {
+  clientMutationId?: boolean;
+  resourceModule?: {
+    select: ResourceModuleSelect;
+  };
+  resourceModuleEdge?: {
+    select: ResourceModuleEdgeSelect;
+  };
+};
+export interface DeleteResourceModulePayload {
+  clientMutationId?: string | null;
+  /** The `ResourceModule` that was deleted by this mutation. */
+  resourceModule?: ResourceModule | null;
+  resourceModuleEdge?: ResourceModuleEdge | null;
+}
+export type DeleteResourceModulePayloadSelect = {
+  clientMutationId?: boolean;
+  resourceModule?: {
+    select: ResourceModuleSelect;
+  };
+  resourceModuleEdge?: {
+    select: ResourceModuleEdgeSelect;
   };
 };
 export interface CreateStorageLogModulePayload {
@@ -16065,30 +16579,6 @@ export type SecureTableProvisionEdgeSelect = {
     select: SecureTableProvisionSelect;
   };
 };
-/** A `MerkleStoreModule` edge in the connection. */
-export interface MerkleStoreModuleEdge {
-  cursor?: string | null;
-  /** The `MerkleStoreModule` at the end of the edge. */
-  node?: MerkleStoreModule | null;
-}
-export type MerkleStoreModuleEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: MerkleStoreModuleSelect;
-  };
-};
-/** A `GraphModule` edge in the connection. */
-export interface GraphModuleEdge {
-  cursor?: string | null;
-  /** The `GraphModule` at the end of the edge. */
-  node?: GraphModule | null;
-}
-export type GraphModuleEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: GraphModuleSelect;
-  };
-};
 /** A `DatabaseProvisionModule` edge in the connection. */
 export interface DatabaseProvisionModuleEdge {
   cursor?: string | null;
@@ -16111,6 +16601,30 @@ export type ConfigSecretsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: ConfigSecretsModuleSelect;
+  };
+};
+/** A `GraphModule` edge in the connection. */
+export interface GraphModuleEdge {
+  cursor?: string | null;
+  /** The `GraphModule` at the end of the edge. */
+  node?: GraphModule | null;
+}
+export type GraphModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: GraphModuleSelect;
+  };
+};
+/** A `MerkleStoreModule` edge in the connection. */
+export interface MerkleStoreModuleEdge {
+  cursor?: string | null;
+  /** The `MerkleStoreModule` at the end of the edge. */
+  node?: MerkleStoreModule | null;
+}
+export type MerkleStoreModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: MerkleStoreModuleSelect;
   };
 };
 /** A `RateLimitMetersModule` edge in the connection. */
@@ -16185,6 +16699,18 @@ export type InvitesModuleEdgeSelect = {
     select: InvitesModuleSelect;
   };
 };
+/** A `PrincipalAuthModule` edge in the connection. */
+export interface PrincipalAuthModuleEdge {
+  cursor?: string | null;
+  /** The `PrincipalAuthModule` at the end of the edge. */
+  node?: PrincipalAuthModule | null;
+}
+export type PrincipalAuthModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PrincipalAuthModuleSelect;
+  };
+};
 /** A `ComputeLogModule` edge in the connection. */
 export interface ComputeLogModuleEdge {
   cursor?: string | null;
@@ -16219,6 +16745,18 @@ export type NamespaceModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: NamespaceModuleSelect;
+  };
+};
+/** A `ResourceModule` edge in the connection. */
+export interface ResourceModuleEdge {
+  cursor?: string | null;
+  /** The `ResourceModule` at the end of the edge. */
+  node?: ResourceModule | null;
+}
+export type ResourceModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ResourceModuleSelect;
   };
 };
 /** A `StorageLogModule` edge in the connection. */

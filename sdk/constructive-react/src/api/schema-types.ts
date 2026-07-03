@@ -99,8 +99,6 @@ export type CheckConstraintOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -132,8 +130,6 @@ export type SpatialRelationOrderBy =
   | 'PARAM_NAME_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -183,8 +179,6 @@ export type FieldOrderBy =
   | 'TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -220,8 +214,6 @@ export type ForeignKeyConstraintOrderBy =
   | 'UPDATE_ACTION_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -286,8 +278,6 @@ export type IndexOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -323,8 +313,6 @@ export type PolicyOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -352,8 +340,6 @@ export type PrimaryKeyConstraintOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -404,8 +390,6 @@ export type TriggerOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -435,8 +419,6 @@ export type UniqueConstraintOrderBy =
   | 'FIELD_IDS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -525,8 +507,6 @@ export type ViewOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC';
 /** Methods to use when ordering `EmbeddingChunk`. */
@@ -597,8 +577,6 @@ export type TableOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'USE_RLS_ASC'
   | 'USE_RLS_DESC'
   | 'TIMESTAMPS_ASC'
@@ -684,8 +662,6 @@ export type EnumOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC';
 /** Methods to use when ordering `Function`. */
@@ -724,8 +700,6 @@ export type CompositeTypeOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC';
 /** Methods to use when ordering `ApiModule`. */
@@ -769,10 +743,16 @@ export type DomainOrderBy =
   | 'API_ID_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
+  | 'SERVICE_ID_ASC'
+  | 'SERVICE_ID_DESC'
   | 'SUBDOMAIN_ASC'
   | 'SUBDOMAIN_DESC'
   | 'DOMAIN_ASC'
-  | 'DOMAIN_DESC';
+  | 'DOMAIN_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 /** Methods to use when ordering `SiteMetadatum`. */
 export type SiteMetadatumOrderBy =
   | 'NATURAL'
@@ -852,8 +832,6 @@ export type SchemaOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'IS_PUBLIC_ASC'
@@ -963,7 +941,11 @@ export type ApiOrderBy =
   | 'ANON_ROLE_ASC'
   | 'ANON_ROLE_DESC'
   | 'IS_PUBLIC_ASC'
-  | 'IS_PUBLIC_DESC';
+  | 'IS_PUBLIC_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 /** Methods to use when ordering `Site`. */
 export type SiteOrderBy =
   | 'NATURAL'
@@ -986,7 +968,11 @@ export type SiteOrderBy =
   | 'LOGO_ASC'
   | 'LOGO_DESC'
   | 'DBNAME_ASC'
-  | 'DBNAME_DESC';
+  | 'DBNAME_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 /** Methods to use when ordering `App`. */
 export type AppOrderBy =
   | 'NATURAL'
@@ -1207,7 +1193,11 @@ export type DatabaseSettingOrderBy =
   | 'ENABLE_I18N_ASC'
   | 'ENABLE_I18N_DESC'
   | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC';
+  | 'OPTIONS_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 /** Methods to use when ordering `WebauthnSetting`. */
 export type WebauthnSettingOrderBy =
   | 'NATURAL'
@@ -1298,8 +1288,6 @@ export interface CheckConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -1558,8 +1546,6 @@ export interface SchemaFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `isPublic` field. */
@@ -1663,8 +1649,6 @@ export interface TableFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
   /** Filter by the object’s `timestamps` field. */
@@ -1832,8 +1816,6 @@ export interface FieldFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -1888,8 +1870,6 @@ export interface SpatialRelationFilter {
   paramName?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -1950,8 +1930,6 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2052,8 +2030,6 @@ export interface IndexFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2106,8 +2082,6 @@ export interface PolicyFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2152,8 +2126,6 @@ export interface PrimaryKeyConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2238,8 +2210,6 @@ export interface TriggerFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2286,8 +2256,6 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2342,8 +2310,6 @@ export interface ViewFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -2720,8 +2686,6 @@ export interface EnumFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -2794,8 +2758,6 @@ export interface CompositeTypeFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -2857,6 +2819,10 @@ export interface ApiFilter {
   anonRole?: StringFilter;
   /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: ApiFilter[];
   /** Checks for any expressions in this list. */
@@ -2944,10 +2910,16 @@ export interface DomainFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `serviceId` field. */
+  serviceId?: UUIDFilter;
   /** Filter by the object’s `subdomain` field. */
   subdomain?: ConstructiveInternalTypeHostnameFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: DomainFilter[];
   /** Checks for any expressions in this list. */
@@ -3062,6 +3034,10 @@ export interface SiteFilter {
   logo?: ConstructiveInternalTypeImageFilter;
   /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: SiteFilter[];
   /** Checks for any expressions in this list. */
@@ -3891,6 +3867,10 @@ export interface DatabaseSettingFilter {
   enableI18N?: BooleanFilter;
   /** Filter by the object’s `options` field. */
   options?: JSONFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: DatabaseSettingFilter[];
   /** Checks for any expressions in this list. */
@@ -4441,28 +4421,6 @@ export interface ViewGrantInput {
   withGrantOption?: boolean;
   isGrant?: boolean;
 }
-export interface CreateApiInput {
-  clientMutationId?: string;
-  /** The `Api` to be created by this mutation. */
-  api: ApiInput;
-}
-/** An input for mutations affecting `Api` */
-export interface ApiInput {
-  /** Unique identifier for this API */
-  id?: string;
-  /** Reference to the metaschema database this API serves */
-  databaseId: string;
-  /** Unique name for this API within its database */
-  name: string;
-  /** PostgreSQL database name to connect to */
-  dbname?: string;
-  /** PostgreSQL role used for authenticated requests */
-  roleName?: string;
-  /** PostgreSQL role used for anonymous/unauthenticated requests */
-  anonRole?: string;
-  /** Whether this API is publicly accessible without authentication */
-  isPublic?: boolean;
-}
 export interface CreateCorsSettingInput {
   clientMutationId?: string;
   /** The `CorsSetting` to be created by this mutation. */
@@ -4529,6 +4487,32 @@ export interface SiteModuleInput {
   name: string;
   /** JSON configuration data for this module */
   data: unknown;
+}
+export interface CreateApiInput {
+  clientMutationId?: string;
+  /** The `Api` to be created by this mutation. */
+  api: ApiInput;
+}
+/** An input for mutations affecting `Api` */
+export interface ApiInput {
+  /** Unique identifier for this API */
+  id?: string;
+  /** Reference to the metaschema database this API serves */
+  databaseId: string;
+  /** Unique name for this API within its database */
+  name: string;
+  /** PostgreSQL database name to connect to */
+  dbname?: string;
+  /** PostgreSQL role used for authenticated requests */
+  roleName?: string;
+  /** PostgreSQL role used for anonymous/unauthenticated requests */
+  anonRole?: string;
+  /** Whether this API is publicly accessible without authentication */
+  isPublic?: boolean;
+  /** Key/value pairs for selecting and filtering APIs */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
 }
 export interface CreateSiteMetadatumInput {
   clientMutationId?: string;
@@ -4637,26 +4621,6 @@ export interface TableGrantInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateDomainInput {
-  clientMutationId?: string;
-  /** The `Domain` to be created by this mutation. */
-  domain: DomainInput;
-}
-/** An input for mutations affecting `Domain` */
-export interface DomainInput {
-  /** Unique identifier for this domain record */
-  id?: string;
-  /** Reference to the metaschema database this domain belongs to */
-  databaseId: string;
-  /** API endpoint this domain routes to (mutually exclusive with site_id) */
-  apiId?: string;
-  /** Site this domain routes to (mutually exclusive with api_id) */
-  siteId?: string;
-  /** Subdomain portion of the hostname */
-  subdomain?: ConstructiveInternalTypeHostname;
-  /** Root domain of the hostname */
-  domain?: ConstructiveInternalTypeHostname;
-}
 export interface CreateRlsSettingInput {
   clientMutationId?: string;
   /** The `RlsSetting` to be created by this mutation. */
@@ -4724,6 +4688,32 @@ export interface PartitionInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateDomainInput {
+  clientMutationId?: string;
+  /** The `Domain` to be created by this mutation. */
+  domain: DomainInput;
+}
+/** An input for mutations affecting `Domain` */
+export interface DomainInput {
+  /** Unique identifier for this domain record */
+  id?: string;
+  /** Reference to the metaschema database this domain belongs to */
+  databaseId: string;
+  /** API endpoint this domain routes to (mutually exclusive with site_id) */
+  apiId?: string;
+  /** Site this domain routes to (mutually exclusive with api_id and service_id) */
+  siteId?: string;
+  /** Server deployment this domain routes to (mutually exclusive with api_id and site_id) */
+  serviceId?: string;
+  /** Subdomain portion of the hostname */
+  subdomain?: ConstructiveInternalTypeHostname;
+  /** Root domain of the hostname */
+  domain?: ConstructiveInternalTypeHostname;
+  /** Key/value pairs for selecting and filtering domains */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+}
 export interface CreateCompositeTypeInput {
   clientMutationId?: string;
   /** The `CompositeType` to be created by this mutation. */
@@ -4740,7 +4730,6 @@ export interface CompositeTypeInput {
   attributes?: unknown;
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
 }
 export interface CreateEnumInput {
@@ -4759,7 +4748,28 @@ export interface EnumInput {
   values?: string[];
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
+  tags?: string[];
+}
+export interface CreateViewInput {
+  clientMutationId?: string;
+  /** The `View` to be created by this mutation. */
+  view: ViewInput;
+}
+/** An input for mutations affecting `View` */
+export interface ViewInput {
+  id?: string;
+  databaseId?: string;
+  schemaId: string;
+  name: string;
+  tableId?: string;
+  viewType: string;
+  data?: unknown;
+  filterType?: string;
+  filterData?: unknown;
+  securityInvoker?: boolean;
+  isReadOnly?: boolean;
+  smartTags?: unknown;
+  category?: ObjectCategory;
   tags?: string[];
 }
 export interface CreateSqlActionInput {
@@ -4783,66 +4793,127 @@ export interface SqlActionInput {
   actionId?: string;
   actorId?: string;
 }
-export interface CreateViewInput {
+export interface CreatePrimaryKeyConstraintInput {
   clientMutationId?: string;
-  /** The `View` to be created by this mutation. */
-  view: ViewInput;
+  /** The `PrimaryKeyConstraint` to be created by this mutation. */
+  primaryKeyConstraint: PrimaryKeyConstraintInput;
 }
-/** An input for mutations affecting `View` */
-export interface ViewInput {
+/** An input for mutations affecting `PrimaryKeyConstraint` */
+export interface PrimaryKeyConstraintInput {
   id?: string;
   databaseId?: string;
-  schemaId: string;
-  name: string;
-  tableId?: string;
-  viewType: string;
-  data?: unknown;
-  filterType?: string;
-  filterData?: unknown;
-  securityInvoker?: boolean;
-  isReadOnly?: boolean;
+  tableId: string;
+  name?: string;
+  type?: string;
+  fieldIds: string[];
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
-export interface CreateDatabaseSettingInput {
+export interface CreateTriggerInput {
   clientMutationId?: string;
-  /** The `DatabaseSetting` to be created by this mutation. */
-  databaseSetting: DatabaseSettingInput;
+  /** The `Trigger` to be created by this mutation. */
+  trigger: TriggerInput;
 }
-/** An input for mutations affecting `DatabaseSetting` */
-export interface DatabaseSettingInput {
-  /** Unique identifier for this settings record */
+/** An input for mutations affecting `Trigger` */
+export interface TriggerInput {
   id?: string;
-  /** Reference to the metaschema database these settings apply to */
-  databaseId: string;
-  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
-  enableAggregates?: boolean;
-  /** Enable PostGIS spatial types and operators in the GraphQL API */
-  enablePostgis?: boolean;
-  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
-  enableSearch?: boolean;
-  /** Enable direct (multipart) file upload mutations in the GraphQL API */
-  enableDirectUploads?: boolean;
-  /** Enable presigned URL upload flow for S3/MinIO storage */
-  enablePresignedUploads?: boolean;
-  /** Enable many-to-many relationship queries in the GraphQL API */
-  enableManyToMany?: boolean;
-  /** Enable connection filter (where argument) in the GraphQL API */
-  enableConnectionFilter?: boolean;
-  /** Enable ltree hierarchical data type support in the GraphQL API */
-  enableLtree?: boolean;
-  /** Enable LLM/AI integration features in the GraphQL API */
-  enableLlm?: boolean;
-  /** Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API */
-  enableRealtime?: boolean;
-  /** Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API */
-  enableBulk?: boolean;
-  /** Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API */
-  enableI18N?: boolean;
-  /** Extensible JSON for additional settings that do not have dedicated columns */
-  options?: unknown;
+  databaseId?: string;
+  tableId: string;
+  name: string;
+  event?: string;
+  functionName?: string;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface CreateCheckConstraintInput {
+  clientMutationId?: string;
+  /** The `CheckConstraint` to be created by this mutation. */
+  checkConstraint: CheckConstraintInput;
+}
+/** An input for mutations affecting `CheckConstraint` */
+export interface CheckConstraintInput {
+  id?: string;
+  databaseId?: string;
+  tableId: string;
+  name?: string;
+  type?: string;
+  fieldIds: string[];
+  expr?: unknown;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface CreateUniqueConstraintInput {
+  clientMutationId?: string;
+  /** The `UniqueConstraint` to be created by this mutation. */
+  uniqueConstraint: UniqueConstraintInput;
+}
+/** An input for mutations affecting `UniqueConstraint` */
+export interface UniqueConstraintInput {
+  id?: string;
+  databaseId?: string;
+  tableId: string;
+  name?: string;
+  description?: string;
+  smartTags?: unknown;
+  type?: string;
+  fieldIds: string[];
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface CreateSpatialRelationInput {
+  clientMutationId?: string;
+  /** The `SpatialRelation` to be created by this mutation. */
+  spatialRelation: SpatialRelationInput;
+}
+/** An input for mutations affecting `SpatialRelation` */
+export interface SpatialRelationInput {
+  id?: string;
+  databaseId?: string;
+  tableId: string;
+  fieldId: string;
+  refTableId: string;
+  refFieldId: string;
+  name: string;
+  operator: string;
+  paramName?: string;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface CreatePolicyInput {
+  clientMutationId?: string;
+  /** The `Policy` to be created by this mutation. */
+  policy: PolicyInput;
+}
+/** An input for mutations affecting `Policy` */
+export interface PolicyInput {
+  id?: string;
+  databaseId?: string;
+  tableId: string;
+  name?: string;
+  granteeName?: string;
+  privilege?: string;
+  permissive?: boolean;
+  disabled?: boolean;
+  policyType?: string;
+  data?: unknown;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface CreateApiSettingInput {
   clientMutationId?: string;
@@ -4906,130 +4977,27 @@ export interface DatabaseTransferInput {
   updatedAt?: string;
   completedAt?: string;
 }
-export interface CreatePrimaryKeyConstraintInput {
+export interface CreateIndexInput {
   clientMutationId?: string;
-  /** The `PrimaryKeyConstraint` to be created by this mutation. */
-  primaryKeyConstraint: PrimaryKeyConstraintInput;
+  /** The `Index` to be created by this mutation. */
+  index: IndexInput;
 }
-/** An input for mutations affecting `PrimaryKeyConstraint` */
-export interface PrimaryKeyConstraintInput {
+/** An input for mutations affecting `Index` */
+export interface IndexInput {
   id?: string;
-  databaseId?: string;
+  databaseId: string;
   tableId: string;
   name?: string;
-  type?: string;
-  fieldIds: string[];
+  fieldIds?: string[];
+  includeFieldIds?: string[];
+  accessMethod?: string;
+  indexParams?: unknown;
+  whereClause?: unknown;
+  isUnique?: boolean;
+  options?: unknown;
+  opClasses?: string[];
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface CreateTriggerInput {
-  clientMutationId?: string;
-  /** The `Trigger` to be created by this mutation. */
-  trigger: TriggerInput;
-}
-/** An input for mutations affecting `Trigger` */
-export interface TriggerInput {
-  id?: string;
-  databaseId?: string;
-  tableId: string;
-  name: string;
-  event?: string;
-  functionName?: string;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface CreateCheckConstraintInput {
-  clientMutationId?: string;
-  /** The `CheckConstraint` to be created by this mutation. */
-  checkConstraint: CheckConstraintInput;
-}
-/** An input for mutations affecting `CheckConstraint` */
-export interface CheckConstraintInput {
-  id?: string;
-  databaseId?: string;
-  tableId: string;
-  name?: string;
-  type?: string;
-  fieldIds: string[];
-  expr?: unknown;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface CreateUniqueConstraintInput {
-  clientMutationId?: string;
-  /** The `UniqueConstraint` to be created by this mutation. */
-  uniqueConstraint: UniqueConstraintInput;
-}
-/** An input for mutations affecting `UniqueConstraint` */
-export interface UniqueConstraintInput {
-  id?: string;
-  databaseId?: string;
-  tableId: string;
-  name?: string;
-  description?: string;
-  smartTags?: unknown;
-  type?: string;
-  fieldIds: string[];
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface CreateSpatialRelationInput {
-  clientMutationId?: string;
-  /** The `SpatialRelation` to be created by this mutation. */
-  spatialRelation: SpatialRelationInput;
-}
-/** An input for mutations affecting `SpatialRelation` */
-export interface SpatialRelationInput {
-  id?: string;
-  databaseId?: string;
-  tableId: string;
-  fieldId: string;
-  refTableId: string;
-  refFieldId: string;
-  name: string;
-  operator: string;
-  paramName?: string;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface CreatePolicyInput {
-  clientMutationId?: string;
-  /** The `Policy` to be created by this mutation. */
-  policy: PolicyInput;
-}
-/** An input for mutations affecting `Policy` */
-export interface PolicyInput {
-  id?: string;
-  databaseId?: string;
-  tableId: string;
-  name?: string;
-  granteeName?: string;
-  privilege?: string;
-  permissive?: boolean;
-  disabled?: boolean;
-  policyType?: string;
-  data?: unknown;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -5060,6 +5028,48 @@ export interface AppInput {
   /** URL to the Google Play Store listing */
   playStoreLink?: ConstructiveInternalTypeUrl;
 }
+export interface CreateDatabaseSettingInput {
+  clientMutationId?: string;
+  /** The `DatabaseSetting` to be created by this mutation. */
+  databaseSetting: DatabaseSettingInput;
+}
+/** An input for mutations affecting `DatabaseSetting` */
+export interface DatabaseSettingInput {
+  /** Unique identifier for this settings record */
+  id?: string;
+  /** Reference to the metaschema database these settings apply to */
+  databaseId: string;
+  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
+  enableAggregates?: boolean;
+  /** Enable PostGIS spatial types and operators in the GraphQL API */
+  enablePostgis?: boolean;
+  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
+  enableSearch?: boolean;
+  /** Enable direct (multipart) file upload mutations in the GraphQL API */
+  enableDirectUploads?: boolean;
+  /** Enable presigned URL upload flow for S3/MinIO storage */
+  enablePresignedUploads?: boolean;
+  /** Enable many-to-many relationship queries in the GraphQL API */
+  enableManyToMany?: boolean;
+  /** Enable connection filter (where argument) in the GraphQL API */
+  enableConnectionFilter?: boolean;
+  /** Enable ltree hierarchical data type support in the GraphQL API */
+  enableLtree?: boolean;
+  /** Enable LLM/AI integration features in the GraphQL API */
+  enableLlm?: boolean;
+  /** Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API */
+  enableRealtime?: boolean;
+  /** Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API */
+  enableBulk?: boolean;
+  /** Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API */
+  enableI18N?: boolean;
+  /** Extensible JSON for additional settings that do not have dedicated columns */
+  options?: unknown;
+  /** Key/value pairs for selecting and filtering database settings */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+}
 export interface CreateSiteInput {
   clientMutationId?: string;
   /** The `Site` to be created by this mutation. */
@@ -5085,32 +5095,10 @@ export interface SiteInput {
   logo?: ConstructiveInternalTypeImage;
   /** PostgreSQL database name this site connects to */
   dbname?: string;
-}
-export interface CreateIndexInput {
-  clientMutationId?: string;
-  /** The `Index` to be created by this mutation. */
-  index: IndexInput;
-}
-/** An input for mutations affecting `Index` */
-export interface IndexInput {
-  id?: string;
-  databaseId: string;
-  tableId: string;
-  name?: string;
-  fieldIds?: string[];
-  includeFieldIds?: string[];
-  accessMethod?: string;
-  indexParams?: unknown;
-  whereClause?: unknown;
-  isUnique?: boolean;
-  options?: unknown;
-  opClasses?: string[];
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
+  /** Key/value pairs for selecting and filtering sites */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
 }
 export interface CreateForeignKeyConstraintInput {
   clientMutationId?: string;
@@ -5132,7 +5120,6 @@ export interface ForeignKeyConstraintInput {
   deleteAction?: string;
   updateAction?: string;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -5246,7 +5233,6 @@ export interface SchemaInput {
   description?: string;
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   isPublic?: boolean;
   apiExposure?: ApiExposureLevel;
@@ -5279,7 +5265,6 @@ export interface FieldInput {
   max?: number;
   tags?: string[];
   category?: ObjectCategory;
-  scope?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -5298,7 +5283,6 @@ export interface TableInput {
   description?: string;
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   useRls?: boolean;
   timestamps?: boolean;
   peoplestamps?: boolean;
@@ -5425,30 +5409,6 @@ export interface ViewGrantPatch {
   withGrantOption?: boolean;
   isGrant?: boolean;
 }
-export interface UpdateApiInput {
-  clientMutationId?: string;
-  /** Unique identifier for this API */
-  id: string;
-  /** An object where the defined keys will be set on the `Api` being updated. */
-  apiPatch: ApiPatch;
-}
-/** Represents an update to a `Api`. Fields that are set will be updated. */
-export interface ApiPatch {
-  /** Unique identifier for this API */
-  id?: string;
-  /** Reference to the metaschema database this API serves */
-  databaseId?: string;
-  /** Unique name for this API within its database */
-  name?: string;
-  /** PostgreSQL database name to connect to */
-  dbname?: string;
-  /** PostgreSQL role used for authenticated requests */
-  roleName?: string;
-  /** PostgreSQL role used for anonymous/unauthenticated requests */
-  anonRole?: string;
-  /** Whether this API is publicly accessible without authentication */
-  isPublic?: boolean;
-}
 export interface UpdateCorsSettingInput {
   clientMutationId?: string;
   /** Unique identifier for this CORS settings record */
@@ -5522,6 +5482,34 @@ export interface SiteModulePatch {
   name?: string;
   /** JSON configuration data for this module */
   data?: unknown;
+}
+export interface UpdateApiInput {
+  clientMutationId?: string;
+  /** Unique identifier for this API */
+  id: string;
+  /** An object where the defined keys will be set on the `Api` being updated. */
+  apiPatch: ApiPatch;
+}
+/** Represents an update to a `Api`. Fields that are set will be updated. */
+export interface ApiPatch {
+  /** Unique identifier for this API */
+  id?: string;
+  /** Reference to the metaschema database this API serves */
+  databaseId?: string;
+  /** Unique name for this API within its database */
+  name?: string;
+  /** PostgreSQL database name to connect to */
+  dbname?: string;
+  /** PostgreSQL role used for authenticated requests */
+  roleName?: string;
+  /** PostgreSQL role used for anonymous/unauthenticated requests */
+  anonRole?: string;
+  /** Whether this API is publicly accessible without authentication */
+  isPublic?: boolean;
+  /** Key/value pairs for selecting and filtering APIs */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
 }
 export interface UpdateSiteMetadatumInput {
   clientMutationId?: string;
@@ -5640,28 +5628,6 @@ export interface TableGrantPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateDomainInput {
-  clientMutationId?: string;
-  /** Unique identifier for this domain record */
-  id: string;
-  /** An object where the defined keys will be set on the `Domain` being updated. */
-  domainPatch: DomainPatch;
-}
-/** Represents an update to a `Domain`. Fields that are set will be updated. */
-export interface DomainPatch {
-  /** Unique identifier for this domain record */
-  id?: string;
-  /** Reference to the metaschema database this domain belongs to */
-  databaseId?: string;
-  /** API endpoint this domain routes to (mutually exclusive with site_id) */
-  apiId?: string;
-  /** Site this domain routes to (mutually exclusive with api_id) */
-  siteId?: string;
-  /** Subdomain portion of the hostname */
-  subdomain?: ConstructiveInternalTypeHostname;
-  /** Root domain of the hostname */
-  domain?: ConstructiveInternalTypeHostname;
-}
 export interface UpdateRlsSettingInput {
   clientMutationId?: string;
   /** Unique identifier for this RLS settings record */
@@ -5733,6 +5699,34 @@ export interface PartitionPatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateDomainInput {
+  clientMutationId?: string;
+  /** Unique identifier for this domain record */
+  id: string;
+  /** An object where the defined keys will be set on the `Domain` being updated. */
+  domainPatch: DomainPatch;
+}
+/** Represents an update to a `Domain`. Fields that are set will be updated. */
+export interface DomainPatch {
+  /** Unique identifier for this domain record */
+  id?: string;
+  /** Reference to the metaschema database this domain belongs to */
+  databaseId?: string;
+  /** API endpoint this domain routes to (mutually exclusive with site_id) */
+  apiId?: string;
+  /** Site this domain routes to (mutually exclusive with api_id and service_id) */
+  siteId?: string;
+  /** Server deployment this domain routes to (mutually exclusive with api_id and site_id) */
+  serviceId?: string;
+  /** Subdomain portion of the hostname */
+  subdomain?: ConstructiveInternalTypeHostname;
+  /** Root domain of the hostname */
+  domain?: ConstructiveInternalTypeHostname;
+  /** Key/value pairs for selecting and filtering domains */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+}
 export interface UpdateCompositeTypeInput {
   clientMutationId?: string;
   id: string;
@@ -5750,7 +5744,6 @@ export interface CompositeTypePatch {
   attributes?: unknown;
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
 }
 export interface UpdateEnumInput {
@@ -5770,7 +5763,6 @@ export interface EnumPatch {
   values?: string[];
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
 }
 export interface UpdateViewInput {
@@ -5794,48 +5786,135 @@ export interface ViewPatch {
   isReadOnly?: boolean;
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
 }
-export interface UpdateDatabaseSettingInput {
+export interface UpdatePrimaryKeyConstraintInput {
   clientMutationId?: string;
-  /** Unique identifier for this settings record */
   id: string;
-  /** An object where the defined keys will be set on the `DatabaseSetting` being updated. */
-  databaseSettingPatch: DatabaseSettingPatch;
+  /** An object where the defined keys will be set on the `PrimaryKeyConstraint` being updated. */
+  primaryKeyConstraintPatch: PrimaryKeyConstraintPatch;
 }
-/** Represents an update to a `DatabaseSetting`. Fields that are set will be updated. */
-export interface DatabaseSettingPatch {
-  /** Unique identifier for this settings record */
+/** Represents an update to a `PrimaryKeyConstraint`. Fields that are set will be updated. */
+export interface PrimaryKeyConstraintPatch {
   id?: string;
-  /** Reference to the metaschema database these settings apply to */
   databaseId?: string;
-  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
-  enableAggregates?: boolean;
-  /** Enable PostGIS spatial types and operators in the GraphQL API */
-  enablePostgis?: boolean;
-  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
-  enableSearch?: boolean;
-  /** Enable direct (multipart) file upload mutations in the GraphQL API */
-  enableDirectUploads?: boolean;
-  /** Enable presigned URL upload flow for S3/MinIO storage */
-  enablePresignedUploads?: boolean;
-  /** Enable many-to-many relationship queries in the GraphQL API */
-  enableManyToMany?: boolean;
-  /** Enable connection filter (where argument) in the GraphQL API */
-  enableConnectionFilter?: boolean;
-  /** Enable ltree hierarchical data type support in the GraphQL API */
-  enableLtree?: boolean;
-  /** Enable LLM/AI integration features in the GraphQL API */
-  enableLlm?: boolean;
-  /** Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API */
-  enableRealtime?: boolean;
-  /** Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API */
-  enableBulk?: boolean;
-  /** Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API */
-  enableI18N?: boolean;
-  /** Extensible JSON for additional settings that do not have dedicated columns */
-  options?: unknown;
+  tableId?: string;
+  name?: string;
+  type?: string;
+  fieldIds?: string[];
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UpdateTriggerInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Trigger` being updated. */
+  triggerPatch: TriggerPatch;
+}
+/** Represents an update to a `Trigger`. Fields that are set will be updated. */
+export interface TriggerPatch {
+  id?: string;
+  databaseId?: string;
+  tableId?: string;
+  name?: string;
+  event?: string;
+  functionName?: string;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UpdateCheckConstraintInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `CheckConstraint` being updated. */
+  checkConstraintPatch: CheckConstraintPatch;
+}
+/** Represents an update to a `CheckConstraint`. Fields that are set will be updated. */
+export interface CheckConstraintPatch {
+  id?: string;
+  databaseId?: string;
+  tableId?: string;
+  name?: string;
+  type?: string;
+  fieldIds?: string[];
+  expr?: unknown;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UpdateUniqueConstraintInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `UniqueConstraint` being updated. */
+  uniqueConstraintPatch: UniqueConstraintPatch;
+}
+/** Represents an update to a `UniqueConstraint`. Fields that are set will be updated. */
+export interface UniqueConstraintPatch {
+  id?: string;
+  databaseId?: string;
+  tableId?: string;
+  name?: string;
+  description?: string;
+  smartTags?: unknown;
+  type?: string;
+  fieldIds?: string[];
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UpdateSpatialRelationInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `SpatialRelation` being updated. */
+  spatialRelationPatch: SpatialRelationPatch;
+}
+/** Represents an update to a `SpatialRelation`. Fields that are set will be updated. */
+export interface SpatialRelationPatch {
+  id?: string;
+  databaseId?: string;
+  tableId?: string;
+  fieldId?: string;
+  refTableId?: string;
+  refFieldId?: string;
+  name?: string;
+  operator?: string;
+  paramName?: string;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UpdatePolicyInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Policy` being updated. */
+  policyPatch: PolicyPatch;
+}
+/** Represents an update to a `Policy`. Fields that are set will be updated. */
+export interface PolicyPatch {
+  id?: string;
+  databaseId?: string;
+  tableId?: string;
+  name?: string;
+  granteeName?: string;
+  privilege?: string;
+  permissive?: boolean;
+  disabled?: boolean;
+  policyType?: string;
+  data?: unknown;
+  smartTags?: unknown;
+  category?: ObjectCategory;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface UpdateApiSettingInput {
   clientMutationId?: string;
@@ -5902,136 +5981,28 @@ export interface DatabaseTransferPatch {
   updatedAt?: string;
   completedAt?: string;
 }
-export interface UpdatePrimaryKeyConstraintInput {
+export interface UpdateIndexInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `PrimaryKeyConstraint` being updated. */
-  primaryKeyConstraintPatch: PrimaryKeyConstraintPatch;
+  /** An object where the defined keys will be set on the `Index` being updated. */
+  indexPatch: IndexPatch;
 }
-/** Represents an update to a `PrimaryKeyConstraint`. Fields that are set will be updated. */
-export interface PrimaryKeyConstraintPatch {
+/** Represents an update to a `Index`. Fields that are set will be updated. */
+export interface IndexPatch {
   id?: string;
   databaseId?: string;
   tableId?: string;
   name?: string;
-  type?: string;
   fieldIds?: string[];
+  includeFieldIds?: string[];
+  accessMethod?: string;
+  indexParams?: unknown;
+  whereClause?: unknown;
+  isUnique?: boolean;
+  options?: unknown;
+  opClasses?: string[];
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdateTriggerInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Trigger` being updated. */
-  triggerPatch: TriggerPatch;
-}
-/** Represents an update to a `Trigger`. Fields that are set will be updated. */
-export interface TriggerPatch {
-  id?: string;
-  databaseId?: string;
-  tableId?: string;
-  name?: string;
-  event?: string;
-  functionName?: string;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdateCheckConstraintInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `CheckConstraint` being updated. */
-  checkConstraintPatch: CheckConstraintPatch;
-}
-/** Represents an update to a `CheckConstraint`. Fields that are set will be updated. */
-export interface CheckConstraintPatch {
-  id?: string;
-  databaseId?: string;
-  tableId?: string;
-  name?: string;
-  type?: string;
-  fieldIds?: string[];
-  expr?: unknown;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdateUniqueConstraintInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `UniqueConstraint` being updated. */
-  uniqueConstraintPatch: UniqueConstraintPatch;
-}
-/** Represents an update to a `UniqueConstraint`. Fields that are set will be updated. */
-export interface UniqueConstraintPatch {
-  id?: string;
-  databaseId?: string;
-  tableId?: string;
-  name?: string;
-  description?: string;
-  smartTags?: unknown;
-  type?: string;
-  fieldIds?: string[];
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdateSpatialRelationInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `SpatialRelation` being updated. */
-  spatialRelationPatch: SpatialRelationPatch;
-}
-/** Represents an update to a `SpatialRelation`. Fields that are set will be updated. */
-export interface SpatialRelationPatch {
-  id?: string;
-  databaseId?: string;
-  tableId?: string;
-  fieldId?: string;
-  refTableId?: string;
-  refFieldId?: string;
-  name?: string;
-  operator?: string;
-  paramName?: string;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdatePolicyInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Policy` being updated. */
-  policyPatch: PolicyPatch;
-}
-/** Represents an update to a `Policy`. Fields that are set will be updated. */
-export interface PolicyPatch {
-  id?: string;
-  databaseId?: string;
-  tableId?: string;
-  name?: string;
-  granteeName?: string;
-  privilege?: string;
-  permissive?: boolean;
-  disabled?: boolean;
-  policyType?: string;
-  data?: unknown;
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -6066,6 +6037,50 @@ export interface AppPatch {
   /** Upload for App icon or promotional image */
   appImageUpload?: File;
 }
+export interface UpdateDatabaseSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this settings record */
+  id: string;
+  /** An object where the defined keys will be set on the `DatabaseSetting` being updated. */
+  databaseSettingPatch: DatabaseSettingPatch;
+}
+/** Represents an update to a `DatabaseSetting`. Fields that are set will be updated. */
+export interface DatabaseSettingPatch {
+  /** Unique identifier for this settings record */
+  id?: string;
+  /** Reference to the metaschema database these settings apply to */
+  databaseId?: string;
+  /** Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API */
+  enableAggregates?: boolean;
+  /** Enable PostGIS spatial types and operators in the GraphQL API */
+  enablePostgis?: boolean;
+  /** Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API */
+  enableSearch?: boolean;
+  /** Enable direct (multipart) file upload mutations in the GraphQL API */
+  enableDirectUploads?: boolean;
+  /** Enable presigned URL upload flow for S3/MinIO storage */
+  enablePresignedUploads?: boolean;
+  /** Enable many-to-many relationship queries in the GraphQL API */
+  enableManyToMany?: boolean;
+  /** Enable connection filter (where argument) in the GraphQL API */
+  enableConnectionFilter?: boolean;
+  /** Enable ltree hierarchical data type support in the GraphQL API */
+  enableLtree?: boolean;
+  /** Enable LLM/AI integration features in the GraphQL API */
+  enableLlm?: boolean;
+  /** Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API */
+  enableRealtime?: boolean;
+  /** Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API */
+  enableBulk?: boolean;
+  /** Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API */
+  enableI18N?: boolean;
+  /** Extensible JSON for additional settings that do not have dedicated columns */
+  options?: unknown;
+  /** Key/value pairs for selecting and filtering database settings */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
+}
 export interface UpdateSiteInput {
   clientMutationId?: string;
   /** Unique identifier for this site */
@@ -6093,6 +6108,10 @@ export interface SitePatch {
   logo?: ConstructiveInternalTypeImage;
   /** PostgreSQL database name this site connects to */
   dbname?: string;
+  /** Key/value pairs for selecting and filtering sites */
+  labels?: unknown;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: unknown;
   /** Upload for Open Graph image used for social media link previews */
   ogImageUpload?: File;
   /** Upload for Browser favicon attachment */
@@ -6101,33 +6120,6 @@ export interface SitePatch {
   appleTouchIconUpload?: File;
   /** Upload for Primary logo image for the site */
   logoUpload?: File;
-}
-export interface UpdateIndexInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Index` being updated. */
-  indexPatch: IndexPatch;
-}
-/** Represents an update to a `Index`. Fields that are set will be updated. */
-export interface IndexPatch {
-  id?: string;
-  databaseId?: string;
-  tableId?: string;
-  name?: string;
-  fieldIds?: string[];
-  includeFieldIds?: string[];
-  accessMethod?: string;
-  indexParams?: unknown;
-  whereClause?: unknown;
-  isUnique?: boolean;
-  options?: unknown;
-  opClasses?: string[];
-  smartTags?: unknown;
-  category?: ObjectCategory;
-  scope?: number;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
 }
 export interface UpdateForeignKeyConstraintInput {
   clientMutationId?: string;
@@ -6150,7 +6142,6 @@ export interface ForeignKeyConstraintPatch {
   deleteAction?: string;
   updateAction?: string;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -6247,7 +6238,6 @@ export interface SchemaPatch {
   description?: string;
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   isPublic?: boolean;
   apiExposure?: ApiExposureLevel;
@@ -6281,7 +6271,6 @@ export interface FieldPatch {
   max?: number;
   tags?: string[];
   category?: ObjectCategory;
-  scope?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -6301,7 +6290,6 @@ export interface TablePatch {
   description?: string;
   smartTags?: unknown;
   category?: ObjectCategory;
-  scope?: number;
   useRls?: boolean;
   timestamps?: boolean;
   peoplestamps?: boolean;
@@ -6346,11 +6334,6 @@ export interface DeleteViewGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteApiInput {
-  clientMutationId?: string;
-  /** Unique identifier for this API */
-  id: string;
-}
 export interface DeleteCorsSettingInput {
   clientMutationId?: string;
   /** Unique identifier for this CORS settings record */
@@ -6368,6 +6351,11 @@ export interface DeleteApiModuleInput {
 export interface DeleteSiteModuleInput {
   clientMutationId?: string;
   /** Unique identifier for this site module record */
+  id: string;
+}
+export interface DeleteApiInput {
+  clientMutationId?: string;
+  /** Unique identifier for this API */
   id: string;
 }
 export interface DeleteSiteMetadatumInput {
@@ -6396,11 +6384,6 @@ export interface DeleteTableGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteDomainInput {
-  clientMutationId?: string;
-  /** Unique identifier for this domain record */
-  id: string;
-}
 export interface DeleteRlsSettingInput {
   clientMutationId?: string;
   /** Unique identifier for this RLS settings record */
@@ -6414,6 +6397,11 @@ export interface DeletePartitionInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteDomainInput {
+  clientMutationId?: string;
+  /** Unique identifier for this domain record */
+  id: string;
+}
 export interface DeleteCompositeTypeInput {
   clientMutationId?: string;
   id: string;
@@ -6423,20 +6411,6 @@ export interface DeleteEnumInput {
   id: string;
 }
 export interface DeleteViewInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteDatabaseSettingInput {
-  clientMutationId?: string;
-  /** Unique identifier for this settings record */
-  id: string;
-}
-export interface DeleteApiSettingInput {
-  clientMutationId?: string;
-  /** Unique identifier for this API settings record */
-  id: string;
-}
-export interface DeleteDatabaseTransferInput {
   clientMutationId?: string;
   id: string;
 }
@@ -6464,18 +6438,32 @@ export interface DeletePolicyInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteApiSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this API settings record */
+  id: string;
+}
+export interface DeleteDatabaseTransferInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteIndexInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteAppInput {
   clientMutationId?: string;
   /** Unique identifier for this app */
   id: string;
 }
+export interface DeleteDatabaseSettingInput {
+  clientMutationId?: string;
+  /** Unique identifier for this settings record */
+  id: string;
+}
 export interface DeleteSiteInput {
   clientMutationId?: string;
   /** Unique identifier for this site */
-  id: string;
-}
-export interface DeleteIndexInput {
-  clientMutationId?: string;
   id: string;
 }
 export interface DeleteForeignKeyConstraintInput {
@@ -6568,13 +6556,6 @@ export interface ViewGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Api` values. */
-export interface ApiConnection {
-  nodes: Api[];
-  edges: ApiEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `CorsSetting` values. */
 export interface CorsSettingConnection {
   nodes: CorsSetting[];
@@ -6600,6 +6581,13 @@ export interface ApiModuleConnection {
 export interface SiteModuleConnection {
   nodes: SiteModule[];
   edges: SiteModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Api` values. */
+export interface ApiConnection {
+  nodes: Api[];
+  edges: ApiEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -6645,13 +6633,6 @@ export interface TableGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Domain` values. */
-export interface DomainConnection {
-  nodes: Domain[];
-  edges: DomainEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `RlsSetting` values. */
 export interface RlsSettingConnection {
   nodes: RlsSetting[];
@@ -6673,6 +6654,13 @@ export interface PartitionConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `Domain` values. */
+export interface DomainConnection {
+  nodes: Domain[];
+  edges: DomainEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `CompositeType` values. */
 export interface CompositeTypeConnection {
   nodes: CompositeType[];
@@ -6687,13 +6675,6 @@ export interface EnumConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `SqlAction` values. */
-export interface SqlActionConnection {
-  nodes: SqlAction[];
-  edges: SqlActionEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `View` values. */
 export interface ViewConnection {
   nodes: View[];
@@ -6701,24 +6682,10 @@ export interface ViewConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `DatabaseSetting` values. */
-export interface DatabaseSettingConnection {
-  nodes: DatabaseSetting[];
-  edges: DatabaseSettingEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `ApiSetting` values. */
-export interface ApiSettingConnection {
-  nodes: ApiSetting[];
-  edges: ApiSettingEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `DatabaseTransfer` values. */
-export interface DatabaseTransferConnection {
-  nodes: DatabaseTransfer[];
-  edges: DatabaseTransferEdge[];
+/** A connection to a list of `SqlAction` values. */
+export interface SqlActionConnection {
+  nodes: SqlAction[];
+  edges: SqlActionEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -6764,17 +6731,17 @@ export interface PolicyConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `App` values. */
-export interface AppConnection {
-  nodes: App[];
-  edges: AppEdge[];
+/** A connection to a list of `ApiSetting` values. */
+export interface ApiSettingConnection {
+  nodes: ApiSetting[];
+  edges: ApiSettingEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Site` values. */
-export interface SiteConnection {
-  nodes: Site[];
-  edges: SiteEdge[];
+/** A connection to a list of `DatabaseTransfer` values. */
+export interface DatabaseTransferConnection {
+  nodes: DatabaseTransfer[];
+  edges: DatabaseTransferEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -6782,6 +6749,27 @@ export interface SiteConnection {
 export interface IndexConnection {
   nodes: Index[];
   edges: IndexEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `App` values. */
+export interface AppConnection {
+  nodes: App[];
+  edges: AppEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `DatabaseSetting` values. */
+export interface DatabaseSettingConnection {
+  nodes: DatabaseSetting[];
+  edges: DatabaseSettingEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Site` values. */
+export interface SiteConnection {
+  nodes: Site[];
+  edges: SiteEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -6915,12 +6903,6 @@ export interface CreateViewGrantPayload {
   viewGrant?: ViewGrant | null;
   viewGrantEdge?: ViewGrantEdge | null;
 }
-export interface CreateApiPayload {
-  clientMutationId?: string | null;
-  /** The `Api` that was created by this mutation. */
-  api?: Api | null;
-  apiEdge?: ApiEdge | null;
-}
 export interface CreateCorsSettingPayload {
   clientMutationId?: string | null;
   /** The `CorsSetting` that was created by this mutation. */
@@ -6944,6 +6926,12 @@ export interface CreateSiteModulePayload {
   /** The `SiteModule` that was created by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface CreateApiPayload {
+  clientMutationId?: string | null;
+  /** The `Api` that was created by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
 }
 export interface CreateSiteMetadatumPayload {
   clientMutationId?: string | null;
@@ -6981,12 +6969,6 @@ export interface CreateTableGrantPayload {
   tableGrant?: TableGrant | null;
   tableGrantEdge?: TableGrantEdge | null;
 }
-export interface CreateDomainPayload {
-  clientMutationId?: string | null;
-  /** The `Domain` that was created by this mutation. */
-  domain?: Domain | null;
-  domainEdge?: DomainEdge | null;
-}
 export interface CreateRlsSettingPayload {
   clientMutationId?: string | null;
   /** The `RlsSetting` that was created by this mutation. */
@@ -7005,6 +6987,12 @@ export interface CreatePartitionPayload {
   partition?: Partition | null;
   partitionEdge?: PartitionEdge | null;
 }
+export interface CreateDomainPayload {
+  clientMutationId?: string | null;
+  /** The `Domain` that was created by this mutation. */
+  domain?: Domain | null;
+  domainEdge?: DomainEdge | null;
+}
 export interface CreateCompositeTypePayload {
   clientMutationId?: string | null;
   /** The `CompositeType` that was created by this mutation. */
@@ -7017,34 +7005,16 @@ export interface CreateEnumPayload {
   enum?: Enum | null;
   enumEdge?: EnumEdge | null;
 }
-export interface CreateSqlActionPayload {
-  clientMutationId?: string | null;
-  /** The `SqlAction` that was created by this mutation. */
-  sqlAction?: SqlAction | null;
-}
 export interface CreateViewPayload {
   clientMutationId?: string | null;
   /** The `View` that was created by this mutation. */
   view?: View | null;
   viewEdge?: ViewEdge | null;
 }
-export interface CreateDatabaseSettingPayload {
+export interface CreateSqlActionPayload {
   clientMutationId?: string | null;
-  /** The `DatabaseSetting` that was created by this mutation. */
-  databaseSetting?: DatabaseSetting | null;
-  databaseSettingEdge?: DatabaseSettingEdge | null;
-}
-export interface CreateApiSettingPayload {
-  clientMutationId?: string | null;
-  /** The `ApiSetting` that was created by this mutation. */
-  apiSetting?: ApiSetting | null;
-  apiSettingEdge?: ApiSettingEdge | null;
-}
-export interface CreateDatabaseTransferPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseTransfer` that was created by this mutation. */
-  databaseTransfer?: DatabaseTransfer | null;
-  databaseTransferEdge?: DatabaseTransferEdge | null;
+  /** The `SqlAction` that was created by this mutation. */
+  sqlAction?: SqlAction | null;
 }
 export interface CreatePrimaryKeyConstraintPayload {
   clientMutationId?: string | null;
@@ -7082,23 +7052,41 @@ export interface CreatePolicyPayload {
   policy?: Policy | null;
   policyEdge?: PolicyEdge | null;
 }
-export interface CreateAppPayload {
+export interface CreateApiSettingPayload {
   clientMutationId?: string | null;
-  /** The `App` that was created by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
+  /** The `ApiSetting` that was created by this mutation. */
+  apiSetting?: ApiSetting | null;
+  apiSettingEdge?: ApiSettingEdge | null;
 }
-export interface CreateSitePayload {
+export interface CreateDatabaseTransferPayload {
   clientMutationId?: string | null;
-  /** The `Site` that was created by this mutation. */
-  site?: Site | null;
-  siteEdge?: SiteEdge | null;
+  /** The `DatabaseTransfer` that was created by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
 }
 export interface CreateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was created by this mutation. */
   index?: Index | null;
   indexEdge?: IndexEdge | null;
+}
+export interface CreateAppPayload {
+  clientMutationId?: string | null;
+  /** The `App` that was created by this mutation. */
+  app?: App | null;
+  appEdge?: AppEdge | null;
+}
+export interface CreateDatabaseSettingPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSetting` that was created by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
+}
+export interface CreateSitePayload {
+  clientMutationId?: string | null;
+  /** The `Site` that was created by this mutation. */
+  site?: Site | null;
+  siteEdge?: SiteEdge | null;
 }
 export interface CreateForeignKeyConstraintPayload {
   clientMutationId?: string | null;
@@ -7183,12 +7171,6 @@ export interface UpdateViewGrantPayload {
   viewGrant?: ViewGrant | null;
   viewGrantEdge?: ViewGrantEdge | null;
 }
-export interface UpdateApiPayload {
-  clientMutationId?: string | null;
-  /** The `Api` that was updated by this mutation. */
-  api?: Api | null;
-  apiEdge?: ApiEdge | null;
-}
 export interface UpdateCorsSettingPayload {
   clientMutationId?: string | null;
   /** The `CorsSetting` that was updated by this mutation. */
@@ -7212,6 +7194,12 @@ export interface UpdateSiteModulePayload {
   /** The `SiteModule` that was updated by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface UpdateApiPayload {
+  clientMutationId?: string | null;
+  /** The `Api` that was updated by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
 }
 export interface UpdateSiteMetadatumPayload {
   clientMutationId?: string | null;
@@ -7249,12 +7237,6 @@ export interface UpdateTableGrantPayload {
   tableGrant?: TableGrant | null;
   tableGrantEdge?: TableGrantEdge | null;
 }
-export interface UpdateDomainPayload {
-  clientMutationId?: string | null;
-  /** The `Domain` that was updated by this mutation. */
-  domain?: Domain | null;
-  domainEdge?: DomainEdge | null;
-}
 export interface UpdateRlsSettingPayload {
   clientMutationId?: string | null;
   /** The `RlsSetting` that was updated by this mutation. */
@@ -7273,6 +7255,12 @@ export interface UpdatePartitionPayload {
   partition?: Partition | null;
   partitionEdge?: PartitionEdge | null;
 }
+export interface UpdateDomainPayload {
+  clientMutationId?: string | null;
+  /** The `Domain` that was updated by this mutation. */
+  domain?: Domain | null;
+  domainEdge?: DomainEdge | null;
+}
 export interface UpdateCompositeTypePayload {
   clientMutationId?: string | null;
   /** The `CompositeType` that was updated by this mutation. */
@@ -7290,24 +7278,6 @@ export interface UpdateViewPayload {
   /** The `View` that was updated by this mutation. */
   view?: View | null;
   viewEdge?: ViewEdge | null;
-}
-export interface UpdateDatabaseSettingPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseSetting` that was updated by this mutation. */
-  databaseSetting?: DatabaseSetting | null;
-  databaseSettingEdge?: DatabaseSettingEdge | null;
-}
-export interface UpdateApiSettingPayload {
-  clientMutationId?: string | null;
-  /** The `ApiSetting` that was updated by this mutation. */
-  apiSetting?: ApiSetting | null;
-  apiSettingEdge?: ApiSettingEdge | null;
-}
-export interface UpdateDatabaseTransferPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseTransfer` that was updated by this mutation. */
-  databaseTransfer?: DatabaseTransfer | null;
-  databaseTransferEdge?: DatabaseTransferEdge | null;
 }
 export interface UpdatePrimaryKeyConstraintPayload {
   clientMutationId?: string | null;
@@ -7345,23 +7315,41 @@ export interface UpdatePolicyPayload {
   policy?: Policy | null;
   policyEdge?: PolicyEdge | null;
 }
-export interface UpdateAppPayload {
+export interface UpdateApiSettingPayload {
   clientMutationId?: string | null;
-  /** The `App` that was updated by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
+  /** The `ApiSetting` that was updated by this mutation. */
+  apiSetting?: ApiSetting | null;
+  apiSettingEdge?: ApiSettingEdge | null;
 }
-export interface UpdateSitePayload {
+export interface UpdateDatabaseTransferPayload {
   clientMutationId?: string | null;
-  /** The `Site` that was updated by this mutation. */
-  site?: Site | null;
-  siteEdge?: SiteEdge | null;
+  /** The `DatabaseTransfer` that was updated by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
 }
 export interface UpdateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was updated by this mutation. */
   index?: Index | null;
   indexEdge?: IndexEdge | null;
+}
+export interface UpdateAppPayload {
+  clientMutationId?: string | null;
+  /** The `App` that was updated by this mutation. */
+  app?: App | null;
+  appEdge?: AppEdge | null;
+}
+export interface UpdateDatabaseSettingPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSetting` that was updated by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
+}
+export interface UpdateSitePayload {
+  clientMutationId?: string | null;
+  /** The `Site` that was updated by this mutation. */
+  site?: Site | null;
+  siteEdge?: SiteEdge | null;
 }
 export interface UpdateForeignKeyConstraintPayload {
   clientMutationId?: string | null;
@@ -7441,12 +7429,6 @@ export interface DeleteViewGrantPayload {
   viewGrant?: ViewGrant | null;
   viewGrantEdge?: ViewGrantEdge | null;
 }
-export interface DeleteApiPayload {
-  clientMutationId?: string | null;
-  /** The `Api` that was deleted by this mutation. */
-  api?: Api | null;
-  apiEdge?: ApiEdge | null;
-}
 export interface DeleteCorsSettingPayload {
   clientMutationId?: string | null;
   /** The `CorsSetting` that was deleted by this mutation. */
@@ -7470,6 +7452,12 @@ export interface DeleteSiteModulePayload {
   /** The `SiteModule` that was deleted by this mutation. */
   siteModule?: SiteModule | null;
   siteModuleEdge?: SiteModuleEdge | null;
+}
+export interface DeleteApiPayload {
+  clientMutationId?: string | null;
+  /** The `Api` that was deleted by this mutation. */
+  api?: Api | null;
+  apiEdge?: ApiEdge | null;
 }
 export interface DeleteSiteMetadatumPayload {
   clientMutationId?: string | null;
@@ -7507,12 +7495,6 @@ export interface DeleteTableGrantPayload {
   tableGrant?: TableGrant | null;
   tableGrantEdge?: TableGrantEdge | null;
 }
-export interface DeleteDomainPayload {
-  clientMutationId?: string | null;
-  /** The `Domain` that was deleted by this mutation. */
-  domain?: Domain | null;
-  domainEdge?: DomainEdge | null;
-}
 export interface DeleteRlsSettingPayload {
   clientMutationId?: string | null;
   /** The `RlsSetting` that was deleted by this mutation. */
@@ -7531,6 +7513,12 @@ export interface DeletePartitionPayload {
   partition?: Partition | null;
   partitionEdge?: PartitionEdge | null;
 }
+export interface DeleteDomainPayload {
+  clientMutationId?: string | null;
+  /** The `Domain` that was deleted by this mutation. */
+  domain?: Domain | null;
+  domainEdge?: DomainEdge | null;
+}
 export interface DeleteCompositeTypePayload {
   clientMutationId?: string | null;
   /** The `CompositeType` that was deleted by this mutation. */
@@ -7548,24 +7536,6 @@ export interface DeleteViewPayload {
   /** The `View` that was deleted by this mutation. */
   view?: View | null;
   viewEdge?: ViewEdge | null;
-}
-export interface DeleteDatabaseSettingPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseSetting` that was deleted by this mutation. */
-  databaseSetting?: DatabaseSetting | null;
-  databaseSettingEdge?: DatabaseSettingEdge | null;
-}
-export interface DeleteApiSettingPayload {
-  clientMutationId?: string | null;
-  /** The `ApiSetting` that was deleted by this mutation. */
-  apiSetting?: ApiSetting | null;
-  apiSettingEdge?: ApiSettingEdge | null;
-}
-export interface DeleteDatabaseTransferPayload {
-  clientMutationId?: string | null;
-  /** The `DatabaseTransfer` that was deleted by this mutation. */
-  databaseTransfer?: DatabaseTransfer | null;
-  databaseTransferEdge?: DatabaseTransferEdge | null;
 }
 export interface DeletePrimaryKeyConstraintPayload {
   clientMutationId?: string | null;
@@ -7603,23 +7573,41 @@ export interface DeletePolicyPayload {
   policy?: Policy | null;
   policyEdge?: PolicyEdge | null;
 }
-export interface DeleteAppPayload {
+export interface DeleteApiSettingPayload {
   clientMutationId?: string | null;
-  /** The `App` that was deleted by this mutation. */
-  app?: App | null;
-  appEdge?: AppEdge | null;
+  /** The `ApiSetting` that was deleted by this mutation. */
+  apiSetting?: ApiSetting | null;
+  apiSettingEdge?: ApiSettingEdge | null;
 }
-export interface DeleteSitePayload {
+export interface DeleteDatabaseTransferPayload {
   clientMutationId?: string | null;
-  /** The `Site` that was deleted by this mutation. */
-  site?: Site | null;
-  siteEdge?: SiteEdge | null;
+  /** The `DatabaseTransfer` that was deleted by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
 }
 export interface DeleteIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was deleted by this mutation. */
   index?: Index | null;
   indexEdge?: IndexEdge | null;
+}
+export interface DeleteAppPayload {
+  clientMutationId?: string | null;
+  /** The `App` that was deleted by this mutation. */
+  app?: App | null;
+  appEdge?: AppEdge | null;
+}
+export interface DeleteDatabaseSettingPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseSetting` that was deleted by this mutation. */
+  databaseSetting?: DatabaseSetting | null;
+  databaseSettingEdge?: DatabaseSettingEdge | null;
+}
+export interface DeleteSitePayload {
+  clientMutationId?: string | null;
+  /** The `Site` that was deleted by this mutation. */
+  site?: Site | null;
+  siteEdge?: SiteEdge | null;
 }
 export interface DeleteForeignKeyConstraintPayload {
   clientMutationId?: string | null;
@@ -7730,12 +7718,6 @@ export interface ViewGrantEdge {
   /** The `ViewGrant` at the end of the edge. */
   node?: ViewGrant | null;
 }
-/** A `Api` edge in the connection. */
-export interface ApiEdge {
-  cursor?: string | null;
-  /** The `Api` at the end of the edge. */
-  node?: Api | null;
-}
 /** A `CorsSetting` edge in the connection. */
 export interface CorsSettingEdge {
   cursor?: string | null;
@@ -7759,6 +7741,12 @@ export interface SiteModuleEdge {
   cursor?: string | null;
   /** The `SiteModule` at the end of the edge. */
   node?: SiteModule | null;
+}
+/** A `Api` edge in the connection. */
+export interface ApiEdge {
+  cursor?: string | null;
+  /** The `Api` at the end of the edge. */
+  node?: Api | null;
 }
 /** A `SiteMetadatum` edge in the connection. */
 export interface SiteMetadatumEdge {
@@ -7796,12 +7784,6 @@ export interface TableGrantEdge {
   /** The `TableGrant` at the end of the edge. */
   node?: TableGrant | null;
 }
-/** A `Domain` edge in the connection. */
-export interface DomainEdge {
-  cursor?: string | null;
-  /** The `Domain` at the end of the edge. */
-  node?: Domain | null;
-}
 /** A `RlsSetting` edge in the connection. */
 export interface RlsSettingEdge {
   cursor?: string | null;
@@ -7820,6 +7802,12 @@ export interface PartitionEdge {
   /** The `Partition` at the end of the edge. */
   node?: Partition | null;
 }
+/** A `Domain` edge in the connection. */
+export interface DomainEdge {
+  cursor?: string | null;
+  /** The `Domain` at the end of the edge. */
+  node?: Domain | null;
+}
 /** A `CompositeType` edge in the connection. */
 export interface CompositeTypeEdge {
   cursor?: string | null;
@@ -7832,35 +7820,17 @@ export interface EnumEdge {
   /** The `Enum` at the end of the edge. */
   node?: Enum | null;
 }
-/** A `SqlAction` edge in the connection. */
-export interface SqlActionEdge {
-  cursor?: string | null;
-  /** The `SqlAction` at the end of the edge. */
-  node?: SqlAction | null;
-}
 /** A `View` edge in the connection. */
 export interface ViewEdge {
   cursor?: string | null;
   /** The `View` at the end of the edge. */
   node?: View | null;
 }
-/** A `DatabaseSetting` edge in the connection. */
-export interface DatabaseSettingEdge {
+/** A `SqlAction` edge in the connection. */
+export interface SqlActionEdge {
   cursor?: string | null;
-  /** The `DatabaseSetting` at the end of the edge. */
-  node?: DatabaseSetting | null;
-}
-/** A `ApiSetting` edge in the connection. */
-export interface ApiSettingEdge {
-  cursor?: string | null;
-  /** The `ApiSetting` at the end of the edge. */
-  node?: ApiSetting | null;
-}
-/** A `DatabaseTransfer` edge in the connection. */
-export interface DatabaseTransferEdge {
-  cursor?: string | null;
-  /** The `DatabaseTransfer` at the end of the edge. */
-  node?: DatabaseTransfer | null;
+  /** The `SqlAction` at the end of the edge. */
+  node?: SqlAction | null;
 }
 /** A `PrimaryKeyConstraint` edge in the connection. */
 export interface PrimaryKeyConstraintEdge {
@@ -7898,23 +7868,41 @@ export interface PolicyEdge {
   /** The `Policy` at the end of the edge. */
   node?: Policy | null;
 }
-/** A `App` edge in the connection. */
-export interface AppEdge {
+/** A `ApiSetting` edge in the connection. */
+export interface ApiSettingEdge {
   cursor?: string | null;
-  /** The `App` at the end of the edge. */
-  node?: App | null;
+  /** The `ApiSetting` at the end of the edge. */
+  node?: ApiSetting | null;
 }
-/** A `Site` edge in the connection. */
-export interface SiteEdge {
+/** A `DatabaseTransfer` edge in the connection. */
+export interface DatabaseTransferEdge {
   cursor?: string | null;
-  /** The `Site` at the end of the edge. */
-  node?: Site | null;
+  /** The `DatabaseTransfer` at the end of the edge. */
+  node?: DatabaseTransfer | null;
 }
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
   cursor?: string | null;
   /** The `Index` at the end of the edge. */
   node?: Index | null;
+}
+/** A `App` edge in the connection. */
+export interface AppEdge {
+  cursor?: string | null;
+  /** The `App` at the end of the edge. */
+  node?: App | null;
+}
+/** A `DatabaseSetting` edge in the connection. */
+export interface DatabaseSettingEdge {
+  cursor?: string | null;
+  /** The `DatabaseSetting` at the end of the edge. */
+  node?: DatabaseSetting | null;
+}
+/** A `Site` edge in the connection. */
+export interface SiteEdge {
+  cursor?: string | null;
+  /** The `Site` at the end of the edge. */
+  node?: Site | null;
 }
 /** A `ForeignKeyConstraint` edge in the connection. */
 export interface ForeignKeyConstraintEdge {

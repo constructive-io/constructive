@@ -1,13 +1,13 @@
 ---
 name: cli-compute
-description: CLI tool (csdk) for the compute API — provides CRUD commands for 18 tables and 15 custom operations
+description: CLI tool (csdk) for the compute API — provides CRUD commands for 22 tables and 15 custom operations
 ---
 
 # cli-compute
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the compute API — provides CRUD commands for 18 tables and 15 custom operations
+CLI tool (csdk) for the compute API — provides CRUD commands for 22 tables and 15 custom operations
 
 ## Usage
 
@@ -59,19 +59,23 @@ See the `references/` directory for detailed per-entity API documentation:
 - [get-all-record](references/get-all-record.md)
 - [function-api-binding](references/function-api-binding.md)
 - [function-deployment](references/function-deployment.md)
+- [resource](references/resource.md)
 - [function-graph-ref](references/function-graph-ref.md)
 - [function-graph-store](references/function-graph-store.md)
 - [function-graph-object](references/function-graph-object.md)
 - [function-deployment-event](references/function-deployment-event.md)
 - [org-function-execution-log](references/org-function-execution-log.md)
+- [resource-event](references/resource-event.md)
 - [function-graph-execution-output](references/function-graph-execution-output.md)
 - [function-graph-commit](references/function-graph-commit.md)
 - [secret-definition](references/secret-definition.md)
 - [function-execution-log](references/function-execution-log.md)
-- [function-graph-execution-node-state](references/function-graph-execution-node-state.md)
 - [function-graph](references/function-graph.md)
+- [function-graph-execution-node-state](references/function-graph-execution-node-state.md)
+- [platform-namespace](references/platform-namespace.md)
 - [org-function-invocation](references/org-function-invocation.md)
 - [function-invocation](references/function-invocation.md)
+- [platform-namespace-event](references/platform-namespace-event.md)
 - [function-graph-execution](references/function-graph-execution.md)
 - [function-definition](references/function-definition.md)
 - [read-function-graph](references/read-function-graph.md)
@@ -83,9 +87,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [save-graph](references/save-graph.md)
 - [add-edge-and-save](references/add-edge-and-save.md)
 - [add-node-and-save](references/add-node-and-save.md)
+- [import-graph-json](references/import-graph-json.md)
 - [add-edge](references/add-edge.md)
 - [add-node](references/add-node.md)
-- [import-graph-json](references/import-graph-json.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
 - [start-execution](references/start-execution.md)
 - [provision-bucket](references/provision-bucket.md)

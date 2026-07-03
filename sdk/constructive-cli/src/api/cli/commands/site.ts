@@ -25,6 +25,8 @@ const fieldSchema: FieldSchema = {
   appleTouchIcon: 'string',
   logo: 'string',
   dbname: 'string',
+  labels: 'json',
+  annotations: 'json',
 };
 const usage =
   '\nsite <command>\n\nCommands:\n  list                  List site records\n  find-first            Find first matching site record\n  get                   Get a site by ID\n  create                Create a new site\n  update                Update an existing site\n  delete                Delete a site\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -86,6 +88,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       appleTouchIcon: true,
       logo: true,
       dbname: true,
+      labels: true,
+      annotations: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<SiteSelect, SiteFilter, SiteOrderBy> & {
@@ -115,6 +119,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       appleTouchIcon: true,
       logo: true,
       dbname: true,
+      labels: true,
+      annotations: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<SiteSelect, SiteFilter, SiteOrderBy> & {
@@ -156,6 +162,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           appleTouchIcon: true,
           logo: true,
           dbname: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();
@@ -226,6 +234,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateSiteInput['site'];
@@ -241,6 +263,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           appleTouchIcon: cleanedData.appleTouchIcon,
           logo: cleanedData.logo,
           dbname: cleanedData.dbname,
+          labels: cleanedData.labels,
+          annotations: cleanedData.annotations,
         },
         select: {
           id: true,
@@ -252,6 +276,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           appleTouchIcon: true,
           logo: true,
           dbname: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();
@@ -328,6 +354,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as SitePatch;
@@ -346,6 +386,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           appleTouchIcon: cleanedData.appleTouchIcon,
           logo: cleanedData.logo,
           dbname: cleanedData.dbname,
+          labels: cleanedData.labels,
+          annotations: cleanedData.annotations,
         },
         select: {
           id: true,
@@ -357,6 +399,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           appleTouchIcon: true,
           logo: true,
           dbname: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();

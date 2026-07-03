@@ -44,6 +44,11 @@ function App() {
 | `useCreateFunctionDeploymentMutation` | Mutation | Function deployment bindings — ties a function definition to a namespace for Knative provisioning and routing |
 | `useUpdateFunctionDeploymentMutation` | Mutation | Function deployment bindings — ties a function definition to a namespace for Knative provisioning and routing |
 | `useDeleteFunctionDeploymentMutation` | Mutation | Function deployment bindings — ties a function definition to a namespace for Knative provisioning and routing |
+| `useResourcesQuery` | Query | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
+| `useResourceQuery` | Query | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
+| `useCreateResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
+| `useUpdateResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
+| `useDeleteResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useFunctionGraphRefsQuery` | Query | Branch heads — mutable pointers into the commit chain |
 | `useFunctionGraphRefQuery` | Query | Branch heads — mutable pointers into the commit chain |
 | `useCreateFunctionGraphRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
@@ -69,6 +74,11 @@ function App() {
 | `useCreateOrgFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useUpdateOrgFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useDeleteOrgFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
+| `useResourceEventsQuery` | Query | Resource lifecycle events — audit log of provisioning, updates, and failure events |
+| `useResourceEventQuery` | Query | Resource lifecycle events — audit log of provisioning, updates, and failure events |
+| `useCreateResourceEventMutation` | Mutation | Resource lifecycle events — audit log of provisioning, updates, and failure events |
+| `useUpdateResourceEventMutation` | Mutation | Resource lifecycle events — audit log of provisioning, updates, and failure events |
+| `useDeleteResourceEventMutation` | Mutation | Resource lifecycle events — audit log of provisioning, updates, and failure events |
 | `useFunctionGraphExecutionOutputsQuery` | Query | Content-addressed store for execution outputs — hash-referenced from node_outputs |
 | `useFunctionGraphExecutionOutputQuery` | Query | Content-addressed store for execution outputs — hash-referenced from node_outputs |
 | `useCreateFunctionGraphExecutionOutputMutation` | Mutation | Content-addressed store for execution outputs — hash-referenced from node_outputs |
@@ -89,16 +99,21 @@ function App() {
 | `useCreateFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useUpdateFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
 | `useDeleteFunctionExecutionLogMutation` | Mutation | Function execution logs — structured console output per invocation |
-| `useFunctionGraphExecutionNodeStatesQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useFunctionGraphExecutionNodeStateQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useCreateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useUpdateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
-| `useDeleteFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
 | `useFunctionGraphsQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useFunctionGraphQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useCreateFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useUpdateFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useDeleteFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
+| `useFunctionGraphExecutionNodeStatesQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useFunctionGraphExecutionNodeStateQuery` | Query | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useCreateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useUpdateFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `useDeleteFunctionGraphExecutionNodeStateMutation` | Mutation | Per-node execution state — tracks individual node lifecycle for debugging |
+| `usePlatformNamespacesQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
+| `usePlatformNamespaceQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
+| `useCreatePlatformNamespaceMutation` | Mutation | Logical namespace containers for grouping secrets, config, functions, and other resources |
+| `useUpdatePlatformNamespaceMutation` | Mutation | Logical namespace containers for grouping secrets, config, functions, and other resources |
+| `useDeletePlatformNamespaceMutation` | Mutation | Logical namespace containers for grouping secrets, config, functions, and other resources |
 | `useOrgFunctionInvocationsQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
 | `useOrgFunctionInvocationQuery` | Query | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
 | `useCreateOrgFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
@@ -109,6 +124,11 @@ function App() {
 | `useCreateFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
 | `useUpdateFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
 | `useDeleteFunctionInvocationMutation` | Mutation | Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string. |
+| `usePlatformNamespaceEventsQuery` | Query | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
+| `usePlatformNamespaceEventQuery` | Query | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
+| `useCreatePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
+| `useUpdatePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
+| `useDeletePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useFunctionGraphExecutionsQuery` | Query | Ephemeral execution state for flow graph evaluation |
 | `useFunctionGraphExecutionQuery` | Query | Ephemeral execution state for flow graph evaluation |
 | `useCreateFunctionGraphExecutionMutation` | Mutation | Ephemeral execution state for flow graph evaluation |
@@ -128,9 +148,9 @@ function App() {
 | `useSaveGraphMutation` | Mutation | saveGraph |
 | `useAddEdgeAndSaveMutation` | Mutation | addEdgeAndSave |
 | `useAddNodeAndSaveMutation` | Mutation | addNodeAndSave |
+| `useImportGraphJsonMutation` | Mutation | importGraphJson |
 | `useAddEdgeMutation` | Mutation | addEdge |
 | `useAddNodeMutation` | Mutation | addNode |
-| `useImportGraphJsonMutation` | Mutation | importGraphJson |
 | `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
 | `useStartExecutionMutation` | Mutation | startExecution |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
@@ -195,6 +215,27 @@ const { mutate: create } = useCreateFunctionDeploymentMutation({
   selection: { fields: { id: true } },
 });
 create({ functionDefinitionId: '<UUID>', namespaceId: '<UUID>', status: '<String>', serviceUrl: '<String>', serviceName: '<String>', revision: '<Int>', image: '<String>', concurrency: '<Int>', scaleMin: '<Int>', scaleMax: '<Int>', timeoutSeconds: '<Int>', resources: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', errorCount: '<Int>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>' });
+```
+
+### Resource
+
+```typescript
+// List all resources
+const { data, isLoading } = useResourcesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true } },
+});
+
+// Get one resource
+const { data: item } = useResourceQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true } },
+});
+
+// Create a resource
+const { mutate: create } = useCreateResourceMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', namespaceId: '<UUID>', kind: '<String>', name: '<String>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', lastError: '<String>', errorCount: '<Int>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>' });
 ```
 
 ### FunctionGraphRef
@@ -302,6 +343,27 @@ const { mutate: create } = useCreateOrgFunctionExecutionLogMutation({
 create({ invocationId: '<UUID>', taskIdentifier: '<String>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', actorId: '<UUID>' });
 ```
 
+### ResourceEvent
+
+```typescript
+// List all resourceEvents
+const { data, isLoading } = useResourceEventsQuery({
+  selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } },
+});
+
+// Get one resourceEvent
+const { data: item } = useResourceEventQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } },
+});
+
+// Create a resourceEvent
+const { mutate: create } = useCreateResourceEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ resourceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', databaseId: '<UUID>' });
+```
+
 ### FunctionGraphExecutionOutput
 
 ```typescript
@@ -386,6 +448,27 @@ const { mutate: create } = useCreateFunctionExecutionLogMutation({
 create({ invocationId: '<UUID>', taskIdentifier: '<String>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', actorId: '<UUID>', databaseId: '<UUID>' });
 ```
 
+### FunctionGraph
+
+```typescript
+// List all functionGraphs
+const { data, isLoading } = useFunctionGraphsQuery({
+  selection: { fields: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one functionGraph
+const { data: item } = useFunctionGraphQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a functionGraph
+const { mutate: create } = useCreateFunctionGraphMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', storeId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' });
+```
+
 ### FunctionGraphExecutionNodeState
 
 ```typescript
@@ -407,25 +490,25 @@ const { mutate: create } = useCreateFunctionGraphExecutionNodeStateMutation({
 create({ executionId: '<UUID>', databaseId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' });
 ```
 
-### FunctionGraph
+### PlatformNamespace
 
 ```typescript
-// List all functionGraphs
-const { data, isLoading } = useFunctionGraphsQuery({
-  selection: { fields: { id: true, databaseId: true, storeId: true, entityId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
+// List all platformNamespaces
+const { data, isLoading } = usePlatformNamespacesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, name: true, namespaceName: true, description: true, isActive: true, labels: true, annotations: true, databaseId: true, sourceDatabaseId: true, sourceScope: true, isManaged: true } },
 });
 
-// Get one functionGraph
-const { data: item } = useFunctionGraphQuery({
+// Get one platformNamespace
+const { data: item } = usePlatformNamespaceQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, storeId: true, entityId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, name: true, namespaceName: true, description: true, isActive: true, labels: true, annotations: true, databaseId: true, sourceDatabaseId: true, sourceScope: true, isManaged: true } },
 });
 
-// Create a functionGraph
-const { mutate: create } = useCreateFunctionGraphMutation({
+// Create a platformNamespace
+const { mutate: create } = useCreatePlatformNamespaceMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', storeId: '<UUID>', entityId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' });
+create({ name: '<String>', namespaceName: '<String>', description: '<String>', isActive: '<Boolean>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>', sourceDatabaseId: '<UUID>', sourceScope: '<String>', isManaged: '<Boolean>' });
 ```
 
 ### OrgFunctionInvocation
@@ -470,25 +553,46 @@ const { mutate: create } = useCreateFunctionInvocationMutation({
 create({ actorId: '<UUID>', databaseId: '<UUID>', taskIdentifier: '<String>', payload: '<JSON>', status: '<String>', result: '<JSON>', error: '<String>', durationMs: '<Int>', jobId: '<BigInt>', startedAt: '<Datetime>', completedAt: '<Datetime>', parentInvocationId: '<UUID>', graphExecutionId: '<UUID>' });
 ```
 
+### PlatformNamespaceEvent
+
+```typescript
+// List all platformNamespaceEvents
+const { data, isLoading } = usePlatformNamespaceEventsQuery({
+  selection: { fields: { createdAt: true, id: true, namespaceId: true, eventType: true, actorId: true, message: true, metadata: true, cpuMillicores: true, memoryBytes: true, storageBytes: true, networkIngressBytes: true, networkEgressBytes: true, podCount: true, metrics: true, databaseId: true } },
+});
+
+// Get one platformNamespaceEvent
+const { data: item } = usePlatformNamespaceEventQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, id: true, namespaceId: true, eventType: true, actorId: true, message: true, metadata: true, cpuMillicores: true, memoryBytes: true, storageBytes: true, networkIngressBytes: true, networkEgressBytes: true, podCount: true, metrics: true, databaseId: true } },
+});
+
+// Create a platformNamespaceEvent
+const { mutate: create } = useCreatePlatformNamespaceEventMutation({
+  selection: { fields: { id: true } },
+});
+create({ namespaceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', cpuMillicores: '<Int>', memoryBytes: '<BigInt>', storageBytes: '<BigInt>', networkIngressBytes: '<BigInt>', networkEgressBytes: '<BigInt>', podCount: '<Int>', metrics: '<JSON>', databaseId: '<UUID>' });
+```
+
 ### FunctionGraphExecution
 
 ```typescript
 // List all functionGraphExecutions
 const { data, isLoading } = useFunctionGraphExecutionsQuery({
-  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, entityId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
+  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
 });
 
 // Get one functionGraphExecution
 const { data: item } = useFunctionGraphExecutionQuery({
   id: '<UUID>',
-  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, entityId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
+  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } },
 });
 
 // Create a functionGraphExecution
 const { mutate: create } = useCreateFunctionGraphExecutionMutation({
   selection: { fields: { id: true } },
 });
-create({ startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', databaseId: '<UUID>', entityId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' });
+create({ startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', databaseId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' });
 ```
 
 ### FunctionDefinition
@@ -613,6 +717,17 @@ addNodeAndSave
   |----------|------|
   | `input` | AddNodeAndSaveInput (required) |
 
+### `useImportGraphJsonMutation`
+
+importGraphJson
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ImportGraphJsonInput (required) |
+
 ### `useAddEdgeMutation`
 
 addEdge
@@ -634,17 +749,6 @@ addNode
   | Argument | Type |
   |----------|------|
   | `input` | AddNodeInput (required) |
-
-### `useImportGraphJsonMutation`
-
-importGraphJson
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ImportGraphJsonInput (required) |
 
 ### `useInsertNodeAtPathMutation`
 
