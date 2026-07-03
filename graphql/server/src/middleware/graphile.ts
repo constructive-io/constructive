@@ -16,6 +16,7 @@ import {
   graphileCache,
   invokeEntryHandler,
   shouldRefuseBuild,
+  waitForDrainSettle,
 } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
@@ -585,6 +586,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           // Evict the LRU instance BEFORE building so the build peak lands on freed
           // headroom instead of stacking on a full cache.
           ensureCacheHeadroom(1);
+          // Evicted != freed: a draining instance's ~GB stays live until its
+          // in-flight requests finish and release completes. Stacking the build
+          // transient on undrained instances OOMed the soak — wait them out
+          // (bounded; returns immediately when heap pressure is already ok).
+          await waitForDrainSettle();
           // A build genuinely starts here: past single-flight coalescing, past the
           // build semaphore, and past the built-meanwhile re-check.
           graphileCounters.builds += 1;

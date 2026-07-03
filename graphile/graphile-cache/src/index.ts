@@ -43,6 +43,10 @@ export {
   startMemoryGovernor,
   stopMemoryGovernor,
 
+  // Drain-aware build admission
+  getDrainingCount,
+  waitForDrainSettle,
+
   // Clear matching entries
   clearMatchingEntries
 } from './graphile-cache';

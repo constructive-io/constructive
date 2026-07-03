@@ -260,6 +260,28 @@ const manualEvictionKeys = new Set<string>();
 // Track keys evicted by the memory governor for accurate eviction reason
 const governorEvictionKeys = new Set<string>();
 
+// Number of entries currently DRAINING (evicted from the cache but their ~GB of
+// heap still live until in-flight requests finish and pgl.release() completes).
+// Invisible to ensureCacheHeadroom (they are no longer cache entries), so build
+// admission must consult it: a build transient stacked on undrained instances is
+// what OOMed the soak (flush -> rebuild race).
+let drainingCount = 0;
+
+export const getDrainingCount = (): number => drainingCount;
+
+/**
+ * Hold a build until evicted instances have actually released their memory —
+ * or heap pressure is comfortable anyway, or the bounded wait expires (drains
+ * are themselves bounded by GRAPHILE_CACHE_DRAIN_TIMEOUT_MS).
+ */
+export async function waitForDrainSettle(timeoutMs = 20_000): Promise<void> {
+  const start = Date.now();
+  while (drainingCount > 0 && Date.now() - start < timeoutMs) {
+    if (getMemoryPressure().level === 'ok') return;
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+}
+
 /**
  * Dispose a PostGraphile v5 cache entry
  *
@@ -280,6 +302,15 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
   disposedEntries.add(entry);
   cacheCounters.disposals += 1;
   entry.disposing = true;
+  drainingCount += 1;
+  try {
+    await disposeEntryInner(entry, key);
+  } finally {
+    drainingCount -= 1;
+  }
+};
+
+const disposeEntryInner = async (entry: GraphileCacheEntry, key: string): Promise<void> => {
 
   // Drain in-flight requests before tearing the instance down. The entry is already
   // out of the cache (dispose fires post-removal), so no NEW requests can route here —

@@ -33,6 +33,12 @@ export interface PoolDecision {
    * pinning the svc to a per-tenant instance until the next flush.
    */
   transient?: boolean;
+  /**
+   * The tenant database this decision belongs to — lets flushService invalidate
+   * ONLY the affected database's decisions/blueprint instead of a fleet-wide
+   * flush on every schema:update.
+   */
+  databaseId?: string;
 }
 
 /**
@@ -43,11 +49,35 @@ export interface PoolDecision {
 const poolDecisions = new Map<string, PoolDecision>();
 
 /**
- * Clear all cached pooling decisions. Called by flushService when a tenant
- * schema change invalidates pooled instances (v1: any change flushes them all).
+ * Clear all cached pooling decisions (explicit /flush admin route).
  */
 export function clearPoolDecisions(): void {
   poolDecisions.clear();
+}
+
+/**
+ * Invalidate ONLY the decisions belonging to one tenant database and return the
+ * `bp:` keys it was attached to (so flushService can rebuild exactly the
+ * affected blueprint). A schema change in tenant X:
+ *   - X's decisions must recompute (its fingerprint may have changed), and
+ *   - the blueprint instance X was pooled into must rebuild (its shared schema
+ *     was derived from a catalog that included X's old shape),
+ * while every OTHER blueprint keeps serving untouched. A brand-new tenant has
+ * no memoized decisions => provisioning events are a no-op here (new tenants
+ * probe on first request; instances are shape-generic and need no rebuild to
+ * accept another same-shape tenant).
+ */
+export function clearPoolDecisionsForDatabase(databaseId: string): string[] {
+  const bpKeys = new Set<string>();
+  for (const [svcKey, decision] of poolDecisions) {
+    if (decision.databaseId === databaseId) {
+      if (decision.pooling && decision.key.startsWith('bp:')) {
+        bpKeys.add(decision.key);
+      }
+      poolDecisions.delete(svcKey);
+    }
+  }
+  return [...bpKeys];
 }
 
 /**
@@ -116,7 +146,11 @@ export const resolvePoolDecision = async (
   if (cached) return cached;
   const decision = await computePoolDecision(svcKey, api, pool);
   if (!decision.transient) {
-    poolDecisions.set(svcKey, decision);
+    // Stamp the owning database once, at the single memoization point, so
+    // flushService can invalidate per-database instead of fleet-wide.
+    const memoized: PoolDecision = { ...decision, databaseId: (api as any).databaseId ?? undefined };
+    poolDecisions.set(svcKey, memoized);
+    return memoized;
   }
   return decision;
 };

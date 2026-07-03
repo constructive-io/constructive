@@ -6,7 +6,7 @@ import { clearMatchingEntries, graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 import './types'; // for Request type
 import { isBlueprintPoolingEnabled } from './blueprint';
-import { clearPoolDecisions } from './pooling-decision';
+import { clearPoolDecisions, clearPoolDecisionsForDatabase } from './pooling-decision';
 
 const log = new Logger('flush');
 
@@ -38,15 +38,20 @@ export const flushService = async (
   const pgPool = getPgPool(opts.pg);
   log.info('flushing db ' + databaseId);
 
-  // Blueprint pooling (v1): a schema change in ANY tenant can alter a shape that
-  // pooled instances share, so flush ALL pooled (`bp:`) instances — rebuilds are
-  // cheap — and drop cached pooling decisions so the next request re-derives the
-  // fingerprint/key. Runs regardless of isPublic since pooling targets the public API.
+  // Blueprint pooling: invalidate ONLY the changed database's decisions and the
+  // blueprint instance it was attached to. Fleet-wide `bp:` flushes on every
+  // schema:update turned each tenant PROVISION into a cold restart of every
+  // pooled instance — and the immediate rebuild raced the evicted instances'
+  // drain (~GB still live until release), which OOMed the 24h soak. New tenants
+  // have no memoized decisions, so provisioning is a no-op here (instances are
+  // shape-generic; a same-shape tenant attaches without any rebuild).
   if (isBlueprintPoolingEnabled()) {
-    const cleared = clearMatchingEntries(/^bp:/);
-    clearPoolDecisions();
-    if (cleared > 0) {
-      log.info(`[pooling] flushed ${cleared} pooled instance(s) after change to db ${databaseId}`);
+    const bpKeys = clearPoolDecisionsForDatabase(databaseId);
+    for (const key of bpKeys) {
+      graphileCache.delete(key);
+    }
+    if (bpKeys.length > 0) {
+      log.info(`[pooling] flushed ${bpKeys.length} blueprint(s) for db ${databaseId}: ${bpKeys.join(', ')}`);
     }
   }
 
