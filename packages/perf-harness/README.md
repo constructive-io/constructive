@@ -57,15 +57,106 @@ dist present, port free + allowed), then evaluates each check
 `{ name, pass, value, threshold, note }` against the baseline (default
 `catalog61k-2026-07`) and writes `regression-results.json` plus a human table.
 
-Suite flags: `--fleet <manifest>` (required) · `--suite quick|standard` (default
+Suite flags: `--fleet <manifest>` (required) · `--suite quick|standard|deep` (default
 `quick`) · `--baseline <name>` · `--port` (default 3345) · `--heap-mb` (default
-3584) · `--out-dir` (default `./perf-out`).
+3584) · `--deep-heap-mb` (default 7168, `deep` only) · `--out-dir` (default
+`./perf-out`) · `--only`/`--skip` (deep-check filter).
 
 Checks: `healthy-single-bp` (errRate ≤ 0.005, p99 ≤ 150ms, 0 bleed) ·
 `zero-marginal-tenants` (heapMax delta ≤ 100MB across tenant counts) · `bleed`
 (sentinel violations == 0). The `standard` suite adds `instance-heap`
 (≤ 28 KB/pg_class row) and `thrash-not-crash` (over-capacity step must **survive** —
-degraded latency/errors are expected, a crashed process is the only failure).
+degraded latency/errors are expected, a crashed process is the only failure). The
+`deep` suite adds four rig-mutating scenarios that cover the axes the other suites
+never touch — see [Deep suite](#deep-suite).
+
+---
+
+## Deep suite
+
+**`--suite deep`** runs everything in `standard` **plus** four scenarios that exercise
+scaling axes the quick/standard checks never touch: multiple hot API surfaces on one
+node, settings-driven pool splits, the cost of a realtime (unpoolable) tenant, and
+catalog creep from `pg_partman`. Unlike the other suites these checks **mutate the
+rig** — they `INSERT` `services_public.database_settings` rows and `CREATE` a
+partition — so each one is wrapped in `try/finally` teardown that returns the rig
+**exactly** to how it was found, each is individually selectable via `--only`/`--skip`,
+its mutating SQL is kept minimal and reversible, and every Postgres/server dial still
+goes through the [hub guardrail](#hub-safety) (`--allow-hub` to override; PG on
+:5433). `--deep-heap-mb` (default **7168**) sizes the server for the multi-API check,
+which needs capacity ≥ 4; the other checks run at the normal `--heap-mb`.
+
+Two of the four can fail the suite (exit 1); the other two are **advisory** — they
+report pass/fail and record their findings but **never** change the verdict or exit
+code (`bleed` remains the only exit-2 trigger):
+
+| Check | Advisory? | Asserts |
+|---|---|---|
+| `multi-api-residency` | no | 4 surfaces resident, 0 evictions, heap ≈ base + 4×I |
+| `settings-variant-split` | no | a settings row forks a 2nd pooled instance; both serve errRate 0 |
+| `realtime-dedicated-cost` | **yes** | a realtime tenant is unpoolable (or captures why it cannot build) |
+| `partition-creep` | **yes** | rows added per partition → projected catalog/heap creep per tenant per month |
+
+### `multi-api-residency` (R=4)
+
+Using 8–10 same-blueprint tenants, it derives one fleet **per surface** by rewriting
+each tenant's `apiHost` to its `admin-…` / `usage-…` host (those domains exist on the
+rig; the `auth-…` host stays for login). At `--deep-heap-mb` (capacity ≥ 4 — verified
+via `computeCapacityFromBudget` or `/metrics`) it cold-builds all four surfaces (api,
+auth via login, admin, usage), then holds all four **hot** for ~120s (a light
+`gqlFetch` loop per surface every 1–2s; the harness child on the api fleet optionally
+supplies the main load). **Asserts** the cache reaches size 4 with **zero LRU
+evictions** during the hold, every surface keeps answering (a 2xx / valid GraphQL
+response on a meta/introspection-safe op), and `heapUsed` plateaus at base + 4×I within
+±20% (`multiApiHeapTolerance`). Records the measured heap-per-instance. Informational
+sub-assert: repeated at heap 3584 (capacity 2), the same four-surface pattern must show
+eviction **churn without process death** — thrash-not-crash at the surface level.
+
+### `settings-variant-split`
+
+`INSERT`s `services_public.database_settings` rows with `enable_aggregates=true` (every
+other column left at its declared default) for exactly **2** same-blueprint tenants,
+triggers them to take effect (a `pg_notify` on `schema:update` carrying those
+`databaseId`s, or the documented flush), then drives one variant tenant and one control
+tenant on the api surface. **Asserts** two **distinct** pooled instances for the same
+relation shape (the builds counter climbs by 2 for the api surface, or the cache-key
+count shows the split) and both groups serve errRate 0 (`settingsSplitExpectedInstances`
+= 2). **Teardown** `DELETE`s the rows and re-flushes, then verifies the pool
+**re-collapses** (or documents the one extra rebuild). If the flush does not pick the
+settings up, the check asserts whatever the recon establishes as the actual contract and
+is marked advisory.
+
+### `realtime-dedicated-cost` (advisory)
+
+`INSERT`s a `database_settings` row with `enable_realtime=true` for **one** tenant,
+flushes, and hits that tenant's api host. Per
+`graphql/server/src/middleware/pooling-decision.ts` a realtime service is unpoolable,
+so the check **either** asserts a dedicated instance (pooling refused — the cache gains
+a non-blueprint key / the pooling-attach counter does not tick for it) and measures its
+heap cost, **or**, if the server cannot build realtime without the module infra,
+captures the exact failure mode as the check result (that is useful data, not a suite
+failure). Either way it confirms the other tenants stay pooled and serving. **Teardown**
+`DELETE`s the row, re-flushes, and verifies the tenant returns to pooled serving.
+Advisory: never flips the verdict.
+
+### `partition-creep` (advisory)
+
+A pure-SQL measurement — **no server**. It reads the `partman.part_config` rows for one
+tenant's schema set (`parent_table LIKE '<tenant-schema>%'`), records each parent's
+`partition_interval` and `premake`, `CREATE`s exactly one additional future partition
+for one `events` parent (via the partman API, or a plain `CREATE TABLE … PARTITION OF`
+with the correct bounds), and measures the `pg_class` row delta for that one partition
+(table + indexes + toast). **Teardown** `DROP`s the partition and verifies the delta
+returns to zero. From rows-per-partition × partitioned-parents-per-tenant ×
+partitions-per-interval it projects catalog rows/tenant/month and, at 22KB/row, heap
+creep MB/tenant/month. Reported as informational against a generous advisory threshold
+(`partitionCreepMaxRowsPerTenantMonth` = 200). Advisory: never flips the verdict.
+
+The four scenarios live in `src/regression/scenarios.ts` (SQL helpers in
+`src/regression/sql.ts`), registered behind the `deep` tier. The baseline
+(`catalog61k-2026-07`) gains deep thresholds `multiApiHeapTolerance: 0.2` ·
+`settingsSplitExpectedInstances: 2` · `partitionCreepMaxRowsPerTenantMonth: 200` and
+expected constants `apiSurfacesRoutable: 8` · `instanceHeapKBPerRow: 21`.
 
 ---
 
@@ -346,7 +437,7 @@ report summarize <results.jsonl> [...more]
 report merge     --metrics <m.jsonl> --harness-log <h.jsonl> [--churn-log <c.jsonl>] [--ops-log <o.log>] [--pg <pg.jsonl>] [--out-dir ./perf-out]
 report predict   --instance-heap-bytes <n> [--heap-mb 1536,2048,3584] [--base-reserve-bytes <n>] [--build-reserve-bytes <n>]
 
-regression run       --fleet <file> [--suite quick|standard] [--baseline <name>] [--port] [--heap-mb] [--out-dir]
+regression run       --fleet <file> [--suite quick|standard|deep] [--baseline <name>] [--port] [--heap-mb] [--deep-heap-mb 7168] [--out-dir] [--only <checks>] [--skip <checks>]
 regression baselines
 ```
 
@@ -368,6 +459,7 @@ Connection flags `--pg-host/--pg-port/--pg-user/--pg-password/--pg-database` ove
 `pnpm test` (jest) is pure-unit and needs **no** network, Postgres, or Docker:
 argv parsing + coercions, the hub guardrail, RNG determinism, the zipf/mix samplers,
 histogram percentiles, subset construction, collector math, token-field scoring,
-ramp config merge, summarize/merge on fixtures, the baseline comparator, and the
-tenant-factory shape fingerprint. Anything needing a live server/PG is gated behind
-`PERF_E2E=1`.
+ramp config merge, summarize/merge on fixtures, the baseline comparator, the deep-suite
+helpers (host-rewrite fleet derivation, partition-creep math, advisory-verdict
+aggregation, and the settings-SQL builder), and the tenant-factory shape fingerprint.
+Anything needing a live server/PG is gated behind `PERF_E2E=1`.

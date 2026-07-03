@@ -34,7 +34,7 @@ async function runBaselines(_argv: Argv): Promise<number> {
 export const subcommands: Record<string, Subcommand> = {
   run: {
     usage:
-      'regression run --fleet <manifest> [--suite quick|standard] [--baseline <name>] [--port 3345] [--heap-mb 3584] [--out-dir ./perf-out] [--drifted <f>] [--same-bp-regex <re>] [--server-cmd "..."] [--allow-hub]',
+      'regression run --fleet <manifest> [--suite quick|standard|deep] [--baseline <name>] [--port 3345] [--heap-mb 3584] [--deep-heap-mb 7168] [--out-dir ./perf-out] [--drifted <f>] [--same-bp-regex <re>] [--only <scenario,...>] [--skip <scenario,...>] [--server-cmd "..."] [--allow-hub]',
     run: runRegression
   },
   baselines: {

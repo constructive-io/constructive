@@ -129,4 +129,9 @@ as-run for provenance.
 - V1 instrumentation+fleet ✅ · V2 limits discovery ✅ (`V2-RESULTS.md`) · V3 soak
   **PASS** (above) · V4 sizing+hardening ✅ (`SIZING.md`, fixes in the findings
   table, perf-harness package).
+- Deep-scenario regression suite (`cperf regression run --suite deep`) added to cover the
+  four previously-untested scaling axes — **multi-API residency**, **settings-variant
+  splits**, **realtime dedicated cost**, and **partition creep** (each mutates the rig
+  under guaranteed teardown); code + baselines landed, **live results pending** (run by
+  the lead in the live phase).
 - All work is local to `feat/scale-phase0`; nothing pushed.

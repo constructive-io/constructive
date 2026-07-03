@@ -13,6 +13,10 @@
  * Suites:
  *   quick     healthy-single-bp, zero-marginal-tenants, bleed
  *   standard  + instance-heap, thrash-not-crash
+ *   deep      + the four scenario probes (multi-api-residency [gradeable],
+ *             settings-variant-split, realtime-dedicated-cost, partition-creep
+ *             [advisory]) — see ./scenarios.ts. Advisory checks report pass/fail
+ *             but never flip the verdict or exit code.
  *
  * Exit: 0 pass / 1 fail / 2 bleed (a cross-tenant sentinel violation anywhere).
  *
@@ -27,19 +31,24 @@ import net from 'node:net';
 import path from 'node:path';
 
 import { Argv, asBool, asInt } from '../core/args';
-import { assertPortAllowed, findRepoRoot, pgConfigFromArgv, resolveOutDir, resolveServerCmd } from '../core/config';
+import { assertPortAllowed, findRepoRoot, pgConfigFromArgv, resolveCreds, resolveOutDir, resolveServerCmd } from '../core/config';
 import { buildSubset, loadFleet, Tenant } from '../core/fleetfile';
 import { withFreshClient } from '../core/pgc';
 import { ensureParentDir, readJsonl } from '../core/proc';
 import { DEFAULT_BASELINE, getBaseline } from './baselines';
 import { compareToBaseline, MeasuredRegression, verdictFromChecks } from './compare';
+import { runDeepScenarios, ScenarioContext, ScenarioResult } from './scenarios';
 
-const USAGE = `perf-harness regression run --fleet <manifest> [--suite quick|standard] \\
-  [--baseline ${DEFAULT_BASELINE}] [--port 3345] [--heap-mb 3584] [--out-dir ./perf-out] \\
-  [--drifted <drifted.json>] [--same-bp-regex <re>] [--server-cmd "node ..."] [--allow-hub]
+const USAGE = `perf-harness regression run --fleet <manifest> [--suite quick|standard|deep] \\
+  [--baseline ${DEFAULT_BASELINE}] [--port 3345] [--heap-mb 3584] [--deep-heap-mb 7168] \\
+  [--out-dir ./perf-out] [--drifted <drifted.json>] [--same-bp-regex <re>] \\
+  [--only <scenario,...>] [--skip <scenario,...>] [--server-cmd "node ..."] [--allow-hub]
 
 Re-run the regression suite against a fresh build and compare to a baseline.
-Exit 0 pass / 1 fail / 2 bleed.`;
+The deep tier adds four scenario probes (--only/--skip filter them by name:
+multi-api-residency, settings-variant-split, realtime-dedicated-cost,
+partition-creep); only multi-api-residency can fail the suite, the rest are
+advisory. Exit 0 pass / 1 fail / 2 bleed.`;
 
 const err = (msg: string): void => console.error(`[regression] ${msg}`);
 
@@ -103,11 +112,16 @@ export async function runRegression(argv: Argv): Promise<number> {
     console.error(USAGE);
     return 1;
   }
-  const suite = argv.suite === 'standard' ? 'standard' : 'quick';
+  const suite = ['standard', 'deep'].includes(argv.suite) ? argv.suite : 'quick';
   const baselineName = typeof argv.baseline === 'string' ? argv.baseline : DEFAULT_BASELINE;
   const port = asInt(argv.port, 3345);
   const heapMb = asInt(argv['heap-mb'], 3584);
+  const deepHeapMb = asInt(argv['deep-heap-mb'], 7168);
   const allowHub = asBool(argv['allow-hub']);
+  // Scenario filters (deep tier). Comma lists, same shape as `run ramp --only`.
+  const parseList = (v: any): string[] => (typeof v === 'string' ? v.split(',').map((s) => s.trim()).filter(Boolean) : []);
+  const onlyScenarios = parseList(argv.only);
+  const skipScenarios = parseList(argv.skip);
 
   let baseline;
   try {
@@ -205,9 +219,9 @@ export async function runRegression(argv: Argv): Promise<number> {
     warnings.push(`zero-marginal: only ${maxAvail} single-blueprint tenants; high step == low step (delta forced 0)`);
   }
 
-  // thrash-not-crash (standard) needs multiple distinct blueprint shapes.
+  // thrash-not-crash (standard + deep) needs multiple distinct blueprint shapes.
   let haveThrash = false;
-  if (suite === 'standard') {
+  if (suite !== 'quick') {
     try {
       const thrashSub = buildSubset(fleet, drifted, { blueprints: 3, perBlueprint: 2, sameBpRegex });
       warnings.push(...thrashSub.warnings);
@@ -242,8 +256,8 @@ export async function runRegression(argv: Argv): Promise<number> {
 
   const measured: MeasuredRegression = {};
 
-  // --- (standard) measure instance-heap ------------------------------------
-  if (suite === 'standard') {
+  // --- (standard + deep) measure instance-heap -----------------------------
+  if (suite !== 'quick') {
     const hostTenant = fleet.find((t) => t.apiHost);
     const host = hostTenant ? hostTenant.apiHost : null;
     if (!host) {
@@ -322,6 +336,43 @@ export async function runRegression(argv: Argv): Promise<number> {
 
   // --- compare + verdict ----------------------------------------------------
   const checks = compareToBaseline(measured, baseline);
+
+  // --- (deep) scenario probes ----------------------------------------------
+  // Each scenario boots its OWN fresh server(s) on the same guardrailed port
+  // (sequential, after the ramp child has released it), drives light traffic
+  // itself, and restores the rig in its own finally. Their checks are merged in
+  // BEFORE the verdict; advisory checks never flip it (see compare.ts).
+  let scenarioResults: ScenarioResult[] = [];
+  if (suite === 'deep') {
+    const ctx: ScenarioContext = {
+      suite,
+      pg,
+      port,
+      deepHeapMb,
+      heapMb,
+      outDir,
+      repoRoot,
+      serverCmd,
+      allowHub,
+      catalogRows,
+      baseline,
+      fleet,
+      drifted,
+      sameBpRegex,
+      only: onlyScenarios,
+      skip: skipScenarios,
+      creds: resolveCreds(argv)
+    };
+    err(`running deep scenarios: ${['multi-api-residency', 'settings-variant-split', 'realtime-dedicated-cost', 'partition-creep'].join(', ')}...`);
+    scenarioResults = await runDeepScenarios(ctx);
+    for (const sr of scenarioResults) {
+      checks.push(...sr.checks);
+      if (sr.warnings && sr.warnings.length) warnings.push(...sr.warnings.map((w) => `[${sr.name}] ${w}`));
+      if (sr.skipped) warnings.push(`scenario ${sr.name} skipped: ${sr.skipped}`);
+      if (sr.error) warnings.push(`scenario ${sr.name} error: ${sr.error}`);
+    }
+  }
+
   const verdict = verdictFromChecks(checks);
 
   const results = {
@@ -330,10 +381,12 @@ export async function runRegression(argv: Argv): Promise<number> {
     suite,
     port,
     heapMb,
+    deepHeapMb,
     catalogPgClassRows: catalogRows,
     fleet: fleetFile,
     measured,
     checks,
+    scenarios: scenarioResults,
     verdict,
     warnings,
     artifacts: { plan: planFile, rampResults: rampOut, log: logFile }
@@ -343,10 +396,11 @@ export async function runRegression(argv: Argv): Promise<number> {
   fs.writeFileSync(resultsFile, JSON.stringify(results, null, 2) + '\n');
   err(`wrote ${resultsFile}`);
 
-  // Human verdict table (stdout).
+  // Human verdict table (stdout). Advisory checks are tagged so it is obvious
+  // they do NOT contribute to the verdict.
   console.log(`\n== regression ${baselineName} (${suite}) — catalog ${catalogRows} rows`);
   for (const c of checks) {
-    const mark = c.pass ? 'PASS' : 'FAIL';
+    const mark = c.advisory ? (c.pass ? 'ADVISORY ok' : 'ADVISORY x') : c.pass ? 'PASS' : 'FAIL';
     console.log(`  [${mark}] ${c.name}: value=${c.value} threshold=${c.threshold}  — ${c.note}`);
   }
   for (const w of warnings) console.log(`  (warn) ${w}`);

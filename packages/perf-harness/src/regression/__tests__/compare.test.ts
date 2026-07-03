@@ -70,3 +70,36 @@ describe('verdictFromChecks', () => {
     expect(v.exitCode).toBe(2);
   });
 });
+
+// Advisory checks (the deep-tier scenario probes) are reported but must NEVER
+// contribute to the verdict / exit code.
+describe('verdictFromChecks — advisory checks', () => {
+  const adv = (name: string, pass: boolean): CheckResult => ({ name, pass, value: null, threshold: null, note: '', advisory: true });
+  const grade = (name: string, pass: boolean): CheckResult => ({ name, pass, value: null, threshold: null, note: '' });
+
+  test('a failing advisory check does not flip a passing suite', () => {
+    const v = verdictFromChecks([grade('multi-api-residency', true), adv('partition-creep', false), adv('settings-variant-split', false)]);
+    expect(v.pass).toBe(true);
+    expect(v.exitCode).toBe(0);
+    expect(v.failed).toEqual([]);
+  });
+
+  test('an advisory check named bleed cannot force exit 2', () => {
+    const v = verdictFromChecks([grade('healthy-single-bp:errRate', true), adv('bleed', false)]);
+    expect(v.bleed).toBe(false);
+    expect(v.exitCode).toBe(0);
+  });
+
+  test('a failing GRADEABLE check still fails while advisory noise is ignored', () => {
+    const v = verdictFromChecks([grade('multi-api-residency', false), adv('partition-creep', false)]);
+    expect(v.exitCode).toBe(1);
+    expect(v.failed).toEqual(['multi-api-residency']);
+    expect(v.failed).not.toContain('partition-creep');
+  });
+
+  test('a GRADEABLE bleed still forces exit 2 alongside advisory checks', () => {
+    const v = verdictFromChecks([grade('bleed', false), adv('realtime-dedicated-cost', true)]);
+    expect(v.bleed).toBe(true);
+    expect(v.exitCode).toBe(2);
+  });
+});

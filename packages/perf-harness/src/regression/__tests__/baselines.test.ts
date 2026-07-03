@@ -29,6 +29,16 @@ describe('baselines catalog', () => {
     });
   });
 
+  test('catalog61k-2026-07 carries the deep-tier thresholds + constants', () => {
+    const b = getBaseline('catalog61k-2026-07');
+    expect(b.deepThresholds).toEqual({
+      multiApiHeapTolerance: 0.2,
+      settingsSplitExpectedInstances: 2,
+      partitionCreepMaxRowsPerTenantMonth: 200
+    });
+    expect(b.deepConstants).toEqual({ apiSurfacesRoutable: 8 });
+  });
+
   test('getBaseline throws on an unknown name', () => {
     expect(() => getBaseline('does-not-exist')).toThrow(/unknown baseline/);
   });

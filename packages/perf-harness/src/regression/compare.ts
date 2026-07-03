@@ -8,6 +8,13 @@
  * check is exit 2 (cross-tenant data bleed — the one violation that is never
  * "just slow"), any other failure is exit 1, all-pass is exit 0.
  *
+ * ADVISORY checks (the `deep`-tier scenario probes in ./scenarios.ts set
+ * `advisory: true`) are reported like any other check but are IGNORED by
+ * `verdictFromChecks` — an advisory failure never flips `pass`, `bleed`, or the
+ * exit code. They exist to surface findings (per-instance heap cost, partition
+ * creep projection, realtime dedicated-instance behaviour) without turning an
+ * informational regression into a gate failure.
+ *
  * No IO, no process — this is the unit-tested heart of `regression run`.
  */
 import { Baseline } from './baselines';
@@ -18,6 +25,9 @@ export interface CheckResult {
   value: number | boolean | null;
   threshold: number | boolean | null;
   note: string;
+  // When true this check is informational: it is printed + recorded but never
+  // contributes to the suite verdict / exit code (see verdictFromChecks).
+  advisory?: boolean;
 }
 
 export interface MeasuredRegression {
@@ -123,8 +133,10 @@ export interface Verdict {
 }
 
 export function verdictFromChecks(checks: CheckResult[]): Verdict {
-  const failed = checks.filter((c) => !c.pass).map((c) => c.name);
-  const bleed = checks.some((c) => c.name === 'bleed' && !c.pass);
+  // Advisory checks are informational only — they never gate the verdict.
+  const graded = checks.filter((c) => !c.advisory);
+  const failed = graded.filter((c) => !c.pass).map((c) => c.name);
+  const bleed = graded.some((c) => c.name === 'bleed' && !c.pass);
   const pass = failed.length === 0;
   const exitCode: 0 | 1 | 2 = bleed ? 2 : pass ? 0 : 1;
   return { pass, bleed, exitCode, failed };

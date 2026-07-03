@@ -14,6 +14,65 @@ zero marginal builds). So you size in two axes: **how many relations live in one
 database** (shard size) and **how many distinct blueprint shapes a node must keep
 resident** (node capacity R).
 
+## Corrected scaling axes (2026-07-03)
+
+Re-measurement on the isolated 48-logical-tenant rig (catalog **61,341 `pg_class` rows**,
+all tenants as hash-prefixed schema sets inside one physical DB) sharpens the two axes
+above — the laws are unchanged; the *interpretation of R* is refined.
+
+**Per-tenant catalog cost is a near-constant set by the base stack, not the blueprint.**
+Each logical tenant adds a uniform **~901–904 `pg_class` rows**, of which only **~18 come
+from the app blueprint** — the rest is the ~40-module base stack (auth, billing, events,
+limits, `pg_partman` partitions, …) that every tenant carries. Blueprints in
+`constructive-db` are 1–5 tables, so **blueprint size variance is immaterial** to sizing:
+price shards on tenant *count*, treating per-tenant catalog cost as fixed.
+
+**Node memory scales with actively-hot API surfaces × settings variants (R), priced
+class-independently at `I = 22KB × shard catalog rows`** (≈1.45GB at 61k rows; the same
+measurement as the banked 21KB/row V2 constant, rounded). What multiplies I is **R = the
+number of distinct pool keys concurrently hot on the node**. The blueprint cache key is
+`[logicalSchemas, relname-shape-fingerprint, databaseSettings-flags, apiName, mode,
+dbname]`, so **each API surface and each settings variant splits the pool
+independently**. A tenant exposes **~9 APIs / 8 routable hosts** on the rig (admin,
+agent, api, auth, compute, config, objects, usage are routable; notifications is not),
+but **only concurrently-hit surfaces count toward R** — api+auth resident is R=2; add
+admin+usage under live traffic and it is R=4. (`regression run --suite deep`'s
+`multi-api-residency` check measures exactly this.)
+
+**Settings flags are part of the pool key.** The rig currently has **zero
+`services_public.database_settings` / `api_settings` rows** — every tenant runs on column
+defaults (postgis / search / uploads / m2m / connection_filter / ltree **ON**; aggregates
+/ llm / realtime / bulk / i18n **OFF**), so the fleet is uniform and settings split no
+pool *today*. The moment a tenant gets a non-default `database_settings` row its shape
+forks a **second** pooled instance (**+1 to R**) for the same relations.
+
+**`enable_realtime` makes a tenant unpoolable.** Per
+`graphql/server/src/middleware/pooling-decision.ts`, a service with `enableRealtime=true`
+gets a **dedicated per-tenant instance** and can never share — so every realtime tenant
+costs a full I of resident heap on its own. **House realtime tenants in small-catalog
+shards** so that dedicated instance is cheap.
+
+**partman partitions grow the catalog over time.** The base stack partman-partitions
+events / billing / limits / user_auth (~144 partition children per tenant, `premake=2`;
+`part_config` has 349 rows fleet-wide). Partitions are pre-created on each
+`partition_interval`, so catalog rows — and therefore I — **creep upward per tenant per
+interval** until retention drops old partitions. Retention bounds it; an
+unbounded-retention tenant grows I without limit.
+
+**Corrected sizing law (residency floor):**
+
+```
+heap ≥ 256MB  +  R × I  +  768MB
+       └ B ┘      └ resident ┘   └ T ┘
+       base       R instances    one build
+       reserve    @ 22KB/row      transient
+```
+
+i.e. `H ≥ B + R·I + T` — the residency form of the two-constraint budget in
+`computeCapacityFromBudget`. R counts every concurrently-hot **(surface × settings-variant)**
+instance, so a node serving api+auth+admin+usage for one blueprint is R=4, and any
+settings variant on those adds one more.
+
 ## Node capacity (implemented in `computeCapacityFromBudget`)
 
 ```

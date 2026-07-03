@@ -27,6 +27,23 @@ export interface Baseline {
     maxHealthyP99Ms: number;
     maxHeapSlopeMBPerHour: number;
   };
+  // Thresholds + constants used ONLY by the `deep`-tier scenario checks
+  // (src/regression/scenarios.ts). Kept separate from `thresholds` so the
+  // quick/standard comparator surface is unchanged.
+  deepThresholds: {
+    // multi-api-residency: allowed |measured - (base + R*I)| / (base + R*I).
+    multiApiHeapTolerance: number;
+    // settings-variant-split: distinct pooled instances expected for one
+    // relation shape when a settings flag differs (control g=[] vs variant g=[…]).
+    settingsSplitExpectedInstances: number;
+    // partition-creep advisory ceiling: projected new catalog rows / tenant / month.
+    partitionCreepMaxRowsPerTenantMonth: number;
+  };
+  deepConstants: {
+    // Number of routable API surfaces per tenant (admin/agent/api/auth/compute/
+    // config/objects/usage — notifications is unrouted). Informational.
+    apiSurfacesRoutable: number;
+  };
 }
 
 export const catalog61k_2026_07: Baseline = {
@@ -47,6 +64,14 @@ export const catalog61k_2026_07: Baseline = {
     maxHealthyErrRate: 0.005,
     maxHealthyP99Ms: 150,
     maxHeapSlopeMBPerHour: 5
+  },
+  deepThresholds: {
+    multiApiHeapTolerance: 0.2,
+    settingsSplitExpectedInstances: 2,
+    partitionCreepMaxRowsPerTenantMonth: 200
+  },
+  deepConstants: {
+    apiSurfacesRoutable: 8
   }
 };
 
