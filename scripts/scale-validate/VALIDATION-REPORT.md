@@ -54,6 +54,7 @@ sizing, knob reference) + the fixes below.
 | 8 | No runtime visibility | blind ops | **`0a8a95402`** `/metrics` endpoint (env-gated, loopback-guarded) + sampler counters incl. governor/guard/refusals |
 | 9 | `pg_partman` registry rows are name-keyed, not FK-cascaded; schema hashes are deterministic per dbname | Re-provisioning a reused tenant name fails with unique_violation | **`d00100631`** teardown cleans part_config(+sub); 434 orphans purged |
 | 10 | `idle_session_timeout` (finding-1 mitigation) reaps ANY long-idle client | killed the churn driver; would kill LISTEN clients lacking reconnect | Server listener already reconnects; driver fixed (**`073f8bd58`**); documented as an ops tradeoff |
+| 11 | `flushService` cleared ALL `bp:` instances on ANY `schema:update`, and the immediate rebuild raced evicted-but-DRAINING instances whose heap was still live (invisible to count-based headroom) | Every tenant PROVISION cold-restarted the whole pooled fleet; rebuild transient stacked on ~GB of draining heap → SIGABRT at 3584MB (killed soak attempt 2 at hour 2) | **`65c3056f9`** surgical per-database flush (`PoolDecision.databaseId` stamped at memoization; only the changed DB's decisions + blueprint invalidated; provisions are no-ops for resident blueprints) + drain-aware build admission (`waitForDrainSettle` after headroom eviction). Validated live: soak attempt 3 survived three provision/drop cycles at the exact event that killed attempt 2 |
 
 Also validated en route: bleed sentinel NEVER fired across the entire program
 (hundreds of thousands of authenticated cross-tenant-adjacent requests, thrash
@@ -83,7 +84,49 @@ node scripts/scale-validate/summarize-results.mjs out/results.jsonl
 node scripts/scale-validate/measure-instance-heap.mjs --label x --host api-...localhost
 ```
 
+## V3 soak — final verdict: **PASS** (5-hour scope)
+
+Attempt 3, 2026-07-03 00:26→05:26 UTC, hardened build (findings 3/4/5/7/8/11 fixes
+in), heap 3584MB / instance estimate 1450MB → capacity R=2, 32-tenant same-shape
+fleet + auth at 30rps zipf, hourly relogin batches, provision+drop cycle every 2h,
+PG-side sampler recording. Scope note: the user shortened the planned 24h to 5h;
+all three prior attempts' failure modes fired inside 2h, so 5 clean hours is 2.5×
+past every observed failure point — but the original 12h/<5MB/h leak criterion was
+adapted to the 4h post-warmup window (below).
+
+| Criterion | Result | Verdict |
+|---|---|---|
+| No node/PG OOM, no crash, no restart | server up the full 5h; PG container ≤3153MB of 4.4GiB cap; backends ≤16 | ✅ |
+| Cross-tenant bleed | **0 violations** / 235 sentinel checks (469/470 own-canary seen; 1 inconclusive during the blip window) | ✅ |
+| Availability / latency | 392,794 requests completed, cumulative errRate **0.094%** (370 errors, ALL inside one ~2min recovery blip at the hour-2 provision/drop; every other window 0); overall p50/p95/p99 = **13/21/55ms** (steady windows p99 21–34ms) | ✅ |
+| Schema-churn survival (finding 11 validation) | **3 provision/drop cycles + 5 hourly relogin batches survived live** (128 relogins, 0 auth failures); attempt 2 died at cycle 1 on the same event | ✅ |
+| Heap stability / leak | like-for-like (cache=2) heap plateaus at **~2.78GB ±45MB** with non-monotonic hour-over-hour floors → no detectable leak at 5h resolution; naive all-sample slope (481MB/h) is a state-mix artifact of cache 1↔2 transitions, not growth | ✅ (5h bound; 24h run would tighten below the original 5MB/h criterion) |
+| Counters clean | governor evictions 0, buildRefusals 0, drainTimeouts 0, buildWaitTimeouts 0, connGuard 0/0; lru=6 evictions + 8 builds vs **481,610 pooling attaches** (~60k:1 instance reuse) | ✅ |
+
+Ops observations (non-blocking): server SIGTERM→exit exceeded 30s under pooling
+(SIGKILL after data-plane stop is safe; document in runbooks). macOS `ps` RSS is
+not usable for leak detection under memory compression — use sampler `heapUsed`.
+Raw artifacts: `out/soak-results.json`, `out/soak-collector.json`,
+`out/metrics-soak.jsonl`, `out/pg-soak.jsonl`, `out/metrics-final.json`,
+`out/soak-{harness,churn,ops,server}.log`.
+
+## Tooling productionized
+
+The entire validation toolkit was ported to a reusable package:
+**`packages/perf-harness`** (`@constructive-io/perf-harness`, bins `perf-harness`/
+`cperf`) — fleet provision/drift/canary/teardown, load harness/churn, measure
+collector/pg/instance-heap, run ramp/soak (detached, ordered stop), report
+summarize/merge/predict, and `cperf regression run` comparing fresh runs against
+baselines banked from this program (21KB/row, capacity law, zero-marginal,
+thrash-not-crash, bleed=0). Hub-port guardrail built in (5432/3000-3002/9000
+refused without `--allow-hub`); credentials via `PERF_PASSWORD` only. 156 unit
+tests; smoke-tested against this soak's live data. See the package README for the
+"regression reappeared" quickstart. The `scripts/scale-validate/` originals remain
+as-run for provenance.
+
 ## Status
 
-- V3 soak: **[in flight — completion numbers + PASS/FAIL appended here]**
+- V1 instrumentation+fleet ✅ · V2 limits discovery ✅ (`V2-RESULTS.md`) · V3 soak
+  **PASS** (above) · V4 sizing+hardening ✅ (`SIZING.md`, fixes in the findings
+  table, perf-harness package).
 - All work is local to `feat/scale-phase0`; nothing pushed.

@@ -343,8 +343,8 @@ run soak stop    --label <l> [--out-dir]
 run soak-ops     [--interval-sec 7200] [--duration-sec 86400] [--prefix soak]
 
 report summarize <results.jsonl> [...more]
-report merge     --out-dir <dir> --label <l> [--out report-data.json]
-report predict   [--heap-mb 2048,3584,…] [--pg-class-rows <n>] [--instance-heap-bytes <n>]
+report merge     --metrics <m.jsonl> --harness-log <h.jsonl> [--churn-log <c.jsonl>] [--ops-log <o.log>] [--pg <pg.jsonl>] [--out-dir ./perf-out]
+report predict   --instance-heap-bytes <n> [--heap-mb 1536,2048,3584] [--base-reserve-bytes <n>] [--build-reserve-bytes <n>]
 
 regression run       --fleet <file> [--suite quick|standard] [--baseline <name>] [--port] [--heap-mb] [--out-dir]
 regression baselines
