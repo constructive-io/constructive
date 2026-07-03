@@ -8,19 +8,23 @@ import type { OrmClientConfig } from './client';
 import { GetAllRecordModel } from './models/getAllRecord';
 import { FunctionApiBindingModel } from './models/functionApiBinding';
 import { FunctionDeploymentModel } from './models/functionDeployment';
+import { ResourceModel } from './models/resource';
 import { FunctionGraphRefModel } from './models/functionGraphRef';
 import { FunctionGraphStoreModel } from './models/functionGraphStore';
 import { FunctionGraphObjectModel } from './models/functionGraphObject';
 import { FunctionDeploymentEventModel } from './models/functionDeploymentEvent';
 import { OrgFunctionExecutionLogModel } from './models/orgFunctionExecutionLog';
+import { ResourceEventModel } from './models/resourceEvent';
 import { FunctionGraphExecutionOutputModel } from './models/functionGraphExecutionOutput';
 import { FunctionGraphCommitModel } from './models/functionGraphCommit';
 import { SecretDefinitionModel } from './models/secretDefinition';
 import { FunctionExecutionLogModel } from './models/functionExecutionLog';
-import { FunctionGraphExecutionNodeStateModel } from './models/functionGraphExecutionNodeState';
 import { FunctionGraphModel } from './models/functionGraph';
+import { FunctionGraphExecutionNodeStateModel } from './models/functionGraphExecutionNodeState';
+import { PlatformNamespaceModel } from './models/platformNamespace';
 import { OrgFunctionInvocationModel } from './models/orgFunctionInvocation';
 import { FunctionInvocationModel } from './models/functionInvocation';
+import { PlatformNamespaceEventModel } from './models/platformNamespaceEvent';
 import { FunctionGraphExecutionModel } from './models/functionGraphExecution';
 import { FunctionDefinitionModel } from './models/functionDefinition';
 import { createQueryOperations } from './query';
@@ -61,19 +65,23 @@ export function createClient(config: OrmClientConfig) {
     getAllRecord: new GetAllRecordModel(client),
     functionApiBinding: new FunctionApiBindingModel(client),
     functionDeployment: new FunctionDeploymentModel(client),
+    resource: new ResourceModel(client),
     functionGraphRef: new FunctionGraphRefModel(client),
     functionGraphStore: new FunctionGraphStoreModel(client),
     functionGraphObject: new FunctionGraphObjectModel(client),
     functionDeploymentEvent: new FunctionDeploymentEventModel(client),
     orgFunctionExecutionLog: new OrgFunctionExecutionLogModel(client),
+    resourceEvent: new ResourceEventModel(client),
     functionGraphExecutionOutput: new FunctionGraphExecutionOutputModel(client),
     functionGraphCommit: new FunctionGraphCommitModel(client),
     secretDefinition: new SecretDefinitionModel(client),
     functionExecutionLog: new FunctionExecutionLogModel(client),
-    functionGraphExecutionNodeState: new FunctionGraphExecutionNodeStateModel(client),
     functionGraph: new FunctionGraphModel(client),
+    functionGraphExecutionNodeState: new FunctionGraphExecutionNodeStateModel(client),
+    platformNamespace: new PlatformNamespaceModel(client),
     orgFunctionInvocation: new OrgFunctionInvocationModel(client),
     functionInvocation: new FunctionInvocationModel(client),
+    platformNamespaceEvent: new PlatformNamespaceEventModel(client),
     functionGraphExecution: new FunctionGraphExecutionModel(client),
     functionDefinition: new FunctionDefinitionModel(client),
     query: createQueryOperations(client),

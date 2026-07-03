@@ -9,7 +9,7 @@ API endpoint configurations: each record defines a PostGraphile/PostgREST API wi
 ```typescript
 db.api.findMany({ select: { id: true } }).execute()
 db.api.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.api.create({ data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>' }, select: { id: true } }).execute()
+db.api.create({ data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>', labels: '<JSON>', annotations: '<JSON>' }, select: { id: true } }).execute()
 db.api.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.api.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.api.findMany({
 
 ```typescript
 const item = await db.api.create({
-  data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>' },
+  data: { databaseId: '<UUID>', name: '<String>', dbname: '<String>', roleName: '<String>', anonRole: '<String>', isPublic: '<Boolean>', labels: '<JSON>', annotations: '<JSON>' },
   select: { id: true }
 }).execute();
 ```

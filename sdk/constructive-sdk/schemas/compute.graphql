@@ -199,6 +199,35 @@ type Query {
     orderBy: [OrgFunctionExecutionLogOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgFunctionExecutionLogConnection
 
+  """Reads and enables pagination through a set of `ResourceEvent`."""
+  resourceEvents(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ResourceEventFilter
+
+    """The method to use when ordering `ResourceEvent`."""
+    orderBy: [ResourceEventOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ResourceEventConnection
+
   """
   Reads and enables pagination through a set of `FunctionGraphExecutionOutput`.
   """
@@ -317,6 +346,35 @@ type Query {
     orderBy: [FunctionExecutionLogOrderBy!] = [PRIMARY_KEY_ASC]
   ): FunctionExecutionLogConnection
 
+  """Reads and enables pagination through a set of `FunctionGraph`."""
+  functionGraphs(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionGraphFilter
+
+    """The method to use when ordering `FunctionGraph`."""
+    orderBy: [FunctionGraphOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FunctionGraphConnection
+
   """
   Reads and enables pagination through a set of `FunctionGraphExecutionNodeState`.
   """
@@ -348,8 +406,8 @@ type Query {
     orderBy: [FunctionGraphExecutionNodeStateOrderBy!] = [PRIMARY_KEY_ASC]
   ): FunctionGraphExecutionNodeStateConnection
 
-  """Reads and enables pagination through a set of `FunctionGraph`."""
-  functionGraphs(
+  """Reads and enables pagination through a set of `PlatformNamespace`."""
+  platformNamespaces(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -371,11 +429,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: FunctionGraphFilter
+    where: PlatformNamespaceFilter
 
-    """The method to use when ordering `FunctionGraph`."""
-    orderBy: [FunctionGraphOrderBy!] = [PRIMARY_KEY_ASC]
-  ): FunctionGraphConnection
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceConnection
 
   """Reads and enables pagination through a set of `OrgFunctionInvocation`."""
   orgFunctionInvocations(
@@ -434,6 +492,66 @@ type Query {
     """The method to use when ordering `FunctionInvocation`."""
     orderBy: [FunctionInvocationOrderBy!] = [PRIMARY_KEY_ASC]
   ): FunctionInvocationConnection
+
+  """Reads and enables pagination through a set of `Resource`."""
+  resources(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ResourceFilter
+
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourceOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ResourceConnection
+
+  """
+  Reads and enables pagination through a set of `PlatformNamespaceEvent`.
+  """
+  platformNamespaceEvents(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformNamespaceEventFilter
+
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEventConnection
 
   """Reads and enables pagination through a set of `FunctionDeployment`."""
   functionDeployments(
@@ -1507,6 +1625,170 @@ input FunctionDeploymentFilter {
 
   """Filter by the object’s `functionDefinition` relation."""
   functionDefinition: FunctionDefinitionFilter
+
+  """Filter by the object’s `namespace` relation."""
+  namespace: PlatformNamespaceFilter
+}
+
+"""
+A filter to be used against `PlatformNamespace` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformNamespaceFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `namespaceName` field."""
+  namespaceName: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `sourceDatabaseId` field."""
+  sourceDatabaseId: UUIDFilter
+
+  """Filter by the object’s `sourceScope` field."""
+  sourceScope: StringFilter
+
+  """Filter by the object’s `isManaged` field."""
+  isManaged: BooleanFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformNamespaceFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [PlatformNamespaceFilter!]
+
+  """Negates the expression."""
+  not: PlatformNamespaceFilter
+
+  """Filter by the object’s `functionDeploymentsByNamespaceId` relation."""
+  functionDeploymentsByNamespaceId: PlatformNamespaceToManyFunctionDeploymentFilter
+
+  """`functionDeploymentsByNamespaceId` exist."""
+  functionDeploymentsByNamespaceIdExist: Boolean
+
+  """Filter by the object’s `resourcesByNamespaceId` relation."""
+  resourcesByNamespaceId: PlatformNamespaceToManyResourceFilter
+
+  """`resourcesByNamespaceId` exist."""
+  resourcesByNamespaceIdExist: Boolean
+}
+
+"""
+A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformNamespaceToManyFunctionDeploymentFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: FunctionDeploymentFilter
+
+  """Filters to entities where every related entity matches."""
+  every: FunctionDeploymentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: FunctionDeploymentFilter
+}
+
+"""
+A filter to be used against many `Resource` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformNamespaceToManyResourceFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: ResourceFilter
+
+  """Filters to entities where every related entity matches."""
+  every: ResourceFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ResourceFilter
+}
+
+"""
+A filter to be used against `Resource` object types. All fields are combined with a logical ‘and.’
+"""
+input ResourceFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `slug` field."""
+  slug: StringFilter
+
+  """Filter by the object’s `spec` field."""
+  spec: JSONFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `statusObserved` field."""
+  statusObserved: JSONFilter
+
+  """Filter by the object’s `lastError` field."""
+  lastError: StringFilter
+
+  """Filter by the object’s `errorCount` field."""
+  errorCount: IntFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [ResourceFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [ResourceFilter!]
+
+  """Negates the expression."""
+  not: ResourceFilter
+
+  """Filter by the object’s `namespace` relation."""
+  namespace: PlatformNamespaceFilter
 }
 
 """Methods to use when ordering `FunctionApiBinding`."""
@@ -1621,15 +1903,116 @@ type FunctionDeployment {
   Reads a single `FunctionDefinition` that is related to this `FunctionDeployment`.
   """
   functionDefinition: FunctionDefinition
+
+  """
+  Reads a single `PlatformNamespace` that is related to this `FunctionDeployment`.
+  """
+  namespace: PlatformNamespace
 }
 
-"""A `FunctionDeployment` edge in the connection."""
-type FunctionDeploymentEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+"""
+Logical namespace containers for grouping secrets, config, functions, and other resources
+"""
+type PlatformNamespace {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
 
-  """The `FunctionDeployment` at the end of the edge."""
-  node: FunctionDeployment
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String!
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String!
+
+  """Optional human-readable description of this namespace"""
+  description: String
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean!
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON!
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Database that created this namespace (NULL for platform-native namespaces)
+  """
+  sourceDatabaseId: UUID
+
+  """
+  Origin scope: platform, org, app — indicates where this namespace was created
+  """
+  sourceScope: String
+
+  """
+  true = created by a child scope mirror trigger, false = platform-native
+  """
+  isManaged: Boolean!
+
+  """Reads and enables pagination through a set of `FunctionDeployment`."""
+  functionDeploymentsByNamespaceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FunctionDeploymentFilter
+
+    """The method to use when ordering `FunctionDeployment`."""
+    orderBy: [FunctionDeploymentOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FunctionDeploymentConnection!
+
+  """Reads and enables pagination through a set of `Resource`."""
+  resourcesByNamespaceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ResourceFilter
+
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourceOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ResourceConnection!
 }
 
 """Methods to use when ordering `FunctionDeployment`."""
@@ -1679,6 +2062,140 @@ enum FunctionDeploymentOrderBy {
   ANNOTATIONS_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
+}
+
+"""A connection to a list of `Resource` values."""
+type ResourceConnection {
+  """A list of `Resource` objects."""
+  nodes: [Resource]!
+
+  """
+  A list of edges which contains the `Resource` and cursor to aid in pagination.
+  """
+  edges: [ResourceEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Resource` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace
+"""
+type Resource {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """
+  Namespace this resource belongs to (security boundary, maps to K8s namespace)
+  """
+  namespaceId: UUID!
+
+  """Resource kind: Deployment, StatefulSet, Service, Ingress, Certificate"""
+  kind: String!
+
+  """Human-readable resource name"""
+  name: String!
+
+  """URL-safe identifier, unique within (namespace_id, kind)"""
+  slug: String!
+
+  """
+  Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s.
+  """
+  spec: JSON!
+
+  """
+  Resource lifecycle status: pending, provisioning, active, failed, draining, deleting
+  """
+  status: String!
+
+  """
+  Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.)
+  """
+  statusObserved: JSON
+
+  """Most recent provisioning or runtime error message"""
+  lastError: String
+
+  """Cumulative error count for this resource"""
+  errorCount: Int!
+
+  """Key/value pairs for selecting and filtering resources"""
+  labels: JSON!
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Reads a single `PlatformNamespace` that is related to this `Resource`."""
+  namespace: PlatformNamespace
+}
+
+"""A `Resource` edge in the connection."""
+type ResourceEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Resource` at the end of the edge."""
+  node: Resource
+}
+
+"""Methods to use when ordering `Resource`."""
+enum ResourceOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  KIND_ASC
+  KIND_DESC
+  NAME_ASC
+  NAME_DESC
+  SLUG_ASC
+  SLUG_DESC
+  SPEC_ASC
+  SPEC_DESC
+  STATUS_ASC
+  STATUS_DESC
+  STATUS_OBSERVED_ASC
+  STATUS_OBSERVED_DESC
+  LAST_ERROR_ASC
+  LAST_ERROR_DESC
+  ERROR_COUNT_ASC
+  ERROR_COUNT_DESC
+  LABELS_ASC
+  LABELS_DESC
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+}
+
+"""A `FunctionDeployment` edge in the connection."""
+type FunctionDeploymentEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FunctionDeployment` at the end of the edge."""
+  node: FunctionDeployment
 }
 
 """A `FunctionApiBinding` edge in the connection."""
@@ -2254,6 +2771,124 @@ enum OrgFunctionExecutionLogOrderBy {
   ACTOR_ID_DESC
 }
 
+"""A connection to a list of `ResourceEvent` values."""
+type ResourceEventConnection {
+  """A list of `ResourceEvent` objects."""
+  nodes: [ResourceEvent]!
+
+  """
+  A list of edges which contains the `ResourceEvent` and cursor to aid in pagination.
+  """
+  edges: [ResourceEventEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ResourceEvent` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Resource lifecycle events — audit log of provisioning, updates, and failure events
+"""
+type ResourceEvent {
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """Resource this event belongs to"""
+  resourceId: UUID!
+
+  """
+  Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check
+  """
+  eventType: String!
+
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, error details, etc.)"""
+  metadata: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+}
+
+"""A `ResourceEvent` edge in the connection."""
+type ResourceEventEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourceEvent` at the end of the edge."""
+  node: ResourceEvent
+}
+
+"""
+A filter to be used against `ResourceEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input ResourceEventFilter {
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `resourceId` field."""
+  resourceId: UUIDFilter
+
+  """Filter by the object’s `eventType` field."""
+  eventType: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [ResourceEventFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [ResourceEventFilter!]
+
+  """Negates the expression."""
+  not: ResourceEventFilter
+}
+
+"""Methods to use when ordering `ResourceEvent`."""
+enum ResourceEventOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  EVENT_TYPE_ASC
+  EVENT_TYPE_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  MESSAGE_ASC
+  MESSAGE_DESC
+  METADATA_ASC
+  METADATA_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+}
+
 """A connection to a list of `FunctionGraphExecutionOutput` values."""
 type FunctionGraphExecutionOutputConnection {
   """A list of `FunctionGraphExecutionOutput` objects."""
@@ -2752,6 +3387,154 @@ enum FunctionExecutionLogOrderBy {
   DATABASE_ID_DESC
 }
 
+"""A connection to a list of `FunctionGraph` values."""
+type FunctionGraphConnection {
+  """A list of `FunctionGraph` objects."""
+  nodes: [FunctionGraph]!
+
+  """
+  A list of edges which contains the `FunctionGraph` and cursor to aid in pagination.
+  """
+  edges: [FunctionGraphEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `FunctionGraph` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
+"""
+type FunctionGraph {
+  """Unique graph identifier"""
+  id: UUID!
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID!
+
+  """Graph store (Merkle store) holding the graph definition"""
+  storeId: UUID!
+
+  """Evaluator/runtime context (function, js, sql, system)"""
+  context: String!
+
+  """Graph name (unique per database)"""
+  name: String!
+
+  """Human-readable description of the graph"""
+  description: String
+
+  """Pinned definitions store commit for deterministic evaluation"""
+  definitionsCommitId: UUID
+
+  """Whether graph passes structural validation"""
+  isValid: Boolean!
+
+  """Array of validation error objects when is_valid = false"""
+  validationErrors: JSON
+
+  """Actor who created this graph"""
+  createdBy: UUID
+
+  """Timestamp of graph creation"""
+  createdAt: Datetime!
+
+  """Timestamp of last modification"""
+  updatedAt: Datetime!
+}
+
+"""A `FunctionGraph` edge in the connection."""
+type FunctionGraphEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FunctionGraph` at the end of the edge."""
+  node: FunctionGraph
+}
+
+"""
+A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionGraphFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `context` field."""
+  context: StringFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `definitionsCommitId` field."""
+  definitionsCommitId: UUIDFilter
+
+  """Filter by the object’s `isValid` field."""
+  isValid: BooleanFilter
+
+  """Filter by the object’s `validationErrors` field."""
+  validationErrors: JSONFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [FunctionGraphFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [FunctionGraphFilter!]
+
+  """Negates the expression."""
+  not: FunctionGraphFilter
+}
+
+"""Methods to use when ordering `FunctionGraph`."""
+enum FunctionGraphOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  STORE_ID_ASC
+  STORE_ID_DESC
+  CONTEXT_ASC
+  CONTEXT_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  DEFINITIONS_COMMIT_ID_ASC
+  DEFINITIONS_COMMIT_ID_DESC
+  IS_VALID_ASC
+  IS_VALID_DESC
+  VALIDATION_ERRORS_ASC
+  VALIDATION_ERRORS_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
 """A connection to a list of `FunctionGraphExecutionNodeState` values."""
 type FunctionGraphExecutionNodeStateConnection {
   """A list of `FunctionGraphExecutionNodeState` objects."""
@@ -2904,160 +3687,65 @@ enum FunctionGraphExecutionNodeStateOrderBy {
   OUTPUT_ID_DESC
 }
 
-"""A connection to a list of `FunctionGraph` values."""
-type FunctionGraphConnection {
-  """A list of `FunctionGraph` objects."""
-  nodes: [FunctionGraph]!
+"""A connection to a list of `PlatformNamespace` values."""
+type PlatformNamespaceConnection {
+  """A list of `PlatformNamespace` objects."""
+  nodes: [PlatformNamespace]!
 
   """
-  A list of edges which contains the `FunctionGraph` and cursor to aid in pagination.
+  A list of edges which contains the `PlatformNamespace` and cursor to aid in pagination.
   """
-  edges: [FunctionGraphEdge]!
+  edges: [PlatformNamespaceEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `FunctionGraph` you could get from the connection."""
+  """
+  The count of *all* `PlatformNamespace` you could get from the connection.
+  """
   totalCount: Int!
 }
 
-"""
-Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
-"""
-type FunctionGraph {
-  """Unique graph identifier"""
-  id: UUID!
-
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID!
-
-  """Graph store (Merkle store) holding the graph definition"""
-  storeId: UUID!
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
-
-  """Evaluator/runtime context (function, js, sql, system)"""
-  context: String!
-
-  """Graph name (unique per database)"""
-  name: String!
-
-  """Human-readable description of the graph"""
-  description: String
-
-  """Pinned definitions store commit for deterministic evaluation"""
-  definitionsCommitId: UUID
-
-  """Whether graph passes structural validation"""
-  isValid: Boolean!
-
-  """Array of validation error objects when is_valid = false"""
-  validationErrors: JSON
-
-  """Actor who created this graph"""
-  createdBy: UUID
-
-  """Timestamp of graph creation"""
-  createdAt: Datetime!
-
-  """Timestamp of last modification"""
-  updatedAt: Datetime!
-}
-
-"""A `FunctionGraph` edge in the connection."""
-type FunctionGraphEdge {
+"""A `PlatformNamespace` edge in the connection."""
+type PlatformNamespaceEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `FunctionGraph` at the end of the edge."""
-  node: FunctionGraph
+  """The `PlatformNamespace` at the end of the edge."""
+  node: PlatformNamespace
 }
 
-"""
-A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’
-"""
-input FunctionGraphFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `storeId` field."""
-  storeId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `context` field."""
-  context: StringFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `definitionsCommitId` field."""
-  definitionsCommitId: UUIDFilter
-
-  """Filter by the object’s `isValid` field."""
-  isValid: BooleanFilter
-
-  """Filter by the object’s `validationErrors` field."""
-  validationErrors: JSONFilter
-
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [FunctionGraphFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [FunctionGraphFilter!]
-
-  """Negates the expression."""
-  not: FunctionGraphFilter
-}
-
-"""Methods to use when ordering `FunctionGraph`."""
-enum FunctionGraphOrderBy {
+"""Methods to use when ordering `PlatformNamespace`."""
+enum PlatformNamespaceOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  STORE_ID_ASC
-  STORE_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  CONTEXT_ASC
-  CONTEXT_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  DEFINITIONS_COMMIT_ID_ASC
-  DEFINITIONS_COMMIT_ID_DESC
-  IS_VALID_ASC
-  IS_VALID_DESC
-  VALIDATION_ERRORS_ASC
-  VALIDATION_ERRORS_DESC
-  CREATED_BY_ASC
-  CREATED_BY_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  NAME_ASC
+  NAME_DESC
+  NAMESPACE_NAME_ASC
+  NAMESPACE_NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  LABELS_ASC
+  LABELS_DESC
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SOURCE_DATABASE_ID_ASC
+  SOURCE_DATABASE_ID_DESC
+  SOURCE_SCOPE_ASC
+  SOURCE_SCOPE_DESC
+  IS_MANAGED_ASC
+  IS_MANAGED_DESC
 }
 
 """A connection to a list of `OrgFunctionInvocation` values."""
@@ -3453,6 +4141,182 @@ enum FunctionInvocationOrderBy {
   GRAPH_EXECUTION_ID_DESC
 }
 
+"""A connection to a list of `PlatformNamespaceEvent` values."""
+type PlatformNamespaceEventConnection {
+  """A list of `PlatformNamespaceEvent` objects."""
+  nodes: [PlatformNamespaceEvent]!
+
+  """
+  A list of edges which contains the `PlatformNamespaceEvent` and cursor to aid in pagination.
+  """
+  edges: [PlatformNamespaceEventEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformNamespaceEvent` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Namespace lifecycle events — audit log of creation, activation, deactivation, label changes
+"""
+type PlatformNamespaceEvent {
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID!
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String!
+
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """CPU usage in millicores at time of event"""
+  cpuMillicores: Int
+
+  """Memory usage in bytes at time of event"""
+  memoryBytes: BigInt
+
+  """Storage usage in bytes at time of event"""
+  storageBytes: BigInt
+
+  """Network ingress in bytes during event window"""
+  networkIngressBytes: BigInt
+
+  """Network egress in bytes during event window"""
+  networkEgressBytes: BigInt
+
+  """Number of active pods in the namespace at time of event"""
+  podCount: Int
+
+  """Additional resource metrics (gpu, replicas, quotas, etc.)"""
+  metrics: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+}
+
+"""A `PlatformNamespaceEvent` edge in the connection."""
+type PlatformNamespaceEventEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformNamespaceEvent` at the end of the edge."""
+  node: PlatformNamespaceEvent
+}
+
+"""
+A filter to be used against `PlatformNamespaceEvent` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformNamespaceEventFilter {
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Filter by the object’s `eventType` field."""
+  eventType: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Filter by the object’s `cpuMillicores` field."""
+  cpuMillicores: IntFilter
+
+  """Filter by the object’s `memoryBytes` field."""
+  memoryBytes: BigIntFilter
+
+  """Filter by the object’s `storageBytes` field."""
+  storageBytes: BigIntFilter
+
+  """Filter by the object’s `networkIngressBytes` field."""
+  networkIngressBytes: BigIntFilter
+
+  """Filter by the object’s `networkEgressBytes` field."""
+  networkEgressBytes: BigIntFilter
+
+  """Filter by the object’s `podCount` field."""
+  podCount: IntFilter
+
+  """Filter by the object’s `metrics` field."""
+  metrics: JSONFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [PlatformNamespaceEventFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [PlatformNamespaceEventFilter!]
+
+  """Negates the expression."""
+  not: PlatformNamespaceEventFilter
+}
+
+"""Methods to use when ordering `PlatformNamespaceEvent`."""
+enum PlatformNamespaceEventOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  EVENT_TYPE_ASC
+  EVENT_TYPE_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  MESSAGE_ASC
+  MESSAGE_DESC
+  METADATA_ASC
+  METADATA_DESC
+  CPU_MILLICORES_ASC
+  CPU_MILLICORES_DESC
+  MEMORY_BYTES_ASC
+  MEMORY_BYTES_DESC
+  STORAGE_BYTES_ASC
+  STORAGE_BYTES_DESC
+  NETWORK_INGRESS_BYTES_ASC
+  NETWORK_INGRESS_BYTES_DESC
+  NETWORK_EGRESS_BYTES_ASC
+  NETWORK_EGRESS_BYTES_DESC
+  POD_COUNT_ASC
+  POD_COUNT_DESC
+  METRICS_ASC
+  METRICS_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+}
+
 """A connection to a list of `FunctionGraphExecution` values."""
 type FunctionGraphExecutionConnection {
   """A list of `FunctionGraphExecution` objects."""
@@ -3488,9 +4352,6 @@ type FunctionGraphExecution {
 
   """Scope for multi-tenant isolation"""
   databaseId: UUID!
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
 
   """Target output boundary node name to resolve"""
   outputNode: String!
@@ -3582,9 +4443,6 @@ input FunctionGraphExecutionFilter {
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
   """Filter by the object’s `outputNode` field."""
   outputNode: StringFilter
 
@@ -3667,8 +4525,6 @@ enum FunctionGraphExecutionOrderBy {
   INVOCATION_ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
   OUTPUT_NODE_ASC
   OUTPUT_NODE_DESC
   OUTPUT_PORT_ASC
@@ -4104,6 +4960,12 @@ type Mutation {
     """
     input: CreateFunctionGraphInput!
   ): CreateFunctionGraphPayload
+  importGraphJson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ImportGraphJsonInput!
+  ): ImportGraphJsonPayload
   addEdge(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4116,12 +4978,6 @@ type Mutation {
     """
     input: AddNodeInput!
   ): AddNodePayload
-  importGraphJson(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ImportGraphJsonInput!
-  ): ImportGraphJsonPayload
   insertNodeAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4183,6 +5039,14 @@ type Mutation {
     input: CreateOrgFunctionExecutionLogInput!
   ): CreateOrgFunctionExecutionLogPayload
 
+  """Creates a single `ResourceEvent`."""
+  createResourceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateResourceEventInput!
+  ): CreateResourceEventPayload
+
   """Creates a single `FunctionGraphExecutionOutput`."""
   createFunctionGraphExecutionOutput(
     """
@@ -4223,6 +5087,14 @@ type Mutation {
     input: CreateFunctionGraphExecutionNodeStateInput!
   ): CreateFunctionGraphExecutionNodeStatePayload
 
+  """Creates a single `PlatformNamespace`."""
+  createPlatformNamespace(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformNamespaceInput!
+  ): CreatePlatformNamespacePayload
+
   """Creates a single `OrgFunctionInvocation`."""
   createOrgFunctionInvocation(
     """
@@ -4238,6 +5110,22 @@ type Mutation {
     """
     input: CreateFunctionInvocationInput!
   ): CreateFunctionInvocationPayload
+
+  """Creates a single `Resource`."""
+  createResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateResourceInput!
+  ): CreateResourcePayload
+
+  """Creates a single `PlatformNamespaceEvent`."""
+  createPlatformNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformNamespaceEventInput!
+  ): CreatePlatformNamespaceEventPayload
 
   """Creates a single `FunctionDeployment`."""
   createFunctionDeployment(
@@ -4315,6 +5203,14 @@ type Mutation {
     input: UpdateOrgFunctionExecutionLogInput!
   ): UpdateOrgFunctionExecutionLogPayload
 
+  """Updates a single `ResourceEvent` using a unique key and a patch."""
+  updateResourceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateResourceEventInput!
+  ): UpdateResourceEventPayload
+
   """
   Updates a single `FunctionGraphExecutionOutput` using a unique key and a patch.
   """
@@ -4351,6 +5247,14 @@ type Mutation {
     input: UpdateFunctionExecutionLogInput!
   ): UpdateFunctionExecutionLogPayload
 
+  """Updates a single `FunctionGraph` using a unique key and a patch."""
+  updateFunctionGraph(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFunctionGraphInput!
+  ): UpdateFunctionGraphPayload
+
   """
   Updates a single `FunctionGraphExecutionNodeState` using a unique key and a patch.
   """
@@ -4361,13 +5265,13 @@ type Mutation {
     input: UpdateFunctionGraphExecutionNodeStateInput!
   ): UpdateFunctionGraphExecutionNodeStatePayload
 
-  """Updates a single `FunctionGraph` using a unique key and a patch."""
-  updateFunctionGraph(
+  """Updates a single `PlatformNamespace` using a unique key and a patch."""
+  updatePlatformNamespace(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateFunctionGraphInput!
-  ): UpdateFunctionGraphPayload
+    input: UpdatePlatformNamespaceInput!
+  ): UpdatePlatformNamespacePayload
 
   """
   Updates a single `OrgFunctionInvocation` using a unique key and a patch.
@@ -4386,6 +5290,24 @@ type Mutation {
     """
     input: UpdateFunctionInvocationInput!
   ): UpdateFunctionInvocationPayload
+
+  """Updates a single `Resource` using a unique key and a patch."""
+  updateResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateResourceInput!
+  ): UpdateResourcePayload
+
+  """
+  Updates a single `PlatformNamespaceEvent` using a unique key and a patch.
+  """
+  updatePlatformNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformNamespaceEventInput!
+  ): UpdatePlatformNamespaceEventPayload
 
   """Updates a single `FunctionDeployment` using a unique key and a patch."""
   updateFunctionDeployment(
@@ -4461,6 +5383,14 @@ type Mutation {
     input: DeleteOrgFunctionExecutionLogInput!
   ): DeleteOrgFunctionExecutionLogPayload
 
+  """Deletes a single `ResourceEvent` using a unique key."""
+  deleteResourceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteResourceEventInput!
+  ): DeleteResourceEventPayload
+
   """Deletes a single `FunctionGraphExecutionOutput` using a unique key."""
   deleteFunctionGraphExecutionOutput(
     """
@@ -4493,6 +5423,14 @@ type Mutation {
     input: DeleteFunctionExecutionLogInput!
   ): DeleteFunctionExecutionLogPayload
 
+  """Deletes a single `FunctionGraph` using a unique key."""
+  deleteFunctionGraph(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFunctionGraphInput!
+  ): DeleteFunctionGraphPayload
+
   """Deletes a single `FunctionGraphExecutionNodeState` using a unique key."""
   deleteFunctionGraphExecutionNodeState(
     """
@@ -4501,13 +5439,13 @@ type Mutation {
     input: DeleteFunctionGraphExecutionNodeStateInput!
   ): DeleteFunctionGraphExecutionNodeStatePayload
 
-  """Deletes a single `FunctionGraph` using a unique key."""
-  deleteFunctionGraph(
+  """Deletes a single `PlatformNamespace` using a unique key."""
+  deletePlatformNamespace(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteFunctionGraphInput!
-  ): DeleteFunctionGraphPayload
+    input: DeletePlatformNamespaceInput!
+  ): DeletePlatformNamespacePayload
 
   """Deletes a single `OrgFunctionInvocation` using a unique key."""
   deleteOrgFunctionInvocation(
@@ -4524,6 +5462,22 @@ type Mutation {
     """
     input: DeleteFunctionInvocationInput!
   ): DeleteFunctionInvocationPayload
+
+  """Deletes a single `Resource` using a unique key."""
+  deleteResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteResourceInput!
+  ): DeleteResourcePayload
+
+  """Deletes a single `PlatformNamespaceEvent` using a unique key."""
+  deletePlatformNamespaceEvent(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformNamespaceEventInput!
+  ): DeletePlatformNamespaceEventPayload
 
   """Deletes a single `FunctionDeployment` using a unique key."""
   deleteFunctionDeployment(
@@ -4808,7 +5762,37 @@ input CreateFunctionGraphInput {
   name: String
   context: String
   description: String
-  entityId: UUID
+  createdBy: UUID
+  definitionsCommitId: UUID
+}
+
+"""The output of our `importGraphJson` mutation."""
+type ImportGraphJsonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `importGraphJson` mutation."""
+input ImportGraphJsonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  name: String
+  graphJson: JSON
+  context: String
+  description: String
   createdBy: UUID
   definitionsCommitId: UUID
 }
@@ -4875,38 +5859,6 @@ input AddNodeInput {
   graphName: String
   props: JSON
   meta: JSON
-}
-
-"""The output of our `importGraphJson` mutation."""
-type ImportGraphJsonPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `importGraphJson` mutation."""
-input ImportGraphJsonInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  name: String
-  graphJson: JSON
-  context: String
-  description: String
-  entityId: UUID
-  createdBy: UUID
-  definitionsCommitId: UUID
 }
 
 """The output of our `insertNodeAtPath` mutation."""
@@ -5339,6 +6291,70 @@ input OrgFunctionExecutionLogInput {
   actorId: UUID
 }
 
+"""The output of our create `ResourceEvent` mutation."""
+type CreateResourceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ResourceEvent` that was created by this mutation."""
+  resourceEvent: ResourceEvent
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ResourceEvent`. May be used by Relay 1."""
+  resourceEventEdge(
+    """The method to use when ordering `ResourceEvent`."""
+    orderBy: [ResourceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceEventEdge
+}
+
+"""All input for the create `ResourceEvent` mutation."""
+input CreateResourceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ResourceEvent` to be created by this mutation."""
+  resourceEvent: ResourceEventInput!
+}
+
+"""An input for mutations affecting `ResourceEvent`"""
+input ResourceEventInput {
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Resource this event belongs to"""
+  resourceId: UUID!
+
+  """
+  Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check
+  """
+  eventType: String!
+
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, error details, etc.)"""
+  metadata: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+}
+
 """The output of our create `FunctionGraphExecutionOutput` mutation."""
 type CreateFunctionGraphExecutionOutputPayload {
   """
@@ -5666,6 +6682,86 @@ input FunctionGraphExecutionNodeStateInput {
   outputId: UUID
 }
 
+"""The output of our create `PlatformNamespace` mutation."""
+type CreatePlatformNamespacePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespace` that was created by this mutation."""
+  platformNamespace: PlatformNamespace
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PlatformNamespace`. May be used by Relay 1."""
+  platformNamespaceEdge(
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEdge
+}
+
+"""All input for the create `PlatformNamespace` mutation."""
+input CreatePlatformNamespaceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespace` to be created by this mutation."""
+  platformNamespace: PlatformNamespaceInput!
+}
+
+"""An input for mutations affecting `PlatformNamespace`"""
+input PlatformNamespaceInput {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Human-readable namespace name (e.g. default, production, oauth)"""
+  name: String!
+
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String!
+
+  """Optional human-readable description of this namespace"""
+  description: String
+
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean
+
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """
+  Database that created this namespace (NULL for platform-native namespaces)
+  """
+  sourceDatabaseId: UUID
+
+  """
+  Origin scope: platform, org, app — indicates where this namespace was created
+  """
+  sourceScope: String
+
+  """
+  true = created by a child scope mirror trigger, false = platform-native
+  """
+  isManaged: Boolean
+}
+
 """The output of our create `OrgFunctionInvocation` mutation."""
 type CreateOrgFunctionInvocationPayload {
   """
@@ -5833,6 +6929,179 @@ input FunctionInvocationInput {
   graphExecutionId: UUID
 }
 
+"""The output of our create `Resource` mutation."""
+type CreateResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Resource` that was created by this mutation."""
+  resource: Resource
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Resource`. May be used by Relay 1."""
+  resourceEdge(
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceEdge
+}
+
+"""All input for the create `Resource` mutation."""
+input CreateResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Resource` to be created by this mutation."""
+  resource: ResourceInput!
+}
+
+"""An input for mutations affecting `Resource`"""
+input ResourceInput {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """
+  Namespace this resource belongs to (security boundary, maps to K8s namespace)
+  """
+  namespaceId: UUID!
+
+  """Resource kind: Deployment, StatefulSet, Service, Ingress, Certificate"""
+  kind: String!
+
+  """Human-readable resource name"""
+  name: String!
+
+  """URL-safe identifier, unique within (namespace_id, kind)"""
+  slug: String!
+
+  """
+  Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s.
+  """
+  spec: JSON
+
+  """
+  Resource lifecycle status: pending, provisioning, active, failed, draining, deleting
+  """
+  status: String
+
+  """
+  Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.)
+  """
+  statusObserved: JSON
+
+  """Most recent provisioning or runtime error message"""
+  lastError: String
+
+  """Cumulative error count for this resource"""
+  errorCount: Int
+
+  """Key/value pairs for selecting and filtering resources"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+}
+
+"""The output of our create `PlatformNamespaceEvent` mutation."""
+type CreatePlatformNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` that was created by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEvent
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PlatformNamespaceEvent`. May be used by Relay 1."""
+  platformNamespaceEventEdge(
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEventEdge
+}
+
+"""All input for the create `PlatformNamespaceEvent` mutation."""
+input CreatePlatformNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` to be created by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEventInput!
+}
+
+"""An input for mutations affecting `PlatformNamespaceEvent`"""
+input PlatformNamespaceEventInput {
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID!
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String!
+
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """CPU usage in millicores at time of event"""
+  cpuMillicores: Int
+
+  """Memory usage in bytes at time of event"""
+  memoryBytes: BigInt
+
+  """Storage usage in bytes at time of event"""
+  storageBytes: BigInt
+
+  """Network ingress in bytes during event window"""
+  networkIngressBytes: BigInt
+
+  """Network egress in bytes during event window"""
+  networkEgressBytes: BigInt
+
+  """Number of active pods in the namespace at time of event"""
+  podCount: Int
+
+  """Additional resource metrics (gpu, replicas, quotas, etc.)"""
+  metrics: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+}
+
 """The output of our create `FunctionDeployment` mutation."""
 type CreateFunctionDeploymentPayload {
   """
@@ -5990,9 +7259,6 @@ input FunctionGraphExecutionInput {
 
   """Scope for multi-tenant isolation"""
   databaseId: UUID!
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
 
   """Target output boundary node name to resolve"""
   outputNode: String!
@@ -6597,6 +7863,80 @@ input OrgFunctionExecutionLogPatch {
   actorId: UUID
 }
 
+"""The output of our update `ResourceEvent` mutation."""
+type UpdateResourceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ResourceEvent` that was updated by this mutation."""
+  resourceEvent: ResourceEvent
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ResourceEvent`. May be used by Relay 1."""
+  resourceEventEdge(
+    """The method to use when ordering `ResourceEvent`."""
+    orderBy: [ResourceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceEventEdge
+}
+
+"""All input for the `updateResourceEvent` mutation."""
+input UpdateResourceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `ResourceEvent` being updated.
+  """
+  resourceEventPatch: ResourceEventPatch!
+}
+
+"""
+Represents an update to a `ResourceEvent`. Fields that are set will be updated.
+"""
+input ResourceEventPatch {
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Resource this event belongs to"""
+  resourceId: UUID
+
+  """
+  Event type: provisioned, provisioning, updated, failed, deprovisioned, health_check
+  """
+  eventType: String
+
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, error details, etc.)"""
+  metadata: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+}
+
 """The output of our update `FunctionGraphExecutionOutput` mutation."""
 type UpdateFunctionGraphExecutionOutputPayload {
   """
@@ -6879,6 +8219,87 @@ input FunctionExecutionLogPatch {
   databaseId: UUID
 }
 
+"""The output of our update `FunctionGraph` mutation."""
+type UpdateFunctionGraphPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionGraph` that was updated by this mutation."""
+  functionGraph: FunctionGraph
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FunctionGraph`. May be used by Relay 1."""
+  functionGraphEdge(
+    """The method to use when ordering `FunctionGraph`."""
+    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionGraphEdge
+}
+
+"""All input for the `updateFunctionGraph` mutation."""
+input UpdateFunctionGraphInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique graph identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `FunctionGraph` being updated.
+  """
+  functionGraphPatch: FunctionGraphPatch!
+}
+
+"""
+Represents an update to a `FunctionGraph`. Fields that are set will be updated.
+"""
+input FunctionGraphPatch {
+  """Unique graph identifier"""
+  id: UUID
+
+  """Database scope for multi-tenant isolation"""
+  databaseId: UUID
+
+  """Graph store (Merkle store) holding the graph definition"""
+  storeId: UUID
+
+  """Evaluator/runtime context (function, js, sql, system)"""
+  context: String
+
+  """Graph name (unique per database)"""
+  name: String
+
+  """Human-readable description of the graph"""
+  description: String
+
+  """Pinned definitions store commit for deterministic evaluation"""
+  definitionsCommitId: UUID
+
+  """Whether graph passes structural validation"""
+  isValid: Boolean
+
+  """Array of validation error objects when is_valid = false"""
+  validationErrors: JSON
+
+  """Actor who created this graph"""
+  createdBy: UUID
+
+  """Timestamp of graph creation"""
+  createdAt: Datetime
+
+  """Timestamp of last modification"""
+  updatedAt: Datetime
+}
+
 """The output of our update `FunctionGraphExecutionNodeState` mutation."""
 type UpdateFunctionGraphExecutionNodeStatePayload {
   """
@@ -6969,88 +8390,89 @@ input FunctionGraphExecutionNodeStatePatch {
   outputId: UUID
 }
 
-"""The output of our update `FunctionGraph` mutation."""
-type UpdateFunctionGraphPayload {
+"""The output of our update `PlatformNamespace` mutation."""
+type UpdatePlatformNamespacePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `FunctionGraph` that was updated by this mutation."""
-  functionGraph: FunctionGraph
+  """The `PlatformNamespace` that was updated by this mutation."""
+  platformNamespace: PlatformNamespace
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `FunctionGraph`. May be used by Relay 1."""
-  functionGraphEdge(
-    """The method to use when ordering `FunctionGraph`."""
-    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): FunctionGraphEdge
+  """An edge for our `PlatformNamespace`. May be used by Relay 1."""
+  platformNamespaceEdge(
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEdge
 }
 
-"""All input for the `updateFunctionGraph` mutation."""
-input UpdateFunctionGraphInput {
+"""All input for the `updatePlatformNamespace` mutation."""
+input UpdatePlatformNamespaceInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """Unique graph identifier"""
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `FunctionGraph` being updated.
+  An object where the defined keys will be set on the `PlatformNamespace` being updated.
   """
-  functionGraphPatch: FunctionGraphPatch!
+  platformNamespacePatch: PlatformNamespacePatch!
 }
 
 """
-Represents an update to a `FunctionGraph`. Fields that are set will be updated.
+Represents an update to a `PlatformNamespace`. Fields that are set will be updated.
 """
-input FunctionGraphPatch {
-  """Unique graph identifier"""
+input PlatformNamespacePatch {
   id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
 
-  """Database scope for multi-tenant isolation"""
-  databaseId: UUID
-
-  """Graph store (Merkle store) holding the graph definition"""
-  storeId: UUID
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
-
-  """Evaluator/runtime context (function, js, sql, system)"""
-  context: String
-
-  """Graph name (unique per database)"""
+  """Human-readable namespace name (e.g. default, production, oauth)"""
   name: String
 
-  """Human-readable description of the graph"""
+  """
+  Globally unique computed namespace identifier via inflection.underscore
+  """
+  namespaceName: String
+
+  """Optional human-readable description of this namespace"""
   description: String
 
-  """Pinned definitions store commit for deterministic evaluation"""
-  definitionsCommitId: UUID
+  """Whether this namespace is active (soft-disable for filtering)"""
+  isActive: Boolean
 
-  """Whether graph passes structural validation"""
-  isValid: Boolean
+  """Key/value pairs for selecting and filtering namespaces"""
+  labels: JSON
 
-  """Array of validation error objects when is_valid = false"""
-  validationErrors: JSON
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
 
-  """Actor who created this graph"""
-  createdBy: UUID
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
 
-  """Timestamp of graph creation"""
-  createdAt: Datetime
+  """
+  Database that created this namespace (NULL for platform-native namespaces)
+  """
+  sourceDatabaseId: UUID
 
-  """Timestamp of last modification"""
-  updatedAt: Datetime
+  """
+  Origin scope: platform, org, app — indicates where this namespace was created
+  """
+  sourceScope: String
+
+  """
+  true = created by a child scope mirror trigger, false = platform-native
+  """
+  isManaged: Boolean
 }
 
 """The output of our update `OrgFunctionInvocation` mutation."""
@@ -7240,6 +8662,194 @@ input FunctionInvocationPatch {
   graphExecutionId: UUID
 }
 
+"""The output of our update `Resource` mutation."""
+type UpdateResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Resource` that was updated by this mutation."""
+  resource: Resource
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Resource`. May be used by Relay 1."""
+  resourceEdge(
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceEdge
+}
+
+"""All input for the `updateResource` mutation."""
+input UpdateResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Resource` being updated.
+  """
+  resourcePatch: ResourcePatch!
+}
+
+"""
+Represents an update to a `Resource`. Fields that are set will be updated.
+"""
+input ResourcePatch {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """
+  Namespace this resource belongs to (security boundary, maps to K8s namespace)
+  """
+  namespaceId: UUID
+
+  """Resource kind: Deployment, StatefulSet, Service, Ingress, Certificate"""
+  kind: String
+
+  """Human-readable resource name"""
+  name: String
+
+  """URL-safe identifier, unique within (namespace_id, kind)"""
+  slug: String
+
+  """
+  Desired state — kind-specific configuration (image, ports, resources, etc.). Opaque to DB; validated by K8s.
+  """
+  spec: JSON
+
+  """
+  Resource lifecycle status: pending, provisioning, active, failed, draining, deleting
+  """
+  status: String
+
+  """
+  Observed state from K8s — populated by handlers after reconciliation (service_url, clone_url, replicas, etc.)
+  """
+  statusObserved: JSON
+
+  """Most recent provisioning or runtime error message"""
+  lastError: String
+
+  """Cumulative error count for this resource"""
+  errorCount: Int
+
+  """Key/value pairs for selecting and filtering resources"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+}
+
+"""The output of our update `PlatformNamespaceEvent` mutation."""
+type UpdatePlatformNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` that was updated by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEvent
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PlatformNamespaceEvent`. May be used by Relay 1."""
+  platformNamespaceEventEdge(
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEventEdge
+}
+
+"""All input for the `updatePlatformNamespaceEvent` mutation."""
+input UpdatePlatformNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformNamespaceEvent` being updated.
+  """
+  platformNamespaceEventPatch: PlatformNamespaceEventPatch!
+}
+
+"""
+Represents an update to a `PlatformNamespaceEvent`. Fields that are set will be updated.
+"""
+input PlatformNamespaceEventPatch {
+  """Event timestamp (partition key)"""
+  createdAt: Datetime
+
+  """Unique event identifier"""
+  id: UUID
+
+  """Namespace this event belongs to"""
+  namespaceId: UUID
+
+  """
+  Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed
+  """
+  eventType: String
+
+  """User who triggered this event (NULL for system/automated)"""
+  actorId: UUID
+
+  """Human-readable description of the event"""
+  message: String
+
+  """Structured context (old/new values, labels diff, etc.)"""
+  metadata: JSON
+
+  """CPU usage in millicores at time of event"""
+  cpuMillicores: Int
+
+  """Memory usage in bytes at time of event"""
+  memoryBytes: BigInt
+
+  """Storage usage in bytes at time of event"""
+  storageBytes: BigInt
+
+  """Network ingress in bytes during event window"""
+  networkIngressBytes: BigInt
+
+  """Network egress in bytes during event window"""
+  networkEgressBytes: BigInt
+
+  """Number of active pods in the namespace at time of event"""
+  podCount: Int
+
+  """Additional resource metrics (gpu, replicas, quotas, etc.)"""
+  metrics: JSON
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+}
+
 """The output of our update `FunctionDeployment` mutation."""
 type UpdateFunctionDeploymentPayload {
   """
@@ -7412,9 +9022,6 @@ input FunctionGraphExecutionPatch {
 
   """Scope for multi-tenant isolation"""
   databaseId: UUID
-
-  """Entity context (org/team) for scoped billing"""
-  entityId: UUID
 
   """Target output boundary node name to resolve"""
   outputNode: String
@@ -7846,6 +9453,44 @@ input DeleteOrgFunctionExecutionLogInput {
   id: UUID!
 }
 
+"""The output of our delete `ResourceEvent` mutation."""
+type DeleteResourceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ResourceEvent` that was deleted by this mutation."""
+  resourceEvent: ResourceEvent
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ResourceEvent`. May be used by Relay 1."""
+  resourceEventEdge(
+    """The method to use when ordering `ResourceEvent`."""
+    orderBy: [ResourceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceEventEdge
+}
+
+"""All input for the `deleteResourceEvent` mutation."""
+input DeleteResourceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
+  id: UUID!
+}
+
 """The output of our delete `FunctionGraphExecutionOutput` mutation."""
 type DeleteFunctionGraphExecutionOutputPayload {
   """
@@ -7995,6 +9640,41 @@ input DeleteFunctionExecutionLogInput {
   id: UUID!
 }
 
+"""The output of our delete `FunctionGraph` mutation."""
+type DeleteFunctionGraphPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FunctionGraph` that was deleted by this mutation."""
+  functionGraph: FunctionGraph
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FunctionGraph`. May be used by Relay 1."""
+  functionGraphEdge(
+    """The method to use when ordering `FunctionGraph`."""
+    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FunctionGraphEdge
+}
+
+"""All input for the `deleteFunctionGraph` mutation."""
+input DeleteFunctionGraphInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique graph identifier"""
+  id: UUID!
+}
+
 """The output of our delete `FunctionGraphExecutionNodeState` mutation."""
 type DeleteFunctionGraphExecutionNodeStatePayload {
   """
@@ -8037,38 +9717,36 @@ input DeleteFunctionGraphExecutionNodeStateInput {
   id: UUID!
 }
 
-"""The output of our delete `FunctionGraph` mutation."""
-type DeleteFunctionGraphPayload {
+"""The output of our delete `PlatformNamespace` mutation."""
+type DeletePlatformNamespacePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `FunctionGraph` that was deleted by this mutation."""
-  functionGraph: FunctionGraph
+  """The `PlatformNamespace` that was deleted by this mutation."""
+  platformNamespace: PlatformNamespace
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `FunctionGraph`. May be used by Relay 1."""
-  functionGraphEdge(
-    """The method to use when ordering `FunctionGraph`."""
-    orderBy: [FunctionGraphOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): FunctionGraphEdge
+  """An edge for our `PlatformNamespace`. May be used by Relay 1."""
+  platformNamespaceEdge(
+    """The method to use when ordering `PlatformNamespace`."""
+    orderBy: [PlatformNamespaceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEdge
 }
 
-"""All input for the `deleteFunctionGraph` mutation."""
-input DeleteFunctionGraphInput {
+"""All input for the `deletePlatformNamespace` mutation."""
+input DeletePlatformNamespaceInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """Unique graph identifier"""
   id: UUID!
 }
 
@@ -8145,6 +9823,77 @@ input DeleteFunctionInvocationInput {
   createdAt: Datetime!
 
   """Unique invocation identifier"""
+  id: UUID!
+}
+
+"""The output of our delete `Resource` mutation."""
+type DeleteResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Resource` that was deleted by this mutation."""
+  resource: Resource
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Resource`. May be used by Relay 1."""
+  resourceEdge(
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourceOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceEdge
+}
+
+"""All input for the `deleteResource` mutation."""
+input DeleteResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformNamespaceEvent` mutation."""
+type DeletePlatformNamespaceEventPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformNamespaceEvent` that was deleted by this mutation."""
+  platformNamespaceEvent: PlatformNamespaceEvent
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PlatformNamespaceEvent`. May be used by Relay 1."""
+  platformNamespaceEventEdge(
+    """The method to use when ordering `PlatformNamespaceEvent`."""
+    orderBy: [PlatformNamespaceEventOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformNamespaceEventEdge
+}
+
+"""All input for the `deletePlatformNamespaceEvent` mutation."""
+input DeletePlatformNamespaceEventInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Event timestamp (partition key)"""
+  createdAt: Datetime!
+
+  """Unique event identifier"""
   id: UUID!
 }
 

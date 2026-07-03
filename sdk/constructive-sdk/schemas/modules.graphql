@@ -747,35 +747,6 @@ type Query {
     orderBy: [SecureTableProvisionOrderBy!] = [PRIMARY_KEY_ASC]
   ): SecureTableProvisionConnection
 
-  """Reads and enables pagination through a set of `MerkleStoreModule`."""
-  merkleStoreModules(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: MerkleStoreModuleFilter
-
-    """The method to use when ordering `MerkleStoreModule`."""
-    orderBy: [MerkleStoreModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MerkleStoreModuleConnection
-
   """
   Reads and enables pagination through a set of `DatabaseProvisionModule`.
   """
@@ -864,6 +835,35 @@ type Query {
     """The method to use when ordering `GraphModule`."""
     orderBy: [GraphModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): GraphModuleConnection
+
+  """Reads and enables pagination through a set of `MerkleStoreModule`."""
+  merkleStoreModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MerkleStoreModuleFilter
+
+    """The method to use when ordering `MerkleStoreModule`."""
+    orderBy: [MerkleStoreModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MerkleStoreModuleConnection
 
   """Reads and enables pagination through a set of `RateLimitMetersModule`."""
   rateLimitMetersModules(
@@ -1041,6 +1041,35 @@ type Query {
     orderBy: [InvitesModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): InvitesModuleConnection
 
+  """Reads and enables pagination through a set of `PrincipalAuthModule`."""
+  principalAuthModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalAuthModuleFilter
+
+    """The method to use when ordering `PrincipalAuthModule`."""
+    orderBy: [PrincipalAuthModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalAuthModuleConnection
+
   """Reads and enables pagination through a set of `ComputeLogModule`."""
   computeLogModules(
     """Only read the first `n` values of the set."""
@@ -1127,6 +1156,35 @@ type Query {
     """The method to use when ordering `NamespaceModule`."""
     orderBy: [NamespaceModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): NamespaceModuleConnection
+
+  """Reads and enables pagination through a set of `ResourceModule`."""
+  resourceModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ResourceModuleFilter
+
+    """The method to use when ordering `ResourceModule`."""
+    orderBy: [ResourceModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ResourceModuleConnection
 
   """Reads and enables pagination through a set of `StorageLogModule`."""
   storageLogModules(
@@ -5611,363 +5669,6 @@ enum SecureTableProvisionOrderBy {
   OUT_FIELDS_DESC
 }
 
-"""A connection to a list of `MerkleStoreModule` values."""
-type MerkleStoreModuleConnection {
-  """A list of `MerkleStoreModule` objects."""
-  nodes: [MerkleStoreModule]!
-
-  """
-  A list of edges which contains the `MerkleStoreModule` and cursor to aid in pagination.
-  """
-  edges: [MerkleStoreModuleEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `MerkleStoreModule` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type MerkleStoreModule {
-  id: UUID!
-  databaseId: UUID!
-  schemaId: UUID!
-  privateSchemaId: UUID!
-  publicSchemaName: String
-  privateSchemaName: String
-  objectTableId: UUID!
-  storeTableId: UUID!
-  commitTableId: UUID!
-  refTableId: UUID!
-  prefix: String!
-  apiName: String
-  privateApiName: String
-  scope: String!
-  functionPrefix: String
-  createdAt: Datetime!
-
-  """Reads and enables pagination through a set of `GraphModule`."""
-  graphModules(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: GraphModuleFilter
-
-    """The method to use when ordering `GraphModule`."""
-    orderBy: [GraphModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): GraphModuleConnection!
-}
-
-"""A connection to a list of `GraphModule` values."""
-type GraphModuleConnection {
-  """A list of `GraphModule` objects."""
-  nodes: [GraphModule]!
-
-  """
-  A list of edges which contains the `GraphModule` and cursor to aid in pagination.
-  """
-  edges: [GraphModuleEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `GraphModule` you could get from the connection."""
-  totalCount: Int!
-}
-
-type GraphModule {
-  id: UUID!
-  databaseId: UUID!
-  publicSchemaId: UUID!
-  privateSchemaId: UUID!
-  publicSchemaName: String
-  privateSchemaName: String
-  scope: String!
-  prefix: String!
-  merkleStoreModuleId: UUID!
-  graphsTableId: UUID!
-  apiName: String
-  privateApiName: String
-  entityTableId: UUID
-  policies: JSON
-  provisions: JSON
-  defaultPermissions: [String]
-  createdAt: Datetime!
-
-  """
-  Reads a single `MerkleStoreModule` that is related to this `GraphModule`.
-  """
-  merkleStoreModule: MerkleStoreModule
-}
-
-"""A `GraphModule` edge in the connection."""
-type GraphModuleEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `GraphModule` at the end of the edge."""
-  node: GraphModule
-}
-
-"""
-A filter to be used against `GraphModule` object types. All fields are combined with a logical ‘and.’
-"""
-input GraphModuleFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `publicSchemaId` field."""
-  publicSchemaId: UUIDFilter
-
-  """Filter by the object’s `privateSchemaId` field."""
-  privateSchemaId: UUIDFilter
-
-  """Filter by the object’s `publicSchemaName` field."""
-  publicSchemaName: StringFilter
-
-  """Filter by the object’s `privateSchemaName` field."""
-  privateSchemaName: StringFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: StringFilter
-
-  """Filter by the object’s `prefix` field."""
-  prefix: StringFilter
-
-  """Filter by the object’s `merkleStoreModuleId` field."""
-  merkleStoreModuleId: UUIDFilter
-
-  """Filter by the object’s `graphsTableId` field."""
-  graphsTableId: UUIDFilter
-
-  """Filter by the object’s `apiName` field."""
-  apiName: StringFilter
-
-  """Filter by the object’s `privateApiName` field."""
-  privateApiName: StringFilter
-
-  """Filter by the object’s `entityTableId` field."""
-  entityTableId: UUIDFilter
-
-  """Filter by the object’s `policies` field."""
-  policies: JSONFilter
-
-  """Filter by the object’s `provisions` field."""
-  provisions: JSONFilter
-
-  """Filter by the object’s `defaultPermissions` field."""
-  defaultPermissions: StringListFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [GraphModuleFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [GraphModuleFilter!]
-
-  """Negates the expression."""
-  not: GraphModuleFilter
-
-  """Filter by the object’s `merkleStoreModule` relation."""
-  merkleStoreModule: MerkleStoreModuleFilter
-}
-
-"""
-A filter to be used against `MerkleStoreModule` object types. All fields are combined with a logical ‘and.’
-"""
-input MerkleStoreModuleFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `schemaId` field."""
-  schemaId: UUIDFilter
-
-  """Filter by the object’s `privateSchemaId` field."""
-  privateSchemaId: UUIDFilter
-
-  """Filter by the object’s `publicSchemaName` field."""
-  publicSchemaName: StringFilter
-
-  """Filter by the object’s `privateSchemaName` field."""
-  privateSchemaName: StringFilter
-
-  """Filter by the object’s `objectTableId` field."""
-  objectTableId: UUIDFilter
-
-  """Filter by the object’s `storeTableId` field."""
-  storeTableId: UUIDFilter
-
-  """Filter by the object’s `commitTableId` field."""
-  commitTableId: UUIDFilter
-
-  """Filter by the object’s `refTableId` field."""
-  refTableId: UUIDFilter
-
-  """Filter by the object’s `prefix` field."""
-  prefix: StringFilter
-
-  """Filter by the object’s `apiName` field."""
-  apiName: StringFilter
-
-  """Filter by the object’s `privateApiName` field."""
-  privateApiName: StringFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: StringFilter
-
-  """Filter by the object’s `functionPrefix` field."""
-  functionPrefix: StringFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [MerkleStoreModuleFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [MerkleStoreModuleFilter!]
-
-  """Negates the expression."""
-  not: MerkleStoreModuleFilter
-
-  """Filter by the object’s `graphModules` relation."""
-  graphModules: MerkleStoreModuleToManyGraphModuleFilter
-
-  """`graphModules` exist."""
-  graphModulesExist: Boolean
-}
-
-"""
-A filter to be used against many `GraphModule` object types. All fields are combined with a logical ‘and.’
-"""
-input MerkleStoreModuleToManyGraphModuleFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: GraphModuleFilter
-
-  """Filters to entities where every related entity matches."""
-  every: GraphModuleFilter
-
-  """Filters to entities where no related entity matches."""
-  none: GraphModuleFilter
-}
-
-"""Methods to use when ordering `GraphModule`."""
-enum GraphModuleOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  PUBLIC_SCHEMA_ID_ASC
-  PUBLIC_SCHEMA_ID_DESC
-  PRIVATE_SCHEMA_ID_ASC
-  PRIVATE_SCHEMA_ID_DESC
-  PUBLIC_SCHEMA_NAME_ASC
-  PUBLIC_SCHEMA_NAME_DESC
-  PRIVATE_SCHEMA_NAME_ASC
-  PRIVATE_SCHEMA_NAME_DESC
-  SCOPE_ASC
-  SCOPE_DESC
-  PREFIX_ASC
-  PREFIX_DESC
-  MERKLE_STORE_MODULE_ID_ASC
-  MERKLE_STORE_MODULE_ID_DESC
-  GRAPHS_TABLE_ID_ASC
-  GRAPHS_TABLE_ID_DESC
-  API_NAME_ASC
-  API_NAME_DESC
-  PRIVATE_API_NAME_ASC
-  PRIVATE_API_NAME_DESC
-  ENTITY_TABLE_ID_ASC
-  ENTITY_TABLE_ID_DESC
-  POLICIES_ASC
-  POLICIES_DESC
-  PROVISIONS_ASC
-  PROVISIONS_DESC
-  DEFAULT_PERMISSIONS_ASC
-  DEFAULT_PERMISSIONS_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-}
-
-"""A `MerkleStoreModule` edge in the connection."""
-type MerkleStoreModuleEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `MerkleStoreModule` at the end of the edge."""
-  node: MerkleStoreModule
-}
-
-"""Methods to use when ordering `MerkleStoreModule`."""
-enum MerkleStoreModuleOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  SCHEMA_ID_ASC
-  SCHEMA_ID_DESC
-  PRIVATE_SCHEMA_ID_ASC
-  PRIVATE_SCHEMA_ID_DESC
-  PUBLIC_SCHEMA_NAME_ASC
-  PUBLIC_SCHEMA_NAME_DESC
-  PRIVATE_SCHEMA_NAME_ASC
-  PRIVATE_SCHEMA_NAME_DESC
-  OBJECT_TABLE_ID_ASC
-  OBJECT_TABLE_ID_DESC
-  STORE_TABLE_ID_ASC
-  STORE_TABLE_ID_DESC
-  COMMIT_TABLE_ID_ASC
-  COMMIT_TABLE_ID_DESC
-  REF_TABLE_ID_ASC
-  REF_TABLE_ID_DESC
-  PREFIX_ASC
-  PREFIX_DESC
-  API_NAME_ASC
-  API_NAME_DESC
-  PRIVATE_API_NAME_ASC
-  PRIVATE_API_NAME_DESC
-  SCOPE_ASC
-  SCOPE_DESC
-  FUNCTION_PREFIX_ASC
-  FUNCTION_PREFIX_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-}
-
 """A connection to a list of `DatabaseProvisionModule` values."""
 type DatabaseProvisionModuleConnection {
   """A list of `DatabaseProvisionModule` objects."""
@@ -6288,6 +5989,369 @@ enum ConfigSecretsModuleOrderBy {
   PROVISIONS_DESC
   HAS_CONFIG_ASC
   HAS_CONFIG_DESC
+}
+
+"""A connection to a list of `GraphModule` values."""
+type GraphModuleConnection {
+  """A list of `GraphModule` objects."""
+  nodes: [GraphModule]!
+
+  """
+  A list of edges which contains the `GraphModule` and cursor to aid in pagination.
+  """
+  edges: [GraphModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `GraphModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+type GraphModule {
+  id: UUID!
+  databaseId: UUID!
+  publicSchemaId: UUID!
+  privateSchemaId: UUID!
+  publicSchemaName: String
+  privateSchemaName: String
+  scope: String!
+  prefix: String!
+  merkleStoreModuleId: UUID!
+  graphsTableId: UUID!
+  apiName: String
+  privateApiName: String
+  entityTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+  createdAt: Datetime!
+
+  """
+  Reads a single `MerkleStoreModule` that is related to this `GraphModule`.
+  """
+  merkleStoreModule: MerkleStoreModule
+}
+
+type MerkleStoreModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  privateSchemaId: UUID!
+  publicSchemaName: String
+  privateSchemaName: String
+  objectTableId: UUID!
+  storeTableId: UUID!
+  commitTableId: UUID!
+  refTableId: UUID!
+  prefix: String!
+  apiName: String
+  privateApiName: String
+  scope: String!
+  functionPrefix: String
+  permissionKey: String
+  createdAt: Datetime!
+
+  """Reads and enables pagination through a set of `GraphModule`."""
+  graphModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: GraphModuleFilter
+
+    """The method to use when ordering `GraphModule`."""
+    orderBy: [GraphModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GraphModuleConnection!
+}
+
+"""
+A filter to be used against `GraphModule` object types. All fields are combined with a logical ‘and.’
+"""
+input GraphModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaId` field."""
+  publicSchemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `merkleStoreModuleId` field."""
+  merkleStoreModuleId: UUIDFilter
+
+  """Filter by the object’s `graphsTableId` field."""
+  graphsTableId: UUIDFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [GraphModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [GraphModuleFilter!]
+
+  """Negates the expression."""
+  not: GraphModuleFilter
+
+  """Filter by the object’s `merkleStoreModule` relation."""
+  merkleStoreModule: MerkleStoreModuleFilter
+}
+
+"""
+A filter to be used against `MerkleStoreModule` object types. All fields are combined with a logical ‘and.’
+"""
+input MerkleStoreModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `objectTableId` field."""
+  objectTableId: UUIDFilter
+
+  """Filter by the object’s `storeTableId` field."""
+  storeTableId: UUIDFilter
+
+  """Filter by the object’s `commitTableId` field."""
+  commitTableId: UUIDFilter
+
+  """Filter by the object’s `refTableId` field."""
+  refTableId: UUIDFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `functionPrefix` field."""
+  functionPrefix: StringFilter
+
+  """Filter by the object’s `permissionKey` field."""
+  permissionKey: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [MerkleStoreModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [MerkleStoreModuleFilter!]
+
+  """Negates the expression."""
+  not: MerkleStoreModuleFilter
+
+  """Filter by the object’s `graphModules` relation."""
+  graphModules: MerkleStoreModuleToManyGraphModuleFilter
+
+  """`graphModules` exist."""
+  graphModulesExist: Boolean
+}
+
+"""
+A filter to be used against many `GraphModule` object types. All fields are combined with a logical ‘and.’
+"""
+input MerkleStoreModuleToManyGraphModuleFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: GraphModuleFilter
+
+  """Filters to entities where every related entity matches."""
+  every: GraphModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: GraphModuleFilter
+}
+
+"""Methods to use when ordering `GraphModule`."""
+enum GraphModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  PUBLIC_SCHEMA_ID_ASC
+  PUBLIC_SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  MERKLE_STORE_MODULE_ID_ASC
+  MERKLE_STORE_MODULE_ID_DESC
+  GRAPHS_TABLE_ID_ASC
+  GRAPHS_TABLE_ID_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  POLICIES_ASC
+  POLICIES_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+}
+
+"""A `GraphModule` edge in the connection."""
+type GraphModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GraphModule` at the end of the edge."""
+  node: GraphModule
+}
+
+"""A connection to a list of `MerkleStoreModule` values."""
+type MerkleStoreModuleConnection {
+  """A list of `MerkleStoreModule` objects."""
+  nodes: [MerkleStoreModule]!
+
+  """
+  A list of edges which contains the `MerkleStoreModule` and cursor to aid in pagination.
+  """
+  edges: [MerkleStoreModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `MerkleStoreModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `MerkleStoreModule` edge in the connection."""
+type MerkleStoreModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MerkleStoreModule` at the end of the edge."""
+  node: MerkleStoreModule
+}
+
+"""Methods to use when ordering `MerkleStoreModule`."""
+enum MerkleStoreModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  OBJECT_TABLE_ID_ASC
+  OBJECT_TABLE_ID_DESC
+  STORE_TABLE_ID_ASC
+  STORE_TABLE_ID_DESC
+  COMMIT_TABLE_ID_ASC
+  COMMIT_TABLE_ID_DESC
+  REF_TABLE_ID_ASC
+  REF_TABLE_ID_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  FUNCTION_PREFIX_ASC
+  FUNCTION_PREFIX_DESC
+  PERMISSION_KEY_ASC
+  PERMISSION_KEY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
 }
 
 """A connection to a list of `RateLimitMetersModule` values."""
@@ -7202,6 +7266,169 @@ enum InvitesModuleOrderBy {
   PRIVATE_API_NAME_DESC
 }
 
+"""A connection to a list of `PrincipalAuthModule` values."""
+type PrincipalAuthModuleConnection {
+  """A list of `PrincipalAuthModule` objects."""
+  nodes: [PrincipalAuthModule]!
+
+  """
+  A list of edges which contains the `PrincipalAuthModule` and cursor to aid in pagination.
+  """
+  edges: [PrincipalAuthModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PrincipalAuthModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Provisions the principals subsystem: a principals table, a principal_entities junction table, create/delete mutations, and org API key management. Supports both human-owned principals (AuthzDirectOwner, AuthzHumanOnly) and org-owned principals (AuthzEntityMembership with is_admin). Org principal and org API key functions are only generated when an org-scoped memberships_module exists for the database.
+"""
+type PrincipalAuthModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  principalsTableId: UUID!
+  principalEntitiesTableId: UUID!
+  principalScopeOverridesTableId: UUID!
+  usersTableId: UUID!
+  sessionsTableId: UUID!
+  sessionCredentialsTableId: UUID!
+  auditsTableId: UUID!
+  principalsTableName: String!
+  createPrincipalFunction: String!
+  deletePrincipalFunction: String!
+  createOrgPrincipalFunction: String!
+  deleteOrgPrincipalFunction: String!
+  createOrgApiKeyFunction: String!
+  revokeOrgApiKeyFunction: String!
+  apiName: String
+}
+
+"""A `PrincipalAuthModule` edge in the connection."""
+type PrincipalAuthModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PrincipalAuthModule` at the end of the edge."""
+  node: PrincipalAuthModule
+}
+
+"""
+A filter to be used against `PrincipalAuthModule` object types. All fields are combined with a logical ‘and.’
+"""
+input PrincipalAuthModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `principalsTableId` field."""
+  principalsTableId: UUIDFilter
+
+  """Filter by the object’s `principalEntitiesTableId` field."""
+  principalEntitiesTableId: UUIDFilter
+
+  """Filter by the object’s `principalScopeOverridesTableId` field."""
+  principalScopeOverridesTableId: UUIDFilter
+
+  """Filter by the object’s `usersTableId` field."""
+  usersTableId: UUIDFilter
+
+  """Filter by the object’s `sessionsTableId` field."""
+  sessionsTableId: UUIDFilter
+
+  """Filter by the object’s `sessionCredentialsTableId` field."""
+  sessionCredentialsTableId: UUIDFilter
+
+  """Filter by the object’s `auditsTableId` field."""
+  auditsTableId: UUIDFilter
+
+  """Filter by the object’s `principalsTableName` field."""
+  principalsTableName: StringFilter
+
+  """Filter by the object’s `createPrincipalFunction` field."""
+  createPrincipalFunction: StringFilter
+
+  """Filter by the object’s `deletePrincipalFunction` field."""
+  deletePrincipalFunction: StringFilter
+
+  """Filter by the object’s `createOrgPrincipalFunction` field."""
+  createOrgPrincipalFunction: StringFilter
+
+  """Filter by the object’s `deleteOrgPrincipalFunction` field."""
+  deleteOrgPrincipalFunction: StringFilter
+
+  """Filter by the object’s `createOrgApiKeyFunction` field."""
+  createOrgApiKeyFunction: StringFilter
+
+  """Filter by the object’s `revokeOrgApiKeyFunction` field."""
+  revokeOrgApiKeyFunction: StringFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [PrincipalAuthModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [PrincipalAuthModuleFilter!]
+
+  """Negates the expression."""
+  not: PrincipalAuthModuleFilter
+}
+
+"""Methods to use when ordering `PrincipalAuthModule`."""
+enum PrincipalAuthModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRINCIPALS_TABLE_ID_ASC
+  PRINCIPALS_TABLE_ID_DESC
+  PRINCIPAL_ENTITIES_TABLE_ID_ASC
+  PRINCIPAL_ENTITIES_TABLE_ID_DESC
+  PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_ASC
+  PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_DESC
+  USERS_TABLE_ID_ASC
+  USERS_TABLE_ID_DESC
+  SESSIONS_TABLE_ID_ASC
+  SESSIONS_TABLE_ID_DESC
+  SESSION_CREDENTIALS_TABLE_ID_ASC
+  SESSION_CREDENTIALS_TABLE_ID_DESC
+  AUDITS_TABLE_ID_ASC
+  AUDITS_TABLE_ID_DESC
+  PRINCIPALS_TABLE_NAME_ASC
+  PRINCIPALS_TABLE_NAME_DESC
+  CREATE_PRINCIPAL_FUNCTION_ASC
+  CREATE_PRINCIPAL_FUNCTION_DESC
+  DELETE_PRINCIPAL_FUNCTION_ASC
+  DELETE_PRINCIPAL_FUNCTION_DESC
+  CREATE_ORG_PRINCIPAL_FUNCTION_ASC
+  CREATE_ORG_PRINCIPAL_FUNCTION_DESC
+  DELETE_ORG_PRINCIPAL_FUNCTION_ASC
+  DELETE_ORG_PRINCIPAL_FUNCTION_DESC
+  CREATE_ORG_API_KEY_FUNCTION_ASC
+  CREATE_ORG_API_KEY_FUNCTION_DESC
+  REVOKE_ORG_API_KEY_FUNCTION_ASC
+  REVOKE_ORG_API_KEY_FUNCTION_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+}
+
 """A connection to a list of `ComputeLogModule` values."""
 type ComputeLogModuleConnection {
   """A list of `ComputeLogModule` objects."""
@@ -7692,6 +7919,181 @@ enum NamespaceModuleOrderBy {
   ENTITY_TABLE_ID_DESC
   PLATFORM_NAMESPACES_TABLE_ID_ASC
   PLATFORM_NAMESPACES_TABLE_ID_DESC
+  POLICIES_ASC
+  POLICIES_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+}
+
+"""A connection to a list of `ResourceModule` values."""
+type ResourceModuleConnection {
+  """A list of `ResourceModule` objects."""
+  nodes: [ResourceModule]!
+
+  """
+  A list of edges which contains the `ResourceModule` and cursor to aid in pagination.
+  """
+  edges: [ResourceModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ResourceModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+type ResourceModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  privateSchemaId: UUID!
+  publicSchemaName: String
+  privateSchemaName: String
+  resourcesTableId: UUID!
+  resourceEventsTableId: UUID!
+  resourcesTableName: String!
+  resourceEventsTableName: String!
+  apiName: String
+  privateApiName: String
+  scope: String!
+  prefix: String!
+  entityTableId: UUID
+  namespaceModuleId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+
+  """
+  Reads a single `NamespaceModule` that is related to this `ResourceModule`.
+  """
+  namespaceModule: NamespaceModule
+}
+
+"""A `ResourceModule` edge in the connection."""
+type ResourceModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourceModule` at the end of the edge."""
+  node: ResourceModule
+}
+
+"""
+A filter to be used against `ResourceModule` object types. All fields are combined with a logical ‘and.’
+"""
+input ResourceModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `resourcesTableId` field."""
+  resourcesTableId: UUIDFilter
+
+  """Filter by the object’s `resourceEventsTableId` field."""
+  resourceEventsTableId: UUIDFilter
+
+  """Filter by the object’s `resourcesTableName` field."""
+  resourcesTableName: StringFilter
+
+  """Filter by the object’s `resourceEventsTableName` field."""
+  resourceEventsTableName: StringFilter
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `namespaceModuleId` field."""
+  namespaceModuleId: UUIDFilter
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Checks for all expressions in this list."""
+  and: [ResourceModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [ResourceModuleFilter!]
+
+  """Negates the expression."""
+  not: ResourceModuleFilter
+
+  """Filter by the object’s `namespaceModule` relation."""
+  namespaceModule: NamespaceModuleFilter
+
+  """A related `namespaceModule` exists."""
+  namespaceModuleExists: Boolean
+}
+
+"""Methods to use when ordering `ResourceModule`."""
+enum ResourceModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  RESOURCES_TABLE_ID_ASC
+  RESOURCES_TABLE_ID_DESC
+  RESOURCE_EVENTS_TABLE_ID_ASC
+  RESOURCE_EVENTS_TABLE_ID_DESC
+  RESOURCES_TABLE_NAME_ASC
+  RESOURCES_TABLE_NAME_DESC
+  RESOURCE_EVENTS_TABLE_NAME_ASC
+  RESOURCE_EVENTS_TABLE_NAME_DESC
+  API_NAME_ASC
+  API_NAME_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  NAMESPACE_MODULE_ID_ASC
+  NAMESPACE_MODULE_ID_DESC
   POLICIES_ASC
   POLICIES_DESC
   PROVISIONS_ASC
@@ -13034,14 +13436,6 @@ type Mutation {
     input: CreateSecureTableProvisionInput!
   ): CreateSecureTableProvisionPayload
 
-  """Creates a single `MerkleStoreModule`."""
-  createMerkleStoreModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMerkleStoreModuleInput!
-  ): CreateMerkleStoreModulePayload
-
   """Creates a single `DatabaseProvisionModule`."""
   createDatabaseProvisionModule(
     """
@@ -13065,6 +13459,14 @@ type Mutation {
     """
     input: CreateGraphModuleInput!
   ): CreateGraphModulePayload
+
+  """Creates a single `MerkleStoreModule`."""
+  createMerkleStoreModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMerkleStoreModuleInput!
+  ): CreateMerkleStoreModulePayload
 
   """Creates a single `RateLimitMetersModule`."""
   createRateLimitMetersModule(
@@ -13114,6 +13516,14 @@ type Mutation {
     input: CreateInvitesModuleInput!
   ): CreateInvitesModulePayload
 
+  """Creates a single `PrincipalAuthModule`."""
+  createPrincipalAuthModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePrincipalAuthModuleInput!
+  ): CreatePrincipalAuthModulePayload
+
   """Creates a single `ComputeLogModule`."""
   createComputeLogModule(
     """
@@ -13137,6 +13547,14 @@ type Mutation {
     """
     input: CreateNamespaceModuleInput!
   ): CreateNamespaceModulePayload
+
+  """Creates a single `ResourceModule`."""
+  createResourceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateResourceModuleInput!
+  ): CreateResourceModulePayload
 
   """Creates a single `StorageLogModule`."""
   createStorageLogModule(
@@ -13530,14 +13948,6 @@ type Mutation {
     input: UpdateSecureTableProvisionInput!
   ): UpdateSecureTableProvisionPayload
 
-  """Updates a single `MerkleStoreModule` using a unique key and a patch."""
-  updateMerkleStoreModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMerkleStoreModuleInput!
-  ): UpdateMerkleStoreModulePayload
-
   """
   Updates a single `DatabaseProvisionModule` using a unique key and a patch.
   """
@@ -13563,6 +13973,14 @@ type Mutation {
     """
     input: UpdateGraphModuleInput!
   ): UpdateGraphModulePayload
+
+  """Updates a single `MerkleStoreModule` using a unique key and a patch."""
+  updateMerkleStoreModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMerkleStoreModuleInput!
+  ): UpdateMerkleStoreModulePayload
 
   """
   Updates a single `RateLimitMetersModule` using a unique key and a patch.
@@ -13616,6 +14034,14 @@ type Mutation {
     input: UpdateInvitesModuleInput!
   ): UpdateInvitesModulePayload
 
+  """Updates a single `PrincipalAuthModule` using a unique key and a patch."""
+  updatePrincipalAuthModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePrincipalAuthModuleInput!
+  ): UpdatePrincipalAuthModulePayload
+
   """Updates a single `ComputeLogModule` using a unique key and a patch."""
   updateComputeLogModule(
     """
@@ -13639,6 +14065,14 @@ type Mutation {
     """
     input: UpdateNamespaceModuleInput!
   ): UpdateNamespaceModulePayload
+
+  """Updates a single `ResourceModule` using a unique key and a patch."""
+  updateResourceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateResourceModuleInput!
+  ): UpdateResourceModulePayload
 
   """Updates a single `StorageLogModule` using a unique key and a patch."""
   updateStorageLogModule(
@@ -14014,14 +14448,6 @@ type Mutation {
     input: DeleteSecureTableProvisionInput!
   ): DeleteSecureTableProvisionPayload
 
-  """Deletes a single `MerkleStoreModule` using a unique key."""
-  deleteMerkleStoreModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMerkleStoreModuleInput!
-  ): DeleteMerkleStoreModulePayload
-
   """Deletes a single `DatabaseProvisionModule` using a unique key."""
   deleteDatabaseProvisionModule(
     """
@@ -14045,6 +14471,14 @@ type Mutation {
     """
     input: DeleteGraphModuleInput!
   ): DeleteGraphModulePayload
+
+  """Deletes a single `MerkleStoreModule` using a unique key."""
+  deleteMerkleStoreModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMerkleStoreModuleInput!
+  ): DeleteMerkleStoreModulePayload
 
   """Deletes a single `RateLimitMetersModule` using a unique key."""
   deleteRateLimitMetersModule(
@@ -14094,6 +14528,14 @@ type Mutation {
     input: DeleteInvitesModuleInput!
   ): DeleteInvitesModulePayload
 
+  """Deletes a single `PrincipalAuthModule` using a unique key."""
+  deletePrincipalAuthModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePrincipalAuthModuleInput!
+  ): DeletePrincipalAuthModulePayload
+
   """Deletes a single `ComputeLogModule` using a unique key."""
   deleteComputeLogModule(
     """
@@ -14117,6 +14559,14 @@ type Mutation {
     """
     input: DeleteNamespaceModuleInput!
   ): DeleteNamespaceModulePayload
+
+  """Deletes a single `ResourceModule` using a unique key."""
+  deleteResourceModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteResourceModuleInput!
+  ): DeleteResourceModulePayload
 
   """Deletes a single `StorageLogModule` using a unique key."""
   deleteStorageLogModule(
@@ -15899,61 +16349,6 @@ input SecureTableProvisionInput {
   outFields: [UUID]
 }
 
-"""The output of our create `MerkleStoreModule` mutation."""
-type CreateMerkleStoreModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MerkleStoreModule` that was created by this mutation."""
-  merkleStoreModule: MerkleStoreModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MerkleStoreModule`. May be used by Relay 1."""
-  merkleStoreModuleEdge(
-    """The method to use when ordering `MerkleStoreModule`."""
-    orderBy: [MerkleStoreModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MerkleStoreModuleEdge
-}
-
-"""All input for the create `MerkleStoreModule` mutation."""
-input CreateMerkleStoreModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MerkleStoreModule` to be created by this mutation."""
-  merkleStoreModule: MerkleStoreModuleInput!
-}
-
-"""An input for mutations affecting `MerkleStoreModule`"""
-input MerkleStoreModuleInput {
-  id: UUID
-  databaseId: UUID!
-  schemaId: UUID
-  privateSchemaId: UUID
-  publicSchemaName: String
-  privateSchemaName: String
-  objectTableId: UUID
-  storeTableId: UUID
-  commitTableId: UUID
-  refTableId: UUID
-  prefix: String
-  apiName: String
-  privateApiName: String
-  scope: String
-  functionPrefix: String
-  createdAt: Datetime
-}
-
 """The output of our create `DatabaseProvisionModule` mutation."""
 type CreateDatabaseProvisionModulePayload {
   """
@@ -16140,6 +16535,62 @@ input GraphModuleInput {
   policies: JSON
   provisions: JSON
   defaultPermissions: [String]
+  createdAt: Datetime
+}
+
+"""The output of our create `MerkleStoreModule` mutation."""
+type CreateMerkleStoreModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MerkleStoreModule` that was created by this mutation."""
+  merkleStoreModule: MerkleStoreModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MerkleStoreModule`. May be used by Relay 1."""
+  merkleStoreModuleEdge(
+    """The method to use when ordering `MerkleStoreModule`."""
+    orderBy: [MerkleStoreModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MerkleStoreModuleEdge
+}
+
+"""All input for the create `MerkleStoreModule` mutation."""
+input CreateMerkleStoreModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MerkleStoreModule` to be created by this mutation."""
+  merkleStoreModule: MerkleStoreModuleInput!
+}
+
+"""An input for mutations affecting `MerkleStoreModule`"""
+input MerkleStoreModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  objectTableId: UUID
+  storeTableId: UUID
+  commitTableId: UUID
+  refTableId: UUID
+  prefix: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  functionPrefix: String
+  permissionKey: String
   createdAt: Datetime
 }
 
@@ -16478,6 +16929,63 @@ input InvitesModuleInput {
   privateApiName: String
 }
 
+"""The output of our create `PrincipalAuthModule` mutation."""
+type CreatePrincipalAuthModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PrincipalAuthModule` that was created by this mutation."""
+  principalAuthModule: PrincipalAuthModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PrincipalAuthModule`. May be used by Relay 1."""
+  principalAuthModuleEdge(
+    """The method to use when ordering `PrincipalAuthModule`."""
+    orderBy: [PrincipalAuthModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrincipalAuthModuleEdge
+}
+
+"""All input for the create `PrincipalAuthModule` mutation."""
+input CreatePrincipalAuthModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PrincipalAuthModule` to be created by this mutation."""
+  principalAuthModule: PrincipalAuthModuleInput!
+}
+
+"""An input for mutations affecting `PrincipalAuthModule`"""
+input PrincipalAuthModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  principalsTableId: UUID
+  principalEntitiesTableId: UUID
+  principalScopeOverridesTableId: UUID
+  usersTableId: UUID
+  sessionsTableId: UUID
+  sessionCredentialsTableId: UUID
+  auditsTableId: UUID
+  principalsTableName: String
+  createPrincipalFunction: String
+  deletePrincipalFunction: String
+  createOrgPrincipalFunction: String
+  deleteOrgPrincipalFunction: String
+  createOrgApiKeyFunction: String
+  revokeOrgApiKeyFunction: String
+  apiName: String
+}
+
 """The output of our create `ComputeLogModule` mutation."""
 type CreateComputeLogModulePayload {
   """
@@ -16647,6 +17155,64 @@ input NamespaceModuleInput {
   prefix: String
   entityTableId: UUID
   platformNamespacesTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+}
+
+"""The output of our create `ResourceModule` mutation."""
+type CreateResourceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ResourceModule` that was created by this mutation."""
+  resourceModule: ResourceModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ResourceModule`. May be used by Relay 1."""
+  resourceModuleEdge(
+    """The method to use when ordering `ResourceModule`."""
+    orderBy: [ResourceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceModuleEdge
+}
+
+"""All input for the create `ResourceModule` mutation."""
+input CreateResourceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ResourceModule` to be created by this mutation."""
+  resourceModule: ResourceModuleInput!
+}
+
+"""An input for mutations affecting `ResourceModule`"""
+input ResourceModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  resourcesTableId: UUID
+  resourceEventsTableId: UUID
+  resourcesTableName: String
+  resourceEventsTableName: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  prefix: String
+  entityTableId: UUID
+  namespaceModuleId: UUID
   policies: JSON
   provisions: JSON
   defaultPermissions: [String]
@@ -19939,66 +20505,6 @@ input SecureTableProvisionPatch {
   outFields: [UUID]
 }
 
-"""The output of our update `MerkleStoreModule` mutation."""
-type UpdateMerkleStoreModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MerkleStoreModule` that was updated by this mutation."""
-  merkleStoreModule: MerkleStoreModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MerkleStoreModule`. May be used by Relay 1."""
-  merkleStoreModuleEdge(
-    """The method to use when ordering `MerkleStoreModule`."""
-    orderBy: [MerkleStoreModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MerkleStoreModuleEdge
-}
-
-"""All input for the `updateMerkleStoreModule` mutation."""
-input UpdateMerkleStoreModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `MerkleStoreModule` being updated.
-  """
-  merkleStoreModulePatch: MerkleStoreModulePatch!
-}
-
-"""
-Represents an update to a `MerkleStoreModule`. Fields that are set will be updated.
-"""
-input MerkleStoreModulePatch {
-  id: UUID
-  databaseId: UUID
-  schemaId: UUID
-  privateSchemaId: UUID
-  publicSchemaName: String
-  privateSchemaName: String
-  objectTableId: UUID
-  storeTableId: UUID
-  commitTableId: UUID
-  refTableId: UUID
-  prefix: String
-  apiName: String
-  privateApiName: String
-  scope: String
-  functionPrefix: String
-  createdAt: Datetime
-}
-
 """The output of our update `DatabaseProvisionModule` mutation."""
 type UpdateDatabaseProvisionModulePayload {
   """
@@ -20200,6 +20706,67 @@ input GraphModulePatch {
   policies: JSON
   provisions: JSON
   defaultPermissions: [String]
+  createdAt: Datetime
+}
+
+"""The output of our update `MerkleStoreModule` mutation."""
+type UpdateMerkleStoreModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MerkleStoreModule` that was updated by this mutation."""
+  merkleStoreModule: MerkleStoreModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MerkleStoreModule`. May be used by Relay 1."""
+  merkleStoreModuleEdge(
+    """The method to use when ordering `MerkleStoreModule`."""
+    orderBy: [MerkleStoreModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MerkleStoreModuleEdge
+}
+
+"""All input for the `updateMerkleStoreModule` mutation."""
+input UpdateMerkleStoreModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `MerkleStoreModule` being updated.
+  """
+  merkleStoreModulePatch: MerkleStoreModulePatch!
+}
+
+"""
+Represents an update to a `MerkleStoreModule`. Fields that are set will be updated.
+"""
+input MerkleStoreModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  objectTableId: UUID
+  storeTableId: UUID
+  commitTableId: UUID
+  refTableId: UUID
+  prefix: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  functionPrefix: String
+  permissionKey: String
   createdAt: Datetime
 }
 
@@ -20568,6 +21135,68 @@ input InvitesModulePatch {
   privateApiName: String
 }
 
+"""The output of our update `PrincipalAuthModule` mutation."""
+type UpdatePrincipalAuthModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PrincipalAuthModule` that was updated by this mutation."""
+  principalAuthModule: PrincipalAuthModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PrincipalAuthModule`. May be used by Relay 1."""
+  principalAuthModuleEdge(
+    """The method to use when ordering `PrincipalAuthModule`."""
+    orderBy: [PrincipalAuthModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrincipalAuthModuleEdge
+}
+
+"""All input for the `updatePrincipalAuthModule` mutation."""
+input UpdatePrincipalAuthModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PrincipalAuthModule` being updated.
+  """
+  principalAuthModulePatch: PrincipalAuthModulePatch!
+}
+
+"""
+Represents an update to a `PrincipalAuthModule`. Fields that are set will be updated.
+"""
+input PrincipalAuthModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  principalsTableId: UUID
+  principalEntitiesTableId: UUID
+  principalScopeOverridesTableId: UUID
+  usersTableId: UUID
+  sessionsTableId: UUID
+  sessionCredentialsTableId: UUID
+  auditsTableId: UUID
+  principalsTableName: String
+  createPrincipalFunction: String
+  deletePrincipalFunction: String
+  createOrgPrincipalFunction: String
+  deleteOrgPrincipalFunction: String
+  createOrgApiKeyFunction: String
+  revokeOrgApiKeyFunction: String
+  apiName: String
+}
+
 """The output of our update `ComputeLogModule` mutation."""
 type UpdateComputeLogModulePayload {
   """
@@ -20752,6 +21381,69 @@ input NamespaceModulePatch {
   prefix: String
   entityTableId: UUID
   platformNamespacesTableId: UUID
+  policies: JSON
+  provisions: JSON
+  defaultPermissions: [String]
+}
+
+"""The output of our update `ResourceModule` mutation."""
+type UpdateResourceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ResourceModule` that was updated by this mutation."""
+  resourceModule: ResourceModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ResourceModule`. May be used by Relay 1."""
+  resourceModuleEdge(
+    """The method to use when ordering `ResourceModule`."""
+    orderBy: [ResourceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceModuleEdge
+}
+
+"""All input for the `updateResourceModule` mutation."""
+input UpdateResourceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `ResourceModule` being updated.
+  """
+  resourceModulePatch: ResourceModulePatch!
+}
+
+"""
+Represents an update to a `ResourceModule`. Fields that are set will be updated.
+"""
+input ResourceModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  publicSchemaName: String
+  privateSchemaName: String
+  resourcesTableId: UUID
+  resourceEventsTableId: UUID
+  resourcesTableName: String
+  resourceEventsTableName: String
+  apiName: String
+  privateApiName: String
+  scope: String
+  prefix: String
+  entityTableId: UUID
+  namespaceModuleId: UUID
   policies: JSON
   provisions: JSON
   defaultPermissions: [String]
@@ -23541,39 +24233,6 @@ input DeleteSecureTableProvisionInput {
   id: UUID!
 }
 
-"""The output of our delete `MerkleStoreModule` mutation."""
-type DeleteMerkleStoreModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MerkleStoreModule` that was deleted by this mutation."""
-  merkleStoreModule: MerkleStoreModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MerkleStoreModule`. May be used by Relay 1."""
-  merkleStoreModuleEdge(
-    """The method to use when ordering `MerkleStoreModule`."""
-    orderBy: [MerkleStoreModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MerkleStoreModuleEdge
-}
-
-"""All input for the `deleteMerkleStoreModule` mutation."""
-input DeleteMerkleStoreModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `DatabaseProvisionModule` mutation."""
 type DeleteDatabaseProvisionModulePayload {
   """
@@ -23665,6 +24324,39 @@ type DeleteGraphModulePayload {
 
 """All input for the `deleteGraphModule` mutation."""
 input DeleteGraphModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `MerkleStoreModule` mutation."""
+type DeleteMerkleStoreModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MerkleStoreModule` that was deleted by this mutation."""
+  merkleStoreModule: MerkleStoreModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MerkleStoreModule`. May be used by Relay 1."""
+  merkleStoreModuleEdge(
+    """The method to use when ordering `MerkleStoreModule`."""
+    orderBy: [MerkleStoreModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MerkleStoreModuleEdge
+}
+
+"""All input for the `deleteMerkleStoreModule` mutation."""
+input DeleteMerkleStoreModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -23871,6 +24563,39 @@ input DeleteInvitesModuleInput {
   id: UUID!
 }
 
+"""The output of our delete `PrincipalAuthModule` mutation."""
+type DeletePrincipalAuthModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PrincipalAuthModule` that was deleted by this mutation."""
+  principalAuthModule: PrincipalAuthModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PrincipalAuthModule`. May be used by Relay 1."""
+  principalAuthModuleEdge(
+    """The method to use when ordering `PrincipalAuthModule`."""
+    orderBy: [PrincipalAuthModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrincipalAuthModuleEdge
+}
+
+"""All input for the `deletePrincipalAuthModule` mutation."""
+input DeletePrincipalAuthModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `ComputeLogModule` mutation."""
 type DeleteComputeLogModulePayload {
   """
@@ -23962,6 +24687,39 @@ type DeleteNamespaceModulePayload {
 
 """All input for the `deleteNamespaceModule` mutation."""
 input DeleteNamespaceModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `ResourceModule` mutation."""
+type DeleteResourceModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ResourceModule` that was deleted by this mutation."""
+  resourceModule: ResourceModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ResourceModule`. May be used by Relay 1."""
+  resourceModuleEdge(
+    """The method to use when ordering `ResourceModule`."""
+    orderBy: [ResourceModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ResourceModuleEdge
+}
+
+"""All input for the `deleteResourceModule` mutation."""
+input DeleteResourceModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.

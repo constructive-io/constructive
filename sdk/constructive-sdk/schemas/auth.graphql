@@ -1,8 +1,8 @@
 """The root query type which gives access points into the data universe."""
 type Query {
   currentUserAgent: String
-  currentIpAddress: InternetAddress
   currentUserId: UUID
+  currentIpAddress: InternetAddress
   requireStepUp(stepUpType: String): Boolean
   currentUser: User
 
@@ -64,6 +64,35 @@ type Query {
     orderBy: [RoleTypeOrderBy!] = [PRIMARY_KEY_ASC]
   ): RoleTypeConnection
 
+  """Reads and enables pagination through a set of `PrincipalEntity`."""
+  principalEntities(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalEntityFilter
+
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalEntityConnection
+
   """Reads and enables pagination through a set of `UserConnectedAccount`."""
   userConnectedAccounts(
     """Only read the first `n` values of the set."""
@@ -122,6 +151,35 @@ type Query {
     orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
   ): CryptoAddressConnection
 
+  """Reads and enables pagination through a set of `Principal`."""
+  principals(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalFilter
+
+    """The method to use when ordering `Principal`."""
+    orderBy: [PrincipalOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalConnection
+
   """Reads and enables pagination through a set of `PhoneNumber`."""
   phoneNumbers(
     """Only read the first `n` values of the set."""
@@ -179,6 +237,66 @@ type Query {
     """The method to use when ordering `AuditLogAuth`."""
     orderBy: [AuditLogAuthOrderBy!] = [PRIMARY_KEY_ASC]
   ): AuditLogAuthConnection
+
+  """
+  Reads and enables pagination through a set of `PrincipalScopeOverride`.
+  """
+  principalScopeOverrides(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalScopeOverrideFilter
+
+    """The method to use when ordering `PrincipalScopeOverride`."""
+    orderBy: [PrincipalScopeOverrideOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalScopeOverrideConnection
+
+  """Reads and enables pagination through a set of `OrgApiKeyList`."""
+  orgApiKeyLists(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgApiKeyListFilter
+
+    """The method to use when ordering `OrgApiKeyList`."""
+    orderBy: [OrgApiKeyListOrderBy!] = [NATURAL]
+  ): OrgApiKeyListConnection
 
   """Reads and enables pagination through a set of `Email`."""
   emails(
@@ -273,13 +391,13 @@ type Query {
   _meta: MetaSchema
 }
 
-"""An IPv4 or IPv6 host address, and optionally its subnet."""
-scalar InternetAddress
-
 """
 A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
 """
 scalar UUID
+
+"""An IPv4 or IPv6 host address, and optionally its subnet."""
+scalar InternetAddress
 
 type User {
   id: UUID!
@@ -293,6 +411,93 @@ type User {
 
   """Reads a single `RoleType` that is related to this `User`."""
   roleType: RoleType
+
+  """Reads and enables pagination through a set of `Principal`."""
+  ownedPrincipals(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalFilter
+
+    """The method to use when ordering `Principal`."""
+    orderBy: [PrincipalOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalConnection!
+
+  """Reads and enables pagination through a set of `Principal`."""
+  principals(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalFilter
+
+    """The method to use when ordering `Principal`."""
+    orderBy: [PrincipalOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalConnection!
+
+  """Reads and enables pagination through a set of `PrincipalEntity`."""
+  principalEntitiesByEntityId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalEntityFilter
+
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalEntityConnection!
 
   """Reads and enables pagination through a set of `Email`."""
   ownedEmails(
@@ -474,55 +679,172 @@ type RoleType {
   name: String!
 }
 
-"""A connection to a list of `Email` values."""
-type EmailConnection {
-  """A list of `Email` objects."""
-  nodes: [Email]!
+"""A connection to a list of `Principal` values."""
+type PrincipalConnection {
+  """A list of `Principal` objects."""
+  nodes: [Principal]!
 
   """
-  A list of edges which contains the `Email` and cursor to aid in pagination.
+  A list of edges which contains the `Principal` and cursor to aid in pagination.
   """
-  edges: [EmailEdge]!
+  edges: [PrincipalEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `Email` you could get from the connection."""
+  """The count of *all* `Principal` you could get from the connection."""
   totalCount: Int!
 }
 
-"""User email addresses with verification and primary-email management"""
-type Email {
+"""Scoped sub-identities (API keys and agents) with precomputed SPRT"""
+type Principal {
   id: UUID!
-  ownerId: UUID!
-
-  """The email address"""
-  email: ConstructiveInternalTypeEmail!
-
-  """Whether the email address has been verified via confirmation link"""
-  isVerified: Boolean!
-
-  """Whether this is the user's primary email address"""
-  isPrimary: Boolean!
-
-  """Optional user-provided label for this email (e.g. "Work", "Personal")."""
-  name: String
   createdAt: Datetime
   updatedAt: Datetime
 
-  """Reads a single `User` that is related to this `Email`."""
+  """The human user who owns and manages this principal"""
+  ownerId: UUID!
+
+  """
+  The user row (type=3 Principal) that represents this principal identity
+  """
+  userId: UUID!
+
+  """
+  Human-readable label for this principal (e.g., billing-bot, ci-deploy-key)
+  """
+  name: String!
+
+  """Permission bitmask subset; all-1s means inherit all parent permissions"""
+  allowedMask: BitString!
+
+  """Whether this principal is restricted to read-only operations"""
+  isReadOnly: Boolean!
+
+  """Whether this principal bypasses MFA step-up requirements"""
+  bypassStepUp: Boolean!
+
+  """Reads a single `User` that is related to this `Principal`."""
   owner: User
+
+  """Reads a single `User` that is related to this `Principal`."""
+  user: User
+
+  """Reads and enables pagination through a set of `PrincipalEntity`."""
+  principalEntities(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalEntityFilter
+
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalEntityConnection!
+
+  """
+  Reads and enables pagination through a set of `PrincipalScopeOverride`.
+  """
+  principalScopeOverrides(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalScopeOverrideFilter
+
+    """The method to use when ordering `PrincipalScopeOverride`."""
+    orderBy: [PrincipalScopeOverrideOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PrincipalScopeOverrideConnection!
 }
 
-scalar ConstructiveInternalTypeEmail
+"""A string representing a series of binary bits"""
+scalar BitString
 
-"""A `Email` edge in the connection."""
-type EmailEdge {
+"""A connection to a list of `PrincipalEntity` values."""
+type PrincipalEntityConnection {
+  """A list of `PrincipalEntity` objects."""
+  nodes: [PrincipalEntity]!
+
+  """
+  A list of edges which contains the `PrincipalEntity` and cursor to aid in pagination.
+  """
+  edges: [PrincipalEntityEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PrincipalEntity` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""Association table scoping principals to specific organizations"""
+type PrincipalEntity {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """The principal this scoping row belongs to"""
+  principalId: UUID!
+
+  """The organization this principal is scoped to"""
+  entityId: UUID!
+
+  """Denormalized owner_id from principals table for RLS"""
+  ownerId: UUID!
+
+  """Reads a single `User` that is related to this `PrincipalEntity`."""
+  entity: User
+
+  """Reads a single `User` that is related to this `PrincipalEntity`."""
+  owner: User
+
+  """Reads a single `Principal` that is related to this `PrincipalEntity`."""
+  principal: Principal
+}
+
+"""A `PrincipalEntity` edge in the connection."""
+type PrincipalEntityEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `Email` at the end of the edge."""
-  node: Email
+  """The `PrincipalEntity` at the end of the edge."""
+  node: PrincipalEntity
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -544,26 +866,11 @@ type PageInfo {
 }
 
 """
-A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `PrincipalEntity` object types. All fields are combined with a logical ‘and.’
 """
-input EmailFilter {
+input PrincipalEntityFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
-
-  """Filter by the object’s `email` field."""
-  email: ConstructiveInternalTypeEmailFilter
-
-  """Filter by the object’s `isVerified` field."""
-  isVerified: BooleanFilter
-
-  """Filter by the object’s `isPrimary` field."""
-  isPrimary: BooleanFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -571,17 +878,32 @@ input EmailFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `principalId` field."""
+  principalId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
   """Checks for all expressions in this list."""
-  and: [EmailFilter!]
+  and: [PrincipalEntityFilter!]
 
   """Checks for any expressions in this list."""
-  or: [EmailFilter!]
+  or: [PrincipalEntityFilter!]
 
   """Negates the expression."""
-  not: EmailFilter
+  not: PrincipalEntityFilter
+
+  """Filter by the object’s `entity` relation."""
+  entity: UserFilter
 
   """Filter by the object’s `owner` relation."""
   owner: UserFilter
+
+  """Filter by the object’s `principal` relation."""
+  principal: PrincipalFilter
 }
 
 """
@@ -624,312 +946,6 @@ input UUIDFilter {
 
   """Greater than or equal to the specified value."""
   greaterThanOrEqualTo: UUID
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeEmailFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: ConstructiveInternalTypeEmail
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: ConstructiveInternalTypeEmail
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: ConstructiveInternalTypeEmail
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-}
-
-"""
-A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
-"""
-input BooleanFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Boolean
-
-  """Not equal to the specified value."""
-  notEqualTo: Boolean
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Boolean
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Boolean
-
-  """Included in the specified list."""
-  in: [Boolean!]
-
-  """Not included in the specified list."""
-  notIn: [Boolean!]
-
-  """Less than the specified value."""
-  lessThan: Boolean
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Boolean
-
-  """Greater than the specified value."""
-  greaterThan: Boolean
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Boolean
-}
-
-"""
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
-"""
-input StringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: String
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: String
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: String
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: String
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: String
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: String
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: String
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: String
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: String
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: String
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: String
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [String!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [String!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: String
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: String
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: String
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: String
 }
 
 """
@@ -1013,6 +1029,24 @@ input UserFilter {
 
   """Filter by the object’s `roleType` relation."""
   roleType: RoleTypeFilter
+
+  """Filter by the object’s `ownedPrincipals` relation."""
+  ownedPrincipals: UserToManyPrincipalFilter
+
+  """`ownedPrincipals` exist."""
+  ownedPrincipalsExist: Boolean
+
+  """Filter by the object’s `principals` relation."""
+  principals: UserToManyPrincipalFilter
+
+  """`principals` exist."""
+  principalsExist: Boolean
+
+  """Filter by the object’s `principalEntitiesByEntityId` relation."""
+  principalEntitiesByEntityId: UserToManyPrincipalEntityFilter
+
+  """`principalEntitiesByEntityId` exist."""
+  principalEntitiesByEntityIdExist: Boolean
 
   """Filter by the object’s `ownedEmails` relation."""
   ownedEmails: UserToManyEmailFilter
@@ -1368,6 +1402,378 @@ input RoleTypeFilter {
 }
 
 """
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+}
+
+"""
+A filter to be used against many `Principal` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyPrincipalFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PrincipalFilter
+
+  """Filters to entities where every related entity matches."""
+  every: PrincipalFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PrincipalFilter
+}
+
+"""
+A filter to be used against `Principal` object types. All fields are combined with a logical ‘and.’
+"""
+input PrincipalFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `userId` field."""
+  userId: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `allowedMask` field."""
+  allowedMask: BitStringFilter
+
+  """Filter by the object’s `isReadOnly` field."""
+  isReadOnly: BooleanFilter
+
+  """Filter by the object’s `bypassStepUp` field."""
+  bypassStepUp: BooleanFilter
+
+  """Checks for all expressions in this list."""
+  and: [PrincipalFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [PrincipalFilter!]
+
+  """Negates the expression."""
+  not: PrincipalFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """Filter by the object’s `user` relation."""
+  user: UserFilter
+
+  """Filter by the object’s `principalEntities` relation."""
+  principalEntities: PrincipalToManyPrincipalEntityFilter
+
+  """`principalEntities` exist."""
+  principalEntitiesExist: Boolean
+
+  """Filter by the object’s `principalScopeOverrides` relation."""
+  principalScopeOverrides: PrincipalToManyPrincipalScopeOverrideFilter
+
+  """`principalScopeOverrides` exist."""
+  principalScopeOverridesExist: Boolean
+}
+
+"""
+A filter to be used against BitString fields. All fields are combined with a logical ‘and.’
+"""
+input BitStringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: BitString
+
+  """Not equal to the specified value."""
+  notEqualTo: BitString
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BitString
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BitString
+
+  """Included in the specified list."""
+  in: [BitString!]
+
+  """Not included in the specified list."""
+  notIn: [BitString!]
+
+  """Less than the specified value."""
+  lessThan: BitString
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BitString
+
+  """Greater than the specified value."""
+  greaterThan: BitString
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BitString
+}
+
+"""
+A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
+"""
+input BooleanFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Boolean
+
+  """Not equal to the specified value."""
+  notEqualTo: Boolean
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Boolean
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Boolean
+
+  """Included in the specified list."""
+  in: [Boolean!]
+
+  """Not included in the specified list."""
+  notIn: [Boolean!]
+
+  """Less than the specified value."""
+  lessThan: Boolean
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Boolean
+
+  """Greater than the specified value."""
+  greaterThan: Boolean
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Boolean
+}
+
+"""
+A filter to be used against many `PrincipalEntity` object types. All fields are combined with a logical ‘and.’
+"""
+input PrincipalToManyPrincipalEntityFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PrincipalEntityFilter
+
+  """Filters to entities where every related entity matches."""
+  every: PrincipalEntityFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PrincipalEntityFilter
+}
+
+"""
+A filter to be used against many `PrincipalScopeOverride` object types. All fields are combined with a logical ‘and.’
+"""
+input PrincipalToManyPrincipalScopeOverrideFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PrincipalScopeOverrideFilter
+
+  """Filters to entities where every related entity matches."""
+  every: PrincipalScopeOverrideFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PrincipalScopeOverrideFilter
+}
+
+"""
+A filter to be used against `PrincipalScopeOverride` object types. All fields are combined with a logical ‘and.’
+"""
+input PrincipalScopeOverrideFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `principalId` field."""
+  principalId: UUIDFilter
+
+  """Filter by the object’s `membershipType` field."""
+  membershipType: IntFilter
+
+  """Filter by the object’s `allowedMask` field."""
+  allowedMask: BitStringFilter
+
+  """Filter by the object’s `isAdmin` field."""
+  isAdmin: BooleanFilter
+
+  """Filter by the object’s `isReadOnly` field."""
+  isReadOnly: BooleanFilter
+
+  """Checks for all expressions in this list."""
+  and: [PrincipalScopeOverrideFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [PrincipalScopeOverrideFilter!]
+
+  """Negates the expression."""
+  not: PrincipalScopeOverrideFilter
+
+  """Filter by the object’s `principal` relation."""
+  principal: PrincipalFilter
+}
+
+"""
+A filter to be used against many `PrincipalEntity` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyPrincipalEntityFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PrincipalEntityFilter
+
+  """Filters to entities where every related entity matches."""
+  every: PrincipalEntityFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PrincipalEntityFilter
+}
+
+"""
 A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’
 """
 input UserToManyEmailFilter {
@@ -1380,6 +1786,181 @@ input UserToManyEmailFilter {
   """Filters to entities where no related entity matches."""
   none: EmailFilter
 }
+
+"""
+A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’
+"""
+input EmailFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `email` field."""
+  email: ConstructiveInternalTypeEmailFilter
+
+  """Filter by the object’s `isVerified` field."""
+  isVerified: BooleanFilter
+
+  """Filter by the object’s `isPrimary` field."""
+  isPrimary: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [EmailFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [EmailFilter!]
+
+  """Negates the expression."""
+  not: EmailFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeEmailFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: ConstructiveInternalTypeEmail
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: ConstructiveInternalTypeEmail
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: ConstructiveInternalTypeEmail
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+}
+
+scalar ConstructiveInternalTypeEmail
 
 """
 A filter to be used against many `PhoneNumber` object types. All fields are combined with a logical ‘and.’
@@ -1959,6 +2540,192 @@ input InternetAddressFilter {
 
   """Contains or contained by the specified internet address."""
   containsOrContainedBy: InternetAddress
+}
+
+"""Methods to use when ordering `PrincipalEntity`."""
+enum PrincipalEntityOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  PRINCIPAL_ID_ASC
+  PRINCIPAL_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+}
+
+"""A connection to a list of `PrincipalScopeOverride` values."""
+type PrincipalScopeOverrideConnection {
+  """A list of `PrincipalScopeOverride` objects."""
+  nodes: [PrincipalScopeOverride]!
+
+  """
+  A list of edges which contains the `PrincipalScopeOverride` and cursor to aid in pagination.
+  """
+  edges: [PrincipalScopeOverrideEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PrincipalScopeOverride` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions.
+"""
+type PrincipalScopeOverride {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """The principal this override applies to"""
+  principalId: UUID!
+
+  """The scope level (membership_type) this override restricts"""
+  membershipType: Int!
+
+  """
+  Permission bitmask for this scope; AND-masked with parent permissions during cascade
+  """
+  allowedMask: BitString!
+
+  """
+  Whether this principal has admin access at this scope (default true = inherit from parent)
+  """
+  isAdmin: Boolean!
+
+  """Whether this principal is restricted to read-only at this scope"""
+  isReadOnly: Boolean!
+
+  """
+  Reads a single `Principal` that is related to this `PrincipalScopeOverride`.
+  """
+  principal: Principal
+}
+
+"""A `PrincipalScopeOverride` edge in the connection."""
+type PrincipalScopeOverrideEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PrincipalScopeOverride` at the end of the edge."""
+  node: PrincipalScopeOverride
+}
+
+"""Methods to use when ordering `PrincipalScopeOverride`."""
+enum PrincipalScopeOverrideOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  PRINCIPAL_ID_ASC
+  PRINCIPAL_ID_DESC
+  MEMBERSHIP_TYPE_ASC
+  MEMBERSHIP_TYPE_DESC
+  ALLOWED_MASK_ASC
+  ALLOWED_MASK_DESC
+  IS_ADMIN_ASC
+  IS_ADMIN_DESC
+  IS_READ_ONLY_ASC
+  IS_READ_ONLY_DESC
+}
+
+"""A `Principal` edge in the connection."""
+type PrincipalEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Principal` at the end of the edge."""
+  node: Principal
+}
+
+"""Methods to use when ordering `Principal`."""
+enum PrincipalOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ALLOWED_MASK_ASC
+  ALLOWED_MASK_DESC
+  IS_READ_ONLY_ASC
+  IS_READ_ONLY_DESC
+  BYPASS_STEP_UP_ASC
+  BYPASS_STEP_UP_DESC
+}
+
+"""A connection to a list of `Email` values."""
+type EmailConnection {
+  """A list of `Email` objects."""
+  nodes: [Email]!
+
+  """
+  A list of edges which contains the `Email` and cursor to aid in pagination.
+  """
+  edges: [EmailEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Email` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""User email addresses with verification and primary-email management"""
+type Email {
+  id: UUID!
+  ownerId: UUID!
+
+  """The email address"""
+  email: ConstructiveInternalTypeEmail!
+
+  """Whether the email address has been verified via confirmation link"""
+  isVerified: Boolean!
+
+  """Whether this is the user's primary email address"""
+  isPrimary: Boolean!
+
+  """Optional user-provided label for this email (e.g. "Work", "Personal")."""
+  name: String
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Reads a single `User` that is related to this `Email`."""
+  owner: User
+}
+
+"""A `Email` edge in the connection."""
+type EmailEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Email` at the end of the edge."""
+  node: Email
 }
 
 """Methods to use when ordering `Email`."""
@@ -2626,6 +3393,126 @@ enum UserConnectedAccountOrderBy {
   UPDATED_AT_DESC
 }
 
+"""A connection to a list of `OrgApiKeyList` values."""
+type OrgApiKeyListConnection {
+  """A list of `OrgApiKeyList` objects."""
+  nodes: [OrgApiKeyList]!
+
+  """
+  A list of edges which contains the `OrgApiKeyList` and cursor to aid in pagination.
+  """
+  edges: [OrgApiKeyListEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgApiKeyList` you could get from the connection."""
+  totalCount: Int!
+}
+
+type OrgApiKeyList {
+  id: UUID
+  keyId: String
+  name: String
+  principalId: UUID
+  orgId: UUID
+  expiresAt: Datetime
+  revokedAt: Datetime
+  lastUsedAt: Datetime
+  mfaLevel: String
+  accessLevel: String
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A `OrgApiKeyList` edge in the connection."""
+type OrgApiKeyListEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgApiKeyList` at the end of the edge."""
+  node: OrgApiKeyList
+}
+
+"""
+A filter to be used against `OrgApiKeyList` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgApiKeyListFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `keyId` field."""
+  keyId: StringFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `principalId` field."""
+  principalId: UUIDFilter
+
+  """Filter by the object’s `orgId` field."""
+  orgId: UUIDFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Filter by the object’s `revokedAt` field."""
+  revokedAt: DatetimeFilter
+
+  """Filter by the object’s `lastUsedAt` field."""
+  lastUsedAt: DatetimeFilter
+
+  """Filter by the object’s `mfaLevel` field."""
+  mfaLevel: StringFilter
+
+  """Filter by the object’s `accessLevel` field."""
+  accessLevel: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgApiKeyListFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgApiKeyListFilter!]
+
+  """Negates the expression."""
+  not: OrgApiKeyListFilter
+}
+
+"""Methods to use when ordering `OrgApiKeyList`."""
+enum OrgApiKeyListOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  KEY_ID_ASC
+  KEY_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  PRINCIPAL_ID_ASC
+  PRINCIPAL_ID_DESC
+  ORG_ID_ASC
+  ORG_ID_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
+  REVOKED_AT_ASC
+  REVOKED_AT_DESC
+  LAST_USED_AT_ASC
+  LAST_USED_AT_DESC
+  MFA_LEVEL_ASC
+  MFA_LEVEL_DESC
+  ACCESS_LEVEL_ASC
+  ACCESS_LEVEL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
 """A connection to a list of `User` values."""
 type UserConnection {
   """A list of `User` objects."""
@@ -2949,6 +3836,18 @@ type Mutation {
     """
     input: CheckPasswordInput!
   ): CheckPasswordPayload
+  deleteOrgPrincipal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgPrincipalInput!
+  ): DeleteOrgPrincipalPayload
+  deletePrincipal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePrincipalInput!
+  ): DeletePrincipalPayload
   disconnectAccount(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2985,6 +3884,12 @@ type Mutation {
     """
     input: ConfirmDeleteAccountInput!
   ): ConfirmDeleteAccountPayload
+  revokeOrgApiKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RevokeOrgApiKeyInput!
+  ): RevokeOrgApiKeyPayload
   setPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3045,12 +3950,24 @@ type Mutation {
     """
     input: LinkIdentityInput!
   ): LinkIdentityPayload
+  createOrgPrincipal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgPrincipalInput!
+  ): CreateOrgPrincipalPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ExtendTokenExpiresInput!
   ): ExtendTokenExpiresPayload
+  createOrgApiKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgApiKeyInput!
+  ): CreateOrgApiKeyPayload
   createApiKey(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3063,6 +3980,12 @@ type Mutation {
     """
     input: RequestCrossOriginTokenInput!
   ): RequestCrossOriginTokenPayload
+  createPrincipal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePrincipalInput!
+  ): CreatePrincipalPayload
   forgotPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3091,6 +4014,14 @@ type Mutation {
     """
     input: CreateRoleTypeInput!
   ): CreateRoleTypePayload
+
+  """Creates a single `PrincipalEntity`."""
+  createPrincipalEntity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePrincipalEntityInput!
+  ): CreatePrincipalEntityPayload
 
   """Creates a single `UserConnectedAccount`."""
   createUserConnectedAccount(
@@ -3124,6 +4055,14 @@ type Mutation {
     input: CreateAuditLogAuthInput!
   ): CreateAuditLogAuthPayload
 
+  """Creates a single `OrgApiKeyList`."""
+  createOrgApiKeyList(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgApiKeyListInput!
+  ): CreateOrgApiKeyListPayload
+
   """Creates a single `Email`."""
   createEmail(
     """
@@ -3155,6 +4094,14 @@ type Mutation {
     """
     input: UpdateRoleTypeInput!
   ): UpdateRoleTypePayload
+
+  """Updates a single `PrincipalEntity` using a unique key and a patch."""
+  updatePrincipalEntity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePrincipalEntityInput!
+  ): UpdatePrincipalEntityPayload
 
   """Updates a single `CryptoAddress` using a unique key and a patch."""
   updateCryptoAddress(
@@ -3211,6 +4158,14 @@ type Mutation {
     """
     input: DeleteRoleTypeInput!
   ): DeleteRoleTypePayload
+
+  """Deletes a single `PrincipalEntity` using a unique key."""
+  deletePrincipalEntity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePrincipalEntityInput!
+  ): DeletePrincipalEntityPayload
 
   """Deletes a single `CryptoAddress` using a unique key."""
   deleteCryptoAddress(
@@ -3343,6 +4298,56 @@ input CheckPasswordInput {
   """
   clientMutationId: String
   password: String
+}
+
+"""The output of our `deleteOrgPrincipal` mutation."""
+type DeleteOrgPrincipalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteOrgPrincipal` mutation."""
+input DeleteOrgPrincipalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  principalId: UUID
+}
+
+"""The output of our `deletePrincipal` mutation."""
+type DeletePrincipalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePrincipal` mutation."""
+input DeletePrincipalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  principalId: UUID
 }
 
 """The output of our `disconnectAccount` mutation."""
@@ -3494,6 +4499,32 @@ input ConfirmDeleteAccountInput {
   clientMutationId: String
   userId: UUID
   token: String
+}
+
+"""The output of our `revokeOrgApiKey` mutation."""
+type RevokeOrgApiKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `revokeOrgApiKey` mutation."""
+input RevokeOrgApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  keyId: UUID!
+  orgId: UUID!
 }
 
 """The output of our `setPassword` mutation."""
@@ -3813,6 +4844,35 @@ input LinkIdentityInput {
   details: JSON
 }
 
+"""The output of our `createOrgPrincipal` mutation."""
+type CreateOrgPrincipalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createOrgPrincipal` mutation."""
+input CreateOrgPrincipalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String
+  orgId: UUID
+  allowedMask: BitString
+  isReadOnly: Boolean
+  bypassStepUp: Boolean
+}
+
 """The output of our `extendTokenExpires` mutation."""
 type ExtendTokenExpiresPayload {
   """
@@ -3871,6 +4931,42 @@ input IntervalInput {
   years: Int
 }
 
+"""The output of our `createOrgApiKey` mutation."""
+type CreateOrgApiKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: CreateOrgApiKeyRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type CreateOrgApiKeyRecord {
+  apiKey: String
+  keyId: UUID
+  expiresAt: Datetime
+}
+
+"""All input for the `createOrgApiKey` mutation."""
+input CreateOrgApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  orgId: UUID
+  principalId: UUID
+  keyName: String
+  accessLevel: String
+  mfaLevel: String
+  expiresIn: IntervalInput
+}
+
 """The output of our `createApiKey` mutation."""
 type CreateApiKeyPayload {
   """
@@ -3903,6 +4999,7 @@ input CreateApiKeyInput {
   accessLevel: String
   mfaLevel: String
   expiresIn: IntervalInput
+  principalId: UUID
 }
 
 """The output of our `requestCrossOriginToken` mutation."""
@@ -3931,6 +5028,35 @@ input RequestCrossOriginTokenInput {
   password: String
   origin: ConstructiveInternalTypeOrigin
   rememberMe: Boolean
+}
+
+"""The output of our `createPrincipal` mutation."""
+type CreatePrincipalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createPrincipal` mutation."""
+input CreatePrincipalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String
+  allowedMask: BitString
+  entityIds: [UUID]
+  isReadOnly: Boolean
+  bypassStepUp: Boolean
 }
 
 """The output of our `forgotPassword` mutation."""
@@ -4059,6 +5185,57 @@ input CreateRoleTypeInput {
 input RoleTypeInput {
   id: Int!
   name: String!
+}
+
+"""The output of our create `PrincipalEntity` mutation."""
+type CreatePrincipalEntityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PrincipalEntity` that was created by this mutation."""
+  principalEntity: PrincipalEntity
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PrincipalEntity`. May be used by Relay 1."""
+  principalEntityEdge(
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrincipalEntityEdge
+}
+
+"""All input for the create `PrincipalEntity` mutation."""
+input CreatePrincipalEntityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PrincipalEntity` to be created by this mutation."""
+  principalEntity: PrincipalEntityInput!
+}
+
+"""An input for mutations affecting `PrincipalEntity`"""
+input PrincipalEntityInput {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """The principal this scoping row belongs to"""
+  principalId: UUID!
+
+  """The organization this principal is scoped to"""
+  entityId: UUID!
+
+  """Denormalized owner_id from principals table for RLS"""
+  ownerId: UUID!
 }
 
 """The output of our create `UserConnectedAccount` mutation."""
@@ -4284,6 +5461,51 @@ input AuditLogAuthInput {
 
   """Whether the authentication attempt succeeded"""
   success: Boolean!
+}
+
+"""The output of our create `OrgApiKeyList` mutation."""
+type CreateOrgApiKeyListPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgApiKeyList` that was created by this mutation."""
+  orgApiKeyList: OrgApiKeyList
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `OrgApiKeyList` mutation."""
+input CreateOrgApiKeyListInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgApiKeyList` to be created by this mutation."""
+  orgApiKeyList: OrgApiKeyListInput!
+}
+
+"""An input for mutations affecting `OrgApiKeyList`"""
+input OrgApiKeyListInput {
+  id: UUID
+  keyId: String
+  name: String
+  principalId: UUID
+  orgId: UUID
+  expiresAt: Datetime
+  revokedAt: Datetime
+  lastUsedAt: Datetime
+  mfaLevel: String
+  accessLevel: String
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our create `Email` mutation."""
@@ -4520,6 +5742,62 @@ Represents an update to a `RoleType`. Fields that are set will be updated.
 input RoleTypePatch {
   id: Int
   name: String
+}
+
+"""The output of our update `PrincipalEntity` mutation."""
+type UpdatePrincipalEntityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PrincipalEntity` that was updated by this mutation."""
+  principalEntity: PrincipalEntity
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PrincipalEntity`. May be used by Relay 1."""
+  principalEntityEdge(
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrincipalEntityEdge
+}
+
+"""All input for the `updatePrincipalEntity` mutation."""
+input UpdatePrincipalEntityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PrincipalEntity` being updated.
+  """
+  principalEntityPatch: PrincipalEntityPatch!
+}
+
+"""
+Represents an update to a `PrincipalEntity`. Fields that are set will be updated.
+"""
+input PrincipalEntityPatch {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """The principal this scoping row belongs to"""
+  principalId: UUID
+
+  """The organization this principal is scoped to"""
+  entityId: UUID
+
+  """Denormalized owner_id from principals table for RLS"""
+  ownerId: UUID
 }
 
 """The output of our update `CryptoAddress` mutation."""
@@ -4966,6 +6244,39 @@ input DeleteRoleTypeInput {
   """
   clientMutationId: String
   id: Int!
+}
+
+"""The output of our delete `PrincipalEntity` mutation."""
+type DeletePrincipalEntityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PrincipalEntity` that was deleted by this mutation."""
+  principalEntity: PrincipalEntity
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PrincipalEntity`. May be used by Relay 1."""
+  principalEntityEdge(
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrincipalEntityEdge
+}
+
+"""All input for the `deletePrincipalEntity` mutation."""
+input DeletePrincipalEntityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
 }
 
 """The output of our delete `CryptoAddress` mutation."""

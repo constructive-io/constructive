@@ -19,6 +19,33 @@
 // Entity Query Keys
 // ============================================================================
 
+export const principalKeys = {
+  /** All principal queries */ all: ['principal'] as const,
+  /** List query keys */ lists: () => [...principalKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...principalKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...principalKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...principalKeys.details(), id] as const,
+} as const;
+export const principalEntityKeys = {
+  /** All principalEntity queries */ all: ['principalentity'] as const,
+  /** List query keys */ lists: () => [...principalEntityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...principalEntityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...principalEntityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...principalEntityKeys.details(), id] as const,
+} as const;
+export const principalScopeOverrideKeys = {
+  /** All principalScopeOverride queries */ all: ['principalscopeoverride'] as const,
+  /** List query keys */ lists: () => [...principalScopeOverrideKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...principalScopeOverrideKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...principalScopeOverrideKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...principalScopeOverrideKeys.details(), id] as const,
+} as const;
 export const emailKeys = {
   /** All email queries */ all: ['email'] as const,
   /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
@@ -91,6 +118,15 @@ export const userConnectedAccountKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...userConnectedAccountKeys.details(), id] as const,
 } as const;
+export const orgApiKeyListKeys = {
+  /** All orgApiKeyList queries */ all: ['orgapikeylist'] as const,
+  /** List query keys */ lists: () => [...orgApiKeyListKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...orgApiKeyListKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...orgApiKeyListKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...orgApiKeyListKeys.details(), id] as const,
+} as const;
 export const userKeys = {
   /** All user queries */ all: ['user'] as const,
   /** List query keys */ lists: () => [...userKeys.all, 'list'] as const,
@@ -107,8 +143,8 @@ export const userKeys = {
 
 export const customQueryKeys = {
   /** Query key for currentUserAgent */ currentUserAgent: () => ['currentUserAgent'] as const,
-  /** Query key for currentIpAddress */ currentIpAddress: () => ['currentIpAddress'] as const,
   /** Query key for currentUserId */ currentUserId: () => ['currentUserId'] as const,
+  /** Query key for currentIpAddress */ currentIpAddress: () => ['currentIpAddress'] as const,
   /** Query key for requireStepUp */ requireStepUp: (variables?: object) =>
     ['requireStepUp', variables] as const,
   /** Query key for currentUser */ currentUser: () => ['currentUser'] as const,
@@ -136,6 +172,9 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
+  principal: principalKeys,
+  principalEntity: principalEntityKeys,
+  principalScopeOverride: principalScopeOverrideKeys,
   email: emailKeys,
   phoneNumber: phoneNumberKeys,
   cryptoAddress: cryptoAddressKeys,
@@ -144,6 +183,7 @@ export const queryKeys = {
   identityProvider: identityProviderKeys,
   roleType: roleTypeKeys,
   userConnectedAccount: userConnectedAccountKeys,
+  orgApiKeyList: orgApiKeyListKeys,
   user: userKeys,
   custom: customQueryKeys,
 } as const;

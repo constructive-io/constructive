@@ -9,19 +9,23 @@ import authCmd from './commands/auth';
 import getAllRecordCmd from './commands/get-all-record';
 import functionApiBindingCmd from './commands/function-api-binding';
 import functionDeploymentCmd from './commands/function-deployment';
+import resourceCmd from './commands/resource';
 import functionGraphRefCmd from './commands/function-graph-ref';
 import functionGraphStoreCmd from './commands/function-graph-store';
 import functionGraphObjectCmd from './commands/function-graph-object';
 import functionDeploymentEventCmd from './commands/function-deployment-event';
 import orgFunctionExecutionLogCmd from './commands/org-function-execution-log';
+import resourceEventCmd from './commands/resource-event';
 import functionGraphExecutionOutputCmd from './commands/function-graph-execution-output';
 import functionGraphCommitCmd from './commands/function-graph-commit';
 import secretDefinitionCmd from './commands/secret-definition';
 import functionExecutionLogCmd from './commands/function-execution-log';
-import functionGraphExecutionNodeStateCmd from './commands/function-graph-execution-node-state';
 import functionGraphCmd from './commands/function-graph';
+import functionGraphExecutionNodeStateCmd from './commands/function-graph-execution-node-state';
+import platformNamespaceCmd from './commands/platform-namespace';
 import orgFunctionInvocationCmd from './commands/org-function-invocation';
 import functionInvocationCmd from './commands/function-invocation';
+import platformNamespaceEventCmd from './commands/platform-namespace-event';
 import functionGraphExecutionCmd from './commands/function-graph-execution';
 import functionDefinitionCmd from './commands/function-definition';
 import readFunctionGraphCmd from './commands/read-function-graph';
@@ -33,9 +37,9 @@ import copyGraphCmd from './commands/copy-graph';
 import saveGraphCmd from './commands/save-graph';
 import addEdgeAndSaveCmd from './commands/add-edge-and-save';
 import addNodeAndSaveCmd from './commands/add-node-and-save';
+import importGraphJsonCmd from './commands/import-graph-json';
 import addEdgeCmd from './commands/add-edge';
 import addNodeCmd from './commands/add-node';
-import importGraphJsonCmd from './commands/import-graph-json';
 import insertNodeAtPathCmd from './commands/insert-node-at-path';
 import startExecutionCmd from './commands/start-execution';
 import provisionBucketCmd from './commands/provision-bucket';
@@ -52,19 +56,23 @@ const createCommandMap: () => Record<
   'get-all-record': getAllRecordCmd,
   'function-api-binding': functionApiBindingCmd,
   'function-deployment': functionDeploymentCmd,
+  resource: resourceCmd,
   'function-graph-ref': functionGraphRefCmd,
   'function-graph-store': functionGraphStoreCmd,
   'function-graph-object': functionGraphObjectCmd,
   'function-deployment-event': functionDeploymentEventCmd,
   'org-function-execution-log': orgFunctionExecutionLogCmd,
+  'resource-event': resourceEventCmd,
   'function-graph-execution-output': functionGraphExecutionOutputCmd,
   'function-graph-commit': functionGraphCommitCmd,
   'secret-definition': secretDefinitionCmd,
   'function-execution-log': functionExecutionLogCmd,
-  'function-graph-execution-node-state': functionGraphExecutionNodeStateCmd,
   'function-graph': functionGraphCmd,
+  'function-graph-execution-node-state': functionGraphExecutionNodeStateCmd,
+  'platform-namespace': platformNamespaceCmd,
   'org-function-invocation': orgFunctionInvocationCmd,
   'function-invocation': functionInvocationCmd,
+  'platform-namespace-event': platformNamespaceEventCmd,
   'function-graph-execution': functionGraphExecutionCmd,
   'function-definition': functionDefinitionCmd,
   'read-function-graph': readFunctionGraphCmd,
@@ -76,15 +84,15 @@ const createCommandMap: () => Record<
   'save-graph': saveGraphCmd,
   'add-edge-and-save': addEdgeAndSaveCmd,
   'add-node-and-save': addNodeAndSaveCmd,
+  'import-graph-json': importGraphJsonCmd,
   'add-edge': addEdgeCmd,
   'add-node': addNodeCmd,
-  'import-graph-json': importGraphJsonCmd,
   'insert-node-at-path': insertNodeAtPathCmd,
   'start-execution': startExecutionCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  get-all-record       getAllRecord CRUD operations\n  function-api-binding functionApiBinding CRUD operations\n  function-deployment  functionDeployment CRUD operations\n  function-graph-ref   functionGraphRef CRUD operations\n  function-graph-store functionGraphStore CRUD operations\n  function-graph-object functionGraphObject CRUD operations\n  function-deployment-event functionDeploymentEvent CRUD operations\n  org-function-execution-log orgFunctionExecutionLog CRUD operations\n  function-graph-execution-output functionGraphExecutionOutput CRUD operations\n  function-graph-commit functionGraphCommit CRUD operations\n  secret-definition    secretDefinition CRUD operations\n  function-execution-log functionExecutionLog CRUD operations\n  function-graph-execution-node-state functionGraphExecutionNodeState CRUD operations\n  function-graph       functionGraph CRUD operations\n  org-function-invocation orgFunctionInvocation CRUD operations\n  function-invocation  functionInvocation CRUD operations\n  function-graph-execution functionGraphExecution CRUD operations\n  function-definition  functionDefinition CRUD operations\n  read-function-graph  readFunctionGraph\n  validate-function-graph validateFunctionGraph\n  init-empty-repo      initEmptyRepo\n  set-data-at-path     setDataAtPath\n  import-definitions   importDefinitions\n  copy-graph           copyGraph\n  save-graph           saveGraph\n  add-edge-and-save    addEdgeAndSave\n  add-node-and-save    addNodeAndSave\n  add-edge             addEdge\n  add-node             addNode\n  import-graph-json    importGraphJson\n  insert-node-at-path  insertNodeAtPath\n  start-execution      startExecution\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  get-all-record       getAllRecord CRUD operations\n  function-api-binding functionApiBinding CRUD operations\n  function-deployment  functionDeployment CRUD operations\n  resource             resource CRUD operations\n  function-graph-ref   functionGraphRef CRUD operations\n  function-graph-store functionGraphStore CRUD operations\n  function-graph-object functionGraphObject CRUD operations\n  function-deployment-event functionDeploymentEvent CRUD operations\n  org-function-execution-log orgFunctionExecutionLog CRUD operations\n  resource-event       resourceEvent CRUD operations\n  function-graph-execution-output functionGraphExecutionOutput CRUD operations\n  function-graph-commit functionGraphCommit CRUD operations\n  secret-definition    secretDefinition CRUD operations\n  function-execution-log functionExecutionLog CRUD operations\n  function-graph       functionGraph CRUD operations\n  function-graph-execution-node-state functionGraphExecutionNodeState CRUD operations\n  platform-namespace   platformNamespace CRUD operations\n  org-function-invocation orgFunctionInvocation CRUD operations\n  function-invocation  functionInvocation CRUD operations\n  platform-namespace-event platformNamespaceEvent CRUD operations\n  function-graph-execution functionGraphExecution CRUD operations\n  function-definition  functionDefinition CRUD operations\n  read-function-graph  readFunctionGraph\n  validate-function-graph validateFunctionGraph\n  init-empty-repo      initEmptyRepo\n  set-data-at-path     setDataAtPath\n  import-definitions   importDefinitions\n  copy-graph           copyGraph\n  save-graph           saveGraph\n  add-edge-and-save    addEdgeAndSave\n  add-node-and-save    addNodeAndSave\n  import-graph-json    importGraphJson\n  add-edge             addEdge\n  add-node             addNode\n  insert-node-at-path  insertNodeAtPath\n  start-execution      startExecution\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

@@ -234,35 +234,6 @@ type Query {
     orderBy: [ViewGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): ViewGrantConnection
 
-  """Reads and enables pagination through a set of `Api`."""
-  apis(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ApiFilter
-
-    """The method to use when ordering `Api`."""
-    orderBy: [ApiOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ApiConnection
-
   """Reads and enables pagination through a set of `CorsSetting`."""
   corsSettings(
     """Only read the first `n` values of the set."""
@@ -378,6 +349,35 @@ type Query {
     """The method to use when ordering `SiteModule`."""
     orderBy: [SiteModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): SiteModuleConnection
+
+  """Reads and enables pagination through a set of `Api`."""
+  apis(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ApiFilter
+
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ApiConnection
 
   """Reads and enables pagination through a set of `SiteMetadatum`."""
   siteMetadata(
@@ -553,35 +553,6 @@ type Query {
     orderBy: [TableGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): TableGrantConnection
 
-  """Reads and enables pagination through a set of `Domain`."""
-  domains(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: DomainFilter
-
-    """The method to use when ordering `Domain`."""
-    orderBy: [DomainOrderBy!] = [PRIMARY_KEY_ASC]
-  ): DomainConnection
-
   """Reads and enables pagination through a set of `RlsSetting`."""
   rlsSettings(
     """Only read the first `n` values of the set."""
@@ -669,6 +640,35 @@ type Query {
     orderBy: [PartitionOrderBy!] = [PRIMARY_KEY_ASC]
   ): PartitionConnection
 
+  """Reads and enables pagination through a set of `Domain`."""
+  domains(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DomainFilter
+
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DomainConnection
+
   """Reads and enables pagination through a set of `CompositeType`."""
   compositeTypes(
     """Only read the first `n` values of the set."""
@@ -727,35 +727,6 @@ type Query {
     orderBy: [EnumOrderBy!] = [PRIMARY_KEY_ASC]
   ): EnumConnection
 
-  """Reads and enables pagination through a set of `SqlAction`."""
-  sqlActions(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: SqlActionFilter
-
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!] = [NATURAL]
-  ): SqlActionConnection
-
   """Reads and enables pagination through a set of `View`."""
   views(
     """Only read the first `n` values of the set."""
@@ -785,8 +756,8 @@ type Query {
     orderBy: [ViewOrderBy!] = [PRIMARY_KEY_ASC]
   ): ViewConnection
 
-  """Reads and enables pagination through a set of `DatabaseSetting`."""
-  databaseSettings(
+  """Reads and enables pagination through a set of `SqlAction`."""
+  sqlActions(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -808,69 +779,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: DatabaseSettingFilter
+    where: SqlActionFilter
 
-    """The method to use when ordering `DatabaseSetting`."""
-    orderBy: [DatabaseSettingOrderBy!] = [PRIMARY_KEY_ASC]
-  ): DatabaseSettingConnection
-
-  """Reads and enables pagination through a set of `ApiSetting`."""
-  apiSettings(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ApiSettingFilter
-
-    """The method to use when ordering `ApiSetting`."""
-    orderBy: [ApiSettingOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ApiSettingConnection
-
-  """Reads and enables pagination through a set of `DatabaseTransfer`."""
-  databaseTransfers(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: DatabaseTransferFilter
-
-    """The method to use when ordering `DatabaseTransfer`."""
-    orderBy: [DatabaseTransferOrderBy!] = [PRIMARY_KEY_ASC]
-  ): DatabaseTransferConnection
+    """The method to use when ordering `SqlAction`."""
+    orderBy: [SqlActionOrderBy!] = [NATURAL]
+  ): SqlActionConnection
 
   """Reads and enables pagination through a set of `PrimaryKeyConstraint`."""
   primaryKeyConstraints(
@@ -1046,8 +959,8 @@ type Query {
     orderBy: [PolicyOrderBy!] = [PRIMARY_KEY_ASC]
   ): PolicyConnection
 
-  """Reads and enables pagination through a set of `App`."""
-  apps(
+  """Reads and enables pagination through a set of `ApiSetting`."""
+  apiSettings(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1069,14 +982,14 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: AppFilter
+    where: ApiSettingFilter
 
-    """The method to use when ordering `App`."""
-    orderBy: [AppOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppConnection
+    """The method to use when ordering `ApiSetting`."""
+    orderBy: [ApiSettingOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ApiSettingConnection
 
-  """Reads and enables pagination through a set of `Site`."""
-  sites(
+  """Reads and enables pagination through a set of `DatabaseTransfer`."""
+  databaseTransfers(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1098,11 +1011,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: SiteFilter
+    where: DatabaseTransferFilter
 
-    """The method to use when ordering `Site`."""
-    orderBy: [SiteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): SiteConnection
+    """The method to use when ordering `DatabaseTransfer`."""
+    orderBy: [DatabaseTransferOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DatabaseTransferConnection
 
   """Reads and enables pagination through a set of `Index`."""
   indices(
@@ -1132,6 +1045,93 @@ type Query {
     """The method to use when ordering `Index`."""
     orderBy: [IndexOrderBy!] = [PRIMARY_KEY_ASC]
   ): IndexConnection
+
+  """Reads and enables pagination through a set of `App`."""
+  apps(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppFilter
+
+    """The method to use when ordering `App`."""
+    orderBy: [AppOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppConnection
+
+  """Reads and enables pagination through a set of `DatabaseSetting`."""
+  databaseSettings(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DatabaseSettingFilter
+
+    """The method to use when ordering `DatabaseSetting`."""
+    orderBy: [DatabaseSettingOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DatabaseSettingConnection
+
+  """Reads and enables pagination through a set of `Site`."""
+  sites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SiteFilter
+
+    """The method to use when ordering `Site`."""
+    orderBy: [SiteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SiteConnection
 
   """Reads and enables pagination through a set of `ForeignKeyConstraint`."""
   foreignKeyConstraints(
@@ -2513,7 +2513,6 @@ type Schema {
   description: String
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   isPublic: Boolean!
   apiExposure: ApiExposureLevel!
@@ -2797,7 +2796,6 @@ type Table {
   description: String
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   useRls: Boolean!
   timestamps: Boolean!
   peoplestamps: Boolean!
@@ -3318,7 +3316,6 @@ type CheckConstraint {
   expr: JSON
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -3387,9 +3384,6 @@ input CheckConstraintFilter {
 
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
 
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
@@ -3750,48 +3744,6 @@ input ObjectCategoryFilter {
 
   """Greater than or equal to the specified value."""
   greaterThanOrEqualTo: ObjectCategory
-}
-
-"""
-A filter to be used against Int fields. All fields are combined with a logical ‘and.’
-"""
-input IntFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Int
-
-  """Not equal to the specified value."""
-  notEqualTo: Int
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Int
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Int
-
-  """Included in the specified list."""
-  in: [Int!]
-
-  """Not included in the specified list."""
-  notIn: [Int!]
-
-  """Less than the specified value."""
-  lessThan: Int
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Int
-
-  """Greater than the specified value."""
-  greaterThan: Int
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Int
 }
 
 """
@@ -4225,9 +4177,6 @@ input SchemaFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
 
@@ -4429,9 +4378,6 @@ input TableFilter {
 
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
 
   """Filter by the object’s `useRls` field."""
   useRls: BooleanFilter
@@ -4685,9 +4631,6 @@ input FieldFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
@@ -4720,6 +4663,48 @@ input FieldFilter {
 
   """`spatialRelationsByRefFieldId` exist."""
   spatialRelationsByRefFieldIdExist: Boolean
+}
+
+"""
+A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+"""
+input IntFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Int
+
+  """Not equal to the specified value."""
+  notEqualTo: Int
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Int
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Int
+
+  """Included in the specified list."""
+  in: [Int!]
+
+  """Not included in the specified list."""
+  notIn: [Int!]
+
+  """Less than the specified value."""
+  lessThan: Int
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Int
+
+  """Greater than the specified value."""
+  greaterThan: Int
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Int
 }
 
 """
@@ -4812,9 +4797,6 @@ input SpatialRelationFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
 
@@ -4905,9 +4887,6 @@ input ForeignKeyConstraintFilter {
 
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
 
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
@@ -5061,9 +5040,6 @@ input IndexFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
 
@@ -5143,9 +5119,6 @@ input PolicyFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
 
@@ -5212,9 +5185,6 @@ input PrimaryKeyConstraintFilter {
 
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
 
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
@@ -5344,9 +5314,6 @@ input TriggerFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
 
@@ -5416,9 +5383,6 @@ input UniqueConstraintFilter {
 
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
 
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
@@ -5501,9 +5465,6 @@ input ViewFilter {
 
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
-
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
 
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
@@ -6078,9 +6039,6 @@ input EnumFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
 
@@ -6191,9 +6149,6 @@ input CompositeTypeFilter {
   """Filter by the object’s `category` field."""
   category: ObjectCategoryFilter
 
-  """Filter by the object’s `scope` field."""
-  scope: IntFilter
-
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
 
@@ -6286,6 +6241,12 @@ input ApiFilter {
 
   """Filter by the object’s `isPublic` field."""
   isPublic: BooleanFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
 
   """Checks for all expressions in this list."""
   and: [ApiFilter!]
@@ -6420,11 +6381,20 @@ input DomainFilter {
   """Filter by the object’s `siteId` field."""
   siteId: UUIDFilter
 
+  """Filter by the object’s `serviceId` field."""
+  serviceId: UUIDFilter
+
   """Filter by the object’s `subdomain` field."""
   subdomain: ConstructiveInternalTypeHostnameFilter
 
   """Filter by the object’s `domain` field."""
   domain: ConstructiveInternalTypeHostnameFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
 
   """Checks for all expressions in this list."""
   and: [DomainFilter!]
@@ -6615,6 +6585,12 @@ input SiteFilter {
 
   """Filter by the object’s `dbname` field."""
   dbname: StringFilter
+
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
 
   """Checks for all expressions in this list."""
   and: [SiteFilter!]
@@ -7927,6 +7903,12 @@ input DatabaseSettingFilter {
   """Filter by the object’s `options` field."""
   options: JSONFilter
 
+  """Filter by the object’s `labels` field."""
+  labels: JSONFilter
+
+  """Filter by the object’s `annotations` field."""
+  annotations: JSONFilter
+
   """Checks for all expressions in this list."""
   and: [DatabaseSettingFilter!]
 
@@ -8334,8 +8316,6 @@ enum CheckConstraintOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -8381,7 +8361,6 @@ type Field {
   max: Float
   tags: [String]!
   category: ObjectCategory!
-  scope: Int
   createdAt: Datetime
   updatedAt: Datetime
 
@@ -8480,7 +8459,6 @@ type SpatialRelation {
   operator: String!
   paramName: String
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -8535,8 +8513,6 @@ enum SpatialRelationOrderBy {
   PARAM_NAME_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -8597,8 +8573,6 @@ enum FieldOrderBy {
   TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -8638,7 +8612,6 @@ type ForeignKeyConstraint {
   deleteAction: String
   updateAction: String
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -8695,8 +8668,6 @@ enum ForeignKeyConstraintOrderBy {
   UPDATE_ACTION_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -8809,7 +8780,6 @@ type Index {
   opClasses: [String]
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -8863,8 +8833,6 @@ enum IndexOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -8903,7 +8871,6 @@ type Policy {
   data: JSON
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -8953,8 +8920,6 @@ enum PolicyOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -8991,7 +8956,6 @@ type PrimaryKeyConstraint {
   fieldIds: [UUID]!
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -9035,8 +8999,6 @@ enum PrimaryKeyConstraintOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -9140,7 +9102,6 @@ type Trigger {
   functionName: String
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -9182,8 +9143,6 @@ enum TriggerOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -9221,7 +9180,6 @@ type UniqueConstraint {
   type: String
   fieldIds: [UUID]!
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
   createdAt: Datetime
   updatedAt: Datetime
@@ -9265,8 +9223,6 @@ enum UniqueConstraintOrderBy {
   FIELD_IDS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   CREATED_AT_ASC
@@ -9306,7 +9262,6 @@ type View {
   isReadOnly: Boolean
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
 
   """Reads a single `Database` that is related to this `View`."""
@@ -9637,8 +9592,6 @@ enum ViewOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
 }
@@ -9812,8 +9765,6 @@ enum TableOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   USE_RLS_ASC
   USE_RLS_DESC
   TIMESTAMPS_ASC
@@ -9994,7 +9945,6 @@ type Enum {
   values: [String]!
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
 
   """Reads a single `Database` that is related to this `Enum`."""
@@ -10036,8 +9986,6 @@ enum EnumOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
 }
@@ -10084,7 +10032,6 @@ type CompositeType {
   attributes: JSON!
   smartTags: JSON
   category: ObjectCategory!
-  scope: Int
   tags: [String]!
 
   """Reads a single `Database` that is related to this `CompositeType`."""
@@ -10126,8 +10073,6 @@ enum CompositeTypeOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
 }
@@ -10199,6 +10144,12 @@ type Api {
 
   """Whether this API is publicly accessible without authentication"""
   isPublic: Boolean!
+
+  """Key/value pairs for selecting and filtering APIs"""
+  labels: JSON!
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
 
   """Reads a single `Database` that is related to this `Api`."""
   database: Database
@@ -10437,14 +10388,27 @@ type Domain {
   """API endpoint this domain routes to (mutually exclusive with site_id)"""
   apiId: UUID
 
-  """Site this domain routes to (mutually exclusive with api_id)"""
+  """
+  Site this domain routes to (mutually exclusive with api_id and service_id)
+  """
   siteId: UUID
+
+  """
+  Server deployment this domain routes to (mutually exclusive with api_id and site_id)
+  """
+  serviceId: UUID
 
   """Subdomain portion of the hostname"""
   subdomain: ConstructiveInternalTypeHostname
 
   """Root domain of the hostname"""
   domain: ConstructiveInternalTypeHostname
+
+  """Key/value pairs for selecting and filtering domains"""
+  labels: JSON!
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
 
   """Reads a single `Api` that is related to this `Domain`."""
   api: Api
@@ -10486,6 +10450,12 @@ type Site {
 
   """PostgreSQL database name this site connects to"""
   dbname: String!
+
+  """Key/value pairs for selecting and filtering sites"""
+  labels: JSON!
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
 
   """Reads a single `Database` that is related to this `Site`."""
   database: Database
@@ -10663,10 +10633,16 @@ enum DomainOrderBy {
   API_ID_DESC
   SITE_ID_ASC
   SITE_ID_DESC
+  SERVICE_ID_ASC
+  SERVICE_ID_DESC
   SUBDOMAIN_ASC
   SUBDOMAIN_DESC
   DOMAIN_ASC
   DOMAIN_DESC
+  LABELS_ASC
+  LABELS_DESC
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
 }
 
 """A connection to a list of `SiteMetadatum` values."""
@@ -11075,8 +11051,6 @@ enum SchemaOrderBy {
   SMART_TAGS_DESC
   CATEGORY_ASC
   CATEGORY_DESC
-  SCOPE_ASC
-  SCOPE_DESC
   TAGS_ASC
   TAGS_DESC
   IS_PUBLIC_ASC
@@ -11335,6 +11309,10 @@ enum ApiOrderBy {
   ANON_ROLE_DESC
   IS_PUBLIC_ASC
   IS_PUBLIC_DESC
+  LABELS_ASC
+  LABELS_DESC
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
 }
 
 """A connection to a list of `Site` values."""
@@ -11386,6 +11364,10 @@ enum SiteOrderBy {
   LOGO_DESC
   DBNAME_ASC
   DBNAME_DESC
+  LABELS_ASC
+  LABELS_DESC
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
 }
 
 """A connection to a list of `App` values."""
@@ -11497,6 +11479,12 @@ type DatabaseSetting {
   Extensible JSON for additional settings that do not have dedicated columns
   """
   options: JSON!
+
+  """Key/value pairs for selecting and filtering database settings"""
+  labels: JSON!
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON!
 
   """Reads a single `Database` that is related to this `DatabaseSetting`."""
   database: Database
@@ -12371,6 +12359,10 @@ enum DatabaseSettingOrderBy {
   ENABLE_I18N_DESC
   OPTIONS_ASC
   OPTIONS_DESC
+  LABELS_ASC
+  LABELS_DESC
+  ANNOTATIONS_ASC
+  ANNOTATIONS_DESC
 }
 
 """A connection to a list of `WebauthnSetting` values."""
@@ -12935,14 +12927,6 @@ type Mutation {
     input: CreateViewGrantInput!
   ): CreateViewGrantPayload
 
-  """Creates a single `Api`."""
-  createApi(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateApiInput!
-  ): CreateApiPayload
-
   """Creates a single `CorsSetting`."""
   createCorsSetting(
     """
@@ -12974,6 +12958,14 @@ type Mutation {
     """
     input: CreateSiteModuleInput!
   ): CreateSiteModulePayload
+
+  """Creates a single `Api`."""
+  createApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateApiInput!
+  ): CreateApiPayload
 
   """Creates a single `SiteMetadatum`."""
   createSiteMetadatum(
@@ -13023,14 +13015,6 @@ type Mutation {
     input: CreateTableGrantInput!
   ): CreateTableGrantPayload
 
-  """Creates a single `Domain`."""
-  createDomain(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateDomainInput!
-  ): CreateDomainPayload
-
   """Creates a single `RlsSetting`."""
   createRlsSetting(
     """
@@ -13055,6 +13039,14 @@ type Mutation {
     input: CreatePartitionInput!
   ): CreatePartitionPayload
 
+  """Creates a single `Domain`."""
+  createDomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDomainInput!
+  ): CreateDomainPayload
+
   """Creates a single `CompositeType`."""
   createCompositeType(
     """
@@ -13071,14 +13063,6 @@ type Mutation {
     input: CreateEnumInput!
   ): CreateEnumPayload
 
-  """Creates a single `SqlAction`."""
-  createSqlAction(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateSqlActionInput!
-  ): CreateSqlActionPayload
-
   """Creates a single `View`."""
   createView(
     """
@@ -13087,29 +13071,13 @@ type Mutation {
     input: CreateViewInput!
   ): CreateViewPayload
 
-  """Creates a single `DatabaseSetting`."""
-  createDatabaseSetting(
+  """Creates a single `SqlAction`."""
+  createSqlAction(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateDatabaseSettingInput!
-  ): CreateDatabaseSettingPayload
-
-  """Creates a single `ApiSetting`."""
-  createApiSetting(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateApiSettingInput!
-  ): CreateApiSettingPayload
-
-  """Creates a single `DatabaseTransfer`."""
-  createDatabaseTransfer(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateDatabaseTransferInput!
-  ): CreateDatabaseTransferPayload
+    input: CreateSqlActionInput!
+  ): CreateSqlActionPayload
 
   """Creates a single `PrimaryKeyConstraint`."""
   createPrimaryKeyConstraint(
@@ -13159,21 +13127,21 @@ type Mutation {
     input: CreatePolicyInput!
   ): CreatePolicyPayload
 
-  """Creates a single `App`."""
-  createApp(
+  """Creates a single `ApiSetting`."""
+  createApiSetting(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateAppInput!
-  ): CreateAppPayload
+    input: CreateApiSettingInput!
+  ): CreateApiSettingPayload
 
-  """Creates a single `Site`."""
-  createSite(
+  """Creates a single `DatabaseTransfer`."""
+  createDatabaseTransfer(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateSiteInput!
-  ): CreateSitePayload
+    input: CreateDatabaseTransferInput!
+  ): CreateDatabaseTransferPayload
 
   """Creates a single `Index`."""
   createIndex(
@@ -13182,6 +13150,30 @@ type Mutation {
     """
     input: CreateIndexInput!
   ): CreateIndexPayload
+
+  """Creates a single `App`."""
+  createApp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppInput!
+  ): CreateAppPayload
+
+  """Creates a single `DatabaseSetting`."""
+  createDatabaseSetting(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDatabaseSettingInput!
+  ): CreateDatabaseSettingPayload
+
+  """Creates a single `Site`."""
+  createSite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSiteInput!
+  ): CreateSitePayload
 
   """Creates a single `ForeignKeyConstraint`."""
   createForeignKeyConstraint(
@@ -13295,14 +13287,6 @@ type Mutation {
     input: UpdateViewGrantInput!
   ): UpdateViewGrantPayload
 
-  """Updates a single `Api` using a unique key and a patch."""
-  updateApi(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateApiInput!
-  ): UpdateApiPayload
-
   """Updates a single `CorsSetting` using a unique key and a patch."""
   updateCorsSetting(
     """
@@ -13334,6 +13318,14 @@ type Mutation {
     """
     input: UpdateSiteModuleInput!
   ): UpdateSiteModulePayload
+
+  """Updates a single `Api` using a unique key and a patch."""
+  updateApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateApiInput!
+  ): UpdateApiPayload
 
   """Updates a single `SiteMetadatum` using a unique key and a patch."""
   updateSiteMetadatum(
@@ -13383,14 +13375,6 @@ type Mutation {
     input: UpdateTableGrantInput!
   ): UpdateTableGrantPayload
 
-  """Updates a single `Domain` using a unique key and a patch."""
-  updateDomain(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateDomainInput!
-  ): UpdateDomainPayload
-
   """Updates a single `RlsSetting` using a unique key and a patch."""
   updateRlsSetting(
     """
@@ -13415,6 +13399,14 @@ type Mutation {
     input: UpdatePartitionInput!
   ): UpdatePartitionPayload
 
+  """Updates a single `Domain` using a unique key and a patch."""
+  updateDomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDomainInput!
+  ): UpdateDomainPayload
+
   """Updates a single `CompositeType` using a unique key and a patch."""
   updateCompositeType(
     """
@@ -13438,30 +13430,6 @@ type Mutation {
     """
     input: UpdateViewInput!
   ): UpdateViewPayload
-
-  """Updates a single `DatabaseSetting` using a unique key and a patch."""
-  updateDatabaseSetting(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateDatabaseSettingInput!
-  ): UpdateDatabaseSettingPayload
-
-  """Updates a single `ApiSetting` using a unique key and a patch."""
-  updateApiSetting(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateApiSettingInput!
-  ): UpdateApiSettingPayload
-
-  """Updates a single `DatabaseTransfer` using a unique key and a patch."""
-  updateDatabaseTransfer(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateDatabaseTransferInput!
-  ): UpdateDatabaseTransferPayload
 
   """
   Updates a single `PrimaryKeyConstraint` using a unique key and a patch.
@@ -13513,21 +13481,21 @@ type Mutation {
     input: UpdatePolicyInput!
   ): UpdatePolicyPayload
 
-  """Updates a single `App` using a unique key and a patch."""
-  updateApp(
+  """Updates a single `ApiSetting` using a unique key and a patch."""
+  updateApiSetting(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateAppInput!
-  ): UpdateAppPayload
+    input: UpdateApiSettingInput!
+  ): UpdateApiSettingPayload
 
-  """Updates a single `Site` using a unique key and a patch."""
-  updateSite(
+  """Updates a single `DatabaseTransfer` using a unique key and a patch."""
+  updateDatabaseTransfer(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateSiteInput!
-  ): UpdateSitePayload
+    input: UpdateDatabaseTransferInput!
+  ): UpdateDatabaseTransferPayload
 
   """Updates a single `Index` using a unique key and a patch."""
   updateIndex(
@@ -13536,6 +13504,30 @@ type Mutation {
     """
     input: UpdateIndexInput!
   ): UpdateIndexPayload
+
+  """Updates a single `App` using a unique key and a patch."""
+  updateApp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppInput!
+  ): UpdateAppPayload
+
+  """Updates a single `DatabaseSetting` using a unique key and a patch."""
+  updateDatabaseSetting(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDatabaseSettingInput!
+  ): UpdateDatabaseSettingPayload
+
+  """Updates a single `Site` using a unique key and a patch."""
+  updateSite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSiteInput!
+  ): UpdateSitePayload
 
   """
   Updates a single `ForeignKeyConstraint` using a unique key and a patch.
@@ -13643,14 +13635,6 @@ type Mutation {
     input: DeleteViewGrantInput!
   ): DeleteViewGrantPayload
 
-  """Deletes a single `Api` using a unique key."""
-  deleteApi(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteApiInput!
-  ): DeleteApiPayload
-
   """Deletes a single `CorsSetting` using a unique key."""
   deleteCorsSetting(
     """
@@ -13682,6 +13666,14 @@ type Mutation {
     """
     input: DeleteSiteModuleInput!
   ): DeleteSiteModulePayload
+
+  """Deletes a single `Api` using a unique key."""
+  deleteApi(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteApiInput!
+  ): DeleteApiPayload
 
   """Deletes a single `SiteMetadatum` using a unique key."""
   deleteSiteMetadatum(
@@ -13731,14 +13723,6 @@ type Mutation {
     input: DeleteTableGrantInput!
   ): DeleteTableGrantPayload
 
-  """Deletes a single `Domain` using a unique key."""
-  deleteDomain(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteDomainInput!
-  ): DeleteDomainPayload
-
   """Deletes a single `RlsSetting` using a unique key."""
   deleteRlsSetting(
     """
@@ -13763,6 +13747,14 @@ type Mutation {
     input: DeletePartitionInput!
   ): DeletePartitionPayload
 
+  """Deletes a single `Domain` using a unique key."""
+  deleteDomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDomainInput!
+  ): DeleteDomainPayload
+
   """Deletes a single `CompositeType` using a unique key."""
   deleteCompositeType(
     """
@@ -13786,30 +13778,6 @@ type Mutation {
     """
     input: DeleteViewInput!
   ): DeleteViewPayload
-
-  """Deletes a single `DatabaseSetting` using a unique key."""
-  deleteDatabaseSetting(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteDatabaseSettingInput!
-  ): DeleteDatabaseSettingPayload
-
-  """Deletes a single `ApiSetting` using a unique key."""
-  deleteApiSetting(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteApiSettingInput!
-  ): DeleteApiSettingPayload
-
-  """Deletes a single `DatabaseTransfer` using a unique key."""
-  deleteDatabaseTransfer(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteDatabaseTransferInput!
-  ): DeleteDatabaseTransferPayload
 
   """Deletes a single `PrimaryKeyConstraint` using a unique key."""
   deletePrimaryKeyConstraint(
@@ -13859,21 +13827,21 @@ type Mutation {
     input: DeletePolicyInput!
   ): DeletePolicyPayload
 
-  """Deletes a single `App` using a unique key."""
-  deleteApp(
+  """Deletes a single `ApiSetting` using a unique key."""
+  deleteApiSetting(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteAppInput!
-  ): DeleteAppPayload
+    input: DeleteApiSettingInput!
+  ): DeleteApiSettingPayload
 
-  """Deletes a single `Site` using a unique key."""
-  deleteSite(
+  """Deletes a single `DatabaseTransfer` using a unique key."""
+  deleteDatabaseTransfer(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteSiteInput!
-  ): DeleteSitePayload
+    input: DeleteDatabaseTransferInput!
+  ): DeleteDatabaseTransferPayload
 
   """Deletes a single `Index` using a unique key."""
   deleteIndex(
@@ -13882,6 +13850,30 @@ type Mutation {
     """
     input: DeleteIndexInput!
   ): DeleteIndexPayload
+
+  """Deletes a single `App` using a unique key."""
+  deleteApp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppInput!
+  ): DeleteAppPayload
+
+  """Deletes a single `DatabaseSetting` using a unique key."""
+  deleteDatabaseSetting(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDatabaseSettingInput!
+  ): DeleteDatabaseSettingPayload
+
+  """Deletes a single `Site` using a unique key."""
+  deleteSite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSiteInput!
+  ): DeleteSitePayload
 
   """Deletes a single `ForeignKeyConstraint` using a unique key."""
   deleteForeignKeyConstraint(
@@ -14574,65 +14566,6 @@ input ViewGrantInput {
   isGrant: Boolean
 }
 
-"""The output of our create `Api` mutation."""
-type CreateApiPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Api` that was created by this mutation."""
-  api: Api
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Api`. May be used by Relay 1."""
-  apiEdge(
-    """The method to use when ordering `Api`."""
-    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApiEdge
-}
-
-"""All input for the create `Api` mutation."""
-input CreateApiInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Api` to be created by this mutation."""
-  api: ApiInput!
-}
-
-"""An input for mutations affecting `Api`"""
-input ApiInput {
-  """Unique identifier for this API"""
-  id: UUID
-
-  """Reference to the metaschema database this API serves"""
-  databaseId: UUID!
-
-  """Unique name for this API within its database"""
-  name: String!
-
-  """PostgreSQL database name to connect to"""
-  dbname: String
-
-  """PostgreSQL role used for authenticated requests"""
-  roleName: String
-
-  """PostgreSQL role used for anonymous/unauthenticated requests"""
-  anonRole: String
-
-  """Whether this API is publicly accessible without authentication"""
-  isPublic: Boolean
-}
-
 """The output of our create `CorsSetting` mutation."""
 type CreateCorsSettingPayload {
   """
@@ -14833,6 +14766,71 @@ input SiteModuleInput {
 
   """JSON configuration data for this module"""
   data: JSON!
+}
+
+"""The output of our create `Api` mutation."""
+type CreateApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Api` that was created by this mutation."""
+  api: Api
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+}
+
+"""All input for the create `Api` mutation."""
+input CreateApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Api` to be created by this mutation."""
+  api: ApiInput!
+}
+
+"""An input for mutations affecting `Api`"""
+input ApiInput {
+  """Unique identifier for this API"""
+  id: UUID
+
+  """Reference to the metaschema database this API serves"""
+  databaseId: UUID!
+
+  """Unique name for this API within its database"""
+  name: String!
+
+  """PostgreSQL database name to connect to"""
+  dbname: String
+
+  """PostgreSQL role used for authenticated requests"""
+  roleName: String
+
+  """PostgreSQL role used for anonymous/unauthenticated requests"""
+  anonRole: String
+
+  """Whether this API is publicly accessible without authentication"""
+  isPublic: Boolean
+
+  """Key/value pairs for selecting and filtering APIs"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
 }
 
 """The output of our create `SiteMetadatum` mutation."""
@@ -15151,62 +15149,6 @@ input TableGrantInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `Domain` mutation."""
-type CreateDomainPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Domain` that was created by this mutation."""
-  domain: Domain
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Domain`. May be used by Relay 1."""
-  domainEdge(
-    """The method to use when ordering `Domain`."""
-    orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DomainEdge
-}
-
-"""All input for the create `Domain` mutation."""
-input CreateDomainInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Domain` to be created by this mutation."""
-  domain: DomainInput!
-}
-
-"""An input for mutations affecting `Domain`"""
-input DomainInput {
-  """Unique identifier for this domain record"""
-  id: UUID
-
-  """Reference to the metaschema database this domain belongs to"""
-  databaseId: UUID!
-
-  """API endpoint this domain routes to (mutually exclusive with site_id)"""
-  apiId: UUID
-
-  """Site this domain routes to (mutually exclusive with api_id)"""
-  siteId: UUID
-
-  """Subdomain portion of the hostname"""
-  subdomain: ConstructiveInternalTypeHostname
-
-  """Root domain of the hostname"""
-  domain: ConstructiveInternalTypeHostname
-}
-
 """The output of our create `RlsSetting` mutation."""
 type CreateRlsSettingPayload {
   """
@@ -15392,6 +15334,75 @@ input PartitionInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `Domain` mutation."""
+type CreateDomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Domain` that was created by this mutation."""
+  domain: Domain
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Domain`. May be used by Relay 1."""
+  domainEdge(
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainEdge
+}
+
+"""All input for the create `Domain` mutation."""
+input CreateDomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Domain` to be created by this mutation."""
+  domain: DomainInput!
+}
+
+"""An input for mutations affecting `Domain`"""
+input DomainInput {
+  """Unique identifier for this domain record"""
+  id: UUID
+
+  """Reference to the metaschema database this domain belongs to"""
+  databaseId: UUID!
+
+  """API endpoint this domain routes to (mutually exclusive with site_id)"""
+  apiId: UUID
+
+  """
+  Site this domain routes to (mutually exclusive with api_id and service_id)
+  """
+  siteId: UUID
+
+  """
+  Server deployment this domain routes to (mutually exclusive with api_id and site_id)
+  """
+  serviceId: UUID
+
+  """Subdomain portion of the hostname"""
+  subdomain: ConstructiveInternalTypeHostname
+
+  """Root domain of the hostname"""
+  domain: ConstructiveInternalTypeHostname
+
+  """Key/value pairs for selecting and filtering domains"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+}
+
 """The output of our create `CompositeType` mutation."""
 type CreateCompositeTypePayload {
   """
@@ -15438,7 +15449,6 @@ input CompositeTypeInput {
   attributes: JSON
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
 }
 
@@ -15488,54 +15498,7 @@ input EnumInput {
   values: [String]
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
-}
-
-"""The output of our create `SqlAction` mutation."""
-type CreateSqlActionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SqlAction` that was created by this mutation."""
-  sqlAction: SqlAction
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `SqlAction` mutation."""
-input CreateSqlActionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `SqlAction` to be created by this mutation."""
-  sqlAction: SqlActionInput!
-}
-
-"""An input for mutations affecting `SqlAction`"""
-input SqlActionInput {
-  id: Int
-  name: String
-  databaseId: UUID
-  deploy: String
-  deps: [String]
-  payload: JSON
-  content: String
-  revert: String
-  verify: String
-  createdAt: Datetime
-  action: String
-  actionId: UUID
-  actorId: UUID
 }
 
 """The output of our create `View` mutation."""
@@ -15588,101 +15551,361 @@ input ViewInput {
   isReadOnly: Boolean
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
 }
 
-"""The output of our create `DatabaseSetting` mutation."""
-type CreateDatabaseSettingPayload {
+"""The output of our create `SqlAction` mutation."""
+type CreateSqlActionPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `DatabaseSetting` that was created by this mutation."""
-  databaseSetting: DatabaseSetting
+  """The `SqlAction` that was created by this mutation."""
+  sqlAction: SqlAction
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our `DatabaseSetting`. May be used by Relay 1."""
-  databaseSettingEdge(
-    """The method to use when ordering `DatabaseSetting`."""
-    orderBy: [DatabaseSettingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DatabaseSettingEdge
 }
 
-"""All input for the create `DatabaseSetting` mutation."""
-input CreateDatabaseSettingInput {
+"""All input for the create `SqlAction` mutation."""
+input CreateSqlActionInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `DatabaseSetting` to be created by this mutation."""
-  databaseSetting: DatabaseSettingInput!
+  """The `SqlAction` to be created by this mutation."""
+  sqlAction: SqlActionInput!
 }
 
-"""An input for mutations affecting `DatabaseSetting`"""
-input DatabaseSettingInput {
-  """Unique identifier for this settings record"""
+"""An input for mutations affecting `SqlAction`"""
+input SqlActionInput {
+  id: Int
+  name: String
+  databaseId: UUID
+  deploy: String
+  deps: [String]
+  payload: JSON
+  content: String
+  revert: String
+  verify: String
+  createdAt: Datetime
+  action: String
+  actionId: UUID
+  actorId: UUID
+}
+
+"""The output of our create `PrimaryKeyConstraint` mutation."""
+type CreatePrimaryKeyConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PrimaryKeyConstraint` that was created by this mutation."""
+  primaryKeyConstraint: PrimaryKeyConstraint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PrimaryKeyConstraint`. May be used by Relay 1."""
+  primaryKeyConstraintEdge(
+    """The method to use when ordering `PrimaryKeyConstraint`."""
+    orderBy: [PrimaryKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrimaryKeyConstraintEdge
+}
+
+"""All input for the create `PrimaryKeyConstraint` mutation."""
+input CreatePrimaryKeyConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PrimaryKeyConstraint` to be created by this mutation."""
+  primaryKeyConstraint: PrimaryKeyConstraintInput!
+}
+
+"""An input for mutations affecting `PrimaryKeyConstraint`"""
+input PrimaryKeyConstraintInput {
   id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String
+  type: String
+  fieldIds: [UUID]!
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
 
-  """Reference to the metaschema database these settings apply to"""
-  databaseId: UUID!
+"""The output of our create `Trigger` mutation."""
+type CreateTriggerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
 
-  """Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API"""
-  enableAggregates: Boolean
-
-  """Enable PostGIS spatial types and operators in the GraphQL API"""
-  enablePostgis: Boolean
+  """The `Trigger` that was created by this mutation."""
+  trigger: Trigger
 
   """
-  Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  enableSearch: Boolean
+  query: Query
 
-  """Enable direct (multipart) file upload mutations in the GraphQL API"""
-  enableDirectUploads: Boolean
+  """An edge for our `Trigger`. May be used by Relay 1."""
+  triggerEdge(
+    """The method to use when ordering `Trigger`."""
+    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TriggerEdge
+}
 
-  """Enable presigned URL upload flow for S3/MinIO storage"""
-  enablePresignedUploads: Boolean
+"""All input for the create `Trigger` mutation."""
+input CreateTriggerInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
 
-  """Enable many-to-many relationship queries in the GraphQL API"""
-  enableManyToMany: Boolean
+  """The `Trigger` to be created by this mutation."""
+  trigger: TriggerInput!
+}
 
-  """Enable connection filter (where argument) in the GraphQL API"""
-  enableConnectionFilter: Boolean
+"""An input for mutations affecting `Trigger`"""
+input TriggerInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String!
+  event: String
+  functionName: String
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
 
-  """Enable ltree hierarchical data type support in the GraphQL API"""
-  enableLtree: Boolean
+"""The output of our create `CheckConstraint` mutation."""
+type CreateCheckConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
 
-  """Enable LLM/AI integration features in the GraphQL API"""
-  enableLlm: Boolean
+  """The `CheckConstraint` that was created by this mutation."""
+  checkConstraint: CheckConstraint
 
   """
-  Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  enableRealtime: Boolean
+  query: Query
+
+  """An edge for our `CheckConstraint`. May be used by Relay 1."""
+  checkConstraintEdge(
+    """The method to use when ordering `CheckConstraint`."""
+    orderBy: [CheckConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CheckConstraintEdge
+}
+
+"""All input for the create `CheckConstraint` mutation."""
+input CreateCheckConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `CheckConstraint` to be created by this mutation."""
+  checkConstraint: CheckConstraintInput!
+}
+
+"""An input for mutations affecting `CheckConstraint`"""
+input CheckConstraintInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String
+  type: String
+  fieldIds: [UUID]!
+  expr: JSON
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `UniqueConstraint` mutation."""
+type CreateUniqueConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `UniqueConstraint` that was created by this mutation."""
+  uniqueConstraint: UniqueConstraint
 
   """
-  Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  enableBulk: Boolean
+  query: Query
+
+  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
+  uniqueConstraintEdge(
+    """The method to use when ordering `UniqueConstraint`."""
+    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UniqueConstraintEdge
+}
+
+"""All input for the create `UniqueConstraint` mutation."""
+input CreateUniqueConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `UniqueConstraint` to be created by this mutation."""
+  uniqueConstraint: UniqueConstraintInput!
+}
+
+"""An input for mutations affecting `UniqueConstraint`"""
+input UniqueConstraintInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String
+  description: String
+  smartTags: JSON
+  type: String
+  fieldIds: [UUID]!
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `SpatialRelation` mutation."""
+type CreateSpatialRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SpatialRelation` that was created by this mutation."""
+  spatialRelation: SpatialRelation
 
   """
-  Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  enableI18N: Boolean
+  query: Query
+
+  """An edge for our `SpatialRelation`. May be used by Relay 1."""
+  spatialRelationEdge(
+    """The method to use when ordering `SpatialRelation`."""
+    orderBy: [SpatialRelationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SpatialRelationEdge
+}
+
+"""All input for the create `SpatialRelation` mutation."""
+input CreateSpatialRelationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SpatialRelation` to be created by this mutation."""
+  spatialRelation: SpatialRelationInput!
+}
+
+"""An input for mutations affecting `SpatialRelation`"""
+input SpatialRelationInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  fieldId: UUID!
+  refTableId: UUID!
+  refFieldId: UUID!
+  name: String!
+  operator: String!
+  paramName: String
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `Policy` mutation."""
+type CreatePolicyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Policy` that was created by this mutation."""
+  policy: Policy
 
   """
-  Extensible JSON for additional settings that do not have dedicated columns
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  options: JSON
+  query: Query
+
+  """An edge for our `Policy`. May be used by Relay 1."""
+  policyEdge(
+    """The method to use when ordering `Policy`."""
+    orderBy: [PolicyOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PolicyEdge
+}
+
+"""All input for the create `Policy` mutation."""
+input CreatePolicyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Policy` to be created by this mutation."""
+  policy: PolicyInput!
+}
+
+"""An input for mutations affecting `Policy`"""
+input PolicyInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String
+  granteeName: String
+  privilege: String
+  permissive: Boolean
+  disabled: Boolean
+  policyType: String
+  data: JSON
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our create `ApiSetting` mutation."""
@@ -15850,315 +16073,57 @@ input DatabaseTransferInput {
   completedAt: Datetime
 }
 
-"""The output of our create `PrimaryKeyConstraint` mutation."""
-type CreatePrimaryKeyConstraintPayload {
+"""The output of our create `Index` mutation."""
+type CreateIndexPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `PrimaryKeyConstraint` that was created by this mutation."""
-  primaryKeyConstraint: PrimaryKeyConstraint
+  """The `Index` that was created by this mutation."""
+  index: Index
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `PrimaryKeyConstraint`. May be used by Relay 1."""
-  primaryKeyConstraintEdge(
-    """The method to use when ordering `PrimaryKeyConstraint`."""
-    orderBy: [PrimaryKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PrimaryKeyConstraintEdge
+  """An edge for our `Index`. May be used by Relay 1."""
+  indexEdge(
+    """The method to use when ordering `Index`."""
+    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IndexEdge
 }
 
-"""All input for the create `PrimaryKeyConstraint` mutation."""
-input CreatePrimaryKeyConstraintInput {
+"""All input for the create `Index` mutation."""
+input CreateIndexInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `PrimaryKeyConstraint` to be created by this mutation."""
-  primaryKeyConstraint: PrimaryKeyConstraintInput!
+  """The `Index` to be created by this mutation."""
+  index: IndexInput!
 }
 
-"""An input for mutations affecting `PrimaryKeyConstraint`"""
-input PrimaryKeyConstraintInput {
+"""An input for mutations affecting `Index`"""
+input IndexInput {
   id: UUID
-  databaseId: UUID
+  databaseId: UUID!
   tableId: UUID!
   name: String
-  type: String
-  fieldIds: [UUID]!
+  fieldIds: [UUID]
+  includeFieldIds: [UUID]
+  accessMethod: String
+  indexParams: JSON
+  whereClause: JSON
+  isUnique: Boolean
+  options: JSON
+  opClasses: [String]
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `Trigger` mutation."""
-type CreateTriggerPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Trigger` that was created by this mutation."""
-  trigger: Trigger
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Trigger`. May be used by Relay 1."""
-  triggerEdge(
-    """The method to use when ordering `Trigger`."""
-    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TriggerEdge
-}
-
-"""All input for the create `Trigger` mutation."""
-input CreateTriggerInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Trigger` to be created by this mutation."""
-  trigger: TriggerInput!
-}
-
-"""An input for mutations affecting `Trigger`"""
-input TriggerInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  name: String!
-  event: String
-  functionName: String
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `CheckConstraint` mutation."""
-type CreateCheckConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `CheckConstraint` that was created by this mutation."""
-  checkConstraint: CheckConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `CheckConstraint`. May be used by Relay 1."""
-  checkConstraintEdge(
-    """The method to use when ordering `CheckConstraint`."""
-    orderBy: [CheckConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CheckConstraintEdge
-}
-
-"""All input for the create `CheckConstraint` mutation."""
-input CreateCheckConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `CheckConstraint` to be created by this mutation."""
-  checkConstraint: CheckConstraintInput!
-}
-
-"""An input for mutations affecting `CheckConstraint`"""
-input CheckConstraintInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  name: String
-  type: String
-  fieldIds: [UUID]!
-  expr: JSON
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `UniqueConstraint` mutation."""
-type CreateUniqueConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `UniqueConstraint` that was created by this mutation."""
-  uniqueConstraint: UniqueConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
-  uniqueConstraintEdge(
-    """The method to use when ordering `UniqueConstraint`."""
-    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UniqueConstraintEdge
-}
-
-"""All input for the create `UniqueConstraint` mutation."""
-input CreateUniqueConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `UniqueConstraint` to be created by this mutation."""
-  uniqueConstraint: UniqueConstraintInput!
-}
-
-"""An input for mutations affecting `UniqueConstraint`"""
-input UniqueConstraintInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  name: String
-  description: String
-  smartTags: JSON
-  type: String
-  fieldIds: [UUID]!
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `SpatialRelation` mutation."""
-type CreateSpatialRelationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SpatialRelation` that was created by this mutation."""
-  spatialRelation: SpatialRelation
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SpatialRelation`. May be used by Relay 1."""
-  spatialRelationEdge(
-    """The method to use when ordering `SpatialRelation`."""
-    orderBy: [SpatialRelationOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SpatialRelationEdge
-}
-
-"""All input for the create `SpatialRelation` mutation."""
-input CreateSpatialRelationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `SpatialRelation` to be created by this mutation."""
-  spatialRelation: SpatialRelationInput!
-}
-
-"""An input for mutations affecting `SpatialRelation`"""
-input SpatialRelationInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  fieldId: UUID!
-  refTableId: UUID!
-  refFieldId: UUID!
-  name: String!
-  operator: String!
-  paramName: String
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `Policy` mutation."""
-type CreatePolicyPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Policy` that was created by this mutation."""
-  policy: Policy
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Policy`. May be used by Relay 1."""
-  policyEdge(
-    """The method to use when ordering `Policy`."""
-    orderBy: [PolicyOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PolicyEdge
-}
-
-"""All input for the create `Policy` mutation."""
-input CreatePolicyInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Policy` to be created by this mutation."""
-  policy: PolicyInput!
-}
-
-"""An input for mutations affecting `Policy`"""
-input PolicyInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  name: String
-  granteeName: String
-  privilege: String
-  permissive: Boolean
-  disabled: Boolean
-  policyType: String
-  data: JSON
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
   tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
@@ -16231,6 +16196,105 @@ input AppInput {
   playStoreLink: ConstructiveInternalTypeUrl
 }
 
+"""The output of our create `DatabaseSetting` mutation."""
+type CreateDatabaseSettingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSetting` that was created by this mutation."""
+  databaseSetting: DatabaseSetting
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DatabaseSetting`. May be used by Relay 1."""
+  databaseSettingEdge(
+    """The method to use when ordering `DatabaseSetting`."""
+    orderBy: [DatabaseSettingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DatabaseSettingEdge
+}
+
+"""All input for the create `DatabaseSetting` mutation."""
+input CreateDatabaseSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSetting` to be created by this mutation."""
+  databaseSetting: DatabaseSettingInput!
+}
+
+"""An input for mutations affecting `DatabaseSetting`"""
+input DatabaseSettingInput {
+  """Unique identifier for this settings record"""
+  id: UUID
+
+  """Reference to the metaschema database these settings apply to"""
+  databaseId: UUID!
+
+  """Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API"""
+  enableAggregates: Boolean
+
+  """Enable PostGIS spatial types and operators in the GraphQL API"""
+  enablePostgis: Boolean
+
+  """
+  Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API
+  """
+  enableSearch: Boolean
+
+  """Enable direct (multipart) file upload mutations in the GraphQL API"""
+  enableDirectUploads: Boolean
+
+  """Enable presigned URL upload flow for S3/MinIO storage"""
+  enablePresignedUploads: Boolean
+
+  """Enable many-to-many relationship queries in the GraphQL API"""
+  enableManyToMany: Boolean
+
+  """Enable connection filter (where argument) in the GraphQL API"""
+  enableConnectionFilter: Boolean
+
+  """Enable ltree hierarchical data type support in the GraphQL API"""
+  enableLtree: Boolean
+
+  """Enable LLM/AI integration features in the GraphQL API"""
+  enableLlm: Boolean
+
+  """
+  Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API
+  """
+  enableRealtime: Boolean
+
+  """
+  Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API
+  """
+  enableBulk: Boolean
+
+  """
+  Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API
+  """
+  enableI18N: Boolean
+
+  """
+  Extensible JSON for additional settings that do not have dedicated columns
+  """
+  options: JSON
+
+  """Key/value pairs for selecting and filtering database settings"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+}
+
 """The output of our create `Site` mutation."""
 type CreateSitePayload {
   """
@@ -16294,63 +16358,12 @@ input SiteInput {
 
   """PostgreSQL database name this site connects to"""
   dbname: String
-}
 
-"""The output of our create `Index` mutation."""
-type CreateIndexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
+  """Key/value pairs for selecting and filtering sites"""
+  labels: JSON
 
-  """The `Index` that was created by this mutation."""
-  index: Index
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Index`. May be used by Relay 1."""
-  indexEdge(
-    """The method to use when ordering `Index`."""
-    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): IndexEdge
-}
-
-"""All input for the create `Index` mutation."""
-input CreateIndexInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Index` to be created by this mutation."""
-  index: IndexInput!
-}
-
-"""An input for mutations affecting `Index`"""
-input IndexInput {
-  id: UUID
-  databaseId: UUID!
-  tableId: UUID!
-  name: String
-  fieldIds: [UUID]
-  includeFieldIds: [UUID]
-  accessMethod: String
-  indexParams: JSON
-  whereClause: JSON
-  isUnique: Boolean
-  options: JSON
-  opClasses: [String]
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
 }
 
 """The output of our create `ForeignKeyConstraint` mutation."""
@@ -16403,7 +16416,6 @@ input ForeignKeyConstraintInput {
   deleteAction: String
   updateAction: String
   category: ObjectCategory
-  scope: Int
   tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
@@ -16662,7 +16674,6 @@ input SchemaInput {
   description: String
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
   isPublic: Boolean
   apiExposure: ApiExposureLevel
@@ -16726,7 +16737,6 @@ input FieldInput {
   max: Float
   tags: [String]
   category: ObjectCategory
-  scope: Int
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -16776,7 +16786,6 @@ input TableInput {
   description: String
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   useRls: Boolean
   timestamps: Boolean
   peoplestamps: Boolean
@@ -17161,70 +17170,6 @@ input ViewGrantPatch {
   isGrant: Boolean
 }
 
-"""The output of our update `Api` mutation."""
-type UpdateApiPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Api` that was updated by this mutation."""
-  api: Api
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Api`. May be used by Relay 1."""
-  apiEdge(
-    """The method to use when ordering `Api`."""
-    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApiEdge
-}
-
-"""All input for the `updateApi` mutation."""
-input UpdateApiInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this API"""
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Api` being updated.
-  """
-  apiPatch: ApiPatch!
-}
-
-"""Represents an update to a `Api`. Fields that are set will be updated."""
-input ApiPatch {
-  """Unique identifier for this API"""
-  id: UUID
-
-  """Reference to the metaschema database this API serves"""
-  databaseId: UUID
-
-  """Unique name for this API within its database"""
-  name: String
-
-  """PostgreSQL database name to connect to"""
-  dbname: String
-
-  """PostgreSQL role used for authenticated requests"""
-  roleName: String
-
-  """PostgreSQL role used for anonymous/unauthenticated requests"""
-  anonRole: String
-
-  """Whether this API is publicly accessible without authentication"""
-  isPublic: Boolean
-}
-
 """The output of our update `CorsSetting` mutation."""
 type UpdateCorsSettingPayload {
   """
@@ -17451,6 +17396,76 @@ input SiteModulePatch {
 
   """JSON configuration data for this module"""
   data: JSON
+}
+
+"""The output of our update `Api` mutation."""
+type UpdateApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Api` that was updated by this mutation."""
+  api: Api
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+}
+
+"""All input for the `updateApi` mutation."""
+input UpdateApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this API"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Api` being updated.
+  """
+  apiPatch: ApiPatch!
+}
+
+"""Represents an update to a `Api`. Fields that are set will be updated."""
+input ApiPatch {
+  """Unique identifier for this API"""
+  id: UUID
+
+  """Reference to the metaschema database this API serves"""
+  databaseId: UUID
+
+  """Unique name for this API within its database"""
+  name: String
+
+  """PostgreSQL database name to connect to"""
+  dbname: String
+
+  """PostgreSQL role used for authenticated requests"""
+  roleName: String
+
+  """PostgreSQL role used for anonymous/unauthenticated requests"""
+  anonRole: String
+
+  """Whether this API is publicly accessible without authentication"""
+  isPublic: Boolean
+
+  """Key/value pairs for selecting and filtering APIs"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
 }
 
 """The output of our update `SiteMetadatum` mutation."""
@@ -17809,69 +17824,6 @@ input TableGrantPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `Domain` mutation."""
-type UpdateDomainPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Domain` that was updated by this mutation."""
-  domain: Domain
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Domain`. May be used by Relay 1."""
-  domainEdge(
-    """The method to use when ordering `Domain`."""
-    orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DomainEdge
-}
-
-"""All input for the `updateDomain` mutation."""
-input UpdateDomainInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this domain record"""
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Domain` being updated.
-  """
-  domainPatch: DomainPatch!
-}
-
-"""
-Represents an update to a `Domain`. Fields that are set will be updated.
-"""
-input DomainPatch {
-  """Unique identifier for this domain record"""
-  id: UUID
-
-  """Reference to the metaschema database this domain belongs to"""
-  databaseId: UUID
-
-  """API endpoint this domain routes to (mutually exclusive with site_id)"""
-  apiId: UUID
-
-  """Site this domain routes to (mutually exclusive with api_id)"""
-  siteId: UUID
-
-  """Subdomain portion of the hostname"""
-  subdomain: ConstructiveInternalTypeHostname
-
-  """Root domain of the hostname"""
-  domain: ConstructiveInternalTypeHostname
-}
-
 """The output of our update `RlsSetting` mutation."""
 type UpdateRlsSettingPayload {
   """
@@ -18074,6 +18026,82 @@ input PartitionPatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `Domain` mutation."""
+type UpdateDomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Domain` that was updated by this mutation."""
+  domain: Domain
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Domain`. May be used by Relay 1."""
+  domainEdge(
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainEdge
+}
+
+"""All input for the `updateDomain` mutation."""
+input UpdateDomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this domain record"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Domain` being updated.
+  """
+  domainPatch: DomainPatch!
+}
+
+"""
+Represents an update to a `Domain`. Fields that are set will be updated.
+"""
+input DomainPatch {
+  """Unique identifier for this domain record"""
+  id: UUID
+
+  """Reference to the metaschema database this domain belongs to"""
+  databaseId: UUID
+
+  """API endpoint this domain routes to (mutually exclusive with site_id)"""
+  apiId: UUID
+
+  """
+  Site this domain routes to (mutually exclusive with api_id and service_id)
+  """
+  siteId: UUID
+
+  """
+  Server deployment this domain routes to (mutually exclusive with api_id and site_id)
+  """
+  serviceId: UUID
+
+  """Subdomain portion of the hostname"""
+  subdomain: ConstructiveInternalTypeHostname
+
+  """Root domain of the hostname"""
+  domain: ConstructiveInternalTypeHostname
+
+  """Key/value pairs for selecting and filtering domains"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+}
+
 """The output of our update `CompositeType` mutation."""
 type UpdateCompositeTypePayload {
   """
@@ -18125,7 +18153,6 @@ input CompositeTypePatch {
   attributes: JSON
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
 }
 
@@ -18178,7 +18205,6 @@ input EnumPatch {
   values: [String]
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
 }
 
@@ -18235,108 +18261,345 @@ input ViewPatch {
   isReadOnly: Boolean
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
 }
 
-"""The output of our update `DatabaseSetting` mutation."""
-type UpdateDatabaseSettingPayload {
+"""The output of our update `PrimaryKeyConstraint` mutation."""
+type UpdatePrimaryKeyConstraintPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `DatabaseSetting` that was updated by this mutation."""
-  databaseSetting: DatabaseSetting
+  """The `PrimaryKeyConstraint` that was updated by this mutation."""
+  primaryKeyConstraint: PrimaryKeyConstraint
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `DatabaseSetting`. May be used by Relay 1."""
-  databaseSettingEdge(
-    """The method to use when ordering `DatabaseSetting`."""
-    orderBy: [DatabaseSettingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DatabaseSettingEdge
+  """An edge for our `PrimaryKeyConstraint`. May be used by Relay 1."""
+  primaryKeyConstraintEdge(
+    """The method to use when ordering `PrimaryKeyConstraint`."""
+    orderBy: [PrimaryKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PrimaryKeyConstraintEdge
 }
 
-"""All input for the `updateDatabaseSetting` mutation."""
-input UpdateDatabaseSettingInput {
+"""All input for the `updatePrimaryKeyConstraint` mutation."""
+input UpdatePrimaryKeyConstraintInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """Unique identifier for this settings record"""
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `DatabaseSetting` being updated.
+  An object where the defined keys will be set on the `PrimaryKeyConstraint` being updated.
   """
-  databaseSettingPatch: DatabaseSettingPatch!
+  primaryKeyConstraintPatch: PrimaryKeyConstraintPatch!
 }
 
 """
-Represents an update to a `DatabaseSetting`. Fields that are set will be updated.
+Represents an update to a `PrimaryKeyConstraint`. Fields that are set will be updated.
 """
-input DatabaseSettingPatch {
-  """Unique identifier for this settings record"""
+input PrimaryKeyConstraintPatch {
   id: UUID
-
-  """Reference to the metaschema database these settings apply to"""
   databaseId: UUID
+  tableId: UUID
+  name: String
+  type: String
+  fieldIds: [UUID]
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
 
-  """Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API"""
-  enableAggregates: Boolean
+"""The output of our update `Trigger` mutation."""
+type UpdateTriggerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
 
-  """Enable PostGIS spatial types and operators in the GraphQL API"""
-  enablePostgis: Boolean
+  """The `Trigger` that was updated by this mutation."""
+  trigger: Trigger
 
   """
-  Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  enableSearch: Boolean
+  query: Query
 
-  """Enable direct (multipart) file upload mutations in the GraphQL API"""
-  enableDirectUploads: Boolean
+  """An edge for our `Trigger`. May be used by Relay 1."""
+  triggerEdge(
+    """The method to use when ordering `Trigger`."""
+    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TriggerEdge
+}
 
-  """Enable presigned URL upload flow for S3/MinIO storage"""
-  enablePresignedUploads: Boolean
-
-  """Enable many-to-many relationship queries in the GraphQL API"""
-  enableManyToMany: Boolean
-
-  """Enable connection filter (where argument) in the GraphQL API"""
-  enableConnectionFilter: Boolean
-
-  """Enable ltree hierarchical data type support in the GraphQL API"""
-  enableLtree: Boolean
-
-  """Enable LLM/AI integration features in the GraphQL API"""
-  enableLlm: Boolean
+"""All input for the `updateTrigger` mutation."""
+input UpdateTriggerInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
 
   """
-  Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API
+  An object where the defined keys will be set on the `Trigger` being updated.
   """
-  enableRealtime: Boolean
+  triggerPatch: TriggerPatch!
+}
+
+"""
+Represents an update to a `Trigger`. Fields that are set will be updated.
+"""
+input TriggerPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  event: String
+  functionName: String
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `CheckConstraint` mutation."""
+type UpdateCheckConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `CheckConstraint` that was updated by this mutation."""
+  checkConstraint: CheckConstraint
 
   """
-  Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  enableBulk: Boolean
+  query: Query
+
+  """An edge for our `CheckConstraint`. May be used by Relay 1."""
+  checkConstraintEdge(
+    """The method to use when ordering `CheckConstraint`."""
+    orderBy: [CheckConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CheckConstraintEdge
+}
+
+"""All input for the `updateCheckConstraint` mutation."""
+input UpdateCheckConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
 
   """
-  Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API
+  An object where the defined keys will be set on the `CheckConstraint` being updated.
   """
-  enableI18N: Boolean
+  checkConstraintPatch: CheckConstraintPatch!
+}
+
+"""
+Represents an update to a `CheckConstraint`. Fields that are set will be updated.
+"""
+input CheckConstraintPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  type: String
+  fieldIds: [UUID]
+  expr: JSON
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `UniqueConstraint` mutation."""
+type UpdateUniqueConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `UniqueConstraint` that was updated by this mutation."""
+  uniqueConstraint: UniqueConstraint
 
   """
-  Extensible JSON for additional settings that do not have dedicated columns
+  Our root query field type. Allows us to run any query from our mutation payload.
   """
-  options: JSON
+  query: Query
+
+  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
+  uniqueConstraintEdge(
+    """The method to use when ordering `UniqueConstraint`."""
+    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UniqueConstraintEdge
+}
+
+"""All input for the `updateUniqueConstraint` mutation."""
+input UpdateUniqueConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `UniqueConstraint` being updated.
+  """
+  uniqueConstraintPatch: UniqueConstraintPatch!
+}
+
+"""
+Represents an update to a `UniqueConstraint`. Fields that are set will be updated.
+"""
+input UniqueConstraintPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  description: String
+  smartTags: JSON
+  type: String
+  fieldIds: [UUID]
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `SpatialRelation` mutation."""
+type UpdateSpatialRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SpatialRelation` that was updated by this mutation."""
+  spatialRelation: SpatialRelation
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SpatialRelation`. May be used by Relay 1."""
+  spatialRelationEdge(
+    """The method to use when ordering `SpatialRelation`."""
+    orderBy: [SpatialRelationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SpatialRelationEdge
+}
+
+"""All input for the `updateSpatialRelation` mutation."""
+input UpdateSpatialRelationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `SpatialRelation` being updated.
+  """
+  spatialRelationPatch: SpatialRelationPatch!
+}
+
+"""
+Represents an update to a `SpatialRelation`. Fields that are set will be updated.
+"""
+input SpatialRelationPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  fieldId: UUID
+  refTableId: UUID
+  refFieldId: UUID
+  name: String
+  operator: String
+  paramName: String
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `Policy` mutation."""
+type UpdatePolicyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Policy` that was updated by this mutation."""
+  policy: Policy
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Policy`. May be used by Relay 1."""
+  policyEdge(
+    """The method to use when ordering `Policy`."""
+    orderBy: [PolicyOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PolicyEdge
+}
+
+"""All input for the `updatePolicy` mutation."""
+input UpdatePolicyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Policy` being updated.
+  """
+  policyPatch: PolicyPatch!
+}
+
+"""
+Represents an update to a `Policy`. Fields that are set will be updated.
+"""
+input PolicyPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  granteeName: String
+  privilege: String
+  permissive: Boolean
+  disabled: Boolean
+  policyType: String
+  data: JSON
+  smartTags: JSON
+  category: ObjectCategory
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our update `ApiSetting` mutation."""
@@ -18516,31 +18779,31 @@ input DatabaseTransferPatch {
   completedAt: Datetime
 }
 
-"""The output of our update `PrimaryKeyConstraint` mutation."""
-type UpdatePrimaryKeyConstraintPayload {
+"""The output of our update `Index` mutation."""
+type UpdateIndexPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `PrimaryKeyConstraint` that was updated by this mutation."""
-  primaryKeyConstraint: PrimaryKeyConstraint
+  """The `Index` that was updated by this mutation."""
+  index: Index
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `PrimaryKeyConstraint`. May be used by Relay 1."""
-  primaryKeyConstraintEdge(
-    """The method to use when ordering `PrimaryKeyConstraint`."""
-    orderBy: [PrimaryKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PrimaryKeyConstraintEdge
+  """An edge for our `Index`. May be used by Relay 1."""
+  indexEdge(
+    """The method to use when ordering `Index`."""
+    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IndexEdge
 }
 
-"""All input for the `updatePrimaryKeyConstraint` mutation."""
-input UpdatePrimaryKeyConstraintInput {
+"""All input for the `updateIndex` mutation."""
+input UpdateIndexInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -18549,312 +18812,29 @@ input UpdatePrimaryKeyConstraintInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `PrimaryKeyConstraint` being updated.
+  An object where the defined keys will be set on the `Index` being updated.
   """
-  primaryKeyConstraintPatch: PrimaryKeyConstraintPatch!
+  indexPatch: IndexPatch!
 }
 
 """
-Represents an update to a `PrimaryKeyConstraint`. Fields that are set will be updated.
+Represents an update to a `Index`. Fields that are set will be updated.
 """
-input PrimaryKeyConstraintPatch {
+input IndexPatch {
   id: UUID
   databaseId: UUID
   tableId: UUID
   name: String
-  type: String
   fieldIds: [UUID]
+  includeFieldIds: [UUID]
+  accessMethod: String
+  indexParams: JSON
+  whereClause: JSON
+  isUnique: Boolean
+  options: JSON
+  opClasses: [String]
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `Trigger` mutation."""
-type UpdateTriggerPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Trigger` that was updated by this mutation."""
-  trigger: Trigger
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Trigger`. May be used by Relay 1."""
-  triggerEdge(
-    """The method to use when ordering `Trigger`."""
-    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TriggerEdge
-}
-
-"""All input for the `updateTrigger` mutation."""
-input UpdateTriggerInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Trigger` being updated.
-  """
-  triggerPatch: TriggerPatch!
-}
-
-"""
-Represents an update to a `Trigger`. Fields that are set will be updated.
-"""
-input TriggerPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  event: String
-  functionName: String
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `CheckConstraint` mutation."""
-type UpdateCheckConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `CheckConstraint` that was updated by this mutation."""
-  checkConstraint: CheckConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `CheckConstraint`. May be used by Relay 1."""
-  checkConstraintEdge(
-    """The method to use when ordering `CheckConstraint`."""
-    orderBy: [CheckConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CheckConstraintEdge
-}
-
-"""All input for the `updateCheckConstraint` mutation."""
-input UpdateCheckConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `CheckConstraint` being updated.
-  """
-  checkConstraintPatch: CheckConstraintPatch!
-}
-
-"""
-Represents an update to a `CheckConstraint`. Fields that are set will be updated.
-"""
-input CheckConstraintPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  type: String
-  fieldIds: [UUID]
-  expr: JSON
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `UniqueConstraint` mutation."""
-type UpdateUniqueConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `UniqueConstraint` that was updated by this mutation."""
-  uniqueConstraint: UniqueConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
-  uniqueConstraintEdge(
-    """The method to use when ordering `UniqueConstraint`."""
-    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UniqueConstraintEdge
-}
-
-"""All input for the `updateUniqueConstraint` mutation."""
-input UpdateUniqueConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `UniqueConstraint` being updated.
-  """
-  uniqueConstraintPatch: UniqueConstraintPatch!
-}
-
-"""
-Represents an update to a `UniqueConstraint`. Fields that are set will be updated.
-"""
-input UniqueConstraintPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  description: String
-  smartTags: JSON
-  type: String
-  fieldIds: [UUID]
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `SpatialRelation` mutation."""
-type UpdateSpatialRelationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SpatialRelation` that was updated by this mutation."""
-  spatialRelation: SpatialRelation
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SpatialRelation`. May be used by Relay 1."""
-  spatialRelationEdge(
-    """The method to use when ordering `SpatialRelation`."""
-    orderBy: [SpatialRelationOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SpatialRelationEdge
-}
-
-"""All input for the `updateSpatialRelation` mutation."""
-input UpdateSpatialRelationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `SpatialRelation` being updated.
-  """
-  spatialRelationPatch: SpatialRelationPatch!
-}
-
-"""
-Represents an update to a `SpatialRelation`. Fields that are set will be updated.
-"""
-input SpatialRelationPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  fieldId: UUID
-  refTableId: UUID
-  refFieldId: UUID
-  name: String
-  operator: String
-  paramName: String
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `Policy` mutation."""
-type UpdatePolicyPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Policy` that was updated by this mutation."""
-  policy: Policy
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Policy`. May be used by Relay 1."""
-  policyEdge(
-    """The method to use when ordering `Policy`."""
-    orderBy: [PolicyOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PolicyEdge
-}
-
-"""All input for the `updatePolicy` mutation."""
-input UpdatePolicyInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Policy` being updated.
-  """
-  policyPatch: PolicyPatch!
-}
-
-"""
-Represents an update to a `Policy`. Fields that are set will be updated.
-"""
-input PolicyPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  granteeName: String
-  privilege: String
-  permissive: Boolean
-  disabled: Boolean
-  policyType: String
-  data: JSON
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
   tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
@@ -18935,6 +18915,112 @@ input AppPatch {
   appImageUpload: Upload
 }
 
+"""The output of our update `DatabaseSetting` mutation."""
+type UpdateDatabaseSettingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSetting` that was updated by this mutation."""
+  databaseSetting: DatabaseSetting
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DatabaseSetting`. May be used by Relay 1."""
+  databaseSettingEdge(
+    """The method to use when ordering `DatabaseSetting`."""
+    orderBy: [DatabaseSettingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DatabaseSettingEdge
+}
+
+"""All input for the `updateDatabaseSetting` mutation."""
+input UpdateDatabaseSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this settings record"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `DatabaseSetting` being updated.
+  """
+  databaseSettingPatch: DatabaseSettingPatch!
+}
+
+"""
+Represents an update to a `DatabaseSetting`. Fields that are set will be updated.
+"""
+input DatabaseSettingPatch {
+  """Unique identifier for this settings record"""
+  id: UUID
+
+  """Reference to the metaschema database these settings apply to"""
+  databaseId: UUID
+
+  """Enable aggregate queries (sum, avg, min, max, etc.) in the GraphQL API"""
+  enableAggregates: Boolean
+
+  """Enable PostGIS spatial types and operators in the GraphQL API"""
+  enablePostgis: Boolean
+
+  """
+  Enable unified search (tsvector, BM25, pg_trgm, pgvector) in the GraphQL API
+  """
+  enableSearch: Boolean
+
+  """Enable direct (multipart) file upload mutations in the GraphQL API"""
+  enableDirectUploads: Boolean
+
+  """Enable presigned URL upload flow for S3/MinIO storage"""
+  enablePresignedUploads: Boolean
+
+  """Enable many-to-many relationship queries in the GraphQL API"""
+  enableManyToMany: Boolean
+
+  """Enable connection filter (where argument) in the GraphQL API"""
+  enableConnectionFilter: Boolean
+
+  """Enable ltree hierarchical data type support in the GraphQL API"""
+  enableLtree: Boolean
+
+  """Enable LLM/AI integration features in the GraphQL API"""
+  enableLlm: Boolean
+
+  """
+  Enable realtime subscriptions (cursor-tracked change delivery) in the GraphQL API
+  """
+  enableRealtime: Boolean
+
+  """
+  Enable bulk mutation operations (insert, upsert, update, delete) in the GraphQL API
+  """
+  enableBulk: Boolean
+
+  """
+  Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API
+  """
+  enableI18N: Boolean
+
+  """
+  Extensible JSON for additional settings that do not have dedicated columns
+  """
+  options: JSON
+
+  """Key/value pairs for selecting and filtering database settings"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+}
+
 """The output of our update `Site` mutation."""
 type UpdateSitePayload {
   """
@@ -19004,6 +19090,12 @@ input SitePatch {
   """PostgreSQL database name this site connects to"""
   dbname: String
 
+  """Key/value pairs for selecting and filtering sites"""
+  labels: JSON
+
+  """Freeform metadata for tooling and operational notes"""
+  annotations: JSON
+
   """Upload for Open Graph image used for social media link previews"""
   ogImageUpload: Upload
 
@@ -19015,68 +19107,6 @@ input SitePatch {
 
   """Upload for Primary logo image for the site"""
   logoUpload: Upload
-}
-
-"""The output of our update `Index` mutation."""
-type UpdateIndexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Index` that was updated by this mutation."""
-  index: Index
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Index`. May be used by Relay 1."""
-  indexEdge(
-    """The method to use when ordering `Index`."""
-    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): IndexEdge
-}
-
-"""All input for the `updateIndex` mutation."""
-input UpdateIndexInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Index` being updated.
-  """
-  indexPatch: IndexPatch!
-}
-
-"""
-Represents an update to a `Index`. Fields that are set will be updated.
-"""
-input IndexPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  fieldIds: [UUID]
-  includeFieldIds: [UUID]
-  accessMethod: String
-  indexParams: JSON
-  whereClause: JSON
-  isUnique: Boolean
-  options: JSON
-  opClasses: [String]
-  smartTags: JSON
-  category: ObjectCategory
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
 }
 
 """The output of our update `ForeignKeyConstraint` mutation."""
@@ -19134,7 +19164,6 @@ input ForeignKeyConstraintPatch {
   deleteAction: String
   updateAction: String
   category: ObjectCategory
-  scope: Int
   tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
@@ -19364,7 +19393,6 @@ input SchemaPatch {
   description: String
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   tags: [String]
   isPublic: Boolean
   apiExposure: ApiExposureLevel
@@ -19433,7 +19461,6 @@ input FieldPatch {
   max: Float
   tags: [String]
   category: ObjectCategory
-  scope: Int
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -19488,7 +19515,6 @@ input TablePatch {
   description: String
   smartTags: JSON
   category: ObjectCategory
-  scope: Int
   useRls: Boolean
   timestamps: Boolean
   peoplestamps: Boolean
@@ -19739,41 +19765,6 @@ input DeleteViewGrantInput {
   id: UUID!
 }
 
-"""The output of our delete `Api` mutation."""
-type DeleteApiPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Api` that was deleted by this mutation."""
-  api: Api
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Api`. May be used by Relay 1."""
-  apiEdge(
-    """The method to use when ordering `Api`."""
-    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApiEdge
-}
-
-"""All input for the `deleteApi` mutation."""
-input DeleteApiInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this API"""
-  id: UUID!
-}
-
 """The output of our delete `CorsSetting` mutation."""
 type DeleteCorsSettingPayload {
   """
@@ -19909,6 +19900,41 @@ input DeleteSiteModuleInput {
   clientMutationId: String
 
   """Unique identifier for this site module record"""
+  id: UUID!
+}
+
+"""The output of our delete `Api` mutation."""
+type DeleteApiPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Api` that was deleted by this mutation."""
+  api: Api
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Api`. May be used by Relay 1."""
+  apiEdge(
+    """The method to use when ordering `Api`."""
+    orderBy: [ApiOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiEdge
+}
+
+"""All input for the `deleteApi` mutation."""
+input DeleteApiInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this API"""
   id: UUID!
 }
 
@@ -20114,41 +20140,6 @@ input DeleteTableGrantInput {
   id: UUID!
 }
 
-"""The output of our delete `Domain` mutation."""
-type DeleteDomainPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Domain` that was deleted by this mutation."""
-  domain: Domain
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Domain`. May be used by Relay 1."""
-  domainEdge(
-    """The method to use when ordering `Domain`."""
-    orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DomainEdge
-}
-
-"""All input for the `deleteDomain` mutation."""
-input DeleteDomainInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this domain record"""
-  id: UUID!
-}
-
 """The output of our delete `RlsSetting` mutation."""
 type DeleteRlsSettingPayload {
   """
@@ -20250,6 +20241,41 @@ input DeletePartitionInput {
   id: UUID!
 }
 
+"""The output of our delete `Domain` mutation."""
+type DeleteDomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Domain` that was deleted by this mutation."""
+  domain: Domain
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Domain`. May be used by Relay 1."""
+  domainEdge(
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DomainEdge
+}
+
+"""All input for the `deleteDomain` mutation."""
+input DeleteDomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this domain record"""
+  id: UUID!
+}
+
 """The output of our delete `CompositeType` mutation."""
 type DeleteCompositeTypePayload {
   """
@@ -20341,109 +20367,6 @@ type DeleteViewPayload {
 
 """All input for the `deleteView` mutation."""
 input DeleteViewInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `DatabaseSetting` mutation."""
-type DeleteDatabaseSettingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `DatabaseSetting` that was deleted by this mutation."""
-  databaseSetting: DatabaseSetting
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `DatabaseSetting`. May be used by Relay 1."""
-  databaseSettingEdge(
-    """The method to use when ordering `DatabaseSetting`."""
-    orderBy: [DatabaseSettingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DatabaseSettingEdge
-}
-
-"""All input for the `deleteDatabaseSetting` mutation."""
-input DeleteDatabaseSettingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this settings record"""
-  id: UUID!
-}
-
-"""The output of our delete `ApiSetting` mutation."""
-type DeleteApiSettingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ApiSetting` that was deleted by this mutation."""
-  apiSetting: ApiSetting
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ApiSetting`. May be used by Relay 1."""
-  apiSettingEdge(
-    """The method to use when ordering `ApiSetting`."""
-    orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ApiSettingEdge
-}
-
-"""All input for the `deleteApiSetting` mutation."""
-input DeleteApiSettingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this API settings record"""
-  id: UUID!
-}
-
-"""The output of our delete `DatabaseTransfer` mutation."""
-type DeleteDatabaseTransferPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `DatabaseTransfer` that was deleted by this mutation."""
-  databaseTransfer: DatabaseTransfer
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `DatabaseTransfer`. May be used by Relay 1."""
-  databaseTransferEdge(
-    """The method to use when ordering `DatabaseTransfer`."""
-    orderBy: [DatabaseTransferOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DatabaseTransferEdge
-}
-
-"""All input for the `deleteDatabaseTransfer` mutation."""
-input DeleteDatabaseTransferInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -20650,6 +20573,107 @@ input DeletePolicyInput {
   id: UUID!
 }
 
+"""The output of our delete `ApiSetting` mutation."""
+type DeleteApiSettingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ApiSetting` that was deleted by this mutation."""
+  apiSetting: ApiSetting
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ApiSetting`. May be used by Relay 1."""
+  apiSettingEdge(
+    """The method to use when ordering `ApiSetting`."""
+    orderBy: [ApiSettingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ApiSettingEdge
+}
+
+"""All input for the `deleteApiSetting` mutation."""
+input DeleteApiSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this API settings record"""
+  id: UUID!
+}
+
+"""The output of our delete `DatabaseTransfer` mutation."""
+type DeleteDatabaseTransferPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DatabaseTransfer` that was deleted by this mutation."""
+  databaseTransfer: DatabaseTransfer
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DatabaseTransfer`. May be used by Relay 1."""
+  databaseTransferEdge(
+    """The method to use when ordering `DatabaseTransfer`."""
+    orderBy: [DatabaseTransferOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DatabaseTransferEdge
+}
+
+"""All input for the `deleteDatabaseTransfer` mutation."""
+input DeleteDatabaseTransferInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Index` mutation."""
+type DeleteIndexPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Index` that was deleted by this mutation."""
+  index: Index
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Index`. May be used by Relay 1."""
+  indexEdge(
+    """The method to use when ordering `Index`."""
+    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IndexEdge
+}
+
+"""All input for the `deleteIndex` mutation."""
+input DeleteIndexInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `App` mutation."""
 type DeleteAppPayload {
   """
@@ -20685,6 +20709,41 @@ input DeleteAppInput {
   id: UUID!
 }
 
+"""The output of our delete `DatabaseSetting` mutation."""
+type DeleteDatabaseSettingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DatabaseSetting` that was deleted by this mutation."""
+  databaseSetting: DatabaseSetting
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DatabaseSetting`. May be used by Relay 1."""
+  databaseSettingEdge(
+    """The method to use when ordering `DatabaseSetting`."""
+    orderBy: [DatabaseSettingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DatabaseSettingEdge
+}
+
+"""All input for the `deleteDatabaseSetting` mutation."""
+input DeleteDatabaseSettingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this settings record"""
+  id: UUID!
+}
+
 """The output of our delete `Site` mutation."""
 type DeleteSitePayload {
   """
@@ -20717,39 +20776,6 @@ input DeleteSiteInput {
   clientMutationId: String
 
   """Unique identifier for this site"""
-  id: UUID!
-}
-
-"""The output of our delete `Index` mutation."""
-type DeleteIndexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Index` that was deleted by this mutation."""
-  index: Index
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Index`. May be used by Relay 1."""
-  indexEdge(
-    """The method to use when ordering `Index`."""
-    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): IndexEdge
-}
-
-"""All input for the `deleteIndex` mutation."""
-input DeleteIndexInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
   id: UUID!
 }
 

@@ -12,8 +12,8 @@ csdk api list --where.<field>.<op> <value> --orderBy <values>
 csdk api list --limit 10 --after <cursor>
 csdk api find-first --where.<field>.<op> <value>
 csdk api get --id <UUID>
-csdk api create --databaseId <UUID> --name <String> [--dbname <String>] [--roleName <String>] [--anonRole <String>] [--isPublic <Boolean>]
-csdk api update --id <UUID> [--databaseId <UUID>] [--name <String>] [--dbname <String>] [--roleName <String>] [--anonRole <String>] [--isPublic <Boolean>]
+csdk api create --databaseId <UUID> --name <String> [--dbname <String>] [--roleName <String>] [--anonRole <String>] [--isPublic <Boolean>] [--labels <JSON>] [--annotations <JSON>]
+csdk api update --id <UUID> [--databaseId <UUID>] [--name <String>] [--dbname <String>] [--roleName <String>] [--anonRole <String>] [--isPublic <Boolean>] [--labels <JSON>] [--annotations <JSON>]
 csdk api delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk api list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a api
 
 ```bash
-csdk api create --databaseId <UUID> --name <String> [--dbname <String>] [--roleName <String>] [--anonRole <String>] [--isPublic <Boolean>]
+csdk api create --databaseId <UUID> --name <String> [--dbname <String>] [--roleName <String>] [--anonRole <String>] [--isPublic <Boolean>] [--labels <JSON>] [--annotations <JSON>]
 ```
 
 ### Get a api by id

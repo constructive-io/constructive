@@ -20,8 +20,11 @@ const fieldSchema: FieldSchema = {
   databaseId: 'uuid',
   apiId: 'uuid',
   siteId: 'uuid',
+  serviceId: 'uuid',
   subdomain: 'string',
   domain: 'string',
+  labels: 'json',
+  annotations: 'json',
 };
 const usage =
   '\ndomain <command>\n\nCommands:\n  list                  List domain records\n  find-first            Find first matching domain record\n  get                   Get a domain by ID\n  create                Create a new domain\n  update                Update an existing domain\n  delete                Delete a domain\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -78,8 +81,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       databaseId: true,
       apiId: true,
       siteId: true,
+      serviceId: true,
       subdomain: true,
       domain: true,
+      labels: true,
+      annotations: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<DomainSelect, DomainFilter, DomainOrderBy> & {
@@ -104,8 +110,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       databaseId: true,
       apiId: true,
       siteId: true,
+      serviceId: true,
       subdomain: true,
       domain: true,
+      labels: true,
+      annotations: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<DomainSelect, DomainFilter, DomainOrderBy> & {
@@ -142,8 +151,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           databaseId: true,
           apiId: true,
           siteId: true,
+          serviceId: true,
           subdomain: true,
           domain: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();
@@ -181,6 +193,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'serviceId',
+        message: 'serviceId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'subdomain',
         message: 'subdomain',
         required: false,
@@ -190,6 +209,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'domain',
         message: 'domain',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
         required: false,
         skipPrompt: true,
       },
@@ -203,16 +236,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: cleanedData.databaseId,
           apiId: cleanedData.apiId,
           siteId: cleanedData.siteId,
+          serviceId: cleanedData.serviceId,
           subdomain: cleanedData.subdomain,
           domain: cleanedData.domain,
+          labels: cleanedData.labels,
+          annotations: cleanedData.annotations,
         },
         select: {
           id: true,
           databaseId: true,
           apiId: true,
           siteId: true,
+          serviceId: true,
           subdomain: true,
           domain: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();
@@ -256,6 +295,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'serviceId',
+        message: 'serviceId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'subdomain',
         message: 'subdomain',
         required: false,
@@ -265,6 +311,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'domain',
         message: 'domain',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
         required: false,
         skipPrompt: true,
       },
@@ -281,16 +341,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: cleanedData.databaseId,
           apiId: cleanedData.apiId,
           siteId: cleanedData.siteId,
+          serviceId: cleanedData.serviceId,
           subdomain: cleanedData.subdomain,
           domain: cleanedData.domain,
+          labels: cleanedData.labels,
+          annotations: cleanedData.annotations,
         },
         select: {
           id: true,
           databaseId: true,
           apiId: true,
           siteId: true,
+          serviceId: true,
           subdomain: true,
           domain: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();

@@ -9,7 +9,7 @@ ORM operations for CompositeType records
 ```typescript
 db.compositeType.findMany({ select: { id: true } }).execute()
 db.compositeType.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.compositeType.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' }, select: { id: true } }).execute()
+db.compositeType.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute()
 db.compositeType.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.compositeType.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.compositeType.findMany({
 
 ```typescript
 const item = await db.compositeType.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', scope: '<Int>', tags: '<String>' },
+  data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' },
   select: { id: true }
 }).execute();
 ```

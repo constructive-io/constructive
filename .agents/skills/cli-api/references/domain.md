@@ -12,8 +12,8 @@ csdk domain list --where.<field>.<op> <value> --orderBy <values>
 csdk domain list --limit 10 --after <cursor>
 csdk domain find-first --where.<field>.<op> <value>
 csdk domain get --id <UUID>
-csdk domain create --databaseId <UUID> [--apiId <UUID>] [--siteId <UUID>] [--subdomain <Hostname>] [--domain <Hostname>]
-csdk domain update --id <UUID> [--databaseId <UUID>] [--apiId <UUID>] [--siteId <UUID>] [--subdomain <Hostname>] [--domain <Hostname>]
+csdk domain create --databaseId <UUID> [--apiId <UUID>] [--siteId <UUID>] [--serviceId <UUID>] [--subdomain <Hostname>] [--domain <Hostname>] [--labels <JSON>] [--annotations <JSON>]
+csdk domain update --id <UUID> [--databaseId <UUID>] [--apiId <UUID>] [--siteId <UUID>] [--serviceId <UUID>] [--subdomain <Hostname>] [--domain <Hostname>] [--labels <JSON>] [--annotations <JSON>]
 csdk domain delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk domain list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a domain
 
 ```bash
-csdk domain create --databaseId <UUID> [--apiId <UUID>] [--siteId <UUID>] [--subdomain <Hostname>] [--domain <Hostname>]
+csdk domain create --databaseId <UUID> [--apiId <UUID>] [--siteId <UUID>] [--serviceId <UUID>] [--subdomain <Hostname>] [--domain <Hostname>] [--labels <JSON>] [--annotations <JSON>]
 ```
 
 ### Get a domain by id

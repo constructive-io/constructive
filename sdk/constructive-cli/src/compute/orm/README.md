@@ -24,19 +24,23 @@ const db = createClient({
 | `getAllRecord` | findMany, findOne, create, update, delete |
 | `functionApiBinding` | findMany, findOne, create, update, delete |
 | `functionDeployment` | findMany, findOne, create, update, delete |
+| `resource` | findMany, findOne, create, update, delete |
 | `functionGraphRef` | findMany, findOne, create, update, delete |
 | `functionGraphStore` | findMany, findOne, create, update, delete |
 | `functionGraphObject` | findMany, findOne, create, update, delete |
 | `functionDeploymentEvent` | findMany, findOne, create, update, delete |
 | `orgFunctionExecutionLog` | findMany, findOne, create, update, delete |
+| `resourceEvent` | findMany, findOne, create, update, delete |
 | `functionGraphExecutionOutput` | findMany, findOne, create, update, delete |
 | `functionGraphCommit` | findMany, findOne, create, update, delete |
 | `secretDefinition` | findMany, findOne, create, update, delete |
 | `functionExecutionLog` | findMany, findOne, create, update, delete |
-| `functionGraphExecutionNodeState` | findMany, findOne, create, update, delete |
 | `functionGraph` | findMany, findOne, create, update, delete |
+| `functionGraphExecutionNodeState` | findMany, findOne, create, update, delete |
+| `platformNamespace` | findMany, findOne, create, update, delete |
 | `orgFunctionInvocation` | findMany, findOne, create, update, delete |
 | `functionInvocation` | findMany, findOne, create, update, delete |
+| `platformNamespaceEvent` | findMany, findOne, create, update, delete |
 | `functionGraphExecution` | findMany, findOne, create, update, delete |
 | `functionDefinition` | findMany, findOne, create, update, delete |
 
@@ -152,6 +156,51 @@ const updated = await db.functionDeployment.update({ where: { id: '<UUID>' }, da
 
 // Delete
 const deleted = await db.functionDeployment.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.resource`
+
+CRUD operations for Resource records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `updatedBy` | UUID | Yes |
+| `namespaceId` | UUID | Yes |
+| `kind` | String | Yes |
+| `name` | String | Yes |
+| `slug` | String | Yes |
+| `spec` | JSON | Yes |
+| `status` | String | Yes |
+| `statusObserved` | JSON | Yes |
+| `lastError` | String | Yes |
+| `errorCount` | Int | Yes |
+| `labels` | JSON | Yes |
+| `annotations` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all resource records
+const items = await db.resource.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true } }).execute();
+
+// Get one by id
+const item = await db.resource.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true } }).execute();
+
+// Create
+const created = await db.resource.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', namespaceId: '<UUID>', kind: '<String>', name: '<String>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', lastError: '<String>', errorCount: '<Int>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.resource.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.resource.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.functionGraphRef`
@@ -326,6 +375,42 @@ const updated = await db.orgFunctionExecutionLog.update({ where: { id: '<UUID>' 
 const deleted = await db.orgFunctionExecutionLog.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.resourceEvent`
+
+CRUD operations for ResourceEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `resourceId` | UUID | Yes |
+| `eventType` | String | Yes |
+| `actorId` | UUID | Yes |
+| `message` | String | Yes |
+| `metadata` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all resourceEvent records
+const items = await db.resourceEvent.findMany({ select: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } }).execute();
+
+// Get one by id
+const item = await db.resourceEvent.findOne({ id: '<UUID>', select: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } }).execute();
+
+// Create
+const created = await db.resourceEvent.create({ data: { resourceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.resourceEvent.update({ where: { id: '<UUID>' }, data: { resourceId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.resourceEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.functionGraphExecutionOutput`
 
 CRUD operations for FunctionGraphExecutionOutput records.
@@ -470,6 +555,46 @@ const updated = await db.functionExecutionLog.update({ where: { id: '<UUID>' }, 
 const deleted = await db.functionExecutionLog.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.functionGraph`
+
+CRUD operations for FunctionGraph records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `storeId` | UUID | Yes |
+| `context` | String | Yes |
+| `name` | String | Yes |
+| `description` | String | Yes |
+| `definitionsCommitId` | UUID | Yes |
+| `isValid` | Boolean | Yes |
+| `validationErrors` | JSON | Yes |
+| `createdBy` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all functionGraph records
+const items = await db.functionGraph.findMany({ select: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.functionGraph.findOne({ id: '<UUID>', select: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.functionGraph.create({ data: { databaseId: '<UUID>', storeId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.functionGraph.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.functionGraph.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.functionGraphExecutionNodeState`
 
 CRUD operations for FunctionGraphExecutionNodeState records.
@@ -510,45 +635,45 @@ const updated = await db.functionGraphExecutionNodeState.update({ where: { id: '
 const deleted = await db.functionGraphExecutionNodeState.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.functionGraph`
+### `db.platformNamespace`
 
-CRUD operations for FunctionGraph records.
+CRUD operations for PlatformNamespace records.
 
 **Fields:**
 
 | Field | Type | Editable |
 |-------|------|----------|
 | `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `storeId` | UUID | Yes |
-| `entityId` | UUID | Yes |
-| `context` | String | Yes |
-| `name` | String | Yes |
-| `description` | String | Yes |
-| `definitionsCommitId` | UUID | Yes |
-| `isValid` | Boolean | Yes |
-| `validationErrors` | JSON | Yes |
-| `createdBy` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `name` | String | Yes |
+| `namespaceName` | String | Yes |
+| `description` | String | Yes |
+| `isActive` | Boolean | Yes |
+| `labels` | JSON | Yes |
+| `annotations` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+| `sourceDatabaseId` | UUID | Yes |
+| `sourceScope` | String | Yes |
+| `isManaged` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
-// List all functionGraph records
-const items = await db.functionGraph.findMany({ select: { id: true, databaseId: true, storeId: true, entityId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } }).execute();
+// List all platformNamespace records
+const items = await db.platformNamespace.findMany({ select: { id: true, createdAt: true, updatedAt: true, name: true, namespaceName: true, description: true, isActive: true, labels: true, annotations: true, databaseId: true, sourceDatabaseId: true, sourceScope: true, isManaged: true } }).execute();
 
 // Get one by id
-const item = await db.functionGraph.findOne({ id: '<UUID>', select: { id: true, databaseId: true, storeId: true, entityId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.platformNamespace.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, name: true, namespaceName: true, description: true, isActive: true, labels: true, annotations: true, databaseId: true, sourceDatabaseId: true, sourceScope: true, isManaged: true } }).execute();
 
 // Create
-const created = await db.functionGraph.create({ data: { databaseId: '<UUID>', storeId: '<UUID>', entityId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformNamespace.create({ data: { name: '<String>', namespaceName: '<String>', description: '<String>', isActive: '<Boolean>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>', sourceDatabaseId: '<UUID>', sourceScope: '<String>', isManaged: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.functionGraph.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.platformNamespace.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.functionGraph.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.platformNamespace.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.orgFunctionInvocation`
@@ -636,6 +761,49 @@ const updated = await db.functionInvocation.update({ where: { id: '<UUID>' }, da
 const deleted = await db.functionInvocation.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformNamespaceEvent`
+
+CRUD operations for PlatformNamespaceEvent records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `id` | UUID | No |
+| `namespaceId` | UUID | Yes |
+| `eventType` | String | Yes |
+| `actorId` | UUID | Yes |
+| `message` | String | Yes |
+| `metadata` | JSON | Yes |
+| `cpuMillicores` | Int | Yes |
+| `memoryBytes` | BigInt | Yes |
+| `storageBytes` | BigInt | Yes |
+| `networkIngressBytes` | BigInt | Yes |
+| `networkEgressBytes` | BigInt | Yes |
+| `podCount` | Int | Yes |
+| `metrics` | JSON | Yes |
+| `databaseId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformNamespaceEvent records
+const items = await db.platformNamespaceEvent.findMany({ select: { createdAt: true, id: true, namespaceId: true, eventType: true, actorId: true, message: true, metadata: true, cpuMillicores: true, memoryBytes: true, storageBytes: true, networkIngressBytes: true, networkEgressBytes: true, podCount: true, metrics: true, databaseId: true } }).execute();
+
+// Get one by id
+const item = await db.platformNamespaceEvent.findOne({ id: '<UUID>', select: { createdAt: true, id: true, namespaceId: true, eventType: true, actorId: true, message: true, metadata: true, cpuMillicores: true, memoryBytes: true, storageBytes: true, networkIngressBytes: true, networkEgressBytes: true, podCount: true, metrics: true, databaseId: true } }).execute();
+
+// Create
+const created = await db.platformNamespaceEvent.create({ data: { namespaceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', cpuMillicores: '<Int>', memoryBytes: '<BigInt>', storageBytes: '<BigInt>', networkIngressBytes: '<BigInt>', networkEgressBytes: '<BigInt>', podCount: '<Int>', metrics: '<JSON>', databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformNamespaceEvent.update({ where: { id: '<UUID>' }, data: { namespaceId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformNamespaceEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.functionGraphExecution`
 
 CRUD operations for FunctionGraphExecution records.
@@ -649,7 +817,6 @@ CRUD operations for FunctionGraphExecution records.
 | `graphId` | UUID | Yes |
 | `invocationId` | UUID | Yes |
 | `databaseId` | UUID | Yes |
-| `entityId` | UUID | Yes |
 | `outputNode` | String | Yes |
 | `outputPort` | String | Yes |
 | `status` | String | Yes |
@@ -673,13 +840,13 @@ CRUD operations for FunctionGraphExecution records.
 
 ```typescript
 // List all functionGraphExecution records
-const items = await db.functionGraphExecution.findMany({ select: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, entityId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } }).execute();
+const items = await db.functionGraphExecution.findMany({ select: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } }).execute();
 
 // Get one by id
-const item = await db.functionGraphExecution.findOne({ id: '<UUID>', select: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, entityId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } }).execute();
+const item = await db.functionGraphExecution.findOne({ id: '<UUID>', select: { startedAt: true, id: true, graphId: true, invocationId: true, databaseId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, errorCode: true, errorMessage: true } }).execute();
 
 // Create
-const created = await db.functionGraphExecution.create({ data: { startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', databaseId: '<UUID>', entityId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' }, select: { id: true } }).execute();
+const created = await db.functionGraphExecution.create({ data: { startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', databaseId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.functionGraphExecution.update({ where: { id: '<UUID>' }, data: { startedAt: '<Datetime>' }, select: { id: true } }).execute();
@@ -882,6 +1049,21 @@ addNodeAndSave
 const result = await db.mutation.addNodeAndSave({ input: '<AddNodeAndSaveInput>' }).execute();
 ```
 
+### `db.mutation.importGraphJson`
+
+importGraphJson
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ImportGraphJsonInput (required) |
+
+```typescript
+const result = await db.mutation.importGraphJson({ input: '<ImportGraphJsonInput>' }).execute();
+```
+
 ### `db.mutation.addEdge`
 
 addEdge
@@ -910,21 +1092,6 @@ addNode
 
 ```typescript
 const result = await db.mutation.addNode({ input: '<AddNodeInput>' }).execute();
-```
-
-### `db.mutation.importGraphJson`
-
-importGraphJson
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ImportGraphJsonInput (required) |
-
-```typescript
-const result = await db.mutation.importGraphJson({ input: '<ImportGraphJsonInput>' }).execute();
 ```
 
 ### `db.mutation.insertNodeAtPath`

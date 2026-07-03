@@ -15,6 +15,9 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
+  principalKeys,
+  principalEntityKeys,
+  principalScopeOverrideKeys,
   emailKeys,
   phoneNumberKeys,
   cryptoAddressKeys,
@@ -23,6 +26,7 @@ import {
   identityProviderKeys,
   roleTypeKeys,
   userConnectedAccountKeys,
+  orgApiKeyListKeys,
   userKeys,
 } from './query-keys';
 /**
@@ -45,6 +49,57 @@ import {
  * ```
  */
 export const invalidate = {
+  /** Invalidate principal queries */ principal: {
+    /** Invalidate all principal queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.all,
+      }),
+    /** Invalidate principal list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.lists(),
+      }),
+    /** Invalidate a specific principal */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalKeys.detail(id),
+      }),
+  },
+  /** Invalidate principalEntity queries */ principalEntity: {
+    /** Invalidate all principalEntity queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.all,
+      }),
+    /** Invalidate principalEntity list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.lists(),
+      }),
+    /** Invalidate a specific principalEntity */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalEntityKeys.detail(id),
+      }),
+  },
+  /** Invalidate principalScopeOverride queries */ principalScopeOverride: {
+    /** Invalidate all principalScopeOverride queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.all,
+      }),
+    /** Invalidate principalScopeOverride list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.lists(),
+      }),
+    /** Invalidate a specific principalScopeOverride */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalScopeOverrideKeys.detail(id),
+      }),
+  },
   /** Invalidate email queries */ email: {
     /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -175,6 +230,23 @@ export const invalidate = {
         queryKey: userConnectedAccountKeys.detail(id),
       }),
   },
+  /** Invalidate orgApiKeyList queries */ orgApiKeyList: {
+    /** Invalidate all orgApiKeyList queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.all,
+      }),
+    /** Invalidate orgApiKeyList list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.lists(),
+      }),
+    /** Invalidate a specific orgApiKeyList */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgApiKeyListKeys.detail(id),
+      }),
+  },
   /** Invalidate user queries */ user: {
     /** Invalidate all user queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -202,6 +274,27 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
+  /** Remove principal from cache */ principal: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: principalKeys.detail(id),
+    });
+  },
+  /** Remove principalEntity from cache */ principalEntity: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: principalEntityKeys.detail(id),
+    });
+  },
+  /** Remove principalScopeOverride from cache */ principalScopeOverride: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: principalScopeOverrideKeys.detail(id),
+    });
+  },
   /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: emailKeys.detail(id),
@@ -258,6 +351,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: userConnectedAccountKeys.detail(id),
+    });
+  },
+  /** Remove orgApiKeyList from cache */ orgApiKeyList: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgApiKeyListKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

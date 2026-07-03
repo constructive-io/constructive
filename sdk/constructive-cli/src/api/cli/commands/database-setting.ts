@@ -31,6 +31,8 @@ const fieldSchema: FieldSchema = {
   enableBulk: 'boolean',
   enableI18N: 'boolean',
   options: 'json',
+  labels: 'json',
+  annotations: 'json',
 };
 const usage =
   '\ndatabase-setting <command>\n\nCommands:\n  list                  List databaseSetting records\n  find-first            Find first matching databaseSetting record\n  get                   Get a databaseSetting by ID\n  create                Create a new databaseSetting\n  update                Update an existing databaseSetting\n  delete                Delete a databaseSetting\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -98,6 +100,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       enableBulk: true,
       enableI18N: true,
       options: true,
+      labels: true,
+      annotations: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<DatabaseSettingSelect, DatabaseSettingFilter, DatabaseSettingOrderBy> & {
@@ -133,6 +137,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       enableBulk: true,
       enableI18N: true,
       options: true,
+      labels: true,
+      annotations: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<DatabaseSettingSelect, DatabaseSettingFilter, DatabaseSettingOrderBy> & {
@@ -180,6 +186,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           enableBulk: true,
           enableI18N: true,
           options: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();
@@ -292,6 +300,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -316,6 +338,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           enableBulk: cleanedData.enableBulk,
           enableI18N: cleanedData.enableI18N,
           options: cleanedData.options,
+          labels: cleanedData.labels,
+          annotations: cleanedData.annotations,
         },
         select: {
           id: true,
@@ -333,6 +357,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           enableBulk: true,
           enableI18N: true,
           options: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();
@@ -451,6 +477,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as DatabaseSettingPatch;
@@ -475,6 +515,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           enableBulk: cleanedData.enableBulk,
           enableI18N: cleanedData.enableI18N,
           options: cleanedData.options,
+          labels: cleanedData.labels,
+          annotations: cleanedData.annotations,
         },
         select: {
           id: true,
@@ -492,6 +534,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           enableBulk: true,
           enableI18N: true,
           options: true,
+          labels: true,
+          annotations: true,
         },
       })
       .execute();
