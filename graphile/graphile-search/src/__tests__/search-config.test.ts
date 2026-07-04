@@ -424,14 +424,14 @@ describe('VectorNearbyInput includeChunks field (Phase E)', () => {
   });
 });
 
-// ─── Blueprint pooling: build.options.constructiveUnqualified ─────────────────
+// ─── Adapter SQL qualification ────────────────────────────────────────────────
 //
-// When the pooled preset sets schema.constructiveUnqualified, tenant-data SQL
-// must be emitted search_path-relative (no schema prefix) so one shared instance
-// can serve every tenant, routed per request via pgSettings search_path.
-// Default (flag off / absent) MUST stay byte-identical (fully qualified).
+// Tenant-data SQL (bm25 index names, chunk table references) is always emitted
+// fully schema-qualified. Tenant routing happens elsewhere (the rewriting pool
+// maps canonical→tenant schemas at query time), so the adapters do not
+// special-case pooled instances.
 
-describe('constructiveUnqualified option (blueprint pooling)', () => {
+describe('adapter SQL qualification', () => {
   // Mock sql object that mimics pg-sql2 behavior (same shape as above).
   const mockSql = {
     identifier: (name: string) => `"${name}"`,
@@ -461,8 +461,6 @@ describe('constructiveUnqualified option (blueprint pooling)', () => {
     mockSql,
   );
 
-  const unqualifiedBuild = { options: { constructiveUnqualified: true } };
-
   // ── bm25: index name passed to to_bm25query ──
   describe('bm25 adapter — index name', () => {
     const adapter = createBm25Adapter();
@@ -478,7 +476,7 @@ describe('constructiveUnqualified option (blueprint pooling)', () => {
       },
     };
 
-    it('emits the schema-qualified index name by default (flag off)', () => {
+    it('emits the schema-qualified index name', () => {
       const result = adapter.buildFilterApply(
         sql,
         'tbl' as any,
@@ -491,22 +489,6 @@ describe('constructiveUnqualified option (blueprint pooling)', () => {
       const scoreStr = String(result!.scoreExpression);
       // Default behavior: fully qualified "schema"."index"
       expect(scoreStr).toContain('"app_private"."documents_body_bm25_idx"');
-    });
-
-    it('emits the unqualified index name when constructiveUnqualified is set', () => {
-      const result = adapter.buildFilterApply(
-        sql,
-        'tbl' as any,
-        bm25Column,
-        { query: 'hello' },
-        unqualifiedBuild,
-      );
-
-      expect(result).not.toBeNull();
-      const scoreStr = String(result!.scoreExpression);
-      // Pooled: index name resolves via search_path — no schema prefix
-      expect(scoreStr).toContain('"documents_body_bm25_idx"');
-      expect(scoreStr).not.toContain('app_private');
     });
   });
 
@@ -526,7 +508,7 @@ describe('constructiveUnqualified option (blueprint pooling)', () => {
       },
     };
 
-    it('emits the schema-qualified chunk table by default (flag off)', () => {
+    it('emits the schema-qualified chunk table', () => {
       const result = adapter.buildFilterApply(
         sql,
         'tbl' as any,
@@ -538,23 +520,6 @@ describe('constructiveUnqualified option (blueprint pooling)', () => {
       expect(result).not.toBeNull();
       const scoreStr = String(result!.scoreExpression);
       expect(scoreStr).toContain('"app_private"."doc_chunks"');
-      expect(scoreStr).toContain('LEAST');
-    });
-
-    it('emits the unqualified chunk table when constructiveUnqualified is set', () => {
-      const result = adapter.buildFilterApply(
-        sql,
-        'tbl' as any,
-        chunkColumn,
-        { vector: [1, 0, 0], metric: 'COSINE' },
-        unqualifiedBuild,
-      );
-
-      expect(result).not.toBeNull();
-      const scoreStr = String(result!.scoreExpression);
-      // Pooled: chunk table resolves via search_path — no schema prefix
-      expect(scoreStr).toContain('"doc_chunks"');
-      expect(scoreStr).not.toContain('app_private');
       expect(scoreStr).toContain('LEAST');
     });
   });

@@ -17,7 +17,7 @@ const makeApi = (overrides: Partial<ApiStructure> = {}): ApiStructure =>
   } as ApiStructure);
 
 // A mock Pool whose query() resolves queued results in call order. computePoolDecision
-// issues the shape-fingerprint query first, then the collision-probe query.
+// issues a single shape-fingerprint query.
 const makePool = (results: QueryResult[]): { pool: Pool; query: jest.Mock } => {
   const query = jest.fn();
   results.forEach((r) => query.mockResolvedValueOnce(r));
@@ -62,7 +62,7 @@ describe('computePoolDecision', () => {
 
     expect(decision.pooling).toBe(true);
     expect(decision.key).toMatch(/^bp:[0-9a-f]{64}$/);
-    expect(query).toHaveBeenCalledTimes(1); // single catalog scan feeds fingerprint + collisions
+    expect(query).toHaveBeenCalledTimes(1); // single catalog scan feeds the fingerprint
   });
 
   it('produces the SAME bp: key for two different physical tenants of the same shape', async () => {
@@ -123,17 +123,18 @@ describe('computePoolDecision', () => {
     expect(dExplicitSame.key).toBe(dDerived.key); // ?? fallback derivation matches
   });
 
-  it('falls back when an unqualified relation-name collision exists across schemas', async () => {
+  it('relation-name collisions across schemas are poolable under qualified SQL', async () => {
     const rows = [
       { nspname: 'shop-5e6b13b2-auth-public', relname: 'identity_providers' },
       { nspname: 'shop-5e6b13b2-auth-private', relname: 'identity_providers' }
     ];
-    const { pool } = makePool([{ rows }, { rows: [{ relname: 'identity_providers' }] }]);
+    const { pool } = makePool([{ rows }]);
     const api = makeApi({ schema: ['shop-5e6b13b2-auth-public', 'shop-5e6b13b2-auth-private'] });
 
     const decision = await computePoolDecision('svc-4', api, pool);
 
-    expect(decision).toEqual({ key: 'svc-4', pooling: false });
+    expect(decision.pooling).toBe(true);
+    expect(decision.key).toMatch(/^bp:[0-9a-f]{64}$/);
   });
 
   it('falls back (never throws) when a catalog probe rejects', async () => {

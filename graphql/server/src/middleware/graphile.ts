@@ -23,8 +23,9 @@ import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
-import { isBlueprintPoolingEnabled, tenantSearchPath } from './blueprint';
+import { isBlueprintPoolingEnabled, stripSchemaHashPrefix } from './blueprint';
 import { resolvePoolDecision } from './pooling-decision';
+import { createRewritingPool, POOL_SCHEMAS_GUC } from './rewrite-pool';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
@@ -317,14 +318,22 @@ const buildPreset = (
   options?: { pooling?: boolean },
 ): GraphileConfig.Preset => {
   // When pooling, the instance is shared across tenants of the same schema-shape
-  // and routed per request via a search_path pgSetting (see grafast.context below).
+  // and routed per request via the rewriting pool (canonical→tenant schema-
+  // identifier rewrite; see ./rewrite-pool).
   const pooling = options?.pooling === true;
+  // Pooled instances are built fully qualified against the canonical tenant's
+  // physical schemas; the rewriting pool swaps canonical→tenant schema
+  // identifiers per request (see ./rewrite-pool). Dedicated instances use the
+  // raw pool untouched.
+  const servicePool = pooling
+    ? createRewritingPool(pool, { canonicalSchemas: schemas, logicalName: stripSchemaHashPrefix })
+    : pool;
   const preset: GraphileConfig.Preset = {
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [AuthCookiePlugin],
   pgServices: [
     makePgService({
-      pool,
+      pool: servicePool,
       schemas,
     }),
   ],
@@ -401,11 +410,11 @@ const buildPreset = (
             pgSettings['request.id'] = req.requestId;
           }
 
-          // Pooled instances emit search_path-relative SQL; route this request to
-          // the REQUESTING tenant's physical schemas (+ shared `public` last — see
-          // tenantSearchPath). Never set when not pooling.
+          // Pooled instances: hand the REQUESTING tenant's physical schema list to
+          // the rewriting pool via a transaction-local GUC; the wrapper maps the
+          // canonical schemas to these by logical name. Never set when not pooling.
           if (pooling && api?.schema?.length) {
-            pgSettings['search_path'] = tenantSearchPath(api.schema);
+            pgSettings[POOL_SCHEMAS_GUC] = JSON.stringify(api.schema);
           }
 
           return { pgSettings };
@@ -419,11 +428,11 @@ const buildPreset = (
       if (req?.requestId) {
         anonSettings['request.id'] = req.requestId;
       }
-      // Pooled instances emit search_path-relative SQL; route this request to
-      // the REQUESTING tenant's physical schemas (+ shared `public` last — see
-      // tenantSearchPath). Never set when not pooling.
+      // Pooled instances: hand the REQUESTING tenant's physical schema list to
+      // the rewriting pool via a transaction-local GUC; the wrapper maps the
+      // canonical schemas to these by logical name. Never set when not pooling.
       if (pooling && api?.schema?.length) {
-        anonSettings['search_path'] = tenantSearchPath(api.schema);
+        anonSettings[POOL_SCHEMAS_GUC] = JSON.stringify(api.schema);
       }
 
       return {
@@ -434,11 +443,12 @@ const buildPreset = (
   };
 
   if (pooling) {
-    // Stock unqualified-identifier gather + our schema flag so Constructive
-    // plugins emit search_path-relative SQL for tenant-data references. Cast:
-    // `constructiveUnqualified` is our custom schema option, absent from base types.
-    (preset as any).gather = { pgIdentifiers: 'unqualified' };
-    (preset as any).schema = { constructiveUnqualified: true };
+    // Shared (pooled) instances must not leak the canonical tenant's hashed
+    // schema names through tenant-facing metadata (e.g. _meta) — plugins read
+    // this flag and report logical schema names instead. SQL emission stays
+    // fully qualified (PostGraphile default). Cast: custom schema option,
+    // absent from base types.
+    (preset as any).schema = { constructivePooled: true };
   }
 
   return preset;
@@ -467,10 +477,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // Blueprint Pooling Decision (opt-in via GRAPHILE_BLUEPRINT_POOLING)
       //
       // When enabled, resolve a shared blueprint key so tenants of the same
-      // schema-shape attach to ONE instance, routed per request via search_path
-      // (set in grafast.context). Decisions are memoized per svc_key and cleared
-      // on flush. When the flag is OFF this block is skipped entirely: `key` stays
-      // exactly req.svc_key and no extra pool or queries are touched.
+      // schema-shape attach to ONE instance, routed per request by the rewriting
+      // pool (the requesting tenant's schema list is set in grafast.context).
+      // Decisions are memoized per svc_key and cleared on flush. When the flag is
+      // OFF this block is skipped entirely: `key` stays exactly req.svc_key and no
+      // extra pool or queries are touched.
       // =========================================================================
       const pgConfig = getPgEnvOptions({ ...opts.pg, database: dbname });
       let key = svcKey;

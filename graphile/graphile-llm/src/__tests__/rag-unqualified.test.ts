@@ -1,11 +1,9 @@
 /**
  * RAG chunk-table qualification tests (pure, no DB / no Ollama required).
  *
- * Verifies the blueprint-pooling flag `build.options.constructiveUnqualified`
- * is threaded into discovered ChunkTableInfo and that the generated chunk
- * search SQL references the tenant-data table UNQUALIFIED when the flag is on
- * (so the per-request search_path resolves the tenant), while the default
- * behavior stays schema-qualified.
+ * Verifies the generated chunk search SQL references the tenant-data table
+ * schema-qualified when a chunks schema is known, and falls back to a bare
+ * table name only when no schema is available.
  */
 
 import { buildChunkSearchSql, discoverChunkTables } from '../plugins/rag-plugin';
@@ -26,9 +24,9 @@ function baseChunkTable(overrides: Partial<ChunkTableInfo> = {}): ChunkTableInfo
   };
 }
 
-function makeBuild(constructiveUnqualified?: boolean) {
+function makeBuild() {
   return {
-    options: constructiveUnqualified === undefined ? {} : { constructiveUnqualified },
+    options: {},
     input: {
       pgRegistry: {
         pgCodecs: {
@@ -57,20 +55,9 @@ function makeBuild(constructiveUnqualified?: boolean) {
 // ─── buildChunkSearchSql ─────────────────────────────────────────────────────
 
 describe('buildChunkSearchSql — chunk table qualification', () => {
-  it('emits a SCHEMA-QUALIFIED reference by default (flag off)', () => {
+  it('emits a SCHEMA-QUALIFIED reference by default', () => {
     const { text } = buildChunkSearchSql(baseChunkTable(), '[1,0,0]', 5, null);
     expect(text).toContain('FROM "llm_test"."articles_chunks"');
-  });
-
-  it('emits an UNQUALIFIED reference when unqualified is true (blueprint pooling)', () => {
-    const { text } = buildChunkSearchSql(
-      baseChunkTable({ unqualified: true }),
-      '[1,0,0]',
-      5,
-      null
-    );
-    expect(text).toContain('FROM "articles_chunks"');
-    expect(text).not.toContain('"llm_test"."articles_chunks"');
   });
 
   it('emits an UNQUALIFIED reference when no schema is known (existing fallback)', () => {
@@ -95,34 +82,13 @@ describe('buildChunkSearchSql — chunk table qualification', () => {
   });
 });
 
-// ─── discoverChunkTables threading ───────────────────────────────────────────
+// ─── discoverChunkTables ─────────────────────────────────────────────────────
 
-describe('discoverChunkTables — threads constructiveUnqualified into ChunkTableInfo', () => {
-  it('sets unqualified=true when build.options.constructiveUnqualified is true', () => {
-    const tables = discoverChunkTables(makeBuild(true));
+describe('discoverChunkTables', () => {
+  it('discovers chunk tables and emits schema-qualified SQL', () => {
+    const tables = discoverChunkTables(makeBuild());
     expect(tables).toHaveLength(1);
-    expect(tables[0].unqualified).toBe(true);
     expect(tables[0].chunksSchema).toBe('llm_test');
-
-    // End-to-end: the discovered table produces a bare reference.
-    const { text } = buildChunkSearchSql(tables[0], '[1,0,0]', 5, null);
-    expect(text).toContain('FROM "articles_chunks"');
-    expect(text).not.toContain('"llm_test"."articles_chunks"');
-  });
-
-  it('sets unqualified=false when the flag is false', () => {
-    const tables = discoverChunkTables(makeBuild(false));
-    expect(tables).toHaveLength(1);
-    expect(tables[0].unqualified).toBe(false);
-
-    const { text } = buildChunkSearchSql(tables[0], '[1,0,0]', 5, null);
-    expect(text).toContain('FROM "llm_test"."articles_chunks"');
-  });
-
-  it('sets unqualified=false when the flag is absent (default behavior unchanged)', () => {
-    const tables = discoverChunkTables(makeBuild(undefined));
-    expect(tables).toHaveLength(1);
-    expect(tables[0].unqualified).toBe(false);
 
     const { text } = buildChunkSearchSql(tables[0], '[1,0,0]', 5, null);
     expect(text).toContain('FROM "llm_test"."articles_chunks"');

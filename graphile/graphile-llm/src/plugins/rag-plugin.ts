@@ -94,11 +94,6 @@ export function discoverChunkTables(build: any): ChunkTableInfo[] {
   const pgRegistry = build.input?.pgRegistry ?? build.pgRegistry;
   if (!pgRegistry) return chunkTables;
 
-  // Blueprint pooling: when the instance is built with unqualified pg
-  // identifiers, tenant-data references must be search_path-relative (bare
-  // table name) so the per-request search_path resolves the tenant schema.
-  const unqualified = (build.options as any)?.constructiveUnqualified === true;
-
   // Scan all codecs for @hasChunks smart tag
   for (const codec of Object.values(pgRegistry.pgCodecs || {})) {
     const c = codec as any;
@@ -109,7 +104,6 @@ export function discoverChunkTables(build: any): ChunkTableInfo[] {
 
     const info = parseHasChunksTag(tags.hasChunks, c);
     if (info) {
-      info.unqualified = unqualified;
       chunkTables.push(info);
     }
   }
@@ -128,11 +122,8 @@ export function buildChunkSearchSql(
   limit: number,
   maxDistance: number | null
 ): { text: string; values: any[] } {
-  // Under blueprint pooling (unqualified pg identifiers) the chunk table is a
-  // tenant-data reference, so emit it bare and let the per-request search_path
-  // resolve the tenant. Otherwise keep the schema-qualified reference when a
-  // schema is known (default behavior unchanged).
-  const qualifiedTable = table.unqualified || !table.chunksSchema
+  // Keep the schema-qualified reference when a schema is known.
+  const qualifiedTable = !table.chunksSchema
     ? `"${table.chunksTableName}"`
     : `"${table.chunksSchema}"."${table.chunksTableName}"`;
 

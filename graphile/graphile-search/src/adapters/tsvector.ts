@@ -96,15 +96,9 @@ export function createTsvectorAdapter(
       alias: SQL,
       column: SearchableColumn,
       filterValue: any,
-      build: any,
+      _build: any,
     ): FilterApplyResult | null {
       if (filterValue == null) return null;
-
-      // When the instance is built for blueprint pooling
-      // (schema.constructiveUnqualified), emit search_path-relative references for
-      // tenant-data tables so the per-request search_path resolves the tenant
-      // schema. Default (flag absent): fully schema-qualified, byte-identical.
-      const constructiveUnqualified = !!((build as any)?.options?.constructiveUnqualified);
 
       // Handle includeChunks option when filter is an object
       let val: string;
@@ -123,7 +117,7 @@ export function createTsvectorAdapter(
       // Check for chunk-aware querying
       const chunksInfo = column.adapterData as ChunksInfo | undefined;
       if (chunksInfo && chunksInfo.searchField && (includeChunks !== false)) {
-        const chunksTableRef = (chunksInfo.chunksSchema && !constructiveUnqualified)
+        const chunksTableRef = chunksInfo.chunksSchema
           ? sql`${sql.identifier(chunksInfo.chunksSchema)}.${sql.identifier(chunksInfo.chunksTableName)}`
           : sql`${sql.identifier(chunksInfo.chunksTableName)}`;
         const parentFk = sql.identifier(chunksInfo.parentFkField);

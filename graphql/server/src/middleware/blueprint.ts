@@ -5,9 +5,9 @@ import type { Pool } from 'pg';
 // Blueprint pooling identity helpers
 //
 // OPT-IN "blueprint pooling" shares one PostGraphile instance per schema-shape.
-// Tenants are routed per request via a search_path pgSetting. These helpers
-// derive the identity of a shared instance (shape fingerprint + blueprint key)
-// and provide the search_path plumbing needed to route unqualified SQL.
+// Tenants are routed per request by the rewriting pool (canonical→tenant schema-
+// identifier rewrite; see ./rewrite-pool). These helpers derive the identity of a
+// shared instance (shape fingerprint + blueprint key).
 // =============================================================================
 
 /**
@@ -34,33 +34,13 @@ export const stripSchemaHashPrefix = (name: string): string => {
   return name.slice(match.index + match[0].length);
 };
 
-/**
- * Render a list of schema names as a Postgres `search_path` value: each name is
- * wrapped in double quotes (embedded double quotes doubled) and comma-joined,
- * e.g. `["a-b-c", "a-b-d"]` -> `"a-b-c", "a-b-d"`.
- */
-export const quoteSearchPath = (schemas: string[]): string =>
-  schemas.map((name) => `"${name.replace(/"/g, '""')}"`).join(', ');
-
-/**
- * Render the per-request search_path for a pooled instance: the tenant's
- * physical schemas FIRST (so unqualified tenant relations resolve to the
- * tenant), then `public` LAST. `public` must stay on the path because shared
- * objects live there (e.g. the `email` domain used by SECURITY DEFINER auth
- * functions without their own `SET search_path`); dropping it breaks sign_in
- * with "type email does not exist".
- */
-export const tenantSearchPath = (schemas: string[]): string =>
-  quoteSearchPath([...schemas.filter((s) => s !== 'public'), 'public']);
-
 export interface SchemaRelation {
   nspname: string;
   relname: string;
 }
 
 /**
- * Single catalog scan backing both the shape fingerprint and the collision
- * check (they previously issued the same pg_class scan twice per decision).
+ * Single catalog scan backing the shape fingerprint.
  */
 export const fetchSchemaRelations = async (
   pool: Pool,
@@ -102,27 +82,6 @@ export const fingerprintFromRelations = (rows: SchemaRelation[]): string => {
 };
 
 /**
- * Pure collision detection over pre-fetched relations: relation names present
- * in more than one PHYSICAL schema of the set (would make unqualified SQL
- * ambiguous under search_path routing).
- */
-export const collisionsFromRelations = (rows: SchemaRelation[]): string[] => {
-  const schemasByRelname = new Map<string, Set<string>>();
-  for (const row of rows) {
-    let set = schemasByRelname.get(row.relname);
-    if (!set) {
-      set = new Set<string>();
-      schemasByRelname.set(row.relname, set);
-    }
-    set.add(row.nspname);
-  }
-  return [...schemasByRelname.entries()]
-    .filter(([, schemas]) => schemas.size > 1)
-    .map(([relname]) => relname)
-    .sort();
-};
-
-/**
  * Compute a fingerprint of the relational shape shared by a set of physical
  * schemas. Physical schema names are mapped to their logical form (hash prefix
  * stripped) so that different tenants of the same shape collapse to the same
@@ -133,18 +92,6 @@ export const computeShapeFingerprint = async (
   pool: Pool,
   physicalSchemas: string[]
 ): Promise<string> => fingerprintFromRelations(await fetchSchemaRelations(pool, physicalSchemas));
-
-/**
- * Detect relation-name collisions that would make unqualified SQL ambiguous:
- * relation names present in more than one of the given schemas. Returns the
- * offending relation names (sorted). E.g. a tenant with `identity_providers`
- * as a table in `auth-private` and a view in `auth-public` yields
- * `['identity_providers']`.
- */
-export const checkUnqualifiedCollisions = async (
-  pool: Pool,
-  physicalSchemas: string[]
-): Promise<string[]> => collisionsFromRelations(await fetchSchemaRelations(pool, physicalSchemas));
 
 /**
  * Compute the stable blueprint key that identifies a poolable PostGraphile

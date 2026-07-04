@@ -1,6 +1,5 @@
 import {
   computeBlueprintKey,
-  quoteSearchPath,
   stripSchemaHashPrefix
 } from '../blueprint';
 
@@ -38,24 +37,6 @@ describe('stripSchemaHashPrefix', () => {
     expect(stripSchemaHashPrefix('marketplace-abcdef1-app-public')).toBe(
       'marketplace-abcdef1-app-public'
     );
-  });
-});
-
-describe('quoteSearchPath', () => {
-  it('wraps each name in double quotes and comma-joins', () => {
-    expect(quoteSearchPath(['a-b-c', 'a-b-d'])).toBe('"a-b-c", "a-b-d"');
-  });
-
-  it('quotes a single element without a trailing comma', () => {
-    expect(quoteSearchPath(['app-public'])).toBe('"app-public"');
-  });
-
-  it('escapes embedded double quotes by doubling them', () => {
-    expect(quoteSearchPath(['weird"name', 'x'])).toBe('"weird""name", "x"');
-  });
-
-  it('returns an empty string for an empty list', () => {
-    expect(quoteSearchPath([])).toBe('');
   });
 });
 
@@ -123,20 +104,6 @@ describe('computeBlueprintKey', () => {
     expect(computeBlueprintKey({ ...base, apiName: null })).toBe(
       computeBlueprintKey({ ...base, apiName: '' })
     );
-  });
-});
-
-describe('tenantSearchPath (W3 fix: keep shared public on the path)', () => {
-  const { tenantSearchPath } = require('../blueprint');
-
-  it('appends public after the tenant schemas', () => {
-    expect(tenantSearchPath(['t-5e6b13b2-app-public', 't-5e6b13b2-public'])).toBe(
-      '"t-5e6b13b2-app-public", "t-5e6b13b2-public", "public"'
-    );
-  });
-
-  it('does not duplicate an explicit public entry and keeps it last', () => {
-    expect(tenantSearchPath(['public', 'services_public'])).toBe('"services_public", "public"');
   });
 });
 

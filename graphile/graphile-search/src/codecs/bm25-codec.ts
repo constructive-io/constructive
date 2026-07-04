@@ -42,9 +42,9 @@ export interface Bm25IndexInfo {
  * Concurrent gathers are serialized by the server's build semaphore, so a
  * single global store is tolerated for now. Under blueprint pooling the store
  * is keyed by the representative tenant's schema; the BM25 adapter reads the
- * index NAME from these entries and, when schema.constructiveUnqualified is set,
- * passes it unqualified to to_bm25query so the per-request search_path resolves
- * the correct tenant index at query time.
+ * index NAME from these entries and always passes the schema-qualified index
+ * name to to_bm25query. Under pooling the rewriting pool maps canonical→tenant
+ * schemas at query time, resolving the correct tenant index.
  */
 export const bm25IndexStore = new Map<string, Bm25IndexInfo>();
 

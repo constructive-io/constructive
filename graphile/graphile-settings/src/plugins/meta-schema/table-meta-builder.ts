@@ -134,8 +134,9 @@ export function collectTablesMeta(build: MetaBuild): TableMeta[] {
   const tablesMeta: TableMeta[] = [];
   // Shared (pooled) instances serve many tenants: reporting the build-time
   // PHYSICAL schema name would leak the representative tenant's hashed schema
-  // identifier to every other tenant via _meta — report the logical name.
-  const unqualified = !!(build.options as any)?.constructiveUnqualified;
+  // identifier to every other tenant via _meta. When schema.constructivePooled
+  // is set, report the logical (hash-stripped) name instead.
+  const pooled = !!(build.options as any)?.constructivePooled;
 
   for (const resource of Object.values(build.input.pgRegistry.pgResources || {})) {
     if (!isTableResource(resource)) continue;
@@ -154,7 +155,7 @@ export function collectTablesMeta(build: MetaBuild): TableMeta[] {
     }
 
     tablesMeta.push(
-      buildTableMeta(resource, unqualified ? stripSchemaHashPrefix(schemaName) : schemaName, context)
+      buildTableMeta(resource, pooled ? stripSchemaHashPrefix(schemaName) : schemaName, context)
     );
   }
 

@@ -3,7 +3,6 @@ import type { Pool } from 'pg';
 
 import type { ApiStructure } from '../types';
 import {
-  collisionsFromRelations,
   computeBlueprintKey,
   fetchSchemaRelations,
   fingerprintFromRelations,
@@ -13,8 +12,9 @@ import {
 // =============================================================================
 // Blueprint Pooling: per-svc decision + decision cache
 //
-// Decides whether a service (svc_key) may attach to a SHARED, search_path-routed
-// PostGraphile instance (blueprint pooling) or must keep a per-tenant instance.
+// Decides whether a service (svc_key) may attach to a SHARED PostGraphile
+// instance (blueprint pooling, tenant-routed by the rewriting pool — see
+// ./rewrite-pool) or must keep a per-tenant instance.
 // Kept in its own module — free of the heavy graphile.ts import chain — so the
 // decision logic is unit-testable without loading PostGraphile.
 // =============================================================================
@@ -24,7 +24,7 @@ const log = new Logger('graphile:pooling');
 export interface PoolDecision {
   /** Effective graphileCache key: a `bp:` blueprint key when pooling, else the svc_key. */
   key: string;
-  /** Whether this svc attaches to a shared, search_path-routed instance. */
+  /** Whether this svc attaches to a shared (blueprint-pooled) instance. */
   pooling: boolean;
   /**
    * True when the fallback came from a thrown catalog probe (a possibly
@@ -42,9 +42,9 @@ export interface PoolDecision {
 }
 
 /**
- * Memoized pooling decision per svc_key. Computing a decision runs two catalog
- * probes (shape fingerprint + collision check), so the result is cached and
- * invalidated on flush (see clearPoolDecisions / flushService).
+ * Memoized pooling decision per svc_key. Computing a decision runs one catalog
+ * probe (the shape fingerprint), so the result is cached and invalidated on
+ * flush (see clearPoolDecisions / flushService).
  */
 const poolDecisions = new Map<string, PoolDecision>();
 
@@ -85,8 +85,7 @@ export function clearPoolDecisionsForDatabase(databaseId: string): string[] {
  *
  * Returns `{ pooling: false, key: svcKey }` — a per-tenant instance keyed by the
  * normal svc_key — when the API opts out of pooling: realtime is enabled, there
- * are no schemas, an unqualified relation-name collision would make search_path
- * routing ambiguous, or the catalog probes throw. Otherwise returns
+ * are no schemas, or the catalog probe throws. Otherwise returns
  * `{ pooling: true, key: 'bp:...' }` so same-shape tenants share one instance.
  *
  * Exported for unit testing; the dispatcher uses the cached resolvePoolDecision.
@@ -106,15 +105,8 @@ export const computePoolDecision = async (
   }
 
   try {
-    // One catalog scan feeds both the fingerprint and the collision check.
+    // One catalog scan feeds the fingerprint.
     const relations = await fetchSchemaRelations(pool, api.schema);
-    const collisions = collisionsFromRelations(relations);
-    if (collisions.length > 0) {
-      log.warn(
-        `svc=${svcKey} not poolable — unqualified relation collision(s): ${collisions.join(', ')}; using per-tenant instance`
-      );
-      return { key: svcKey, pooling: false };
-    }
 
     const key = computeBlueprintKey({
       logicalSchemas: api.logicalSchemas ?? api.schema.map(stripSchemaHashPrefix),
@@ -127,7 +119,7 @@ export const computePoolDecision = async (
     return { key, pooling: true };
   } catch (err) {
     log.warn(
-      `svc=${svcKey} not poolable — shape/collision probe failed: ${err instanceof Error ? err.message : String(err)}; using per-tenant instance (not memoized)`
+      `svc=${svcKey} not poolable — shape probe failed: ${err instanceof Error ? err.message : String(err)}; using per-tenant instance (not memoized)`
     );
     return { key: svcKey, pooling: false, transient: true };
   }
