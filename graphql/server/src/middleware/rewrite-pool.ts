@@ -1,5 +1,12 @@
 import { createHash } from 'node:crypto';
 
+import {
+  createIntrospectionInterceptor,
+  type IntrospectionInterceptor,
+  isIntrospectionQuery,
+  noteIntrospectionCallbackPassthrough
+} from './introspection-filter';
+
 // =============================================================================
 // Rewriting pool: per-request tenant schema rewriting for a pooled instance
 //
@@ -46,6 +53,13 @@ export interface RewritingPoolOptions {
   maxPreparedNames?: number;
   /** Optional shared counters; a fresh set is created when omitted. */
   counters?: RewriteCounters;
+  /**
+   * When set, the pooled instance's catalog introspection query is scoped to the
+   * given served schemas (plus their transitive cross-schema references, public
+   * and pg_catalog) before it runs — see ./introspection-filter. `false`/omitted
+   * leaves introspection unfiltered (today's behavior).
+   */
+  introspectionFilter?: { servedSchemas: string[] } | false;
 }
 
 /** Build a zeroed counters object (companion to RewritingPoolOptions.counters). */
@@ -317,9 +331,16 @@ interface CheckoutState {
   tenantTag: string | null;
   /** Set when the tenant schema set can't satisfy the canonical shape (fail closed). */
   invalidReason: string | null;
+  /** Per-checkout introspection interceptor (memoizes discovery); null when the filter is off. */
+  introspectionInterceptor: IntrospectionInterceptor | null;
 }
 
-const freshState = (): CheckoutState => ({ tenantMap: null, tenantTag: null, invalidReason: null });
+const freshState = (): CheckoutState => ({
+  tenantMap: null,
+  tenantTag: null,
+  invalidReason: null,
+  introspectionInterceptor: null
+});
 
 const sha256hex = (input: string): string => createHash('sha256').update(input).digest('hex');
 
@@ -497,6 +518,37 @@ export function createRewritingPool(pool: any, opts: RewritingPoolOptions): any 
   const interceptQuery = (rawQuery: any, thisArg: any, args: any[], state: CheckoutState): any => {
     const first = args[0];
 
+    // Introspection filter (runs BEFORE settings parsing and any needs-rewrite /
+    // fail-closed logic). The introspection statement carries schema names only
+    // as string literals, so the identifier rewrite pass never applies to it —
+    // we forward the swapped text directly, bypassing rewriting entirely.
+    if (state.introspectionInterceptor) {
+      let iText: string | undefined;
+      if (typeof first === 'string') iText = first;
+      else if (first && typeof first === 'object' && typeof first.text === 'string') iText = first.text;
+      if (iText !== undefined && isIntrospectionQuery(iText)) {
+        // A callback-form introspection query would break callback semantics if
+        // rewritten async — pass it through unfiltered and count it.
+        if (typeof args[args.length - 1] === 'function') {
+          noteIntrospectionCallbackPassthrough();
+          return rawQuery.apply(thisArg, args);
+        }
+        const swap = state.introspectionInterceptor(iText, {
+          query: (sql: string, values?: any[]) => thisArg.query(sql, values)
+        });
+        if (swap !== null) {
+          return Promise.resolve(swap).then((swapped: string) => {
+            if (swapped === iText) return rawQuery.apply(thisArg, args);
+            if (typeof first === 'string') {
+              return rawQuery.apply(thisArg, [swapped, ...args.slice(1)]);
+            }
+            return rawQuery.apply(thisArg, [{ ...first, text: swapped }, ...args.slice(1)]);
+          });
+        }
+        // swap === null: filter disabled / no served schemas — fall through.
+      }
+    }
+
     let text: string;
     let values: any;
     let name: any;
@@ -555,8 +607,18 @@ export function createRewritingPool(pool: any, opts: RewritingPoolOptions): any 
     return rawQuery.apply(thisArg, [newText, ...args.slice(1)]);
   };
 
+  const introspectionFilter = opts.introspectionFilter;
+
   const wrapClient = (client: any): any => {
     const state = freshState();
+    // Per-checkout introspection interceptor: memoizes the closure discovery so a
+    // single build's introspection is filtered once and reused. A fresh interceptor
+    // per checkout keeps the memo connection-scoped.
+    if (introspectionFilter && Array.isArray(introspectionFilter.servedSchemas)) {
+      state.introspectionInterceptor = createIntrospectionInterceptor({
+        servedSchemas: introspectionFilter.servedSchemas
+      });
+    }
     return new Proxy(client, {
       get(target, prop, receiver) {
         if (prop === 'query') {
@@ -568,6 +630,7 @@ export function createRewritingPool(pool: any, opts: RewritingPoolOptions): any 
             state.tenantMap = null;
             state.tenantTag = null;
             state.invalidReason = null;
+            state.introspectionInterceptor = null;
             return target.release.apply(target, args);
           };
         }

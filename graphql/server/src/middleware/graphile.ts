@@ -25,6 +25,10 @@ import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
 import { isBlueprintPoolingEnabled, stripSchemaHashPrefix } from './blueprint';
 import { resolvePoolDecision } from './pooling-decision';
+import {
+  createIntrospectionFilterPool,
+  isIntrospectionFilterEnabled
+} from './introspection-filter';
 import { createRewritingPool, POOL_SCHEMAS_GUC } from './rewrite-pool';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
@@ -325,9 +329,22 @@ const buildPreset = (
   // physical schemas; the rewriting pool swaps canonical→tenant schema
   // identifiers per request (see ./rewrite-pool). Dedicated instances use the
   // raw pool untouched.
+  // Introspection filter (opt-in via GRAPHILE_INTROSPECTION_FILTER): scope the
+  // instance's catalog introspection to the schemas it serves. Only active when
+  // the flag is on AND we have a concrete served-schema list; otherwise the pool
+  // selection below is byte-identical to today. Pooled instances receive the
+  // filter through the rewriting pool; dedicated instances get a thin filter-only
+  // wrapper on the raw pool.
+  const introspectionFilterActive = isIntrospectionFilterEnabled() && schemas.length > 0;
   const servicePool = pooling
-    ? createRewritingPool(pool, { canonicalSchemas: schemas, logicalName: stripSchemaHashPrefix })
-    : pool;
+    ? createRewritingPool(pool, {
+        canonicalSchemas: schemas,
+        logicalName: stripSchemaHashPrefix,
+        introspectionFilter: introspectionFilterActive ? { servedSchemas: schemas } : false
+      })
+    : introspectionFilterActive
+      ? createIntrospectionFilterPool(pool, { servedSchemas: schemas })
+      : pool;
   const preset: GraphileConfig.Preset = {
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [AuthCookiePlugin],

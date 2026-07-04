@@ -1783,6 +1783,9 @@ importers:
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
+      pg-introspection:
+        specifier: 1.0.1
+        version: 1.0.1
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)

@@ -5,6 +5,7 @@ import { Logger } from '@pgpmjs/logger';
 import { getCacheCounters, getCacheStats } from 'graphile-cache';
 
 import { getBuildQueueDepth, getGraphileCounters } from '../middleware/graphile';
+import { getIntrospectionFilterCounters } from '../middleware/introspection-filter';
 import { getRewritePoolCounters } from '../middleware/rewrite-pool';
 import { getConnectionErrorGuardCounters } from './connection-error-guard';
 
@@ -128,6 +129,7 @@ export interface MetricsSample {
       buildQueueDepth: number;
       connGuard: ReturnType<typeof getConnectionErrorGuardCounters>;
       rewritePool: ReturnType<typeof getRewritePoolCounters>;
+      introspectionFilter: ReturnType<typeof getIntrospectionFilterCounters>;
     };
   gc: GcStats;
 }
@@ -156,7 +158,8 @@ export const collectMetricsSample = (): MetricsSample => {
       ...getGraphileCounters(),
       buildQueueDepth: getBuildQueueDepth(),
       connGuard: getConnectionErrorGuardCounters(),
-      rewritePool: getRewritePoolCounters()
+      rewritePool: getRewritePoolCounters(),
+      introspectionFilter: getIntrospectionFilterCounters()
     },
     gc: snapshotGcStats()
   };
