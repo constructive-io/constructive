@@ -103,9 +103,14 @@ export const TENANT_SCHEMAS_SQL =
 // ---------------------------------------------------------------------------
 
 // Time-partitioned parents belonging to a tenant's schema set. `$1` is an array
-// of `'<schema>.%'` LIKE patterns. partition_interval is returned as text and
-// parsed in JS (parsePartitionIntervalSeconds) so a non-time interval simply
-// fails to parse and that parent is skipped, rather than throwing here.
+// of `'<schema>.%'` LIKE patterns built by buildPartConfigLikePatterns, which
+// escapes the LIKE metacharacters in the schema names (so an underscore in a
+// schema cannot act as a single-char wildcard and pull in a DIFFERENT tenant's
+// parents). Matching relies on LIKE's default backslash escape — an explicit
+// ESCAPE clause is not permitted with the `LIKE ANY` quantified form.
+// partition_interval is returned as text and parsed in JS
+// (parsePartitionIntervalSeconds) so a non-time interval simply fails to parse
+// and that parent is skipped, rather than throwing here.
 export const PART_CONFIG_FOR_TENANT_SQL = `
   SELECT parent_table,
          partition_interval::text AS partition_interval,
@@ -113,6 +118,23 @@ export const PART_CONFIG_FOR_TENANT_SQL = `
     FROM partman.part_config
    WHERE parent_table LIKE ANY($1)
    ORDER BY parent_table`;
+
+// Escape the three LIKE metacharacters (backslash, %, _) in a literal so it
+// matches only itself. PostgreSQL's LIKE treats backslash as its default escape
+// character, so an escaped literal needs no explicit ESCAPE clause.
+export const escapeLikeLiteral = (s: string): string => String(s).replace(/([\\%_])/g, '\\$1');
+
+// Build the `'<schema>.%'` patterns for PART_CONFIG_FOR_TENANT_SQL's `LIKE ANY`.
+// Physical schema names here carry dashes and MAY carry underscores; left
+// unescaped, an underscore is a LIKE single-character wildcard, so a schema
+// 'foo_bar' would yield 'foo_bar.%' and also match a DIFFERENT tenant's
+// 'fooXbar.<table>' parent (a cross-tenant over-match). Escaping the
+// metacharacters pins the schema to itself; the trailing '.%' stays the one
+// intended wildcard (the table component), and the '.' is a literal that anchors
+// the schema/table boundary exactly.
+export function buildPartConfigLikePatterns(schemas: string[]): string[] {
+  return schemas.map((s) => `${escapeLikeLiteral(s)}.%`);
+}
 
 // Confirm a parent is a native partitioned table (relkind 'p') before we add a
 // child to it. `$1` = schema, `$2` = table.

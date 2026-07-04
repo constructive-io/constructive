@@ -1,5 +1,8 @@
 import { Tenant } from '../../core/fleetfile';
+import { verdictFromChecks } from '../compare';
 import {
+  buildResidencyAbortCheck,
+  buildTeardownLeftoverWarning,
   computeCreepProjection,
   DEEP_SCENARIOS,
   deriveSurfaceFleets,
@@ -137,5 +140,61 @@ describe('scenarioEnabled', () => {
   test('--skip removes, and wins over --only', () => {
     expect(scenarioEnabled('partition-creep', null, ['partition-creep'])).toBe(false);
     expect(scenarioEnabled('partition-creep', ['partition-creep'], ['partition-creep'])).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// teardown-leftover warning (settings-variant-split / realtime-dedicated-cost)
+// ---------------------------------------------------------------------------
+describe('buildTeardownLeftoverWarning', () => {
+  test('surfaces a warning naming the scenario and the leftover row count', () => {
+    const w = buildTeardownLeftoverWarning('settings-variant-split', 2);
+    expect(w).not.toBeNull();
+    expect(w).toContain('settings-variant-split');
+    expect(w).toMatch(/left 2 database_settings row/);
+  });
+
+  test('no warning when the teardown restored cleanly (0 rows)', () => {
+    expect(buildTeardownLeftoverWarning('settings-variant-split', 0)).toBeNull();
+  });
+
+  test('no warning when the leftover count is unknown (null — the teardown error already warned)', () => {
+    expect(buildTeardownLeftoverWarning('realtime-dedicated-cost', null)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// residency fail-closed check (multi-api-residency abort) — the gradeable deep
+// check must not be able to silently PASS when the scenario aborts early
+// ---------------------------------------------------------------------------
+describe('buildResidencyAbortCheck', () => {
+  test('is a FAILING, non-advisory gradeable check that explains the abort', () => {
+    const c = buildResidencyAbortCheck('no baseline metrics sample');
+    expect(c.name).toBe('multi-api-residency');
+    expect(c.pass).toBe(false);
+    expect(c.advisory).toBeUndefined();
+    expect(c.note).toContain('no baseline metrics sample');
+  });
+
+  test('GATES the verdict — an aborted residency scenario cannot silently PASS', () => {
+    const verdict = verdictFromChecks([buildResidencyAbortCheck('boom')]);
+    expect(verdict.pass).toBe(false);
+    expect(verdict.exitCode).toBe(1);
+    expect(verdict.failed).toContain('multi-api-residency');
+  });
+
+  test('advisory-only failures still PASS (the fail-open bug); adding the abort check FAILS (the fix)', () => {
+    const advisoryFailure = {
+      name: 'multi-api-heap-plateau',
+      advisory: true,
+      pass: false,
+      value: 1,
+      threshold: 0,
+      note: 'x'
+    };
+    // Fail-open shape: no gradeable check present → suite still PASSES.
+    expect(verdictFromChecks([advisoryFailure]).pass).toBe(true);
+    // Fail-closed shape: the abort check gates it to FAIL.
+    expect(verdictFromChecks([advisoryFailure, buildResidencyAbortCheck('boom')]).pass).toBe(false);
   });
 });

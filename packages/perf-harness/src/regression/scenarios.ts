@@ -18,8 +18,8 @@
  * residency invariant). Everything else is ADVISORY: reported, never gating.
  *
  * The PURE helpers (rewriteHostPrefix / deriveSurfaceFleets / computeCreepProjection
- * / parsePartitionIntervalSeconds / scenarioEnabled) are exported for unit tests
- * and touch no PG or network.
+ * / parsePartitionIntervalSeconds / scenarioEnabled / buildTeardownLeftoverWarning
+ * / buildResidencyAbortCheck) are exported for unit tests and touch no PG or network.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -35,6 +35,7 @@ import { CheckResult } from './compare';
 import {
   buildCreateProbePartition,
   buildDropProbePartition,
+  buildPartConfigLikePatterns,
   buildSettingsInsert,
   DATABASE_ID_BY_NAME_SQL,
   IS_PARTITIONED_PARENT_SQL,
@@ -444,11 +445,38 @@ async function teardownSettings(
   }
 }
 
+// Surface a non-exact teardown into the suite warnings: when a scenario's
+// teardown left settings rows behind (rowsRemaining > 0) the rig is no longer
+// exactly as found, and that must be VISIBLE in the verdict output — not merely
+// recorded in `data`. Returns the warning string, or null when nothing leaked
+// (0 rows) or the leftover count is unknown (null — the teardown itself already
+// pushed its own error warning). Pure (no PG/IO); exported for unit tests.
+export function buildTeardownLeftoverWarning(scenario: string, rowsRemaining: number | null): string | null {
+  if (typeof rowsRemaining === 'number' && rowsRemaining > 0) {
+    return `${scenario} TEARDOWN left ${rowsRemaining} database_settings row(s) behind (manual cleanup may be needed)`;
+  }
+  return null;
+}
+
 // ===========================================================================
 // 1) multi-api-residency  (GRADEABLE residency + ADVISORY heap / thrash)
 // ===========================================================================
 
 const SURFACES = ['api', 'admin', 'usage'] as const; // + auth via authHost
+
+// Fail-CLOSED CheckResult for the residency invariant when the scenario aborts
+// before it can be measured. NON-advisory (no `advisory` flag) so it GATES the
+// verdict — the whole point is that the suite must not silently PASS when the
+// one gradeable deep check never ran. Pure; exported for unit tests.
+export function buildResidencyAbortCheck(errorMessage: string): CheckResult {
+  return {
+    name: 'multi-api-residency',
+    pass: false,
+    value: null,
+    threshold: 0,
+    note: `residency invariant NOT established — scenario aborted before measurement: ${errorMessage}`
+  };
+}
 
 export async function runMultiApiResidency(ctx: ScenarioContext): Promise<ScenarioResult> {
   const name = 'multi-api-residency';
@@ -605,8 +633,17 @@ export async function runMultiApiResidency(ctx: ScenarioContext): Promise<Scenar
     });
   } catch (e: any) {
     if (!booted && e && e.server) booted = { server: e.server, metricsFile: '' };
-    warnings.push(`multi-api-residency primary phase error: ${e && e.message ? e.message : e}`);
-    data.error = String(e && e.message ? e.message : e);
+    const msg = String(e && e.message ? e.message : e);
+    warnings.push(`multi-api-residency primary phase error: ${msg}`);
+    data.error = msg;
+    // Fail CLOSED: residency is the one GRADEABLE deep check. If we aborted
+    // before recording it, the suite would otherwise PASS with the invariant
+    // never tested (advisory checks don't gate). Push a FAILING gradeable result
+    // — unless the residency check already landed — so the verdict reflects that
+    // the invariant could not be established.
+    if (!checks.some((c) => c.name === name)) {
+      checks.push(buildResidencyAbortCheck(msg));
+    }
   } finally {
     await stopServer(booted ? booted.server : null);
   }
@@ -849,6 +886,8 @@ export async function runSettingsVariantSplit(ctx: ScenarioContext): Promise<Sce
     const td = await teardownSettings(ctx, insertedIds);
     data.teardownRowsRemaining = td.rowsRemaining;
     if (td.error) warnings.push(`settings-variant-split TEARDOWN failed (manual cleanup may be needed): ${td.error}`);
+    const leftover = buildTeardownLeftoverWarning(name, td.rowsRemaining);
+    if (leftover) warnings.push(leftover);
   }
 
   return { name, ran: true, checks, data, warnings };
@@ -984,6 +1023,8 @@ export async function runRealtimeDedicatedCost(ctx: ScenarioContext): Promise<Sc
     const td = await teardownSettings(ctx, insertedIds);
     data.teardownRowsRemaining = td.rowsRemaining;
     if (td.error) warnings.push(`realtime-dedicated-cost TEARDOWN failed (manual cleanup may be needed): ${td.error}`);
+    const leftover = buildTeardownLeftoverWarning(name, td.rowsRemaining);
+    if (leftover) warnings.push(leftover);
   }
 
   return { name, ran: true, checks, data, warnings };
@@ -1025,7 +1066,7 @@ export async function runPartitionCreep(ctx: ScenarioContext): Promise<ScenarioR
         data.skipped = 'no physical schemas for tenant';
         return;
       }
-      const patterns = schemas.map((s: string) => `${s}.%`);
+      const patterns = buildPartConfigLikePatterns(schemas);
       const partRows = (await client.query(PART_CONFIG_FOR_TENANT_SQL, [patterns])).rows as any[];
       if (partRows.length === 0) {
         data.skipped = 'no partman.part_config rows for this tenant (not partitioned / partman absent)';

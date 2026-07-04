@@ -1,7 +1,10 @@
 import {
   buildCreateProbePartition,
   buildDropProbePartition,
+  buildPartConfigLikePatterns,
   buildSettingsInsert,
+  escapeLikeLiteral,
+  PART_CONFIG_FOR_TENANT_SQL,
   qid,
   SCHEMA_UPDATE_CHANNEL,
   SETTINGS_DELETE_SQL,
@@ -90,5 +93,44 @@ describe('splitParentTable', () => {
     expect(splitParentTable('events')).toBeNull();
     expect(splitParentTable('.events')).toBeNull();
     expect(splitParentTable('schema.')).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// partman LIKE-pattern building — escape LIKE metacharacters so a schema's
+// underscore/percent cannot over-match a DIFFERENT tenant's parents
+// ---------------------------------------------------------------------------
+describe('escapeLikeLiteral', () => {
+  test('escapes the three LIKE metacharacters (backslash, %, _)', () => {
+    expect(escapeLikeLiteral('foo_bar')).toBe('foo\\_bar');
+    expect(escapeLikeLiteral('a%b')).toBe('a\\%b');
+    expect(escapeLikeLiteral('a\\b')).toBe('a\\\\b');
+  });
+
+  test('leaves dashes and dots untouched (not LIKE metacharacters)', () => {
+    expect(escapeLikeLiteral('factory2-aaaa1111-app-private')).toBe('factory2-aaaa1111-app-private');
+    expect(escapeLikeLiteral('a.b')).toBe('a.b');
+  });
+});
+
+describe('buildPartConfigLikePatterns', () => {
+  test('appends the intended .% table wildcard to each schema', () => {
+    expect(buildPartConfigLikePatterns(['factory2-aaaa1111-app-private'])).toEqual([
+      'factory2-aaaa1111-app-private.%'
+    ]);
+  });
+
+  test('an underscore in a schema is escaped so it cannot match a foreign tenant', () => {
+    // Unescaped, 'foo_bar.%' would ALSO match 'fooXbar.<table>' (a cross-tenant
+    // over-match); escaped, only the literal 'foo_bar.<table>' can match.
+    expect(buildPartConfigLikePatterns(['foo_bar'])).toEqual(['foo\\_bar.%']);
+  });
+
+  test('preserves order and escapes each schema independently', () => {
+    expect(buildPartConfigLikePatterns(['a_b', 'c-d', 'e%f'])).toEqual(['a\\_b.%', 'c-d.%', 'e\\%f.%']);
+  });
+
+  test('the query it feeds still matches with LIKE ANY over $1', () => {
+    expect(PART_CONFIG_FOR_TENANT_SQL).toContain('parent_table LIKE ANY($1)');
   });
 });
