@@ -1177,7 +1177,32 @@ function buildMutationHandler(
     }
   }
 
-  const selectObj = buildSelectObject(table, typeRegistry);
+  const selectObj =
+    operation === 'delete'
+      ? t.objectExpression(
+          pkFields.map((pkField) => {
+            // PK constraint names come from PostGraphile inflection (e.g. "principalId"
+            // for the "id" column on the Principal table).  The select clause must use
+            // entity field names that exist on the generated *Select type.
+            const scalarFields = getScalarFields(table);
+            const directMatch = scalarFields.find((f) => f.name === pkField.name);
+            if (directMatch) {
+              return t.objectProperty(t.identifier(pkField.name), t.booleanLiteral(true));
+            }
+            // Reverse the standard inflection: {lcFirst(typeName)}Id → id
+            const prefix = lcFirst(typeName);
+            if (pkField.name.startsWith(prefix)) {
+              const stripped = lcFirst(pkField.name.slice(prefix.length));
+              const match = scalarFields.find((f) => f.name === stripped);
+              if (match) {
+                return t.objectProperty(t.identifier(stripped), t.booleanLiteral(true));
+              }
+            }
+            // Fallback: use the PK name as-is (will surface a TS error if wrong)
+            return t.objectProperty(t.identifier(pkField.name), t.booleanLiteral(true));
+          }),
+        )
+      : buildSelectObject(table, typeRegistry);
 
   let ormArgs: t.ObjectExpression;
 

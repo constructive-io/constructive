@@ -949,12 +949,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         id: answers.id as string
       },
       select: {
-        id: true,
-        make: true,
-        model: true,
-        year: true,
-        isElectric: true,
-        createdAt: true
+        id: true
       }
     }).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -1380,9 +1375,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         id: answers.id as string
       },
       select: {
-        id: true,
-        name: true,
-        licenseNumber: true
+        id: true
       }
     }).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3419,9 +3412,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         id: answers.id as string
       },
       select: {
-        id: true,
-        email: true,
-        name: true
+        id: true
       }
     }).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3637,8 +3628,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         id: answers.id as string
       },
       select: {
-        id: true,
-        role: true
+        id: true
       }
     }).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3914,12 +3904,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
         id: answers.id as string
       },
       select: {
-        id: true,
-        make: true,
-        model: true,
-        year: true,
-        isElectric: true,
-        createdAt: true
+        id: true
       }
     }).execute();
     console.log(JSON.stringify(result, null, 2));
