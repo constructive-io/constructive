@@ -1177,14 +1177,7 @@ function buildMutationHandler(
     }
   }
 
-  const selectObj =
-    operation === 'delete'
-      ? t.objectExpression(
-          pkFields.map((pkField) =>
-            t.objectProperty(t.identifier(pkField.name), t.booleanLiteral(true)),
-          ),
-        )
-      : buildSelectObject(table, typeRegistry);
+  const selectObj = buildSelectObject(table, typeRegistry);
 
   let ormArgs: t.ObjectExpression;
 

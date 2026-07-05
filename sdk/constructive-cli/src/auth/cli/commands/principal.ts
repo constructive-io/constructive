@@ -259,7 +259,15 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
           principalId: answers.principalId as string,
         },
         select: {
-          principalId: true,
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          ownerId: true,
+          userId: true,
+          name: true,
+          allowedMask: true,
+          isReadOnly: true,
+          bypassStepUp: true,
         },
       })
       .execute();
