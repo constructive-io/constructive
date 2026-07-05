@@ -732,7 +732,7 @@ describe('Mutation Operation Matching', () => {
           fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
-        { name: 'CreateUserPayload', kind: 'OBJECT', fields: [] },
+        { name: 'CreateUserPayload', kind: 'OBJECT', fields: [{ name: 'user', type: object('User') }] },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
       [
@@ -760,8 +760,8 @@ describe('Mutation Operation Matching', () => {
           fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
-        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] },
-        { name: 'DeleteUserPayload', kind: 'OBJECT', fields: [] },
+        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [{ name: 'user', type: object('User') }] },
+        { name: 'DeleteUserPayload', kind: 'OBJECT', fields: [{ name: 'user', type: object('User') }] },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
       [
@@ -797,7 +797,7 @@ describe('Mutation Operation Matching', () => {
           fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
-        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] },
+        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [{ name: 'user', type: object('User') }] },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
       [
