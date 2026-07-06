@@ -1,0 +1,13 @@
+{
+  "port": 3345,
+  "defaults": {
+    "heapMb": 1152,
+    "rps": 10,
+    "durationSec": 300,
+    "shape": "uniform",
+    "auth": 1,
+    "mix": "read:0.7,write:0.25,meta:0.05",
+    "serverEnv": { "GRAPHILE_CACHE_INSTANCE_HEAP_BYTES": "1450000000" }
+  },
+  "steps": [{ "name": "floor-div-k1", "fleet": "out/fleet-k1.json" }]
+}

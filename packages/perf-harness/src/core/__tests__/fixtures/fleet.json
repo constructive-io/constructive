@@ -1,0 +1,13 @@
+{
+  "tenants": [
+    { "dbname": "factory1" },
+    { "dbname": "factory2" },
+    { "dbname": "factory3" },
+    { "dbname": "factory4" },
+    { "dbname": "factory5" },
+    { "dbname": "marketplace_db_tenant1" },
+    { "dbname": "tenant2" },
+    { "dbname": "drift_a" },
+    { "dbname": "drift_b" }
+  ]
+}
