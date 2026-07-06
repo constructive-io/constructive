@@ -408,6 +408,17 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         );
       }
 
+      if (statePayload.provider !== provider) {
+        log.warn(`[oauth] State provider mismatch for ${provider}`);
+        return redirectToError(
+          res,
+          baseUrl,
+          DEFAULT_ERROR_REDIRECT_PATH,
+          'INVALID_STATE',
+          provider,
+        );
+      }
+
       const { redirect_uri: redirectUriFromState } = statePayload;
       const ctx = req.constructive;
 
