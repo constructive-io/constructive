@@ -14,3 +14,8 @@ postgres/pgsql-test/output/
 graphql/server/logs/
 graphql/server/*.heapsnapshot
 scripts/scale-validate/out/
+scripts/scale-validate/fleet*.json
+scripts/scale-validate/drifted.json
+scripts/scale-spike/
+packages/perf-harness/perf-out/
+/metrics.jsonl

@@ -78,7 +78,12 @@ const TIMEOUT_MS = asInt(args['timeout-ms'], 30000);
 const MAX_INFLIGHT = asInt(args['max-inflight'], Math.max(64, Math.ceil(RPS * 2)));
 const ROTATE_BACKOFF_MS = asInt(args['rotate-backoff-ms'], 250);
 const EMAIL = typeof args.email === 'string' ? args.email : 'seeder@gmail.com';
+// Never a literal default: flag > PERF_PASSWORD env (matches packages/perf-harness resolveCreds).
 const PASSWORD = typeof args.password === 'string' ? args.password : (process.env.PERF_PASSWORD ?? null);
+if (AUTH && !PASSWORD) {
+  console.error('[harness] --auth requires credentials: pass --password or set PERF_PASSWORD');
+  process.exit(2);
+}
 const SEED = asInt(args.seed, (Date.now() & 0x7fffffff));
 const QUIET = asBool(args.quiet);
 
