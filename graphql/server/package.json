@@ -88,6 +88,7 @@
     "graphile-test": "workspace:*",
     "makage": "^0.3.0",
     "nodemon": "^3.1.14",
+    "pg-introspection": "1.0.1",
     "ts-node": "^10.9.2"
   }
 }

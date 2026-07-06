@@ -24,6 +24,10 @@ import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
+import {
+  createIntrospectionFilterPool,
+  isIntrospectionFilterEnabled
+} from './introspection-filter';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
@@ -312,12 +316,20 @@ const buildPreset = (
   roleName: string,
   databaseSettings?: DatabaseSettings,
 ): GraphileConfig.Preset => {
+  // Introspection filter (opt-in via GRAPHILE_INTROSPECTION_FILTER): scope the
+  // instance's catalog introspection to the schemas it serves. Only active when
+  // the flag is on AND we have a concrete served-schema list; otherwise the pool
+  // selection below is byte-identical to today.
+  const introspectionFilterActive = isIntrospectionFilterEnabled() && schemas.length > 0;
+  const servicePool = introspectionFilterActive
+    ? createIntrospectionFilterPool(pool, { servedSchemas: schemas })
+    : pool;
   const preset: GraphileConfig.Preset = {
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [AuthCookiePlugin],
   pgServices: [
     makePgService({
-      pool,
+      pool: servicePool,
       schemas,
     }),
   ],

@@ -47,6 +47,8 @@ describe('collectMetricsSample', () => {
     expect(typeof sample.counters.evictions.lru).toBe('number');
     expect(typeof sample.counters.builds).toBe('number');
     expect(typeof sample.counters.buildQueueDepth).toBe('number');
+    expect(typeof sample.counters.introspectionFilter.swaps).toBe('number');
+    expect(typeof sample.counters.introspectionFilter.discoveries).toBe('number');
     expect(typeof sample.gc).toBe('object');
 
     // Round-trips through JSON without loss.
