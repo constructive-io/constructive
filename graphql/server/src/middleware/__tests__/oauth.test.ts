@@ -246,6 +246,32 @@ describe('OAuth routes', () => {
     });
   });
 
+  it('rejects callback requests when signed state belongs to another provider', async () => {
+    await withOAuthServer(async (baseUrl) => {
+      const fetchMock = jest.fn();
+      global.fetch = fetchMock as unknown as typeof fetch;
+      const stateCookie = createSignedState<OAuthStatePayload>(
+        { redirect_uri: '/dashboard', provider: 'github' },
+        { secret: OAUTH_SECRET, maxAgeMs: 60_000 },
+      );
+      const callbackUrl = new URL('/auth/google/callback', baseUrl);
+      callbackUrl.searchParams.set('code', 'callback-code');
+      callbackUrl.searchParams.set('state', stateCookie);
+
+      const response = await request(callbackUrl.toString(), {
+        Cookie: `oauth_state=${encodeURIComponent(stateCookie)}`,
+      });
+
+      expect(response.statusCode).toBe(302);
+      const redirect = new URL(response.headers.location!);
+      expect(redirect.pathname).toBe('/auth/error');
+      expect(redirect.searchParams.get('error')).toBe('INVALID_STATE');
+      expect(redirect.searchParams.get('provider')).toBe('google');
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(authQueryMock).not.toHaveBeenCalled();
+    });
+  });
+
   it('uses the identity function schema for successful sign-up callbacks', async () => {
     await withOAuthServer(async (baseUrl) => {
       const beginResponse = await request(`${baseUrl}/auth/github?redirect_uri=%2Fdashboard`);
