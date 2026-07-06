@@ -50,10 +50,19 @@ const SCHEMA_AND_TABLE_SQL = `
 `;
 
 const PLATFORM_DATABASE_SQL = `
-  SELECT id AS database_id
-  FROM metaschema_public.database
-  WHERE owner_id IS NULL
-  ORDER BY created_at ASC
+  SELECT d.id AS database_id
+  FROM metaschema_public.database d
+  WHERE d.name = $1
+     OR EXISTS (
+       SELECT 1
+       FROM services_public.apis a
+       WHERE a.database_id = d.id
+         AND a.dbname = $1
+     )
+  ORDER BY
+    CASE WHEN d.name = $1 THEN 0 ELSE 1 END,
+    CASE WHEN d.owner_id IS NULL THEN 0 ELSE 1 END,
+    d.created_at ASC
   LIMIT 1
 `;
 
@@ -150,7 +159,7 @@ async function resolveSecretsTable(
 export async function resolveIdentityProvidersConfig(
   ctx: LoaderContext,
 ): Promise<IdentityProvidersConfig | undefined> {
-  const { servicesPool, tenantPool, databaseId } = ctx;
+  const { servicesPool, tenantPool, databaseId, dbname } = ctx;
 
   const moduleResult = await tenantPool.query<IdentityProvidersModuleRow>(
     IDENTITY_PROVIDERS_MODULE_SQL,
@@ -165,7 +174,9 @@ export async function resolveIdentityProvidersConfig(
   // Provider credentials are platform-managed; auth functions remain scoped
   // to the current request database.
   const platformDatabaseResult =
-    await servicesPool.query<PlatformDatabaseRow>(PLATFORM_DATABASE_SQL);
+    await servicesPool.query<PlatformDatabaseRow>(PLATFORM_DATABASE_SQL, [
+      dbname,
+    ]);
   const platformDatabaseId = platformDatabaseResult.rows[0]?.database_id;
   if (!platformDatabaseId) return undefined;
 
