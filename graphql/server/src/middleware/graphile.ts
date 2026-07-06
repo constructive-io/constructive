@@ -12,6 +12,7 @@ import type { Pool } from 'pg';
 import {
   createGraphileInstance,
   ensureCacheHeadroom,
+  getMemoryPressure,
   type GraphileCacheEntry,
   graphileCache,
   invokeEntryHandler,
@@ -471,8 +472,65 @@ const buildPreset = (
   return preset;
 };
 
+/**
+ * Bound how long a REQUEST waits on a build, ALWAYS clearing the timeout timer.
+ *
+ * The build itself is not cancelled — makeSchema cannot be aborted — it completes
+ * in the background and fills the cache for retries. Resolves to the built value
+ * when the build wins, or `null` when the wait expires.
+ *
+ * Why the finally/clearTimeout is load-bearing: `Promise.race` subscribes reactions
+ * to BOTH arms. If the timeout timer is left armed after the build wins, Node's
+ * internal timers list keeps the timeout arm's reaction — and, transitively through
+ * the race result promise, the built ~15MB instance — reachable for the full
+ * `timeoutMs` (default 180s). Under evict-churn (GRAPHILE_CACHE_MAX=1) every built
+ * instance stays pinned past its cache eviction, stacking ~2 builds/s × ~15MB × 180s
+ * far beyond the heap ceiling and OOMing the process. `.unref()` only removes
+ * event-loop keepalive, NOT GC retention — the timer must be cleared. clearTimeout()
+ * removes the Timeout from the timers list so the whole chain is collectable the
+ * instant the cache evicts the entry.
+ */
+/**
+ * Thrown from inside the build critical section when heap pressure reaches
+ * critical between a request's admission check and the build's actual start.
+ * The dispatcher maps it (for the requester and every coalesced waiter) to
+ * 503 SERVICE_OVERLOADED instead of a generic 500.
+ */
+export class BuildRefusedError extends Error {
+  readonly code = 'SERVICE_OVERLOADED';
+  constructor(ratio: number) {
+    super(`Schema build refused at critical heap pressure (ratio ${ratio.toFixed(2)})`);
+    this.name = 'BuildRefusedError';
+  }
+}
+
+export const raceBuildAgainstTimeout = async <T>(
+  buildPromise: Promise<T>,
+  timeoutMs: number,
+): Promise<T | null> => {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), timeoutMs);
+    timer.unref?.();
+  });
+  try {
+    return await Promise.race([buildPromise, timeoutPromise]);
+  } finally {
+    // Disarm the timer whether the build won, timed out, or rejected — otherwise
+    // the armed Timeout pins the built instance via the race reaction chain.
+    clearTimeout(timer);
+  }
+};
+
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+
+  // Pause between build STARTS while heap pressure is elevated (ms; 0 disables).
+  // Bounds the allocation rate of an eviction-churn storm so GC keeps pace.
+  const buildPressureSpacingMs = (() => {
+    const n = parseInt(process.env.GRAPHILE_BUILD_PRESSURE_SPACING_MS || '', 10);
+    return Number.isFinite(n) && n >= 0 ? n : 250;
+  })();
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
@@ -619,6 +677,25 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           // transient on undrained instances OOMed the soak — wait them out
           // (bounded; returns immediately when heap pressure is already ok).
           await waitForDrainSettle();
+          // The request-time pressure gate can be seconds stale by the time a
+          // queued build reaches this point: under an eviction-churn storm the
+          // dispatcher sustains tens of builds/s, each retaining ~15MB until GC
+          // catches up, so heap can cross from ok to fatal between two request
+          // admissions. Re-check at the point of allocation — and under elevated
+          // pressure pause once (semaphore held, so this spaces GLOBAL build
+          // starts) to give mark-compact a window before committing the next
+          // transient.
+          let latePressure = getMemoryPressure();
+          if (latePressure.level === 'elevated' && buildPressureSpacingMs > 0) {
+            await new Promise<void>((resolve) => setTimeout(resolve, buildPressureSpacingMs));
+            latePressure = getMemoryPressure();
+          }
+          if (latePressure.level === 'critical') {
+            const refusal = shouldRefuseBuild();
+            if (refusal.refuseBuild) {
+              throw new BuildRefusedError(refusal.ratio);
+            }
+          }
           // A build genuinely starts here: past single-flight coalescing, past the
           // build semaphore, and past the built-meanwhile re-check.
           graphileCounters.builds += 1;
@@ -663,16 +740,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       try {
         // Bound how long a REQUEST waits on a build (queue time + build time).
-        // The build itself is not cancelled — makeSchema cannot be aborted —
-        // it completes in the background and fills the cache for retries.
         const timeoutMs = (() => {
           const n = parseInt(process.env.GRAPHILE_BUILD_TIMEOUT_MS || '', 10);
           return Number.isFinite(n) && n > 0 ? n : 180_000;
         })();
-        const instance = await Promise.race([
-          creationPromise,
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs).unref?.())
-        ]);
+        const instance = await raceBuildAgainstTimeout(creationPromise, timeoutMs);
         if (instance === null) {
           graphileCounters.buildWaitTimeouts += 1;
           log.warn(`${label} Request timed out after ${timeoutMs}ms waiting for PostGraphile[${key}] build`);
@@ -689,6 +761,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           error: { code: 'SERVICE_ROTATING', message: 'Service is restarting, please retry' }
         });
       } catch (error) {
+        // Pressure refusal from inside the critical section: same contract as the
+        // request-time gate — 503 + Retry-After for the requester and every
+        // coalesced waiter, never a generic 500.
+        if (error instanceof BuildRefusedError) {
+          log.warn(`${label} ${error.message} key=${key}`);
+          res.setHeader('Retry-After', '15');
+          return res.status(503).json({
+            error: { code: 'SERVICE_OVERLOADED', message: 'Server is at critical memory pressure; retry shortly' }
+          });
+        }
         log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
         throw new HandlerCreationError(
           `Failed to create handler for ${key}: ${error instanceof Error ? error.message : String(error)}`,

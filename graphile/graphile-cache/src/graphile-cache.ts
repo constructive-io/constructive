@@ -492,7 +492,8 @@ const parseEnvFloat = (value: string | undefined, fallback: number): number => {
 };
 
 /**
- * Current heap pressure against the V8 old-space limit.
+ * Current heap pressure against V8's actually-exhaustible headroom
+ * (used / (used + total_available_size)).
  *
  * elevated (default >=85%): proactively evict idle instances ahead of the LRU
  * schedule. critical (default >=92%): additionally REFUSE to start new schema
@@ -503,9 +504,19 @@ const parseEnvFloat = (value: string | undefined, fallback: number): number => {
  * Tunables: GRAPHILE_MEMORY_GOVERNOR_ELEVATED / GRAPHILE_MEMORY_GOVERNOR_CRITICAL.
  */
 export function getMemoryPressure(): MemoryPressure {
-  const heapLimit = getHeapStatistics().heap_size_limit;
+  const stats = getHeapStatistics();
+  const heapLimit = stats.heap_size_limit;
   const heapUsed = process.memoryUsage().heapUsed;
-  const ratio = heapLimit > 0 ? heapUsed / heapLimit : 0;
+  // Ratio denominator is used + V8's own remaining-allocatable estimate, NOT
+  // heap_size_limit: the limit includes young-generation and reserved space the
+  // old space can never use, so with --max-old-space-size=512 the limit reads
+  // ~738MB while the process aborts near ~508MB used — a 0.69 "ratio" at the
+  // moment of death, leaving 0.85/0.92 watermarks unreachable exactly when they
+  // matter. used/(used+available) approaches 1.0 as the abort nears at every
+  // heap size.
+  const available = stats.total_available_size ?? Math.max(0, heapLimit - heapUsed);
+  const exhaustible = heapUsed + available;
+  const ratio = exhaustible > 0 ? heapUsed / exhaustible : 0;
   const elevated = parseEnvFloat(process.env.GRAPHILE_MEMORY_GOVERNOR_ELEVATED, 0.85);
   const critical = parseEnvFloat(process.env.GRAPHILE_MEMORY_GOVERNOR_CRITICAL, 0.92);
   const level: MemoryPressureLevel = ratio >= critical ? 'critical' : ratio >= elevated ? 'elevated' : 'ok';
