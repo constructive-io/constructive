@@ -427,9 +427,10 @@ describe('VectorNearbyInput includeChunks field (Phase E)', () => {
 // ─── Adapter SQL qualification ────────────────────────────────────────────────
 //
 // Tenant-data SQL (bm25 index names, chunk table references) is always emitted
-// fully schema-qualified. Tenant routing happens elsewhere (the rewriting pool
-// maps canonical→tenant schemas at query time), so the adapters do not
-// special-case pooled instances.
+// fully schema-qualified, so resolution never depends on search_path. Index
+// names are quoted via @pgsql/quotes (quote_ident semantics): plain snake_case
+// names come out bare, and any name that lexically requires quoting — notably
+// hashed multi-tenant schemas, which contain '-' — comes out double-quoted.
 
 describe('adapter SQL qualification', () => {
   // Mock sql object that mimics pg-sql2 behavior (same shape as above).
@@ -487,8 +488,33 @@ describe('adapter SQL qualification', () => {
 
       expect(result).not.toBeNull();
       const scoreStr = String(result!.scoreExpression);
-      // Default behavior: fully qualified "schema"."index"
-      expect(scoreStr).toContain('"app_private"."documents_body_bm25_idx"');
+      // quote_ident semantics: plain snake_case names are emitted bare but
+      // still fully qualified (schema.index).
+      expect(scoreStr).toContain('app_private.documents_body_bm25_idx');
+      expect(scoreStr).not.toContain('"app_private"');
+    });
+
+    it('double-quotes hashed tenant schemas (they contain "-")', () => {
+      const hashedColumn = {
+        ...bm25Column,
+        adapterData: {
+          bm25Index: {
+            ...bm25Column.adapterData.bm25Index,
+            schemaName: 'marketplace-db-t1-5e6b13b2-app-public',
+          },
+        },
+      };
+      const result = adapter.buildFilterApply(
+        sql,
+        'tbl' as any,
+        hashedColumn,
+        { query: 'hello' },
+        {},
+      );
+
+      expect(result).not.toBeNull();
+      const scoreStr = String(result!.scoreExpression);
+      expect(scoreStr).toContain('"marketplace-db-t1-5e6b13b2-app-public".documents_body_bm25_idx');
     });
   });
 

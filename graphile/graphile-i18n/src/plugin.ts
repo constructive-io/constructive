@@ -21,6 +21,7 @@ import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
 import type { PgCodecWithAttributes } from '@dataplan/pg';
+import { QuoteUtils } from '@pgsql/quotes';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
@@ -235,21 +236,27 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
           const { schemaName, baseTable, translationTable, fkColumn, pkColumn, pkType, fields: i18nFields } = info;
 
+          // Identifier quoting via @pgsql/quotes (quote_ident semantics: quoted
+          // only when lexically required — uppercase, special chars, reserved
+          // keywords). Hashed multi-tenant schema names contain '-' so they are
+          // always emitted double-quoted, which schema-identifier rewriting at
+          // the pool seam relies on.
+          const qi = (name: string): string => QuoteUtils.quoteIdentifier(name);
           const coalescedCols = Object.values(i18nFields)
-            .map(f => `coalesce(v."${f.column}", b."${f.column}") as "${f.column}"`)
+            .map(f => `coalesce(v.${qi(f.column)}, b.${qi(f.column)}) as ${qi(f.column)}`)
             .join(', ');
 
-          const baseTableRef = `"${schemaName}"."${baseTable}"`;
-          const translationTableRef = `"${schemaName}"."${translationTable}"`;
+          const baseTableRef = QuoteUtils.quoteQualifiedIdentifier(schemaName, baseTable);
+          const translationTableRef = QuoteUtils.quoteQualifiedIdentifier(schemaName, translationTable);
 
           // Build the SQL query template
-          const sqlQuery = `SELECT v."${langCodeColumn}" AS "lang_code", ${coalescedCols}
+          const sqlQuery = `SELECT v.${qi(langCodeColumn)} AS "lang_code", ${coalescedCols}
              FROM ${baseTableRef} b
              LEFT JOIN ${translationTableRef} v
-               ON v."${fkColumn}" = b."${pkColumn}"
-               AND array_position($2::text[], v."${langCodeColumn}") IS NOT NULL
-             WHERE b."${pkColumn}" = $1::${pkType}
-             ORDER BY array_position($2::text[], v."${langCodeColumn}") ASC NULLS LAST
+               ON v.${qi(fkColumn)} = b.${qi(pkColumn)}
+               AND array_position($2::text[], v.${qi(langCodeColumn)}) IS NOT NULL
+             WHERE b.${qi(pkColumn)} = $1::${pkType}
+             ORDER BY array_position($2::text[], v.${qi(langCodeColumn)}) ASC NULLS LAST
              LIMIT 1`;
 
           // Build column names list for mapping base values

@@ -13,6 +13,7 @@
  * LEAST(parent_score, chunk_score) (lower = better for BM25).
  */
 
+import { QuoteUtils } from '@pgsql/quotes';
 import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
 import { bm25IndexStore as moduleBm25IndexStore } from '../codecs/bm25-codec';
@@ -182,8 +183,10 @@ export function createBm25Adapter(
 
       // The store lookup (getBm25IndexForAttribute) keys off the build-time
       // codec schema — correct, because the store was populated by the same
-      // representative gather.
-      const indexNameArg = `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
+      // gather that produced this codec. The index reference is always emitted
+      // schema-qualified (via @pgsql/quotes, quote_ident semantics) so its
+      // resolution never depends on search_path.
+      const indexNameArg = QuoteUtils.quoteQualifiedIdentifier(bm25Index.schemaName, bm25Index.indexName);
       const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(indexNameArg)})`;
       const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
 
@@ -201,7 +204,10 @@ export function createBm25Adapter(
         // BM25 on chunks requires an index name on the chunks table.
         // We construct it from the chunks table schema + a conventional index name.
         // The BM25 index on chunks is named: {chunks_table}_{content_field}_bm25_idx
-        const chunksIndexName = `"${chunksInfo.chunksSchema || bm25Index.schemaName}"."${chunksInfo.chunksTableName}_${chunksInfo.contentField}_bm25_idx"`;
+        const chunksIndexName = QuoteUtils.quoteQualifiedIdentifier(
+          chunksInfo.chunksSchema || bm25Index.schemaName,
+          `${chunksInfo.chunksTableName}_${chunksInfo.contentField}_bm25_idx`
+        );
         const chunkBm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(chunksIndexName)})`;
         const chunkScoreExpr = sql`(${chunksAlias}.${chunkContentField} <@> ${chunkBm25queryExpr})`;
 

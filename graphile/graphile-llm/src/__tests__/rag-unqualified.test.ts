@@ -57,7 +57,19 @@ function makeBuild() {
 describe('buildChunkSearchSql — chunk table qualification', () => {
   it('emits a SCHEMA-QUALIFIED reference by default', () => {
     const { text } = buildChunkSearchSql(baseChunkTable(), '[1,0,0]', 5, null);
-    expect(text).toContain('FROM "llm_test"."articles_chunks"');
+    // quote_ident semantics (@pgsql/quotes): plain snake_case names are
+    // emitted bare but still fully qualified.
+    expect(text).toContain('FROM llm_test.articles_chunks');
+  });
+
+  it('double-quotes hashed tenant schemas (they contain "-")', () => {
+    const { text } = buildChunkSearchSql(
+      baseChunkTable({ chunksSchema: 'marketplace-db-t1-5e6b13b2-app-public' }),
+      '[1,0,0]',
+      5,
+      null
+    );
+    expect(text).toContain('FROM "marketplace-db-t1-5e6b13b2-app-public".articles_chunks');
   });
 
   it('emits an UNQUALIFIED reference when no schema is known (existing fallback)', () => {
@@ -67,7 +79,7 @@ describe('buildChunkSearchSql — chunk table qualification', () => {
       5,
       null
     );
-    expect(text).toContain('FROM "articles_chunks"');
+    expect(text).toContain('FROM articles_chunks');
   });
 
   it('preserves parameter order/values (no maxDistance)', () => {
@@ -91,6 +103,6 @@ describe('discoverChunkTables', () => {
     expect(tables[0].chunksSchema).toBe('llm_test');
 
     const { text } = buildChunkSearchSql(tables[0], '[1,0,0]', 5, null);
-    expect(text).toContain('FROM "llm_test"."articles_chunks"');
+    expect(text).toContain('FROM llm_test.articles_chunks');
   });
 });
