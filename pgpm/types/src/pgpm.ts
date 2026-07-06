@@ -131,8 +131,8 @@ export interface CDNOptions {
  * OAuth configuration options
  */
 export interface OAuthOptions {
-    /** Secret key for signing OAuth state tokens (HMAC-SHA256) */
-    secret?: string;
+    /** Secret key for signing OAuth state and PKCE cookies (HMAC-SHA256) */
+    stateSecret?: string;
 }
 
 /**

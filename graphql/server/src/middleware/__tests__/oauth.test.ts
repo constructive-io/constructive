@@ -9,17 +9,12 @@ import {
 
 import { createOAuthRoutes } from '../oauth';
 
-const OAUTH_SECRET = 'test-oauth-state-secret';
+const OAUTH_STATE_SECRET = 'test-oauth-state-secret';
 const originalFetch = global.fetch;
 const authQueryMock = jest.fn();
 
 jest.mock('@pgpmjs/env', () => ({
   getNodeEnv: jest.fn(() => 'test'),
-  getEnvVars: jest.fn(() => ({
-    oauth: {
-      secret: OAUTH_SECRET,
-    },
-  })),
 }));
 
 jest.mock('@pgpmjs/logger', () => ({
@@ -111,7 +106,11 @@ async function withOAuthServer<T>(
     (req as any).constructive = createConstructiveContext();
     next();
   });
-  app.use('/auth', createOAuthRoutes({} as any));
+  app.use('/auth', createOAuthRoutes({
+    oauth: {
+      stateSecret: OAUTH_STATE_SECRET,
+    },
+  } as any));
 
   const server = await new Promise<http.Server>((resolve) => {
     const listening = app.listen(0, '127.0.0.1', () => resolve(listening));
@@ -185,7 +184,7 @@ describe('OAuth routes', () => {
       expect(location).not.toContain('code_verifier');
 
       const statePayload = verifySignedState<OAuthStatePayload>(stateCookie, {
-        secret: OAUTH_SECRET,
+        secret: OAUTH_STATE_SECRET,
       });
       expect(statePayload).toMatchObject({
         redirect_uri: '/dashboard',
@@ -193,7 +192,7 @@ describe('OAuth routes', () => {
       });
 
       const pkcePayload = verifySignedState<OAuthPkcePayload>(pkceCookie, {
-        secret: OAUTH_SECRET,
+        secret: OAUTH_STATE_SECRET,
       });
       expect(pkcePayload).toMatchObject({
         state: stateCookie,
@@ -217,7 +216,7 @@ describe('OAuth routes', () => {
     await withOAuthServer(async (baseUrl) => {
       const stateCookie = createSignedState<OAuthStatePayload>(
         { redirect_uri: '/dashboard', provider: 'github' },
-        { secret: OAUTH_SECRET, maxAgeMs: 60_000 },
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 },
       );
       const pkceCookie = createSignedState<OAuthPkcePayload>(
         {
@@ -225,7 +224,7 @@ describe('OAuth routes', () => {
           provider: 'github',
           code_verifier: 'test-code-verifier',
         },
-        { secret: OAUTH_SECRET, maxAgeMs: 60_000 },
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 },
       );
       const callbackUrl = new URL('/auth/github/callback', baseUrl);
       callbackUrl.searchParams.set('code', 'callback-code');
@@ -252,7 +251,7 @@ describe('OAuth routes', () => {
       global.fetch = fetchMock as unknown as typeof fetch;
       const stateCookie = createSignedState<OAuthStatePayload>(
         { redirect_uri: '/dashboard', provider: 'github' },
-        { secret: OAUTH_SECRET, maxAgeMs: 60_000 },
+        { secret: OAUTH_STATE_SECRET, maxAgeMs: 60_000 },
       );
       const callbackUrl = new URL('/auth/google/callback', baseUrl);
       callbackUrl.searchParams.set('code', 'callback-code');
@@ -279,7 +278,7 @@ describe('OAuth routes', () => {
       const stateCookie = readCookie(setCookies, 'oauth_state');
       const pkceCookie = readCookie(setCookies, 'oauth_pkce');
       const pkcePayload = verifySignedState<OAuthPkcePayload>(pkceCookie, {
-        secret: OAUTH_SECRET,
+        secret: OAUTH_STATE_SECRET,
       });
       expect(pkcePayload).toBeTruthy();
 

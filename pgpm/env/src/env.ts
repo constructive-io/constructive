@@ -101,7 +101,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     SMTP_DEBUG,
 
     // OAuth env vars
-    OAUTH_SECRET
+    OAUTH_STATE_SECRET
   } = env;
 
   return {
@@ -235,7 +235,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) }),
     },
     oauth: {
-      ...(OAUTH_SECRET && { secret: OAUTH_SECRET }),
+      ...(OAUTH_STATE_SECRET && { stateSecret: OAUTH_STATE_SECRET }),
     }
   };
 };
