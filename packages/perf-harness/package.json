@@ -1,0 +1,58 @@
+{
+  "name": "@constructive-io/perf-harness",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Reusable performance / regression harness for the Constructive GraphQL server",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "bin": {
+    "perf-harness": "index.js",
+    "cperf": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "dev": "ts-node ./src/index.ts",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@inquirerer/utils": "^3.3.9",
+    "graphile-cache": "workspace:^",
+    "inquirerer": "^4.9.1",
+    "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "@inquirerer/test": "^1.4.3",
+    "@types/node": "^22.19.11",
+    "@types/pg": "^8.20.0",
+    "makage": "^0.3.0",
+    "ts-node": "^10.9.2"
+  },
+  "keywords": [
+    "performance",
+    "regression",
+    "harness",
+    "soak",
+    "constructive",
+    "graphile",
+    "postgres"
+  ]
+}
