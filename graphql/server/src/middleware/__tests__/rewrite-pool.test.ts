@@ -426,6 +426,81 @@ describe('createRewritingPool — fail closed', () => {
 });
 
 // =============================================================================
+// Wrapper: settings detection keys on the adaptor statement TEXT, not on
+// user-influenceable parameter contents (A1 — misclassification hardening).
+// =============================================================================
+
+describe('createRewritingPool — settings detection is text-gated', () => {
+  it('does not misclassify a data query as settings when a bind value contains the GUC substring', async () => {
+    const { client, counters, wrapped } = setup();
+    const c = await wrapped.connect();
+    await c.query(settingsQuery(tenantSchemas));
+    expect(counters.settingsParses).toBe(1);
+
+    // A genuine data query whose user-controlled bind value contains the GUC
+    // string. Under parameter-only detection this was treated as the settings
+    // query and forwarded UNREWRITTEN (canonical SQL on the tenant connection).
+    await c.query({
+      text: `select from "${CANON_APP}"."t" where x = $1`,
+      values: [`${POOL_SCHEMAS_GUC} = whatever`]
+    });
+
+    // Rewritten to the tenant schema — not forwarded with canonical identifiers.
+    expect(sentText(client, 1)).toBe(`select from "${TENANT_APP}"."t" where x = $1`);
+    // The malicious value was NOT parsed as settings; checkout map is intact.
+    expect(counters.settingsParses).toBe(1);
+  });
+
+  it('a GUC-substring bind value cannot null the established tenant map (no self-DoS)', async () => {
+    const { client, counters, wrapped } = setup();
+    const c = await wrapped.connect();
+    await c.query(settingsQuery(tenantSchemas));
+
+    // Malicious non-JSON value that, under parameter-only detection, would have
+    // re-run applySettings and nulled tenantMap (forcing later fail-closed).
+    await c.query({
+      text: `select from "${CANON_APP}"."t"`,
+      values: [`${POOL_SCHEMAS_GUC}: not json`]
+    });
+    expect(sentText(client, 1)).toBe(`select from "${TENANT_APP}"."t"`);
+
+    // Sibling query still rewrites (map not clobbered) rather than failing closed.
+    await c.query({ text: `select from "${CANON_AUTH}"."r"` });
+    expect(sentText(client, 2)).toBe(`select from "${TENANT_AUTH}"."r"`);
+    expect(counters.failClosed).toBe(0);
+    expect(counters.settingsParses).toBe(1);
+  });
+
+  it('a crafted GUC-bearing JSON bind value cannot remap the checkout to another tenant', async () => {
+    const { client, wrapped } = setup();
+    const c = await wrapped.connect();
+    await c.query(settingsQuery(tenantSchemas)); // maps canonical -> app-22222222
+
+    const victim = ['app-99999999-app-public', 'app-99999999-auth-public', 'public'];
+    // Same value shape the real settings query would carry, but on a DATA query.
+    await c.query({
+      text: `select from "${CANON_APP}"."t"`,
+      values: [JSON.stringify([[POOL_SCHEMAS_GUC, JSON.stringify(victim)]])]
+    });
+
+    // Still the original tenant (22222222), never the injected victim (99999999).
+    expect(sentText(client, 1)).toBe(`select from "${TENANT_APP}"."t"`);
+  });
+
+  it('fails closed (does not swallow as settings) for a pre-settings query carrying a GUC value', async () => {
+    const { client, counters, wrapped } = setup();
+    const c = await wrapped.connect();
+
+    await expect(
+      c.query({ text: `select from "${CANON_APP}"."t"`, values: [`${POOL_SCHEMAS_GUC} x`] })
+    ).rejects.toThrow(/requires a tenant mapping/);
+    expect(counters.failClosed).toBe(1);
+    expect(counters.settingsParses).toBe(0);
+    expect(client.query).not.toHaveBeenCalled();
+  });
+});
+
+// =============================================================================
 // Wrapper: release clears state
 // =============================================================================
 

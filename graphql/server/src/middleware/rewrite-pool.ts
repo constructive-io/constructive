@@ -348,6 +348,19 @@ const sha256hex = (input: string): string => createHash('sha256').update(input).
 const hashName = (tenantTag: string, name: string): string =>
   'bp_' + sha256hex(tenantTag + ':' + name).slice(0, 24);
 
+// The adaptor's fixed pgSettings statement (@dataplan/pg adaptors/pg.js: the
+// `select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el`
+// it issues with the JSON-serialized pgSettings as $1). Settings detection MUST
+// key on THIS TEXT — never on parameter contents alone: a data query whose
+// user-controlled bind value merely contains the GUC substring must never be
+// classified as the settings query, or it would be forwarded UNREWRITTEN (canonical
+// SQL on the tenant connection) and its value could remap or null the checkout's
+// tenant state for sibling queries. This literal byte-matches SQL emitted upstream.
+const SETTINGS_QUERY_TEXT =
+  'select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el';
+
+const isSettingsText = (text: string): boolean => text === SETTINGS_QUERY_TEXT;
+
 const isSettingsValues = (values: any): boolean =>
   Array.isArray(values) &&
   values.length > 0 &&
@@ -445,7 +458,12 @@ export function createRewritingPool(pool: any, opts: RewritingPoolOptions): any 
   };
 
   // Parse the adaptor's pgSettings query and (re)build the checkout's tenant map.
-  const applySettings = (values: any[], state: CheckoutState): void => {
+  const applySettings = (text: string, values: any[], state: CheckoutState): void => {
+    // Defense in depth: only the adaptor's fixed settings statement may mutate
+    // checkout tenant state. The call site already gates on this text; guard again
+    // so no stray query whose parameter merely contains the GUC substring can
+    // suppress rewriting or remap the checkout via parameter contents alone.
+    if (!isSettingsText(text)) return;
     counters.settingsParses += 1;
 
     let tenantSchemas: string[] | null = null;
@@ -568,8 +586,12 @@ export function createRewritingPool(pool: any, opts: RewritingPoolOptions): any 
     }
 
     // Settings query: parse tenant identity, forward the query itself untouched.
-    if (isSettingsValues(values)) {
-      applySettings(values, state);
+    // Classification keys on the adaptor's fixed statement TEXT (plus the GUC-bearing
+    // value shape), never on parameter contents alone — a data query carrying a
+    // user-controlled value that contains the GUC substring has different text and
+    // therefore falls through to the needs-rewrite / fail-closed path below.
+    if (isSettingsText(text) && isSettingsValues(values)) {
+      applySettings(text, values, state);
       return rawQuery.apply(thisArg, args);
     }
 
