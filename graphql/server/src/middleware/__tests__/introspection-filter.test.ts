@@ -9,6 +9,11 @@ import {
   isIntrospectionFilterEnabled,
   isIntrospectionQuery
 } from '../introspection-filter';
+import {
+  createRewriteCounters,
+  createRewritingPool,
+  POOL_SCHEMAS_GUC
+} from '../rewrite-pool';
 
 // The exact runtime gate substring (single backslash before the underscore).
 // Derived here so tests fail loudly if the installed package ever drifts.
@@ -269,5 +274,76 @@ describe('createIntrospectionFilterPool — dedicated wrapper', () => {
         })
         .catch(done);
     });
+  });
+});
+
+// =============================================================================
+// 7. rewrite-pool integration
+// =============================================================================
+
+const logicalName = (name: string): string => name.split('-').slice(2).join('-');
+const CANON_APP = 'app-11111111-app-public';
+const TENANT_APP = 'app-22222222-app-public';
+
+const settingsQuery = (schemas: string[]) => ({
+  text: 'select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el',
+  values: [JSON.stringify([['role', 'app_user'], [POOL_SCHEMAS_GUC, JSON.stringify(schemas)]])]
+});
+
+describe('createRewritingPool — introspection filter integration', () => {
+  beforeEach(() => {
+    process.env.GRAPHILE_INTROSPECTION_FILTER = '1';
+  });
+
+  it('applies settings, swaps introspection (not identifier-rewritten), still rewrites tenant SQL', async () => {
+    const client = introspectingClient([[], []]);
+    const pool = { connect: jest.fn().mockResolvedValue(client), query: jest.fn(), on: jest.fn() };
+    const counters = createRewriteCounters();
+    const wrapped = createRewritingPool(pool, {
+      canonicalSchemas: [CANON_APP],
+      logicalName,
+      counters,
+      introspectionFilter: { servedSchemas: [CANON_APP] }
+    });
+
+    const c = await wrapped.connect();
+
+    // Settings establish the tenant map.
+    await c.query(settingsQuery([TENANT_APP, 'public']));
+    expect(counters.settingsParses).toBe(1);
+
+    // Introspection: swapped, NOT identifier-rewritten, no fail-closed.
+    await c.query({ text: STOCK });
+    const introspectionCall = client.query.mock.calls.find(
+      (call: any[]) => call[0] && typeof call[0] === 'object' &&
+        typeof call[0].text === 'string' && call[0].text.includes('as introspection')
+    );
+    expect(introspectionCall).toBeDefined();
+    const swapped = introspectionCall[0].text as string;
+    expect(countOccurrences(swapped, 'nspname = any (array[')).toBe(4);
+    expect(countOccurrences(swapped, GATE_SUBSTRING)).toBe(0);
+    // Introspection was not treated as a rewrite target.
+    expect(counters.failClosed).toBe(0);
+
+    // A normal tenant query is still identifier-rewritten as before.
+    await c.query({ text: `select from "${CANON_APP}"."t"` });
+    const rewritten = sentConfigTexts(client).find((t) => t && t.includes(TENANT_APP));
+    expect(rewritten).toBe(`select from "${TENANT_APP}"."t"`);
+    expect(counters.rewrittenQueries).toBeGreaterThanOrEqual(1);
+  });
+
+  it('feeds the process-wide introspection-filter counters', async () => {
+    const before = getIntrospectionFilterCounters().swaps;
+    const client = introspectingClient([[]]);
+    const pool = { connect: jest.fn().mockResolvedValue(client), query: jest.fn(), on: jest.fn() };
+    const wrapped = createRewritingPool(pool, {
+      canonicalSchemas: [CANON_APP],
+      logicalName,
+      introspectionFilter: { servedSchemas: [CANON_APP] }
+    });
+    const c = await wrapped.connect();
+    await c.query(settingsQuery([TENANT_APP, 'public']));
+    await c.query({ text: STOCK });
+    expect(getIntrospectionFilterCounters().swaps).toBe(before + 1);
   });
 });
