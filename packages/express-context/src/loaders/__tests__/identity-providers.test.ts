@@ -96,6 +96,7 @@ describe('identityProvidersLoader metadata resolution', () => {
       authorizationUrl: 'https://github.example/authorize',
       authorizationParams: { prompt: 'select_account' },
     });
+    expect(services.queries[0].values).toEqual(['constructive-test']);
     expect(services.queries[2].sql).toContain('config_secrets_module');
     expect(services.queries[2].values).toEqual(['platform-db', 'platform']);
     expect(services.queries[4].sql).toContain('secret_private.resolved_secrets');
