@@ -24,7 +24,7 @@ import {
   verifySignedState,
 } from '@constructive-io/oauth';
 import { Logger } from '@pgpmjs/logger';
-import { getNodeEnv, getEnvVars } from '@pgpmjs/env';
+import { getNodeEnv } from '@pgpmjs/env';
 import { QuoteUtils } from '@pgsql/quotes';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type {
@@ -64,20 +64,14 @@ interface OAuthPkcePayload {
   code_verifier: string;
 }
 
-interface OAuthEnvConfig {
-  oauth?: {
-    secret?: string;
-  };
+function getStateSecret(opts: ConstructiveOptions): string | undefined {
+  return opts.oauth?.stateSecret;
 }
 
-function getStateSecret(): string | undefined {
-  return (getEnvVars() as OAuthEnvConfig).oauth?.secret;
-}
-
-function requireStateSecret(): string {
-  const secret = getStateSecret();
+function requireStateSecret(opts: ConstructiveOptions): string {
+  const secret = getStateSecret(opts);
   if (!secret) {
-    throw new Error('OAUTH_SECRET environment variable is required');
+    throw new Error('OAUTH_STATE_SECRET environment variable is required');
   }
   return secret;
 }
@@ -211,7 +205,7 @@ function redirectToError(
   res.redirect(errorUrl.toString());
 }
 
-export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
+export function createOAuthRoutes(opts: ConstructiveOptions): Router {
   const router = Router();
   const isProduction = getNodeEnv() === 'production';
 
@@ -310,7 +304,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
       const state = createSignedState(
         { redirect_uri: redirectUri, provider },
         {
-          secret: requireStateSecret(),
+          secret: requireStateSecret(opts),
           maxAgeMs: stateMaxAge,
         },
       );
@@ -330,7 +324,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         const pkceState = createSignedState<OAuthPkcePayload>(
           { state, provider, code_verifier: codeVerifier },
           {
-            secret: requireStateSecret(),
+            secret: requireStateSecret(opts),
             maxAgeMs: stateMaxAge,
           },
         );
@@ -395,7 +389,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
 
       const statePayload = verifySignedState<OAuthStatePayload>(
         storedState as string,
-        { secret: getStateSecret() },
+        { secret: getStateSecret(opts) },
       );
       if (!statePayload) {
         log.warn(`[oauth] Invalid or expired state for ${provider}`);
@@ -486,7 +480,7 @@ export function createOAuthRoutes(_opts: ConstructiveOptions): Router {
         if (providerConfig.pkceEnabled) {
           const pkcePayload = verifySignedState<OAuthPkcePayload>(
             storedPkce,
-            { secret: getStateSecret() },
+            { secret: getStateSecret(opts) },
           );
           if (
             !pkcePayload ||

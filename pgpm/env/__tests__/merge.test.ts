@@ -153,7 +153,8 @@ describe('getEnvOptions', () => {
       DB_CONNECTIONS_APP_PASSWORD: 'env-app-pass',
       DB_CONNECTIONS_ADMIN_USER: 'env-admin-user',
       PORT: '7777',
-      DEPLOYMENT_FAST: 'false'
+      DEPLOYMENT_FAST: 'false',
+      OAUTH_STATE_SECRET: 'test-state-secret'
     };
 
     const result = getEnvOptions(
