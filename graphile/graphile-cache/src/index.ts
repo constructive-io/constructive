@@ -25,6 +25,28 @@ export {
   CacheStats,
   getCacheStats,
 
+  // In-process metrics counters
+  CacheCounters,
+  cacheCounters,
+  getCacheCounters,
+
+  // In-flight refcounting + pre-build headroom
+  invokeEntryHandler,
+  ensureCacheHeadroom,
+
+  // Capacity model + memory governor
+  computeCapacityFromBudget,
+  MemoryPressure,
+  MemoryPressureLevel,
+  getMemoryPressure,
+  shouldRefuseBuild,
+  startMemoryGovernor,
+  stopMemoryGovernor,
+
+  // Drain-aware build admission
+  getDrainingCount,
+  waitForDrainSettle,
+
   // Clear matching entries
   clearMatchingEntries
 } from './graphile-cache';
