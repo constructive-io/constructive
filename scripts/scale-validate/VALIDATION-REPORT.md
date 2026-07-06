@@ -135,3 +135,55 @@ as-run for provenance.
   under guaranteed teardown); code + baselines landed, **live results pending** (run by
   the lead in the live phase).
 - All work is local to `feat/scale-phase0`; nothing pushed.
+
+## 2026-07-06 — Capacity-10× + ship-validation program (introspection filter, churn fix, compliance audit)
+
+Question under test: *can one node host the whole tenant fleet under real client
+traffic without crashing, and what is the memory footprint at 2GB / N GB?*
+
+**Headline (a3-day-clean, final ship tree):** 47 authenticated tenants, zipf @50rps,
+mixed read/write/meta, 30 minutes → **104,818/104,818 HTTP 200, errRate 0, p99 21ms,
+heap max 195.7MB of 2048MB (9.6%), RSS max 380MB, 0 evictions, 0 build refusals,
+115,907 pool-rewritten queries with 0 fail-closed, introspection filter 7/7 swaps,
+bleed 0.** (`out/a3-day-rerun-results.jsonl`; the earlier 0.22 errRate was fully
+attributed to a null-apiHost platform row in the fleet manifest — every error came
+from the harness fetching `http://null`; all real tenants had 0 errors.)
+
+Program evidence (perf-out/stress/, graded per-arm):
+- **Arm 1, pooling OFF**: 2048MB → SIGABRT; 3584MB → total thrash death (errRate 1.0,
+  964 evictions). The regression is real: dedicated instances cannot host a fleet at
+  the 61k-row catalog.
+- **Arm 2, pooled unfiltered**: 2048MB OOM on concurrent api+auth cold builds —
+  knife-edge; pooling needs the filter at production heap sizes.
+- **Arm 3, pooled + `GRAPHILE_INTROSPECTION_FILTER=1`**: k1–k5 blueprint diversity all
+  healthy at 2048MB (errRate 0, heap 131–167MB, 0 evictions); 900s storm errRate 0;
+  cold-burst 5/5 < 700ms; 187rps sustained; zero marginal heap per tenant.
+- **Constants transformed** (SDL byte-identical, MD5): instance 1305.6→14.7MB
+  (21.9→0.24KB per pg_class row, 87×), cold build 7165→417ms (17×), PG introspection
+  spike +1283→+17MiB, realtime dedicated 2596→14.7MB (176×). See SIZING.md
+  (2026-07-06 section) for the updated capacity law and knobs; floor is 1024MB heap.
+- **Eviction-churn OOM found + fixed (`46636d4b4`)**: the build-wait Promise.race
+  armed a 180s timer per waiting request and never cleared it on build success —
+  every evicted ~15MB instance stayed reachable for 180s, so forced max=1 churn
+  OOM-killed a 2GB heap in 65s (heap-snapshot proven; post-timer-expiry memory
+  collapsed 1766→52.9MB). Fixed with raceBuildAgainstTimeout() + made the
+  heap-pressure governor reachable (ratio vs V8's exhaustible headroom, not
+  heap_size_limit) + in-critical-section refusal (503) + 250ms build spacing under
+  elevated pressure. Post-fix: worst-case all-miss churn at 2048MB is a bounded
+  sawtooth at 23 builds/s with clean recovery; capacity+1 rotation sustains
+  1444/1444 OK.
+- **1h churn soak**: 9 provision/drop cycles, RSS slope +8.3MB/h, 0 bleed, rewrite
+  pool 0 fail-closed over 103,384 queries. pg_class +189 residue explained: 21
+  orphaned `partman.template_*` tables per dropped tenant (teardown follow-up noted).
+- **CTO compliance audit (4 lenses + adversarial verify, perf-out/cto-audit-result.json)**:
+  search_path ZERO in product code; identifier emission fully qualified (no
+  pgIdentifiers overrides; upstream default verified); 13/13 scope-pollution checks
+  clean (transaction-local GUCs, per-tenant prepared-statement namespacing +
+  DEALLOCATE, LISTEN on a dedicated client, tenant-keyed caches). One blocker found
+  and fixed (`e38f4b52d`): settings-query detection now byte-matches the adaptor's
+  statement text instead of trusting bind-value shape. Credential literal purged
+  from unpushed history (base untouched — normal push).
+
+Verdict: **SHIP.** All gates pass on the final tree; remaining advisories (bm25
+index name under pooling, PublicKeySignature withPgClient(null) — preexisting,
+partman template teardown) are documented follow-ups, none load-bearing.

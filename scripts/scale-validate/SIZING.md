@@ -4,6 +4,41 @@ All constants measured on `feat/scale-phase0` (blueprint pooling + hardening), i
 PG 17 rig, 47-tenant fleet, catalog 61k `pg_class` rows. Method and raw data:
 `V2-RESULTS.md` + `out/v2-*-results.jsonl`.
 
+## 2026-07-06 — the introspection filter rewrites the constants
+
+With `GRAPHILE_INTROSPECTION_FILTER=1` (namespace-scoped catalog introspection at the
+pool seam; SDL byte-identical, MD5-proven), the catalog-size axis collapses:
+
+| constant | stock | filtered | factor |
+|---|---|---|---|
+| instance retained heap @61k rows | 1305.6MB (21.9KB/row) | **14.7MB (0.24KB/row)** | 87× |
+| cold schema build | 7165ms | **417ms** | 17× |
+| PG-side introspection spike | +1283MiB | **+17MiB** | 75× |
+| realtime tenant (dedicated instance) | 2596MB | **14.7MB** | 176× |
+
+Capacity with the shipped defaults (B=256MB, T=768MB, planning I=40MiB — measured
+15–35MB): `R(H) = clamp(min(⌊(H−B)/I⌋, ⌊(H−B−T)/I⌋+1), 1, 50)` →
+**1024MB→1 · 1536MB→13 · 2048MB→26 · 3072MB+→50 (cap)**. Measured at 2048MB: six
+resident blueprints use 167MB total; the 187rps knee runs at 339MB. T=768 is a
+stock-era transient reserve — with the filter the true transient is ~50–100MB, so
+`GRAPHILE_CACHE_BUILD_RESERVE_BYTES` can unlock 1024MB→13 / 1536MB→26 / 2048MB→39
+when density at small heaps matters. **Floor: 1024MB minimum heap** (≤768MB heaps die
+under 100%-miss rebuild churn before any governor signal can fire — not a supported
+configuration). RSS ≈ heap×~2.2 at these working sets. Set
+`GRAPHILE_CACHE_INSTANCE_HEAP_BYTES=41943040` so admission plans with the filtered
+instance size.
+
+Churn robustness (fix `46636d4b4`): the build-wait race timer no longer pins built
+instances (was: every evicted ~15MB instance stayed reachable for 180s → forced
+`max=1` churn OOM-killed a 2GB heap in 65s). Post-fix, worst-case all-miss churn at
+2048MB runs a bounded sawtooth at 23 builds/s and recovers cleanly; the realistic
+over-capacity mode (blueprints = capacity+1 rotating) sustains 100% success. The
+heap-pressure governor now measures against V8's actually-exhaustible headroom
+(`used/(used+total_available_size)`) — the old `heap_size_limit` denominator made the
+0.85/0.92 watermarks unreachable at every heap size — and re-checks inside the build
+critical section with `GRAPHILE_BUILD_PRESSURE_SPACING_MS` (default 250ms) spacing
+under elevated pressure.
+
 ## The model in one paragraph
 
 Memory cost is driven by **catalog size** (total relations in the PG database), not by
