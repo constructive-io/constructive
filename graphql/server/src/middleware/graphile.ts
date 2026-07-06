@@ -24,15 +24,22 @@ import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
+import { isBlueprintPoolingEnabled, stripSchemaHashPrefix } from './blueprint';
+import { resolvePoolDecision } from './pooling-decision';
 import {
   createIntrospectionFilterPool,
   isIntrospectionFilterEnabled
 } from './introspection-filter';
+import { createRewritingPool, POOL_SCHEMAS_GUC } from './rewrite-pool';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 import type { DatabaseSettings } from '../types';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+
+// Re-exported so flush.ts (and other callers) can invalidate pooling decisions
+// through the graphile module surface.
+export { clearPoolDecisions } from './pooling-decision';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -279,17 +286,23 @@ export function getBuildQueueDepth(): number {
 export interface GraphileCounters {
   /** Total PostGraphile schema builds started (past coalescing + the semaphore). */
   builds: number;
+  /** Requests routed to a shared blueprint (pooling) instance. */
+  poolingAttaches: number;
+  /** Builds that were pooled (shared-blueprint) builds. */
+  poolingBuilds: number;
   /** Requests that gave up waiting on a build (GRAPHILE_BUILD_TIMEOUT_MS) and got 503. */
   buildWaitTimeouts: number;
 }
 
 /**
  * Cumulative in-process build counters for the metrics sampler. Mutated where a build
- * starts. Zero overhead when the sampler is off — these are integer bumps on paths
- * that already do real build work.
+ * starts and where a [pooling] attach/build happens. Zero overhead when the sampler is
+ * off — these are integer bumps on paths that already do real build work.
  */
 const graphileCounters: GraphileCounters = {
   builds: 0,
+  poolingAttaches: 0,
+  poolingBuilds: 0,
   buildWaitTimeouts: 0
 };
 
@@ -315,15 +328,32 @@ const buildPreset = (
   anonRole: string,
   roleName: string,
   databaseSettings?: DatabaseSettings,
+  options?: { pooling?: boolean },
 ): GraphileConfig.Preset => {
+  // When pooling, the instance is shared across tenants of the same schema-shape
+  // and routed per request via the rewriting pool (canonical→tenant schema-
+  // identifier rewrite; see ./rewrite-pool).
+  const pooling = options?.pooling === true;
+  // Pooled instances are built fully qualified against the canonical tenant's
+  // physical schemas; the rewriting pool swaps canonical→tenant schema
+  // identifiers per request (see ./rewrite-pool). Dedicated instances use the
+  // raw pool untouched.
   // Introspection filter (opt-in via GRAPHILE_INTROSPECTION_FILTER): scope the
   // instance's catalog introspection to the schemas it serves. Only active when
   // the flag is on AND we have a concrete served-schema list; otherwise the pool
-  // selection below is byte-identical to today.
+  // selection below is byte-identical to today. Pooled instances receive the
+  // filter through the rewriting pool; dedicated instances get a thin filter-only
+  // wrapper on the raw pool.
   const introspectionFilterActive = isIntrospectionFilterEnabled() && schemas.length > 0;
-  const servicePool = introspectionFilterActive
-    ? createIntrospectionFilterPool(pool, { servedSchemas: schemas })
-    : pool;
+  const servicePool = pooling
+    ? createRewritingPool(pool, {
+        canonicalSchemas: schemas,
+        logicalName: stripSchemaHashPrefix,
+        introspectionFilter: introspectionFilterActive ? { servedSchemas: schemas } : false
+      })
+    : introspectionFilterActive
+      ? createIntrospectionFilterPool(pool, { servedSchemas: schemas })
+      : pool;
   const preset: GraphileConfig.Preset = {
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [AuthCookiePlugin],
@@ -349,6 +379,13 @@ const buildPreset = (
       const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
       const context: Record<string, string> = {};
 
+      // De-closure the role names: read them from the resolved API on the request
+      // so a shared (pooled) instance uses the REQUESTING tenant's roles rather than
+      // whichever tenant happened to build it. Falls back to the build-time params.
+      const api = req?.api;
+      const role = api?.roleName ?? roleName;
+      const anon = api?.anonRole ?? anonRole;
+
       if (req) {
         if (req.databaseId) {
           context['jwt.claims.database_id'] = req.databaseId;
@@ -368,7 +405,7 @@ const buildPreset = (
 
         if (req.token?.user_id) {
           const pgSettings: Record<string, string> = {
-            role: roleName,
+            role,
             'jwt.claims.token_id': req.token.id,
             'jwt.claims.user_id': req.token.user_id,
             ...context,
@@ -399,16 +436,29 @@ const buildPreset = (
             pgSettings['request.id'] = req.requestId;
           }
 
+          // Pooled instances: hand the REQUESTING tenant's physical schema list to
+          // the rewriting pool via a transaction-local GUC; the wrapper maps the
+          // canonical schemas to these by logical name. Never set when not pooling.
+          if (pooling && api?.schema?.length) {
+            pgSettings[POOL_SCHEMAS_GUC] = JSON.stringify(api.schema);
+          }
+
           return { pgSettings };
         }
       }
 
       const anonSettings: Record<string, string> = {
-        role: anonRole,
+        role: anon,
         ...context,
       };
       if (req?.requestId) {
         anonSettings['request.id'] = req.requestId;
+      }
+      // Pooled instances: hand the REQUESTING tenant's physical schema list to
+      // the rewriting pool via a transaction-local GUC; the wrapper maps the
+      // canonical schemas to these by logical name. Never set when not pooling.
+      if (pooling && api?.schema?.length) {
+        anonSettings[POOL_SCHEMAS_GUC] = JSON.stringify(api.schema);
       }
 
       return {
@@ -417,6 +467,15 @@ const buildPreset = (
     },
   },
   };
+
+  if (pooling) {
+    // Shared (pooled) instances must not leak the canonical tenant's hashed
+    // schema names through tenant-facing metadata (e.g. _meta) — plugins read
+    // this flag and report logical schema names instead. SQL emission stays
+    // fully qualified (PostGraphile default). Cast: custom schema option,
+    // absent from base types.
+    (preset as any).schema = { constructivePooled: true };
+  }
 
   return preset;
 };
@@ -489,13 +548,39 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         log.error(`${label} Missing API info`);
         return res.status(500).send('Missing API info');
       }
-      const key = req.svc_key;
-      if (!key) {
+      const svcKey = req.svc_key;
+      if (!svcKey) {
         log.error(`${label} Missing service cache key`);
         return res.status(500).send('Missing service cache key');
       }
       const { dbname, anonRole, roleName, schema } = api;
       const schemaLabel = schema?.join(',') || 'unknown';
+
+      // =========================================================================
+      // Blueprint Pooling Decision (opt-in via GRAPHILE_BLUEPRINT_POOLING)
+      //
+      // When enabled, resolve a shared blueprint key so tenants of the same
+      // schema-shape attach to ONE instance, routed per request by the rewriting
+      // pool (the requesting tenant's schema list is set in grafast.context).
+      // Decisions are memoized per svc_key and cleared on flush. When the flag is
+      // OFF this block is skipped entirely: `key` stays exactly req.svc_key and no
+      // extra pool or queries are touched.
+      // =========================================================================
+      const pgConfig = getPgEnvOptions({ ...opts.pg, database: dbname });
+      let key = svcKey;
+      let pooling = false;
+      let pool: Pool | undefined;
+      if (isBlueprintPoolingEnabled() && api) {
+        // Blueprint keying needs the tenant pool to fingerprint the schema shape.
+        pool = getPgPool(pgConfig);
+        const decision = await resolvePoolDecision(svcKey, api, pool);
+        key = decision.key;
+        pooling = decision.pooling;
+        if (pooling) {
+          graphileCounters.poolingAttaches += 1;
+          log.info(`[pooling] svc=${svcKey} → ${key}`);
+        }
+      }
 
       // =========================================================================
       // Phase A: Cache Check (fast path)
@@ -557,10 +642,10 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           });
         } catch (error) {
           // A refusal surfacing on the re-coalesce await is bound by the same
-          // contract as the owner path and the request-time gate below:
+          // contract as the owner path (763) and the request-time gate (640):
           // 503 SERVICE_OVERLOADED + Retry-After for every coalesced waiter, never
           // a generic 500. Other rejections fall through to retry the build here,
-          // exactly as Phase B does.
+          // exactly as Phase B does (605).
           if (error instanceof BuildRefusedError) {
             log.warn(`${label} ${error.message} key=${key}`);
             res.setHeader('Retry-After', '15');
@@ -591,17 +676,14 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`,
       );
 
-      const pgConfig = getPgEnvOptions({
-        ...opts.pg,
-        database: dbname,
-      });
-
       // Route through pg-cache so the pool is tracked and can be cleaned up
-      // properly, preventing leaked connections during database teardown.
-      const pool = getPgPool(pgConfig);
+      // properly, preventing leaked connections during database teardown. When the
+      // pooling decision above already resolved the pool, reuse it (pg-cache memoizes
+      // regardless); otherwise resolve it here exactly as before (flag-off path).
+      const activePool = pool ?? getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings);
+      const preset = buildPreset(activePool, schema || [], anonRole, roleName, api.databaseSettings, { pooling });
       const creationPromise = (async (): Promise<GraphileCacheEntry> => {
         // Serialize builds process-wide: each build transiently allocates hundreds of MB,
         // and only same-key builds are deduped by the single-flight map above.
@@ -642,6 +724,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           // A build genuinely starts here: past single-flight coalescing, past the
           // build semaphore, and past the built-meanwhile re-check.
           graphileCounters.builds += 1;
+          if (pooling) {
+            graphileCounters.poolingBuilds += 1;
+          }
           return await observeGraphileBuild(
             {
               cacheKey: key,

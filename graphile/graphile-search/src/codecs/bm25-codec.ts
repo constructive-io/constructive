@@ -36,6 +36,18 @@ export interface Bm25IndexInfo {
  *
  * Key: "schemaName.tableName.columnName"
  * Value: Bm25IndexInfo
+ *
+ * NOTE (concurrency + blueprint pooling): this store is process-global and is
+ * cleared + repopulated per introspection run. Concurrent gathers in one
+ * process are serialized by the server's build semaphore
+ * (GRAPHILE_BUILD_CONCURRENCY, default 1), so a single global store is
+ * tolerated for now; if that guarantee ever moves, key this store by build
+ * object like meta-schema's per-build cache. The adapter embeds the
+ * schema-qualified index name from these entries as a bind VALUE at plan
+ * time; the pooling rewrite seam maps schema identifiers in SQL TEXT only and
+ * never rewrites values, so shapes carrying bm25 indexes are structurally
+ * excluded from pooling (see graphql/server pooling-decision.ts) and always
+ * get per-tenant instances.
  */
 export const bm25IndexStore = new Map<string, Bm25IndexInfo>();
 

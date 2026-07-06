@@ -355,10 +355,44 @@ export async function loadAllStorageModules(
 }
 
 /**
+ * Strip a tenant hash prefix from a physical schema name, returning the
+ * logical schema name.
+ *
+ * Hashed multi-tenant schemas are named like
+ * `marketplace-db-tenant1-5e6b13b2-app-public`, where `-5e6b13b2-` is an
+ * 8-hex-char tenant hash separating the tenant prefix from the logical schema
+ * suffix (`app-public`). This removes everything up to and including the first
+ * such hash segment. If no hash segment is present (e.g. a plain schema like
+ * `app_public` or a control-plane schema like `metaschema_public`), the name
+ * is returned unchanged.
+ *
+ * (Duplicated locally rather than imported to avoid a cross-package dependency
+ * for a one-line helper.)
+ */
+function stripSchemaHashPrefix(name: string): string {
+  const match = /-[0-9a-f]{8}-/.exec(name);
+  return match ? name.slice(match.index + match[0].length) : name;
+}
+
+/**
  * Resolve the storage module config from a PostGraphile pgCodec.
  *
  * Matches the codec's schema + table name against cached storage modules.
  * Works for both files codecs (@storageFiles) and buckets codecs (@storageBuckets).
+ *
+ * Matching is two-tier:
+ *   1. Exact physical schema match — used for single-tenant / non-pooled
+ *      instances where the codec's build-time schema equals the request
+ *      tenant's actual schema. Keeps existing behavior unchanged.
+ *   2. Logical schema match — strip the tenant hash prefix from BOTH the
+ *      codec's schema and each config's schema before comparing. Under
+ *      blueprint pooling a single shared instance serves every tenant of a
+ *      given schema-shape, so the codec's build-time `schemaName` belongs to
+ *      the representative tenant while `allConfigs` carry the request tenant's
+ *      actual (differently-hashed) schema. Both share the same logical suffix
+ *      (e.g. `app-public`). Safe because `allConfigs` is already filtered to a
+ *      single databaseId, so (tableName, logicalSchema) uniquely identifies a
+ *      module.
  *
  * @param pgCodec - The PostGraphile codec (has extensions.pg.schemaName, name)
  * @param allConfigs - All storage module configs for this database
@@ -373,10 +407,24 @@ export function resolveStorageConfigFromCodec(
 
   if (!schemaName || !tableName) return null;
 
-  return allConfigs.find((c) =>
+  // Priority 1: exact physical schema match (non-pooled / single-tenant).
+  const exact = allConfigs.find((c) =>
     (c.filesTableName === tableName && c.schemaName === schemaName) ||
     (c.bucketsTableName === tableName && c.schemaName === schemaName),
-  ) || null;
+  );
+  if (exact) return exact;
+
+  // Priority 2: logical schema match (blueprint pooling — the codec's
+  // build-time schema belongs to the representative tenant; strip the tenant
+  // hash from both sides so the shared logical suffix lines up).
+  const logicalSchema = stripSchemaHashPrefix(schemaName);
+  return allConfigs.find((c) => {
+    const configLogicalSchema = stripSchemaHashPrefix(c.schemaName);
+    return (
+      (c.filesTableName === tableName && configLogicalSchema === logicalSchema) ||
+      (c.bucketsTableName === tableName && configLogicalSchema === logicalSchema)
+    );
+  }) || null;
 }
 
 // --- Bucket metadata cache ---

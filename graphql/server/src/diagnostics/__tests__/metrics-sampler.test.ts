@@ -46,6 +46,7 @@ describe('collectMetricsSample', () => {
     expect(typeof sample.counters.disposals).toBe('number');
     expect(typeof sample.counters.evictions.lru).toBe('number');
     expect(typeof sample.counters.builds).toBe('number');
+    expect(typeof sample.counters.poolingAttaches).toBe('number');
     expect(typeof sample.counters.buildQueueDepth).toBe('number');
     expect(typeof sample.counters.rewritePool.rewrittenQueries).toBe('number');
     expect(typeof sample.counters.introspectionFilter.swaps).toBe('number');
