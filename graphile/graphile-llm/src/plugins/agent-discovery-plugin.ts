@@ -41,6 +41,9 @@ export function clearAgentDiscoveryCache(): void {
 
 // ─── Discovery Query ────────────────────────────────────────────────────────
 
+// Control-plane metaschema_* tables stay fully qualified. The schema row is
+// filtered by the requesting tenant's database id ($1) so a shared/pooled
+// instance never bleeds another tenant's agent config across the join.
 const DISCOVERY_SQL = `
   SELECT
     s.schema_name,
@@ -49,18 +52,31 @@ const DISCOVERY_SQL = `
     acm.task_table_name
   FROM metaschema_modules_public.agent_chat_module acm
   JOIN metaschema_public.schema s ON s.id = acm.schema_id
+  WHERE s.database_id = $1
   LIMIT 1
 `;
 
 /**
  * Look up agent table info for a database, querying the module config table.
- * Results are cached per-database with a 60s TTL.
+ *
+ * The requesting tenant is identified by its database id, resolved from
+ * `jwt.claims.database_id` in the per-request pgSettings — the same way the
+ * billing config cache obtains it (see config-cache.ts / metering-plugin.ts).
+ * The query filters on that id so a shared instance cannot return another
+ * tenant's config. When the id is absent we fail closed (no discovery) and
+ * cache under a `<dbname>:nodb` key to avoid poisoning a real tenant's entry.
+ *
+ * Results are cached per database id with a 60s TTL.
  */
 export async function getAgentDiscovery(
   pool: Pool,
-  dbname: string
+  dbname: string,
+  pgSettings?: Record<string, string> | null
 ): Promise<AgentDiscovery | null> {
-  const cached = agentDiscoveryCache.get(dbname);
+  const databaseId = pgSettings?.['jwt.claims.database_id'] ?? null;
+  const cacheKey = databaseId ?? `${dbname}:nodb`;
+
+  const cached = agentDiscoveryCache.get(cacheKey);
   if (cached !== undefined) {
     return cached;
   }
@@ -68,7 +84,7 @@ export async function getAgentDiscovery(
   let discovery: AgentDiscovery | null = null;
 
   try {
-    const { rows } = await pool.query(DISCOVERY_SQL);
+    const { rows } = await pool.query(DISCOVERY_SQL, [databaseId]);
 
     if (rows.length > 0) {
       const row = rows[0];
@@ -90,6 +106,6 @@ export async function getAgentDiscovery(
     // Module table doesn't exist in this database — not provisioned
   }
 
-  agentDiscoveryCache.set(dbname, discovery);
+  agentDiscoveryCache.set(cacheKey, discovery);
   return discovery;
 }
