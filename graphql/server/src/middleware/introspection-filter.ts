@@ -245,9 +245,6 @@ where n.nspname <> 'information_schema'
   and n.nspname <> all ($1::text[])
 `;
 
-/** Expose the round SQL for tests / callers that want the raw statement. */
-export const buildKeepClosureQuery = (): string => CLOSURE_ROUND_SQL;
-
 const MAX_CLOSURE_ROUNDS = 5;
 
 /** Minimal shape of the checked-out client the discovery needs. */

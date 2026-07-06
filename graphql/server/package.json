@@ -78,6 +78,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.1052.0",
+    "@dataplan/pg": "1.0.3",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",

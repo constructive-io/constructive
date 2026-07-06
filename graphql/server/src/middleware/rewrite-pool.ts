@@ -356,7 +356,10 @@ const hashName = (tenantTag: string, name: string): string =>
 // classified as the settings query, or it would be forwarded UNREWRITTEN (canonical
 // SQL on the tenant connection) and its value could remap or null the checkout's
 // tenant state for sibling queries. This literal byte-matches SQL emitted upstream.
-const SETTINGS_QUERY_TEXT =
+// Exported ONLY for the pinning test that asserts it against the installed
+// @dataplan/pg source — a dependency bump that changes the statement must fail
+// loudly at test time, not silently fail-closed at runtime.
+export const SETTINGS_QUERY_TEXT =
   'select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el';
 
 const isSettingsText = (text: string): boolean => text === SETTINGS_QUERY_TEXT;

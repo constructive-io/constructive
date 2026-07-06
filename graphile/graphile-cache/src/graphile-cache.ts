@@ -535,7 +535,8 @@ export function shouldRefuseBuild(): MemoryPressure & { refuseBuild: boolean } {
     cacheCounters.buildRefusals += 1;
     log.warn(
       `Refusing new schema build at critical heap pressure ` +
-        `(${Math.round(pressure.ratio * 100)}% of ${Math.round(pressure.heapLimit / 1048576)}MB)`,
+        `(${Math.round(pressure.ratio * 100)}% of exhaustible headroom used; ` +
+        `heap limit ${Math.round(pressure.heapLimit / 1048576)}MB)`,
     );
   }
   return { ...pressure, refuseBuild };

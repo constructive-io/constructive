@@ -216,6 +216,14 @@ export function clearInFlightMap(): void {
   creating.clear();
 }
 
+/**
+ * Seeds an in-flight creation promise for a key. Used for testing purposes to
+ * exercise the coalescing paths (Phase B / Phase C re-coalesce) deterministically.
+ */
+export function setInFlightForTest(key: string, promise: Promise<GraphileCacheEntry>): void {
+  creating.set(key, promise);
+}
+
 // =============================================================================
 // Build Admission Control
 // =============================================================================
@@ -623,14 +631,31 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const retryInFlight = creating.get(key);
       if (retryInFlight) {
         log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
-        const retryInstance = await retryInFlight;
-        if (invokeEntryHandler(retryInstance, req, res, next)) {
-          return;
+        try {
+          const retryInstance = await retryInFlight;
+          if (invokeEntryHandler(retryInstance, req, res, next)) {
+            return;
+          }
+          log.warn(`${label} Re-coalesced instance already disposing for PostGraphile[${key}]`);
+          return res.status(503).json({
+            error: { code: 'SERVICE_ROTATING', message: 'Service is restarting, please retry' }
+          });
+        } catch (error) {
+          // A refusal surfacing on the re-coalesce await is bound by the same
+          // contract as the owner path (763) and the request-time gate (640):
+          // 503 SERVICE_OVERLOADED + Retry-After for every coalesced waiter, never
+          // a generic 500. Other rejections fall through to retry the build here,
+          // exactly as Phase B does (605).
+          if (error instanceof BuildRefusedError) {
+            log.warn(`${label} ${error.message} key=${key}`);
+            res.setHeader('Retry-After', '15');
+            return res.status(503).json({
+              error: { code: 'SERVICE_OVERLOADED', message: 'Server is at critical memory pressure; retry shortly' }
+            });
+          }
+          log.warn(`${label} Re-coalesced request failed for PostGraphile[${key}], retrying`);
+          // Fall through to build below.
         }
-        log.warn(`${label} Re-coalesced instance already disposing for PostGraphile[${key}]`);
-        return res.status(503).json({
-          error: { code: 'SERVICE_ROTATING', message: 'Service is restarting, please retry' }
-        });
       }
 
       // Memory governor gate: at critical heap pressure a build's transient

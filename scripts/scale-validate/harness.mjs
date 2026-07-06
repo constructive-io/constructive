@@ -82,7 +82,9 @@ const EMAIL = typeof args.email === 'string' ? args.email : 'seeder@gmail.com';
 const PASSWORD = typeof args.password === 'string' ? args.password : (process.env.PERF_PASSWORD ?? null);
 if (AUTH && !PASSWORD) {
   console.error('[harness] --auth requires credentials: pass --password or set PERF_PASSWORD');
-  process.exit(2);
+  // Exit 3 = config error. Exit 2 is reserved exclusively for the bleed sentinel
+  // (cross-tenant isolation violation) — suites key on it; never reuse it.
+  process.exit(3);
 }
 const SEED = asInt(args.seed, (Date.now() & 0x7fffffff));
 const QUIET = asBool(args.quiet);
