@@ -223,6 +223,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Durability is irrelevant for throwaway CI databases. Disabling fsync
+      # and synchronous commit avoids checkpoint I/O stalls on CI runners.
+      - name: Tune Postgres for CI (disable durability)
+        run: pnpm --filter pgpm exec node dist/index.js tune --yes
+
       - name: Seed app_user
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
@@ -331,6 +336,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Durability is irrelevant for throwaway CI databases. Disabling fsync
+      # and synchronous commit avoids checkpoint I/O stalls on CI runners.
+      - name: Tune Postgres for CI (disable durability)
+        run: pnpm --filter pgpm exec node dist/index.js tune --yes
+
       - name: Seed app_user
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
@@ -401,6 +411,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Durability is irrelevant for throwaway CI databases. Disabling fsync
+      # and synchronous commit avoids checkpoint I/O stalls on CI runners.
+      - name: Tune Postgres for CI (disable durability)
+        run: pnpm --filter pgpm exec node dist/index.js tune --yes
 
       - name: Seed app_user
         run: |
