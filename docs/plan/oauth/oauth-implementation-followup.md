@@ -25,7 +25,3 @@
 ## API Service Cache Loader Snapshots
 
 - Revisit `graphql/server/src/middleware/api.ts` storing resolved loader values inside the cached `ApiStructure`. The API resolver currently resolves mutable module settings such as `authSettings`, `corsOrigins`, `databaseSettings`, `pubkeyChallengeSettings`, and `webauthnSettings`, then stores the whole API structure in `svcCache`, whose TTL is effectively long-lived. This can bypass each loader's own TTL and invalidation path; for example, `updateAuthSettings()` invalidates `authSettingsLoader`, but middleware that reads `req.api.authSettings` could still see the old value from `svcCache`. Consider narrowing `svcCache` to stable API routing fields only, resolving mutable module settings through `ctx.useModule(...)` at use sites, or adding coordinated `svcCache` invalidation whenever loader-backed settings are updated.
-
-## Env Config Consolidation
-
-- Consider moving existing CAPTCHA and upload environment variables into the shared `@pgpmjs/env` config surface in a separate cleanup PR. The reference OAuth branch added `RECAPTCHA_SECRET_KEY` and `MAX_UPLOAD_FILE_SIZE` to `PgpmOptions`, but this OAuth migration keeps those existing middleware paths on direct `process.env` reads to avoid widening the PR scope beyond OAuth/server admin APIs.

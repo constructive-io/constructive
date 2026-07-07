@@ -2,6 +2,9 @@
 
 exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
 {
+  "captcha": {
+    "recaptchaSecretKey": "test-recaptcha-secret",
+  },
   "cdn": {
     "awsAccessKey": "minioadmin",
     "awsRegion": "us-east-1",
@@ -101,6 +104,9 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "pool": false,
     "port": 587,
     "secure": false,
+  },
+  "upload": {
+    "maxFileSize": 123456,
   },
 }
 `;

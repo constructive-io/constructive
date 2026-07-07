@@ -62,6 +62,9 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     CDN_ENDPOINT,
     CDN_PUBLIC_URL_PREFIX,
 
+    RECAPTCHA_SECRET_KEY,
+    MAX_UPLOAD_FILE_SIZE,
+
     DEPLOYMENT_USE_TX,
     DEPLOYMENT_FAST,
     DEPLOYMENT_USE_PLAN,
@@ -103,6 +106,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     // OAuth env vars
     OAUTH_STATE_SECRET
   } = env;
+  const maxUploadFileSize = parseEnvNumber(MAX_UPLOAD_FILE_SIZE);
 
   return {
     db: {
@@ -157,6 +161,12 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...((AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY) && { awsSecretKey: AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY }),
       ...(CDN_ENDPOINT && { endpoint: CDN_ENDPOINT }),
       ...(CDN_PUBLIC_URL_PREFIX && { publicUrlPrefix: CDN_PUBLIC_URL_PREFIX }),
+    },
+    captcha: {
+      ...(RECAPTCHA_SECRET_KEY && { recaptchaSecretKey: RECAPTCHA_SECRET_KEY }),
+    },
+    upload: {
+      ...(maxUploadFileSize !== undefined && { maxFileSize: maxUploadFileSize }),
     },
     deployment: {
       ...(DEPLOYMENT_USE_TX && { useTx: parseEnvBoolean(DEPLOYMENT_USE_TX) }),

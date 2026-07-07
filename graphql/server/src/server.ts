@@ -152,8 +152,9 @@ class Server {
     app.use(poweredBy('constructive'));
     app.use(cookieParser());
     app.use(cors(fallbackOrigin));
+    const uploadMaxFileSize = effectiveOpts.upload?.maxFileSize ?? 10 * 1024 * 1024;
     app.use('/graphql', graphqlUpload.graphqlUploadExpress({
-      maxFileSize: 10 * 1024 * 1024, // 10 MB
+      maxFileSize: uploadMaxFileSize,
       maxFiles: 10,
     }));
 
@@ -166,7 +167,9 @@ class Server {
     app.use(api);
     app.use(authenticate);
     app.use(createContextMiddleware({ pg: effectiveOpts.pg, loaders: createDefaultRegistry() }));
-    app.use(createCaptchaMiddleware());
+    app.use(createCaptchaMiddleware({
+      recaptchaSecretKey: effectiveOpts.captcha?.recaptchaSecretKey,
+    }));
 
     // CSRF protection for cookie-authenticated requests
     // Skip CSRF for Bearer token auth (not vulnerable to CSRF) and anonymous requests

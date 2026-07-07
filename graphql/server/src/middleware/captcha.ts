@@ -25,6 +25,10 @@ const CAPTCHA_PROTECTED_OPERATIONS = new Set([
   'requestPasswordReset',
 ]);
 
+export interface CaptchaMiddlewareOptions {
+  recaptchaSecretKey?: string;
+}
+
 interface RecaptchaResponse {
   success: boolean;
   'error-codes'?: string[];
@@ -70,7 +74,7 @@ const verifyToken = async (token: string, secretKey: string): Promise<boolean> =
  *
  * When `enable_captcha` is true in app_auth_settings, this middleware checks
  * the X-Captcha-Token header on protected mutations (sign-up, password reset).
- * The secret key is read from the RECAPTCHA_SECRET_KEY environment variable
+ * The secret key is passed from server configuration
  * (the public site key is stored in app_auth_settings for the frontend).
  *
  * Skips verification when:
@@ -78,7 +82,9 @@ const verifyToken = async (token: string, secretKey: string): Promise<boolean> =
  *  - The request is not a protected mutation
  *  - No secret key is configured server-side
  */
-export const createCaptchaMiddleware = (): RequestHandler => {
+export const createCaptchaMiddleware = (
+  opts: CaptchaMiddlewareOptions = {},
+): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const authSettings = req.api?.authSettings;
 
@@ -93,10 +99,10 @@ export const createCaptchaMiddleware = (): RequestHandler => {
       return next();
     }
 
-    // Secret key must be set server-side (env var, not stored in DB for security)
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    // Secret key must be set server-side (config/env, not stored in DB for security)
+    const secretKey = opts.recaptchaSecretKey;
     if (!secretKey) {
-      log.warn('[captcha] enable_captcha is true but RECAPTCHA_SECRET_KEY env var is not set; skipping verification');
+      log.warn('[captcha] enable_captcha is true but no reCAPTCHA secret key is configured; skipping verification');
       return next();
     }
 

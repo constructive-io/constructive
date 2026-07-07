@@ -52,7 +52,9 @@ describe('getEnvOptions', () => {
       API_META_SCHEMAS: 'env_meta1,env_meta2',
       API_ANON_ROLE: 'env_anon',
       API_ROLE_NAME: 'env_role',
-      API_DEFAULT_DATABASE_ID: 'env_db'
+      API_DEFAULT_DATABASE_ID: 'env_db',
+      RECAPTCHA_SECRET_KEY: 'test-recaptcha-secret',
+      MAX_UPLOAD_FILE_SIZE: '123456'
     };
 
     const result = getEnvOptions(
@@ -82,6 +84,8 @@ describe('getEnvOptions', () => {
     );
 
     expect(result).toMatchSnapshot();
+    expect(result.captcha?.recaptchaSecretKey).toBe('test-recaptcha-secret');
+    expect(result.upload?.maxFileSize).toBe(123456);
   });
 
   it('replaces graphql array fields with later values (overrides win)', () => {
