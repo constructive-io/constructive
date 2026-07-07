@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.33.0](https://github.com/constructive-io/constructive/compare/pgpm@4.32.2...pgpm@4.33.0) (2026-07-07)
+
+### Features
+
+- **pgpm:** add tune command to disable durability for throwaway environments ([616dd1b](https://github.com/constructive-io/constructive/commit/616dd1b1d66219f13f6cd2cc1f6d9534051a6edf))
+
 ## [4.32.2](https://github.com/constructive-io/constructive/compare/pgpm@4.32.1...pgpm@4.32.2) (2026-07-05)
 
 **Note:** Version bump only for package pgpm
