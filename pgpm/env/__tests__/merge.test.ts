@@ -154,7 +154,9 @@ describe('getEnvOptions', () => {
       PORT: '7777',
       DEPLOYMENT_FAST: 'false',
       JOBS_SUPPORT_ANY: 'false',
-      JOBS_SUPPORTED: 'alpha,beta'
+      JOBS_SUPPORTED: 'alpha,beta',
+      RECAPTCHA_SECRET_KEY: 'test-recaptcha-secret',
+      MAX_UPLOAD_FILE_SIZE: '123456'
     };
 
     const result = getEnvOptions(
@@ -178,6 +180,8 @@ describe('getEnvOptions', () => {
     );
 
     expect(result).toMatchSnapshot();
+    expect(result.captcha?.recaptchaSecretKey).toBe('test-recaptcha-secret');
+    expect(result.upload?.maxFileSize).toBe(123456);
   });
 
   it('replaces array fields with later values (overrides win)', () => {
@@ -224,5 +228,13 @@ describe('getEnvOptions', () => {
     expect(result.jobs?.worker?.supported).toEqual(['delta', 'epsilon']);
     expect(result.jobs?.scheduler?.supported).toEqual(['gamma', 'zeta']);
     expect(result.packages).toEqual(['testing/*', 'extensions/*']);
+  });
+
+  it('ignores invalid MAX_UPLOAD_FILE_SIZE values', () => {
+    const result = getEnvOptions({}, process.cwd(), {
+      MAX_UPLOAD_FILE_SIZE: 'not-a-number'
+    });
+
+    expect(result.upload?.maxFileSize).toBe(pgpmDefaults.upload?.maxFileSize);
   });
 });

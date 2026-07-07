@@ -17,6 +17,9 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     ],
     "roleName": "env_role",
   },
+  "captcha": {
+    "recaptchaSecretKey": "test-recaptcha-secret",
+  },
   "cdn": {
     "awsAccessKey": "minioadmin",
     "awsRegion": "us-east-1",
@@ -119,6 +122,9 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "pool": false,
     "port": 587,
     "secure": false,
+  },
+  "upload": {
+    "maxFileSize": 123456,
   },
 }
 `;
