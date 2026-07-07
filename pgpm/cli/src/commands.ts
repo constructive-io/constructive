@@ -27,6 +27,7 @@ import revert from './commands/revert';
 import slice from './commands/slice';
 import tag from './commands/tag';
 import testPackages from './commands/test-packages';
+import tune from './commands/tune';
 import verify from './commands/verify';
 import { usageText } from './utils';
 
@@ -66,6 +67,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
         rename: pgt(renameCmd),
         slice,
         'test-packages': pgt(testPackages),
+        tune: pgt(tune),
         upgrade: pgt(upgrade),
         up: pgt(upgrade),
         cache,
