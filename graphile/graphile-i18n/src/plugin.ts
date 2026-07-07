@@ -21,6 +21,7 @@ import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
 import type { PgCodecWithAttributes } from '@dataplan/pg';
+import { QuoteUtils } from '@pgsql/quotes';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 
@@ -74,7 +75,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
   // Closure-scoped state shared between init and field hooks
   let i18nRegistry: Record<string, I18nTableInfo> = {};
-  const localeTypeCache: Record<string, any> = {};
+  let localeTypeCache: Record<string, any> = {};
 
   return {
     name: 'I18nPlugin',
@@ -85,6 +86,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
         init: {
           callback(_, build) {
             i18nRegistry = {};
+            localeTypeCache = {};
 
             for (const [, codec] of Object.entries(build.input.pgRegistry.pgCodecs)) {
               const c = codec as PgCodecWithAttributes;
@@ -234,18 +236,27 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
           const { schemaName, baseTable, translationTable, fkColumn, pkColumn, pkType, fields: i18nFields } = info;
 
+          // Identifier quoting via @pgsql/quotes (quote_ident semantics: quoted
+          // only when lexically required — uppercase, special chars, reserved
+          // keywords). Hashed multi-tenant schema names contain '-' so they are
+          // always emitted double-quoted, which schema-identifier rewriting at
+          // the pool seam relies on.
+          const qi = (name: string): string => QuoteUtils.quoteIdentifier(name);
           const coalescedCols = Object.values(i18nFields)
-            .map(f => `coalesce(v."${f.column}", b."${f.column}") as "${f.column}"`)
+            .map(f => `coalesce(v.${qi(f.column)}, b.${qi(f.column)}) as ${qi(f.column)}`)
             .join(', ');
 
+          const baseTableRef = QuoteUtils.quoteQualifiedIdentifier(schemaName, baseTable);
+          const translationTableRef = QuoteUtils.quoteQualifiedIdentifier(schemaName, translationTable);
+
           // Build the SQL query template
-          const sqlQuery = `SELECT v."${langCodeColumn}" AS "lang_code", ${coalescedCols}
-             FROM "${schemaName}"."${baseTable}" b
-             LEFT JOIN "${schemaName}"."${translationTable}" v
-               ON v."${fkColumn}" = b."${pkColumn}"
-               AND array_position($2::text[], v."${langCodeColumn}") IS NOT NULL
-             WHERE b."${pkColumn}" = $1::${pkType}
-             ORDER BY array_position($2::text[], v."${langCodeColumn}") ASC NULLS LAST
+          const sqlQuery = `SELECT v.${qi(langCodeColumn)} AS "lang_code", ${coalescedCols}
+             FROM ${baseTableRef} b
+             LEFT JOIN ${translationTableRef} v
+               ON v.${qi(fkColumn)} = b.${qi(pkColumn)}
+               AND array_position($2::text[], v.${qi(langCodeColumn)}) IS NOT NULL
+             WHERE b.${qi(pkColumn)} = $1::${pkType}
+             ORDER BY array_position($2::text[], v.${qi(langCodeColumn)}) ASC NULLS LAST
              LIMIT 1`;
 
           // Build column names list for mapping base values
@@ -265,18 +276,20 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                   $baseCols[column] = $parent.get(column);
                 }
                 const $withPgClient = (grafastContext() as any).get('withPgClient');
+                const $pgSettings = (grafastContext() as any).get('pgSettings');
                 const $langCodes = (grafastContext() as any).get('langCodes');
 
                 // Combine all inputs into a single step
                 const $input = object({
                   id: $id,
                   withPgClient: $withPgClient,
+                  pgSettings: $pgSettings,
                   langCodes: $langCodes,
                   ...$baseCols,
                 });
 
                 return lambda($input, async (input: any) => {
-                  const { id, withPgClient, langCodes: ctxLangCodes, ...baseCols } = input;
+                  const { id, withPgClient, pgSettings, langCodes: ctxLangCodes, ...baseCols } = input;
                   const langs: string[] = ctxLangCodes ?? defaultLanguages;
 
                   if (!withPgClient || !id) {
@@ -287,7 +300,7 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
                     return result;
                   }
 
-                  const row = await withPgClient(null, async (client: any) => {
+                  const row = await withPgClient(pgSettings, async (client: any) => {
                     const { rows } = await client.query(sqlQuery, [id, langs]);
                     return rows[0] ?? null;
                   });

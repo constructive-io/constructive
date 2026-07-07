@@ -20,6 +20,7 @@
  *   2. Falls back to error if not configured
  */
 
+import { QuoteUtils } from '@pgsql/quotes';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
@@ -86,8 +87,10 @@ function parseHasChunksTag(raw: any, codec: any): ChunkTableInfo | null {
 
 /**
  * Discover all chunk-aware tables from the pgRegistry.
+ *
+ * Exported for unit testing.
  */
-function discoverChunkTables(build: any): ChunkTableInfo[] {
+export function discoverChunkTables(build: any): ChunkTableInfo[] {
   const chunkTables: ChunkTableInfo[] = [];
   const pgRegistry = build.input?.pgRegistry ?? build.pgRegistry;
   if (!pgRegistry) return chunkTables;
@@ -111,21 +114,28 @@ function discoverChunkTables(build: any): ChunkTableInfo[] {
 
 /**
  * Build a SQL query string to search a chunks table for similar embeddings.
+ *
+ * Exported for unit testing.
  */
-function buildChunkSearchSql(
+export function buildChunkSearchSql(
   table: ChunkTableInfo,
   vectorString: string,
   limit: number,
   maxDistance: number | null
 ): { text: string; values: any[] } {
-  const schema = table.chunksSchema;
-  const qualifiedTable = schema
-    ? `"${schema}"."${table.chunksTableName}"`
-    : `"${table.chunksTableName}"`;
+  // Keep the schema-qualified reference when a schema is known. Quoting via
+  // @pgsql/quotes (quote_ident semantics: quoted only when lexically
+  // required). Hashed multi-tenant schema names contain '-' so they are always
+  // emitted double-quoted, which schema-identifier rewriting at the pool seam
+  // relies on.
+  const qualifiedTable = QuoteUtils.quoteQualifiedIdentifier(
+    table.chunksSchema || null,
+    table.chunksTableName
+  );
 
-  const embeddingCol = `"${table.embeddingField}"`;
-  const contentCol = `"${table.contentField}"`;
-  const parentFkCol = `"${table.parentFkField}"`;
+  const embeddingCol = QuoteUtils.quoteIdentifier(table.embeddingField);
+  const contentCol = QuoteUtils.quoteIdentifier(table.contentField);
+  const parentFkCol = QuoteUtils.quoteIdentifier(table.parentFkField);
 
   let text = `
     SELECT

@@ -423,3 +423,130 @@ describe('VectorNearbyInput includeChunks field (Phase E)', () => {
     expect(fields.includeChunks.description).toContain('chunks');
   });
 });
+
+// ─── Adapter SQL qualification ────────────────────────────────────────────────
+//
+// Tenant-data SQL (bm25 index names, chunk table references) is always emitted
+// fully schema-qualified, so resolution never depends on search_path. Index
+// names are quoted via @pgsql/quotes (quote_ident semantics): plain snake_case
+// names come out bare, and any name that lexically requires quoting — notably
+// hashed multi-tenant schemas, which contain '-' — comes out double-quoted.
+
+describe('adapter SQL qualification', () => {
+  // Mock sql object that mimics pg-sql2 behavior (same shape as above).
+  const mockSql = {
+    identifier: (name: string) => `"${name}"`,
+    value: (val: any) => `'${val}'`,
+    literal: (val: any) => `'${val}'`,
+    raw: (s: string) => s,
+    fragment: (strings: TemplateStringsArray, ...values: any[]) => {
+      let result = '';
+      strings.forEach((str, i) => {
+        result += str;
+        if (i < values.length) result += String(values[i]);
+      });
+      return result;
+    },
+    join: (parts: any[], sep: string) => parts.join(sep),
+    parens: (expr: any) => `(${expr})`,
+  };
+  const sql = Object.assign(
+    (strings: TemplateStringsArray, ...values: any[]) => {
+      let result = '';
+      strings.forEach((str: string, i: number) => {
+        result += str;
+        if (i < values.length) result += String(values[i]);
+      });
+      return result;
+    },
+    mockSql,
+  );
+
+  // ── bm25: index name passed to to_bm25query ──
+  describe('bm25 adapter — index name', () => {
+    const adapter = createBm25Adapter();
+    const bm25Column = {
+      attributeName: 'body',
+      adapterData: {
+        bm25Index: {
+          schemaName: 'app_private',
+          tableName: 'documents',
+          columnName: 'body',
+          indexName: 'documents_body_bm25_idx',
+        },
+      },
+    };
+
+    it('emits the schema-qualified index name', () => {
+      const result = adapter.buildFilterApply(
+        sql,
+        'tbl' as any,
+        bm25Column,
+        { query: 'hello' },
+        {},
+      );
+
+      expect(result).not.toBeNull();
+      const scoreStr = String(result!.scoreExpression);
+      // quote_ident semantics: plain snake_case names are emitted bare but
+      // still fully qualified (schema.index).
+      expect(scoreStr).toContain('app_private.documents_body_bm25_idx');
+      expect(scoreStr).not.toContain('"app_private"');
+    });
+
+    it('double-quotes hashed tenant schemas (they contain "-")', () => {
+      const hashedColumn = {
+        ...bm25Column,
+        adapterData: {
+          bm25Index: {
+            ...bm25Column.adapterData.bm25Index,
+            schemaName: 'marketplace-db-t1-5e6b13b2-app-public',
+          },
+        },
+      };
+      const result = adapter.buildFilterApply(
+        sql,
+        'tbl' as any,
+        hashedColumn,
+        { query: 'hello' },
+        {},
+      );
+
+      expect(result).not.toBeNull();
+      const scoreStr = String(result!.scoreExpression);
+      expect(scoreStr).toContain('"marketplace-db-t1-5e6b13b2-app-public".documents_body_bm25_idx');
+    });
+  });
+
+  // ── pgvector: chunk table reference ──
+  describe('pgvector adapter — chunk table reference', () => {
+    const adapter = createPgvectorAdapter();
+    const chunkColumn = {
+      attributeName: 'embedding',
+      adapterData: {
+        chunksInfo: {
+          chunksSchema: 'app_private',
+          chunksTableName: 'doc_chunks',
+          parentFkField: 'document_id',
+          parentPkField: 'row_id',
+          embeddingField: 'vec',
+        },
+      },
+    };
+
+    it('emits the schema-qualified chunk table', () => {
+      const result = adapter.buildFilterApply(
+        sql,
+        'tbl' as any,
+        chunkColumn,
+        { vector: [1, 0, 0], metric: 'COSINE' },
+        {},
+      );
+
+      expect(result).not.toBeNull();
+      const scoreStr = String(result!.scoreExpression);
+      expect(scoreStr).toContain('"app_private"."doc_chunks"');
+      expect(scoreStr).toContain('LEAST');
+    });
+  });
+});

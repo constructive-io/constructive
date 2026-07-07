@@ -1,7 +1,7 @@
 {
   "name": "agentic-server",
   "version": "0.8.0",
-  "description": "Standalone Express LLM service — agent threads, chat streaming, billing metering, and inference logging via express-context",
+  "description": "Standalone Express LLM service - agent threads, chat streaming, billing metering, and inference logging via express-context",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
