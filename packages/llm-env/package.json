@@ -2,7 +2,7 @@
   "name": "@constructive-io/llm-env",
   "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "LLM environment configuration — single source of truth for all LLM-related env vars and defaults",
+  "description": "LLM environment configuration - single source of truth for all LLM-related env vars and defaults",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",

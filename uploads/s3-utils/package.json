@@ -2,7 +2,7 @@
   "name": "@constructive-io/s3-utils",
   "version": "2.19.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Unified S3 utilities — client factory, file operations, presigned URLs",
+  "description": "Unified S3 utilities - client factory, file operations, presigned URLs",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
