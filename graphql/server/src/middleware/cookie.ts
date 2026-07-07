@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import type { AuthSettings } from '../types';
+import { pgIntervalToSeconds } from '../utils/pg-interval';
 
 export const SESSION_COOKIE_NAME = 'constructive_session';
 export const DEVICE_TOKEN_COOKIE_NAME = 'constructive_device_token';
@@ -24,12 +25,15 @@ export const getSessionCookieConfig = (
 ): CookieConfig => {
   const DEFAULT_MAX_AGE = 86400; // 24 hours
   let maxAge = DEFAULT_MAX_AGE;
-  if (rememberMe && authSettings?.rememberMeDuration) {
-    const parsed = parseInt(authSettings.rememberMeDuration, 10);
-    if (!isNaN(parsed)) maxAge = parsed;
-  } else if (authSettings?.cookieMaxAge) {
-    const parsed = parseInt(authSettings.cookieMaxAge, 10);
-    if (!isNaN(parsed)) maxAge = parsed;
+
+  const configuredMaxAge =
+    rememberMe
+      ? pgIntervalToSeconds(authSettings?.rememberMeDuration) ??
+        pgIntervalToSeconds(authSettings?.cookieMaxAge)
+      : pgIntervalToSeconds(authSettings?.cookieMaxAge);
+
+  if (configuredMaxAge !== null) {
+    maxAge = configuredMaxAge;
   }
 
   return {

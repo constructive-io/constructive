@@ -53,6 +53,7 @@ export type {
   InferenceLogConfig,
   LlmConfig,
   PublicKeyChallengeData,
+  PgInterval,
   PubkeyChallengeSettings,
   RlsModule,
   WebauthnSettings,

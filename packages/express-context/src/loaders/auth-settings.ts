@@ -10,7 +10,7 @@
  * database rather than the services database.
  */
 
-import type { AuthSettings } from '../types';
+import type { AuthSettings, PgInterval } from '../types';
 import type { LoaderContext, ModuleLoader } from './types';
 import { createModuleLoader } from './create-loader';
 
@@ -45,9 +45,9 @@ interface AuthSettingsRow {
   cookie_samesite: string;
   cookie_domain: string | null;
   cookie_httponly: boolean;
-  cookie_max_age: string | null;
+  cookie_max_age: string | PgInterval | null;
   cookie_path: string;
-  remember_me_duration: string | null;
+  remember_me_duration: string | PgInterval | null;
   enable_captcha: boolean;
   captcha_site_key: string | null;
 }
