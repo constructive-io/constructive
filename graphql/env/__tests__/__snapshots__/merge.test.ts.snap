@@ -44,6 +44,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "administrator": "administrator",
       "anonymous": "anonymous",
       "authenticated": "authenticated",
+      "authenticatedClient": "authenticated_client",
       "default": "anonymous",
     },
     "rootDb": "postgres",
