@@ -7,6 +7,7 @@ export const DEFAULT_ROLE_MAPPING: Required<RoleMapping> = {
   anonymous: 'anonymous',
   authenticated: 'authenticated',
   administrator: 'administrator',
+  authenticatedClient: 'authenticated_client',
   default: 'anonymous'
 };
 

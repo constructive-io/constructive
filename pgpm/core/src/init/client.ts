@@ -5,6 +5,7 @@ import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 import { 
   generateCreateBaseRolesSQL, 
+  generateCreateClientRoleSQL,
   generateCreateUserSQL, 
   generateCreateTestUsersSQL,
   generateRemoveUserSQL
@@ -36,6 +37,26 @@ export class PgpmInit {
       log.success('Successfully bootstrapped PGPM roles');
     } catch (error) {
       log.error('Failed to bootstrap roles:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Bootstrap the restricted client role (authenticated_client) for SQL-level
+   * proxy clients. Opt-in via `pgpm admin-users bootstrap --client`.
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+   * @param roles - Role mapping from getConnEnvOptions().roles!
+   */
+  async bootstrapClientRole(roles: RoleMapping): Promise<void> {
+    try {
+      log.info('Bootstrapping PGPM client role...');
+
+      const sql = generateCreateClientRoleSQL(roles);
+      await this.pool.query(sql);
+
+      log.success('Successfully bootstrapped PGPM client role');
+    } catch (error) {
+      log.error('Failed to bootstrap client role:', error);
       throw error;
     }
   }

@@ -1,5 +1,6 @@
 import {
   generateCreateBaseRolesSQL,
+  generateCreateClientRoleSQL,
   generateCreateUserSQL,
   generateCreateTestUsersSQL,
   generateRemoveUserSQL
@@ -56,6 +57,61 @@ describe('Role SQL Generators - Input Validation', () => {
       expect(sql).toContain('auth');
       expect(sql).toContain('admin');
       expect(sql).toContain('CREATE ROLE');
+    });
+  });
+
+  describe('generateCreateClientRoleSQL', () => {
+    it('should throw an error when roles is undefined', () => {
+      expect(() => {
+        generateCreateClientRoleSQL(undefined as any);
+      }).toThrow('generateCreateClientRoleSQL: roles parameter is undefined');
+    });
+
+    it('should throw an error when roles.authenticated is missing', () => {
+      expect(() => {
+        generateCreateClientRoleSQL({
+          authenticatedClient: 'authenticated_client'
+        });
+      }).toThrow('generateCreateClientRoleSQL: roles is missing required properties');
+    });
+
+    it('should throw an error when roles.authenticatedClient is missing', () => {
+      expect(() => {
+        generateCreateClientRoleSQL({
+          authenticated: 'authenticated'
+        });
+      }).toThrow('generateCreateClientRoleSQL: roles is missing required properties');
+    });
+
+    it('should generate valid SQL when all roles are provided', () => {
+      const sql = generateCreateClientRoleSQL({
+        authenticated: 'auth',
+        authenticatedClient: 'auth_client'
+      });
+      expect(sql).toContain('auth');
+      expect(sql).toContain('auth_client');
+      expect(sql).toContain('CREATE ROLE');
+      expect(sql).toContain('NOBYPASSRLS');
+      expect(sql).toContain('GRANT %I TO %I');
+      expect(sql).toContain('statement_timeout');
+      expect(sql).toContain('REVOKE EXECUTE ON FUNCTION pg_catalog.set_config(text, text, boolean) FROM PUBLIC');
+      expect(sql).toContain('REVOKE EXECUTE ON FUNCTION pg_catalog.pg_notify(text, text) FROM PUBLIC');
+    });
+
+    it('should apply a custom statement timeout', () => {
+      const sql = generateCreateClientRoleSQL(
+        { authenticated: 'authenticated', authenticatedClient: 'authenticated_client' },
+        '30s'
+      );
+      expect(sql).toContain(`'30s'`);
+    });
+
+    it('should escape single quotes in role names', () => {
+      const sql = generateCreateClientRoleSQL({
+        authenticated: "auth'role",
+        authenticatedClient: 'authenticated_client'
+      });
+      expect(sql).toContain("'auth''role'");
     });
   });
 

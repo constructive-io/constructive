@@ -105,6 +105,115 @@ COMMIT;
 }
 
 /**
+ * Generate SQL to create the restricted `authenticated_client` role used by
+ * SQL-level proxy clients (opt-in via `admin-users bootstrap --client`).
+ *
+ * The role inherits table/schema grants from `authenticated` but is stripped
+ * of GUC-mutation and pub/sub abilities at the Postgres grant level:
+ *   - set_config() revoked from PUBLIC (claims cannot be forged in-session)
+ *   - pg_notify() revoked from PUBLIC (pub/sub closed at any call depth)
+ *   - server-enforced statement_timeout baseline
+ *
+ * Note: revoking from PUBLIC affects all non-superuser roles in the database;
+ * roles that legitimately need set_config()/pg_notify() (e.g. a proxy login
+ * role or job workers) must be re-granted EXECUTE explicitly.
+ *
+ * @param roles - Role mapping from getConnEnvOptions().roles!
+ * @param statementTimeout - Baseline statement_timeout for the role (default '15s')
+ */
+export function generateCreateClientRoleSQL(
+  roles: RoleMapping,
+  statementTimeout = '15s'
+): string {
+  if (!roles) {
+    throw new Error(
+      'generateCreateClientRoleSQL: roles parameter is undefined. ' +
+      'Ensure getConnEnvOptions().roles is defined.'
+    );
+  }
+  if (!roles.authenticated || !roles.authenticatedClient) {
+    throw new Error(
+      'generateCreateClientRoleSQL: roles is missing required properties. ' +
+      `Got: authenticated=${roles.authenticated}, authenticatedClient=${roles.authenticatedClient}. ` +
+      'Ensure all role names are defined in your configuration.'
+    );
+  }
+  const r = {
+    authenticated: roles.authenticated,
+    authenticatedClient: roles.authenticatedClient
+  };
+
+  return `
+BEGIN;
+DO $do$
+DECLARE
+  v_authenticated text := ${sqlLiteral(r.authenticated)};
+  v_client text := ${sqlLiteral(r.authenticatedClient)};
+  v_statement_timeout text := ${sqlLiteral(statementTimeout)};
+BEGIN
+  -- Create client role: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_client) THEN
+    BEGIN
+      EXECUTE format('CREATE ROLE %I', v_client);
+    EXCEPTION
+      WHEN duplicate_object THEN
+        -- 42710: Role already exists (race condition); safe to ignore
+        NULL;
+      WHEN unique_violation THEN
+        -- 23505: Concurrent CREATE ROLE hit unique index; safe to ignore
+        NULL;
+      WHEN insufficient_privilege THEN
+        -- 42501: Must surface this error - caller lacks permission
+        RAISE;
+    END;
+  END IF;
+
+  -- Strip escalation attributes (safe to run even if role already exists)
+  EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION NOBYPASSRLS', v_client);
+
+  -- Inherit table/schema grants from authenticated
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_auth_members am
+    JOIN pg_roles r1 ON am.roleid = r1.oid
+    JOIN pg_roles r2 ON am.member = r2.oid
+    WHERE r1.rolname = v_authenticated AND r2.rolname = v_client
+  ) THEN
+    BEGIN
+      EXECUTE format('GRANT %I TO %I', v_authenticated, v_client);
+    EXCEPTION
+      WHEN unique_violation THEN
+        -- 23505: Membership was granted concurrently; safe to ignore
+        NULL;
+      WHEN undefined_object THEN
+        -- 42704: One of the roles doesn't exist; log notice and continue
+        RAISE NOTICE 'Missing role when granting % to %', v_authenticated, v_client;
+      WHEN insufficient_privilege THEN
+        -- 42501: Must surface this error - caller lacks permission
+        RAISE;
+      WHEN invalid_grant_operation THEN
+        -- 0LP01: Must surface this error - invalid grant operation
+        RAISE;
+    END;
+  END IF;
+
+  -- Server-enforced baseline statement timeout for the client role
+  EXECUTE format('ALTER ROLE %I SET statement_timeout = %L', v_client, v_statement_timeout);
+
+  -- Claim integrity: revoke set_config() from PUBLIC so no proxied role can
+  -- mutate GUCs (jwt.claims.*) in-session. Roles that need it (e.g. a proxy
+  -- login role) must be re-granted EXECUTE explicitly.
+  REVOKE EXECUTE ON FUNCTION pg_catalog.set_config(text, text, boolean) FROM PUBLIC;
+
+  -- Pub/sub: revoke pg_notify() from PUBLIC so no proxied role can emit a
+  -- NOTIFY at any call depth (incl. nested inside SECURITY INVOKER functions).
+  REVOKE EXECUTE ON FUNCTION pg_catalog.pg_notify(text, text) FROM PUBLIC;
+END
+$do$;
+COMMIT;
+`;
+}
+
+/**
  * Generate SQL to create a user with password and grant base roles.
  * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
  * @param roles - Role mapping from getConnEnvOptions().roles!
