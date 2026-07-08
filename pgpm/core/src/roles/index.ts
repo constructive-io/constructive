@@ -108,15 +108,11 @@ COMMIT;
  * Generate SQL to create the restricted `authenticated_client` role used by
  * SQL-level proxy clients (opt-in via `admin-users bootstrap --client`).
  *
- * The role inherits table/schema grants from `authenticated` but is stripped
- * of GUC-mutation and pub/sub abilities at the Postgres grant level:
- *   - set_config() revoked from PUBLIC (claims cannot be forged in-session)
- *   - pg_notify() revoked from PUBLIC (pub/sub closed at any call depth)
- *   - server-enforced statement_timeout baseline
- *
- * Note: revoking from PUBLIC affects all non-superuser roles in the database;
- * roles that legitimately need set_config()/pg_notify() (e.g. a proxy login
- * role or job workers) must be re-granted EXECUTE explicitly.
+ * The role inherits table/schema grants from `authenticated` and gets a
+ * server-enforced statement_timeout baseline. Grant-level hardening such as
+ * revoking set_config()/pg_notify() from PUBLIC is intentionally left to the
+ * proxy deployment config, since those revokes affect every non-superuser
+ * role in the database (the app server and job workers depend on both).
  *
  * @param roles - Role mapping from getConnEnvOptions().roles!
  * @param statementTimeout - Baseline statement_timeout for the role (default '15s')
@@ -198,15 +194,6 @@ BEGIN
 
   -- Server-enforced baseline statement timeout for the client role
   EXECUTE format('ALTER ROLE %I SET statement_timeout = %L', v_client, v_statement_timeout);
-
-  -- Claim integrity: revoke set_config() from PUBLIC so no proxied role can
-  -- mutate GUCs (jwt.claims.*) in-session. Roles that need it (e.g. a proxy
-  -- login role) must be re-granted EXECUTE explicitly.
-  REVOKE EXECUTE ON FUNCTION pg_catalog.set_config(text, text, boolean) FROM PUBLIC;
-
-  -- Pub/sub: revoke pg_notify() from PUBLIC so no proxied role can emit a
-  -- NOTIFY at any call depth (incl. nested inside SECURITY INVOKER functions).
-  REVOKE EXECUTE ON FUNCTION pg_catalog.pg_notify(text, text) FROM PUBLIC;
 END
 $do$;
 COMMIT;

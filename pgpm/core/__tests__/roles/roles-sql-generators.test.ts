@@ -94,8 +94,7 @@ describe('Role SQL Generators - Input Validation', () => {
       expect(sql).toContain('NOBYPASSRLS');
       expect(sql).toContain('GRANT %I TO %I');
       expect(sql).toContain('statement_timeout');
-      expect(sql).toContain('REVOKE EXECUTE ON FUNCTION pg_catalog.set_config(text, text, boolean) FROM PUBLIC');
-      expect(sql).toContain('REVOKE EXECUTE ON FUNCTION pg_catalog.pg_notify(text, text) FROM PUBLIC');
+      expect(sql).not.toContain('REVOKE');
     });
 
     it('should apply a custom statement timeout', () => {

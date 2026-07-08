@@ -19,8 +19,7 @@ Options:
   --cwd <directory>       Working directory (default: current directory)
   --client                Also create the restricted authenticated_client role
                           (for SQL-level proxy clients: inherits from
-                          authenticated; set_config/pg_notify revoked from
-                          PUBLIC; server-enforced statement_timeout)
+                          authenticated; server-enforced statement_timeout)
 
 Examples:
   pgpm admin-users bootstrap              # Initialize postgres roles
