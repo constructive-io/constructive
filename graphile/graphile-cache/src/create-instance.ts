@@ -11,6 +11,11 @@ interface GraphileInstanceOptions {
   preset: any;
   cacheKey: string;
   /**
+   * Database name backing this instance's pg pool. Stored on the entry so the
+   * graphile-cache pgCache cleanup callback can evict it when its pool is disposed.
+   */
+  dbname?: string;
+  /**
    * When true, a RealtimeManager is created and started alongside the
    * PostGraphile instance.  The pool is extracted from the preset's
    * pgServices (managed by pg-cache) rather than passed separately.
@@ -37,7 +42,7 @@ interface GraphileInstanceOptions {
 export const createGraphileInstance = async (
   opts: GraphileInstanceOptions
 ): Promise<GraphileCacheEntry> => {
-  const { preset, cacheKey, enableRealtime = false } = opts;
+  const { preset, cacheKey, dbname, enableRealtime = false } = opts;
 
   const pgl = postgraphile(preset);
   const serv = pgl.createServ(grafserv);
@@ -53,7 +58,9 @@ export const createGraphileInstance = async (
     handler,
     httpServer,
     cacheKey,
+    dbname,
     createdAt: Date.now(),
+    inflight: 0,
   };
 
   if (enableRealtime) {
