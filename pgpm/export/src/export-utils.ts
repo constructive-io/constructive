@@ -29,6 +29,7 @@ export const DB_REQUIRED_EXTENSIONS = [
   'vector',
   'ltree',
   'metaschema-schema',
+  'inflection-db',
   'pgpm-inflection',
   'pgpm-uuid',
   'pgpm-utils',
