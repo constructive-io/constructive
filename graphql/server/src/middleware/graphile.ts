@@ -249,12 +249,6 @@ const buildPreset = (
           context['jwt.claims.device_token'] = req.deviceToken;
         }
 
-        // Export category exclusion — set 'platform_mirror' as default so
-        // platform-integrated mirror triggers are always excluded from
-        // db_migrate.sql_actions queries via the export_category_filter RLS
-        // policy. The X-Exclude-Categories header can override if needed.
-        context['export.exclude_categories'] = req.get('X-Exclude-Categories') || 'platform_mirror';
-
         if (req.token?.user_id) {
           const pgSettings: Record<string, string> = {
             role: roleName,
