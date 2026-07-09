@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.1](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.17.0...simple-smtp-server@0.17.1) (2026-07-08)
+
+**Note:** Version bump only for package simple-smtp-server
+
 # [0.17.0](https://github.com/constructive-io/constructive/compare/simple-smtp-server@0.16.1...simple-smtp-server@0.17.0) (2026-06-28)
 
 **Note:** Version bump only for package simple-smtp-server

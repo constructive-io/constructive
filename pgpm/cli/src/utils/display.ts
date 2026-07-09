@@ -27,6 +27,7 @@ export const usageText = `
     analyze            Analyze database structure
     rename             Rename database changes
     admin-users        Manage admin users
+    tune               Tune PostgreSQL for throwaway environments (CI/test)
 
   Testing:
     test-packages      Run integration tests on all workspace packages

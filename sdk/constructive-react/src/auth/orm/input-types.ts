@@ -235,8 +235,54 @@ export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
-/** User email addresses with verification and primary-email management */
+/** Scoped sub-identities (API keys and agents) with precomputed SPRT */
 // ============ Entity Types ============
+export interface Principal {
+  id: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  /** The human user who owns and manages this principal */
+  ownerId?: string | null;
+  /** The user row (type=3 Principal) that represents this principal identity */
+  userId?: string | null;
+  /** Human-readable label for this principal (e.g., billing-bot, ci-deploy-key) */
+  name?: string | null;
+  /** Permission bitmask subset; all-1s means inherit all parent permissions */
+  allowedMask?: string | null;
+  /** Whether this principal is restricted to read-only operations */
+  isReadOnly?: boolean | null;
+  /** Whether this principal bypasses MFA step-up requirements */
+  bypassStepUp?: boolean | null;
+}
+/** Association table scoping principals to specific organizations */
+export interface PrincipalEntity {
+  id: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  /** The principal this scoping row belongs to */
+  principalId?: string | null;
+  /** The organization this principal is scoped to */
+  entityId?: string | null;
+  /** Denormalized owner_id from principals table for RLS */
+  ownerId?: string | null;
+}
+/** Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. */
+export interface PrincipalScopeOverride {
+  id: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  /** The principal this override applies to */
+  principalId?: string | null;
+  /** The scope level (membership_type) this override restricts */
+  membershipType?: number | null;
+  /** Permission bitmask for this scope; AND-masked with parent permissions during cascade */
+  allowedMask?: string | null;
+  /** Whether this principal has admin access at this scope (default true = inherit from parent) */
+  isAdmin?: boolean | null;
+  /** Whether this principal is restricted to read-only at this scope */
+  isReadOnly?: boolean | null;
+}
+/** User email addresses with verification and primary-email management */
 export interface Email {
   id: string;
   ownerId?: string | null;
@@ -349,6 +395,20 @@ export interface UserConnectedAccount {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+export interface OrgApiKeyList {
+  id: string;
+  keyId?: string | null;
+  name?: string | null;
+  principalId?: string | null;
+  orgId?: string | null;
+  expiresAt?: string | null;
+  revokedAt?: string | null;
+  lastUsedAt?: string | null;
+  mfaLevel?: string | null;
+  accessLevel?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
 export interface User {
   id: string;
   username?: string | null;
@@ -378,6 +438,20 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
+export interface PrincipalRelations {
+  owner?: User | null;
+  user?: User | null;
+  principalEntities?: ConnectionResult<PrincipalEntity>;
+  principalScopeOverrides?: ConnectionResult<PrincipalScopeOverride>;
+}
+export interface PrincipalEntityRelations {
+  entity?: User | null;
+  owner?: User | null;
+  principal?: Principal | null;
+}
+export interface PrincipalScopeOverrideRelations {
+  principal?: Principal | null;
+}
 export interface EmailRelations {
   owner?: User | null;
 }
@@ -396,8 +470,12 @@ export interface AuditLogAuthRelations {
 export interface IdentityProviderRelations {}
 export interface RoleTypeRelations {}
 export interface UserConnectedAccountRelations {}
+export interface OrgApiKeyListRelations {}
 export interface UserRelations {
   roleType?: RoleType | null;
+  ownedPrincipals?: ConnectionResult<Principal>;
+  principals?: ConnectionResult<Principal>;
+  principalEntitiesByEntityId?: ConnectionResult<PrincipalEntity>;
   ownedEmails?: ConnectionResult<Email>;
   ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
   ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
@@ -405,6 +483,10 @@ export interface UserRelations {
   auditLogAuthsByActorId?: ConnectionResult<AuditLogAuth>;
 }
 // ============ Entity Types With Relations ============
+export type PrincipalWithRelations = Principal & PrincipalRelations;
+export type PrincipalEntityWithRelations = PrincipalEntity & PrincipalEntityRelations;
+export type PrincipalScopeOverrideWithRelations = PrincipalScopeOverride &
+  PrincipalScopeOverrideRelations;
 export type EmailWithRelations = Email & EmailRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
@@ -414,8 +496,68 @@ export type IdentityProviderWithRelations = IdentityProvider & IdentityProviderR
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
 export type UserConnectedAccountWithRelations = UserConnectedAccount &
   UserConnectedAccountRelations;
+export type OrgApiKeyListWithRelations = OrgApiKeyList & OrgApiKeyListRelations;
 export type UserWithRelations = User & UserRelations;
 // ============ Entity Select Types ============
+export type PrincipalSelect = {
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  ownerId?: boolean;
+  userId?: boolean;
+  name?: boolean;
+  allowedMask?: boolean;
+  isReadOnly?: boolean;
+  bypassStepUp?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+  user?: {
+    select: UserSelect;
+  };
+  principalEntities?: {
+    select: PrincipalEntitySelect;
+    first?: number;
+    filter?: PrincipalEntityFilter;
+    orderBy?: PrincipalEntityOrderBy[];
+  };
+  principalScopeOverrides?: {
+    select: PrincipalScopeOverrideSelect;
+    first?: number;
+    filter?: PrincipalScopeOverrideFilter;
+    orderBy?: PrincipalScopeOverrideOrderBy[];
+  };
+};
+export type PrincipalEntitySelect = {
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  principalId?: boolean;
+  entityId?: boolean;
+  ownerId?: boolean;
+  entity?: {
+    select: UserSelect;
+  };
+  owner?: {
+    select: UserSelect;
+  };
+  principal?: {
+    select: PrincipalSelect;
+  };
+};
+export type PrincipalScopeOverrideSelect = {
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  principalId?: boolean;
+  membershipType?: boolean;
+  allowedMask?: boolean;
+  isAdmin?: boolean;
+  isReadOnly?: boolean;
+  principal?: {
+    select: PrincipalSelect;
+  };
+};
 export type EmailSelect = {
   id?: boolean;
   ownerId?: boolean;
@@ -509,6 +651,20 @@ export type UserConnectedAccountSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
 };
+export type OrgApiKeyListSelect = {
+  id?: boolean;
+  keyId?: boolean;
+  name?: boolean;
+  principalId?: boolean;
+  orgId?: boolean;
+  expiresAt?: boolean;
+  revokedAt?: boolean;
+  lastUsedAt?: boolean;
+  mfaLevel?: boolean;
+  accessLevel?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+};
 export type UserSelect = {
   id?: boolean;
   username?: boolean;
@@ -523,6 +679,24 @@ export type UserSelect = {
   searchScore?: boolean;
   roleType?: {
     select: RoleTypeSelect;
+  };
+  ownedPrincipals?: {
+    select: PrincipalSelect;
+    first?: number;
+    filter?: PrincipalFilter;
+    orderBy?: PrincipalOrderBy[];
+  };
+  principals?: {
+    select: PrincipalSelect;
+    first?: number;
+    filter?: PrincipalFilter;
+    orderBy?: PrincipalOrderBy[];
+  };
+  principalEntitiesByEntityId?: {
+    select: PrincipalEntitySelect;
+    first?: number;
+    filter?: PrincipalEntityFilter;
+    orderBy?: PrincipalEntityOrderBy[];
   };
   ownedEmails?: {
     select: EmailSelect;
@@ -556,6 +730,96 @@ export type UserSelect = {
   };
 };
 // ============ Table Filter Types ============
+export interface PrincipalFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `userId` field. */
+  userId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `allowedMask` field. */
+  allowedMask?: BitStringFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
+  /** Filter by the object’s `bypassStepUp` field. */
+  bypassStepUp?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrincipalFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrincipalFilter[];
+  /** Negates the expression. */
+  not?: PrincipalFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `user` relation. */
+  user?: UserFilter;
+  /** Filter by the object’s `principalEntities` relation. */
+  principalEntities?: PrincipalToManyPrincipalEntityFilter;
+  /** `principalEntities` exist. */
+  principalEntitiesExist?: boolean;
+  /** Filter by the object’s `principalScopeOverrides` relation. */
+  principalScopeOverrides?: PrincipalToManyPrincipalScopeOverrideFilter;
+  /** `principalScopeOverrides` exist. */
+  principalScopeOverridesExist?: boolean;
+}
+export interface PrincipalEntityFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrincipalEntityFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrincipalEntityFilter[];
+  /** Negates the expression. */
+  not?: PrincipalEntityFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `principal` relation. */
+  principal?: PrincipalFilter;
+}
+export interface PrincipalScopeOverrideFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `allowedMask` field. */
+  allowedMask?: BitStringFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrincipalScopeOverrideFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrincipalScopeOverrideFilter[];
+  /** Negates the expression. */
+  not?: PrincipalScopeOverrideFilter;
+  /** Filter by the object’s `principal` relation. */
+  principal?: PrincipalFilter;
+}
 export interface EmailFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -756,6 +1020,38 @@ export interface UserConnectedAccountFilter {
   /** Negates the expression. */
   not?: UserConnectedAccountFilter;
 }
+export interface OrgApiKeyListFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `keyId` field. */
+  keyId?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `orgId` field. */
+  orgId?: UUIDFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `revokedAt` field. */
+  revokedAt?: DatetimeFilter;
+  /** Filter by the object’s `lastUsedAt` field. */
+  lastUsedAt?: DatetimeFilter;
+  /** Filter by the object’s `mfaLevel` field. */
+  mfaLevel?: StringFilter;
+  /** Filter by the object’s `accessLevel` field. */
+  accessLevel?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgApiKeyListFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgApiKeyListFilter[];
+  /** Negates the expression. */
+  not?: OrgApiKeyListFilter;
+}
 export interface UserFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -781,6 +1077,18 @@ export interface UserFilter {
   not?: UserFilter;
   /** Filter by the object’s `roleType` relation. */
   roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedPrincipals` relation. */
+  ownedPrincipals?: UserToManyPrincipalFilter;
+  /** `ownedPrincipals` exist. */
+  ownedPrincipalsExist?: boolean;
+  /** Filter by the object’s `principals` relation. */
+  principals?: UserToManyPrincipalFilter;
+  /** `principals` exist. */
+  principalsExist?: boolean;
+  /** Filter by the object’s `principalEntitiesByEntityId` relation. */
+  principalEntitiesByEntityId?: UserToManyPrincipalEntityFilter;
+  /** `principalEntitiesByEntityId` exist. */
+  principalEntitiesByEntityIdExist?: boolean;
   /** Filter by the object’s `ownedEmails` relation. */
   ownedEmails?: UserToManyEmailFilter;
   /** `ownedEmails` exist. */
@@ -815,6 +1123,64 @@ export interface UserFilter {
   unifiedSearch?: string;
 }
 // ============ OrderBy Types ============
+export type PrincipalOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'USER_ID_ASC'
+  | 'USER_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'ALLOWED_MASK_ASC'
+  | 'ALLOWED_MASK_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC'
+  | 'BYPASS_STEP_UP_ASC'
+  | 'BYPASS_STEP_UP_DESC';
+export type PrincipalEntityOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC';
+export type PrincipalScopeOverrideOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'MEMBERSHIP_TYPE_ASC'
+  | 'MEMBERSHIP_TYPE_DESC'
+  | 'ALLOWED_MASK_ASC'
+  | 'ALLOWED_MASK_DESC'
+  | 'IS_ADMIN_ASC'
+  | 'IS_ADMIN_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC';
 export type EmailOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -967,6 +1333,32 @@ export type UserConnectedAccountOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+export type OrgApiKeyListOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KEY_ID_ASC'
+  | 'KEY_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'ORG_ID_ASC'
+  | 'ORG_ID_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'REVOKED_AT_ASC'
+  | 'REVOKED_AT_DESC'
+  | 'LAST_USED_AT_ASC'
+  | 'LAST_USED_AT_DESC'
+  | 'MFA_LEVEL_ASC'
+  | 'MFA_LEVEL_DESC'
+  | 'ACCESS_LEVEL_ASC'
+  | 'ACCESS_LEVEL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type UserOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -994,6 +1386,82 @@ export type UserOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 // ============ CRUD Input Types ============
+export interface CreatePrincipalInput {
+  clientMutationId?: string;
+  principal: {
+    ownerId: string;
+    userId: string;
+    name?: string;
+    allowedMask?: string;
+    isReadOnly?: boolean;
+    bypassStepUp?: boolean;
+  };
+}
+export interface PrincipalPatch {
+  ownerId?: string | null;
+  userId?: string | null;
+  name?: string | null;
+  allowedMask?: string | null;
+  isReadOnly?: boolean | null;
+  bypassStepUp?: boolean | null;
+}
+export interface UpdatePrincipalInput {
+  clientMutationId?: string;
+  principalId: string;
+  principalPatch: PrincipalPatch;
+}
+export interface DeletePrincipalInput {
+  clientMutationId?: string;
+  principalId: string;
+}
+export interface CreatePrincipalEntityInput {
+  clientMutationId?: string;
+  principalEntity: {
+    principalId: string;
+    entityId: string;
+    ownerId: string;
+  };
+}
+export interface PrincipalEntityPatch {
+  principalId?: string | null;
+  entityId?: string | null;
+  ownerId?: string | null;
+}
+export interface UpdatePrincipalEntityInput {
+  clientMutationId?: string;
+  id: string;
+  principalEntityPatch: PrincipalEntityPatch;
+}
+export interface DeletePrincipalEntityInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePrincipalScopeOverrideInput {
+  clientMutationId?: string;
+  principalScopeOverride: {
+    principalId: string;
+    membershipType?: number;
+    allowedMask?: string;
+    isAdmin?: boolean;
+    isReadOnly?: boolean;
+  };
+}
+export interface PrincipalScopeOverridePatch {
+  principalId?: string | null;
+  membershipType?: number | null;
+  allowedMask?: string | null;
+  isAdmin?: boolean | null;
+  isReadOnly?: boolean | null;
+}
+export interface UpdatePrincipalScopeOverrideInput {
+  clientMutationId?: string;
+  id: string;
+  principalScopeOverridePatch: PrincipalScopeOverridePatch;
+}
+export interface DeletePrincipalScopeOverrideInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateEmailInput {
   clientMutationId?: string;
   email: {
@@ -1210,6 +1678,40 @@ export interface DeleteUserConnectedAccountInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateOrgApiKeyListInput {
+  clientMutationId?: string;
+  orgApiKeyList: {
+    keyId?: string;
+    name?: string;
+    principalId?: string;
+    orgId?: string;
+    expiresAt?: string;
+    revokedAt?: string;
+    lastUsedAt?: string;
+    mfaLevel?: string;
+    accessLevel?: string;
+  };
+}
+export interface OrgApiKeyListPatch {
+  keyId?: string | null;
+  name?: string | null;
+  principalId?: string | null;
+  orgId?: string | null;
+  expiresAt?: string | null;
+  revokedAt?: string | null;
+  lastUsedAt?: string | null;
+  mfaLevel?: string | null;
+  accessLevel?: string | null;
+}
+export interface UpdateOrgApiKeyListInput {
+  clientMutationId?: string;
+  id: string;
+  orgApiKeyListPatch: OrgApiKeyListPatch;
+}
+export interface DeleteOrgApiKeyListInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateUserInput {
   clientMutationId?: string;
   user: {
@@ -1237,7 +1739,14 @@ export interface DeleteUserInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {
+  Principal: {
+    principalEntities: 'PrincipalEntity',
+    principalScopeOverrides: 'PrincipalScopeOverride',
+  },
   User: {
+    ownedPrincipals: 'Principal',
+    principals: 'Principal',
+    principalEntitiesByEntityId: 'PrincipalEntity',
     ownedEmails: 'Email',
     ownedPhoneNumbers: 'PhoneNumber',
     ownedCryptoAddresses: 'CryptoAddress',
@@ -1255,6 +1764,10 @@ export interface SendAccountDeletionEmailInput {
 export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
+}
+export interface DeleteOrgPrincipalInput {
+  clientMutationId?: string;
+  principalId?: string;
 }
 export interface DisconnectAccountInput {
   clientMutationId?: string;
@@ -1280,6 +1793,11 @@ export interface ConfirmDeleteAccountInput {
   clientMutationId?: string;
   userId?: string;
   token?: string;
+}
+export interface RevokeOrgApiKeyInput {
+  clientMutationId?: string;
+  keyId: string;
+  orgId: string;
 }
 export interface SetPasswordInput {
   clientMutationId?: string;
@@ -1347,9 +1865,26 @@ export interface LinkIdentityInput {
   identifier: string;
   details?: Record<string, unknown>;
 }
+export interface CreateOrgPrincipalInput {
+  clientMutationId?: string;
+  name?: string;
+  orgId?: string;
+  allowedMask?: string;
+  isReadOnly?: boolean;
+  bypassStepUp?: boolean;
+}
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
   amount?: IntervalInput;
+}
+export interface CreateOrgApiKeyInput {
+  clientMutationId?: string;
+  orgId?: string;
+  principalId?: string;
+  keyName?: string;
+  accessLevel?: string;
+  mfaLevel?: string;
+  expiresIn?: IntervalInput;
 }
 export interface CreateApiKeyInput {
   clientMutationId?: string;
@@ -1357,6 +1892,7 @@ export interface CreateApiKeyInput {
   accessLevel?: string;
   mfaLevel?: string;
   expiresIn?: IntervalInput;
+  principalId?: string;
 }
 export interface RequestCrossOriginTokenInput {
   clientMutationId?: string;
@@ -1381,6 +1917,24 @@ export interface ProvisionBucketInput {
    * Omit for app-level (database-wide) storage.
    */
   ownerId?: string;
+}
+/** A filter to be used against many `PrincipalEntity` object types. All fields are combined with a logical ‘and.’ */
+export interface PrincipalToManyPrincipalEntityFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrincipalEntityFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrincipalEntityFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrincipalEntityFilter;
+}
+/** A filter to be used against many `PrincipalScopeOverride` object types. All fields are combined with a logical ‘and.’ */
+export interface PrincipalToManyPrincipalScopeOverrideFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrincipalScopeOverrideFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrincipalScopeOverrideFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrincipalScopeOverrideFilter;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -1669,6 +2223,24 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Contained by the specified JSON. */
   containedBy?: ConstructiveInternalTypeImage;
 }
+/** A filter to be used against many `Principal` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyPrincipalFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrincipalFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrincipalFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrincipalFilter;
+}
+/** A filter to be used against many `PrincipalEntity` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyPrincipalEntityFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrincipalEntityFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrincipalEntityFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrincipalEntityFilter;
+}
 /** A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyEmailFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -1720,6 +2292,18 @@ export interface TrgmSearchInput {
   value: string;
   /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
   threshold?: number;
+}
+/** An input for mutations affecting `PrincipalEntity` */
+export interface PrincipalEntityInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** The principal this scoping row belongs to */
+  principalId: string;
+  /** The organization this principal is scoped to */
+  entityId: string;
+  /** Denormalized owner_id from principals table for RLS */
+  ownerId: string;
 }
 /** An input for mutations affecting `Email` */
 export interface EmailInput {
@@ -1837,6 +2421,21 @@ export interface UserConnectedAccountInput {
   createdAt?: string;
   updatedAt?: string;
 }
+/** An input for mutations affecting `OrgApiKeyList` */
+export interface OrgApiKeyListInput {
+  id?: string;
+  keyId?: string;
+  name?: string;
+  principalId?: string;
+  orgId?: string;
+  expiresAt?: string;
+  revokedAt?: string;
+  lastUsedAt?: string;
+  mfaLevel?: string;
+  accessLevel?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 /** An input for mutations affecting `User` */
 export interface UserInput {
   id?: string;
@@ -1865,6 +2464,99 @@ export interface IntervalInput {
   months?: number;
   /** A quantity of years. */
   years?: number;
+}
+/** A filter to be used against `PrincipalEntity` object types. All fields are combined with a logical ‘and.’ */
+export interface PrincipalEntityFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrincipalEntityFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrincipalEntityFilter[];
+  /** Negates the expression. */
+  not?: PrincipalEntityFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `principal` relation. */
+  principal?: PrincipalFilter;
+}
+/** A filter to be used against `PrincipalScopeOverride` object types. All fields are combined with a logical ‘and.’ */
+export interface PrincipalScopeOverrideFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `allowedMask` field. */
+  allowedMask?: BitStringFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrincipalScopeOverrideFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrincipalScopeOverrideFilter[];
+  /** Negates the expression. */
+  not?: PrincipalScopeOverrideFilter;
+  /** Filter by the object’s `principal` relation. */
+  principal?: PrincipalFilter;
+}
+/** A filter to be used against `Principal` object types. All fields are combined with a logical ‘and.’ */
+export interface PrincipalFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `userId` field. */
+  userId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `allowedMask` field. */
+  allowedMask?: BitStringFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
+  /** Filter by the object’s `bypassStepUp` field. */
+  bypassStepUp?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrincipalFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrincipalFilter[];
+  /** Negates the expression. */
+  not?: PrincipalFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** Filter by the object’s `user` relation. */
+  user?: UserFilter;
+  /** Filter by the object’s `principalEntities` relation. */
+  principalEntities?: PrincipalToManyPrincipalEntityFilter;
+  /** `principalEntities` exist. */
+  principalEntitiesExist?: boolean;
+  /** Filter by the object’s `principalScopeOverrides` relation. */
+  principalScopeOverrides?: PrincipalToManyPrincipalScopeOverrideFilter;
+  /** `principalScopeOverrides` exist. */
+  principalScopeOverridesExist?: boolean;
 }
 /** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
 export interface EmailFilter {
@@ -2042,6 +2734,152 @@ export interface UUIDFilter {
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: string;
 }
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
+export interface UserFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
+  searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
+  type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserFilter[];
+  /** Negates the expression. */
+  not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedPrincipals` relation. */
+  ownedPrincipals?: UserToManyPrincipalFilter;
+  /** `ownedPrincipals` exist. */
+  ownedPrincipalsExist?: boolean;
+  /** Filter by the object’s `principals` relation. */
+  principals?: UserToManyPrincipalFilter;
+  /** `principals` exist. */
+  principalsExist?: boolean;
+  /** Filter by the object’s `principalEntitiesByEntityId` relation. */
+  principalEntitiesByEntityId?: UserToManyPrincipalEntityFilter;
+  /** `principalEntitiesByEntityId` exist. */
+  principalEntitiesByEntityIdExist?: boolean;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedWebauthnCredentials` relation. */
+  ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
+  /** `ownedWebauthnCredentials` exist. */
+  ownedWebauthnCredentialsExist?: boolean;
+  /** Filter by the object’s `auditLogAuthsByActorId` relation. */
+  auditLogAuthsByActorId?: UserToManyAuditLogAuthFilter;
+  /** `auditLogAuthsByActorId` exist. */
+  auditLogAuthsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+}
+/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
+export interface IntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+}
+/** A filter to be used against BitString fields. All fields are combined with a logical ‘and.’ */
+export interface BitStringFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
 /** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
 export interface BooleanFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
@@ -2143,90 +2981,6 @@ export interface StringFilter {
   greaterThanInsensitive?: string;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
-}
-/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
-export interface DatetimeFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-}
-/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
-export interface UserFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `username` field. */
-  username?: StringTrgmFilter;
-  /** Filter by the object’s `displayName` field. */
-  displayName?: StringTrgmFilter;
-  /** Filter by the object’s `profilePicture` field. */
-  profilePicture?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `searchTsv` field. */
-  searchTsv?: FullTextFilter;
-  /** Filter by the object’s `type` field. */
-  type?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: UserFilter[];
-  /** Checks for any expressions in this list. */
-  or?: UserFilter[];
-  /** Negates the expression. */
-  not?: UserFilter;
-  /** Filter by the object’s `roleType` relation. */
-  roleType?: RoleTypeFilter;
-  /** Filter by the object’s `ownedEmails` relation. */
-  ownedEmails?: UserToManyEmailFilter;
-  /** `ownedEmails` exist. */
-  ownedEmailsExist?: boolean;
-  /** Filter by the object’s `ownedPhoneNumbers` relation. */
-  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
-  /** `ownedPhoneNumbers` exist. */
-  ownedPhoneNumbersExist?: boolean;
-  /** Filter by the object’s `ownedCryptoAddresses` relation. */
-  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
-  /** `ownedCryptoAddresses` exist. */
-  ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedWebauthnCredentials` relation. */
-  ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
-  /** `ownedWebauthnCredentials` exist. */
-  ownedWebauthnCredentialsExist?: boolean;
-  /** Filter by the object’s `auditLogAuthsByActorId` relation. */
-  auditLogAuthsByActorId?: UserToManyAuditLogAuthFilter;
-  /** `auditLogAuthsByActorId` exist. */
-  auditLogAuthsByActorIdExist?: boolean;
-  /** TSV search on the `search_tsv` column. */
-  tsvSearchTsv?: string;
-  /** TRGM search on the `display_name` column. */
-  trgmDisplayName?: TrgmSearchInput;
-  /**
-   * Composite unified search. Provide a search string and it will be dispatched to
-   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. When the LLM plugin is active, pgvector also participates via
-   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  unifiedSearch?: string;
 }
 /** A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’ */
 export interface BigIntFilter {
@@ -2346,31 +3100,6 @@ export interface FullTextFilter {
   /** Performs a full text search on the field. */
   matches?: string;
 }
-/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
-export interface IntFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: number;
-  /** Not equal to the specified value. */
-  notEqualTo?: number;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: number;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: number;
-  /** Included in the specified list. */
-  in?: number[];
-  /** Not included in the specified list. */
-  notIn?: number[];
-  /** Less than the specified value. */
-  lessThan?: number;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: number;
-  /** Greater than the specified value. */
-  greaterThan?: number;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: number;
-}
 /** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
 export interface RoleTypeFilter {
   /** Filter by the object’s `id` field. */
@@ -2404,6 +3133,14 @@ export interface CheckPasswordPayload {
 }
 export type CheckPasswordPayloadSelect = {
   clientMutationId?: boolean;
+};
+export interface DeleteOrgPrincipalPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type DeleteOrgPrincipalPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface DisconnectAccountPayload {
   clientMutationId?: string | null;
@@ -2450,6 +3187,14 @@ export interface ConfirmDeleteAccountPayload {
   result?: boolean | null;
 }
 export type ConfirmDeleteAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RevokeOrgApiKeyPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RevokeOrgApiKeyPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -2543,6 +3288,14 @@ export type LinkIdentityPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface CreateOrgPrincipalPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CreateOrgPrincipalPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
   result?: ExtendTokenExpiresRecord[] | null;
@@ -2551,6 +3304,16 @@ export type ExtendTokenExpiresPayloadSelect = {
   clientMutationId?: boolean;
   result?: {
     select: ExtendTokenExpiresRecordSelect;
+  };
+};
+export interface CreateOrgApiKeyPayload {
+  clientMutationId?: string | null;
+  result?: CreateOrgApiKeyRecord | null;
+}
+export type CreateOrgApiKeyPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: CreateOrgApiKeyRecordSelect;
   };
 };
 export interface CreateApiKeyPayload {
@@ -2606,6 +3369,67 @@ export type ProvisionBucketPayloadSelect = {
   provider?: boolean;
   endpoint?: boolean;
   error?: boolean;
+};
+export interface CreatePrincipalPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CreatePrincipalPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface DeletePrincipalPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type DeletePrincipalPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface CreatePrincipalEntityPayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalEntity` that was created by this mutation. */
+  principalEntity?: PrincipalEntity | null;
+  principalEntityEdge?: PrincipalEntityEdge | null;
+}
+export type CreatePrincipalEntityPayloadSelect = {
+  clientMutationId?: boolean;
+  principalEntity?: {
+    select: PrincipalEntitySelect;
+  };
+  principalEntityEdge?: {
+    select: PrincipalEntityEdgeSelect;
+  };
+};
+export interface UpdatePrincipalEntityPayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalEntity` that was updated by this mutation. */
+  principalEntity?: PrincipalEntity | null;
+  principalEntityEdge?: PrincipalEntityEdge | null;
+}
+export type UpdatePrincipalEntityPayloadSelect = {
+  clientMutationId?: boolean;
+  principalEntity?: {
+    select: PrincipalEntitySelect;
+  };
+  principalEntityEdge?: {
+    select: PrincipalEntityEdgeSelect;
+  };
+};
+export interface DeletePrincipalEntityPayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalEntity` that was deleted by this mutation. */
+  principalEntity?: PrincipalEntity | null;
+  principalEntityEdge?: PrincipalEntityEdge | null;
+}
+export type DeletePrincipalEntityPayloadSelect = {
+  clientMutationId?: boolean;
+  principalEntity?: {
+    select: PrincipalEntitySelect;
+  };
+  principalEntityEdge?: {
+    select: PrincipalEntityEdgeSelect;
+  };
 };
 export interface CreateEmailPayload {
   clientMutationId?: string | null;
@@ -2899,6 +3723,17 @@ export type CreateUserConnectedAccountPayloadSelect = {
     select: UserConnectedAccountSelect;
   };
 };
+export interface CreateOrgApiKeyListPayload {
+  clientMutationId?: string | null;
+  /** The `OrgApiKeyList` that was created by this mutation. */
+  orgApiKeyList?: OrgApiKeyList | null;
+}
+export type CreateOrgApiKeyListPayloadSelect = {
+  clientMutationId?: boolean;
+  orgApiKeyList?: {
+    select: OrgApiKeyListSelect;
+  };
+};
 export interface CreateUserPayload {
   clientMutationId?: string | null;
   /** The `User` that was created by this mutation. */
@@ -3026,6 +3861,16 @@ export type ExtendTokenExpiresRecordSelect = {
   sessionId?: boolean;
   expiresAt?: boolean;
 };
+export interface CreateOrgApiKeyRecord {
+  apiKey?: string | null;
+  keyId?: string | null;
+  expiresAt?: string | null;
+}
+export type CreateOrgApiKeyRecordSelect = {
+  apiKey?: boolean;
+  keyId?: boolean;
+  expiresAt?: boolean;
+};
 export interface CreateApiKeyRecord {
   apiKey?: string | null;
   keyId?: string | null;
@@ -3035,6 +3880,18 @@ export type CreateApiKeyRecordSelect = {
   apiKey?: boolean;
   keyId?: boolean;
   expiresAt?: boolean;
+};
+/** A `PrincipalEntity` edge in the connection. */
+export interface PrincipalEntityEdge {
+  cursor?: string | null;
+  /** The `PrincipalEntity` at the end of the edge. */
+  node?: PrincipalEntity | null;
+}
+export type PrincipalEntityEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PrincipalEntitySelect;
+  };
 };
 /** A `Email` edge in the connection. */
 export interface EmailEdge {

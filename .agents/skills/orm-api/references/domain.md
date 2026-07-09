@@ -9,7 +9,7 @@ DNS domain and subdomain routing: maps hostnames to either an API endpoint or a 
 ```typescript
 db.domain.findMany({ select: { id: true } }).execute()
 db.domain.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.domain.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>', domain: '<Hostname>' }, select: { id: true } }).execute()
+db.domain.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', siteId: '<UUID>', serviceId: '<UUID>', subdomain: '<Hostname>', domain: '<Hostname>', labels: '<JSON>', annotations: '<JSON>' }, select: { id: true } }).execute()
 db.domain.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.domain.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.domain.findMany({
 
 ```typescript
 const item = await db.domain.create({
-  data: { databaseId: '<UUID>', apiId: '<UUID>', siteId: '<UUID>', subdomain: '<Hostname>', domain: '<Hostname>' },
+  data: { databaseId: '<UUID>', apiId: '<UUID>', siteId: '<UUID>', serviceId: '<UUID>', subdomain: '<Hostname>', domain: '<Hostname>', labels: '<JSON>', annotations: '<JSON>' },
   select: { id: true }
 }).execute();
 ```

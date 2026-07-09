@@ -12,8 +12,8 @@ csdk table list --where.<field>.<op> <value> --orderBy <values>
 csdk table list --limit 10 --after <cursor>
 csdk table find-first --where.<field>.<op> <value>
 csdk table get --id <UUID>
-csdk table create --schemaId <UUID> --name <String> [--databaseId <UUID>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--useRls <Boolean>] [--timestamps <Boolean>] [--peoplestamps <Boolean>] [--pluralName <String>] [--singularName <String>] [--tags <String>] [--partitioned <Boolean>] [--partitionStrategy <String>] [--partitionKeyNames <String>] [--partitionKeyTypes <String>] [--inheritsId <UUID>]
-csdk table update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--name <String>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--useRls <Boolean>] [--timestamps <Boolean>] [--peoplestamps <Boolean>] [--pluralName <String>] [--singularName <String>] [--tags <String>] [--partitioned <Boolean>] [--partitionStrategy <String>] [--partitionKeyNames <String>] [--partitionKeyTypes <String>] [--inheritsId <UUID>]
+csdk table create --schemaId <UUID> --name <String> [--databaseId <UUID>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--useRls <Boolean>] [--timestamps <Boolean>] [--peoplestamps <Boolean>] [--pluralName <String>] [--singularName <String>] [--tags <String>] [--partitioned <Boolean>] [--partitionStrategy <String>] [--partitionKeyNames <String>] [--partitionKeyTypes <String>] [--inheritsId <UUID>]
+csdk table update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--name <String>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--useRls <Boolean>] [--timestamps <Boolean>] [--peoplestamps <Boolean>] [--pluralName <String>] [--singularName <String>] [--tags <String>] [--partitioned <Boolean>] [--partitionStrategy <String>] [--partitionKeyNames <String>] [--partitionKeyTypes <String>] [--inheritsId <UUID>]
 csdk table delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk table list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a table
 
 ```bash
-csdk table create --schemaId <UUID> --name <String> [--databaseId <UUID>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--scope <Int>] [--useRls <Boolean>] [--timestamps <Boolean>] [--peoplestamps <Boolean>] [--pluralName <String>] [--singularName <String>] [--tags <String>] [--partitioned <Boolean>] [--partitionStrategy <String>] [--partitionKeyNames <String>] [--partitionKeyTypes <String>] [--inheritsId <UUID>]
+csdk table create --schemaId <UUID> --name <String> [--databaseId <UUID>] [--label <String>] [--description <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--useRls <Boolean>] [--timestamps <Boolean>] [--peoplestamps <Boolean>] [--pluralName <String>] [--singularName <String>] [--tags <String>] [--partitioned <Boolean>] [--partitionStrategy <String>] [--partitionKeyNames <String>] [--partitionKeyTypes <String>] [--inheritsId <UUID>]
 ```
 
 ### Get a table by id

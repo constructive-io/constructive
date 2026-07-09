@@ -47,19 +47,21 @@ const db = createClient({
 | `cryptoAuthModule` | findMany, findOne, create, update, delete |
 | `sessionsModule` | findMany, findOne, create, update, delete |
 | `secureTableProvision` | findMany, findOne, create, update, delete |
-| `merkleStoreModule` | findMany, findOne, create, update, delete |
-| `graphModule` | findMany, findOne, create, update, delete |
 | `databaseProvisionModule` | findMany, findOne, create, update, delete |
 | `configSecretsModule` | findMany, findOne, create, update, delete |
+| `graphModule` | findMany, findOne, create, update, delete |
+| `merkleStoreModule` | findMany, findOne, create, update, delete |
 | `rateLimitMetersModule` | findMany, findOne, create, update, delete |
 | `realtimeModule` | findMany, findOne, create, update, delete |
 | `webauthnAuthModule` | findMany, findOne, create, update, delete |
 | `functionInvocationModule` | findMany, findOne, create, update, delete |
 | `functionModule` | findMany, findOne, create, update, delete |
 | `invitesModule` | findMany, findOne, create, update, delete |
+| `principalAuthModule` | findMany, findOne, create, update, delete |
 | `computeLogModule` | findMany, findOne, create, update, delete |
 | `inferenceLogModule` | findMany, findOne, create, update, delete |
 | `namespaceModule` | findMany, findOne, create, update, delete |
+| `resourceModule` | findMany, findOne, create, update, delete |
 | `storageLogModule` | findMany, findOne, create, update, delete |
 | `transferLogModule` | findMany, findOne, create, update, delete |
 | `functionDeploymentModule` | findMany, findOne, create, update, delete |
@@ -1053,95 +1055,6 @@ const updated = await db.secureTableProvision.update({ where: { id: '<UUID>' }, 
 const deleted = await db.secureTableProvision.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.merkleStoreModule`
-
-CRUD operations for MerkleStoreModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `schemaId` | UUID | Yes |
-| `privateSchemaId` | UUID | Yes |
-| `publicSchemaName` | String | Yes |
-| `privateSchemaName` | String | Yes |
-| `objectTableId` | UUID | Yes |
-| `storeTableId` | UUID | Yes |
-| `commitTableId` | UUID | Yes |
-| `refTableId` | UUID | Yes |
-| `prefix` | String | Yes |
-| `apiName` | String | Yes |
-| `privateApiName` | String | Yes |
-| `scope` | String | Yes |
-| `functionPrefix` | String | Yes |
-| `createdAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all merkleStoreModule records
-const items = await db.merkleStoreModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, objectTableId: true, storeTableId: true, commitTableId: true, refTableId: true, prefix: true, apiName: true, privateApiName: true, scope: true, functionPrefix: true, createdAt: true } }).execute();
-
-// Get one by id
-const item = await db.merkleStoreModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, objectTableId: true, storeTableId: true, commitTableId: true, refTableId: true, prefix: true, apiName: true, privateApiName: true, scope: true, functionPrefix: true, createdAt: true } }).execute();
-
-// Create
-const created = await db.merkleStoreModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', objectTableId: '<UUID>', storeTableId: '<UUID>', commitTableId: '<UUID>', refTableId: '<UUID>', prefix: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', functionPrefix: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.merkleStoreModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.merkleStoreModule.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.graphModule`
-
-CRUD operations for GraphModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `publicSchemaId` | UUID | Yes |
-| `privateSchemaId` | UUID | Yes |
-| `publicSchemaName` | String | Yes |
-| `privateSchemaName` | String | Yes |
-| `scope` | String | Yes |
-| `prefix` | String | Yes |
-| `merkleStoreModuleId` | UUID | Yes |
-| `graphsTableId` | UUID | Yes |
-| `apiName` | String | Yes |
-| `privateApiName` | String | Yes |
-| `entityTableId` | UUID | Yes |
-| `policies` | JSON | Yes |
-| `provisions` | JSON | Yes |
-| `defaultPermissions` | String | Yes |
-| `createdAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all graphModule records
-const items = await db.graphModule.findMany({ select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
-
-// Get one by id
-const item = await db.graphModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
-
-// Create
-const created = await db.graphModule.create({ data: { databaseId: '<UUID>', publicSchemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', scope: '<String>', prefix: '<String>', merkleStoreModuleId: '<UUID>', graphsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.graphModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.graphModule.delete({ where: { id: '<UUID>' } }).execute();
-```
-
 ### `db.databaseProvisionModule`
 
 CRUD operations for DatabaseProvisionModule records.
@@ -1227,6 +1140,96 @@ const updated = await db.configSecretsModule.update({ where: { id: '<UUID>' }, d
 
 // Delete
 const deleted = await db.configSecretsModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.graphModule`
+
+CRUD operations for GraphModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `publicSchemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `publicSchemaName` | String | Yes |
+| `privateSchemaName` | String | Yes |
+| `scope` | String | Yes |
+| `prefix` | String | Yes |
+| `merkleStoreModuleId` | UUID | Yes |
+| `graphsTableId` | UUID | Yes |
+| `apiName` | String | Yes |
+| `privateApiName` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `policies` | JSON | Yes |
+| `provisions` | JSON | Yes |
+| `defaultPermissions` | String | Yes |
+| `createdAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all graphModule records
+const items = await db.graphModule.findMany({ select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
+
+// Get one by id
+const item = await db.graphModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, graphsTableId: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, defaultPermissions: true, createdAt: true } }).execute();
+
+// Create
+const created = await db.graphModule.create({ data: { databaseId: '<UUID>', publicSchemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', scope: '<String>', prefix: '<String>', merkleStoreModuleId: '<UUID>', graphsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.graphModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.graphModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.merkleStoreModule`
+
+CRUD operations for MerkleStoreModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `publicSchemaName` | String | Yes |
+| `privateSchemaName` | String | Yes |
+| `objectTableId` | UUID | Yes |
+| `storeTableId` | UUID | Yes |
+| `commitTableId` | UUID | Yes |
+| `refTableId` | UUID | Yes |
+| `prefix` | String | Yes |
+| `apiName` | String | Yes |
+| `privateApiName` | String | Yes |
+| `scope` | String | Yes |
+| `functionPrefix` | String | Yes |
+| `permissionKey` | String | Yes |
+| `createdAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all merkleStoreModule records
+const items = await db.merkleStoreModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, objectTableId: true, storeTableId: true, commitTableId: true, refTableId: true, prefix: true, apiName: true, privateApiName: true, scope: true, functionPrefix: true, permissionKey: true, createdAt: true } }).execute();
+
+// Get one by id
+const item = await db.merkleStoreModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, objectTableId: true, storeTableId: true, commitTableId: true, refTableId: true, prefix: true, apiName: true, privateApiName: true, scope: true, functionPrefix: true, permissionKey: true, createdAt: true } }).execute();
+
+// Create
+const created = await db.merkleStoreModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', objectTableId: '<UUID>', storeTableId: '<UUID>', commitTableId: '<UUID>', refTableId: '<UUID>', prefix: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', functionPrefix: '<String>', permissionKey: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.merkleStoreModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.merkleStoreModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.rateLimitMetersModule`
@@ -1498,6 +1501,52 @@ const updated = await db.invitesModule.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.invitesModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.principalAuthModule`
+
+CRUD operations for PrincipalAuthModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `principalsTableId` | UUID | Yes |
+| `principalEntitiesTableId` | UUID | Yes |
+| `principalScopeOverridesTableId` | UUID | Yes |
+| `usersTableId` | UUID | Yes |
+| `sessionsTableId` | UUID | Yes |
+| `sessionCredentialsTableId` | UUID | Yes |
+| `auditsTableId` | UUID | Yes |
+| `principalsTableName` | String | Yes |
+| `createPrincipalFunction` | String | Yes |
+| `deletePrincipalFunction` | String | Yes |
+| `createOrgPrincipalFunction` | String | Yes |
+| `deleteOrgPrincipalFunction` | String | Yes |
+| `createOrgApiKeyFunction` | String | Yes |
+| `revokeOrgApiKeyFunction` | String | Yes |
+| `apiName` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all principalAuthModule records
+const items = await db.principalAuthModule.findMany({ select: { id: true, databaseId: true, schemaId: true, principalsTableId: true, principalEntitiesTableId: true, principalScopeOverridesTableId: true, usersTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, principalsTableName: true, createPrincipalFunction: true, deletePrincipalFunction: true, createOrgPrincipalFunction: true, deleteOrgPrincipalFunction: true, createOrgApiKeyFunction: true, revokeOrgApiKeyFunction: true, apiName: true } }).execute();
+
+// Get one by id
+const item = await db.principalAuthModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, principalsTableId: true, principalEntitiesTableId: true, principalScopeOverridesTableId: true, usersTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, principalsTableName: true, createPrincipalFunction: true, deletePrincipalFunction: true, createOrgPrincipalFunction: true, deleteOrgPrincipalFunction: true, createOrgApiKeyFunction: true, revokeOrgApiKeyFunction: true, apiName: true } }).execute();
+
+// Create
+const created = await db.principalAuthModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', principalsTableId: '<UUID>', principalEntitiesTableId: '<UUID>', principalScopeOverridesTableId: '<UUID>', usersTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', auditsTableId: '<UUID>', principalsTableName: '<String>', createPrincipalFunction: '<String>', deletePrincipalFunction: '<String>', createOrgPrincipalFunction: '<String>', deleteOrgPrincipalFunction: '<String>', createOrgApiKeyFunction: '<String>', revokeOrgApiKeyFunction: '<String>', apiName: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.principalAuthModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.principalAuthModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.computeLogModule`
 
 CRUD operations for ComputeLogModule records.
@@ -1637,6 +1686,53 @@ const updated = await db.namespaceModule.update({ where: { id: '<UUID>' }, data:
 
 // Delete
 const deleted = await db.namespaceModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.resourceModule`
+
+CRUD operations for ResourceModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `publicSchemaName` | String | Yes |
+| `privateSchemaName` | String | Yes |
+| `resourcesTableId` | UUID | Yes |
+| `resourceEventsTableId` | UUID | Yes |
+| `resourcesTableName` | String | Yes |
+| `resourceEventsTableName` | String | Yes |
+| `apiName` | String | Yes |
+| `privateApiName` | String | Yes |
+| `scope` | String | Yes |
+| `prefix` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `namespaceModuleId` | UUID | Yes |
+| `policies` | JSON | Yes |
+| `provisions` | JSON | Yes |
+| `defaultPermissions` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all resourceModule records
+const items = await db.resourceModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, resourcesTableId: true, resourceEventsTableId: true, resourcesTableName: true, resourceEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, namespaceModuleId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
+
+// Get one by id
+const item = await db.resourceModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, resourcesTableId: true, resourceEventsTableId: true, resourcesTableName: true, resourceEventsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, namespaceModuleId: true, policies: true, provisions: true, defaultPermissions: true } }).execute();
+
+// Create
+const created = await db.resourceModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', resourcesTableId: '<UUID>', resourceEventsTableId: '<UUID>', resourcesTableName: '<String>', resourceEventsTableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', provisions: '<JSON>', defaultPermissions: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.resourceModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.resourceModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.storageLogModule`

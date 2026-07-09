@@ -7,7 +7,7 @@ Execute the createApiKey mutation
 ## Usage
 
 ```bash
-csdk create-api-key --input.clientMutationId <String> --input.keyName <String> --input.accessLevel <String> --input.mfaLevel <String> --input.expiresIn <IntervalInput>
+csdk create-api-key --input.clientMutationId <String> --input.keyName <String> --input.accessLevel <String> --input.mfaLevel <String> --input.expiresIn <IntervalInput> --input.principalId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk create-api-key --input.clientMutationId <String> --input.keyName <String> -
 ### Run createApiKey
 
 ```bash
-csdk create-api-key --input.clientMutationId <String> --input.keyName <String> --input.accessLevel <String> --input.mfaLevel <String> --input.expiresIn <IntervalInput>
+csdk create-api-key --input.clientMutationId <String> --input.keyName <String> --input.accessLevel <String> --input.mfaLevel <String> --input.expiresIn <IntervalInput> --input.principalId <UUID>
 ```

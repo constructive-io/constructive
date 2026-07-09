@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.30.0...@pgpmjs/types@2.31.0) (2026-07-08)
+
+### Features
+
+- **pgpm:** opt-in authenticated_client role via admin-users bootstrap --client ([d3158e0](https://github.com/constructive-io/constructive/commit/d3158e0940635e4decea97d161bd7a1af6b8a703))
+
 # [2.30.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.29.1...@pgpmjs/types@2.30.0) (2026-06-28)
 
 **Note:** Version bump only for package @pgpmjs/types

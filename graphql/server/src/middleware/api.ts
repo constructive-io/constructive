@@ -120,12 +120,7 @@ interface ResolveContext {
   domain: string;
   subdomain: string | null;
   cacheKey: string;
-  headers: {
-    schemata?: string;
-    apiName?: string;
-    metaSchema?: string;
-    databaseId?: string;
-  };
+  headers: RoutingHeaders;
 }
 
 type ResolutionMode = 
@@ -134,6 +129,15 @@ type ResolutionMode =
   | 'api-name-header'
   | 'meta-schema-header'
   | 'domain-lookup';
+
+type PrivateHeaderMode = Exclude<ResolutionMode, 'services-disabled' | 'domain-lookup'>;
+
+interface RoutingHeaders {
+  schemata?: string;
+  apiName?: string;
+  metaSchema?: string;
+  databaseId?: string;
+}
 
 // =============================================================================
 // Module Resolution (via loader registry)
@@ -208,6 +212,20 @@ const isApiError = (result: ApiConfigResult): result is ApiError =>
 const parseCommaSeparatedHeader = (value: string): string[] =>
   value.split(',').map((s) => s.trim()).filter(Boolean);
 
+const getPrivateHeaderMode = (headers: RoutingHeaders): PrivateHeaderMode | null => {
+  if (headers.apiName) return 'api-name-header';
+  if (headers.schemata) return 'schemata-header';
+  if (headers.metaSchema) return 'meta-schema-header';
+  return null;
+};
+
+const getRoutingHeaders = (req: Request): RoutingHeaders => ({
+  schemata: req.get('X-Schemata'),
+  apiName: req.get('X-Api-Name'),
+  metaSchema: req.get('X-Meta-Schema'),
+  databaseId: req.get('X-Database-Id'),
+});
+
 const getUrlDomains = (req: Request): { domain: string; subdomains: string[] } => {
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   const parsed = parseUrl(fullUrl);
@@ -227,14 +245,16 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
   const baseKey = subdomains.filter((n) => n !== 'www').concat(domain).join('.');
 
   if (opts.api?.isPublic === false) {
-    if (req.get('X-Api-Name')) {
-      return `api:${req.get('X-Database-Id')}:${req.get('X-Api-Name')}`;
+    const headers = getRoutingHeaders(req);
+    const mode = getPrivateHeaderMode(headers);
+    if (mode === 'api-name-header') {
+      return `api:${headers.databaseId}:${headers.apiName}`;
     }
-    if (req.get('X-Schemata')) {
-      return `schemata:${req.get('X-Database-Id')}:${req.get('X-Schemata')}`;
+    if (mode === 'schemata-header') {
+      return `schemata:${headers.databaseId}:${headers.schemata}`;
     }
-    if (req.get('X-Meta-Schema')) {
-      return `metaschema:api:${req.get('X-Database-Id')}`;
+    if (mode === 'meta-schema-header') {
+      return `metaschema:api:${headers.databaseId}`;
     }
   }
   return baseKey;
@@ -319,9 +339,7 @@ const determineMode = (ctx: ResolveContext): ResolutionMode => {
   
   if (opts.api?.enableServicesApi === false) return 'services-disabled';
   if (opts.api?.isPublic === false) {
-    if (headers.schemata) return 'schemata-header';
-    if (headers.apiName) return 'api-name-header';
-    if (headers.metaSchema) return 'meta-schema-header';
+    return getPrivateHeaderMode(headers) ?? 'domain-lookup';
   }
   return 'domain-lookup';
 };
@@ -479,12 +497,7 @@ export const getApiConfig = async (
     domain,
     subdomain,
     cacheKey,
-    headers: {
-      schemata: req.get('X-Schemata'),
-      apiName: req.get('X-Api-Name'),
-      metaSchema: req.get('X-Meta-Schema'),
-      databaseId: req.get('X-Database-Id'),
-    },
+    headers: getRoutingHeaders(req),
   };
 
   // Validate schemas upfront for modes that need them

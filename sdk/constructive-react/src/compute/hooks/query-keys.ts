@@ -46,6 +46,15 @@ export const functionDeploymentKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionDeploymentKeys.details(), id] as const,
 } as const;
+export const resourceKeys = {
+  /** All resource queries */ all: ['resource'] as const,
+  /** List query keys */ lists: () => [...resourceKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceKeys.details(), id] as const,
+} as const;
 export const functionGraphRefKeys = {
   /** All functionGraphRef queries */ all: ['functiongraphref'] as const,
   /** List query keys */ lists: () => [...functionGraphRefKeys.all, 'list'] as const,
@@ -91,6 +100,15 @@ export const orgFunctionExecutionLogKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgFunctionExecutionLogKeys.details(), id] as const,
 } as const;
+export const resourceEventKeys = {
+  /** All resourceEvent queries */ all: ['resourceevent'] as const,
+  /** List query keys */ lists: () => [...resourceEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceEventKeys.details(), id] as const,
+} as const;
 export const functionGraphExecutionOutputKeys = {
   /** All functionGraphExecutionOutput queries */ all: ['functiongraphexecutionoutput'] as const,
   /** List query keys */ lists: () => [...functionGraphExecutionOutputKeys.all, 'list'] as const,
@@ -128,6 +146,15 @@ export const functionExecutionLogKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionExecutionLogKeys.details(), id] as const,
 } as const;
+export const functionGraphKeys = {
+  /** All functionGraph queries */ all: ['functiongraph'] as const,
+  /** List query keys */ lists: () => [...functionGraphKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...functionGraphKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...functionGraphKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...functionGraphKeys.details(), id] as const,
+} as const;
 export const functionGraphExecutionNodeStateKeys = {
   /** All functionGraphExecutionNodeState queries */ all: [
     'functiongraphexecutionnodestate',
@@ -140,14 +167,14 @@ export const functionGraphExecutionNodeStateKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphExecutionNodeStateKeys.details(), id] as const,
 } as const;
-export const functionGraphKeys = {
-  /** All functionGraph queries */ all: ['functiongraph'] as const,
-  /** List query keys */ lists: () => [...functionGraphKeys.all, 'list'] as const,
+export const platformNamespaceKeys = {
+  /** All platformNamespace queries */ all: ['platformnamespace'] as const,
+  /** List query keys */ lists: () => [...platformNamespaceKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...functionGraphKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...functionGraphKeys.all, 'detail'] as const,
+    [...platformNamespaceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformNamespaceKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...functionGraphKeys.details(), id] as const,
+    [...platformNamespaceKeys.details(), id] as const,
 } as const;
 export const orgFunctionInvocationKeys = {
   /** All orgFunctionInvocation queries */ all: ['orgfunctioninvocation'] as const,
@@ -166,6 +193,15 @@ export const functionInvocationKeys = {
   /** Detail query keys */ details: () => [...functionInvocationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionInvocationKeys.details(), id] as const,
+} as const;
+export const platformNamespaceEventKeys = {
+  /** All platformNamespaceEvent queries */ all: ['platformnamespaceevent'] as const,
+  /** List query keys */ lists: () => [...platformNamespaceEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformNamespaceEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformNamespaceEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformNamespaceEventKeys.details(), id] as const,
 } as const;
 export const functionGraphExecutionKeys = {
   /** All functionGraphExecution queries */ all: ['functiongraphexecution'] as const,
@@ -220,19 +256,23 @@ export const queryKeys = {
   getAllRecord: getAllRecordKeys,
   functionApiBinding: functionApiBindingKeys,
   functionDeployment: functionDeploymentKeys,
+  resource: resourceKeys,
   functionGraphRef: functionGraphRefKeys,
   functionGraphStore: functionGraphStoreKeys,
   functionGraphObject: functionGraphObjectKeys,
   functionDeploymentEvent: functionDeploymentEventKeys,
   orgFunctionExecutionLog: orgFunctionExecutionLogKeys,
+  resourceEvent: resourceEventKeys,
   functionGraphExecutionOutput: functionGraphExecutionOutputKeys,
   functionGraphCommit: functionGraphCommitKeys,
   secretDefinition: secretDefinitionKeys,
   functionExecutionLog: functionExecutionLogKeys,
-  functionGraphExecutionNodeState: functionGraphExecutionNodeStateKeys,
   functionGraph: functionGraphKeys,
+  functionGraphExecutionNodeState: functionGraphExecutionNodeStateKeys,
+  platformNamespace: platformNamespaceKeys,
   orgFunctionInvocation: orgFunctionInvocationKeys,
   functionInvocation: functionInvocationKeys,
+  platformNamespaceEvent: platformNamespaceEventKeys,
   functionGraphExecution: functionGraphExecutionKeys,
   functionDefinition: functionDefinitionKeys,
   custom: customQueryKeys,

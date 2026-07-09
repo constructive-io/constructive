@@ -29,7 +29,6 @@ const fieldSchema: FieldSchema = {
   isReadOnly: 'boolean',
   smartTags: 'json',
   category: 'string',
-  scope: 'int',
   tags: 'string',
 };
 const usage =
@@ -96,7 +95,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isReadOnly: true,
       smartTags: true,
       category: true,
-      scope: true,
       tags: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -131,7 +129,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isReadOnly: true,
       smartTags: true,
       category: true,
-      scope: true,
       tags: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -178,7 +175,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           isReadOnly: true,
           smartTags: true,
           category: true,
-          scope: true,
           tags: true,
         },
       })
@@ -278,13 +274,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'scope',
-        message: 'scope',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'tags',
         message: 'tags',
         required: false,
@@ -309,7 +298,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: cleanedData.isReadOnly,
           smartTags: cleanedData.smartTags,
           category: cleanedData.category,
-          scope: cleanedData.scope,
           tags: cleanedData.tags,
         },
         select: {
@@ -326,7 +314,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: true,
           smartTags: true,
           category: true,
-          scope: true,
           tags: true,
         },
       })
@@ -432,13 +419,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'scope',
-        message: 'scope',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'tags',
         message: 'tags',
         required: false,
@@ -466,7 +446,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: cleanedData.isReadOnly,
           smartTags: cleanedData.smartTags,
           category: cleanedData.category,
-          scope: cleanedData.scope,
           tags: cleanedData.tags,
         },
         select: {
@@ -483,7 +462,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isReadOnly: true,
           smartTags: true,
           category: true,
-          scope: true,
           tags: true,
         },
       })

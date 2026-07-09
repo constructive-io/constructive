@@ -255,7 +255,6 @@ export interface Schema {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   isPublic?: boolean | null;
   apiExposure?: ApiExposureLevel | null;
@@ -271,7 +270,6 @@ export interface Table {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   useRls?: boolean | null;
   timestamps?: boolean | null;
   peoplestamps?: boolean | null;
@@ -296,7 +294,6 @@ export interface CheckConstraint {
   expr?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -321,7 +318,6 @@ export interface Field {
   max?: number | null;
   tags?: string[] | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -336,7 +332,6 @@ export interface SpatialRelation {
   operator?: string | null;
   paramName?: string | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -355,7 +350,6 @@ export interface ForeignKeyConstraint {
   deleteAction?: string | null;
   updateAction?: string | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -387,7 +381,6 @@ export interface Index {
   opClasses?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -405,7 +398,6 @@ export interface Policy {
   data?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -419,7 +411,6 @@ export interface PrimaryKeyConstraint {
   fieldIds?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -444,7 +435,6 @@ export interface Trigger {
   functionName?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -459,7 +449,6 @@ export interface UniqueConstraint {
   type?: string | null;
   fieldIds?: string[] | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -478,7 +467,6 @@ export interface View {
   isReadOnly?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 /** Junction table linking views to their joined tables for referential integrity */
@@ -559,7 +547,6 @@ export interface Enum {
   values?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface CompositeType {
@@ -572,7 +559,6 @@ export interface CompositeType {
   attributes?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 /** Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API */
@@ -607,12 +593,18 @@ export interface Domain {
   databaseId?: string | null;
   /** API endpoint this domain routes to (mutually exclusive with site_id) */
   apiId?: string | null;
-  /** Site this domain routes to (mutually exclusive with api_id) */
+  /** Site this domain routes to (mutually exclusive with api_id and service_id) */
   siteId?: string | null;
+  /** Server deployment this domain routes to (mutually exclusive with api_id and site_id) */
+  serviceId?: string | null;
   /** Subdomain portion of the hostname */
   subdomain?: ConstructiveInternalTypeHostname | null;
   /** Root domain of the hostname */
   domain?: ConstructiveInternalTypeHostname | null;
+  /** Key/value pairs for selecting and filtering domains */
+  labels?: Record<string, unknown> | null;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
 }
 /** SEO and social sharing metadata for a site: page title, description, and Open Graph image */
 export interface SiteMetadatum {
@@ -719,6 +711,10 @@ export interface Api {
   anonRole?: string | null;
   /** Whether this API is publicly accessible without authentication */
   isPublic?: boolean | null;
+  /** Key/value pairs for selecting and filtering APIs */
+  labels?: Record<string, unknown> | null;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
 }
 /** Top-level site configuration: branding assets, title, and description for a deployed application */
 export interface Site {
@@ -740,6 +736,10 @@ export interface Site {
   logo?: ConstructiveInternalTypeImage | null;
   /** PostgreSQL database name this site connects to */
   dbname?: string | null;
+  /** Key/value pairs for selecting and filtering sites */
+  labels?: Record<string, unknown> | null;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
 }
 /** Mobile and native app configuration linked to a site, including store links and identifiers */
 export interface App {
@@ -912,6 +912,10 @@ export interface DatabaseSetting {
   enableI18N?: boolean | null;
   /** Extensible JSON for additional settings that do not have dedicated columns */
   options?: Record<string, unknown> | null;
+  /** Key/value pairs for selecting and filtering database settings */
+  labels?: Record<string, unknown> | null;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown> | null;
 }
 /** Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries */
 export interface WebauthnSetting {
@@ -1328,7 +1332,6 @@ export type SchemaSelect = {
   description?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   isPublic?: boolean;
   apiExposure?: boolean;
@@ -1395,7 +1398,6 @@ export type TableSelect = {
   description?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   useRls?: boolean;
   timestamps?: boolean;
   peoplestamps?: boolean;
@@ -1528,7 +1530,6 @@ export type CheckConstraintSelect = {
   expr?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1559,7 +1560,6 @@ export type FieldSelect = {
   max?: boolean;
   tags?: boolean;
   category?: boolean;
-  scope?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   database?: {
@@ -1592,7 +1592,6 @@ export type SpatialRelationSelect = {
   operator?: boolean;
   paramName?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1626,7 +1625,6 @@ export type ForeignKeyConstraintSelect = {
   deleteAction?: boolean;
   updateAction?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1673,7 +1671,6 @@ export type IndexSelect = {
   opClasses?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1697,7 +1694,6 @@ export type PolicySelect = {
   data?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1717,7 +1713,6 @@ export type PrimaryKeyConstraintSelect = {
   fieldIds?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1754,7 +1749,6 @@ export type TriggerSelect = {
   functionName?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1775,7 +1769,6 @@ export type UniqueConstraintSelect = {
   type?: boolean;
   fieldIds?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
@@ -1800,7 +1793,6 @@ export type ViewSelect = {
   isReadOnly?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   database?: {
     select: DatabaseSelect;
@@ -1952,7 +1944,6 @@ export type EnumSelect = {
   values?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   database?: {
     select: DatabaseSelect;
@@ -1971,7 +1962,6 @@ export type CompositeTypeSelect = {
   attributes?: boolean;
   smartTags?: boolean;
   category?: boolean;
-  scope?: boolean;
   tags?: boolean;
   database?: {
     select: DatabaseSelect;
@@ -2013,8 +2003,11 @@ export type DomainSelect = {
   databaseId?: boolean;
   apiId?: boolean;
   siteId?: boolean;
+  serviceId?: boolean;
   subdomain?: boolean;
   domain?: boolean;
+  labels?: boolean;
+  annotations?: boolean;
   api?: {
     select: ApiSelect;
   };
@@ -2138,6 +2131,8 @@ export type ApiSelect = {
   roleName?: boolean;
   anonRole?: boolean;
   isPublic?: boolean;
+  labels?: boolean;
+  annotations?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2179,6 +2174,8 @@ export type SiteSelect = {
   appleTouchIcon?: boolean;
   logo?: boolean;
   dbname?: boolean;
+  labels?: boolean;
+  annotations?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2608,6 +2605,8 @@ export type DatabaseSettingSelect = {
   enableBulk?: boolean;
   enableI18N?: boolean;
   options?: boolean;
+  labels?: boolean;
+  annotations?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -2715,8 +2714,6 @@ export interface SchemaFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `isPublic` field. */
@@ -2785,8 +2782,6 @@ export interface TableFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
   /** Filter by the object’s `timestamps` field. */
@@ -2915,8 +2910,6 @@ export interface CheckConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -2973,8 +2966,6 @@ export interface FieldFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -3019,8 +3010,6 @@ export interface SpatialRelationFilter {
   paramName?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -3071,8 +3060,6 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -3153,8 +3140,6 @@ export interface IndexFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -3197,8 +3182,6 @@ export interface PolicyFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -3233,8 +3216,6 @@ export interface PrimaryKeyConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -3299,8 +3280,6 @@ export interface TriggerFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -3337,8 +3316,6 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -3383,8 +3360,6 @@ export interface ViewFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -3623,8 +3598,6 @@ export interface EnumFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -3657,8 +3630,6 @@ export interface CompositeTypeFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -3723,10 +3694,16 @@ export interface DomainFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `serviceId` field. */
+  serviceId?: UUIDFilter;
   /** Filter by the object’s `subdomain` field. */
   subdomain?: ConstructiveInternalTypeHostnameFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: DomainFilter[];
   /** Checks for any expressions in this list. */
@@ -3945,6 +3922,10 @@ export interface ApiFilter {
   anonRole?: StringFilter;
   /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: ApiFilter[];
   /** Checks for any expressions in this list. */
@@ -3993,6 +3974,10 @@ export interface SiteFilter {
   logo?: ConstructiveInternalTypeImageFilter;
   /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: SiteFilter[];
   /** Checks for any expressions in this list. */
@@ -4493,6 +4478,10 @@ export interface DatabaseSettingFilter {
   enableI18N?: BooleanFilter;
   /** Filter by the object’s `options` field. */
   options?: JSONFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: DatabaseSettingFilter[];
   /** Checks for any expressions in this list. */
@@ -4651,8 +4640,6 @@ export type SchemaOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'IS_PUBLIC_ASC'
@@ -4683,8 +4670,6 @@ export type TableOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'USE_RLS_ASC'
   | 'USE_RLS_DESC'
   | 'TIMESTAMPS_ASC'
@@ -4733,8 +4718,6 @@ export type CheckConstraintOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -4783,8 +4766,6 @@ export type FieldOrderBy =
   | 'TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -4813,8 +4794,6 @@ export type SpatialRelationOrderBy =
   | 'PARAM_NAME_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -4851,8 +4830,6 @@ export type ForeignKeyConstraintOrderBy =
   | 'UPDATE_ACTION_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -4915,8 +4892,6 @@ export type IndexOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -4951,8 +4926,6 @@ export type PolicyOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -4979,8 +4952,6 @@ export type PrimaryKeyConstraintOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -5029,8 +5000,6 @@ export type TriggerOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -5059,8 +5028,6 @@ export type UniqueConstraintOrderBy =
   | 'FIELD_IDS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
@@ -5097,8 +5064,6 @@ export type ViewOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC';
 export type ViewTableOrderBy =
@@ -5251,8 +5216,6 @@ export type EnumOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC';
 export type CompositeTypeOrderBy =
@@ -5277,8 +5240,6 @@ export type CompositeTypeOrderBy =
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
   | 'CATEGORY_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC';
 export type ApiSchemaOrderBy =
@@ -5319,10 +5280,16 @@ export type DomainOrderBy =
   | 'API_ID_DESC'
   | 'SITE_ID_ASC'
   | 'SITE_ID_DESC'
+  | 'SERVICE_ID_ASC'
+  | 'SERVICE_ID_DESC'
   | 'SUBDOMAIN_ASC'
   | 'SUBDOMAIN_DESC'
   | 'DOMAIN_ASC'
-  | 'DOMAIN_DESC';
+  | 'DOMAIN_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 export type SiteMetadatumOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -5472,7 +5439,11 @@ export type ApiOrderBy =
   | 'ANON_ROLE_ASC'
   | 'ANON_ROLE_DESC'
   | 'IS_PUBLIC_ASC'
-  | 'IS_PUBLIC_DESC';
+  | 'IS_PUBLIC_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 export type SiteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -5494,7 +5465,11 @@ export type SiteOrderBy =
   | 'LOGO_ASC'
   | 'LOGO_DESC'
   | 'DBNAME_ASC'
-  | 'DBNAME_DESC';
+  | 'DBNAME_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 export type AppOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -5706,7 +5681,11 @@ export type DatabaseSettingOrderBy =
   | 'ENABLE_I18N_ASC'
   | 'ENABLE_I18N_DESC'
   | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC';
+  | 'OPTIONS_DESC'
+  | 'LABELS_ASC'
+  | 'LABELS_DESC'
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC';
 export type WebauthnSettingOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -5808,7 +5787,6 @@ export interface CreateSchemaInput {
     description?: string;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
     isPublic?: boolean;
     apiExposure?: ApiExposureLevel;
@@ -5822,7 +5800,6 @@ export interface SchemaPatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
   isPublic?: boolean | null;
   apiExposure?: ApiExposureLevel | null;
@@ -5846,7 +5823,6 @@ export interface CreateTableInput {
     description?: string;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     useRls?: boolean;
     timestamps?: boolean;
     peoplestamps?: boolean;
@@ -5868,7 +5844,6 @@ export interface TablePatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   useRls?: boolean | null;
   timestamps?: boolean | null;
   peoplestamps?: boolean | null;
@@ -5901,7 +5876,6 @@ export interface CreateCheckConstraintInput {
     expr?: Record<string, unknown>;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -5914,7 +5888,6 @@ export interface CheckConstraintPatch {
   expr?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateCheckConstraintInput {
@@ -5947,7 +5920,6 @@ export interface CreateFieldInput {
     max?: number;
     tags?: string[];
     category?: ObjectCategory;
-    scope?: number;
   };
 }
 export interface FieldPatch {
@@ -5969,7 +5941,6 @@ export interface FieldPatch {
   max?: number | null;
   tags?: string[] | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
 }
 export interface UpdateFieldInput {
   clientMutationId?: string;
@@ -5992,7 +5963,6 @@ export interface CreateSpatialRelationInput {
     operator: string;
     paramName?: string;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6006,7 +5976,6 @@ export interface SpatialRelationPatch {
   operator?: string | null;
   paramName?: string | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateSpatialRelationInput {
@@ -6033,7 +6002,6 @@ export interface CreateForeignKeyConstraintInput {
     deleteAction?: string;
     updateAction?: string;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6050,7 +6018,6 @@ export interface ForeignKeyConstraintPatch {
   deleteAction?: string | null;
   updateAction?: string | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateForeignKeyConstraintInput {
@@ -6108,7 +6075,6 @@ export interface CreateIndexInput {
     opClasses?: string[];
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6126,7 +6092,6 @@ export interface IndexPatch {
   opClasses?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateIndexInput {
@@ -6152,7 +6117,6 @@ export interface CreatePolicyInput {
     data?: Record<string, unknown>;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6168,7 +6132,6 @@ export interface PolicyPatch {
   data?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdatePolicyInput {
@@ -6190,7 +6153,6 @@ export interface CreatePrimaryKeyConstraintInput {
     fieldIds: string[];
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6202,7 +6164,6 @@ export interface PrimaryKeyConstraintPatch {
   fieldIds?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdatePrimaryKeyConstraintInput {
@@ -6252,7 +6213,6 @@ export interface CreateTriggerInput {
     functionName?: string;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6264,7 +6224,6 @@ export interface TriggerPatch {
   functionName?: string | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateTriggerInput {
@@ -6287,7 +6246,6 @@ export interface CreateUniqueConstraintInput {
     type?: string;
     fieldIds: string[];
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6300,7 +6258,6 @@ export interface UniqueConstraintPatch {
   type?: string | null;
   fieldIds?: string[] | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateUniqueConstraintInput {
@@ -6327,7 +6284,6 @@ export interface CreateViewInput {
     isReadOnly?: boolean;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6344,7 +6300,6 @@ export interface ViewPatch {
   isReadOnly?: boolean | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateViewInput {
@@ -6547,7 +6502,6 @@ export interface CreateEnumInput {
     values?: string[];
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6560,7 +6514,6 @@ export interface EnumPatch {
   values?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateEnumInput {
@@ -6583,7 +6536,6 @@ export interface CreateCompositeTypeInput {
     attributes?: Record<string, unknown>;
     smartTags?: Record<string, unknown>;
     category?: ObjectCategory;
-    scope?: number;
     tags?: string[];
   };
 }
@@ -6596,7 +6548,6 @@ export interface CompositeTypePatch {
   attributes?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
-  scope?: number | null;
   tags?: string[] | null;
 }
 export interface UpdateCompositeTypeInput {
@@ -6660,16 +6611,22 @@ export interface CreateDomainInput {
     databaseId: string;
     apiId?: string;
     siteId?: string;
+    serviceId?: string;
     subdomain?: ConstructiveInternalTypeHostname;
     domain?: ConstructiveInternalTypeHostname;
+    labels?: Record<string, unknown>;
+    annotations?: Record<string, unknown>;
   };
 }
 export interface DomainPatch {
   databaseId?: string | null;
   apiId?: string | null;
   siteId?: string | null;
+  serviceId?: string | null;
   subdomain?: ConstructiveInternalTypeHostname | null;
   domain?: ConstructiveInternalTypeHostname | null;
+  labels?: Record<string, unknown> | null;
+  annotations?: Record<string, unknown> | null;
 }
 export interface UpdateDomainInput {
   clientMutationId?: string;
@@ -6880,6 +6837,8 @@ export interface CreateApiInput {
     roleName?: string;
     anonRole?: string;
     isPublic?: boolean;
+    labels?: Record<string, unknown>;
+    annotations?: Record<string, unknown>;
   };
 }
 export interface ApiPatch {
@@ -6889,6 +6848,8 @@ export interface ApiPatch {
   roleName?: string | null;
   anonRole?: string | null;
   isPublic?: boolean | null;
+  labels?: Record<string, unknown> | null;
+  annotations?: Record<string, unknown> | null;
 }
 export interface UpdateApiInput {
   clientMutationId?: string;
@@ -6910,6 +6871,8 @@ export interface CreateSiteInput {
     appleTouchIcon?: ConstructiveInternalTypeImage;
     logo?: ConstructiveInternalTypeImage;
     dbname?: string;
+    labels?: Record<string, unknown>;
+    annotations?: Record<string, unknown>;
   };
 }
 export interface SitePatch {
@@ -6921,6 +6884,8 @@ export interface SitePatch {
   appleTouchIcon?: ConstructiveInternalTypeImage | null;
   logo?: ConstructiveInternalTypeImage | null;
   dbname?: string | null;
+  labels?: Record<string, unknown> | null;
+  annotations?: Record<string, unknown> | null;
   ogImageUpload?: File | null;
   faviconUpload?: File | null;
   appleTouchIconUpload?: File | null;
@@ -7211,6 +7176,8 @@ export interface CreateDatabaseSettingInput {
     enableBulk?: boolean;
     enableI18N?: boolean;
     options?: Record<string, unknown>;
+    labels?: Record<string, unknown>;
+    annotations?: Record<string, unknown>;
   };
 }
 export interface DatabaseSettingPatch {
@@ -7228,6 +7195,8 @@ export interface DatabaseSettingPatch {
   enableBulk?: boolean | null;
   enableI18N?: boolean | null;
   options?: Record<string, unknown> | null;
+  labels?: Record<string, unknown> | null;
+  annotations?: Record<string, unknown> | null;
 }
 export interface UpdateDatabaseSettingInput {
   clientMutationId?: string;
@@ -8488,7 +8457,6 @@ export interface SchemaInput {
   description?: string;
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   isPublic?: boolean;
   apiExposure?: ApiExposureLevel;
@@ -8505,7 +8473,6 @@ export interface TableInput {
   description?: string;
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   useRls?: boolean;
   timestamps?: boolean;
   peoplestamps?: boolean;
@@ -8531,7 +8498,6 @@ export interface CheckConstraintInput {
   expr?: Record<string, unknown>;
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8557,7 +8523,6 @@ export interface FieldInput {
   max?: number;
   tags?: string[];
   category?: ObjectCategory;
-  scope?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -8573,7 +8538,6 @@ export interface SpatialRelationInput {
   operator: string;
   paramName?: string;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8593,7 +8557,6 @@ export interface ForeignKeyConstraintInput {
   deleteAction?: string;
   updateAction?: string;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8627,7 +8590,6 @@ export interface IndexInput {
   opClasses?: string[];
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8646,7 +8608,6 @@ export interface PolicyInput {
   data?: Record<string, unknown>;
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8661,7 +8622,6 @@ export interface PrimaryKeyConstraintInput {
   fieldIds: string[];
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8688,7 +8648,6 @@ export interface TriggerInput {
   functionName?: string;
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8704,7 +8663,6 @@ export interface UniqueConstraintInput {
   type?: string;
   fieldIds: string[];
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -8724,7 +8682,6 @@ export interface ViewInput {
   isReadOnly?: boolean;
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
 }
 /** An input for mutations affecting `ViewTable` */
@@ -8810,7 +8767,6 @@ export interface EnumInput {
   values?: string[];
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
 }
 /** An input for mutations affecting `CompositeType` */
@@ -8824,7 +8780,6 @@ export interface CompositeTypeInput {
   attributes?: Record<string, unknown>;
   smartTags?: Record<string, unknown>;
   category?: ObjectCategory;
-  scope?: number;
   tags?: string[];
 }
 /** An input for mutations affecting `ApiSchema` */
@@ -8859,12 +8814,18 @@ export interface DomainInput {
   databaseId: string;
   /** API endpoint this domain routes to (mutually exclusive with site_id) */
   apiId?: string;
-  /** Site this domain routes to (mutually exclusive with api_id) */
+  /** Site this domain routes to (mutually exclusive with api_id and service_id) */
   siteId?: string;
+  /** Server deployment this domain routes to (mutually exclusive with api_id and site_id) */
+  serviceId?: string;
   /** Subdomain portion of the hostname */
   subdomain?: ConstructiveInternalTypeHostname;
   /** Root domain of the hostname */
   domain?: ConstructiveInternalTypeHostname;
+  /** Key/value pairs for selecting and filtering domains */
+  labels?: Record<string, unknown>;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
 }
 /** An input for mutations affecting `SiteMetadatum` */
 export interface SiteMetadatumInput {
@@ -8974,6 +8935,10 @@ export interface ApiInput {
   anonRole?: string;
   /** Whether this API is publicly accessible without authentication */
   isPublic?: boolean;
+  /** Key/value pairs for selecting and filtering APIs */
+  labels?: Record<string, unknown>;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
 }
 /** An input for mutations affecting `Site` */
 export interface SiteInput {
@@ -8995,6 +8960,10 @@ export interface SiteInput {
   logo?: ConstructiveInternalTypeImage;
   /** PostgreSQL database name this site connects to */
   dbname?: string;
+  /** Key/value pairs for selecting and filtering sites */
+  labels?: Record<string, unknown>;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
 }
 /** An input for mutations affecting `App` */
 export interface AppInput {
@@ -9171,6 +9140,10 @@ export interface DatabaseSettingInput {
   enableI18N?: boolean;
   /** Extensible JSON for additional settings that do not have dedicated columns */
   options?: Record<string, unknown>;
+  /** Key/value pairs for selecting and filtering database settings */
+  labels?: Record<string, unknown>;
+  /** Freeform metadata for tooling and operational notes */
+  annotations?: Record<string, unknown>;
 }
 /** An input for mutations affecting `WebauthnSetting` */
 export interface WebauthnSettingInput {
@@ -9264,8 +9237,6 @@ export interface TableFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
   /** Filter by the object’s `timestamps` field. */
@@ -9428,8 +9399,6 @@ export interface ViewFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -9506,8 +9475,6 @@ export interface EnumFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -9562,8 +9529,6 @@ export interface CompositeTypeFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Checks for all expressions in this list. */
@@ -9620,8 +9585,6 @@ export interface CheckConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -9679,8 +9642,6 @@ export interface FieldFilter {
   tags?: StringListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -9732,8 +9693,6 @@ export interface ForeignKeyConstraintFilter {
   updateAction?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -9816,8 +9775,6 @@ export interface IndexFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -9861,8 +9818,6 @@ export interface PolicyFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -9898,8 +9853,6 @@ export interface PrimaryKeyConstraintFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -9966,8 +9919,6 @@ export interface TriggerFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -10005,8 +9956,6 @@ export interface UniqueConstraintFilter {
   fieldIds?: UUIDListFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -10138,8 +10087,6 @@ export interface SpatialRelationFilter {
   paramName?: StringFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -10246,10 +10193,16 @@ export interface DomainFilter {
   apiId?: UUIDFilter;
   /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `serviceId` field. */
+  serviceId?: UUIDFilter;
   /** Filter by the object’s `subdomain` field. */
   subdomain?: ConstructiveInternalTypeHostnameFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: DomainFilter[];
   /** Checks for any expressions in this list. */
@@ -10375,8 +10328,6 @@ export interface SchemaFilter {
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
   category?: ObjectCategoryFilter;
-  /** Filter by the object’s `scope` field. */
-  scope?: IntFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
   /** Filter by the object’s `isPublic` field. */
@@ -10547,6 +10498,10 @@ export interface ApiFilter {
   anonRole?: StringFilter;
   /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: ApiFilter[];
   /** Checks for any expressions in this list. */
@@ -10596,6 +10551,10 @@ export interface SiteFilter {
   logo?: ConstructiveInternalTypeImageFilter;
   /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: SiteFilter[];
   /** Checks for any expressions in this list. */
@@ -10837,31 +10796,6 @@ export interface JSONFilter {
   containsAnyKeys?: string[];
   /** Contained by the specified JSON. */
   containedBy?: Record<string, unknown>;
-}
-/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
-export interface IntFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: number;
-  /** Not equal to the specified value. */
-  notEqualTo?: number;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: number;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: number;
-  /** Included in the specified list. */
-  in?: number[];
-  /** Not included in the specified list. */
-  notIn?: number[];
-  /** Less than the specified value. */
-  lessThan?: number;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: number;
-  /** Greater than the specified value. */
-  greaterThan?: number;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: number;
 }
 /** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
 export interface BooleanFilter {
@@ -11180,6 +11114,31 @@ export interface UUIDListFilter {
   /** Any array item is greater than or equal to the specified value. */
   anyGreaterThanOrEqualTo?: string;
 }
+/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
+export interface IntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+}
 /** A filter to be used against Float fields. All fields are combined with a logical ‘and.’ */
 export interface FloatFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
@@ -11237,6 +11196,10 @@ export interface DatabaseSettingFilter {
   enableI18N?: BooleanFilter;
   /** Filter by the object’s `options` field. */
   options?: JSONFilter;
+  /** Filter by the object’s `labels` field. */
+  labels?: JSONFilter;
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
   /** Checks for all expressions in this list. */
   and?: DatabaseSettingFilter[];
   /** Checks for any expressions in this list. */

@@ -39,6 +39,25 @@ export interface FunctionDeployment {
   annotations: unknown | null;
   databaseId: string | null;
 }
+export interface Resource {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  namespaceId: string | null;
+  kind: string | null;
+  name: string | null;
+  slug: string | null;
+  spec: unknown | null;
+  status: string | null;
+  statusObserved: unknown | null;
+  lastError: string | null;
+  errorCount: number | null;
+  labels: unknown | null;
+  annotations: unknown | null;
+  databaseId: string | null;
+}
 export interface FunctionGraphRef {
   id: string | null;
   name: string | null;
@@ -81,6 +100,16 @@ export interface OrgFunctionExecutionLog {
   metadata: unknown | null;
   actorId: string | null;
 }
+export interface ResourceEvent {
+  createdAt: string | null;
+  id: string | null;
+  resourceId: string | null;
+  eventType: string | null;
+  actorId: string | null;
+  message: string | null;
+  metadata: unknown | null;
+  databaseId: string | null;
+}
 export interface FunctionGraphExecutionOutput {
   createdAt: string | null;
   id: string | null;
@@ -121,6 +150,20 @@ export interface FunctionExecutionLog {
   actorId: string | null;
   databaseId: string | null;
 }
+export interface FunctionGraph {
+  id: string | null;
+  databaseId: string | null;
+  storeId: string | null;
+  context: string | null;
+  name: string | null;
+  description: string | null;
+  definitionsCommitId: string | null;
+  isValid: boolean | null;
+  validationErrors: unknown | null;
+  createdBy: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface FunctionGraphExecutionNodeState {
   createdAt: string | null;
   id: string | null;
@@ -135,20 +178,20 @@ export interface FunctionGraphExecutionNodeState {
   errorMessage: string | null;
   outputId: string | null;
 }
-export interface FunctionGraph {
+export interface PlatformNamespace {
   id: string | null;
-  databaseId: string | null;
-  storeId: string | null;
-  entityId: string | null;
-  context: string | null;
-  name: string | null;
-  description: string | null;
-  definitionsCommitId: string | null;
-  isValid: boolean | null;
-  validationErrors: unknown | null;
-  createdBy: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  name: string | null;
+  namespaceName: string | null;
+  description: string | null;
+  isActive: boolean | null;
+  labels: unknown | null;
+  annotations: unknown | null;
+  databaseId: string | null;
+  sourceDatabaseId: string | null;
+  sourceScope: string | null;
+  isManaged: boolean | null;
 }
 export interface OrgFunctionInvocation {
   createdAt: string | null;
@@ -183,13 +226,29 @@ export interface FunctionInvocation {
   parentInvocationId: string | null;
   graphExecutionId: string | null;
 }
+export interface PlatformNamespaceEvent {
+  createdAt: string | null;
+  id: string | null;
+  namespaceId: string | null;
+  eventType: string | null;
+  actorId: string | null;
+  message: string | null;
+  metadata: unknown | null;
+  cpuMillicores: number | null;
+  memoryBytes: string | null;
+  storageBytes: string | null;
+  networkIngressBytes: string | null;
+  networkEgressBytes: string | null;
+  podCount: number | null;
+  metrics: unknown | null;
+  databaseId: string | null;
+}
 export interface FunctionGraphExecution {
   startedAt: string | null;
   id: string | null;
   graphId: string | null;
   invocationId: string | null;
   databaseId: string | null;
-  entityId: string | null;
   outputNode: string | null;
   outputPort: string | null;
   status: string | null;

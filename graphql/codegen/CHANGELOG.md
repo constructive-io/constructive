@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.51.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.2...@constructive-io/graphql-codegen@4.51.3) (2026-07-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.51.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.1...@constructive-io/graphql-codegen@4.51.2) (2026-07-05)
+
+### Bug Fixes
+
+- distinguish custom SQL function mutations from CRUD in codegen ([b7e1169](https://github.com/constructive-io/constructive/commit/b7e11690b363fd21ed0afa185fddcf4968013f97))
+- resolve entity field names for delete select instead of selecting all fields ([ca6010b](https://github.com/constructive-io/constructive/commit/ca6010b0fa80db9cc51a9ba650fc767c88dea741))
+- use entity field names in CLI delete select instead of PK constraint names ([d87b887](https://github.com/constructive-io/constructive/commit/d87b887f8fff80eaeb79965f6127beeaf43c40f6))
+
 ## [4.51.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.51.0...@constructive-io/graphql-codegen@4.51.1) (2026-06-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
