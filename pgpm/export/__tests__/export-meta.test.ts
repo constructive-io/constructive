@@ -64,6 +64,8 @@ describe('Export Meta Config Validation', () => {
       'notifications_module', 'plans_module',
       'realtime_module', 'session_secrets_module',
       'config_secrets_org_module', 'config_secrets_module',
+      'infra_secrets_module', 'infra_config_module',
+      'internal_secrets_module',
       'i18n_module', 'agent_module',
       'function_module', 'namespace_module',
       'merkle_store_module', 'graph_module',
