@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.35.0](https://github.com/constructive-io/constructive/compare/pgpm@4.34.2...pgpm@4.35.0) (2026-07-10)
+
+### Features
+
+- **pgpm:** pluggable migration-driver contract + generic plugin loader ([eef726f](https://github.com/constructive-io/constructive/commit/eef726fcf2d31a084641b42487e4991bd8d5992a))
+
 ## [4.34.2](https://github.com/constructive-io/constructive/compare/pgpm@4.34.1...pgpm@4.34.2) (2026-07-10)
 
 **Note:** Version bump only for package pgpm

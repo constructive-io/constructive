@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.31.0...@pgpmjs/types@2.32.0) (2026-07-10)
+
+### Features
+
+- **pgpm:** pluggable migration-driver contract + generic plugin loader ([eef726f](https://github.com/constructive-io/constructive/commit/eef726fcf2d31a084641b42487e4991bd8d5992a))
+
 # [2.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.30.0...@pgpmjs/types@2.31.0) (2026-07-08)
 
 ### Features
