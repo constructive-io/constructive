@@ -3,7 +3,9 @@ import { getActivePgPoolFactory, registerPgPoolFactory } from 'pg-cache';
 
 import { createPglitePool } from './pool';
 
+export { createPgliteClient, type QueryablePgClient } from './client';
 export { createPglitePool } from './pool';
+export type { PgResultLike } from './runner';
 
 export interface PgliteAdapterOptions {
   /** Persist to a directory (default: in-memory). */

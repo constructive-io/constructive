@@ -3162,6 +3162,38 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
+  postgres/pglite-test:
+    dependencies:
+      '@electric-sql/pglite':
+        specifier: 0.5.4
+        version: 0.5.4
+      '@pgpmjs/env':
+        specifier: workspace:^
+        version: link:../../pgpm/env/dist
+      '@pgpmjs/pglite-adapter':
+        specifier: workspace:^
+        version: link:../pglite-adapter/dist
+      pg-cache:
+        specifier: workspace:^
+        version: link:../pg-cache/dist
+      pg-env:
+        specifier: workspace:^
+        version: link:../pg-env/dist
+      pgsql-client:
+        specifier: workspace:^
+        version: link:../pgsql-client/dist
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../pgsql-test/dist
+    devDependencies:
+      '@types/pg':
+        specifier: ^8.20.0
+        version: 8.20.0
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
   postgres/pgsql-client:
     dependencies:
       '@pgpmjs/core':

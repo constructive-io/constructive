@@ -175,9 +175,11 @@ single-writer backend, but is not required for this rollout.
 
 1. **`pg-cache` driver seam + registry** (default = pg; zero behavior change). ✅ **DONE** — `registerPgPoolFactory` / `defaultPgPoolFactory`, 19 unit tests, CI green.
 2. **`@pgpmjs/pglite-adapter`** (in-process driver, all pglite deps here). ✅ **DONE** — `registerPglite()` registers a PGlite-backed `QueryablePool`; 6 tests deploy→verify→revert an unmodified pgpm plan into in-process PGlite (no socket), with `useTransaction: true`.
-3. **`pglite-test`** drop-in `getConnections` (instance-per-test). Needs a matching client-factory seam in `pgsql-client` + a PGlite-aware admin, because `pgsql-test` bypasses `pg-cache` (`new Pool`/`new Client` directly + `createdb`/`psql`).
-4. Convert this PoC's CI job to use the adapter instead of the socket shim.
+2b. **`pgsql-client` client-factory seam** (default = `new pg.Client`; zero behavior change). ✅ **DONE** — `registerPgClientFactory` / `defaultPgClientFactory` / `getActivePgClientFactory`, mirroring the `pg-cache` pool seam; `PgClient` routes its underlying client through it; 4 unit tests. Needed because `pgsql-test`/`pgsql-client` build `pg.Client`s directly rather than via `getPgPool`.
+3. **`pglite-test`** drop-in `getConnections` (instance-per-suite). ✅ **DONE** — composes `registerPglite()` (pool seam) + `registerPgClientFactory` (client seam) so `pg`/`db` share one in-process PGlite session; a `SharedTxn` ref-counter keeps the standard two-client `beforeEach`/`afterEach` savepoint harness working over a single session; seeds via `seed.pgpm()`; no `createdb`/`psql`. 5 tests cover deploy, per-test isolation, and RLS role/JWT switching (incl. `WITH CHECK`). No separate PGlite-aware `DbAdmin` subclass was needed — the instance *is* the database and extension/role bootstrap runs via `pglite.extensionSql`.
+4. This PoC's socket-shim CI job (`pglite-poc.yaml`) is **kept as-is** — it's a standalone, out-of-workspace demonstration of the `pg-gateway` wire-protocol path (own lockfile, published `@pgpmjs/core`). The canonical in-process path is now proven by the `@pgpmjs/pglite-adapter` and `pglite-test` jest suites in `run-tests.yaml` (no-services tier).
 5. (Optional) Core transaction-client fix — only if a *multi-connection* single-writer backend is ever targeted; the in-process adapter does not need it.
+6. (Future) `pgpm init --pglite` scaffolder — CLI-layer convenience; no PGlite dep in core.
 
 Each shipped step is independently testable; only step 1 touches core, and it adds
 no PGlite dependency to it. All `@electric-sql/pglite*` deps live in
