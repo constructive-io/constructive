@@ -19,6 +19,7 @@ import { toCamelCase } from 'inflekt';
 
 import { exportMeta } from '../src/export-meta';
 import { exportGraphQLMeta } from '../src/export-graphql-meta';
+import { buildMetaTableShimsSQL } from '../test-utils/shim-utils';
 import { GraphQLClient } from '../src/graphql-client';
 import { META_TABLE_CONFIG, FieldType } from '../src/export-utils';
 import { getGraphQLQueryName, getGraphQLTypeName, GraphQLTypeInfo } from '../src/graphql-naming';
@@ -61,7 +62,7 @@ function createMockGraphQLClient(pgClient: PgTestClient): GraphQLClient {
     // Reverse-lookup: find the META_TABLE_CONFIG entry whose GraphQL type name matches
     let matchedKey: string | undefined;
     for (const [key, config] of Object.entries(META_TABLE_CONFIG)) {
-      if (getGraphQLTypeName(config.table) === typeName) {
+      if ((config.gqlTypeName || getGraphQLTypeName(config.table)) === typeName) {
         matchedKey = key;
         break;
       }
@@ -422,6 +423,8 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
             sign_out_function text
           );
         `);
+
+        await pg.query(buildMetaTableShimsSQL());
 
         // Seed data
         await pg.query(`

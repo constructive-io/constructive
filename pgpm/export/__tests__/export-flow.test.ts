@@ -22,6 +22,7 @@ import type { PgConfig } from 'pg-env';
 
 import { PgpmPackage, PgpmMigrate } from '@pgpmjs/core';
 import { exportMigrations } from '../src/export-migrations';
+import { buildMetaTableShimsSQL } from '../test-utils/shim-utils';
 
 // Increase timeout for this test as it involves workspace setup and deployment
 jest.setTimeout(120000);
@@ -252,6 +253,7 @@ describe('Export Flow E2E', () => {
 
         // Create shim schemas + tables
         await pg.query(SCHEMA_SHIMS_SQL);
+        await pg.query(buildMetaTableShimsSQL());
 
         // Deploy the test module
         const deployer = new PgpmMigrate(config);
