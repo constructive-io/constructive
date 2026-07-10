@@ -31,7 +31,7 @@
     "@electric-sql/pglite-socket": "0.2.7",
     "@pgpmjs/core": "workspace:^",
     "@types/pg": "^8.20.0",
-    "pg": "8.22.0",
+    "pg": "^8.21.0",
     "pg-cache": "workspace:^"
   }
 }
