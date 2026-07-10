@@ -131,11 +131,17 @@ export const exportGraphQLMeta = async ({
 
   const queryAndParse = async (key: string) => {
     const tableConfig = META_TABLE_CONFIG[key];
-    if (!tableConfig) return;
+    if (!tableConfig) {
+      throw new Error(`exportGraphQLMeta: no META_TABLE_CONFIG entry for '${key}'`);
+    }
 
     // Build fields dynamically: either from hardcoded config or via introspection
     const { fields: configFields, enumFields } = await buildDynamicFieldsFromGraphQL(client, tableConfig);
-    if (Object.keys(configFields).length === 0) return;
+    if (Object.keys(configFields).length === 0) {
+      throw new Error(
+        `exportGraphQLMeta: table ${tableConfig.schema}.${tableConfig.table} not exposed in the GraphQL schema or has no matching fields`
+      );
+    }
 
     const pgFieldNames = Object.keys(configFields);
     const graphqlFieldsFragment = buildFieldsFragment(pgFieldNames, configFields);
@@ -146,99 +152,83 @@ export const exportGraphQLMeta = async ({
       ? { id: database_id }
       : { databaseId: database_id };
 
-    try {
-      const rows = await client.fetchAllNodes(
-        graphqlQueryName,
-        graphqlFieldsFragment,
-        condition
-      );
+    const rows = await client.fetchAllNodes(
+      graphqlQueryName,
+      graphqlFieldsFragment,
+      condition
+    );
 
-      if (rows.length > 0) {
-        // Convert camelCase GraphQL keys back to snake_case for the Parser
-        // Also convert interval objects back to Postgres interval strings
-        // and normalize enum values from CONSTANT_CASE back to lowercase
-        const pgRows = rows.map(row => {
-          const pgRow = graphqlRowToPostgresRow(row);
-          for (const [fieldName, fieldType] of Object.entries(configFields)) {
-            // Convert interval fields from {seconds, minutes, ...} objects to strings
-            if (fieldType === 'interval' && pgRow[fieldName] && typeof pgRow[fieldName] === 'object') {
-              pgRow[fieldName] = intervalToPostgres(pgRow[fieldName] as Record<string, number | null>);
-            }
-            // Truncate timestamptz to second precision for parity with SQL flow
-            // PostGraphile's Datetime scalar preserves full millisecond precision,
-            // but the pg driver + our SQL flow truncates to .000Z via Date rounding
-            if (fieldType === 'timestamptz' && typeof pgRow[fieldName] === 'string') {
-              const d = new Date(pgRow[fieldName] as string);
-              if (!isNaN(d.getTime())) {
-                pgRow[fieldName] = new Date(Math.floor(d.getTime() / 1000) * 1000).toISOString();
-              }
-            }
-          }
-          // Normalize enum values: custom inflector uppercases them to CONSTANT_CASE,
-          // but PostgreSQL stores them in lowercase — convert back for parity with SQL flow
-          for (const fieldName of enumFields) {
-            if (typeof pgRow[fieldName] === 'string') {
-              pgRow[fieldName] = (pgRow[fieldName] as string).toLowerCase();
-            }
-          }
-          return pgRow;
-        });
-
-        // Filter fields to only those that exist in the returned data
-        // This mirrors the dynamic field building in the SQL version
-        const returnedKeys = new Set<string>();
-        for (const row of pgRows) {
-          for (const k of Object.keys(row)) {
-            returnedKeys.add(k);
-          }
-        }
-
-        const dynamicFields: Record<string, FieldType> = {};
+    if (rows.length > 0) {
+      // Convert camelCase GraphQL keys back to snake_case for the Parser
+      // Also convert interval objects back to Postgres interval strings
+      // and normalize enum values from CONSTANT_CASE back to lowercase
+      const pgRows = rows.map(row => {
+        const pgRow = graphqlRowToPostgresRow(row);
         for (const [fieldName, fieldType] of Object.entries(configFields)) {
-          if (returnedKeys.has(fieldName)) {
-            dynamicFields[fieldName] = fieldType;
+          // Convert interval fields from {seconds, minutes, ...} objects to strings
+          if (fieldType === 'interval' && pgRow[fieldName] && typeof pgRow[fieldName] === 'object') {
+            pgRow[fieldName] = intervalToPostgres(pgRow[fieldName] as Record<string, number | null>);
           }
-        }
-
-        if (Object.keys(dynamicFields).length === 0) return;
-
-        // Omit columnDefaults columns from row data so the Parser never sees them.
-        // configFields already excludes them (via buildDynamicFieldsFromGraphQL),
-        // so dynamicFields won't contain them either — but the pgRow data still does.
-        if (tableConfig.columnDefaults) {
-          for (const colName of Object.keys(tableConfig.columnDefaults)) {
-            for (const row of pgRows) {
-              delete row[colName];
+          // Truncate timestamptz to second precision for parity with SQL flow
+          // PostGraphile's Datetime scalar preserves full millisecond precision,
+          // but the pg driver + our SQL flow truncates to .000Z via Date rounding
+          if (fieldType === 'timestamptz' && typeof pgRow[fieldName] === 'string') {
+            const d = new Date(pgRow[fieldName] as string);
+            if (!isNaN(d.getTime())) {
+              pgRow[fieldName] = new Date(Math.floor(d.getTime() / 1000) * 1000).toISOString();
             }
           }
         }
+        // Normalize enum values: custom inflector uppercases them to CONSTANT_CASE,
+        // but PostgreSQL stores them in lowercase — convert back for parity with SQL flow
+        for (const fieldName of enumFields) {
+          if (typeof pgRow[fieldName] === 'string') {
+            pgRow[fieldName] = (pgRow[fieldName] as string).toLowerCase();
+          }
+        }
+        return pgRow;
+      });
 
-        const parser = new Parser({
-          schema: tableConfig.schema,
-          table: tableConfig.table,
-          conflictDoNothing: tableConfig.conflictDoNothing,
-          fields: dynamicFields
-        });
-
-        const parsed = await parser.parse(pgRows);
-        if (parsed) {
-          sql[key] = parsed;
+      // Filter fields to only those that exist in the returned data
+      // This mirrors the dynamic field building in the SQL version
+      const returnedKeys = new Set<string>();
+      for (const row of pgRows) {
+        for (const k of Object.keys(row)) {
+          returnedKeys.add(k);
         }
       }
-    } catch (err: unknown) {
-      // If the GraphQL query fails (e.g. table not exposed), skip silently
-      // similar to how the SQL version handles 42P01 (undefined_table)
-      const message = err instanceof Error ? err.message : String(err);
-      if (
-        message.includes('Cannot query field') ||
-        message.includes('is not defined by type') ||
-        message.includes('Unknown field') ||
-        (message.includes('Field') && message.includes('not found'))
-      ) {
-        // Field/table not available in the GraphQL schema — skip
-        return;
+
+      const dynamicFields: Record<string, FieldType> = {};
+      for (const [fieldName, fieldType] of Object.entries(configFields)) {
+        if (returnedKeys.has(fieldName)) {
+          dynamicFields[fieldName] = fieldType;
+        }
       }
-      throw err;
+
+      if (Object.keys(dynamicFields).length === 0) return;
+
+      // Omit columnDefaults columns from row data so the Parser never sees them.
+      // configFields already excludes them (via buildDynamicFieldsFromGraphQL),
+      // so dynamicFields won't contain them either — but the pgRow data still does.
+      if (tableConfig.columnDefaults) {
+        for (const colName of Object.keys(tableConfig.columnDefaults)) {
+          for (const row of pgRows) {
+            delete row[colName];
+          }
+        }
+      }
+
+      const parser = new Parser({
+        schema: tableConfig.schema,
+        table: tableConfig.table,
+        conflictDoNothing: tableConfig.conflictDoNothing,
+        fields: dynamicFields
+      });
+
+      const parsed = await parser.parse(pgRows);
+      if (parsed) {
+        sql[key] = parsed;
+      }
     }
   };
 
@@ -330,7 +320,6 @@ export const exportGraphQLMeta = async ({
     queryAndParse('plans_module'),
     queryAndParse('realtime_module'),
     queryAndParse('session_secrets_module'),
-    queryAndParse('config_secrets_org_module'),
     queryAndParse('infra_secrets_module'),
     queryAndParse('infra_config_module'),
     queryAndParse('internal_secrets_module'),
