@@ -89,23 +89,22 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   const parserFields: Record<string, Record<string, FieldType>> = {};
 
   // Build parser dynamically by querying actual columns from the database
-  const getParser = async (key: string): Promise<Parser> => {
+  const getParser = async (key: string): Promise<Parser | null> => {
     if (parsers[key]) {
       return parsers[key];
     }
 
     const tableConfig = META_TABLE_CONFIG[key];
     if (!tableConfig) {
-      throw new Error(`exportMeta: no META_TABLE_CONFIG entry for '${key}'`);
+      return null;
     }
 
     // Build fields dynamically based on actual database columns
     const dynamicFields = await buildDynamicFields(pool, tableConfig);
 
     if (Object.keys(dynamicFields).length === 0) {
-      throw new Error(
-        `exportMeta: table ${tableConfig.schema}.${tableConfig.table} not found or has no matching columns`
-      );
+      // No columns found (table doesn't exist or no matching columns)
+      return null;
     }
 
     parserFields[key] = dynamicFields;
@@ -122,44 +121,55 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   };
 
   const queryAndParse = async (key: string, query: string) => {
-    const parser = await getParser(key);
+    try {
+      const parser = await getParser(key);
+      if (!parser) {
+        return;
+      }
 
-    const result = await pool.query(query, [database_id]);
-    if (result.rows.length) {
-      // Truncate timestamptz to second precision to match PostGraphile's Datetime scalar
-      // which truncates milliseconds in the GraphQL flow
-      const fields = parserFields[key];
-      if (fields) {
-        for (const row of result.rows) {
-          for (const [fieldName, fieldType] of Object.entries(fields)) {
-            if (fieldType === 'timestamptz') {
-              const val = row[fieldName];
-              if (val instanceof Date) {
-                // Truncate to second precision and convert to ISO string
-                // so both SQL and GraphQL flows pass the same value type to the Parser
-                row[fieldName] = new Date(Math.floor(val.getTime() / 1000) * 1000).toISOString();
+      const result = await pool.query(query, [database_id]);
+      if (result.rows.length) {
+        // Truncate timestamptz to second precision to match PostGraphile's Datetime scalar
+        // which truncates milliseconds in the GraphQL flow
+        const fields = parserFields[key];
+        if (fields) {
+          for (const row of result.rows) {
+            for (const [fieldName, fieldType] of Object.entries(fields)) {
+              if (fieldType === 'timestamptz') {
+                const val = row[fieldName];
+                if (val instanceof Date) {
+                  // Truncate to second precision and convert to ISO string
+                  // so both SQL and GraphQL flows pass the same value type to the Parser
+                  row[fieldName] = new Date(Math.floor(val.getTime() / 1000) * 1000).toISOString();
+                }
               }
             }
           }
         }
-      }
 
-      // Omit columnDefaults columns from row data so the Parser never sees them.
-      // The Parser's field config already excludes them (via buildDynamicFields),
-      // so they would be ignored anyway, but removing them from the data is cleaner.
-      const tblCfg = META_TABLE_CONFIG[key];
-      if (tblCfg?.columnDefaults) {
-        for (const colName of Object.keys(tblCfg.columnDefaults)) {
-          for (const row of result.rows) {
-            delete row[colName];
+        // Omit columnDefaults columns from row data so the Parser never sees them.
+        // The Parser's field config already excludes them (via buildDynamicFields),
+        // so they would be ignored anyway, but removing them from the data is cleaner.
+        const tblCfg = META_TABLE_CONFIG[key];
+        if (tblCfg?.columnDefaults) {
+          for (const colName of Object.keys(tblCfg.columnDefaults)) {
+            for (const row of result.rows) {
+              delete row[colName];
+            }
           }
         }
-      }
 
-      const parsed = await parser.parse(result.rows);
-      if (parsed) {
-        sql[key] = parsed;
+        const parsed = await parser.parse(result.rows);
+        if (parsed) {
+          sql[key] = parsed;
+        }
       }
+    } catch (err: unknown) {
+      const pgError = err as { code?: string };
+      if (pgError.code === '42P01') {
+        return;
+      }
+      throw err;
     }
   };
 
@@ -249,6 +259,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('plans_module', `SELECT * FROM metaschema_modules_public.plans_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('realtime_module', `SELECT * FROM metaschema_modules_public.realtime_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('session_secrets_module', `SELECT * FROM metaschema_modules_public.session_secrets_module WHERE database_id = $1 ORDER BY id`);
+  await queryAndParse('config_secrets_org_module', `SELECT * FROM metaschema_modules_public.config_secrets_org_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('infra_secrets_module', `SELECT * FROM metaschema_modules_public.infra_secrets_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('infra_config_module', `SELECT * FROM metaschema_modules_public.infra_config_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('internal_secrets_module', `SELECT * FROM metaschema_modules_public.internal_secrets_module WHERE database_id = $1 ORDER BY id`);
