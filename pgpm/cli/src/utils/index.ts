@@ -1,4 +1,5 @@
 export * from './database';
+export * from './driver';
 export * from './display';
 export * from './deployed-changes';
 export * from './module-utils';

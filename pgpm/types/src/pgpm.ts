@@ -1,5 +1,6 @@
 import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
+import { PgpmDriverConfig } from './driver';
 import { JobsConfig } from './jobs';
 
 /**
@@ -257,6 +258,12 @@ export interface PgpmOptions {
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
+    /**
+     * Pluggable migration backend. Undefined = built-in `pg` (server) path.
+     * Set `driver.plugin` to a package (e.g. `@pgpmjs/pglite-adapter`) resolved
+     * from the consumer's `node_modules`.
+     */
+    driver?: PgpmDriverConfig;
 }
 
 /**
