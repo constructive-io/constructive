@@ -2,6 +2,7 @@ import pg from 'pg';
 import { getPgEnvOptions, PgConfig, PgPoolConfig } from 'pg-env';
 import { Logger } from '@pgpmjs/logger';
 
+import { getActivePgPoolFactory, PgPoolFactory } from './driver';
 import { pgCache } from './lru';
 
 const log = new Logger('pg-cache');
@@ -38,13 +39,13 @@ export function getPgPoolConfig(overrides?: PgPoolConfig): pg.PoolConfig {
   };
 }
 
-export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig }): pg.Pool => {
+/**
+ * Default pool factory: builds a real `pg.Pool` over TCP. This is the behavior
+ * used whenever no alternate driver is registered (see `./driver`).
+ */
+export const defaultPgPoolFactory: PgPoolFactory = (pgConfig): pg.Pool => {
   const config = getPgEnvOptions(pgConfig);
-  const { user, password, host, port, database, } = config;
-  if (pgCache.has(database)) {
-    const cached = pgCache.get(database);
-    if (cached) return cached;
-  }
+  const { user, password, host, port, database } = config;
   const connectionString = buildConnectionString(user, password, host, port, database);
   const poolConfig = getPgPoolConfig(pgConfig.pool);
   const pgPool = new pg.Pool({ connectionString, ...poolConfig });
@@ -100,7 +101,22 @@ export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig })
       log.error(`Pool ${database} unexpected idle connection error [${err.code || 'unknown'}]: ${err.message}`);
     }
   });
-  
+
+  return pgPool;
+};
+
+export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig }): pg.Pool => {
+  const config = getPgEnvOptions(pgConfig);
+  const { database } = config;
+  if (pgCache.has(database)) {
+    const cached = pgCache.get(database);
+    if (cached) return cached;
+  }
+
+  // Route through the registered driver (default = pg.Pool over TCP).
+  const factory = getActivePgPoolFactory() ?? defaultPgPoolFactory;
+  const pgPool = factory(pgConfig);
+
   pgCache.set(database, pgPool);
   return pgPool;
 };
