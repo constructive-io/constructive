@@ -32,7 +32,7 @@
 import type { PGlite } from '@electric-sql/pglite';
 import { createPgliteClient,registerPglite } from '@pgpmjs/pglite-adapter';
 import { getPgEnvOptions, PgConfig } from 'pg-env';
-import { registerPgClientFactory } from 'pgsql-client';
+import { getActivePgClientFactory, registerPgClientFactory } from 'pgsql-client';
 import { DbAdmin, GetConnectionOpts, PgTestClient, seed, SeedAdapter } from 'pgsql-test';
 
 import { PgliteTestClient, SharedTxn } from './txn';
@@ -75,6 +75,11 @@ export const getConnections = async (
   cn: PgliteConnectionOpts = {},
   seedAdapters: SeedAdapter[] = [seed.pgpm()]
 ): Promise<PgliteConnectionResult> => {
+  // Capture the previously-active client factory so teardown restores it
+  // (rather than clobbering to the default), mirroring how registerPglite
+  // restores the previous pool factory. Keeps nested/sequential suites clean.
+  const previousClientFactory = getActivePgClientFactory();
+
   const handle = await registerPglite({
     dataDir: cn.pglite?.dataDir,
     extensions: cn.pglite?.extensions,
@@ -85,30 +90,38 @@ export const getConnections = async (
   // Route pgsql-client's PgClient at the same in-process PGlite session.
   registerPgClientFactory(() => createPgliteClient(handle.db));
 
-  const config: PgConfig = getPgEnvOptions({ database: 'postgres', ...cn.pg });
+  try {
+    const config: PgConfig = getPgEnvOptions({ database: 'postgres', ...cn.pg });
 
-  const txn = new SharedTxn();
-  const pg = new PgliteTestClient(config, {}, txn);
-  const db = new PgliteTestClient(config, { auth: cn.db?.auth, roles: cn.db?.roles }, txn);
+    const txn = new SharedTxn();
+    const pg = new PgliteTestClient(config, {}, txn);
+    const db = new PgliteTestClient(config, { auth: cn.db?.auth, roles: cn.db?.roles }, txn);
 
-  // seed.pgpm deploys via getPgPool -> PGlite; sqlfile/json/csv/fn use ctx.pg.
-  if (seedAdapters.length) {
-    await seed.compose(seedAdapters).seed({
-      connect: cn.db ?? {},
-      admin: undefined as unknown as DbAdmin, // unused by the PGlite-safe adapters
-      config,
-      pg
-    });
-  }
+    // seed.pgpm deploys via getPgPool -> PGlite; sqlfile/json/csv/fn use ctx.pg.
+    if (seedAdapters.length) {
+      await seed.compose(seedAdapters).seed({
+        connect: cn.db ?? {},
+        admin: undefined as unknown as DbAdmin, // unused by the PGlite-safe adapters
+        config,
+        pg
+      });
+    }
 
-  const teardown = async (): Promise<void> => {
-    registerPgClientFactory(undefined);
-    await pg.close();
-    await db.close();
+    const teardown = async (): Promise<void> => {
+      registerPgClientFactory(previousClientFactory);
+      await pg.close();
+      await db.close();
+      await handle.close();
+    };
+
+    return { pg, db, instance: handle.db, teardown };
+  } catch (err) {
+    // Setup failed after registering the seams — unwind so a broken suite
+    // doesn't leak factories/instance into the next one.
+    registerPgClientFactory(previousClientFactory);
     await handle.close();
-  };
-
-  return { pg, db, instance: handle.db, teardown };
+    throw err;
+  }
 };
 
 export { PgliteTestClient, SharedTxn } from './txn';

@@ -11,7 +11,7 @@ npm ci
 npm start   # boots PGlite in-process, runs pgpm deploy -> verify -> revert, asserts
 ```
 
-This runs in CI via `.github/workflows/pglite-poc.yaml` with no `services:` block —
+This runs in CI via `.github/workflows/pglite.yaml` with no `services:` block —
 the whole point: PGlite needs no external database.
 
 ## What it does

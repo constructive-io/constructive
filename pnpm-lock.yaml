@@ -3144,13 +3144,13 @@ importers:
 
   postgres/pglite-adapter:
     dependencies:
-      '@electric-sql/pglite':
-        specifier: 0.5.4
-        version: 0.5.4
       pg-cache:
         specifier: workspace:^
         version: link:../pg-cache/dist
     devDependencies:
+      '@electric-sql/pglite':
+        specifier: 0.5.4
+        version: 0.5.4
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -3164,9 +3164,6 @@ importers:
 
   postgres/pglite-test:
     dependencies:
-      '@electric-sql/pglite':
-        specifier: 0.5.4
-        version: 0.5.4
       '@pgpmjs/env':
         specifier: workspace:^
         version: link:../../pgpm/env/dist
@@ -3186,6 +3183,9 @@ importers:
         specifier: workspace:^
         version: link:../pgsql-test/dist
     devDependencies:
+      '@electric-sql/pglite':
+        specifier: 0.5.4
+        version: 0.5.4
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
