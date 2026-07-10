@@ -1,0 +1,7 @@
+# app extension
+comment = 'pglite-test fixture app'
+default_version = '0.0.1'
+module_pathname = '$libdir/app'
+requires = 'plpgsql'
+relocatable = false
+superuser = false

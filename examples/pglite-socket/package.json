@@ -1,0 +1,37 @@
+{
+  "name": "@constructive-io/examples-pglite-socket",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Example: the pgpm migrate engine deploying into PGlite (WASM Postgres) over the pg-gateway socket shim — no Postgres service required.",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "pglite",
+    "wasm",
+    "pgpm",
+    "migrations",
+    "socket",
+    "pg-gateway",
+    "example"
+  ],
+  "scripts": {
+    "lint": "eslint . --fix",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.4",
+    "@electric-sql/pglite-pgvector": "0.0.5",
+    "@electric-sql/pglite-socket": "0.2.7",
+    "@pgpmjs/core": "workspace:^",
+    "@types/pg": "^8.20.0",
+    "pg": "^8.21.0",
+    "pg-cache": "workspace:^"
+  }
+}
