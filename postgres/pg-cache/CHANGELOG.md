@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0](https://github.com/constructive-io/constructive/compare/pg-cache@3.13.1...pg-cache@3.14.0) (2026-07-10)
+
+### Features
+
+- **pg-cache:** pluggable pool-factory seam (default = pg.Pool) ([46a59ed](https://github.com/constructive-io/constructive/commit/46a59ed9c4822b9060076646458844a311fc3cd8))
+- **pglite:** add @pgpmjs/pglite-adapter (in-process PGlite driver) ([8e00052](https://github.com/constructive-io/constructive/commit/8e00052c496524731291ab48b78730c625850289))
+
 ## [3.13.1](https://github.com/constructive-io/constructive/compare/pg-cache@3.13.0...pg-cache@3.13.1) (2026-07-08)
 
 **Note:** Version bump only for package pg-cache

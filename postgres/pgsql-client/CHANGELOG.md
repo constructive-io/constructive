@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.20.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.19.0...pgsql-client@3.20.0) (2026-07-10)
+
+### Features
+
+- **pglite:** client-factory seam + pglite-test drop-in getConnections ([bb269ce](https://github.com/constructive-io/constructive/commit/bb269ce23aaace29fedfcf25ec81ec0faa8710eb))
+
 # [3.19.0](https://github.com/constructive-io/constructive/compare/pgsql-client@3.18.1...pgsql-client@3.19.0) (2026-07-08)
 
 ### Features
