@@ -1,0 +1,51 @@
+{
+  "name": "@pgpmjs/pglite-adapter",
+  "version": "0.0.1",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "PGlite driver for pgpm — registers an in-process PGlite instance as the pg-cache pool factory so the unmodified pgpm engine deploys into PGlite (WASM Postgres) with no server",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "pglite",
+    "wasm",
+    "pgpm",
+    "migrations",
+    "pg-cache",
+    "adapter",
+    "driver"
+  ],
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch"
+  },
+  "devDependencies": {
+    "@pgpmjs/core": "workspace:^",
+    "@types/pg": "^8.20.0",
+    "makage": "^0.3.0"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.4",
+    "pg-cache": "workspace:^"
+  }
+}

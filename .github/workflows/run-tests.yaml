@@ -94,6 +94,8 @@ jobs:
             packages: 'packages/postmaster packages/smtppostmaster packages/csv-to-pg packages/cli postgres/pgsql-client postgres/pg-ast'
           - batch: graphql
             packages: 'graphql/query graphql/codegen'
+          - batch: pglite
+            packages: 'postgres/pglite-adapter'
 
     steps:
       - name: Download workspace

@@ -147,16 +147,21 @@ Extensions are provisioned out-of-band here (pgpm's `cleanSql` strips
 `DbAdmin.installExtensions()` — the adapter runs `CREATE EXTENSION` at instance
 bootstrap and registers the WASM ext in JS at construction.
 
-### 4. One correctness fix in `@pgpmjs/core` (benign for pg, required for PGlite)
+### 4. One correctness fix in `@pgpmjs/core` — NOT needed for the in-process adapter
 
-Today the deploy/revert loop opens a transaction on one pooled connection but calls
-`isDeployed()` on `this.pool.query` — a *different* connection. On a
-single-connection backend that second query can't run concurrently with the open
-transaction. Fix: thread the transaction's client through so all in-transaction
-reads use `context.client` (fall back to the pool only when not in a transaction).
-This is invisible to `pg` (pool has many connections) and unblocks any
-single-connection driver. It also removes the PoC's `useTransaction:false`
+The deploy/revert loop opens a transaction on one pooled connection but calls
+`isDeployed()` on `this.pool.query` — a *different* connection. Over the **socket**
+shim (multiple TCP sessions against a single-connection backend) that second query
+can't run while the transaction is open → the PoC's `useTransaction:false`
 workaround.
+
+**Empirically, the in-process `@pgpmjs/pglite-adapter` does NOT hit this.** PGlite
+is one in-process session, and the adapter funnels both `pool.query` and the
+`connect()` client to that same session, so `BEGIN` + `isDeployed()` + `COMMIT`
+all share one session — no cross-connection deadlock. The adapter's tests run with
+the default `useTransaction: true` and pass. The core fix (thread `context.client`
+through in-transaction reads) remains a nice-to-have for any *multi-connection*
+single-writer backend, but is not required for this rollout.
 
 ## What stays out of scope
 
@@ -168,11 +173,12 @@ workaround.
 
 ## Suggested rollout
 
-1. **`pg-cache` driver seam + registry** (default = pg; zero behavior change). Land + prove green.
-2. **Core transaction-client fix** (drop `useTransaction:false` from the PoC).
-3. **`@pgpmjs/pglite-adapter`** (in-process driver, all pglite deps here).
-4. **`pglite-test`** drop-in `getConnections` (instance-per-test) + a PGlite-aware admin.
-5. Convert this PoC's CI job to use `pglite-test` instead of the socket shim.
+1. **`pg-cache` driver seam + registry** (default = pg; zero behavior change). ✅ **DONE** — `registerPgPoolFactory` / `defaultPgPoolFactory`, 19 unit tests, CI green.
+2. **`@pgpmjs/pglite-adapter`** (in-process driver, all pglite deps here). ✅ **DONE** — `registerPglite()` registers a PGlite-backed `QueryablePool`; 6 tests deploy→verify→revert an unmodified pgpm plan into in-process PGlite (no socket), with `useTransaction: true`.
+3. **`pglite-test`** drop-in `getConnections` (instance-per-test). Needs a matching client-factory seam in `pgsql-client` + a PGlite-aware admin, because `pgsql-test` bypasses `pg-cache` (`new Pool`/`new Client` directly + `createdb`/`psql`).
+4. Convert this PoC's CI job to use the adapter instead of the socket shim.
+5. (Optional) Core transaction-client fix — only if a *multi-connection* single-writer backend is ever targeted; the in-process adapter does not need it.
 
-Each step is independently shippable and testable; only step 1–2 touch core, and
-neither adds a PGlite dependency to it.
+Each shipped step is independently testable; only step 1 touches core, and it adds
+no PGlite dependency to it. All `@electric-sql/pglite*` deps live in
+`@pgpmjs/pglite-adapter`.

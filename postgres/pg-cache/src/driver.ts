@@ -10,9 +10,10 @@ import type { PgConfig, PgPoolConfig } from 'pg-env';
  * backend (e.g. an in-process PGlite instance) supply the pool WITHOUT any
  * backend-specific dependency leaking into pg-cache or its consumers.
  *
- * The factory returns a `pg.Pool`; the only surface pgpm/pgsql-* actually rely
- * on is `query()`, `connect()` and `end()`, so an adapter may return an object
- * that implements that subset. `QueryablePool` documents that contract.
+ * The only surface pgpm/pgsql-* actually rely on is `query()`, `connect()` and
+ * `end()` (plus an `ended` flag for disposal), so a factory may return anything
+ * implementing that subset — `QueryablePool`. A real `pg.Pool` structurally
+ * satisfies it, so the default path is unchanged and fully backward-compatible.
  */
 export interface QueryableClient {
   query(text: string, values?: any[]): Promise<any>;
@@ -27,7 +28,7 @@ export interface QueryablePool {
 
 export type PgPoolFactory = (
   config: Partial<PgConfig> & { pool?: PgPoolConfig }
-) => pg.Pool;
+) => pg.Pool | QueryablePool;
 
 let activeFactory: PgPoolFactory | undefined;
 

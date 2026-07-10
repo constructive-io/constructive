@@ -113,9 +113,11 @@ export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig })
     if (cached) return cached;
   }
 
-  // Route through the registered driver (default = pg.Pool over TCP).
+  // Route through the registered driver (default = pg.Pool over TCP). A custom
+  // factory may return any QueryablePool (e.g. an in-process PGlite pool); it is
+  // treated as a pg.Pool since that is the only surface consumers use.
   const factory = getActivePgPoolFactory() ?? defaultPgPoolFactory;
-  const pgPool = factory(pgConfig);
+  const pgPool = factory(pgConfig) as pg.Pool;
 
   pgCache.set(database, pgPool);
   return pgPool;
