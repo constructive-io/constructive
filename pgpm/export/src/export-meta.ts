@@ -260,7 +260,6 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('realtime_module', `SELECT * FROM metaschema_modules_public.realtime_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('session_secrets_module', `SELECT * FROM metaschema_modules_public.session_secrets_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('config_secrets_org_module', `SELECT * FROM metaschema_modules_public.config_secrets_org_module WHERE database_id = $1 ORDER BY id`);
-  await queryAndParse('config_secrets_module', `SELECT * FROM metaschema_modules_public.config_secrets_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('infra_secrets_module', `SELECT * FROM metaschema_modules_public.infra_secrets_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('infra_config_module', `SELECT * FROM metaschema_modules_public.infra_config_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('internal_secrets_module', `SELECT * FROM metaschema_modules_public.internal_secrets_module WHERE database_id = $1 ORDER BY id`);
