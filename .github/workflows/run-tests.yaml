@@ -95,7 +95,7 @@ jobs:
           - batch: graphql
             packages: 'graphql/query graphql/codegen'
           - batch: pglite
-            packages: 'postgres/pglite-adapter postgres/pglite-test'
+            packages: 'postgres/pglite-adapter postgres/pglite-test examples/pglite-socket'
 
     steps:
       - name: Download workspace
