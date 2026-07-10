@@ -330,7 +330,6 @@ export const exportGraphQLMeta = async ({
     queryAndParse('plans_module'),
     queryAndParse('realtime_module'),
     queryAndParse('session_secrets_module'),
-    queryAndParse('config_secrets_org_module'),
     queryAndParse('infra_secrets_module'),
     queryAndParse('infra_config_module'),
     queryAndParse('internal_secrets_module'),
