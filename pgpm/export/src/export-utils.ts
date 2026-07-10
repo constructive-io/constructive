@@ -172,7 +172,9 @@ export const META_TABLE_ORDER = [
   'realtime_module',
   'session_secrets_module',
   'config_secrets_org_module',
-  'config_secrets_module',
+  'infra_secrets_module',
+  'infra_config_module',
+  'internal_secrets_module',
   'i18n_module',
   'agent_module',
   'function_module',
@@ -555,9 +557,17 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
     schema: 'metaschema_modules_public',
     table: 'config_secrets_org_module'
   },
-  config_secrets_module: {
+  infra_secrets_module: {
     schema: 'metaschema_modules_public',
-    table: 'config_secrets_module'
+    table: 'infra_secrets_module'
+  },
+  infra_config_module: {
+    schema: 'metaschema_modules_public',
+    table: 'infra_config_module'
+  },
+  internal_secrets_module: {
+    schema: 'metaschema_modules_public',
+    table: 'internal_secrets_module'
   },
   i18n_module: {
     schema: 'metaschema_modules_public',
