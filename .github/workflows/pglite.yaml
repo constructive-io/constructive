@@ -29,12 +29,15 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install (standalone, not the monorepo)
+      - name: Install (standalone, ignoring the monorepo workspace)
         working-directory: poc/pglite
-        run: npm ci
+        run: pnpm install --ignore-workspace --frozen-lockfile
       - name: Deploy pgpm migrations into PGlite (no Postgres service)
         working-directory: poc/pglite
-        run: npm start
+        run: pnpm start

@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Proof of concept: the pgpm migrate engine deploying into PGlite (WASM Postgres), no Postgres service required. Standalone; not part of the pnpm workspace.",
   "scripts": {
-    "start": "node run.mjs"
+    "start": "node run.js"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.4",
