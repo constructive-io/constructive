@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.3...@pgpmjs/export@0.26.4) (2026-07-10)
+
+### Bug Fixes
+
+- **export:** fully remove config_secrets_module; add graph_execution/function_deployment/function_invocation to GraphQL flow for cross-flow parity ([9931fee](https://github.com/constructive-io/constructive/commit/9931feea4ff310e30454714566047e83296056db))
+- **export:** include infra_secrets_module, infra_config_module, internal_secrets_module in meta export ([c939e64](https://github.com/constructive-io/constructive/commit/c939e64f0fdbf93e70c2ade34ecc5b7dc37c9285))
+- **export:** remove vestigial config_secrets_org_module (revert strict-throw changes) ([1743c00](https://github.com/constructive-io/constructive/commit/1743c0060f8023cbcb3e6486dbd7b28bb3996e7f))
+- **export:** remove vestigial config_secrets_org_module and fail loudly on missing tables ([58100f3](https://github.com/constructive-io/constructive/commit/58100f311c099646a9d0dc64db23fca30ff2d132))
+
 ## [0.26.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.2...@pgpmjs/export@0.26.3) (2026-07-08)
 
 **Note:** Version bump only for package @pgpmjs/export
