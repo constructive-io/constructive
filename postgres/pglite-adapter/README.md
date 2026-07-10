@@ -1,5 +1,21 @@
 # @pgpmjs/pglite-adapter
 
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+  <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE">
+    <img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/>
+  </a>
+  <a href="https://www.npmjs.com/package/@pgpmjs/pglite-adapter">
+    <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=postgres%2Fpglite-adapter%2Fpackage.json"/>
+  </a>
+</p>
+
 A PGlite driver for pgpm. It registers an **in-process** [PGlite](https://github.com/electric-sql/pglite)
 instance (WASM Postgres) as the `pg-cache` pool factory, so the **unmodified**
 pgpm engine deploys, verifies, and reverts migrations against PGlite with **no
@@ -7,6 +23,14 @@ Postgres server and no socket**.
 
 All `@electric-sql/pglite*` dependencies live here — `@pgpmjs/core`, `pg-cache`,
 and `pgsql-test` never import them.
+
+## Install
+
+```sh
+npm install @pgpmjs/pglite-adapter @electric-sql/pglite
+```
+
+`@electric-sql/pglite` is a peer dependency, so you pin the version.
 
 ## How it works
 
