@@ -4,8 +4,9 @@ A drop-in [`pgsql-test`](../pgsql-test) `getConnections()` backed by an in-proce
 [**PGlite**](https://github.com/electric-sql/pglite) instance (WASM Postgres) —
 **no Postgres server, no `createdb`, no `psql`, no TCP.**
 
-It follows the same pattern as `drizzle-orm-test` / `supabase-test`: compose the
-existing seams instead of forking the base.
+It follows the same pattern as `drizzle-orm-test` / `supabase-test`: a thin
+`getConnections()` wrapper that composes the existing `pg-cache` / `pgsql-client`
+seams.
 
 - [`@pgpmjs/pglite-adapter`](../pglite-adapter)'s `registerPglite()` routes
   `pg-cache`'s `getPgPool()` at PGlite, so `seed.pgpm()` deploys your module into
