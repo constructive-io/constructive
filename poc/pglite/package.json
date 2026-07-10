@@ -2,7 +2,6 @@
   "name": "pgpm-pglite-poc",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "description": "Proof of concept: the pgpm migrate engine deploying into PGlite (WASM Postgres), no Postgres service required. Standalone; not part of the pnpm workspace.",
   "scripts": {
     "start": "node run.js"
