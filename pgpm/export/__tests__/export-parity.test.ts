@@ -49,7 +49,6 @@ import { exportMigrations } from '../src/export-migrations';
 import { exportMeta } from '../src/export-meta';
 import { GraphQLClient } from '../src/graphql-client';
 import { exportGraphQLMeta } from '../src/export-graphql-meta';
-import { buildMetaTableShimsSQL } from '../test-utils/shim-utils';
 import { toCamelCase } from 'inflekt';
 import { getConnections, seed } from 'pgsql-test';
 
@@ -255,7 +254,6 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
 
         // Create shim schemas + tables
         await pgClient.query(SCHEMA_SHIMS_SQL);
-        await pgClient.query(buildMetaTableShimsSQL());
 
         // Seed data
         await pgClient.query(SEED_SQL);
@@ -504,7 +502,6 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
         await migrate.initialize();
 
         await pgClient.query(SCHEMA_SHIMS_SQL);
-        await pgClient.query(buildMetaTableShimsSQL());
 
         // Seed the database row + schemas (required by exportMigrations)
         await pgClient.query(`
