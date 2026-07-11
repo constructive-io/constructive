@@ -2,13 +2,15 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { DEFAULT_TEMPLATE_REPO, PGLITE_TEMPLATE_REPO } from '@pgpmjs/core';
+import { DEFAULT_TEMPLATE_REPO, TEMPLATE_REPOS } from '@pgpmjs/core';
 
 import {
   persistBoilerplateSource,
   readBoilerplateSource,
   resolveInitTemplateRepo,
 } from '../src/commands/init/boilerplate';
+
+const PGLITE_TEMPLATE_REPO = TEMPLATE_REPOS.pglite;
 
 describe('resolveInitTemplateRepo', () => {
   it('defaults to the pgpm boilerplates repo (not explicit)', () => {

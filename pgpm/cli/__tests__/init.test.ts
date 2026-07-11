@@ -2,7 +2,7 @@ jest.setTimeout(60000);
 process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 process.env.PGPM_SKIP_SKILL_INSTALL = 'true';
 
-import { PgpmPackage, PGLITE_TEMPLATE_REPO } from '@pgpmjs/core';
+import { PgpmPackage, TEMPLATE_REPOS } from '@pgpmjs/core';
 import { existsSync, readFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer, ParsedArgs } from 'inquirerer';
@@ -16,6 +16,8 @@ import {
   TestFixture,
   withInitDefaults
 } from '../test-utils';
+
+const PGLITE_TEMPLATE_REPO = TEMPLATE_REPOS.pglite;
 
 const beforeEachSetup = setupTests();
 

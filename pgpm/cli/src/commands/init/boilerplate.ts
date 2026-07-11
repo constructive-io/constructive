@@ -1,11 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import {
-  DEFAULT_TEMPLATE_REPO,
-  PGLITE_TEMPLATE_REPO,
-  PgpmPackage,
-} from '@pgpmjs/core';
+import { DEFAULT_TEMPLATE_REPO, PgpmPackage, TEMPLATE_REPOS } from '@pgpmjs/core';
 
 /**
  * A template/boilerplate source, recorded on a workspace so that modules
@@ -33,7 +29,7 @@ export function resolveInitTemplateRepo(flags: {
     typeof flags.repo === 'string'
       ? flags.repo
       : pglite
-        ? PGLITE_TEMPLATE_REPO
+        ? TEMPLATE_REPOS.pglite
         : DEFAULT_TEMPLATE_REPO;
   return { templateRepo, repoWasExplicit };
 }
