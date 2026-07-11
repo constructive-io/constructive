@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.20.0...@constructive-io/query-builder@2.21.0) (2026-07-11)
+
+### Features
+
+- **query-builder:** expression args (col/lit/param/fn) + computed SELECT columns ([98e3649](https://github.com/constructive-io/constructive/commit/98e364910ad57263534d2d9b9562d4f163eb0914))
+
 # [2.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.19.0...@constructive-io/query-builder@2.20.0) (2026-06-28)
 
 **Note:** Version bump only for package @constructive-io/query-builder
