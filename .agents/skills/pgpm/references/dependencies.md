@@ -60,25 +60,32 @@ Module metadata and extension dependencies live in the `.control` file:
 # pets.control
 comment = 'Pet management module'
 default_version = '0.0.1'
-requires = 'uuid-ossp,plpgsql'
+requires = 'pgcrypto'
 ```
 
 | Field | Purpose |
 |-------|---------|
 | `comment` | Module description |
 | `default_version` | Semantic version |
-| `requires` | PostgreSQL extensions needed |
+| `requires` | PostgreSQL extensions / module dependencies needed (omitted when there are none) |
+
+New modules scaffold with no extensions, so there is no `requires` line until you add a dependency.
 
 ## Adding Extension Dependencies
 
 When your module needs PostgreSQL extensions:
 
 ```bash
-# Interactive mode
+# Non-interactive (edits only the requires line)
+pgpm extension --add pgcrypto,citext
+pgpm extension --remove citext
+pgpm extension --set pgcrypto
+
+# Interactive picker
 pgpm extension
 
 # Or edit .control directly
-requires = 'uuid-ossp,plpgsql,pgcrypto'
+requires = 'pgcrypto,citext'
 ```
 
 ## Dependency Resolution
