@@ -46,11 +46,16 @@ Options:
   --boilerplate           Prompt to select from available boilerplates
   --create-workspace, -w  Create a workspace first, then create the module inside it
   --use-skills            Use npx skills CLI for skill installation (slower, writes skills-lock.json)
+  --extensions <a,b>      Extensions to require in the new module (default: none).
+                          Add them later instead with \`${binaryName} extension\`.
+  --with-extensions       Prompt interactively for extensions during module init
 
 Examples:
-  ${binaryName} init                                   Initialize new module (default)
+  ${binaryName} init                                   Initialize new module (default, no extensions)
   ${binaryName} init workspace                         Initialize new workspace
   ${binaryName} init module                            Initialize new module explicitly
+  ${binaryName} init --extensions uuid-ossp,citext     Initialize module requiring extensions
+  ${binaryName} init --with-extensions                 Pick extensions interactively
   ${binaryName} init workspace --dir <variant>         Use variant templates
   ${binaryName} init --template pnpm/module            Use full template path (dir + type)
   ${binaryName} init --boilerplate                     Select from available boilerplates
@@ -605,8 +610,28 @@ async function handleModuleInit(
     },
   ];
 
-  // Only ask for extensions if this is a pgpm template
-  if (isPgpmTemplate && project.workspacePath) {
+  // Extensions are opt-in: a bare `pgpm init` scaffolds a module with no
+  // extensions (no `requires` line). Extensions are added explicitly later via
+  // `pgpm extension`, or up front via `--extensions a,b` (non-interactive) or
+  // `--with-extensions` (interactive picker). This matches the zero-config init
+  // of comparable tools (sqitch, prisma, drizzle, dbmate, ...).
+  // Normalize `--extensions a,b` (a comma string from the CLI) into an array so
+  // it is consumed the same way as a programmatic string[].
+  if (typeof (argv as any).extensions === 'string') {
+    (argv as any).extensions = (argv as any).extensions
+      .split(',')
+      .map((s: string) => s.trim())
+      .filter(Boolean);
+  }
+  const extensionsProvided = (argv as any).extensions !== undefined;
+  const wantExtensionsPrompt = Boolean(
+    (argv as any).withExtensions || argv['with-extensions']
+  );
+  if (
+    isPgpmTemplate &&
+    project.workspacePath &&
+    (extensionsProvided || wantExtensionsPrompt)
+  ) {
     const availExtensions = await project.getAvailableModules();
     moduleQuestions.push({
       name: 'extensions',
@@ -614,8 +639,7 @@ async function handleModuleInit(
       options: availExtensions,
       type: 'checkbox',
       allowCustomOptions: true,
-      required: true,
-      default: ['plpgsql', 'uuid-ossp'],
+      default: [],
     });
   }
 
