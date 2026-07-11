@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.21.5](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.21.4...graphile-postgis@2.21.5) (2026-07-11)
+
+**Note:** Version bump only for package graphile-postgis
+
 ## [2.21.4](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.21.3...graphile-postgis@2.21.4) (2026-07-10)
 
 **Note:** Version bump only for package graphile-postgis

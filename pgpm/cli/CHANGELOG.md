@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.36.0](https://github.com/constructive-io/constructive/compare/pgpm@4.35.0...pgpm@4.36.0) (2026-07-11)
+
+### Features
+
+- **pgpm:** add --pglite flag to init with workspace inheritance ([1cbe2e4](https://github.com/constructive-io/constructive/commit/1cbe2e447638d970016a0920a3feba5a84b5e12e))
+- **pgpm:** default pgpm init to no extensions (opt-in via --extensions/--with-extensions) ([fb0eb70](https://github.com/constructive-io/constructive/commit/fb0eb7036128a2413d89cb2e09d78648543b4bda))
+- **pgpm:** harden `pgpm extension` as the canonical enable-later path ([41c60dc](https://github.com/constructive-io/constructive/commit/41c60dc9fd42ccff03443a61f698fd12c669e835))
+
 # [4.35.0](https://github.com/constructive-io/constructive/compare/pgpm@4.34.2...pgpm@4.35.0) (2026-07-10)
 
 ### Features

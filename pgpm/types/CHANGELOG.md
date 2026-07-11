@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.33.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.32.0...@pgpmjs/types@2.33.0) (2026-07-11)
+
+### Features
+
+- **pgpm:** add --pglite flag to init with workspace inheritance ([1cbe2e4](https://github.com/constructive-io/constructive/commit/1cbe2e447638d970016a0920a3feba5a84b5e12e))
+
 # [2.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.31.0...@pgpmjs/types@2.32.0) (2026-07-10)
 
 ### Features
