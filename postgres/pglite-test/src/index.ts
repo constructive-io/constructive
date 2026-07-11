@@ -30,9 +30,10 @@
  */
 
 import type { PGlite } from '@electric-sql/pglite';
-import { createPgliteClient,registerPglite } from '@pgpmjs/pglite-adapter';
+import { generateCreateBaseRolesSQL, generateCreateClientRoleSQL } from '@pgpmjs/core';
+import { createPgliteClient, registerPglite } from '@pgpmjs/pglite-adapter';
 import { getPgEnvOptions, PgConfig } from 'pg-env';
-import { getActivePgClientFactory, registerPgClientFactory } from 'pgsql-client';
+import { getActivePgClientFactory, getRoleMapping, registerPgClientFactory } from 'pgsql-client';
 import { DbAdmin, GetConnectionOpts, PgTestClient, seed, SeedAdapter } from 'pgsql-test';
 
 import { PgliteTestClient, SharedTxn } from './txn';
@@ -45,11 +46,22 @@ export interface PgliteConnectionOpts extends GetConnectionOpts {
     /** WASM extensions registered at construction, e.g. `{ vector }`. */
     extensions?: Record<string, any>;
     /**
-     * SQL run once after the instance is ready — `CREATE EXTENSION ...`, and any
-     * `CREATE ROLE ...` needed for RLS role switching (PGlite starts as a single
-     * superuser, so roles used via `setContext({ role })` must be created here).
+     * SQL run once after the instance is ready — the place for
+     * `CREATE EXTENSION ...` (and any extra roles/objects you want).
      */
     extensionSql?: string[];
+    /**
+     * Auto-create the standard app roles (`anonymous` / `authenticated` /
+     * `administrator` / `authenticated_client`) with the same attributes
+     * pgsql-test's server bootstrap uses, before seeding. This is what lets a
+     * bare `getConnections()` switch into an app role via `db.setContext()`
+     * with no manual `CREATE ROLE`. Defaults to `true`.
+     *
+     * Set `false` to boot as a lone superuser and manage your own roles/users
+     * through `extensionSql` (see the README for the pattern). Role *names* can
+     * be customized via `db.roles` (a `RoleMapping`), mirroring pgsql-test.
+     */
+    roles?: boolean;
     /** Reuse an already-created PGlite instance instead of creating one. */
     instance?: PGlite;
   };
@@ -69,7 +81,9 @@ export interface PgliteConnectionResult {
 /**
  * Create an isolated PGlite-backed test environment and return `pg`/`db` clients
  * plus a `teardown()`. Defaults to seeding via `seed.pgpm()` (deploys the pgpm
- * module in `cwd`), matching pgsql-test.
+ * module in `cwd`) and creating the standard app roles, matching pgsql-test — so
+ * a bare `getConnections()` is enough to deploy and switch roles with no manual
+ * `CREATE ROLE`. Opt out of the role bootstrap with `pglite: { roles: false }`.
  */
 export const getConnections = async (
   cn: PgliteConnectionOpts = {},
@@ -80,10 +94,23 @@ export const getConnections = async (
   // restores the previous pool factory. Keeps nested/sequential suites clean.
   const previousClientFactory = getActivePgClientFactory();
 
+  // Seed the standard app roles by default so `db.setContext({ role })` works
+  // out of the box — PGlite boots as a lone superuser with no app roles, unlike
+  // a server where pgsql-test bootstraps them at createdb. Opt out with
+  // `pglite: { roles: false }` to manage your own (see README).
+  const bootstrapRoles = cn.pglite?.roles !== false;
+  const roleMapping = getRoleMapping({ roles: cn.db?.roles });
+  const roleSql = bootstrapRoles
+    ? [
+        generateCreateBaseRolesSQL(roleMapping),
+        generateCreateClientRoleSQL(roleMapping)
+      ]
+    : [];
+
   const handle = await registerPglite({
     dataDir: cn.pglite?.dataDir,
     extensions: cn.pglite?.extensions,
-    extensionSql: cn.pglite?.extensionSql,
+    extensionSql: [...roleSql, ...(cn.pglite?.extensionSql ?? [])],
     instance: cn.pglite?.instance
   });
 
