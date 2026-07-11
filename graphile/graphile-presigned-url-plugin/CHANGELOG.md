@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.21.0...graphile-presigned-url-plugin@0.21.1) (2026-07-11)
+
+**Note:** Version bump only for package graphile-presigned-url-plugin
+
 # [0.21.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.20.2...graphile-presigned-url-plugin@0.21.0) (2026-06-28)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin

@@ -1,6 +1,6 @@
 {
   "name": "agentic-kit",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "description": "Provider-agnostic LLM adapter with streaming and multi-turn support",
   "main": "index.js",
