@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { writeExtensions, generateControlFileContent } from '../../../src/files/extension/writer';
+import { writeExtensions, generateControlFileContent, upsertRequiresLine } from '../../../src/files/extension/writer';
 import { getInstalledExtensions } from '../../../src/files/extension/reader';
 
 describe('extension writer', () => {
@@ -97,6 +97,44 @@ describe('extension writer', () => {
       });
 
       expect(content).toContain('schema = public');
+    });
+  });
+
+  describe('upsertRequiresLine', () => {
+    const base = generateControlFileContent({
+      name: 'test-module',
+      version: '1.0.0',
+      requires: ['pgcrypto'],
+      schema: 'my_schema'
+    });
+
+    it('replaces an existing requires line and preserves other fields', () => {
+      const result = upsertRequiresLine(base, ['pgcrypto', 'postgis']);
+      expect(result).toContain("requires = 'pgcrypto,postgis'");
+      expect(result).toContain('schema = my_schema');
+      expect(result).toContain("comment = 'test-module extension'");
+    });
+
+    it('removes the requires line when the set is empty', () => {
+      const result = upsertRequiresLine(base, []);
+      expect(result).not.toContain('requires =');
+      expect(result).toContain('schema = my_schema');
+    });
+
+    it('inserts a requires line before relocatable when none exists', () => {
+      const noRequires = generateControlFileContent({
+        name: 'test-module',
+        version: '1.0.0',
+        requires: []
+      });
+      expect(noRequires).not.toContain('requires =');
+
+      const result = upsertRequiresLine(noRequires, ['citext']);
+      const lines = result.split('\n');
+      const requiresIdx = lines.findIndex((l) => /^requires\s*=/.test(l));
+      const relocatableIdx = lines.findIndex((l) => /^relocatable\s*=/.test(l));
+      expect(requiresIdx).toBeGreaterThanOrEqual(0);
+      expect(requiresIdx).toBeLessThan(relocatableIdx);
     });
   });
 

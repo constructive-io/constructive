@@ -209,6 +209,20 @@ export interface PgpmWorkspaceConfig {
   };
   /** Deployment configuration for the workspace */
   deployment?: Omit<DeploymentOptions, 'toChange'>;
+  /**
+   * Template source recorded at scaffold time when the workspace is created
+   * from a non-default boilerplate repo (e.g. via `pgpm init workspace --pglite`
+   * or `--repo`). `pgpm init` reads this so modules created inside the workspace
+   * inherit the same boilerplate source without re-specifying the flag.
+   */
+  boilerplates?: {
+    /** Template repository URL */
+    repo: string;
+    /** Branch/tag to clone */
+    branch?: string;
+    /** Template variant directory */
+    dir?: string;
+  };
 }
 
 /**

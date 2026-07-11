@@ -40,9 +40,10 @@ pgpm init workspace
 cd my-database-project
 pnpm install
 
-# 4. Create a module
+# 4. Create a module (scaffolds with no extensions by default)
 pgpm init
-# Enter module name (e.g., "pets") and select extensions
+# Enter module name (e.g., "pets"). Add extensions later with `pgpm extension`,
+# or up front with `pgpm init --extensions a,b`
 
 # 5. Add a change
 cd packages/pets
@@ -78,11 +79,11 @@ Dependencies `[...]` must come immediately after the change name, before the tim
 
 ### .control File
 
-Each module has a `.control` file declaring its name and PostgreSQL extension dependencies:
+Each module has a `.control` file declaring its name and PostgreSQL extension dependencies. A freshly-scaffolded module has **no** `requires` line (zero extensions by default); it appears once you add a dependency:
 ```
 comment = 'My database module'
 default_version = '0.0.1'
-requires = 'uuid-ossp,plpgsql'
+requires = 'pgcrypto,pgpm-base32'
 ```
 
 The `requires` field uses **control file names** (e.g., `pgpm-base32`), NOT npm names (e.g., `@pgpm/base32`). See [references/module-naming.md](references/module-naming.md) for details.
@@ -137,7 +138,7 @@ pgpm handles extension creation during deploy. Declare extensions in your `.cont
 | `pgpm revert --to <change>` | Revert changes back to a specific point |
 | `pgpm tag <version>` | Tag current state for targeted deploys |
 | `pgpm install <module>` | Install a pgpm module dependency |
-| `pgpm extension` | Interactive dependency selector |
+| `pgpm extension [--add/--remove/--set a,b]` | Manage module dependencies (flags are non-interactive; no flags = interactive picker) |
 | `pgpm test-packages` | Test all packages |
 | `pgpm test-packages --full-cycle` | Test deploy → verify → revert → redeploy |
 | `pgpm docker start` | Start PostgreSQL container |
@@ -303,7 +304,10 @@ In `noTty` mode, `inquirerer` uses defaults where available and throws with the 
    pgpm deploy --database mydb --package my-module --yes --recursive
    ```
 
-5. **`pgpm init` and `pgpm extension` are fully interactive** — they require multi-step input (names, selections). Do not use them in scripts. Instead, create `.control`, `pgpm.plan`, and `package.json` files directly.
+5. **`pgpm init` and `pgpm extension` support non-interactive use.**
+   - `pgpm init --moduleName <module> --extensions a,b` scaffolds without prompting (no `--extensions` means zero extensions). Only the module name would otherwise prompt, so pass `--moduleName` (`pgpm init workspace` uses `--name`).
+   - `pgpm extension --add <a,b>` / `--remove <a,b>` / `--set <a,b>` change a module's `requires` without a prompt.
+   Running either with no args is interactive.
 
 6. **`pgpm test-packages` does NOT prompt** — safe to run without any flags.
 
@@ -319,8 +323,8 @@ In `noTty` mode, `inquirerer` uses defaults where available and throws with the 
 | `pgpm revert` | `--yes --database <name>` | Confirms before reverting |
 | `pgpm test-packages` | None | Non-interactive by default |
 | `pgpm verify` | None | Non-interactive |
-| `pgpm init` | N/A | Fully interactive — don't use in CI |
-| `pgpm extension` | N/A | Fully interactive — don't use in CI |
+| `pgpm init` | `--moduleName <module> [--extensions a,b]` | Non-interactive with `--moduleName`; no `--extensions` = zero extensions |
+| `pgpm extension` | `--add/--remove/--set a,b` | Non-interactive with a flag; no flag = interactive picker |
 
 ## Troubleshooting Quick Reference
 

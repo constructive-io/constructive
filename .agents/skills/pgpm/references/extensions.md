@@ -79,16 +79,28 @@ See `references/module-naming.md` for the full naming convention.
 
 ## Adding Dependencies
 
-### Interactive: `pgpm extension`
+> New modules scaffold with **no** extensions (no `requires` line). Add them explicitly, either up front at init (`pgpm init --extensions a,b` / `--with-extensions`) or afterward with `pgpm extension` (below).
 
-Run inside a module directory to interactively select dependencies:
+### `pgpm extension`
+
+Run inside a module directory to change its dependencies. It rewrites only the `requires` line of the `.control` file, preserving every other field (comment, schema, relocatable, ...).
+
+**Non-interactive (preferred for scripts/CI):**
 
 ```bash
 cd packages/my-module
+pgpm extension --add pgcrypto          # add one or more (--add a,b)
+pgpm extension --remove pgcrypto       # remove one or more
+pgpm extension --set pgcrypto,citext   # replace the whole requires set
+```
+
+**Interactive:**
+
+```bash
 pgpm extension
 ```
 
-This shows a checkbox picker of all available modules in the workspace. Selected items are written to the `.control` file's `requires` list. You can also type custom extension names for native Postgres extensions.
+With no flags it shows a checkbox picker of all available modules in the workspace. Selected items are written to the `.control` file's `requires` list. You can also type custom extension names for native Postgres extensions.
 
 ### Installing npm-published pgpm modules: `pgpm install`
 
@@ -107,7 +119,7 @@ pgpm install
 
 `pgpm install` downloads the module from npm and places it in the workspace's `extensions/` directory (e.g., `extensions/@pgpm/base32/`).
 
-After installing, use `pgpm extension` to add the installed module to your `.control` file's `requires`.
+After installing, use `pgpm extension --add <control-name>` to add the installed module to your `.control` file's `requires`.
 
 ### Manual Editing
 
@@ -174,7 +186,7 @@ This is fully automatic — you never need to manually order extension creation.
 ### Add a pgpm module dependency
 
 1. Install: `pgpm install @pgpm/base32`
-2. Add to requires: `pgpm extension` (interactive) or edit `.control`
+2. Add to requires: `pgpm extension --add pgpm-base32` (or run `pgpm extension` interactively, or edit `.control`)
 3. Deploy — pgpm deploys `@pgpm/base32` before your module
 
 ### Check what's installed

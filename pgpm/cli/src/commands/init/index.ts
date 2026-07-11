@@ -18,6 +18,12 @@ import { resolveWorkspaceByType } from '@pgpmjs/env';
 import { errors } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
 
+import {
+  persistBoilerplateSource,
+  readBoilerplateSource,
+  resolveInitTemplateRepo,
+} from './boilerplate';
+
 const DEFAULT_MOTD = `
                  |              _   _
      ===         |.===.        '\\-//\`
@@ -40,6 +46,9 @@ Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
   --repo <repo>           Template repo (default: https://github.com/constructive-io/pgpm-boilerplates.git)
+  --pglite                Use the PGlite boilerplates (in-process WASM Postgres, no server/Docker).
+                          Sugar for --repo https://github.com/constructive-io/pglite-boilerplates.git.
+                          Recorded on the workspace so later \`init\` calls inherit it automatically.
   --from-branch <branch>  Branch/tag to use when cloning repo
   --dir <variant>         Template variant directory (e.g., supabase, drizzle)
   --template, -t <path>   Full template path (e.g., pnpm/module) - combines dir and fromPath
@@ -62,6 +71,8 @@ Examples:
   ${binaryName} init --repo owner/repo                 Use templates from GitHub repository
   ${binaryName} init --repo owner/repo --from-branch develop  Use specific branch
   ${binaryName} init --dir pnpm -w                     Create pnpm workspace + module in one command
+  ${binaryName} init workspace --pglite                Create a PGlite (in-process) workspace
+  ${binaryName} init --pglite                          Create a PGlite module (inherited automatically inside a --pglite workspace)
 `;
 };
 
@@ -81,7 +92,13 @@ export default async (
 
 async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirerer) {
   const { cwd = process.cwd() } = argv;
-  const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
+  // `--pglite` is sugar for the pglite boilerplates repo; `--repo` overrides it.
+  // `repoWasExplicit` means a module created inside a workspace should NOT
+  // inherit the workspace's recorded repo (the user pinned one).
+  const { templateRepo, repoWasExplicit } = resolveInitTemplateRepo({
+    repo: argv.repo,
+    pglite: Boolean(argv.pglite),
+  });
   const branch = argv.fromBranch as string | undefined;
   const noTty = Boolean((argv as any).noTty || argv['no-tty'] || argv.tty === false || process.env.CI === 'true');
   const useBoilerplatePrompt = Boolean(argv.boilerplate);
@@ -149,6 +166,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
       noTty,
       cwd,
       useNpxSkills,
+      repoWasExplicit,
     });
   }
 
@@ -163,6 +181,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     requiresWorkspace: inspection.config?.requiresWorkspace,
     createWorkspace,
     useNpxSkills,
+    repoWasExplicit,
   }, wasExplicitModuleRequest);
 }
 
@@ -293,6 +312,12 @@ interface InitContext {
    * If true, use npx skills CLI instead of built-in shallow clone.
    */
   useNpxSkills?: boolean;
+  /**
+   * True when the user pinned a template source explicitly (`--repo`/`--pglite`).
+   * When false, a module created inside a workspace inherits the workspace's
+   * recorded boilerplate repo (see `PgpmWorkspaceConfig.boilerplates`).
+   */
+  repoWasExplicit?: boolean;
 }
 
 function installSkills(skills: BoilerplateSkill[], cwd: string, useNpxSkills: boolean): void {
@@ -398,6 +423,17 @@ async function handleWorkspaceInit(
     prompter
   });
 
+  // Record a non-default template source on the workspace so that modules
+  // created later inside it (`pgpm init`) inherit the same boilerplate repo
+  // without re-specifying `--pglite`/`--repo`.
+  if (ctx.templateRepo !== DEFAULT_TEMPLATE_REPO) {
+    persistBoilerplateSource(targetPath, {
+      repo: ctx.templateRepo,
+      branch: ctx.branch,
+      dir: ctx.dir,
+    });
+  }
+
   // Check for .motd file and print it, or use default ASCII art
   const motdPath = path.join(targetPath, '.motd');
   let motd = DEFAULT_MOTD;
@@ -448,9 +484,14 @@ function resolveWorkspaceTemplateRepo(options: {
 }): WorkspaceTemplateConfig {
   const { templateRepo, branch, dir, workspaceType, cwd } = options;
 
-  // Determine the dir to use for workspace template
-  // If dir is specified, use it; otherwise use the workspaceType as the dir variant
-  const workspaceDir = dir || workspaceType;
+  // Determine the dir to use for workspace template.
+  // - Explicit --dir always wins.
+  // - For the default repo (which holds several families), fall back to the
+  //   workspaceType (pgpm/pnpm) as the variant dir.
+  // - For a custom/single-family repo (e.g. --pglite), leave dir undefined so
+  //   the repo's own .boilerplates.json resolves the family (e.g. `pglite/`).
+  const isDefaultRepo = templateRepo === DEFAULT_TEMPLATE_REPO;
+  const workspaceDir = dir || (isDefaultRepo ? workspaceType : undefined);
 
   // Try to find workspace template in the specified repo
   try {
@@ -490,6 +531,18 @@ async function handleModuleInit(
   ctx: InitContext,
   wasExplicitModuleRequest: boolean = false
 ) {
+  // Inherit the boilerplate source recorded on the enclosing workspace (e.g. by
+  // `pgpm init workspace --pglite`) unless the user pinned one explicitly. This
+  // makes a bare `pgpm init` inside a pglite workspace scaffold pglite modules.
+  if (!ctx.repoWasExplicit) {
+    const inherited = readBoilerplateSource(ctx.cwd);
+    if (inherited) {
+      ctx.templateRepo = inherited.repo;
+      ctx.branch = inherited.branch;
+      ctx.dir = inherited.dir;
+    }
+  }
+
   // Determine workspace requirement (defaults to 'pgpm' for backward compatibility)
   const workspaceType = ctx.requiresWorkspace ?? 'pgpm';
   // Whether this is a pgpm-managed template (creates pgpm.plan, .control files)
@@ -533,6 +586,7 @@ async function handleModuleInit(
           dir: workspaceTemplateConfig.dir,
           noTty: ctx.noTty,
           cwd: ctx.cwd,
+          repoWasExplicit: ctx.repoWasExplicit,
         });
 
         // Update context to point to new workspace and continue with module creation
@@ -581,6 +635,7 @@ async function handleModuleInit(
               dir: ctx.dir,
               noTty: ctx.noTty,
               cwd: ctx.cwd,
+              repoWasExplicit: ctx.repoWasExplicit,
             });
           }
         }

@@ -53,11 +53,12 @@ Inside the workspace:
 pgpm init
 ```
 
-Enter module details:
+Enter the module name:
 ```sh
 ? Enter module name: pets
-? Select extensions: uuid-ossp, plpgsql
 ```
+
+Modules scaffold with no extensions by default. Add them later with `pgpm extension --add <ext>`, or up front with `pgpm init --extensions <a,b>`.
 
 This creates:
 ```text
@@ -93,10 +94,10 @@ Points pgpm to your modules directory.
 # pets.control
 comment = 'Pet adoption module'
 default_version = '0.0.1'
-requires = 'uuid-ossp,plpgsql'
+requires = 'pgcrypto'
 ```
 
-Declares module name, description, version, and dependencies.
+Declares module name, description, version, and dependencies. A freshly-scaffolded module has no `requires` line until you add a dependency.
 
 ### pgpm.plan (Migration Plan)
 

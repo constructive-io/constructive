@@ -24,7 +24,7 @@ procedures/generate_secret [pg-verify:procedures/verify_view] 2017-08-11T08:11:5
 exports[`PgpmPackage.writeModulePlan writes a plan with project references (utils) 1`] = `
 {
   "ctrl": "# pg-verify extension
-comment = 'pg-verify extension'
+comment = 'PostgreSQL verification utilities'
 default_version = '0.0.1'
 module_pathname = '$libdir/pg-verify'
 requires = 'some-native-module,pg-utilities'
