@@ -109,6 +109,28 @@ describe('cmds:init', () => {
     expect(cnc.getModuleControlFile()).toMatchSnapshot();
   });
 
+  it('initializes module with no extensions by default', async () => {
+    const workspaceDir = path.join(fixture.tempDir, 'my-workspace');
+    const moduleDir = path.join(workspaceDir, 'packages', 'no-ext-module');
+
+    // A bare `pgpm init` (no --extensions / --with-extensions) must scaffold a
+    // module whose .control has no `requires` line.
+    await runInitTest(
+      {
+        _: ['init'],
+        cwd: workspaceDir,
+        name: 'no-ext-module',
+        moduleName: 'no-ext-module'
+      },
+      'module-no-extensions'
+    );
+
+    const cnc = new PgpmPackage(moduleDir);
+    const control = cnc.getModuleControlFile();
+    expect(control).not.toMatch(/requires\s*=/);
+    expect(cnc.getRequiredModules()).toEqual([]);
+  });
+
   describe('with custom templates', () => {
     it('initializes workspace with --template', async () => {
       const { mockInput, mockOutput } = environment;
