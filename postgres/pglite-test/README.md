@@ -107,8 +107,8 @@ await getConnections(
 
 On a server, `pgsql-test` bootstraps the standard app roles at `createdb`. PGlite
 has no `createdb` — it boots as a lone superuser — so by default `getConnections()`
-creates the same roles for you before seeding: `anonymous`, `authenticated`,
-`administrator` (with `BYPASSRLS`), and `authenticated_client`, using the same
+creates the same roles for you before seeding: `anonymous`, `authenticated`, and
+`administrator` (with `BYPASSRLS`), using the same
 attributes as the server bootstrap. That's why `db.setContext({ role: 'authenticated' })`
 just works with no manual `CREATE ROLE`. Custom role *names* come from `db.roles`
 (a `RoleMapping`), exactly like `pgsql-test`.

@@ -52,7 +52,7 @@ export interface PgliteConnectionOpts extends GetConnectionOpts {
     extensionSql?: string[];
     /**
      * Auto-create the standard app roles (`anonymous` / `authenticated` /
-     * `administrator` / `authenticated_client`) with the same attributes
+     * `administrator`) with the same attributes
      * pgsql-test's server bootstrap uses, before seeding. This is what lets a
      * bare `getConnections()` switch into an app role via `db.setContext()`
      * with no manual `CREATE ROLE`. Defaults to `true`.
