@@ -92,10 +92,10 @@ await getConnections(
   {
     pglite: {
       dataDir: undefined,           // in-memory by default
+      roles: true,                  // seed standard app roles (default) — see below
       extensions: { vector },       // WASM extensions (e.g. pglite-pgvector)
       extensionSql: [               // run once after ready
-        'CREATE EXTENSION IF NOT EXISTS vector;',
-        'CREATE ROLE authenticated;'
+        'CREATE EXTENSION IF NOT EXISTS vector;'
       ]
     }
   },
@@ -103,12 +103,43 @@ await getConnections(
 );
 ```
 
+## Roles
+
+On a server, `pgsql-test` bootstraps the standard app roles at `createdb`. PGlite
+has no `createdb` — it boots as a lone superuser — so by default `getConnections()`
+creates the same roles for you before seeding: `anonymous`, `authenticated`,
+`administrator` (with `BYPASSRLS`), and `authenticated_client`, using the same
+attributes as the server bootstrap. That's why `db.setContext({ role: 'authenticated' })`
+just works with no manual `CREATE ROLE`. Custom role *names* come from `db.roles`
+(a `RoleMapping`), exactly like `pgsql-test`.
+
+### Bring your own roles/users
+
+Want a clean superuser-only instance and full control over your own roles? Opt
+out with `pglite: { roles: false }` and create them in `extensionSql` (real
+Postgres DDL — the same statements you'd run on a server):
+
+```typescript
+await getConnections({
+  pglite: {
+    roles: false, // skip the built-in bootstrap
+    extensionSql: [
+      "CREATE ROLE app_reader NOLOGIN;",
+      "CREATE ROLE app_writer NOLOGIN;",
+      // a login user, if a test needs one (no password needed in-process):
+      "CREATE ROLE app_user LOGIN;",
+      "GRANT app_writer TO app_user;"
+    ]
+  }
+});
+```
+
 ## Single-session model
 
 PGlite is one in-process session, so `pg` and `db` share it. That differs from `pgsql-test` (two authenticated connections on a real server):
 
 - Transaction control is **ref-counted** (`SharedTxn`) so the standard two-client `beforeEach`/`afterEach` harness emits exactly one `BEGIN`/`SAVEPOINT`/`ROLLBACK`/`COMMIT` per test. The single-client (`db` only) pattern also works.
-- Role-based RLS uses `setContext({ role })` (i.e. `SET LOCAL role`) on the shared session rather than separate authenticated connections. Any role you switch to must exist — create it via `pglite.extensionSql` (e.g. `['CREATE ROLE authenticated;']`).
+- Role-based RLS uses `setContext({ role })` (i.e. `SET LOCAL role`) on the shared session rather than separate authenticated connections. The standard app roles are created for you by default (see [Roles](#roles)); any *extra* role you switch to must be created via `pglite.extensionSql`.
 - `publish()` (commit-and-continue) is not supported under the shared-session coordinator.
 
 ## Related

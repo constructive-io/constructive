@@ -46,6 +46,7 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "@pgpmjs/core": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/pglite-adapter": "workspace:^",
     "pg-cache": "workspace:^",

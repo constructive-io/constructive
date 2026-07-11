@@ -10,10 +10,7 @@ describe('pglite-test: pgsql-test getConnections backed by in-process PGlite', (
   let teardown: () => Promise<void>;
 
   beforeAll(async () => {
-    ({ pg, db, teardown } = await getConnections(
-      { pglite: { extensionSql: ['CREATE ROLE authenticated;'] } },
-      [seed.pgpm(MODULE)]
-    ));
+    ({ pg, db, teardown } = await getConnections({}, [seed.pgpm(MODULE)]));
   });
 
   afterAll(async () => {
