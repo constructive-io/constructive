@@ -2,6 +2,7 @@ jest.setTimeout(60000);
 process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 
 import { PgpmPackage } from '@pgpmjs/core';
+import { readFileSync, writeFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
@@ -101,5 +102,74 @@ describe('cmds:extension', () => {
     expect(updatedProject.getModuleControlFile()).toMatchSnapshot('updated - control file');
     expect(updatedProject.getModuleDependencies('my-module')).toMatchSnapshot('updated - module dependencies');
     expect(updatedProject.getRequiredModules()).toMatchSnapshot('updated - required modules');
+  });
+
+  // Helper: scaffold a workspace + module with a starting set of extensions.
+  const scaffoldModule = async (extensions: string[]) => {
+    const workspacePath = fixture.fixturePath('ws');
+    const modulePath = path.join(workspacePath, 'packages', 'my-module');
+    await runCommand({
+      _: ['init', 'workspace'],
+      cwd: fixture.tempDir,
+      name: 'ws',
+      workspace: true
+    });
+    await runCommand({
+      _: ['init'],
+      cwd: workspacePath,
+      name: 'my-module',
+      moduleName: 'my-module',
+      extensions
+    });
+    return modulePath;
+  };
+
+  it('adds a dependency non-interactively with --add', async () => {
+    const modulePath = await scaffoldModule(['citext']);
+
+    await runCommand({ _: ['extension'], cwd: modulePath, add: 'uuid-ossp' });
+
+    expect(new PgpmPackage(modulePath).getRequiredModules()).toEqual([
+      'citext',
+      'uuid-ossp'
+    ]);
+  });
+
+  it('removes a dependency non-interactively with --remove', async () => {
+    const modulePath = await scaffoldModule(['citext', 'uuid-ossp']);
+
+    await runCommand({ _: ['extension'], cwd: modulePath, remove: 'uuid-ossp' });
+
+    expect(new PgpmPackage(modulePath).getRequiredModules()).toEqual(['citext']);
+  });
+
+  it('replaces the dependency set non-interactively with --set', async () => {
+    const modulePath = await scaffoldModule(['citext', 'uuid-ossp']);
+
+    await runCommand({ _: ['extension'], cwd: modulePath, set: 'plpgsql,hstore' });
+
+    expect(new PgpmPackage(modulePath).getRequiredModules()).toEqual([
+      'plpgsql',
+      'hstore'
+    ]);
+  });
+
+  it('preserves custom .control fields when changing dependencies', async () => {
+    const modulePath = await scaffoldModule(['citext']);
+    const project = new PgpmPackage(modulePath);
+    const controlPath = path.join(modulePath, `${project.getModuleName()}.control`);
+
+    // Hand-tune a custom field that init does not emit.
+    const original = readFileSync(controlPath, 'utf8');
+    writeFileSync(controlPath, `${original}schema = my_schema\n`);
+
+    await runCommand({ _: ['extension'], cwd: modulePath, add: 'uuid-ossp' });
+
+    const updated = readFileSync(controlPath, 'utf8');
+    expect(updated).toMatch(/schema = my_schema/);
+    expect(new PgpmPackage(modulePath).getRequiredModules()).toEqual([
+      'citext',
+      'uuid-ossp'
+    ]);
   });
 });
