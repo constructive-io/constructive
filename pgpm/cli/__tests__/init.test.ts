@@ -2,14 +2,15 @@ jest.setTimeout(60000);
 process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 process.env.PGPM_SKIP_SKILL_INSTALL = 'true';
 
-import { PgpmPackage } from '@pgpmjs/core';
-import { existsSync } from 'fs';
+import { PgpmPackage, PGLITE_TEMPLATE_REPO } from '@pgpmjs/core';
+import { existsSync, readFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 
 import { commands } from '../src/commands';
 import {
+  addInitDefaults,
   setupTests,
   TestEnvironment,
   TestFixture,
@@ -650,6 +651,77 @@ describe('cmds:init', () => {
         expect(existsSync(nestedWs)).toBe(false);
       },
       120000
+    );
+  });
+
+  describe('--pglite flag', () => {
+    const shouldSkipGitHubTests = process.env.CI === 'true' && !process.env.ALLOW_NETWORK_TESTS;
+
+    (shouldSkipGitHubTests ? it.skip : it)(
+      'records the pglite repo on the workspace and inherits it for modules',
+      async () => {
+        const { mockInput, mockOutput } = environment;
+        const prompter = new Inquirerer({
+          input: mockInput,
+          output: mockOutput,
+          noTty: true
+        });
+
+        const wsName = 'ws-pglite';
+        const wsRoot = path.join(fixture.tempDir, wsName);
+
+        // 1) Create a pglite workspace. --pglite must NOT be overridden by a
+        //    default repo, so build argv directly (withInitDefaults injects --repo).
+        await commands(addInitDefaults({
+          _: ['init', 'workspace'],
+          cwd: fixture.tempDir,
+          name: wsName,
+          workspace: true,
+          pglite: true,
+          fromBranch: 'main'
+        }), prompter, {
+          noTty: true,
+          input: mockInput,
+          output: mockOutput,
+          version: '1.0.0',
+          minimistOpts: {}
+        });
+
+        // Workspace records the pglite boilerplate source so modules inherit it.
+        const wsConfig = JSON.parse(
+          readFileSync(path.join(wsRoot, 'pgpm.json'), 'utf8')
+        );
+        expect(wsConfig.boilerplates?.repo).toBe(PGLITE_TEMPLATE_REPO);
+
+        // 2) A bare `pgpm init` (no --pglite) inside the workspace inherits it.
+        const modName = 'pglite-mod';
+        await commands(addInitDefaults({
+          _: ['init'],
+          cwd: wsRoot,
+          moduleName: modName,
+          name: modName,
+          extensions: ['plpgsql'],
+          fromBranch: 'main'
+        }), prompter, {
+          noTty: true,
+          input: mockInput,
+          output: mockOutput,
+          version: '1.0.0',
+          minimistOpts: {}
+        });
+
+        const modDir = path.join(wsRoot, 'packages', modName);
+        expect(existsSync(path.join(modDir, 'pgpm.plan'))).toBe(true);
+
+        // The inherited pglite module template swaps in pglite-test.
+        const modPkg = JSON.parse(
+          readFileSync(path.join(modDir, 'package.json'), 'utf8')
+        );
+        const devDeps = modPkg.devDependencies ?? {};
+        expect(devDeps['pglite-test']).toBeDefined();
+        expect(devDeps['pgsql-test']).toBeUndefined();
+      },
+      180000
     );
   });
 });

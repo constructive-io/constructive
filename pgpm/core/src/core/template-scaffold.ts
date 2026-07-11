@@ -101,6 +101,8 @@ export interface ScaffoldTemplateResult {
 
 export const DEFAULT_TEMPLATE_REPO =
   'https://github.com/constructive-io/pgpm-boilerplates.git';
+export const PGLITE_TEMPLATE_REPO =
+  'https://github.com/constructive-io/pglite-boilerplates.git';
 export const DEFAULT_TEMPLATE_TTL_MS = 1 * 24 * 60 * 60 * 1000; // 1 day
 export const DEFAULT_TEMPLATE_TOOL_NAME = 'pgpm';
 
