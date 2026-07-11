@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/constructive-io/constructive/compare/pglite-test@0.1.2...pglite-test@0.2.0) (2026-07-11)
+
+### Features
+
+- **pglite-test:** seed standard app roles by default with roles:false escape hatch ([07179b2](https://github.com/constructive-io/constructive/commit/07179b254bf37700077e7912ef537648516f5cfa))
+
 ## [0.1.2](https://github.com/constructive-io/constructive/compare/pglite-test@0.1.1...pglite-test@0.1.2) (2026-07-11)
 
 **Note:** Version bump only for package pglite-test
