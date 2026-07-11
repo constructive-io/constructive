@@ -1,4 +1,4 @@
-import { QueryBuilder } from '../src/query-builder';
+import { col, fn, lit, param, QueryBuilder } from '../src/query-builder';
 
 // The deparser outputs pretty-printed SQL with newlines.
 // Use the `s` flag on regex so `.` matches newlines, or use [\s\S].
@@ -882,6 +882,118 @@ describe('QueryBuilder', () => {
       expect(text).toMatch(/last_login\s*<\s*\$2/);
       expect(text).toMatch(/RETURNING\s+\*/);
       expect(values).toEqual(['inactive', '2024-01-01']);
+    });
+  });
+
+  // =========================================================================
+  // Expression system (col / lit / param / fn) + computed SELECT columns
+  // =========================================================================
+  describe('Expressions', () => {
+    it('should pass a column reference as a function arg (not a param)', () => {
+      const { text, values } = new QueryBuilder()
+        .schema('priv')
+        .call('secrets_get', { secret_name: col('s.name'), namespace_id: col('s.namespace_id') })
+        .build();
+
+      expect(text).toMatch(/priv\.secrets_get\(/);
+      expect(text).toMatch(/secret_name\s*=>\s*s\.name/);
+      expect(text).toMatch(/namespace_id\s*=>\s*s\.namespace_id/);
+      // Column refs are not parameterized.
+      expect(values).toEqual([]);
+    });
+
+    it('should emit a literal NULL via lit(null) (not a bound param)', () => {
+      const { text, values } = new QueryBuilder()
+        .call('f', { d: lit(null) })
+        .build();
+
+      expect(text).toMatch(/d\s*=>\s*NULL/i);
+      expect(values).toEqual([]);
+    });
+
+    it('should bind an explicit param() and auto-bind a plain value', () => {
+      const { text, values } = new QueryBuilder()
+        .call('f', { a: param('x'), b: 'y' })
+        .build();
+
+      expect(text).toMatch(/a\s*=>\s*\$1/);
+      expect(text).toMatch(/b\s*=>\s*\$2/);
+      expect(values).toEqual(['x', 'y']);
+    });
+
+    it('should mix column-ref, param, and literal args in one named call', () => {
+      const { text, values } = new QueryBuilder()
+        .call('f', {
+          owner_id: col('s.owner_id'),
+          secret_name: col('s.name'),
+          ns: param('11111111-1111-1111-1111-111111111111'),
+          d: lit(null),
+        })
+        .build();
+
+      expect(text).toMatch(/owner_id\s*=>\s*s\.owner_id/);
+      expect(text).toMatch(/secret_name\s*=>\s*s\.name/);
+      expect(text).toMatch(/ns\s*=>\s*\$1/);
+      expect(text).toMatch(/d\s*=>\s*NULL/i);
+      expect(values).toEqual(['11111111-1111-1111-1111-111111111111']);
+    });
+
+    it('should support fn() with schema-qualified name', () => {
+      const { text } = new QueryBuilder()
+        .selectExpr('v', fn('priv.secrets_get', { secret_name: col('s.name') }))
+        .table('secrets', 's')
+        .schema('priv')
+        .build();
+
+      expect(text).toMatch(/priv\.secrets_get\(\s*secret_name\s*=>\s*s\.name\s*\)\s+AS\s+v/);
+    });
+
+    it('should build a computed function-call column over a base table (scope-switch shape)', () => {
+      // Mirrors decryptScopeSecrets for an entity scope.
+      const nsId = '22222222-2222-2222-2222-222222222222';
+      const { text, values } = new QueryBuilder()
+        .schema('priv')
+        .table('secrets', 's')
+        .select(['s.name'])
+        .selectCall('decrypted_value', 'secrets_get', {
+          owner_id: col('s.owner_id'),
+          secret_name: col('s.name'),
+          namespace_id: col('s.namespace_id'),
+          default_value: lit(null),
+        }, { schema: 'priv' })
+        .where('s.namespace_id', '=', nsId)
+        .where('s.owner_id', '=', 'owner-1')
+        .where('s.retired_at', 'IS', null)
+        .orderBy('s.created_at', 'ASC')
+        .build();
+
+      expect(text).toMatch(/SELECT/);
+      expect(text).toMatch(/s\.name/);
+      expect(text).toMatch(/priv\.secrets_get\(/);
+      expect(text).toMatch(/owner_id\s*=>\s*s\.owner_id/);
+      expect(text).toMatch(/default_value\s*=>\s*NULL/i);
+      expect(text).toMatch(/AS\s+decrypted_value/);
+      expect(text).toMatch(/FROM\s+priv\.secrets\s+(AS\s+)?s/);
+      expect(text).toMatch(/s\.namespace_id\s*=\s*\$1/);
+      expect(text).toMatch(/s\.owner_id\s*=\s*\$2/);
+      expect(text).toMatch(/s\.retired_at\s+IS\s+NULL/);
+      expect(text).toMatch(/ORDER\s+BY\s+s\.created_at/);
+      // Column-ref getter args bind nothing; only WHERE values are params.
+      expect(values).toEqual([nsId, 'owner-1']);
+    });
+
+    it('should keep param numbering correct when a computed column also binds a param', () => {
+      const { text, values } = new QueryBuilder()
+        .table('t', 's')
+        .select(['s.id'])
+        .selectExpr('v', fn('f', { a: param('A'), b: col('s.b') }))
+        .where('s.active', '=', true)
+        .build();
+
+      // Target-list param comes before WHERE param.
+      expect(text).toMatch(/a\s*=>\s*\$1/);
+      expect(text).toMatch(/s\.active\s*=\s*\$2/);
+      expect(values).toEqual(['A', true]);
     });
   });
 });

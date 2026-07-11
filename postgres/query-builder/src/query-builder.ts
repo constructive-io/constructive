@@ -17,6 +17,13 @@ type SortDir = 'ASC' | 'DESC';
 type NullsOrder = 'FIRST' | 'LAST';
 type ConflictAction = 'nothing' | 'update';
 
+// A SELECT target: a column name string, or a computed expression with alias.
+export interface SelectExpr {
+  expr: Expr;
+  as?: string;
+}
+export type SelectItem = string | SelectExpr;
+
 interface OrderBySpec {
   column: string;
   direction: SortDir;
@@ -181,6 +188,73 @@ function namedArgNode(name: string, val: unknown) {
 }
 
 // ---------------------------------------------------------------------------
+// Expression system
+//
+// Function-call arguments and computed SELECT columns are built lazily via
+// thunks so that parameter numbering ($1, $2, ...) stays correct regardless of
+// where the expression lands in the final statement. An `Expr` is a function
+// that, given the builder's parameter allocator, returns a pg-ast node.
+// ---------------------------------------------------------------------------
+
+// Allocates a positional parameter ($n) and returns its AST node.
+export type ParamAllocator = (value: SqlValue) => unknown;
+
+// A deferred AST node. Produced by `col`, `lit`, `param`, `fn`.
+export type Expr = (alloc: ParamAllocator) => unknown;
+
+// A function-call argument: an explicit expression, or a plain value (which is
+// auto-parameterized as $n).
+export type FnArg = Expr | SqlValue;
+export type FnArgs = FnArg[] | Record<string, FnArg>;
+
+function isExpr(x: unknown): x is Expr {
+  return typeof x === 'function';
+}
+
+function argToNode(arg: FnArg, alloc: ParamAllocator): unknown {
+  return isExpr(arg) ? arg(alloc) : alloc(arg);
+}
+
+function buildFnArgNodes(args: FnArgs | undefined, alloc: ParamAllocator): unknown[] {
+  if (!args) return [];
+  if (Array.isArray(args)) {
+    return args.map((a) => argToNode(a, alloc));
+  }
+  return Object.entries(args).map(([name, a]) =>
+    namedArgNode(name, argToNode(a, alloc))
+  );
+}
+
+// Column reference, e.g. `col('s.owner_id')` or `col('name')`.
+export function col(name: string): Expr {
+  return () => colRef(name);
+}
+
+// SQL literal (not a bound parameter), e.g. `lit(null)` -> NULL, `lit(3)` -> 3.
+export function lit(value: SqlValue): Expr {
+  return () => constNode(value);
+}
+
+// Explicitly bound parameter ($n).
+export function param(value: SqlValue): Expr {
+  return (alloc) => alloc(value);
+}
+
+// Function/procedure call as an expression. `name` may be schema-qualified
+// ('schema.fn') or the schema passed via opts. Args may be positional (array)
+// or named (object); each arg is an Expr or a plain value.
+export function fn(name: string, args?: FnArgs, opts?: { schema?: string }): Expr {
+  let schema = opts?.schema;
+  let fname = name;
+  if (!schema && name.includes('.')) {
+    const idx = name.lastIndexOf('.');
+    schema = name.slice(0, idx);
+    fname = name.slice(idx + 1);
+  }
+  return (alloc) => funcCallNode(fname, buildFnArgNodes(args, alloc), schema);
+}
+
+// ---------------------------------------------------------------------------
 // QueryBuilder
 // ---------------------------------------------------------------------------
 
@@ -188,7 +262,7 @@ export class QueryBuilder {
   private _schema: string | undefined;
   private _table: string | undefined;
   private _tableAlias: string | undefined;
-  private _columns: string[] = [];
+  private _selectItems: SelectItem[] = [];
   private _distinct: boolean = false;
   private _insertData: Record<string, SqlValue>[] | undefined;
   private _updateData: Record<string, SqlValue> | undefined;
@@ -203,7 +277,7 @@ export class QueryBuilder {
   private _returning: string[] | undefined;
   private _ctes: CteSpec[] = [];
   private _onConflict: OnConflictSpec | undefined;
-  private _funcCall: { name: string; args?: SqlValue[] | Record<string, SqlValue>; schema?: string } | undefined;
+  private _funcCall: { name: string; args?: FnArgs; schema?: string } | undefined;
 
   // -------------------------------------------------------------------------
   // Schema / Table
@@ -224,8 +298,21 @@ export class QueryBuilder {
   // SELECT
   // -------------------------------------------------------------------------
 
-  select(columns: string[] = ['*']): this {
-    this._columns = columns;
+  select(columns: SelectItem[] = ['*']): this {
+    this._selectItems = columns;
+    return this;
+  }
+
+  // Append a computed function-call column, e.g.
+  // .selectCall('decrypted_value', 'priv.secrets_get', { secret_name: col('s.name') })
+  selectCall(as: string, name: string, args?: FnArgs, opts?: { schema?: string }): this {
+    this._selectItems.push({ expr: fn(name, args, opts), as });
+    return this;
+  }
+
+  // Append an arbitrary computed column expression with an alias.
+  selectExpr(as: string, expr: Expr): this {
+    this._selectItems.push({ expr, as });
     return this;
   }
 
@@ -374,8 +461,8 @@ export class QueryBuilder {
   // Function / Procedure call
   // -------------------------------------------------------------------------
 
-  call(name: string, args?: SqlValue[] | Record<string, SqlValue>): this {
-    this._funcCall = { name, args, schema: this._schema };
+  call(name: string, args?: FnArgs, opts?: { schema?: string }): this {
+    this._funcCall = { name, args, schema: opts?.schema ?? this._schema };
     return this;
   }
 
@@ -422,6 +509,22 @@ export class QueryBuilder {
     this._paramIndex++;
     this._paramValues.push(value);
     return paramNode(this._paramIndex);
+  }
+
+  private get _alloc(): ParamAllocator {
+    return (value: SqlValue) => this._addParam(value);
+  }
+
+  private _buildTargetList(items: SelectItem[]): unknown[] {
+    const alloc = this._alloc;
+    return items.map((item) => {
+      if (typeof item === 'string') {
+        return item === '*'
+          ? resTargetVal(colRef('*'))
+          : resTargetVal(colRef(item));
+      }
+      return resTargetVal(item.expr(alloc), item.as);
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -558,11 +661,7 @@ export class QueryBuilder {
   private _buildSelectInternal(startParamIndex: number = 0): unknown {
     this._paramIndex = startParamIndex;
 
-    const targetList = this._columns.map((col) =>
-      col === '*'
-        ? resTargetVal(colRef('*'))
-        : resTargetVal(colRef(col))
-    );
+    const targetList = this._buildTargetList(this._selectItems);
 
     const whereClause = this._buildWhereNode(this._whereConditions);
     const havingClause = this._buildWhereNode(this._havingConditions);
@@ -763,22 +862,12 @@ export class QueryBuilder {
     this._resetParams();
 
     const fc = this._funcCall!;
-    let funcArgs: unknown[] = [];
-
-    if (Array.isArray(fc.args)) {
-      funcArgs = fc.args.map((v) => this._addParam(v));
-    } else if (fc.args && typeof fc.args === 'object') {
-      funcArgs = Object.entries(fc.args).map(([name, val]) =>
-        namedArgNode(name, this._addParam(val))
-      );
-    }
+    const funcArgs = buildFnArgNodes(fc.args, this._alloc);
 
     const funcNode = funcCallNode(fc.name, funcArgs, fc.schema);
 
-    if (this._columns.length > 0) {
-      const targetList = this._columns.map((col) =>
-        resTargetVal(colRef(col))
-      );
+    if (this._selectItems.length > 0) {
+      const targetList = this._buildTargetList(this._selectItems);
 
       const rangeFunc = nodes.rangeFunction({
         functions: [nodes.list({ items: [funcNode] as any[] })] as any[],
