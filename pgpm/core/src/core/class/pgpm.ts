@@ -1,7 +1,6 @@
 import { loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
-import yanse from 'yanse';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
@@ -10,24 +9,24 @@ import { parse } from 'parse-package-name';
 import path, { dirname, resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+import yanse from 'yanse';
 
-import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TTL_MS, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate } from '../template-scaffold';
 import { getAvailableExtensions } from '../../extensions/extensions';
 import { generatePlan, writePlan, writePlanFile } from '../../files';
-import { Tag, ExtendedPlanFile, Change } from '../../files/types';
-import { parsePlanFile } from '../../files/plan/parser';
-import { isValidTagName, isValidChangeName, parseReference } from '../../files/plan/validators';
-import { getNow as getPlanTimestamp } from '../../files/plan/generator';
-import { resolveTagToChangeName } from '../../resolution/resolve';
 import {
   ExtensionInfo,
   getExtensionInfo,
   getExtensionName,
   getInstalledExtensions,
   parseControlFile,
-  writeExtensions,
+  writeExtensions
 } from '../../files';
 import { generateControlFileContent, writeExtensionMakefile } from '../../files/extension/writer';
+import { getNow as getPlanTimestamp } from '../../files/plan/generator';
+import { parsePlanFile } from '../../files/plan/parser';
+import { isValidChangeName, isValidTagName, parseReference } from '../../files/plan/validators';
+import { Change, Tag } from '../../files/types';
+import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
 import { PgpmMigrate } from '../../migrate/client';
 import {
   getExtensionsAndModules,
@@ -37,10 +36,9 @@ import {
   ModuleMap
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
-import { resolveExtensionDependencies, resolveDependencies } from '../../resolution/deps';
-import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
-
+import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { parseTarget } from '../../utils/target-utils';
+import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
 
 const logger = new Logger('pgpm');
@@ -51,26 +49,9 @@ const logger = new Logger('pgpm');
  */
 const EXTENSIONS_DIR = 'extensions';
 
-function getUTCTimestamp(d: Date = new Date()): string {
-  return (
-    d.getUTCFullYear() +
-    '-' + String(d.getUTCMonth() + 1).padStart(2, '0') +
-    '-' + String(d.getUTCDate()).padStart(2, '0') +
-    'T' + String(d.getUTCHours()).padStart(2, '0') +
-    ':' + String(d.getUTCMinutes()).padStart(2, '0') +
-    ':' + String(d.getUTCSeconds()).padStart(2, '0') +
-    'Z'
-  );
-}
-
 function sortObjectByKey<T extends Record<string, any>>(obj: T): T {
   return Object.fromEntries(Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))) as T;
 }
-
-const getNow = () =>
-  process.env.NODE_ENV === 'test'
-    ? getUTCTimestamp(new Date('2017-08-11T08:11:51Z'))
-    : getUTCTimestamp(new Date());
 
 
 /**
@@ -95,7 +76,7 @@ const truncateExtensionsToTarget = (
     resolved: workspaceExtensions.resolved.slice(targetIndex),
     external: workspaceExtensions.external
   };
-}
+};
 
 export enum PackageContext {
   Outside = 'outside',
@@ -484,7 +465,7 @@ export class PgpmPackage {
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
       toolName: options.toolName ?? DEFAULT_TEMPLATE_TOOL_NAME,
       cwd: this.cwd,
-      prompter: options.prompter,
+      prompter: options.prompter
     });
 
     // Only create pgpm files (pgpm.plan, .control, deploy/revert/verify dirs) for pgpm-managed modules
@@ -808,7 +789,7 @@ export class PgpmPackage {
     }
     
     if (!isValidChangeName(changeName)) {
-      throw errors.INVALID_NAME({ name: changeName, type: 'change', rules: "Change names must follow Sqitch naming rules" });
+      throw errors.INVALID_NAME({ name: changeName, type: 'change', rules: 'Change names must follow Sqitch naming rules' });
     }
     
     if (!this.isInWorkspace() && !this.isInModule()) {
@@ -1125,7 +1106,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   getInstalledModules(): { 
     installed: string[]; 
     installedVersions: Record<string, string>;
-  } {
+    } {
     this.ensureModule();
     this.ensureWorkspace();
 

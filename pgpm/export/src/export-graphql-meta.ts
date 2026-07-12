@@ -7,8 +7,7 @@
  */
 import { Parser } from 'csv-to-pg';
 import { toSnakeCase } from 'inflekt';
-
-import { FieldType, META_TABLE_CONFIG, META_TABLE_ORDER, TableConfig } from './export-utils';
+import { FieldType, getTimestampDefaultColumnsForTable, META_TABLE_CONFIG, META_TABLE_ORDER, TableConfig } from './export-utils';
 import { GraphQLClient } from './graphql-client';
 import {
   buildFieldsFragment,
@@ -94,7 +93,22 @@ const buildDynamicFieldsFromGraphQL = async (
       }
     }
 
-    // Omit columns that are marked as columnDefaults — their DDL DEFAULT (e.g.
+    // Omit timestamptz columns whose default supplies the current time. Their
+    // DDL DEFAULT will apply at deploy time, keeping generated INSERT rows
+    // free of literal environment-specific timestamps.
+    const timestampDefaultColumns = getTimestampDefaultColumnsForTable(tableConfig.schema, tableConfig.table);
+    if (timestampDefaultColumns.length > 0) {
+      tableConfig.columnDefaults = tableConfig.columnDefaults || {};
+      for (const colName of timestampDefaultColumns) {
+        if (dynamicFields[colName] === 'timestamptz') {
+          delete dynamicFields[colName];
+          enumFields.delete(colName);
+          tableConfig.columnDefaults[colName] = '';
+        }
+      }
+    }
+
+    // Omit columns that are explicitly marked as columnDefaults — their DDL DEFAULT (e.g.
     // current_database()) will supply the correct value at deploy time, so the
     // exported INSERT must not hardcode an environment-specific literal.
     if (tableConfig.columnDefaults) {
