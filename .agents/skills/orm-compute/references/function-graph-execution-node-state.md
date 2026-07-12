@@ -9,7 +9,7 @@ Per-node execution state — tracks individual node lifecycle for debugging
 ```typescript
 db.functionGraphExecutionNodeState.findMany({ select: { id: true } }).execute()
 db.functionGraphExecutionNodeState.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionGraphExecutionNodeState.create({ data: { executionId: '<UUID>', databaseId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' }, select: { id: true } }).execute()
+db.functionGraphExecutionNodeState.create({ data: { executionId: '<UUID>', scopeId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' }, select: { id: true } }).execute()
 db.functionGraphExecutionNodeState.update({ where: { id: '<UUID>' }, data: { executionId: '<UUID>' }, select: { id: true } }).execute()
 db.functionGraphExecutionNodeState.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.functionGraphExecutionNodeState.findMany({
 
 ```typescript
 const item = await db.functionGraphExecutionNodeState.create({
-  data: { executionId: '<UUID>', databaseId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' },
+  data: { executionId: '<UUID>', scopeId: '<UUID>', nodeName: '<String>', nodePath: '<String>', status: '<String>', startedAt: '<Datetime>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', outputId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

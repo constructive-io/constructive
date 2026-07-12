@@ -45,6 +45,7 @@ export interface Table {
   pluralName: string | null;
   singularName: string | null;
   tags: string[] | null;
+  stepUp: unknown | null;
   partitioned: boolean | null;
   partitionStrategy: string | null;
   partitionKeyNames: string[] | null;
@@ -78,6 +79,8 @@ export interface Field {
   isRequired: boolean | null;
   apiRequired: boolean | null;
   defaultValue: unknown | null;
+  generationExpression: unknown | null;
+  generationType: string | null;
   type: unknown | null;
   fieldOrder: number | null;
   regexp: string | null;
@@ -165,6 +168,7 @@ export interface Policy {
   disabled: boolean | null;
   policyType: string | null;
   data: unknown | null;
+  withCheck: unknown | null;
   smartTags: unknown | null;
   category: ObjectCategory | null;
   tags: string[] | null;
@@ -501,6 +505,7 @@ export interface Database {
   name: string | null;
   label: string | null;
   hash: string | null;
+  platform: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -550,6 +555,21 @@ export interface DatabaseSetting {
   labels: unknown | null;
   annotations: unknown | null;
 }
+export interface AstMigration {
+  id: number | null;
+  databaseId: string | null;
+  name: string | null;
+  requires: string[] | null;
+  payload: unknown | null;
+  deploys: string | null;
+  deploy: unknown | null;
+  revert: unknown | null;
+  verify: unknown | null;
+  createdAt: string | null;
+  action: string | null;
+  actionId: string | null;
+  actorId: string | null;
+}
 export interface WebauthnSetting {
   id: string | null;
   databaseId: string | null;
@@ -569,21 +589,6 @@ export interface WebauthnSetting {
   requireUserVerification: boolean | null;
   residentKey: string | null;
   challengeExpirySeconds: string | null;
-}
-export interface AstMigration {
-  id: number | null;
-  databaseId: string | null;
-  name: string | null;
-  requires: string[] | null;
-  payload: unknown | null;
-  deploys: string | null;
-  deploy: unknown | null;
-  revert: unknown | null;
-  verify: unknown | null;
-  createdAt: string | null;
-  action: string | null;
-  actionId: string | null;
-  actorId: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

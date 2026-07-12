@@ -240,6 +240,8 @@ export interface AgentPlan {
   ownerId?: string | null;
   /** Foreign key to agent_thread */
   threadId?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Human-readable plan name */
   title?: string | null;
   /** Overall goal or context for this plan */
@@ -254,6 +256,8 @@ export interface Agent {
   updatedAt?: string | null;
   /** Human who owns/manages this agent */
   ownerId?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Persona template this agent was created from */
   personaId?: string | null;
   /** Parent agent (for sub-agent delegation hierarchy) */
@@ -276,6 +280,8 @@ export interface AgentThread {
   updatedAt?: string | null;
   /** User who owns this thread */
   ownerId?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Current status of this thread */
   status?: string | null;
   /** Whether this record has been archived by the user */
@@ -310,6 +316,8 @@ export interface AgentMessage {
   parts?: Record<string, unknown> | null;
   /** Foreign key to agent_thread */
   threadId?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Who authored this message: user or assistant */
   authorRole?: string | null;
   /** LLM model that generated this response */
@@ -328,6 +336,8 @@ export interface AgentTask {
   status?: string | null;
   /** Foreign key to agent_plan */
   planId?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Natural-language description of the work to do */
   description?: string | null;
   /** Who created the task: agent or user */
@@ -354,6 +364,8 @@ export interface AgentPrompt {
   updatedAt?: string | null;
   createdBy?: string | null;
   updatedBy?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
   name?: string | null;
   /** The system prompt template content */
@@ -386,6 +398,8 @@ export interface AgentPersona {
   updatedAt?: string | null;
   createdBy?: string | null;
   updatedBy?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Unique human-readable identifier for this persona */
   slug?: string | null;
   /** Display name for this persona */
@@ -408,6 +422,8 @@ export interface AgentResource {
   updatedAt?: string | null;
   createdBy?: string | null;
   updatedBy?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
   /** Unique human-readable identifier for portable references */
   slug?: string | null;
   /** Resource type: skill, knowledge, or convention */
@@ -512,6 +528,7 @@ export type AgentPlanSelect = {
   updatedAt?: boolean;
   ownerId?: boolean;
   threadId?: boolean;
+  databaseId?: boolean;
   title?: boolean;
   description?: boolean;
   status?: boolean;
@@ -530,6 +547,7 @@ export type AgentSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   ownerId?: boolean;
+  databaseId?: boolean;
   personaId?: boolean;
   parentId?: boolean;
   name?: boolean;
@@ -567,6 +585,7 @@ export type AgentThreadSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   ownerId?: boolean;
+  databaseId?: boolean;
   status?: boolean;
   isArchived?: boolean;
   archivedAt?: boolean;
@@ -613,6 +632,7 @@ export type AgentMessageSelect = {
   actorId?: boolean;
   parts?: boolean;
   threadId?: boolean;
+  databaseId?: boolean;
   authorRole?: boolean;
   model?: boolean;
   agentId?: boolean;
@@ -630,6 +650,7 @@ export type AgentTaskSelect = {
   actorId?: boolean;
   status?: boolean;
   planId?: boolean;
+  databaseId?: boolean;
   description?: boolean;
   source?: boolean;
   error?: boolean;
@@ -649,6 +670,7 @@ export type AgentPromptSelect = {
   updatedAt?: boolean;
   createdBy?: boolean;
   updatedBy?: boolean;
+  databaseId?: boolean;
   name?: boolean;
   content?: boolean;
   description?: boolean;
@@ -676,6 +698,7 @@ export type AgentPersonaSelect = {
   updatedAt?: boolean;
   createdBy?: boolean;
   updatedBy?: boolean;
+  databaseId?: boolean;
   slug?: boolean;
   name?: boolean;
   description?: boolean;
@@ -696,6 +719,7 @@ export type AgentResourceSelect = {
   updatedAt?: boolean;
   createdBy?: boolean;
   updatedBy?: boolean;
+  databaseId?: boolean;
   slug?: boolean;
   kind?: boolean;
   title?: boolean;
@@ -735,6 +759,8 @@ export interface AgentPlanFilter {
   ownerId?: UUIDFilter;
   /** Filter by the object’s `threadId` field. */
   threadId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `title` field. */
   title?: StringFilter;
   /** Filter by the object’s `description` field. */
@@ -763,6 +789,8 @@ export interface AgentFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `personaId` field. */
   personaId?: UUIDFilter;
   /** Filter by the object’s `parentId` field. */
@@ -813,6 +841,8 @@ export interface AgentThreadFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `isArchived` field. */
@@ -879,6 +909,8 @@ export interface AgentMessageFilter {
   parts?: JSONFilter;
   /** Filter by the object’s `threadId` field. */
   threadId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `authorRole` field. */
   authorRole?: StringFilter;
   /** Filter by the object’s `model` field. */
@@ -911,6 +943,8 @@ export interface AgentTaskFilter {
   status?: StringFilter;
   /** Filter by the object’s `planId` field. */
   planId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `source` field. */
@@ -949,6 +983,8 @@ export interface AgentPromptFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Filter by the object’s `content` field. */
@@ -1005,6 +1041,8 @@ export interface AgentPersonaFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
   /** Filter by the object’s `name` field. */
@@ -1041,6 +1079,8 @@ export interface AgentResourceFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `slug` field. */
   slug?: StringTrgmFilter;
   /** Filter by the object’s `kind` field. */
@@ -1113,6 +1153,8 @@ export type AgentPlanOrderBy =
   | 'OWNER_ID_DESC'
   | 'THREAD_ID_ASC'
   | 'THREAD_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'TITLE_ASC'
   | 'TITLE_DESC'
   | 'DESCRIPTION_ASC'
@@ -1131,6 +1173,8 @@ export type AgentOrderBy =
   | 'UPDATED_AT_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'PERSONA_ID_ASC'
   | 'PERSONA_ID_DESC'
   | 'PARENT_ID_ASC'
@@ -1157,6 +1201,8 @@ export type AgentThreadOrderBy =
   | 'UPDATED_AT_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'STATUS_ASC'
   | 'STATUS_DESC'
   | 'IS_ARCHIVED_ASC'
@@ -1195,6 +1241,8 @@ export type AgentMessageOrderBy =
   | 'PARTS_DESC'
   | 'THREAD_ID_ASC'
   | 'THREAD_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'AUTHOR_ROLE_ASC'
   | 'AUTHOR_ROLE_DESC'
   | 'MODEL_ASC'
@@ -1217,6 +1265,8 @@ export type AgentTaskOrderBy =
   | 'STATUS_DESC'
   | 'PLAN_ID_ASC'
   | 'PLAN_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
   | 'SOURCE_ASC'
@@ -1249,6 +1299,8 @@ export type AgentPromptOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'CONTENT_ASC'
@@ -1297,6 +1349,8 @@ export type AgentPersonaOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC'
   | 'NAME_ASC'
@@ -1325,6 +1379,8 @@ export type AgentResourceOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC'
   | 'KIND_ASC'
@@ -1371,6 +1427,7 @@ export interface CreateAgentPlanInput {
   agentPlan: {
     ownerId?: string;
     threadId: string;
+    databaseId: string;
     title: string;
     description?: string;
     status?: string;
@@ -1379,6 +1436,7 @@ export interface CreateAgentPlanInput {
 export interface AgentPlanPatch {
   ownerId?: string | null;
   threadId?: string | null;
+  databaseId?: string | null;
   title?: string | null;
   description?: string | null;
   status?: string | null;
@@ -1396,6 +1454,7 @@ export interface CreateAgentInput {
   clientMutationId?: string;
   agent: {
     ownerId?: string;
+    databaseId: string;
     personaId?: string;
     parentId?: string;
     name: string;
@@ -1407,6 +1466,7 @@ export interface CreateAgentInput {
 }
 export interface AgentPatch {
   ownerId?: string | null;
+  databaseId?: string | null;
   personaId?: string | null;
   parentId?: string | null;
   name?: string | null;
@@ -1428,6 +1488,7 @@ export interface CreateAgentThreadInput {
   clientMutationId?: string;
   agentThread: {
     ownerId?: string;
+    databaseId: string;
     status?: string;
     isArchived?: boolean;
     archivedAt?: string;
@@ -1443,6 +1504,7 @@ export interface CreateAgentThreadInput {
 }
 export interface AgentThreadPatch {
   ownerId?: string | null;
+  databaseId?: string | null;
   status?: string | null;
   isArchived?: boolean | null;
   archivedAt?: string | null;
@@ -1470,6 +1532,7 @@ export interface CreateAgentMessageInput {
     actorId?: string;
     parts?: Record<string, unknown>;
     threadId: string;
+    databaseId: string;
     authorRole: string;
     model?: string;
     agentId?: string;
@@ -1479,6 +1542,7 @@ export interface AgentMessagePatch {
   actorId?: string | null;
   parts?: Record<string, unknown> | null;
   threadId?: string | null;
+  databaseId?: string | null;
   authorRole?: string | null;
   model?: string | null;
   agentId?: string | null;
@@ -1498,6 +1562,7 @@ export interface CreateAgentTaskInput {
     actorId?: string;
     status?: string;
     planId: string;
+    databaseId: string;
     description: string;
     source?: string;
     error?: string;
@@ -1513,6 +1578,7 @@ export interface AgentTaskPatch {
   actorId?: string | null;
   status?: string | null;
   planId?: string | null;
+  databaseId?: string | null;
   description?: string | null;
   source?: string | null;
   error?: string | null;
@@ -1537,6 +1603,7 @@ export interface CreateAgentPromptInput {
   agentPrompt: {
     createdBy?: string;
     updatedBy?: string;
+    databaseId: string;
     name: string;
     content: string;
     description?: string;
@@ -1547,6 +1614,7 @@ export interface CreateAgentPromptInput {
 export interface AgentPromptPatch {
   createdBy?: string | null;
   updatedBy?: string | null;
+  databaseId?: string | null;
   name?: string | null;
   content?: string | null;
   description?: string | null;
@@ -1595,6 +1663,7 @@ export interface CreateAgentPersonaInput {
   agentPersona: {
     createdBy?: string;
     updatedBy?: string;
+    databaseId: string;
     slug: string;
     name: string;
     description?: string;
@@ -1607,6 +1676,7 @@ export interface CreateAgentPersonaInput {
 export interface AgentPersonaPatch {
   createdBy?: string | null;
   updatedBy?: string | null;
+  databaseId?: string | null;
   slug?: string | null;
   name?: string | null;
   description?: string | null;
@@ -1629,6 +1699,7 @@ export interface CreateAgentResourceInput {
   agentResource: {
     createdBy?: string;
     updatedBy?: string;
+    databaseId: string;
     slug: string;
     kind?: string;
     title: string;
@@ -1647,6 +1718,7 @@ export interface CreateAgentResourceInput {
 export interface AgentResourcePatch {
   createdBy?: string | null;
   updatedBy?: string | null;
+  databaseId?: string | null;
   slug?: string | null;
   kind?: string | null;
   title?: string | null;
@@ -1893,6 +1965,8 @@ export interface AgentPlanInput {
   ownerId?: string;
   /** Foreign key to agent_thread */
   threadId: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Human-readable plan name */
   title: string;
   /** Overall goal or context for this plan */
@@ -1907,6 +1981,8 @@ export interface AgentInput {
   updatedAt?: string;
   /** Human who owns/manages this agent */
   ownerId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Persona template this agent was created from */
   personaId?: string;
   /** Parent agent (for sub-agent delegation hierarchy) */
@@ -1929,6 +2005,8 @@ export interface AgentThreadInput {
   updatedAt?: string;
   /** User who owns this thread */
   ownerId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Current status of this thread */
   status?: string;
   /** Whether this record has been archived by the user */
@@ -1963,6 +2041,8 @@ export interface AgentMessageInput {
   parts?: Record<string, unknown>;
   /** Foreign key to agent_thread */
   threadId: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Who authored this message: user or assistant */
   authorRole: string;
   /** LLM model that generated this response */
@@ -1981,6 +2061,8 @@ export interface AgentTaskInput {
   status?: string;
   /** Foreign key to agent_plan */
   planId: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Natural-language description of the work to do */
   description: string;
   /** Who created the task: agent or user */
@@ -2007,6 +2089,8 @@ export interface AgentPromptInput {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
   name: string;
   /** The system prompt template content */
@@ -2038,6 +2122,8 @@ export interface AgentPersonaInput {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Unique human-readable identifier for this persona */
   slug: string;
   /** Display name for this persona */
@@ -2060,6 +2146,8 @@ export interface AgentResourceInput {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Unique human-readable identifier for portable references */
   slug: string;
   /** Resource type: skill, knowledge, or convention */
@@ -2099,6 +2187,8 @@ export interface AgentTaskFilter {
   status?: StringFilter;
   /** Filter by the object’s `planId` field. */
   planId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `source` field. */
@@ -2136,6 +2226,8 @@ export interface AgentThreadFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `isArchived` field. */
@@ -2203,6 +2295,8 @@ export interface AgentMessageFilter {
   parts?: JSONFilter;
   /** Filter by the object’s `threadId` field. */
   threadId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `authorRole` field. */
   authorRole?: StringFilter;
   /** Filter by the object’s `model` field. */
@@ -2232,6 +2326,8 @@ export interface AgentFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `personaId` field. */
   personaId?: UUIDFilter;
   /** Filter by the object’s `parentId` field. */
@@ -2285,6 +2381,8 @@ export interface AgentPlanFilter {
   ownerId?: UUIDFilter;
   /** Filter by the object’s `threadId` field. */
   threadId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `title` field. */
   title?: StringFilter;
   /** Filter by the object’s `description` field. */
@@ -2563,6 +2661,8 @@ export interface AgentPromptFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Filter by the object’s `content` field. */
@@ -2627,6 +2727,8 @@ export interface AgentPersonaFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
   /** Filter by the object’s `name` field. */
@@ -2681,6 +2783,8 @@ export interface AgentResourceFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `slug` field. */
   slug?: StringTrgmFilter;
   /** Filter by the object’s `kind` field. */

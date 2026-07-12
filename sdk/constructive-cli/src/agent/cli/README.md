@@ -103,11 +103,12 @@ CRUD operations for AgentPlan records.
 | `updatedAt` | Datetime |
 | `ownerId` | UUID |
 | `threadId` | UUID |
+| `databaseId` | UUID |
 | `title` | String |
 | `description` | String |
 | `status` | String |
 
-**Required create fields:** `threadId`, `title`
+**Required create fields:** `threadId`, `databaseId`, `title`
 **Optional create fields (backend defaults):** `ownerId`, `description`, `status`
 
 ### `agent`
@@ -131,6 +132,7 @@ CRUD operations for Agent records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `ownerId` | UUID |
+| `databaseId` | UUID |
 | `personaId` | UUID |
 | `parentId` | UUID |
 | `name` | String |
@@ -139,7 +141,7 @@ CRUD operations for Agent records.
 | `status` | String |
 | `isEphemeral` | Boolean |
 
-**Required create fields:** `name`
+**Required create fields:** `databaseId`, `name`
 **Optional create fields (backend defaults):** `ownerId`, `personaId`, `parentId`, `systemPrompt`, `config`, `status`, `isEphemeral`
 
 ### `agent-thread`
@@ -163,6 +165,7 @@ CRUD operations for AgentThread records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `ownerId` | UUID |
+| `databaseId` | UUID |
 | `status` | String |
 | `isArchived` | Boolean |
 | `archivedAt` | Datetime |
@@ -175,6 +178,7 @@ CRUD operations for AgentThread records.
 | `agentId` | UUID |
 | `parentThreadId` | UUID |
 
+**Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `ownerId`, `status`, `isArchived`, `archivedAt`, `title`, `mode`, `model`, `systemPrompt`, `tags`, `promptTemplateId`, `agentId`, `parentThreadId`
 
 ### `agent-message`
@@ -200,11 +204,12 @@ CRUD operations for AgentMessage records.
 | `actorId` | UUID |
 | `parts` | JSON |
 | `threadId` | UUID |
+| `databaseId` | UUID |
 | `authorRole` | String |
 | `model` | String |
 | `agentId` | UUID |
 
-**Required create fields:** `threadId`, `authorRole`
+**Required create fields:** `threadId`, `databaseId`, `authorRole`
 **Optional create fields (backend defaults):** `actorId`, `parts`, `model`, `agentId`
 
 ### `agent-task`
@@ -230,6 +235,7 @@ CRUD operations for AgentTask records.
 | `actorId` | UUID |
 | `status` | String |
 | `planId` | UUID |
+| `databaseId` | UUID |
 | `description` | String |
 | `source` | String |
 | `error` | String |
@@ -240,7 +246,7 @@ CRUD operations for AgentTask records.
 | `approvedAt` | Datetime |
 | `approvalFeedback` | String |
 
-**Required create fields:** `planId`, `description`
+**Required create fields:** `planId`, `databaseId`, `description`
 **Optional create fields (backend defaults):** `actorId`, `status`, `source`, `error`, `orderIndex`, `requiresApproval`, `approvalStatus`, `approvedBy`, `approvedAt`, `approvalFeedback`
 
 ### `agent-prompt`
@@ -265,13 +271,14 @@ CRUD operations for AgentPrompt records.
 | `updatedAt` | Datetime |
 | `createdBy` | UUID |
 | `updatedBy` | UUID |
+| `databaseId` | UUID |
 | `name` | String |
 | `content` | String |
 | `description` | String |
 | `isDefault` | Boolean |
 | `metadata` | JSON |
 
-**Required create fields:** `name`, `content`
+**Required create fields:** `databaseId`, `name`, `content`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `description`, `isDefault`, `metadata`
 
 ### `agent-resource-chunk`
@@ -362,6 +369,7 @@ CRUD operations for AgentPersona records.
 | `updatedAt` | Datetime |
 | `createdBy` | UUID |
 | `updatedBy` | UUID |
+| `databaseId` | UUID |
 | `slug` | String |
 | `name` | String |
 | `description` | String |
@@ -370,7 +378,7 @@ CRUD operations for AgentPersona records.
 | `config` | JSON |
 | `isActive` | Boolean |
 
-**Required create fields:** `slug`, `name`
+**Required create fields:** `databaseId`, `slug`, `name`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `description`, `systemPrompt`, `resources`, `config`, `isActive`
 
 ### `agent-resource`
@@ -396,6 +404,7 @@ CRUD operations for AgentResource records.
 | `updatedAt` | Datetime |
 | `createdBy` | UUID |
 | `updatedBy` | UUID |
+| `databaseId` | UUID |
 | `slug` | String |
 | `kind` | String |
 | `title` | String |
@@ -417,7 +426,7 @@ CRUD operations for AgentResource records.
 | `bodyTrgmSimilarity` | Float |
 | `searchScore` | Float |
 
-**Required create fields:** `slug`, `title`, `body`
+**Required create fields:** `databaseId`, `slug`, `title`, `body`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `kind`, `description`, `keywords`, `isActive`, `metadata`, `isArchived`, `archivedAt`, `embedding`, `embeddingUpdatedAt`
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.

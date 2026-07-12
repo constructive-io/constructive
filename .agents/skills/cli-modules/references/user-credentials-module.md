@@ -12,8 +12,8 @@ csdk user-credentials-module list --where.<field>.<op> <value> --orderBy <values
 csdk user-credentials-module list --limit 10 --after <cursor>
 csdk user-credentials-module find-first --where.<field>.<op> <value>
 csdk user-credentials-module get --id <UUID>
-csdk user-credentials-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
-csdk user-credentials-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk user-credentials-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--privateApiName <String>]
+csdk user-credentials-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--privateApiName <String>]
 csdk user-credentials-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk user-credentials-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a userCredentialsModule
 
 ```bash
-csdk user-credentials-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk user-credentials-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--privateApiName <String>]
 ```
 
 ### Get a userCredentialsModule by id

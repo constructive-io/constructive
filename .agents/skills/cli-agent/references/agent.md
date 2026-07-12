@@ -12,8 +12,8 @@ csdk agent list --where.<field>.<op> <value> --orderBy <values>
 csdk agent list --limit 10 --after <cursor>
 csdk agent find-first --where.<field>.<op> <value>
 csdk agent get --id <UUID>
-csdk agent create --name <String> [--ownerId <UUID>] [--personaId <UUID>] [--parentId <UUID>] [--systemPrompt <String>] [--config <JSON>] [--status <String>] [--isEphemeral <Boolean>]
-csdk agent update --id <UUID> [--ownerId <UUID>] [--personaId <UUID>] [--parentId <UUID>] [--name <String>] [--systemPrompt <String>] [--config <JSON>] [--status <String>] [--isEphemeral <Boolean>]
+csdk agent create --databaseId <UUID> --name <String> [--ownerId <UUID>] [--personaId <UUID>] [--parentId <UUID>] [--systemPrompt <String>] [--config <JSON>] [--status <String>] [--isEphemeral <Boolean>]
+csdk agent update --id <UUID> [--ownerId <UUID>] [--databaseId <UUID>] [--personaId <UUID>] [--parentId <UUID>] [--name <String>] [--systemPrompt <String>] [--config <JSON>] [--status <String>] [--isEphemeral <Boolean>]
 csdk agent delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agent
 
 ```bash
-csdk agent create --name <String> [--ownerId <UUID>] [--personaId <UUID>] [--parentId <UUID>] [--systemPrompt <String>] [--config <JSON>] [--status <String>] [--isEphemeral <Boolean>]
+csdk agent create --databaseId <UUID> --name <String> [--ownerId <UUID>] [--personaId <UUID>] [--parentId <UUID>] [--systemPrompt <String>] [--config <JSON>] [--status <String>] [--isEphemeral <Boolean>]
 ```
 
 ### Get a agent by id

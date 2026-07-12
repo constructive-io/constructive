@@ -103,6 +103,7 @@ function App() {
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
 | `useDeleteOrgPrincipalMutation` | Mutation | deleteOrgPrincipal |
+| `useDeletePrincipalMutation` | Mutation | deletePrincipal |
 | `useDisconnectAccountMutation` | Mutation | disconnectAccount |
 | `useRevokeApiKeyMutation` | Mutation | revokeApiKey |
 | `useRevokeSessionMutation` | Mutation | revokeSession |
@@ -114,13 +115,13 @@ function App() {
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useResetPasswordMutation` | Mutation | resetPassword |
+| `useCreateOrgPrincipalMutation` | Mutation | createOrgPrincipal |
 | `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useSignInSmsOtpMutation` | Mutation | signInSmsOtp |
 | `useSignUpSmsMutation` | Mutation | signUpSms |
 | `useSignUpMutation` | Mutation | signUp |
 | `useSignInMutation` | Mutation | signIn |
 | `useLinkIdentityMutation` | Mutation | linkIdentity |
-| `useCreateOrgPrincipalMutation` | Mutation | createOrgPrincipal |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useCreateOrgApiKeyMutation` | Mutation | createOrgApiKey |
 | `useCreateApiKeyMutation` | Mutation | createApiKey |
@@ -139,20 +140,20 @@ and lifecycle settings. |
 ```typescript
 // List all principals
 const { data, isLoading } = usePrincipalsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, useAdminOwner: true, isReadOnly: true, bypassStepUp: true } },
 });
 
 // Get one principal
 const { data: item } = usePrincipalQuery({
   principalId: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, useAdminOwner: true, isReadOnly: true, bypassStepUp: true } },
 });
 
 // Create a principal
 const { mutate: create } = useCreatePrincipalMutation({
   selection: { fields: { principalId: true } },
 });
-create({ id: '<UUID>', ownerId: '<UUID>', userId: '<UUID>', name: '<String>', allowedMask: '<BitString>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' });
+create({ id: '<UUID>', ownerId: '<UUID>', userId: '<UUID>', name: '<String>', useAdminOwner: '<Boolean>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' });
 ```
 
 ### PrincipalEntity
@@ -181,20 +182,20 @@ create({ principalId: '<UUID>', entityId: '<UUID>', ownerId: '<UUID>' });
 ```typescript
 // List all principalScopeOverrides
 const { data, isLoading } = usePrincipalScopeOverridesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, useAdminOwner: true, isActive: true, isReadOnly: true } },
 });
 
 // Get one principalScopeOverride
 const { data: item } = usePrincipalScopeOverrideQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, useAdminOwner: true, isActive: true, isReadOnly: true } },
 });
 
 // Create a principalScopeOverride
 const { mutate: create } = useCreatePrincipalScopeOverrideMutation({
   selection: { fields: { id: true } },
 });
-create({ principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', isAdmin: '<Boolean>', isReadOnly: '<Boolean>' });
+create({ principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', useAdminOwner: '<Boolean>', isActive: '<Boolean>', isReadOnly: '<Boolean>' });
 ```
 
 ### Email
@@ -486,6 +487,17 @@ deleteOrgPrincipal
   |----------|------|
   | `input` | DeleteOrgPrincipalInput (required) |
 
+### `useDeletePrincipalMutation`
+
+deletePrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DeletePrincipalInput (required) |
+
 ### `useDisconnectAccountMutation`
 
 disconnectAccount
@@ -607,6 +619,17 @@ resetPassword
   |----------|------|
   | `input` | ResetPasswordInput (required) |
 
+### `useCreateOrgPrincipalMutation`
+
+createOrgPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateOrgPrincipalInput (required) |
+
 ### `useSignInCrossOriginMutation`
 
 signInCrossOrigin
@@ -672,17 +695,6 @@ linkIdentity
   | Argument | Type |
   |----------|------|
   | `input` | LinkIdentityInput (required) |
-
-### `useCreateOrgPrincipalMutation`
-
-createOrgPrincipal
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | CreateOrgPrincipalInput (required) |
 
 ### `useExtendTokenExpiresMutation`
 

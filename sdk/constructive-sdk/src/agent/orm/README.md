@@ -46,6 +46,7 @@ CRUD operations for AgentPlan records.
 | `updatedAt` | Datetime | No |
 | `ownerId` | UUID | Yes |
 | `threadId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `title` | String | Yes |
 | `description` | String | Yes |
 | `status` | String | Yes |
@@ -54,13 +55,13 @@ CRUD operations for AgentPlan records.
 
 ```typescript
 // List all agentPlan records
-const items = await db.agentPlan.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, title: true, description: true, status: true } }).execute();
+const items = await db.agentPlan.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, databaseId: true, title: true, description: true, status: true } }).execute();
 
 // Get one by id
-const item = await db.agentPlan.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, title: true, description: true, status: true } }).execute();
+const item = await db.agentPlan.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, databaseId: true, title: true, description: true, status: true } }).execute();
 
 // Create
-const created = await db.agentPlan.create({ data: { ownerId: '<UUID>', threadId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' }, select: { id: true } }).execute();
+const created = await db.agentPlan.create({ data: { ownerId: '<UUID>', threadId: '<UUID>', databaseId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentPlan.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
@@ -81,6 +82,7 @@ CRUD operations for Agent records.
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 | `ownerId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `personaId` | UUID | Yes |
 | `parentId` | UUID | Yes |
 | `name` | String | Yes |
@@ -93,13 +95,13 @@ CRUD operations for Agent records.
 
 ```typescript
 // List all agent records
-const items = await db.agent.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } }).execute();
+const items = await db.agent.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } }).execute();
 
 // Get one by id
-const item = await db.agent.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } }).execute();
+const item = await db.agent.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } }).execute();
 
 // Create
-const created = await db.agent.create({ data: { ownerId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<String>', systemPrompt: '<String>', config: '<JSON>', status: '<String>', isEphemeral: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.agent.create({ data: { ownerId: '<UUID>', databaseId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<String>', systemPrompt: '<String>', config: '<JSON>', status: '<String>', isEphemeral: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agent.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
@@ -120,6 +122,7 @@ CRUD operations for AgentThread records.
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 | `ownerId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `status` | String | Yes |
 | `isArchived` | Boolean | Yes |
 | `archivedAt` | Datetime | Yes |
@@ -136,13 +139,13 @@ CRUD operations for AgentThread records.
 
 ```typescript
 // List all agentThread records
-const items = await db.agentThread.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } }).execute();
+const items = await db.agentThread.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } }).execute();
 
 // Get one by id
-const item = await db.agentThread.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } }).execute();
+const item = await db.agentThread.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } }).execute();
 
 // Create
-const created = await db.agentThread.create({ data: { ownerId: '<UUID>', status: '<String>', isArchived: '<Boolean>', archivedAt: '<Datetime>', title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', tags: '<String>', promptTemplateId: '<UUID>', agentId: '<UUID>', parentThreadId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.agentThread.create({ data: { ownerId: '<UUID>', databaseId: '<UUID>', status: '<String>', isArchived: '<Boolean>', archivedAt: '<Datetime>', title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', tags: '<String>', promptTemplateId: '<UUID>', agentId: '<UUID>', parentThreadId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentThread.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
@@ -165,6 +168,7 @@ CRUD operations for AgentMessage records.
 | `actorId` | UUID | Yes |
 | `parts` | JSON | Yes |
 | `threadId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `authorRole` | String | Yes |
 | `model` | String | Yes |
 | `agentId` | UUID | Yes |
@@ -173,13 +177,13 @@ CRUD operations for AgentMessage records.
 
 ```typescript
 // List all agentMessage records
-const items = await db.agentMessage.findMany({ select: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } }).execute();
+const items = await db.agentMessage.findMany({ select: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, databaseId: true, authorRole: true, model: true, agentId: true } }).execute();
 
 // Get one by id
-const item = await db.agentMessage.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } }).execute();
+const item = await db.agentMessage.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, databaseId: true, authorRole: true, model: true, agentId: true } }).execute();
 
 // Create
-const created = await db.agentMessage.create({ data: { actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>', agentId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.agentMessage.create({ data: { actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', databaseId: '<UUID>', authorRole: '<String>', model: '<String>', agentId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentMessage.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -202,6 +206,7 @@ CRUD operations for AgentTask records.
 | `actorId` | UUID | Yes |
 | `status` | String | Yes |
 | `planId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `description` | String | Yes |
 | `source` | String | Yes |
 | `error` | String | Yes |
@@ -216,13 +221,13 @@ CRUD operations for AgentTask records.
 
 ```typescript
 // List all agentTask records
-const items = await db.agentTask.findMany({ select: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
+const items = await db.agentTask.findMany({ select: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, databaseId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
 
 // Get one by id
-const item = await db.agentTask.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
+const item = await db.agentTask.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, databaseId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } }).execute();
 
 // Create
-const created = await db.agentTask.create({ data: { actorId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' }, select: { id: true } }).execute();
+const created = await db.agentTask.create({ data: { actorId: '<UUID>', status: '<String>', planId: '<UUID>', databaseId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentTask.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -244,6 +249,7 @@ CRUD operations for AgentPrompt records.
 | `updatedAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
 | `updatedBy` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `name` | String | Yes |
 | `content` | String | Yes |
 | `description` | String | Yes |
@@ -254,13 +260,13 @@ CRUD operations for AgentPrompt records.
 
 ```typescript
 // List all agentPrompt records
-const items = await db.agentPrompt.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, name: true, content: true, description: true, isDefault: true, metadata: true } }).execute();
+const items = await db.agentPrompt.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, name: true, content: true, description: true, isDefault: true, metadata: true } }).execute();
 
 // Get one by id
-const item = await db.agentPrompt.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, name: true, content: true, description: true, isDefault: true, metadata: true } }).execute();
+const item = await db.agentPrompt.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, name: true, content: true, description: true, isDefault: true, metadata: true } }).execute();
 
 // Create
-const created = await db.agentPrompt.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', name: '<String>', content: '<String>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.agentPrompt.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', databaseId: '<UUID>', name: '<String>', content: '<String>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentPrompt.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
@@ -323,6 +329,7 @@ CRUD operations for AgentPersona records.
 | `updatedAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
 | `updatedBy` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `slug` | String | Yes |
 | `name` | String | Yes |
 | `description` | String | Yes |
@@ -335,13 +342,13 @@ CRUD operations for AgentPersona records.
 
 ```typescript
 // List all agentPersona records
-const items = await db.agentPersona.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } }).execute();
+const items = await db.agentPersona.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } }).execute();
 
 // Get one by id
-const item = await db.agentPersona.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } }).execute();
+const item = await db.agentPersona.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } }).execute();
 
 // Create
-const created = await db.agentPersona.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', name: '<String>', description: '<String>', systemPrompt: '<String>', resources: '<String>', config: '<JSON>', isActive: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.agentPersona.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', databaseId: '<UUID>', slug: '<String>', name: '<String>', description: '<String>', systemPrompt: '<String>', resources: '<String>', config: '<JSON>', isActive: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentPersona.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
@@ -363,6 +370,7 @@ CRUD operations for AgentResource records.
 | `updatedAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
 | `updatedBy` | UUID | Yes |
+| `databaseId` | UUID | Yes |
 | `slug` | String | Yes |
 | `kind` | String | Yes |
 | `title` | String | Yes |
@@ -388,13 +396,13 @@ CRUD operations for AgentResource records.
 
 ```typescript
 // List all agentResource records
-const items = await db.agentResource.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } }).execute();
+const items = await db.agentResource.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.agentResource.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } }).execute();
+const item = await db.agentResource.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.agentResource.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', kind: '<String>', title: '<String>', description: '<String>', body: '<String>', keywords: '<String>', isActive: '<Boolean>', metadata: '<JSON>', isArchived: '<Boolean>', archivedAt: '<Datetime>', search: '<FullText>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', searchTsvRank: '<Float>', embeddingVectorDistance: '<Float>', kindTrgmSimilarity: '<Float>', titleTrgmSimilarity: '<Float>', descriptionTrgmSimilarity: '<Float>', bodyTrgmSimilarity: '<Float>', searchScore: '<Float>' }, select: { id: true } }).execute();
+const created = await db.agentResource.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', databaseId: '<UUID>', slug: '<String>', kind: '<String>', title: '<String>', description: '<String>', body: '<String>', keywords: '<String>', isActive: '<Boolean>', metadata: '<JSON>', isArchived: '<Boolean>', archivedAt: '<Datetime>', search: '<FullText>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', searchTsvRank: '<Float>', embeddingVectorDistance: '<Float>', kindTrgmSimilarity: '<Float>', titleTrgmSimilarity: '<Float>', descriptionTrgmSimilarity: '<Float>', bodyTrgmSimilarity: '<Float>', searchScore: '<Float>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentResource.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();

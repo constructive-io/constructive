@@ -59,8 +59,8 @@ import {
   rlsSettingKeys,
   sqlActionKeys,
   databaseSettingKeys,
-  webauthnSettingKeys,
   astMigrationKeys,
+  webauthnSettingKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -785,23 +785,6 @@ export const invalidate = {
         queryKey: databaseSettingKeys.detail(id),
       }),
   },
-  /** Invalidate webauthnSetting queries */ webauthnSetting: {
-    /** Invalidate all webauthnSetting queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnSettingKeys.all,
-      }),
-    /** Invalidate webauthnSetting list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnSettingKeys.lists(),
-      }),
-    /** Invalidate a specific webauthnSetting */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: webauthnSettingKeys.detail(id),
-      }),
-  },
   /** Invalidate astMigration queries */ astMigration: {
     /** Invalidate all astMigration queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -817,6 +800,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: astMigrationKeys.detail(id),
+      }),
+  },
+  /** Invalidate webauthnSetting queries */ webauthnSetting: {
+    /** Invalidate all webauthnSetting queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnSettingKeys.all,
+      }),
+    /** Invalidate webauthnSetting list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnSettingKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnSetting */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnSettingKeys.detail(id),
       }),
   },
 } as const;
@@ -1118,20 +1118,20 @@ export const remove = {
       queryKey: databaseSettingKeys.detail(id),
     });
   },
-  /** Remove webauthnSetting from cache */ webauthnSetting: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: webauthnSettingKeys.detail(id),
-    });
-  },
   /** Remove astMigration from cache */ astMigration: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: astMigrationKeys.detail(id),
+    });
+  },
+  /** Remove webauthnSetting from cache */ webauthnSetting: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnSettingKeys.detail(id),
     });
   },
 } as const;

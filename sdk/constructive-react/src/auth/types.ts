@@ -14,7 +14,7 @@ export interface Principal {
   ownerId: string | null;
   userId: string | null;
   name: string | null;
-  allowedMask: string | null;
+  useAdminOwner: boolean | null;
   isReadOnly: boolean | null;
   bypassStepUp: boolean | null;
 }
@@ -33,7 +33,8 @@ export interface PrincipalScopeOverride {
   principalId: string | null;
   membershipType: number | null;
   allowedMask: string | null;
-  isAdmin: boolean | null;
+  useAdminOwner: boolean | null;
+  isActive: boolean | null;
   isReadOnly: boolean | null;
 }
 export interface Email {

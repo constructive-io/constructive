@@ -12,8 +12,8 @@ csdk function-graph-execution-node-state list --where.<field>.<op> <value> --ord
 csdk function-graph-execution-node-state list --limit 10 --after <cursor>
 csdk function-graph-execution-node-state find-first --where.<field>.<op> <value>
 csdk function-graph-execution-node-state get --id <UUID>
-csdk function-graph-execution-node-state create --executionId <UUID> --databaseId <UUID> --nodeName <String> [--nodePath <String>] [--status <String>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--outputId <UUID>]
-csdk function-graph-execution-node-state update --id <UUID> [--executionId <UUID>] [--databaseId <UUID>] [--nodeName <String>] [--nodePath <String>] [--status <String>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--outputId <UUID>]
+csdk function-graph-execution-node-state create --executionId <UUID> --scopeId <UUID> --nodeName <String> [--nodePath <String>] [--status <String>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--outputId <UUID>]
+csdk function-graph-execution-node-state update --id <UUID> [--executionId <UUID>] [--scopeId <UUID>] [--nodeName <String>] [--nodePath <String>] [--status <String>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--outputId <UUID>]
 csdk function-graph-execution-node-state delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-graph-execution-node-state list --where.id.equalTo <value> --order
 ### Create a functionGraphExecutionNodeState
 
 ```bash
-csdk function-graph-execution-node-state create --executionId <UUID> --databaseId <UUID> --nodeName <String> [--nodePath <String>] [--status <String>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--outputId <UUID>]
+csdk function-graph-execution-node-state create --executionId <UUID> --scopeId <UUID> --nodeName <String> [--nodePath <String>] [--status <String>] [--startedAt <Datetime>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--outputId <UUID>]
 ```
 
 ### Get a functionGraphExecutionNodeState by id

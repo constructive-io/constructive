@@ -12,8 +12,8 @@ csdk database list --where.<field>.<op> <value> --orderBy <values>
 csdk database list --limit 10 --after <cursor>
 csdk database find-first --where.<field>.<op> <value>
 csdk database get --id <UUID>
-csdk database create [--ownerId <UUID>] [--schemaHash <String>] [--name <String>] [--label <String>] [--hash <UUID>]
-csdk database update --id <UUID> [--ownerId <UUID>] [--schemaHash <String>] [--name <String>] [--label <String>] [--hash <UUID>]
+csdk database create [--ownerId <UUID>] [--schemaHash <String>] [--name <String>] [--label <String>] [--hash <UUID>] [--platform <Boolean>]
+csdk database update --id <UUID> [--ownerId <UUID>] [--schemaHash <String>] [--name <String>] [--label <String>] [--hash <UUID>] [--platform <Boolean>]
 csdk database delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk database list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a database
 
 ```bash
-csdk database create [--ownerId <UUID>] [--schemaHash <String>] [--name <String>] [--label <String>] [--hash <UUID>]
+csdk database create [--ownerId <UUID>] [--schemaHash <String>] [--name <String>] [--label <String>] [--hash <UUID>] [--platform <Boolean>]
 ```
 
 ### Get a database by id

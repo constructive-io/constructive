@@ -7,8 +7,8 @@ Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store
 ## Usage
 
 ```typescript
-useFunctionGraphsQuery({ selection: { fields: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } } })
-useFunctionGraphQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } } })
+useFunctionGraphsQuery({ selection: { fields: { id: true, scopeId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } } })
+useFunctionGraphQuery({ id: '<UUID>', selection: { fields: { id: true, scopeId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } } })
 useCreateFunctionGraphMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionGraphMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionGraphMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionGraphMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionGraphsQuery({
-  selection: { fields: { id: true, databaseId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, scopeId: true, storeId: true, context: true, name: true, description: true, definitionsCommitId: true, isValid: true, validationErrors: true, createdBy: true, createdAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionGraphsQuery({
 const { mutate } = useCreateFunctionGraphMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', storeId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' });
+mutate({ scopeId: '<UUID>', storeId: '<UUID>', context: '<String>', name: '<String>', description: '<String>', definitionsCommitId: '<UUID>', isValid: '<Boolean>', validationErrors: '<JSON>', createdBy: '<UUID>' });
 ```

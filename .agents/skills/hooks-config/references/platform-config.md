@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-App-level plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
+Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed
 
 ## Usage
 
 ```typescript
-usePlatformConfigsQuery({ selection: { fields: { id: true, namespaceId: true, name: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } } })
-usePlatformConfigQuery({ id: '<UUID>', selection: { fields: { id: true, namespaceId: true, name: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } } })
+usePlatformConfigsQuery({ selection: { fields: { id: true, namespaceId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } } })
+usePlatformConfigQuery({ id: '<UUID>', selection: { fields: { id: true, namespaceId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } } })
 useCreatePlatformConfigMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformConfigMutation({ selection: { fields: { id: true } } })
 useDeletePlatformConfigMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformConfigMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformConfigsQuery({
-  selection: { fields: { id: true, namespaceId: true, name: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } },
+  selection: { fields: { id: true, namespaceId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformConfigsQuery({
 const { mutate } = useCreatePlatformConfigMutation({
   selection: { fields: { id: true } },
 });
-mutate({ namespaceId: '<UUID>', name: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' });
+mutate({ namespaceId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' });
 ```

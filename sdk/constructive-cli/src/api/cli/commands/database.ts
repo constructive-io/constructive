@@ -22,6 +22,7 @@ const fieldSchema: FieldSchema = {
   name: 'string',
   label: 'string',
   hash: 'uuid',
+  platform: 'boolean',
   createdAt: 'string',
   updatedAt: 'string',
 };
@@ -82,6 +83,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       name: true,
       label: true,
       hash: true,
+      platform: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -110,6 +112,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       name: true,
       label: true,
       hash: true,
+      platform: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -150,6 +153,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           name: true,
           label: true,
           hash: true,
+          platform: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -202,6 +206,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'platform',
+        message: 'platform',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateDatabaseInput['database'];
@@ -214,6 +225,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           label: cleanedData.label,
           hash: cleanedData.hash,
+          platform: cleanedData.platform,
         },
         select: {
           id: true,
@@ -222,6 +234,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: true,
           label: true,
           hash: true,
+          platform: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -280,6 +293,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'platform',
+        message: 'platform',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as DatabasePatch;
@@ -295,6 +315,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           label: cleanedData.label,
           hash: cleanedData.hash,
+          platform: cleanedData.platform,
         },
         select: {
           id: true,
@@ -303,6 +324,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: true,
           label: true,
           hash: true,
+          platform: true,
           createdAt: true,
           updatedAt: true,
         },

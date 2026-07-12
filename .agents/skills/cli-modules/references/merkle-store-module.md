@@ -12,8 +12,8 @@ csdk merkle-store-module list --where.<field>.<op> <value> --orderBy <values>
 csdk merkle-store-module list --limit 10 --after <cursor>
 csdk merkle-store-module find-first --where.<field>.<op> <value>
 csdk merkle-store-module get --id <UUID>
-csdk merkle-store-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--objectTableId <UUID>] [--storeTableId <UUID>] [--commitTableId <UUID>] [--refTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--functionPrefix <String>] [--permissionKey <String>]
-csdk merkle-store-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--objectTableId <UUID>] [--storeTableId <UUID>] [--commitTableId <UUID>] [--refTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--functionPrefix <String>] [--permissionKey <String>]
+csdk merkle-store-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--objectTableId <UUID>] [--storeTableId <UUID>] [--commitTableId <UUID>] [--refTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--functionPrefix <String>] [--permissionKey <String>]
+csdk merkle-store-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--objectTableId <UUID>] [--storeTableId <UUID>] [--commitTableId <UUID>] [--refTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--functionPrefix <String>] [--permissionKey <String>]
 csdk merkle-store-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk merkle-store-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a merkleStoreModule
 
 ```bash
-csdk merkle-store-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--objectTableId <UUID>] [--storeTableId <UUID>] [--commitTableId <UUID>] [--refTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--functionPrefix <String>] [--permissionKey <String>]
+csdk merkle-store-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--objectTableId <UUID>] [--storeTableId <UUID>] [--commitTableId <UUID>] [--refTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--functionPrefix <String>] [--permissionKey <String>]
 ```
 
 ### Get a merkleStoreModule by id

@@ -18,6 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
+  entityField: 'string',
   schemaId: 'uuid',
   privateSchemaId: 'uuid',
   publicSchemaName: 'string',
@@ -106,6 +107,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       privateSchemaId: true,
       publicSchemaName: true,
@@ -162,6 +164,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       privateSchemaId: true,
       publicSchemaName: true,
@@ -230,6 +233,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           publicSchemaName: true,
@@ -284,6 +288,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -534,6 +545,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           publicSchemaName: cleanedData.publicSchemaName,
@@ -572,6 +584,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           publicSchemaName: true,
@@ -632,6 +645,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -882,6 +902,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           publicSchemaName: cleanedData.publicSchemaName,
@@ -920,6 +941,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           publicSchemaName: true,

@@ -33,6 +33,10 @@ const fieldSchema: FieldSchema = {
   labels: 'json',
   annotations: 'json',
   databaseId: 'uuid',
+  requiredSecrets: 'string',
+  requiredConfigs: 'string',
+  integrations: 'string',
+  resourceDefinitionId: 'uuid',
 };
 const usage =
   '\nresource <command>\n\nCommands:\n  list                  List resource records\n  find-first            Find first matching resource record\n  get                   Get a resource by ID\n  create                Create a new resource\n  update                Update an existing resource\n  delete                Delete a resource\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -102,6 +106,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       labels: true,
       annotations: true,
       databaseId: true,
+      requiredSecrets: true,
+      requiredConfigs: true,
+      integrations: true,
+      resourceDefinitionId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ResourceSelect, ResourceFilter, ResourceOrderBy> & {
@@ -139,6 +147,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       labels: true,
       annotations: true,
       databaseId: true,
+      requiredSecrets: true,
+      requiredConfigs: true,
+      integrations: true,
+      resourceDefinitionId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ResourceSelect, ResourceFilter, ResourceOrderBy> & {
@@ -188,6 +200,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           labels: true,
           annotations: true,
           databaseId: true,
+          requiredSecrets: true,
+          requiredConfigs: true,
+          integrations: true,
+          resourceDefinitionId: true,
         },
       })
       .execute();
@@ -296,6 +312,34 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'databaseId',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'requiredSecrets',
+        message: 'requiredSecrets',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'requiredConfigs',
+        message: 'requiredConfigs',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'integrations',
+        message: 'integrations',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'resourceDefinitionId',
+        message: 'resourceDefinitionId',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateResourceInput['resource'];
@@ -317,6 +361,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           labels: cleanedData.labels,
           annotations: cleanedData.annotations,
           databaseId: cleanedData.databaseId,
+          requiredSecrets: cleanedData.requiredSecrets,
+          requiredConfigs: cleanedData.requiredConfigs,
+          integrations: cleanedData.integrations,
+          resourceDefinitionId: cleanedData.resourceDefinitionId,
         },
         select: {
           id: true,
@@ -336,6 +384,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           labels: true,
           annotations: true,
           databaseId: true,
+          requiredSecrets: true,
+          requiredConfigs: true,
+          integrations: true,
+          resourceDefinitionId: true,
         },
       })
       .execute();
@@ -450,6 +502,34 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'databaseId',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'requiredSecrets',
+        message: 'requiredSecrets',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'requiredConfigs',
+        message: 'requiredConfigs',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'integrations',
+        message: 'integrations',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'resourceDefinitionId',
+        message: 'resourceDefinitionId',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as ResourcePatch;
@@ -474,6 +554,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           labels: cleanedData.labels,
           annotations: cleanedData.annotations,
           databaseId: cleanedData.databaseId,
+          requiredSecrets: cleanedData.requiredSecrets,
+          requiredConfigs: cleanedData.requiredConfigs,
+          integrations: cleanedData.integrations,
+          resourceDefinitionId: cleanedData.resourceDefinitionId,
         },
         select: {
           id: true,
@@ -493,6 +577,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           labels: true,
           annotations: true,
           databaseId: true,
+          requiredSecrets: true,
+          requiredConfigs: true,
+          integrations: true,
+          resourceDefinitionId: true,
         },
       })
       .execute();

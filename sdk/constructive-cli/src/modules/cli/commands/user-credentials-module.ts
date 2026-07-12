@@ -18,10 +18,10 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
+  entityField: 'string',
   schemaId: 'uuid',
   tableId: 'uuid',
   tableName: 'string',
-  apiName: 'string',
   privateApiName: 'string',
 };
 const usage =
@@ -77,10 +77,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       tableId: true,
       tableName: true,
-      apiName: true,
       privateApiName: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -108,10 +108,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       tableId: true,
       tableName: true,
-      apiName: true,
       privateApiName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -151,10 +151,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           tableId: true,
           tableName: true,
-          apiName: true,
           privateApiName: true,
         },
       })
@@ -179,6 +179,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'schemaId',
         message: 'schemaId',
         required: false,
@@ -200,13 +207,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'apiName',
-        message: 'apiName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'privateApiName',
         message: 'privateApiName',
         required: false,
@@ -223,19 +223,19 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
-          apiName: cleanedData.apiName,
           privateApiName: cleanedData.privateApiName,
         },
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           tableId: true,
           tableName: true,
-          apiName: true,
           privateApiName: true,
         },
       })
@@ -266,6 +266,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'schemaId',
         message: 'schemaId',
         required: false,
@@ -287,13 +294,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'apiName',
-        message: 'apiName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'privateApiName',
         message: 'privateApiName',
         required: false,
@@ -310,19 +310,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
-          apiName: cleanedData.apiName,
           privateApiName: cleanedData.privateApiName,
         },
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           tableId: true,
           tableName: true,
-          apiName: true,
           privateApiName: true,
         },
       })

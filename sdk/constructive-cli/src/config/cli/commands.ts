@@ -6,16 +6,23 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
-import platformConfigDefinitionCmd from './commands/platform-config-definition';
 import platformConfigCmd from './commands/platform-config';
+import configCmd from './commands/config';
+import platformInternalSecretCmd from './commands/platform-internal-secret';
+import platformSecretCmd from './commands/platform-secret';
+import secretCmd from './commands/secret';
+import platformInternalSecretsDelCmd from './commands/platform-internal-secrets-del';
 import platformSecretsDelCmd from './commands/platform-secrets-del';
-import orgSecretsDelCmd from './commands/org-secrets-del';
+import _secretsDelCmd from './commands/secrets-del';
+import platformInternalSecretsRemoveArrayCmd from './commands/platform-internal-secrets-remove-array';
 import platformSecretsRemoveArrayCmd from './commands/platform-secrets-remove-array';
-import orgSecretsRemoveArrayCmd from './commands/org-secrets-remove-array';
+import _secretsRemoveArrayCmd from './commands/secrets-remove-array';
+import platformInternalSecretsRotateCmd from './commands/platform-internal-secrets-rotate';
+import platformInternalSecretsSetCmd from './commands/platform-internal-secrets-set';
 import platformSecretsRotateCmd from './commands/platform-secrets-rotate';
+import _secretsRotateCmd from './commands/secrets-rotate';
 import platformSecretsSetCmd from './commands/platform-secrets-set';
-import orgSecretsRotateCmd from './commands/org-secrets-rotate';
-import orgSecretsSetCmd from './commands/org-secrets-set';
+import _secretsSetCmd from './commands/secrets-set';
 import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
@@ -27,20 +34,27 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
-  'platform-config-definition': platformConfigDefinitionCmd,
   'platform-config': platformConfigCmd,
+  config: configCmd,
+  'platform-internal-secret': platformInternalSecretCmd,
+  'platform-secret': platformSecretCmd,
+  secret: secretCmd,
+  'platform-internal-secrets-del': platformInternalSecretsDelCmd,
   'platform-secrets-del': platformSecretsDelCmd,
-  'org-secrets-del': orgSecretsDelCmd,
+  'secrets-del': _secretsDelCmd,
+  'platform-internal-secrets-remove-array': platformInternalSecretsRemoveArrayCmd,
   'platform-secrets-remove-array': platformSecretsRemoveArrayCmd,
-  'org-secrets-remove-array': orgSecretsRemoveArrayCmd,
+  'secrets-remove-array': _secretsRemoveArrayCmd,
+  'platform-internal-secrets-rotate': platformInternalSecretsRotateCmd,
+  'platform-internal-secrets-set': platformInternalSecretsSetCmd,
   'platform-secrets-rotate': platformSecretsRotateCmd,
+  'secrets-rotate': _secretsRotateCmd,
   'platform-secrets-set': platformSecretsSetCmd,
-  'org-secrets-rotate': orgSecretsRotateCmd,
-  'org-secrets-set': orgSecretsSetCmd,
+  'secrets-set': _secretsSetCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  platform-config-definition platformConfigDefinition CRUD operations\n  platform-config      platformConfig CRUD operations\n  platform-secrets-del platformSecretsDel\n  org-secrets-del      orgSecretsDel\n  platform-secrets-remove-array platformSecretsRemoveArray\n  org-secrets-remove-array orgSecretsRemoveArray\n  platform-secrets-rotate platformSecretsRotate\n  platform-secrets-set platformSecretsSet\n  org-secrets-rotate   orgSecretsRotate\n  org-secrets-set      orgSecretsSet\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  platform-config      platformConfig CRUD operations\n  config               config CRUD operations\n  platform-internal-secret platformInternalSecret CRUD operations\n  platform-secret      platformSecret CRUD operations\n  secret               secret CRUD operations\n  platform-internal-secrets-del platformInternalSecretsDel\n  platform-secrets-del platformSecretsDel\n  secrets-del          _secretsDel\n  platform-internal-secrets-remove-array platformInternalSecretsRemoveArray\n  platform-secrets-remove-array platformSecretsRemoveArray\n  secrets-remove-array _secretsRemoveArray\n  platform-internal-secrets-rotate platformInternalSecretsRotate\n  platform-internal-secrets-set platformInternalSecretsSet\n  platform-secrets-rotate platformSecretsRotate\n  secrets-rotate       _secretsRotate\n  platform-secrets-set platformSecretsSet\n  secrets-set          _secretsSet\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

@@ -65,8 +65,8 @@ const db = createClient({
 | `rlsSetting` | findMany, findOne, create, update, delete |
 | `sqlAction` | findMany, findOne, create, update, delete |
 | `databaseSetting` | findMany, findOne, create, update, delete |
-| `webauthnSetting` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
+| `webauthnSetting` | findMany, findOne, create, update, delete |
 
 ## Table Operations
 
@@ -165,6 +165,7 @@ CRUD operations for Table records.
 | `pluralName` | String | Yes |
 | `singularName` | String | Yes |
 | `tags` | String | Yes |
+| `stepUp` | JSON | Yes |
 | `partitioned` | Boolean | Yes |
 | `partitionStrategy` | String | Yes |
 | `partitionKeyNames` | String | Yes |
@@ -177,13 +178,13 @@ CRUD operations for Table records.
 
 ```typescript
 // List all table records
-const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
+const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, stepUp: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
 
 // Get one by id
-const item = await db.table.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
+const item = await db.table.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, stepUp: true, partitioned: true, partitionStrategy: true, partitionKeyNames: true, partitionKeyTypes: true, createdAt: true, updatedAt: true, inheritsId: true } }).execute();
 
 // Create
-const created = await db.table.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', useRls: '<Boolean>', timestamps: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', singularName: '<String>', tags: '<String>', partitioned: '<Boolean>', partitionStrategy: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', inheritsId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.table.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', useRls: '<Boolean>', timestamps: '<Boolean>', peoplestamps: '<Boolean>', pluralName: '<String>', singularName: '<String>', tags: '<String>', stepUp: '<JSON>', partitioned: '<Boolean>', partitionStrategy: '<String>', partitionKeyNames: '<String>', partitionKeyTypes: '<String>', inheritsId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.table.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -250,6 +251,8 @@ CRUD operations for Field records.
 | `isRequired` | Boolean | Yes |
 | `apiRequired` | Boolean | Yes |
 | `defaultValue` | JSON | Yes |
+| `generationExpression` | JSON | Yes |
+| `generationType` | String | Yes |
 | `type` | JSON | Yes |
 | `fieldOrder` | Int | Yes |
 | `regexp` | String | Yes |
@@ -266,13 +269,13 @@ CRUD operations for Field records.
 
 ```typescript
 // List all field records
-const items = await db.field.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.field.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, generationExpression: true, generationType: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.field.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.field.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, apiRequired: true, defaultValue: true, generationExpression: true, generationType: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.field.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', isRequired: '<Boolean>', apiRequired: '<Boolean>', defaultValue: '<JSON>', type: '<JSON>', fieldOrder: '<Int>', regexp: '<String>', chk: '<JSON>', chkExpr: '<JSON>', min: '<Float>', max: '<Float>', tags: '<String>', category: '<ObjectCategory>' }, select: { id: true } }).execute();
+const created = await db.field.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', isRequired: '<Boolean>', apiRequired: '<Boolean>', defaultValue: '<JSON>', generationExpression: '<JSON>', generationType: '<String>', type: '<JSON>', fieldOrder: '<Int>', regexp: '<String>', chk: '<JSON>', chkExpr: '<JSON>', min: '<Float>', max: '<Float>', tags: '<String>', category: '<ObjectCategory>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.field.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -467,6 +470,7 @@ CRUD operations for Policy records.
 | `disabled` | Boolean | Yes |
 | `policyType` | String | Yes |
 | `data` | JSON | Yes |
+| `withCheck` | JSON | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
 | `tags` | String | Yes |
@@ -477,13 +481,13 @@ CRUD operations for Policy records.
 
 ```typescript
 // List all policy records
-const items = await db.policy.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.policy.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, withCheck: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.policy.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.policy.findOne({ id: '<UUID>', select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, withCheck: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.policy.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
+const created = await db.policy.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', granteeName: '<String>', privilege: '<String>', permissive: '<Boolean>', disabled: '<Boolean>', policyType: '<String>', data: '<JSON>', withCheck: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.policy.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -1609,6 +1613,7 @@ CRUD operations for Database records.
 | `name` | String | Yes |
 | `label` | String | Yes |
 | `hash` | UUID | Yes |
+| `platform` | Boolean | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 
@@ -1616,13 +1621,13 @@ CRUD operations for Database records.
 
 ```typescript
 // List all database records
-const items = await db.database.findMany({ select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.database.findMany({ select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, platform: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.database.findOne({ id: '<UUID>', select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.database.findOne({ id: '<UUID>', select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, platform: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.database.create({ data: { ownerId: '<UUID>', schemaHash: '<String>', name: '<String>', label: '<String>', hash: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.database.create({ data: { ownerId: '<UUID>', schemaHash: '<String>', name: '<String>', label: '<String>', hash: '<UUID>', platform: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.database.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
@@ -1755,6 +1760,47 @@ const updated = await db.databaseSetting.update({ where: { id: '<UUID>' }, data:
 const deleted = await db.databaseSetting.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.astMigration`
+
+CRUD operations for AstMigration records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | Int | No |
+| `databaseId` | UUID | Yes |
+| `name` | String | Yes |
+| `requires` | String | Yes |
+| `payload` | JSON | Yes |
+| `deploys` | String | Yes |
+| `deploy` | JSON | Yes |
+| `revert` | JSON | Yes |
+| `verify` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `action` | String | Yes |
+| `actionId` | UUID | Yes |
+| `actorId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all astMigration records
+const items = await db.astMigration.findMany({ select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+
+// Get one by id
+const item = await db.astMigration.findOne({ id: '<Int>', select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+
+// Create
+const created = await db.astMigration.create({ data: { databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: '<JSON>', deploys: '<String>', deploy: '<JSON>', revert: '<JSON>', verify: '<JSON>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.astMigration.update({ where: { id: '<Int>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.astMigration.delete({ where: { id: '<Int>' } }).execute();
+```
+
 ### `db.webauthnSetting`
 
 CRUD operations for WebauthnSetting records.
@@ -1799,47 +1845,6 @@ const updated = await db.webauthnSetting.update({ where: { id: '<UUID>' }, data:
 
 // Delete
 const deleted = await db.webauthnSetting.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.astMigration`
-
-CRUD operations for AstMigration records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | Int | No |
-| `databaseId` | UUID | Yes |
-| `name` | String | Yes |
-| `requires` | String | Yes |
-| `payload` | JSON | Yes |
-| `deploys` | String | Yes |
-| `deploy` | JSON | Yes |
-| `revert` | JSON | Yes |
-| `verify` | JSON | Yes |
-| `createdAt` | Datetime | No |
-| `action` | String | Yes |
-| `actionId` | UUID | Yes |
-| `actorId` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all astMigration records
-const items = await db.astMigration.findMany({ select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
-
-// Get one by id
-const item = await db.astMigration.findOne({ id: '<Int>', select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
-
-// Create
-const created = await db.astMigration.create({ data: { databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: '<JSON>', deploys: '<String>', deploy: '<JSON>', revert: '<JSON>', verify: '<JSON>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.astMigration.update({ where: { id: '<Int>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.astMigration.delete({ where: { id: '<Int>' } }).execute();
 ```
 
 ## Custom Operations
@@ -1905,36 +1910,6 @@ rejectDatabaseTransfer
 const result = await db.mutation.rejectDatabaseTransfer({ input: { transferId: '<UUID>' } }).execute();
 ```
 
-### `db.mutation.provisionDatabaseWithUser`
-
-provisionDatabaseWithUser
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionDatabaseWithUserInput (required) |
-
-```typescript
-const result = await db.mutation.provisionDatabaseWithUser({ input: { pDatabaseName: '<String>', pDomain: '<String>', pSubdomain: '<String>', pModules: '<JSON>', pOptions: '<JSON>' } }).execute();
-```
-
-### `db.mutation.bootstrapUser`
-
-bootstrapUser
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | BootstrapUserInput (required) |
-
-```typescript
-const result = await db.mutation.bootstrapUser({ input: '<BootstrapUserInput>' }).execute();
-```
-
 ### `db.mutation.setFieldOrder`
 
 setFieldOrder
@@ -1965,35 +1940,25 @@ applyRls
 const result = await db.mutation.applyRls({ input: '<ApplyRlsInput>' }).execute();
 ```
 
-### `db.mutation.createUserDatabase`
+### `db.mutation.requestDatabase`
 
-Creates a new user database with all required modules, permissions, and RLS policies.
+Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Parameters:
-  - database_name: Name for the new database (required)
-  - owner_id: UUID of the owner user (required)
-  - include_invites: Include invite system (default: true)
-  - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include events/analytics (default: false)
-  - bitlen: Bit length for permission masks (default: 64)
-  - tokens_expiration: Token expiration interval (default: 30 days)
-
-Returns the database_id UUID of the newly created database.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups
-
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | CreateUserDatabaseInput (required) |
+  | `input` | RequestDatabaseInput (required) |
 
 ```typescript
-const result = await db.mutation.createUserDatabase({ input: '<CreateUserDatabaseInput>' }).execute();
+const result = await db.mutation.requestDatabase({ input: '<RequestDatabaseInput>' }).execute();
 ```
 
 ### `db.mutation.provisionBucket`

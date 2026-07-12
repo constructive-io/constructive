@@ -49,7 +49,7 @@ export function useUpdateFunctionGraphRefMutation<S extends FunctionGraphRefSele
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
         functionGraphRefPatch: FunctionGraphRefPatch;
       }
     >,
@@ -64,7 +64,7 @@ export function useUpdateFunctionGraphRefMutation<S extends FunctionGraphRefSele
   Error,
   {
     id: string;
-    databaseId: string;
+    scopeId: string;
     functionGraphRefPatch: FunctionGraphRefPatch;
   }
 >;
@@ -77,7 +77,7 @@ export function useUpdateFunctionGraphRefMutation(
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
         functionGraphRefPatch: FunctionGraphRefPatch;
       }
     >,
@@ -92,18 +92,18 @@ export function useUpdateFunctionGraphRefMutation(
     mutationKey: functionGraphRefMutationKeys.all,
     mutationFn: ({
       id,
-      databaseId,
+      scopeId,
       functionGraphRefPatch,
     }: {
       id: string;
-      databaseId: string;
+      scopeId: string;
       functionGraphRefPatch: FunctionGraphRefPatch;
     }) =>
       getClient()
         .functionGraphRef.update({
           where: {
             id,
-            databaseId,
+            scopeId,
           },
           data: functionGraphRefPatch,
           select: args.select,

@@ -19,6 +19,15 @@
 // Entity Query Keys
 // ============================================================================
 
+export const infraGetAllRecordKeys = {
+  /** All infraGetAllRecord queries */ all: ['infragetallrecord'] as const,
+  /** List query keys */ lists: () => [...infraGetAllRecordKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...infraGetAllRecordKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...infraGetAllRecordKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...infraGetAllRecordKeys.details(), id] as const,
+} as const;
 export const getAllRecordKeys = {
   /** All getAllRecord queries */ all: ['getallrecord'] as const,
   /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
@@ -28,6 +37,24 @@ export const getAllRecordKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...getAllRecordKeys.details(), id] as const,
 } as const;
+export const infraRefKeys = {
+  /** All infraRef queries */ all: ['infraref'] as const,
+  /** List query keys */ lists: () => [...infraRefKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...infraRefKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...infraRefKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...infraRefKeys.details(), id] as const,
+} as const;
+export const infraStoreKeys = {
+  /** All infraStore queries */ all: ['infrastore'] as const,
+  /** List query keys */ lists: () => [...infraStoreKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...infraStoreKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...infraStoreKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...infraStoreKeys.details(), id] as const,
+} as const;
 export const functionApiBindingKeys = {
   /** All functionApiBinding queries */ all: ['functionapibinding'] as const,
   /** List query keys */ lists: () => [...functionApiBindingKeys.all, 'list'] as const,
@@ -36,24 +63,6 @@ export const functionApiBindingKeys = {
   /** Detail query keys */ details: () => [...functionApiBindingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionApiBindingKeys.details(), id] as const,
-} as const;
-export const functionDeploymentKeys = {
-  /** All functionDeployment queries */ all: ['functiondeployment'] as const,
-  /** List query keys */ lists: () => [...functionDeploymentKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...functionDeploymentKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...functionDeploymentKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...functionDeploymentKeys.details(), id] as const,
-} as const;
-export const resourceKeys = {
-  /** All resource queries */ all: ['resource'] as const,
-  /** List query keys */ lists: () => [...resourceKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...resourceKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...resourceKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...resourceKeys.details(), id] as const,
 } as const;
 export const functionGraphRefKeys = {
   /** All functionGraphRef queries */ all: ['functiongraphref'] as const,
@@ -73,6 +82,87 @@ export const functionGraphStoreKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphStoreKeys.details(), id] as const,
 } as const;
+export const platformFunctionApiBindingKeys = {
+  /** All platformFunctionApiBinding queries */ all: ['platformfunctionapibinding'] as const,
+  /** List query keys */ lists: () => [...platformFunctionApiBindingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformFunctionApiBindingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionApiBindingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformFunctionApiBindingKeys.details(), id] as const,
+} as const;
+export const platformResourcesRequirementsStateKeys = {
+  /** All platformResourcesRequirementsState queries */ all: [
+    'platformresourcesrequirementsstate',
+  ] as const,
+  /** List query keys */ lists: () =>
+    [...platformResourcesRequirementsStateKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourcesRequirementsStateKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourcesRequirementsStateKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourcesRequirementsStateKeys.details(), id] as const,
+} as const;
+export const resourcesRequirementsStateKeys = {
+  /** All resourcesRequirementsState queries */ all: ['resourcesrequirementsstate'] as const,
+  /** List query keys */ lists: () => [...resourcesRequirementsStateKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourcesRequirementsStateKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...resourcesRequirementsStateKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourcesRequirementsStateKeys.details(), id] as const,
+} as const;
+export const platformResourceStatusCheckKeys = {
+  /** All platformResourceStatusCheck queries */ all: ['platformresourcestatuscheck'] as const,
+  /** List query keys */ lists: () => [...platformResourceStatusCheckKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceStatusCheckKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourceStatusCheckKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceStatusCheckKeys.details(), id] as const,
+} as const;
+export const platformFunctionDeploymentKeys = {
+  /** All platformFunctionDeployment queries */ all: ['platformfunctiondeployment'] as const,
+  /** List query keys */ lists: () => [...platformFunctionDeploymentKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformFunctionDeploymentKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionDeploymentKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformFunctionDeploymentKeys.details(), id] as const,
+} as const;
+export const platformResourceKeys = {
+  /** All platformResource queries */ all: ['platformresource'] as const,
+  /** List query keys */ lists: () => [...platformResourceKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformResourceKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceKeys.details(), id] as const,
+} as const;
+export const platformResourceDefinitionKeys = {
+  /** All platformResourceDefinition queries */ all: ['platformresourcedefinition'] as const,
+  /** List query keys */ lists: () => [...platformResourceDefinitionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceDefinitionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourceDefinitionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceDefinitionKeys.details(), id] as const,
+} as const;
+export const infraObjectKeys = {
+  /** All infraObject queries */ all: ['infraobject'] as const,
+  /** List query keys */ lists: () => [...infraObjectKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...infraObjectKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...infraObjectKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...infraObjectKeys.details(), id] as const,
+} as const;
 export const functionGraphObjectKeys = {
   /** All functionGraphObject queries */ all: ['functiongraphobject'] as const,
   /** List query keys */ lists: () => [...functionGraphObjectKeys.all, 'list'] as const,
@@ -81,6 +171,63 @@ export const functionGraphObjectKeys = {
   /** Detail query keys */ details: () => [...functionGraphObjectKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphObjectKeys.details(), id] as const,
+} as const;
+export const platformFunctionDeploymentEventKeys = {
+  /** All platformFunctionDeploymentEvent queries */ all: [
+    'platformfunctiondeploymentevent',
+  ] as const,
+  /** List query keys */ lists: () => [...platformFunctionDeploymentEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformFunctionDeploymentEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionDeploymentEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformFunctionDeploymentEventKeys.details(), id] as const,
+} as const;
+export const platformResourceEventKeys = {
+  /** All platformResourceEvent queries */ all: ['platformresourceevent'] as const,
+  /** List query keys */ lists: () => [...platformResourceEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformResourceEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceEventKeys.details(), id] as const,
+} as const;
+export const resourceStatusCheckKeys = {
+  /** All resourceStatusCheck queries */ all: ['resourcestatuscheck'] as const,
+  /** List query keys */ lists: () => [...resourceStatusCheckKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceStatusCheckKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceStatusCheckKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceStatusCheckKeys.details(), id] as const,
+} as const;
+export const functionDeploymentKeys = {
+  /** All functionDeployment queries */ all: ['functiondeployment'] as const,
+  /** List query keys */ lists: () => [...functionDeploymentKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...functionDeploymentKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...functionDeploymentKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...functionDeploymentKeys.details(), id] as const,
+} as const;
+export const resourceKeys = {
+  /** All resource queries */ all: ['resource'] as const,
+  /** List query keys */ lists: () => [...resourceKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceKeys.details(), id] as const,
+} as const;
+export const resourceDefinitionKeys = {
+  /** All resourceDefinition queries */ all: ['resourcedefinition'] as const,
+  /** List query keys */ lists: () => [...resourceDefinitionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceDefinitionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceDefinitionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceDefinitionKeys.details(), id] as const,
 } as const;
 export const functionDeploymentEventKeys = {
   /** All functionDeploymentEvent queries */ all: ['functiondeploymentevent'] as const,
@@ -91,14 +238,15 @@ export const functionDeploymentEventKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionDeploymentEventKeys.details(), id] as const,
 } as const;
-export const orgFunctionExecutionLogKeys = {
-  /** All orgFunctionExecutionLog queries */ all: ['orgfunctionexecutionlog'] as const,
-  /** List query keys */ lists: () => [...orgFunctionExecutionLogKeys.all, 'list'] as const,
+export const platformFunctionExecutionLogKeys = {
+  /** All platformFunctionExecutionLog queries */ all: ['platformfunctionexecutionlog'] as const,
+  /** List query keys */ lists: () => [...platformFunctionExecutionLogKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...orgFunctionExecutionLogKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgFunctionExecutionLogKeys.all, 'detail'] as const,
+    [...platformFunctionExecutionLogKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionExecutionLogKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgFunctionExecutionLogKeys.details(), id] as const,
+    [...platformFunctionExecutionLogKeys.details(), id] as const,
 } as const;
 export const resourceEventKeys = {
   /** All resourceEvent queries */ all: ['resourceevent'] as const,
@@ -119,6 +267,15 @@ export const functionGraphExecutionOutputKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphExecutionOutputKeys.details(), id] as const,
 } as const;
+export const infraCommitKeys = {
+  /** All infraCommit queries */ all: ['infracommit'] as const,
+  /** List query keys */ lists: () => [...infraCommitKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...infraCommitKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...infraCommitKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...infraCommitKeys.details(), id] as const,
+} as const;
 export const functionGraphCommitKeys = {
   /** All functionGraphCommit queries */ all: ['functiongraphcommit'] as const,
   /** List query keys */ lists: () => [...functionGraphCommitKeys.all, 'list'] as const,
@@ -128,15 +285,6 @@ export const functionGraphCommitKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphCommitKeys.details(), id] as const,
 } as const;
-export const secretDefinitionKeys = {
-  /** All secretDefinition queries */ all: ['secretdefinition'] as const,
-  /** List query keys */ lists: () => [...secretDefinitionKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...secretDefinitionKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...secretDefinitionKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...secretDefinitionKeys.details(), id] as const,
-} as const;
 export const functionExecutionLogKeys = {
   /** All functionExecutionLog queries */ all: ['functionexecutionlog'] as const,
   /** List query keys */ lists: () => [...functionExecutionLogKeys.all, 'list'] as const,
@@ -145,6 +293,47 @@ export const functionExecutionLogKeys = {
   /** Detail query keys */ details: () => [...functionExecutionLogKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionExecutionLogKeys.details(), id] as const,
+} as const;
+export const platformResourcesResolvedRequirementKeys = {
+  /** All platformResourcesResolvedRequirement queries */ all: [
+    'platformresourcesresolvedrequirement',
+  ] as const,
+  /** List query keys */ lists: () =>
+    [...platformResourcesResolvedRequirementKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourcesResolvedRequirementKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourcesResolvedRequirementKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourcesResolvedRequirementKeys.details(), id] as const,
+} as const;
+export const resourcesResolvedRequirementKeys = {
+  /** All resourcesResolvedRequirement queries */ all: ['resourcesresolvedrequirement'] as const,
+  /** List query keys */ lists: () => [...resourcesResolvedRequirementKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourcesResolvedRequirementKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...resourcesResolvedRequirementKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourcesResolvedRequirementKeys.details(), id] as const,
+} as const;
+export const dbPresetKeys = {
+  /** All dbPreset queries */ all: ['dbpreset'] as const,
+  /** List query keys */ lists: () => [...dbPresetKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...dbPresetKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...dbPresetKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...dbPresetKeys.details(), id] as const,
+} as const;
+export const platformNamespaceKeys = {
+  /** All platformNamespace queries */ all: ['platformnamespace'] as const,
+  /** List query keys */ lists: () => [...platformNamespaceKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformNamespaceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformNamespaceKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformNamespaceKeys.details(), id] as const,
 } as const;
 export const functionGraphKeys = {
   /** All functionGraph queries */ all: ['functiongraph'] as const,
@@ -167,23 +356,24 @@ export const functionGraphExecutionNodeStateKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphExecutionNodeStateKeys.details(), id] as const,
 } as const;
-export const platformNamespaceKeys = {
-  /** All platformNamespace queries */ all: ['platformnamespace'] as const,
-  /** List query keys */ lists: () => [...platformNamespaceKeys.all, 'list'] as const,
+export const namespaceKeys = {
+  /** All namespace queries */ all: ['namespace'] as const,
+  /** List query keys */ lists: () => [...namespaceKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...platformNamespaceKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformNamespaceKeys.all, 'detail'] as const,
+    [...namespaceKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...namespaceKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformNamespaceKeys.details(), id] as const,
+    [...namespaceKeys.details(), id] as const,
 } as const;
-export const orgFunctionInvocationKeys = {
-  /** All orgFunctionInvocation queries */ all: ['orgfunctioninvocation'] as const,
-  /** List query keys */ lists: () => [...orgFunctionInvocationKeys.all, 'list'] as const,
+export const platformFunctionInvocationKeys = {
+  /** All platformFunctionInvocation queries */ all: ['platformfunctioninvocation'] as const,
+  /** List query keys */ lists: () => [...platformFunctionInvocationKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...orgFunctionInvocationKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgFunctionInvocationKeys.all, 'detail'] as const,
+    [...platformFunctionInvocationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionInvocationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgFunctionInvocationKeys.details(), id] as const,
+    [...platformFunctionInvocationKeys.details(), id] as const,
 } as const;
 export const functionInvocationKeys = {
   /** All functionInvocation queries */ all: ['functioninvocation'] as const,
@@ -203,6 +393,24 @@ export const platformNamespaceEventKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformNamespaceEventKeys.details(), id] as const,
 } as const;
+export const integrationProviderKeys = {
+  /** All integrationProvider queries */ all: ['integrationprovider'] as const,
+  /** List query keys */ lists: () => [...integrationProviderKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...integrationProviderKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...integrationProviderKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...integrationProviderKeys.details(), id] as const,
+} as const;
+export const namespaceEventKeys = {
+  /** All namespaceEvent queries */ all: ['namespaceevent'] as const,
+  /** List query keys */ lists: () => [...namespaceEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...namespaceEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...namespaceEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...namespaceEventKeys.details(), id] as const,
+} as const;
 export const functionGraphExecutionKeys = {
   /** All functionGraphExecution queries */ all: ['functiongraphexecution'] as const,
   /** List query keys */ lists: () => [...functionGraphExecutionKeys.all, 'list'] as const,
@@ -211,6 +419,16 @@ export const functionGraphExecutionKeys = {
   /** Detail query keys */ details: () => [...functionGraphExecutionKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionGraphExecutionKeys.details(), id] as const,
+} as const;
+export const platformFunctionDefinitionKeys = {
+  /** All platformFunctionDefinition queries */ all: ['platformfunctiondefinition'] as const,
+  /** List query keys */ lists: () => [...platformFunctionDefinitionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformFunctionDefinitionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformFunctionDefinitionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformFunctionDefinitionKeys.details(), id] as const,
 } as const;
 export const functionDefinitionKeys = {
   /** All functionDefinition queries */ all: ['functiondefinition'] as const,
@@ -253,27 +471,49 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
+  infraGetAllRecord: infraGetAllRecordKeys,
   getAllRecord: getAllRecordKeys,
+  infraRef: infraRefKeys,
+  infraStore: infraStoreKeys,
   functionApiBinding: functionApiBindingKeys,
-  functionDeployment: functionDeploymentKeys,
-  resource: resourceKeys,
   functionGraphRef: functionGraphRefKeys,
   functionGraphStore: functionGraphStoreKeys,
+  platformFunctionApiBinding: platformFunctionApiBindingKeys,
+  platformResourcesRequirementsState: platformResourcesRequirementsStateKeys,
+  resourcesRequirementsState: resourcesRequirementsStateKeys,
+  platformResourceStatusCheck: platformResourceStatusCheckKeys,
+  platformFunctionDeployment: platformFunctionDeploymentKeys,
+  platformResource: platformResourceKeys,
+  platformResourceDefinition: platformResourceDefinitionKeys,
+  infraObject: infraObjectKeys,
   functionGraphObject: functionGraphObjectKeys,
+  platformFunctionDeploymentEvent: platformFunctionDeploymentEventKeys,
+  platformResourceEvent: platformResourceEventKeys,
+  resourceStatusCheck: resourceStatusCheckKeys,
+  functionDeployment: functionDeploymentKeys,
+  resource: resourceKeys,
+  resourceDefinition: resourceDefinitionKeys,
   functionDeploymentEvent: functionDeploymentEventKeys,
-  orgFunctionExecutionLog: orgFunctionExecutionLogKeys,
+  platformFunctionExecutionLog: platformFunctionExecutionLogKeys,
   resourceEvent: resourceEventKeys,
   functionGraphExecutionOutput: functionGraphExecutionOutputKeys,
+  infraCommit: infraCommitKeys,
   functionGraphCommit: functionGraphCommitKeys,
-  secretDefinition: secretDefinitionKeys,
   functionExecutionLog: functionExecutionLogKeys,
+  platformResourcesResolvedRequirement: platformResourcesResolvedRequirementKeys,
+  resourcesResolvedRequirement: resourcesResolvedRequirementKeys,
+  dbPreset: dbPresetKeys,
+  platformNamespace: platformNamespaceKeys,
   functionGraph: functionGraphKeys,
   functionGraphExecutionNodeState: functionGraphExecutionNodeStateKeys,
-  platformNamespace: platformNamespaceKeys,
-  orgFunctionInvocation: orgFunctionInvocationKeys,
+  namespace: namespaceKeys,
+  platformFunctionInvocation: platformFunctionInvocationKeys,
   functionInvocation: functionInvocationKeys,
   platformNamespaceEvent: platformNamespaceEventKeys,
+  integrationProvider: integrationProviderKeys,
+  namespaceEvent: namespaceEventKeys,
   functionGraphExecution: functionGraphExecutionKeys,
+  platformFunctionDefinition: platformFunctionDefinitionKeys,
   functionDefinition: functionDefinitionKeys,
   custom: customQueryKeys,
 } as const;

@@ -4,10 +4,29 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export type Base64EncodedBinary = unknown;
-export type FunctionRequirement = unknown;
+export type ConstructiveInternalTypeImage = unknown;
+export type ResourceRequirement = unknown;
+export interface InfraGetAllRecord {
+  path: string[] | null;
+  data: unknown | null;
+}
 export interface GetAllRecord {
   path: string[] | null;
   data: unknown | null;
+}
+export interface InfraRef {
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
+  storeId: string | null;
+  commitId: string | null;
+}
+export interface InfraStore {
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
+  hash: string | null;
+  createdAt: string | null;
 }
 export interface FunctionApiBinding {
   id: string | null;
@@ -16,17 +35,174 @@ export interface FunctionApiBinding {
   alias: string | null;
   config: unknown | null;
 }
-export interface FunctionDeployment {
+export interface FunctionGraphRef {
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
+  storeId: string | null;
+  commitId: string | null;
+}
+export interface FunctionGraphStore {
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
+  hash: string | null;
+  createdAt: string | null;
+}
+export interface PlatformFunctionApiBinding {
+  id: string | null;
+  functionDefinitionId: string | null;
+  apiId: string | null;
+  alias: string | null;
+  config: unknown | null;
+}
+export interface PlatformResourcesRequirementsState {
+  resourceId: string | null;
+  slug: string | null;
+  secretsHash: string | null;
+  configHash: string | null;
+  requirementsHash: string | null;
+  secretsObjectName: string | null;
+  configObjectName: string | null;
+}
+export interface ResourcesRequirementsState {
+  resourceId: string | null;
+  slug: string | null;
+  secretsHash: string | null;
+  configHash: string | null;
+  requirementsHash: string | null;
+  secretsObjectName: string | null;
+  configObjectName: string | null;
+}
+export interface PlatformResourceStatusCheck {
+  id: string | null;
+  resourceId: string | null;
+  requestedBy: string | null;
+  requestedAt: string | null;
+  completedAt: string | null;
+  status: string | null;
+  result: unknown | null;
+}
+export interface PlatformFunctionDeployment {
   id: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  functionDefinitionId: string | null;
   namespaceId: string | null;
   status: string | null;
   serviceUrl: string | null;
   serviceName: string | null;
   revision: number | null;
   image: string | null;
+  imageVersion: string | null;
+  handlerName: string | null;
+  concurrency: number | null;
+  scaleMin: number | null;
+  scaleMax: number | null;
+  timeoutSeconds: number | null;
+  resources: unknown | null;
+  lastError: string | null;
+  lastErrorAt: string | null;
+  errorCount: number | null;
+  labels: unknown | null;
+  annotations: unknown | null;
+}
+export interface PlatformResource {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  namespaceId: string | null;
+  kind: string | null;
+  name: string | null;
+  slug: string | null;
+  spec: unknown | null;
+  status: string | null;
+  statusObserved: unknown | null;
+  lastError: string | null;
+  errorCount: number | null;
+  labels: unknown | null;
+  annotations: unknown | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  integrations: string[] | null;
+  resourceDefinitionId: string | null;
+}
+export interface PlatformResourceDefinition {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  namespaceId: string | null;
+  kind: string | null;
+  name: string | null;
+  slug: string | null;
+  description: string | null;
+  defaultSpec: unknown | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  integrations: string[] | null;
+  labels: unknown | null;
+  annotations: unknown | null;
+  stepUpMinAge: string | null;
+}
+export interface InfraObject {
+  id: string | null;
+  scopeId: string | null;
+  kids: string[] | null;
+  ktree: string[] | null;
+  data: unknown | null;
+  createdAt: string | null;
+}
+export interface FunctionGraphObject {
+  id: string | null;
+  scopeId: string | null;
+  kids: string[] | null;
+  ktree: string[] | null;
+  data: unknown | null;
+  createdAt: string | null;
+}
+export interface PlatformFunctionDeploymentEvent {
+  createdAt: string | null;
+  id: string | null;
+  deploymentId: string | null;
+  eventType: string | null;
+  actorId: string | null;
+  message: string | null;
+  metadata: unknown | null;
+}
+export interface PlatformResourceEvent {
+  createdAt: string | null;
+  id: string | null;
+  resourceId: string | null;
+  eventType: string | null;
+  actorId: string | null;
+  message: string | null;
+  metadata: unknown | null;
+}
+export interface ResourceStatusCheck {
+  id: string | null;
+  resourceId: string | null;
+  databaseId: string | null;
+  requestedBy: string | null;
+  requestedAt: string | null;
+  completedAt: string | null;
+  status: string | null;
+  result: unknown | null;
+}
+export interface FunctionDeployment {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  namespaceId: string | null;
+  status: string | null;
+  serviceUrl: string | null;
+  serviceName: string | null;
+  revision: number | null;
+  image: string | null;
+  imageVersion: string | null;
+  handlerName: string | null;
   concurrency: number | null;
   scaleMin: number | null;
   scaleMax: number | null;
@@ -57,28 +233,30 @@ export interface Resource {
   labels: unknown | null;
   annotations: unknown | null;
   databaseId: string | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  integrations: string[] | null;
+  resourceDefinitionId: string | null;
 }
-export interface FunctionGraphRef {
+export interface ResourceDefinition {
   id: string | null;
-  name: string | null;
-  databaseId: string | null;
-  storeId: string | null;
-  commitId: string | null;
-}
-export interface FunctionGraphStore {
-  id: string | null;
-  name: string | null;
-  databaseId: string | null;
-  hash: string | null;
   createdAt: string | null;
-}
-export interface FunctionGraphObject {
-  id: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  namespaceId: string | null;
+  kind: string | null;
+  name: string | null;
+  slug: string | null;
+  description: string | null;
+  defaultSpec: unknown | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  integrations: string[] | null;
+  labels: unknown | null;
+  annotations: unknown | null;
+  stepUpMinAge: string | null;
   databaseId: string | null;
-  kids: string[] | null;
-  ktree: string[] | null;
-  data: unknown | null;
-  createdAt: string | null;
 }
 export interface FunctionDeploymentEvent {
   createdAt: string | null;
@@ -90,7 +268,7 @@ export interface FunctionDeploymentEvent {
   metadata: unknown | null;
   databaseId: string | null;
 }
-export interface OrgFunctionExecutionLog {
+export interface PlatformFunctionExecutionLog {
   createdAt: string | null;
   id: string | null;
   invocationId: string | null;
@@ -113,14 +291,14 @@ export interface ResourceEvent {
 export interface FunctionGraphExecutionOutput {
   createdAt: string | null;
   id: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   hash: Base64EncodedBinary | null;
   data: unknown | null;
 }
-export interface FunctionGraphCommit {
+export interface InfraCommit {
   id: string | null;
   message: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   storeId: string | null;
   parentIds: string[] | null;
   authorId: string | null;
@@ -128,16 +306,16 @@ export interface FunctionGraphCommit {
   treeId: string | null;
   date: string | null;
 }
-export interface SecretDefinition {
+export interface FunctionGraphCommit {
   id: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  name: string | null;
-  description: string | null;
-  isBuiltIn: boolean | null;
-  labels: unknown | null;
-  annotations: unknown | null;
-  databaseId: string | null;
+  message: string | null;
+  scopeId: string | null;
+  storeId: string | null;
+  parentIds: string[] | null;
+  authorId: string | null;
+  committerId: string | null;
+  treeId: string | null;
+  date: string | null;
 }
 export interface FunctionExecutionLog {
   createdAt: string | null;
@@ -150,9 +328,60 @@ export interface FunctionExecutionLog {
   actorId: string | null;
   databaseId: string | null;
 }
+export interface PlatformResourcesResolvedRequirement {
+  resourceId: string | null;
+  slug: string | null;
+  namespaceId: string | null;
+  requirementKind: string | null;
+  name: string | null;
+  required: boolean | null;
+  atomId: string | null;
+  present: boolean | null;
+  secretsObjectName: string | null;
+  configObjectName: string | null;
+}
+export interface ResourcesResolvedRequirement {
+  resourceId: string | null;
+  slug: string | null;
+  namespaceId: string | null;
+  requirementKind: string | null;
+  name: string | null;
+  required: boolean | null;
+  atomId: string | null;
+  present: boolean | null;
+  secretsObjectName: string | null;
+  configObjectName: string | null;
+}
+export interface DbPreset {
+  id: string | null;
+  storeId: string | null;
+  slug: string | null;
+  definition: unknown | null;
+  commitId: string | null;
+  modulesHash: string | null;
+  label: string | null;
+  description: string | null;
+  active: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface PlatformNamespace {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  name: string | null;
+  namespaceName: string | null;
+  description: string | null;
+  isActive: boolean | null;
+  status: string | null;
+  lastError: string | null;
+  labels: unknown | null;
+  annotations: unknown | null;
+  isManaged: boolean | null;
+}
 export interface FunctionGraph {
   id: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   storeId: string | null;
   context: string | null;
   name: string | null;
@@ -168,7 +397,7 @@ export interface FunctionGraphExecutionNodeState {
   createdAt: string | null;
   id: string | null;
   executionId: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   nodeName: string | null;
   nodePath: string[] | null;
   status: string | null;
@@ -178,7 +407,7 @@ export interface FunctionGraphExecutionNodeState {
   errorMessage: string | null;
   outputId: string | null;
 }
-export interface PlatformNamespace {
+export interface Namespace {
   id: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -186,14 +415,14 @@ export interface PlatformNamespace {
   namespaceName: string | null;
   description: string | null;
   isActive: boolean | null;
+  status: string | null;
+  lastError: string | null;
   labels: unknown | null;
   annotations: unknown | null;
   databaseId: string | null;
-  sourceDatabaseId: string | null;
-  sourceScope: string | null;
   isManaged: boolean | null;
 }
-export interface OrgFunctionInvocation {
+export interface PlatformFunctionInvocation {
   createdAt: string | null;
   id: string | null;
   actorId: string | null;
@@ -241,6 +470,36 @@ export interface PlatformNamespaceEvent {
   networkEgressBytes: string | null;
   podCount: number | null;
   metrics: unknown | null;
+}
+export interface IntegrationProvider {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  slug: string | null;
+  name: string | null;
+  description: string | null;
+  category: string | null;
+  icon: string | null;
+  logo: ConstructiveInternalTypeImage | null;
+  brand: unknown | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  requiredConfigs: ResourceRequirement[] | null;
+}
+export interface NamespaceEvent {
+  createdAt: string | null;
+  id: string | null;
+  namespaceId: string | null;
+  eventType: string | null;
+  actorId: string | null;
+  message: string | null;
+  metadata: unknown | null;
+  cpuMillicores: number | null;
+  memoryBytes: string | null;
+  storageBytes: string | null;
+  networkIngressBytes: string | null;
+  networkEgressBytes: string | null;
+  podCount: number | null;
+  metrics: unknown | null;
   databaseId: string | null;
 }
 export interface FunctionGraphExecution {
@@ -248,7 +507,7 @@ export interface FunctionGraphExecution {
   id: string | null;
   graphId: string | null;
   invocationId: string | null;
-  databaseId: string | null;
+  scopeId: string | null;
   outputNode: string | null;
   outputPort: string | null;
   status: string | null;
@@ -265,8 +524,48 @@ export interface FunctionGraphExecution {
   maxTicks: number | null;
   maxPendingJobs: number | null;
   timeoutAt: string | null;
+  lastProgressAt: string | null;
   errorCode: string | null;
   errorMessage: string | null;
+}
+export interface PlatformFunctionDefinition {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  scope: string | null;
+  name: string | null;
+  taskIdentifier: string | null;
+  description: string | null;
+  isPublished: boolean | null;
+  accessChannels: string[] | null;
+  publishedAt: string | null;
+  maxAttempts: number | null;
+  priority: number | null;
+  queueName: string | null;
+  runtime: string | null;
+  targetSchema: string | null;
+  targetFunction: string | null;
+  moduleTable: string | null;
+  functionColumns: unknown | null;
+  payloadArgs: unknown | null;
+  image: string | null;
+  concurrency: number | null;
+  scaleMin: number | null;
+  scaleMax: number | null;
+  timeoutSeconds: number | null;
+  resources: unknown | null;
+  isBuiltIn: boolean | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  integrations: string[] | null;
+  requiredBuckets: string[] | null;
+  requiredModels: string[] | null;
+  inputs: unknown | null;
+  outputs: unknown | null;
+  props: unknown | null;
+  volatile: boolean | null;
+  icon: string | null;
+  category: string | null;
 }
 export interface FunctionDefinition {
   id: string | null;
@@ -276,11 +575,18 @@ export interface FunctionDefinition {
   name: string | null;
   taskIdentifier: string | null;
   description: string | null;
-  isInvocable: boolean | null;
+  isPublished: boolean | null;
+  accessChannels: string[] | null;
+  publishedAt: string | null;
   maxAttempts: number | null;
   priority: number | null;
   queueName: string | null;
   runtime: string | null;
+  targetSchema: string | null;
+  targetFunction: string | null;
+  moduleTable: string | null;
+  functionColumns: unknown | null;
+  payloadArgs: unknown | null;
   image: string | null;
   concurrency: number | null;
   scaleMin: number | null;
@@ -288,8 +594,9 @@ export interface FunctionDefinition {
   timeoutSeconds: number | null;
   resources: unknown | null;
   isBuiltIn: boolean | null;
-  requiredSecrets: FunctionRequirement[] | null;
-  requiredConfigs: FunctionRequirement[] | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  integrations: string[] | null;
   requiredBuckets: string[] | null;
   requiredModels: string[] | null;
   inputs: unknown | null;
@@ -298,6 +605,7 @@ export interface FunctionDefinition {
   volatile: boolean | null;
   icon: string | null;
   category: string | null;
+  databaseId: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

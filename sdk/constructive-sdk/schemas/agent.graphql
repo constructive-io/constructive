@@ -116,35 +116,6 @@ type Query {
     orderBy: [AgentMessageOrderBy!] = [PRIMARY_KEY_ASC]
   ): AgentMessageConnection
 
-  """Reads and enables pagination through a set of `AgentTask`."""
-  agentTasks(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AgentTaskFilter
-
-    """The method to use when ordering `AgentTask`."""
-    orderBy: [AgentTaskOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AgentTaskConnection
-
   """Reads and enables pagination through a set of `AgentResourceChunk`."""
   agentResourceChunks(
     """Only read the first `n` values of the set."""
@@ -173,6 +144,35 @@ type Query {
     """The method to use when ordering `AgentResourceChunk`."""
     orderBy: [AgentResourceChunkOrderBy!] = [PRIMARY_KEY_ASC]
   ): AgentResourceChunkConnection
+
+  """Reads and enables pagination through a set of `AgentTask`."""
+  agentTasks(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentTaskFilter
+
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AgentTaskConnection
 
   """Reads and enables pagination through a set of `AgentPersona`."""
   agentPersonas(
@@ -298,6 +298,9 @@ type AgentPlan {
   """Foreign key to agent_thread"""
   threadId: UUID!
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
   """Human-readable plan name"""
   title: String!
 
@@ -362,6 +365,9 @@ type AgentThread {
 
   """User who owns this thread"""
   ownerId: UUID!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Current status of this thread"""
   status: String!
@@ -502,6 +508,9 @@ type Agent {
   """Human who owns/manages this agent"""
   ownerId: UUID!
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
   """Persona template this agent was created from"""
   personaId: UUID
 
@@ -632,6 +641,9 @@ type AgentPersona {
   createdBy: UUID
   updatedBy: UUID
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
   """Unique human-readable identifier for this persona"""
   slug: String!
 
@@ -742,6 +754,9 @@ input AgentFilter {
 
   """Filter by the object’s `ownerId` field."""
   ownerId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
 
   """Filter by the object’s `personaId` field."""
   personaId: UUIDFilter
@@ -1138,6 +1153,9 @@ input AgentPersonaFilter {
   """Filter by the object’s `updatedBy` field."""
   updatedBy: UUIDFilter
 
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
   """Filter by the object’s `slug` field."""
   slug: StringFilter
 
@@ -1282,6 +1300,9 @@ input AgentThreadFilter {
   """Filter by the object’s `ownerId` field."""
   ownerId: UUIDFilter
 
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
   """Filter by the object’s `status` field."""
   status: StringFilter
 
@@ -1380,6 +1401,9 @@ input AgentPromptFilter {
   """Filter by the object’s `updatedBy` field."""
   updatedBy: UUIDFilter
 
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
   """Filter by the object’s `name` field."""
   name: StringFilter
 
@@ -1455,6 +1479,9 @@ input AgentMessageFilter {
   """Filter by the object’s `threadId` field."""
   threadId: UUIDFilter
 
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
   """Filter by the object’s `authorRole` field."""
   authorRole: StringFilter
 
@@ -1515,6 +1542,9 @@ input AgentPlanFilter {
 
   """Filter by the object’s `threadId` field."""
   threadId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
 
   """Filter by the object’s `title` field."""
   title: StringFilter
@@ -1579,6 +1609,9 @@ input AgentTaskFilter {
 
   """Filter by the object’s `planId` field."""
   planId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
 
   """Filter by the object’s `description` field."""
   description: StringFilter
@@ -1703,6 +1736,8 @@ enum AgentOrderBy {
   UPDATED_AT_DESC
   OWNER_ID_ASC
   OWNER_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   PERSONA_ID_ASC
   PERSONA_ID_DESC
   PARENT_ID_ASC
@@ -1758,6 +1793,8 @@ enum AgentThreadOrderBy {
   UPDATED_AT_DESC
   OWNER_ID_ASC
   OWNER_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   STATUS_ASC
   STATUS_DESC
   IS_ARCHIVED_ASC
@@ -1814,6 +1851,9 @@ type AgentMessage {
   """Foreign key to agent_thread"""
   threadId: UUID!
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
   """Who authored this message: user or assistant"""
   authorRole: String!
 
@@ -1856,6 +1896,8 @@ enum AgentMessageOrderBy {
   PARTS_DESC
   THREAD_ID_ASC
   THREAD_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   AUTHOR_ROLE_ASC
   AUTHOR_ROLE_DESC
   MODEL_ASC
@@ -1871,6 +1913,9 @@ type AgentPrompt {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
   name: String!
@@ -1903,6 +1948,8 @@ enum AgentPlanOrderBy {
   OWNER_ID_DESC
   THREAD_ID_ASC
   THREAD_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   TITLE_ASC
   TITLE_DESC
   DESCRIPTION_ASC
@@ -1942,6 +1989,9 @@ type AgentTask {
 
   """Foreign key to agent_plan"""
   planId: UUID!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Natural-language description of the work to do"""
   description: String!
@@ -2002,6 +2052,8 @@ enum AgentTaskOrderBy {
   STATUS_DESC
   PLAN_ID_ASC
   PLAN_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
   SOURCE_ASC
@@ -2072,6 +2124,8 @@ enum AgentPromptOrderBy {
   CREATED_BY_DESC
   UPDATED_BY_ASC
   UPDATED_BY_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   NAME_ASC
   NAME_DESC
   CONTENT_ASC
@@ -2148,6 +2202,9 @@ type AgentResource {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Unique human-readable identifier for portable references"""
   slug: String!
@@ -2344,6 +2401,9 @@ input AgentResourceFilter {
 
   """Filter by the object’s `updatedBy` field."""
   updatedBy: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
 
   """Filter by the object’s `slug` field."""
   slug: StringTrgmFilter
@@ -2746,6 +2806,8 @@ enum AgentPersonaOrderBy {
   CREATED_BY_DESC
   UPDATED_BY_ASC
   UPDATED_BY_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   SLUG_ASC
   SLUG_DESC
   NAME_ASC
@@ -2803,6 +2865,8 @@ enum AgentResourceOrderBy {
   CREATED_BY_DESC
   UPDATED_BY_ASC
   UPDATED_BY_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
   SLUG_ASC
   SLUG_DESC
   KIND_ASC
@@ -3127,14 +3191,6 @@ type Mutation {
     input: CreateAgentMessageInput!
   ): CreateAgentMessagePayload
 
-  """Creates a single `AgentTask`."""
-  createAgentTask(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAgentTaskInput!
-  ): CreateAgentTaskPayload
-
   """Creates a single `AgentResourceChunk`."""
   createAgentResourceChunk(
     """
@@ -3142,6 +3198,14 @@ type Mutation {
     """
     input: CreateAgentResourceChunkInput!
   ): CreateAgentResourceChunkPayload
+
+  """Creates a single `AgentTask`."""
+  createAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAgentTaskInput!
+  ): CreateAgentTaskPayload
 
   """Creates a single `AgentPersona`."""
   createAgentPersona(
@@ -3199,14 +3263,6 @@ type Mutation {
     input: UpdateAgentMessageInput!
   ): UpdateAgentMessagePayload
 
-  """Updates a single `AgentTask` using a unique key and a patch."""
-  updateAgentTask(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAgentTaskInput!
-  ): UpdateAgentTaskPayload
-
   """Updates a single `AgentResourceChunk` using a unique key and a patch."""
   updateAgentResourceChunk(
     """
@@ -3214,6 +3270,14 @@ type Mutation {
     """
     input: UpdateAgentResourceChunkInput!
   ): UpdateAgentResourceChunkPayload
+
+  """Updates a single `AgentTask` using a unique key and a patch."""
+  updateAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAgentTaskInput!
+  ): UpdateAgentTaskPayload
 
   """Updates a single `AgentPersona` using a unique key and a patch."""
   updateAgentPersona(
@@ -3271,14 +3335,6 @@ type Mutation {
     input: DeleteAgentMessageInput!
   ): DeleteAgentMessagePayload
 
-  """Deletes a single `AgentTask` using a unique key."""
-  deleteAgentTask(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAgentTaskInput!
-  ): DeleteAgentTaskPayload
-
   """Deletes a single `AgentResourceChunk` using a unique key."""
   deleteAgentResourceChunk(
     """
@@ -3286,6 +3342,14 @@ type Mutation {
     """
     input: DeleteAgentResourceChunkInput!
   ): DeleteAgentResourceChunkPayload
+
+  """Deletes a single `AgentTask` using a unique key."""
+  deleteAgentTask(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAgentTaskInput!
+  ): DeleteAgentTaskPayload
 
   """Deletes a single `AgentPersona` using a unique key."""
   deleteAgentPersona(
@@ -3372,6 +3436,9 @@ input AgentPlanInput {
   """Foreign key to agent_thread"""
   threadId: UUID!
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
   """Human-readable plan name"""
   title: String!
 
@@ -3424,6 +3491,9 @@ input AgentPromptInput {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
   name: String!
@@ -3484,6 +3554,9 @@ input AgentInput {
 
   """Human who owns/manages this agent"""
   ownerId: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Persona template this agent was created from"""
   personaId: UUID
@@ -3557,6 +3630,9 @@ input AgentMessageInput {
   """Foreign key to agent_thread"""
   threadId: UUID!
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
   """Who authored this message: user or assistant"""
   authorRole: String!
 
@@ -3565,86 +3641,6 @@ input AgentMessageInput {
 
   """Agent that authored this message (NULL for human messages)"""
   agentId: UUID
-}
-
-"""The output of our create `AgentTask` mutation."""
-type CreateAgentTaskPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AgentTask` that was created by this mutation."""
-  agentTask: AgentTask
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AgentTask`. May be used by Relay 1."""
-  agentTaskEdge(
-    """The method to use when ordering `AgentTask`."""
-    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AgentTaskEdge
-}
-
-"""All input for the create `AgentTask` mutation."""
-input CreateAgentTaskInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AgentTask` to be created by this mutation."""
-  agentTask: AgentTaskInput!
-}
-
-"""An input for mutations affecting `AgentTask`"""
-input AgentTaskInput {
-  id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """User who authored this task"""
-  actorId: UUID
-
-  """Current status of this task"""
-  status: String
-
-  """Foreign key to agent_plan"""
-  planId: UUID!
-
-  """Natural-language description of the work to do"""
-  description: String!
-
-  """Who created the task: agent or user"""
-  source: String
-
-  """Error message captured when the task failed"""
-  error: String
-
-  """Position within the plan (for ordered task lists)"""
-  orderIndex: Int
-
-  """Whether this task is an approval gate requiring human decision"""
-  requiresApproval: Boolean
-
-  """
-  Approval decision: pending, approved, rejected (NULL if not an approval task)
-  """
-  approvalStatus: String
-
-  """User who approved or rejected this task"""
-  approvedBy: UUID
-
-  """Timestamp of the approval or rejection decision"""
-  approvedAt: Datetime
-
-  """Reviewer feedback or reason for the decision"""
-  approvalFeedback: String
 }
 
 """The output of our create `AgentResourceChunk` mutation."""
@@ -3699,6 +3695,89 @@ input AgentResourceChunkInput {
   embeddingText: String
 }
 
+"""The output of our create `AgentTask` mutation."""
+type CreateAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` that was created by this mutation."""
+  agentTask: AgentTask
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentTask`. May be used by Relay 1."""
+  agentTaskEdge(
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentTaskEdge
+}
+
+"""All input for the create `AgentTask` mutation."""
+input CreateAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` to be created by this mutation."""
+  agentTask: AgentTaskInput!
+}
+
+"""An input for mutations affecting `AgentTask`"""
+input AgentTaskInput {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """User who authored this task"""
+  actorId: UUID
+
+  """Current status of this task"""
+  status: String
+
+  """Foreign key to agent_plan"""
+  planId: UUID!
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+
+  """Natural-language description of the work to do"""
+  description: String!
+
+  """Who created the task: agent or user"""
+  source: String
+
+  """Error message captured when the task failed"""
+  error: String
+
+  """Position within the plan (for ordered task lists)"""
+  orderIndex: Int
+
+  """Whether this task is an approval gate requiring human decision"""
+  requiresApproval: Boolean
+
+  """
+  Approval decision: pending, approved, rejected (NULL if not an approval task)
+  """
+  approvalStatus: String
+
+  """User who approved or rejected this task"""
+  approvedBy: UUID
+
+  """Timestamp of the approval or rejection decision"""
+  approvedAt: Datetime
+
+  """Reviewer feedback or reason for the decision"""
+  approvalFeedback: String
+}
+
 """The output of our create `AgentPersona` mutation."""
 type CreateAgentPersonaPayload {
   """
@@ -3741,6 +3820,9 @@ input AgentPersonaInput {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Unique human-readable identifier for this persona"""
   slug: String!
@@ -3807,6 +3889,9 @@ input AgentThreadInput {
 
   """User who owns this thread"""
   ownerId: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Current status of this thread"""
   status: String
@@ -3884,6 +3969,9 @@ input AgentResourceInput {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
 
   """Unique human-readable identifier for portable references"""
   slug: String!
@@ -3977,6 +4065,9 @@ input AgentPlanPatch {
   """Foreign key to agent_thread"""
   threadId: UUID
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
   """Human-readable plan name"""
   title: String
 
@@ -4034,6 +4125,9 @@ input AgentPromptPatch {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
 
   """Unique name for lookup (e.g. default, code-review, sales-assistant)"""
   name: String
@@ -4099,6 +4193,9 @@ input AgentPatch {
 
   """Human who owns/manages this agent"""
   ownerId: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
 
   """Persona template this agent was created from"""
   personaId: UUID
@@ -4177,6 +4274,9 @@ input AgentMessagePatch {
   """Foreign key to agent_thread"""
   threadId: UUID
 
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
   """Who authored this message: user or assistant"""
   authorRole: String
 
@@ -4185,91 +4285,6 @@ input AgentMessagePatch {
 
   """Agent that authored this message (NULL for human messages)"""
   agentId: UUID
-}
-
-"""The output of our update `AgentTask` mutation."""
-type UpdateAgentTaskPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AgentTask` that was updated by this mutation."""
-  agentTask: AgentTask
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AgentTask`. May be used by Relay 1."""
-  agentTaskEdge(
-    """The method to use when ordering `AgentTask`."""
-    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AgentTaskEdge
-}
-
-"""All input for the `updateAgentTask` mutation."""
-input UpdateAgentTaskInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AgentTask` being updated.
-  """
-  agentTaskPatch: AgentTaskPatch!
-}
-
-"""
-Represents an update to a `AgentTask`. Fields that are set will be updated.
-"""
-input AgentTaskPatch {
-  id: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """User who authored this task"""
-  actorId: UUID
-
-  """Current status of this task"""
-  status: String
-
-  """Foreign key to agent_plan"""
-  planId: UUID
-
-  """Natural-language description of the work to do"""
-  description: String
-
-  """Who created the task: agent or user"""
-  source: String
-
-  """Error message captured when the task failed"""
-  error: String
-
-  """Position within the plan (for ordered task lists)"""
-  orderIndex: Int
-
-  """Whether this task is an approval gate requiring human decision"""
-  requiresApproval: Boolean
-
-  """
-  Approval decision: pending, approved, rejected (NULL if not an approval task)
-  """
-  approvalStatus: String
-
-  """User who approved or rejected this task"""
-  approvedBy: UUID
-
-  """Timestamp of the approval or rejection decision"""
-  approvedAt: Datetime
-
-  """Reviewer feedback or reason for the decision"""
-  approvalFeedback: String
 }
 
 """The output of our update `AgentResourceChunk` mutation."""
@@ -4329,6 +4344,94 @@ input AgentResourceChunkPatch {
   embeddingText: String
 }
 
+"""The output of our update `AgentTask` mutation."""
+type UpdateAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` that was updated by this mutation."""
+  agentTask: AgentTask
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentTask`. May be used by Relay 1."""
+  agentTaskEdge(
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentTaskEdge
+}
+
+"""All input for the `updateAgentTask` mutation."""
+input UpdateAgentTaskInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AgentTask` being updated.
+  """
+  agentTaskPatch: AgentTaskPatch!
+}
+
+"""
+Represents an update to a `AgentTask`. Fields that are set will be updated.
+"""
+input AgentTaskPatch {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """User who authored this task"""
+  actorId: UUID
+
+  """Current status of this task"""
+  status: String
+
+  """Foreign key to agent_plan"""
+  planId: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+
+  """Natural-language description of the work to do"""
+  description: String
+
+  """Who created the task: agent or user"""
+  source: String
+
+  """Error message captured when the task failed"""
+  error: String
+
+  """Position within the plan (for ordered task lists)"""
+  orderIndex: Int
+
+  """Whether this task is an approval gate requiring human decision"""
+  requiresApproval: Boolean
+
+  """
+  Approval decision: pending, approved, rejected (NULL if not an approval task)
+  """
+  approvalStatus: String
+
+  """User who approved or rejected this task"""
+  approvedBy: UUID
+
+  """Timestamp of the approval or rejection decision"""
+  approvedAt: Datetime
+
+  """Reviewer feedback or reason for the decision"""
+  approvalFeedback: String
+}
+
 """The output of our update `AgentPersona` mutation."""
 type UpdateAgentPersonaPayload {
   """
@@ -4376,6 +4479,9 @@ input AgentPersonaPatch {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
 
   """Unique human-readable identifier for this persona"""
   slug: String
@@ -4447,6 +4553,9 @@ input AgentThreadPatch {
 
   """User who owns this thread"""
   ownerId: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
 
   """Current status of this thread"""
   status: String
@@ -4529,6 +4638,9 @@ input AgentResourcePatch {
   updatedAt: Datetime
   createdBy: UUID
   updatedBy: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
 
   """Unique human-readable identifier for portable references"""
   slug: String
@@ -4702,39 +4814,6 @@ input DeleteAgentMessageInput {
   id: UUID!
 }
 
-"""The output of our delete `AgentTask` mutation."""
-type DeleteAgentTaskPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AgentTask` that was deleted by this mutation."""
-  agentTask: AgentTask
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AgentTask`. May be used by Relay 1."""
-  agentTaskEdge(
-    """The method to use when ordering `AgentTask`."""
-    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AgentTaskEdge
-}
-
-"""All input for the `deleteAgentTask` mutation."""
-input DeleteAgentTaskInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `AgentResourceChunk` mutation."""
 type DeleteAgentResourceChunkPayload {
   """
@@ -4760,6 +4839,39 @@ type DeleteAgentResourceChunkPayload {
 
 """All input for the `deleteAgentResourceChunk` mutation."""
 input DeleteAgentResourceChunkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AgentTask` mutation."""
+type DeleteAgentTaskPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AgentTask` that was deleted by this mutation."""
+  agentTask: AgentTask
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AgentTask`. May be used by Relay 1."""
+  agentTaskEdge(
+    """The method to use when ordering `AgentTask`."""
+    orderBy: [AgentTaskOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AgentTaskEdge
+}
+
+"""All input for the `deleteAgentTask` mutation."""
+input DeleteAgentTaskInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
