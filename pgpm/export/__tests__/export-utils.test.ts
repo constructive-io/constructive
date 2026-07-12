@@ -13,6 +13,7 @@ import path from 'path';
 import {
   META_TABLE_CONFIG,
   META_TABLE_ORDER,
+  META_TABLE_OVERRIDES,
   DB_REQUIRED_EXTENSIONS,
   SERVICE_REQUIRED_EXTENSIONS,
   META_COMMON_HEADER,
@@ -100,56 +101,28 @@ describe('META_TABLE_CONFIG and META_TABLE_ORDER consistency', () => {
 // =============================================================================
 
 describe('SQL and GraphQL flow table parity', () => {
-  let sqlFlowTables: string[];
-  let graphqlFlowTables: string[];
+  let sqlSource: string;
+  let gqlSource: string;
 
   beforeAll(() => {
-    // Extract queryAndParse keys from export-meta.ts
-    const sqlSource = readFileSync(
-      join(__dirname, '../src/export-meta.ts'),
-      'utf-8'
-    );
-    sqlFlowTables = [...sqlSource.matchAll(/queryAndParse\('(\w+)'/g)].map(m => m[1]);
-
-    // Extract queryAndParse keys from export-graphql-meta.ts
-    const gqlSource = readFileSync(
-      join(__dirname, '../src/export-graphql-meta.ts'),
-      'utf-8'
-    );
-    graphqlFlowTables = [...gqlSource.matchAll(/queryAndParse\('(\w+)'/g)].map(m => m[1]);
+    sqlSource = readFileSync(join(__dirname, '../src/export-meta.ts'), 'utf-8');
+    gqlSource = readFileSync(join(__dirname, '../src/export-graphql-meta.ts'), 'utf-8');
   });
 
-  it('both flows should query the same set of tables', () => {
-    const sqlSet = new Set(sqlFlowTables);
-    const gqlSet = new Set(graphqlFlowTables);
-
-    const inSqlNotGql = sqlFlowTables.filter(t => !gqlSet.has(t));
-    const inGqlNotSql = graphqlFlowTables.filter(t => !sqlSet.has(t));
-
-    expect(inSqlNotGql).toEqual([]);
-    expect(inGqlNotSql).toEqual([]);
+  it('both flows should iterate the generated manifest via META_TABLE_ORDER', () => {
+    expect(sqlSource).toContain('META_TABLE_ORDER');
+    expect(gqlSource).toContain('META_TABLE_ORDER');
   });
 
-  it('all queried tables should have entries in META_TABLE_CONFIG', () => {
+  it('neither flow should have hardcoded per-table queryAndParse calls', () => {
+    expect([...sqlSource.matchAll(/queryAndParse\('(\w+)'/g)]).toEqual([]);
+    expect([...gqlSource.matchAll(/queryAndParse\('(\w+)'/g)]).toEqual([]);
+  });
+
+  it('every override key should exist in the generated manifest config', () => {
     const configKeys = new Set(Object.keys(META_TABLE_CONFIG));
-
-    const sqlMissing = sqlFlowTables.filter(t => !configKeys.has(t));
-    const gqlMissing = graphqlFlowTables.filter(t => !configKeys.has(t));
-
-    expect(sqlMissing).toEqual([]);
-    expect(gqlMissing).toEqual([]);
-  });
-
-  it('every key in META_TABLE_CONFIG should be queried by both flows', () => {
-    const sqlSet = new Set(sqlFlowTables);
-    const gqlSet = new Set(graphqlFlowTables);
-    const configKeys = Object.keys(META_TABLE_CONFIG);
-
-    const notQueriedBySql = configKeys.filter(k => !sqlSet.has(k));
-    const notQueriedByGql = configKeys.filter(k => !gqlSet.has(k));
-
-    expect(notQueriedBySql).toEqual([]);
-    expect(notQueriedByGql).toEqual([]);
+    const orphaned = Object.keys(META_TABLE_OVERRIDES).filter(k => !configKeys.has(k));
+    expect(orphaned).toEqual([]);
   });
 });
 
