@@ -49,7 +49,7 @@ export function useUpdateFunctionGraphCommitMutation<S extends FunctionGraphComm
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
         functionGraphCommitPatch: FunctionGraphCommitPatch;
       }
     >,
@@ -64,7 +64,7 @@ export function useUpdateFunctionGraphCommitMutation<S extends FunctionGraphComm
   Error,
   {
     id: string;
-    databaseId: string;
+    scopeId: string;
     functionGraphCommitPatch: FunctionGraphCommitPatch;
   }
 >;
@@ -77,7 +77,7 @@ export function useUpdateFunctionGraphCommitMutation(
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
         functionGraphCommitPatch: FunctionGraphCommitPatch;
       }
     >,
@@ -92,18 +92,18 @@ export function useUpdateFunctionGraphCommitMutation(
     mutationKey: functionGraphCommitMutationKeys.all,
     mutationFn: ({
       id,
-      databaseId,
+      scopeId,
       functionGraphCommitPatch,
     }: {
       id: string;
-      databaseId: string;
+      scopeId: string;
       functionGraphCommitPatch: FunctionGraphCommitPatch;
     }) =>
       getClient()
         .functionGraphCommit.update({
           where: {
             id,
-            databaseId,
+            scopeId,
           },
           data: functionGraphCommitPatch,
           select: args.select,

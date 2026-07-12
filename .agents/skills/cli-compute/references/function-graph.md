@@ -12,8 +12,8 @@ csdk function-graph list --where.<field>.<op> <value> --orderBy <values>
 csdk function-graph list --limit 10 --after <cursor>
 csdk function-graph find-first --where.<field>.<op> <value>
 csdk function-graph get --id <UUID>
-csdk function-graph create --databaseId <UUID> --storeId <UUID> --context <String> --name <String> --description <String> --definitionsCommitId <UUID> --isValid <Boolean> --validationErrors <JSON> --createdBy <UUID>
-csdk function-graph update --id <UUID> [--databaseId <UUID>] [--storeId <UUID>] [--context <String>] [--name <String>] [--description <String>] [--definitionsCommitId <UUID>] [--isValid <Boolean>] [--validationErrors <JSON>] [--createdBy <UUID>]
+csdk function-graph create --scopeId <UUID> --storeId <UUID> --context <String> --name <String> --description <String> --definitionsCommitId <UUID> --isValid <Boolean> --validationErrors <JSON> --createdBy <UUID>
+csdk function-graph update --id <UUID> [--scopeId <UUID>] [--storeId <UUID>] [--context <String>] [--name <String>] [--description <String>] [--definitionsCommitId <UUID>] [--isValid <Boolean>] [--validationErrors <JSON>] [--createdBy <UUID>]
 csdk function-graph delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-graph list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionGraph
 
 ```bash
-csdk function-graph create --databaseId <UUID> --storeId <UUID> --context <String> --name <String> --description <String> --definitionsCommitId <UUID> --isValid <Boolean> --validationErrors <JSON> --createdBy <UUID>
+csdk function-graph create --scopeId <UUID> --storeId <UUID> --context <String> --name <String> --description <String> --definitionsCommitId <UUID> --isValid <Boolean> --validationErrors <JSON> --createdBy <UUID>
 ```
 
 ### Get a functionGraph by id

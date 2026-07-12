@@ -12,8 +12,8 @@ csdk function-deployment-module list --where.<field>.<op> <value> --orderBy <val
 csdk function-deployment-module list --limit 10 --after <cursor>
 csdk function-deployment-module find-first --where.<field>.<op> <value>
 csdk function-deployment-module get --id <UUID>
-csdk function-deployment-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--deploymentsTableId <UUID>] [--deploymentEventsTableId <UUID>] [--deploymentsTableName <String>] [--deploymentEventsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--namespaceModuleId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
-csdk function-deployment-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--deploymentsTableId <UUID>] [--deploymentEventsTableId <UUID>] [--deploymentsTableName <String>] [--deploymentEventsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--namespaceModuleId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-deployment-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--deploymentsTableId <UUID>] [--deploymentEventsTableId <UUID>] [--deploymentsTableName <String>] [--deploymentEventsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--namespaceModuleId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-deployment-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--deploymentsTableId <UUID>] [--deploymentEventsTableId <UUID>] [--deploymentsTableName <String>] [--deploymentEventsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--namespaceModuleId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
 csdk function-deployment-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-deployment-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionDeploymentModule
 
 ```bash
-csdk function-deployment-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--deploymentsTableId <UUID>] [--deploymentEventsTableId <UUID>] [--deploymentsTableName <String>] [--deploymentEventsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--namespaceModuleId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-deployment-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--deploymentsTableId <UUID>] [--deploymentEventsTableId <UUID>] [--deploymentsTableName <String>] [--deploymentEventsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--functionModuleId <UUID>] [--namespaceModuleId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
 ```
 
 ### Get a functionDeploymentModule by id

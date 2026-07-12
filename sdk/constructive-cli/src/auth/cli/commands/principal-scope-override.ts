@@ -22,7 +22,8 @@ const fieldSchema: FieldSchema = {
   principalId: 'uuid',
   membershipType: 'int',
   allowedMask: 'string',
-  isAdmin: 'boolean',
+  useAdminOwner: 'boolean',
+  isActive: 'boolean',
   isReadOnly: 'boolean',
 };
 const usage =
@@ -76,7 +77,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       principalId: true,
       membershipType: true,
       allowedMask: true,
-      isAdmin: true,
+      useAdminOwner: true,
+      isActive: true,
       isReadOnly: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -108,7 +110,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       principalId: true,
       membershipType: true,
       allowedMask: true,
-      isAdmin: true,
+      useAdminOwner: true,
+      isActive: true,
       isReadOnly: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -154,8 +157,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'boolean',
-        name: 'isAdmin',
-        message: 'isAdmin',
+        name: 'useAdminOwner',
+        message: 'useAdminOwner',
+        required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isActive',
+        message: 'isActive',
         required: true,
       },
       {
@@ -177,7 +186,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           principalId: cleanedData.principalId,
           membershipType: cleanedData.membershipType,
           allowedMask: cleanedData.allowedMask,
-          isAdmin: cleanedData.isAdmin,
+          useAdminOwner: cleanedData.useAdminOwner,
+          isActive: cleanedData.isActive,
           isReadOnly: cleanedData.isReadOnly,
         },
         select: {
@@ -187,7 +197,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           principalId: true,
           membershipType: true,
           allowedMask: true,
-          isAdmin: true,
+          useAdminOwner: true,
+          isActive: true,
           isReadOnly: true,
         },
       })

@@ -9,7 +9,7 @@ Tracks database provisioning requests and their status. The BEFORE INSERT trigge
 ```typescript
 db.databaseProvisionModule.findMany({ select: { id: true } }).execute()
 db.databaseProvisionModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.databaseProvisionModule.create({ data: { databaseName: '<String>', ownerId: '<UUID>', subdomain: '<String>', domain: '<String>', modules: '<JSON>', options: '<JSON>', bootstrapUser: '<Boolean>', status: '<String>', errorMessage: '<String>', databaseId: '<UUID>', completedAt: '<Datetime>' }, select: { id: true } }).execute()
+db.databaseProvisionModule.create({ data: { databaseName: '<String>', ownerId: '<UUID>', subdomain: '<String>', domain: '<String>', modules: '<JSON>', options: '<JSON>', bootstrapUser: '<Boolean>', status: '<String>', errorMessage: '<String>', sourceDatabaseId: '<UUID>', bootstrapStatus: '<String>', bootstrapError: '<String>', databaseId: '<UUID>', completedAt: '<Datetime>', fulfilledAt: '<Datetime>' }, select: { id: true } }).execute()
 db.databaseProvisionModule.update({ where: { id: '<UUID>' }, data: { databaseName: '<String>' }, select: { id: true } }).execute()
 db.databaseProvisionModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.databaseProvisionModule.findMany({
 
 ```typescript
 const item = await db.databaseProvisionModule.create({
-  data: { databaseName: '<String>', ownerId: '<UUID>', subdomain: '<String>', domain: '<String>', modules: '<JSON>', options: '<JSON>', bootstrapUser: '<Boolean>', status: '<String>', errorMessage: '<String>', databaseId: '<UUID>', completedAt: '<Datetime>' },
+  data: { databaseName: '<String>', ownerId: '<UUID>', subdomain: '<String>', domain: '<String>', modules: '<JSON>', options: '<JSON>', bootstrapUser: '<Boolean>', status: '<String>', errorMessage: '<String>', sourceDatabaseId: '<UUID>', bootstrapStatus: '<String>', bootstrapError: '<String>', databaseId: '<UUID>', completedAt: '<Datetime>', fulfilledAt: '<Datetime>' },
   select: { id: true }
 }).execute();
 ```

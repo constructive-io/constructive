@@ -12,8 +12,8 @@ csdk user-state-module list --where.<field>.<op> <value> --orderBy <values>
 csdk user-state-module list --limit 10 --after <cursor>
 csdk user-state-module find-first --where.<field>.<op> <value>
 csdk user-state-module get --id <UUID>
-csdk user-state-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
-csdk user-state-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
+csdk user-state-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
+csdk user-state-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk user-state-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk user-state-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a userStateModule
 
 ```bash
-csdk user-state-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
+csdk user-state-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 ```
 
 ### Get a userStateModule by id

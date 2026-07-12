@@ -10,29 +10,23 @@ import type {
   AcceptDatabaseTransferInput,
   CancelDatabaseTransferInput,
   RejectDatabaseTransferInput,
-  ProvisionDatabaseWithUserInput,
-  BootstrapUserInput,
   SetFieldOrderInput,
   ApplyRlsInput,
-  CreateUserDatabaseInput,
+  RequestDatabaseInput,
   ProvisionBucketInput,
   AcceptDatabaseTransferPayload,
   CancelDatabaseTransferPayload,
   RejectDatabaseTransferPayload,
-  ProvisionDatabaseWithUserPayload,
-  BootstrapUserPayload,
   SetFieldOrderPayload,
   ApplyRlsPayload,
-  CreateUserDatabasePayload,
+  RequestDatabasePayload,
   ProvisionBucketPayload,
   AcceptDatabaseTransferPayloadSelect,
   CancelDatabaseTransferPayloadSelect,
   RejectDatabaseTransferPayloadSelect,
-  ProvisionDatabaseWithUserPayloadSelect,
-  BootstrapUserPayloadSelect,
   SetFieldOrderPayloadSelect,
   ApplyRlsPayloadSelect,
-  CreateUserDatabasePayloadSelect,
+  RequestDatabasePayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -45,12 +39,6 @@ export interface CancelDatabaseTransferVariables {
 export interface RejectDatabaseTransferVariables {
   input: RejectDatabaseTransferInput;
 }
-export interface ProvisionDatabaseWithUserVariables {
-  input: ProvisionDatabaseWithUserInput;
-}
-export interface BootstrapUserVariables {
-  input: BootstrapUserInput;
-}
 export interface SetFieldOrderVariables {
   input: SetFieldOrderInput;
 }
@@ -58,26 +46,17 @@ export interface ApplyRlsVariables {
   input: ApplyRlsInput;
 }
 /**
- * Variables for createUserDatabase
- * Creates a new user database with all required modules, permissions, and RLS policies.
+ * Variables for requestDatabase
+ * Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Parameters:
-  - database_name: Name for the new database (required)
-  - owner_id: UUID of the owner user (required)
-  - include_invites: Include invite system (default: true)
-  - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include events/analytics (default: false)
-  - bitlen: Bit length for permission masks (default: 64)
-  - tokens_expiration: Token expiration interval (default: 30 days)
-
-Returns the database_id UUID of the newly created database.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
  */
-export interface CreateUserDatabaseVariables {
-  input: CreateUserDatabaseInput;
+export interface RequestDatabaseVariables {
+  input: RequestDatabaseInput;
 }
 /**
  * Variables for provisionBucket
@@ -178,64 +157,6 @@ export function createMutationOperations(client: OrmClient) {
           'RejectDatabaseTransferPayload'
         ),
       }),
-    provisionDatabaseWithUser: <S extends ProvisionDatabaseWithUserPayloadSelect>(
-      args: ProvisionDatabaseWithUserVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionDatabaseWithUserPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionDatabaseWithUser: InferSelectResult<ProvisionDatabaseWithUserPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionDatabaseWithUser',
-        fieldName: 'provisionDatabaseWithUser',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionDatabaseWithUser',
-          'provisionDatabaseWithUser',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionDatabaseWithUserInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionDatabaseWithUserPayload'
-        ),
-      }),
-    bootstrapUser: <S extends BootstrapUserPayloadSelect>(
-      args: BootstrapUserVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, BootstrapUserPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        bootstrapUser: InferSelectResult<BootstrapUserPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'BootstrapUser',
-        fieldName: 'bootstrapUser',
-        ...buildCustomDocument(
-          'mutation',
-          'BootstrapUser',
-          'bootstrapUser',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'BootstrapUserInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'BootstrapUserPayload'
-        ),
-      }),
     setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
       args: SetFieldOrderVariables,
       options: {
@@ -294,33 +215,33 @@ export function createMutationOperations(client: OrmClient) {
           'ApplyRlsPayload'
         ),
       }),
-    createUserDatabase: <S extends CreateUserDatabasePayloadSelect>(
-      args: CreateUserDatabaseVariables,
+    requestDatabase: <S extends RequestDatabasePayloadSelect>(
+      args: RequestDatabaseVariables,
       options: {
         select: S;
-      } & StrictSelect<S, CreateUserDatabasePayloadSelect>
+      } & StrictSelect<S, RequestDatabasePayloadSelect>
     ) =>
       new QueryBuilder<{
-        createUserDatabase: InferSelectResult<CreateUserDatabasePayload, S> | null;
+        requestDatabase: InferSelectResult<RequestDatabasePayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'CreateUserDatabase',
-        fieldName: 'createUserDatabase',
+        operationName: 'RequestDatabase',
+        fieldName: 'requestDatabase',
         ...buildCustomDocument(
           'mutation',
-          'CreateUserDatabase',
-          'createUserDatabase',
+          'RequestDatabase',
+          'requestDatabase',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'CreateUserDatabaseInput!',
+              type: 'RequestDatabaseInput!',
             },
           ],
           connectionFieldsMap,
-          'CreateUserDatabasePayload'
+          'RequestDatabasePayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

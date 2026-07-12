@@ -162,7 +162,7 @@ export class FunctionGraphObjectModel {
       S,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       },
       FunctionGraphObjectPatch
     > & {
@@ -185,7 +185,7 @@ export class FunctionGraphObjectModel {
       'functionGraphObjectPatch',
       connectionFieldsMap,
       {
-        databaseId: args.where.databaseId,
+        scopeId: args.where.scopeId,
       }
     );
     return new QueryBuilder({
@@ -201,7 +201,7 @@ export class FunctionGraphObjectModel {
     args: DeleteArgs<
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       },
       S
     > & {
@@ -218,7 +218,7 @@ export class FunctionGraphObjectModel {
       'functionGraphObject',
       {
         id: args.where.id,
-        databaseId: args.where.databaseId,
+        scopeId: args.where.scopeId,
       },
       'DeleteFunctionGraphObjectInput',
       args.select,

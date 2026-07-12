@@ -1,13 +1,13 @@
 ---
 name: cli-compute
-description: CLI tool (csdk) for the compute API — provides CRUD commands for 22 tables and 15 custom operations
+description: CLI tool (csdk) for the compute API — provides CRUD commands for 44 tables and 18 custom operations
 ---
 
 # cli-compute
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the compute API — provides CRUD commands for 22 tables and 15 custom operations
+CLI tool (csdk) for the compute API — provides CRUD commands for 44 tables and 18 custom operations
 
 ## Usage
 
@@ -23,13 +23,13 @@ csdk auth set-token <token>
 csdk config set <key> <value>
 csdk config get <key>
 
-# CRUD for any table (e.g. get-all-record)
-csdk get-all-record list
-csdk get-all-record get --id <value>
-csdk get-all-record create --<field> <value>
+# CRUD for any table (e.g. infra-get-all-record)
+csdk infra-get-all-record list
+csdk infra-get-all-record get --id <value>
+csdk infra-get-all-record create --<field> <value>
 
 # Non-interactive mode (skip all prompts, use flags only)
-csdk --no-tty get-all-record list
+csdk --no-tty infra-get-all-record list
 ```
 
 ## Examples
@@ -40,13 +40,13 @@ csdk --no-tty get-all-record list
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk get-all-record list
+csdk infra-get-all-record list
 ```
 
 ### Non-interactive mode (for scripts and CI)
 
 ```bash
-csdk --no-tty get-all-record create --<field> <value>
+csdk --no-tty infra-get-all-record create --<field> <value>
 ```
 
 ## References
@@ -56,33 +56,57 @@ See the `references/` directory for detailed per-entity API documentation:
 - [context](references/context.md)
 - [auth](references/auth.md)
 - [config](references/config.md)
+- [infra-get-all-record](references/infra-get-all-record.md)
 - [get-all-record](references/get-all-record.md)
+- [infra-ref](references/infra-ref.md)
+- [infra-store](references/infra-store.md)
 - [function-api-binding](references/function-api-binding.md)
-- [function-deployment](references/function-deployment.md)
-- [resource](references/resource.md)
 - [function-graph-ref](references/function-graph-ref.md)
 - [function-graph-store](references/function-graph-store.md)
+- [platform-function-api-binding](references/platform-function-api-binding.md)
+- [platform-resources-requirements-state](references/platform-resources-requirements-state.md)
+- [resources-requirements-state](references/resources-requirements-state.md)
+- [platform-resource-status-check](references/platform-resource-status-check.md)
+- [platform-function-deployment](references/platform-function-deployment.md)
+- [platform-resource](references/platform-resource.md)
+- [platform-resource-definition](references/platform-resource-definition.md)
+- [infra-object](references/infra-object.md)
 - [function-graph-object](references/function-graph-object.md)
+- [platform-function-deployment-event](references/platform-function-deployment-event.md)
+- [platform-resource-event](references/platform-resource-event.md)
+- [resource-status-check](references/resource-status-check.md)
+- [function-deployment](references/function-deployment.md)
+- [resource](references/resource.md)
+- [resource-definition](references/resource-definition.md)
 - [function-deployment-event](references/function-deployment-event.md)
-- [org-function-execution-log](references/org-function-execution-log.md)
+- [platform-function-execution-log](references/platform-function-execution-log.md)
 - [resource-event](references/resource-event.md)
 - [function-graph-execution-output](references/function-graph-execution-output.md)
+- [infra-commit](references/infra-commit.md)
 - [function-graph-commit](references/function-graph-commit.md)
-- [secret-definition](references/secret-definition.md)
 - [function-execution-log](references/function-execution-log.md)
+- [platform-resources-resolved-requirement](references/platform-resources-resolved-requirement.md)
+- [resources-resolved-requirement](references/resources-resolved-requirement.md)
+- [db-preset](references/db-preset.md)
+- [platform-namespace](references/platform-namespace.md)
 - [function-graph](references/function-graph.md)
 - [function-graph-execution-node-state](references/function-graph-execution-node-state.md)
-- [platform-namespace](references/platform-namespace.md)
-- [org-function-invocation](references/org-function-invocation.md)
+- [namespace](references/namespace.md)
+- [platform-function-invocation](references/platform-function-invocation.md)
 - [function-invocation](references/function-invocation.md)
 - [platform-namespace-event](references/platform-namespace-event.md)
+- [integration-provider](references/integration-provider.md)
+- [namespace-event](references/namespace-event.md)
 - [function-graph-execution](references/function-graph-execution.md)
+- [platform-function-definition](references/platform-function-definition.md)
 - [function-definition](references/function-definition.md)
 - [read-function-graph](references/read-function-graph.md)
 - [validate-function-graph](references/validate-function-graph.md)
+- [infra-init-empty-repo](references/infra-init-empty-repo.md)
 - [init-empty-repo](references/init-empty-repo.md)
-- [set-data-at-path](references/set-data-at-path.md)
 - [import-definitions](references/import-definitions.md)
+- [infra-set-data-at-path](references/infra-set-data-at-path.md)
+- [set-data-at-path](references/set-data-at-path.md)
 - [copy-graph](references/copy-graph.md)
 - [save-graph](references/save-graph.md)
 - [add-edge-and-save](references/add-edge-and-save.md)
@@ -90,6 +114,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [import-graph-json](references/import-graph-json.md)
 - [add-edge](references/add-edge.md)
 - [add-node](references/add-node.md)
+- [infra-insert-node-at-path](references/infra-insert-node-at-path.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
 - [start-execution](references/start-execution.md)
 - [provision-bucket](references/provision-bucket.md)

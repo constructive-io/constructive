@@ -12,8 +12,8 @@ csdk permissions-module list --where.<field>.<op> <value> --orderBy <values>
 csdk permissions-module list --limit 10 --after <cursor>
 csdk permissions-module find-first --where.<field>.<op> <value>
 csdk permissions-module get --id <UUID>
-csdk permissions-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--defaultTableId <UUID>] [--defaultTableName <String>] [--bitlen <Int>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--actorTableId <UUID>] [--getPaddedMask <String>] [--getMask <String>] [--getByMask <String>] [--getMaskByName <String>] [--apiName <String>] [--privateApiName <String>]
-csdk permissions-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--defaultTableId <UUID>] [--defaultTableName <String>] [--bitlen <Int>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--actorTableId <UUID>] [--getPaddedMask <String>] [--getMask <String>] [--getByMask <String>] [--getMaskByName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk permissions-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--defaultTableId <UUID>] [--defaultTableName <String>] [--bitlen <Int>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--actorTableId <UUID>] [--getPaddedMask <String>] [--getMask <String>] [--getByMask <String>] [--getMaskByName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk permissions-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--defaultTableId <UUID>] [--defaultTableName <String>] [--bitlen <Int>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--actorTableId <UUID>] [--getPaddedMask <String>] [--getMask <String>] [--getByMask <String>] [--getMaskByName <String>] [--apiName <String>] [--privateApiName <String>]
 csdk permissions-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk permissions-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a permissionsModule
 
 ```bash
-csdk permissions-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--defaultTableId <UUID>] [--defaultTableName <String>] [--bitlen <Int>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--actorTableId <UUID>] [--getPaddedMask <String>] [--getMask <String>] [--getByMask <String>] [--getMaskByName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk permissions-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--defaultTableId <UUID>] [--defaultTableName <String>] [--bitlen <Int>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--actorTableId <UUID>] [--getPaddedMask <String>] [--getMask <String>] [--getByMask <String>] [--getMaskByName <String>] [--apiName <String>] [--privateApiName <String>]
 ```
 
 ### Get a permissionsModule by id

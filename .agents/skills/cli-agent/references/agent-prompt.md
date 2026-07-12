@@ -12,8 +12,8 @@ csdk agent-prompt list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-prompt list --limit 10 --after <cursor>
 csdk agent-prompt find-first --where.<field>.<op> <value>
 csdk agent-prompt get --id <UUID>
-csdk agent-prompt create --name <String> --content <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--isDefault <Boolean>] [--metadata <JSON>]
-csdk agent-prompt update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--name <String>] [--content <String>] [--description <String>] [--isDefault <Boolean>] [--metadata <JSON>]
+csdk agent-prompt create --databaseId <UUID> --name <String> --content <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--isDefault <Boolean>] [--metadata <JSON>]
+csdk agent-prompt update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--databaseId <UUID>] [--name <String>] [--content <String>] [--description <String>] [--isDefault <Boolean>] [--metadata <JSON>]
 csdk agent-prompt delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-prompt list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentPrompt
 
 ```bash
-csdk agent-prompt create --name <String> --content <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--isDefault <Boolean>] [--metadata <JSON>]
+csdk agent-prompt create --databaseId <UUID> --name <String> --content <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--isDefault <Boolean>] [--metadata <JSON>]
 ```
 
 ### Get a agentPrompt by id

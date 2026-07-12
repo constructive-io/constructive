@@ -18,6 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
+  entityField: 'string',
   schemaId: 'uuid',
   privateSchemaId: 'uuid',
   chartEdgesTableId: 'uuid',
@@ -92,6 +93,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       privateSchemaId: true,
       chartEdgesTableId: true,
@@ -134,6 +136,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       privateSchemaId: true,
       chartEdgesTableId: true,
@@ -188,6 +191,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           chartEdgesTableId: true,
@@ -228,6 +232,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -371,6 +382,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           chartEdgesTableId: cleanedData.chartEdgesTableId,
@@ -394,6 +406,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           chartEdgesTableId: true,
@@ -440,6 +453,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -583,6 +603,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           chartEdgesTableId: cleanedData.chartEdgesTableId,
@@ -606,6 +627,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           chartEdgesTableId: true,

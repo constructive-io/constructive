@@ -11,6 +11,7 @@ import type {
   SendAccountDeletionEmailInput,
   CheckPasswordInput,
   DeleteOrgPrincipalInput,
+  DeletePrincipalInput,
   DisconnectAccountInput,
   RevokeApiKeyInput,
   RevokeSessionInput,
@@ -22,13 +23,13 @@ import type {
   VerifyEmailInput,
   ProvisionNewUserInput,
   ResetPasswordInput,
+  CreateOrgPrincipalInput,
   SignInCrossOriginInput,
   SignInSmsOtpInput,
   SignUpSmsInput,
   SignUpInput,
   SignInInput,
   LinkIdentityInput,
-  CreateOrgPrincipalInput,
   ExtendTokenExpiresInput,
   CreateOrgApiKeyInput,
   CreateApiKeyInput,
@@ -40,6 +41,7 @@ import type {
   SendAccountDeletionEmailPayload,
   CheckPasswordPayload,
   DeleteOrgPrincipalPayload,
+  DeletePrincipalPayload,
   DisconnectAccountPayload,
   RevokeApiKeyPayload,
   RevokeSessionPayload,
@@ -51,13 +53,13 @@ import type {
   VerifyEmailPayload,
   ProvisionNewUserPayload,
   ResetPasswordPayload,
+  CreateOrgPrincipalPayload,
   SignInCrossOriginPayload,
   SignInSmsOtpPayload,
   SignUpSmsPayload,
   SignUpPayload,
   SignInPayload,
   LinkIdentityPayload,
-  CreateOrgPrincipalPayload,
   ExtendTokenExpiresPayload,
   CreateOrgApiKeyPayload,
   CreateApiKeyPayload,
@@ -69,6 +71,7 @@ import type {
   SendAccountDeletionEmailPayloadSelect,
   CheckPasswordPayloadSelect,
   DeleteOrgPrincipalPayloadSelect,
+  DeletePrincipalPayloadSelect,
   DisconnectAccountPayloadSelect,
   RevokeApiKeyPayloadSelect,
   RevokeSessionPayloadSelect,
@@ -80,13 +83,13 @@ import type {
   VerifyEmailPayloadSelect,
   ProvisionNewUserPayloadSelect,
   ResetPasswordPayloadSelect,
+  CreateOrgPrincipalPayloadSelect,
   SignInCrossOriginPayloadSelect,
   SignInSmsOtpPayloadSelect,
   SignUpSmsPayloadSelect,
   SignUpPayloadSelect,
   SignInPayloadSelect,
   LinkIdentityPayloadSelect,
-  CreateOrgPrincipalPayloadSelect,
   ExtendTokenExpiresPayloadSelect,
   CreateOrgApiKeyPayloadSelect,
   CreateApiKeyPayloadSelect,
@@ -107,6 +110,9 @@ export interface CheckPasswordVariables {
 }
 export interface DeleteOrgPrincipalVariables {
   input: DeleteOrgPrincipalInput;
+}
+export interface DeletePrincipalVariables {
+  input: DeletePrincipalInput;
 }
 export interface DisconnectAccountVariables {
   input: DisconnectAccountInput;
@@ -141,6 +147,9 @@ export interface ProvisionNewUserVariables {
 export interface ResetPasswordVariables {
   input: ResetPasswordInput;
 }
+export interface CreateOrgPrincipalVariables {
+  input: CreateOrgPrincipalInput;
+}
 export interface SignInCrossOriginVariables {
   input: SignInCrossOriginInput;
 }
@@ -158,9 +167,6 @@ export interface SignInVariables {
 }
 export interface LinkIdentityVariables {
   input: LinkIdentityInput;
-}
-export interface CreateOrgPrincipalVariables {
-  input: CreateOrgPrincipalInput;
 }
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
@@ -306,6 +312,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'DeleteOrgPrincipalPayload'
+        ),
+      }),
+    deletePrincipal: <S extends DeletePrincipalPayloadSelect>(
+      args: DeletePrincipalVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, DeletePrincipalPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        deletePrincipal: InferSelectResult<DeletePrincipalPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'DeletePrincipal',
+        fieldName: 'deletePrincipal',
+        ...buildCustomDocument(
+          'mutation',
+          'DeletePrincipal',
+          'deletePrincipal',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'DeletePrincipalInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'DeletePrincipalPayload'
         ),
       }),
     disconnectAccount: <S extends DisconnectAccountPayloadSelect>(
@@ -627,6 +662,35 @@ export function createMutationOperations(client: OrmClient) {
           'ResetPasswordPayload'
         ),
       }),
+    createOrgPrincipal: <S extends CreateOrgPrincipalPayloadSelect>(
+      args: CreateOrgPrincipalVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CreateOrgPrincipalPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        createOrgPrincipal: InferSelectResult<CreateOrgPrincipalPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CreateOrgPrincipal',
+        fieldName: 'createOrgPrincipal',
+        ...buildCustomDocument(
+          'mutation',
+          'CreateOrgPrincipal',
+          'createOrgPrincipal',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CreateOrgPrincipalInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CreateOrgPrincipalPayload'
+        ),
+      }),
     signInCrossOrigin: <S extends SignInCrossOriginPayloadSelect>(
       args: SignInCrossOriginVariables,
       options: {
@@ -799,35 +863,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'LinkIdentityPayload'
-        ),
-      }),
-    createOrgPrincipal: <S extends CreateOrgPrincipalPayloadSelect>(
-      args: CreateOrgPrincipalVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CreateOrgPrincipalPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        createOrgPrincipal: InferSelectResult<CreateOrgPrincipalPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CreateOrgPrincipal',
-        fieldName: 'createOrgPrincipal',
-        ...buildCustomDocument(
-          'mutation',
-          'CreateOrgPrincipal',
-          'createOrgPrincipal',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CreateOrgPrincipalInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CreateOrgPrincipalPayload'
         ),
       }),
     extendTokenExpires: <S extends ExtendTokenExpiresPayloadSelect>(

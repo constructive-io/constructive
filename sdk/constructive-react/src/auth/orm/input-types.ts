@@ -247,8 +247,8 @@ export interface Principal {
   userId?: string | null;
   /** Human-readable label for this principal (e.g., billing-bot, ci-deploy-key) */
   name?: string | null;
-  /** Permission bitmask subset; all-1s means inherit all parent permissions */
-  allowedMask?: string | null;
+  /** Whether this principal inherits admin/owner privileges from the owner */
+  useAdminOwner?: boolean | null;
   /** Whether this principal is restricted to read-only operations */
   isReadOnly?: boolean | null;
   /** Whether this principal bypasses MFA step-up requirements */
@@ -275,10 +275,12 @@ export interface PrincipalScopeOverride {
   principalId?: string | null;
   /** The scope level (membership_type) this override restricts */
   membershipType?: number | null;
-  /** Permission bitmask for this scope; AND-masked with parent permissions during cascade */
+  /** Optional permission mask; AND-masked with parent permissions during cascade. NULL means no extra mask. */
   allowedMask?: string | null;
-  /** Whether this principal has admin access at this scope (default true = inherit from parent) */
-  isAdmin?: boolean | null;
+  /** Whether this principal inherits admin/owner at this scope (default true = inherit from parent) */
+  useAdminOwner?: boolean | null;
+  /** Whether this scope is active for this principal; false disables all access at this scope */
+  isActive?: boolean | null;
   /** Whether this principal is restricted to read-only at this scope */
   isReadOnly?: boolean | null;
 }
@@ -506,7 +508,7 @@ export type PrincipalSelect = {
   ownerId?: boolean;
   userId?: boolean;
   name?: boolean;
-  allowedMask?: boolean;
+  useAdminOwner?: boolean;
   isReadOnly?: boolean;
   bypassStepUp?: boolean;
   owner?: {
@@ -552,7 +554,8 @@ export type PrincipalScopeOverrideSelect = {
   principalId?: boolean;
   membershipType?: boolean;
   allowedMask?: boolean;
-  isAdmin?: boolean;
+  useAdminOwner?: boolean;
+  isActive?: boolean;
   isReadOnly?: boolean;
   principal?: {
     select: PrincipalSelect;
@@ -743,8 +746,8 @@ export interface PrincipalFilter {
   userId?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `allowedMask` field. */
-  allowedMask?: BitStringFilter;
+  /** Filter by the object’s `useAdminOwner` field. */
+  useAdminOwner?: BooleanFilter;
   /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
   /** Filter by the object’s `bypassStepUp` field. */
@@ -807,8 +810,10 @@ export interface PrincipalScopeOverrideFilter {
   membershipType?: IntFilter;
   /** Filter by the object’s `allowedMask` field. */
   allowedMask?: BitStringFilter;
-  /** Filter by the object’s `isAdmin` field. */
-  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `useAdminOwner` field. */
+  useAdminOwner?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
   /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
   /** Checks for all expressions in this list. */
@@ -1139,8 +1144,8 @@ export type PrincipalOrderBy =
   | 'USER_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'ALLOWED_MASK_ASC'
-  | 'ALLOWED_MASK_DESC'
+  | 'USE_ADMIN_OWNER_ASC'
+  | 'USE_ADMIN_OWNER_DESC'
   | 'IS_READ_ONLY_ASC'
   | 'IS_READ_ONLY_DESC'
   | 'BYPASS_STEP_UP_ASC'
@@ -1177,8 +1182,10 @@ export type PrincipalScopeOverrideOrderBy =
   | 'MEMBERSHIP_TYPE_DESC'
   | 'ALLOWED_MASK_ASC'
   | 'ALLOWED_MASK_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
+  | 'USE_ADMIN_OWNER_ASC'
+  | 'USE_ADMIN_OWNER_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
   | 'IS_READ_ONLY_ASC'
   | 'IS_READ_ONLY_DESC';
 export type EmailOrderBy =
@@ -1392,7 +1399,7 @@ export interface CreatePrincipalInput {
     ownerId: string;
     userId: string;
     name?: string;
-    allowedMask?: string;
+    useAdminOwner?: boolean;
     isReadOnly?: boolean;
     bypassStepUp?: boolean;
   };
@@ -1401,7 +1408,7 @@ export interface PrincipalPatch {
   ownerId?: string | null;
   userId?: string | null;
   name?: string | null;
-  allowedMask?: string | null;
+  useAdminOwner?: boolean | null;
   isReadOnly?: boolean | null;
   bypassStepUp?: boolean | null;
 }
@@ -1442,7 +1449,8 @@ export interface CreatePrincipalScopeOverrideInput {
     principalId: string;
     membershipType?: number;
     allowedMask?: string;
-    isAdmin?: boolean;
+    useAdminOwner?: boolean;
+    isActive?: boolean;
     isReadOnly?: boolean;
   };
 }
@@ -1450,7 +1458,8 @@ export interface PrincipalScopeOverridePatch {
   principalId?: string | null;
   membershipType?: number | null;
   allowedMask?: string | null;
-  isAdmin?: boolean | null;
+  useAdminOwner?: boolean | null;
+  isActive?: boolean | null;
   isReadOnly?: boolean | null;
 }
 export interface UpdatePrincipalScopeOverrideInput {
@@ -1820,6 +1829,14 @@ export interface ResetPasswordInput {
   resetToken?: string;
   newPassword?: string;
 }
+export interface CreateOrgPrincipalInput {
+  clientMutationId?: string;
+  name?: string;
+  orgId?: string;
+  useAdminOwner?: boolean;
+  isReadOnly?: boolean;
+  bypassStepUp?: boolean;
+}
 export interface SignInCrossOriginInput {
   clientMutationId?: string;
   token?: string;
@@ -1864,14 +1881,6 @@ export interface LinkIdentityInput {
   service: string;
   identifier: string;
   details?: Record<string, unknown>;
-}
-export interface CreateOrgPrincipalInput {
-  clientMutationId?: string;
-  name?: string;
-  orgId?: string;
-  allowedMask?: string;
-  isReadOnly?: boolean;
-  bypassStepUp?: boolean;
 }
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
@@ -2506,8 +2515,10 @@ export interface PrincipalScopeOverrideFilter {
   membershipType?: IntFilter;
   /** Filter by the object’s `allowedMask` field. */
   allowedMask?: BitStringFilter;
-  /** Filter by the object’s `isAdmin` field. */
-  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `useAdminOwner` field. */
+  useAdminOwner?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
   /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
   /** Checks for all expressions in this list. */
@@ -2533,8 +2544,8 @@ export interface PrincipalFilter {
   userId?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `allowedMask` field. */
-  allowedMask?: BitStringFilter;
+  /** Filter by the object’s `useAdminOwner` field. */
+  useAdminOwner?: BooleanFilter;
   /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
   /** Filter by the object’s `bypassStepUp` field. */
@@ -3142,6 +3153,14 @@ export type DeleteOrgPrincipalPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface DeletePrincipalPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type DeletePrincipalPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface DisconnectAccountPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -3230,6 +3249,14 @@ export type ResetPasswordPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface CreateOrgPrincipalPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CreateOrgPrincipalPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
   result?: SignInCrossOriginRecord | null;
@@ -3285,14 +3312,6 @@ export interface LinkIdentityPayload {
   result?: boolean | null;
 }
 export type LinkIdentityPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface CreateOrgPrincipalPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type CreateOrgPrincipalPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -3375,14 +3394,6 @@ export interface CreatePrincipalPayload {
   result?: string | null;
 }
 export type CreatePrincipalPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface DeletePrincipalPayload {
-  clientMutationId?: string | null;
-  result?: boolean | null;
-}
-export type DeletePrincipalPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };

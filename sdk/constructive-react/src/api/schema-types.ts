@@ -161,6 +161,10 @@ export type FieldOrderBy =
   | 'API_REQUIRED_DESC'
   | 'DEFAULT_VALUE_ASC'
   | 'DEFAULT_VALUE_DESC'
+  | 'GENERATION_EXPRESSION_ASC'
+  | 'GENERATION_EXPRESSION_DESC'
+  | 'GENERATION_TYPE_ASC'
+  | 'GENERATION_TYPE_DESC'
   | 'TYPE_ASC'
   | 'TYPE_DESC'
   | 'FIELD_ORDER_ASC'
@@ -309,6 +313,8 @@ export type PolicyOrderBy =
   | 'POLICY_TYPE_DESC'
   | 'DATA_ASC'
   | 'DATA_DESC'
+  | 'WITH_CHECK_ASC'
+  | 'WITH_CHECK_DESC'
   | 'SMART_TAGS_ASC'
   | 'SMART_TAGS_DESC'
   | 'CATEGORY_ASC'
@@ -589,6 +595,8 @@ export type TableOrderBy =
   | 'SINGULAR_NAME_DESC'
   | 'TAGS_ASC'
   | 'TAGS_DESC'
+  | 'STEP_UP_ASC'
+  | 'STEP_UP_DESC'
   | 'PARTITIONED_ASC'
   | 'PARTITIONED_DESC'
   | 'PARTITION_STRATEGY_ASC'
@@ -1101,6 +1109,8 @@ export type DatabaseOrderBy =
   | 'LABEL_DESC'
   | 'HASH_ASC'
   | 'HASH_DESC'
+  | 'PLATFORM_ASC'
+  | 'PLATFORM_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -1198,6 +1208,35 @@ export type DatabaseSettingOrderBy =
   | 'LABELS_DESC'
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC';
+/** Methods to use when ordering `AstMigration`. */
+export type AstMigrationOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'REQUIRES_ASC'
+  | 'REQUIRES_DESC'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'DEPLOYS_ASC'
+  | 'DEPLOYS_DESC'
+  | 'DEPLOY_ASC'
+  | 'DEPLOY_DESC'
+  | 'REVERT_ASC'
+  | 'REVERT_DESC'
+  | 'VERIFY_ASC'
+  | 'VERIFY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ACTION_ASC'
+  | 'ACTION_DESC'
+  | 'ACTION_ID_ASC'
+  | 'ACTION_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC';
 /** Methods to use when ordering `WebauthnSetting`. */
 export type WebauthnSettingOrderBy =
   | 'NATURAL'
@@ -1239,35 +1278,6 @@ export type WebauthnSettingOrderBy =
   | 'RESIDENT_KEY_DESC'
   | 'CHALLENGE_EXPIRY_SECONDS_ASC'
   | 'CHALLENGE_EXPIRY_SECONDS_DESC';
-/** Methods to use when ordering `AstMigration`. */
-export type AstMigrationOrderBy =
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'REQUIRES_ASC'
-  | 'REQUIRES_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'DEPLOYS_ASC'
-  | 'DEPLOYS_DESC'
-  | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC'
-  | 'REVERT_ASC'
-  | 'REVERT_DESC'
-  | 'VERIFY_ASC'
-  | 'VERIFY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ACTION_ASC'
-  | 'ACTION_DESC'
-  | 'ACTION_ID_ASC'
-  | 'ACTION_ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC';
 /** A filter to be used against `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
 export interface CheckConstraintFilter {
   /** Filter by the object’s `id` field. */
@@ -1344,6 +1354,8 @@ export interface DatabaseFilter {
   label?: StringFilter;
   /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
+  /** Filter by the object’s `platform` field. */
+  platform?: BooleanFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -1661,6 +1673,8 @@ export interface TableFilter {
   singularName?: StringFilter;
   /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `stepUp` field. */
+  stepUp?: JSONFilter;
   /** Filter by the object’s `partitioned` field. */
   partitioned?: BooleanFilter;
   /** Filter by the object’s `partitionStrategy` field. */
@@ -1798,6 +1812,10 @@ export interface FieldFilter {
   apiRequired?: BooleanFilter;
   /** Filter by the object’s `defaultValue` field. */
   defaultValue?: JSONFilter;
+  /** Filter by the object’s `generationExpression` field. */
+  generationExpression?: JSONFilter;
+  /** Filter by the object’s `generationType` field. */
+  generationType?: StringFilter;
   /** Filter by the object’s `type` field. */
   type?: JSONFilter;
   /** Filter by the object’s `fieldOrder` field. */
@@ -2078,6 +2096,8 @@ export interface PolicyFilter {
   policyType?: StringFilter;
   /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `withCheck` field. */
+  withCheck?: JSONFilter;
   /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
   /** Filter by the object’s `category` field. */
@@ -4246,24 +4266,6 @@ export interface RejectDatabaseTransferInput {
   clientMutationId?: string;
   transferId?: string;
 }
-export interface ProvisionDatabaseWithUserInput {
-  clientMutationId?: string;
-  pDatabaseName?: string;
-  pDomain?: string;
-  pSubdomain?: string;
-  pModules?: unknown;
-  pOptions?: unknown;
-}
-export interface BootstrapUserInput {
-  clientMutationId?: string;
-  targetDatabaseId?: string;
-  password?: string;
-  isAdmin?: boolean;
-  isOwner?: boolean;
-  username?: string;
-  displayName?: string;
-  returnApiKey?: boolean;
-}
 export interface SetFieldOrderInput {
   clientMutationId?: string;
   fieldIds?: string[];
@@ -4278,34 +4280,14 @@ export interface ApplyRlsInput {
   permissive?: boolean;
   name?: string;
 }
-export interface CreateUserDatabaseInput {
+export interface RequestDatabaseInput {
   clientMutationId?: string;
   databaseName?: string;
-  ownerId?: string;
-  includeInvites?: boolean;
-  includeGroups?: boolean;
-  includeLevels?: boolean;
-  bitlen?: number;
-  tokensExpiration?: IntervalInput;
-}
-/** An interval of time that has passed where the smallest distinct unit is a second. */
-export interface IntervalInput {
-  /**
-   * A quantity of seconds. This is the only non-integer field, as all the other
-   * fields will dump their overflow into a smaller unit of time. Intervals don’t
-   * have a smaller unit than seconds.
-   */
-  seconds?: number;
-  /** A quantity of minutes. */
-  minutes?: number;
-  /** A quantity of hours. */
-  hours?: number;
-  /** A quantity of days. */
-  days?: number;
-  /** A quantity of months. */
-  months?: number;
-  /** A quantity of years. */
-  years?: number;
+  domain?: string;
+  presetSlug?: string;
+  modules?: unknown;
+  options?: unknown;
+  subdomain?: string;
 }
 export interface CreateFunctionInput {
   clientMutationId?: string;
@@ -4601,6 +4583,7 @@ export interface DatabaseInput {
   name?: string;
   label?: string;
   hash?: string;
+  platform?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -4909,6 +4892,8 @@ export interface PolicyInput {
   disabled?: boolean;
   policyType?: string;
   data?: unknown;
+  /** Optional WITH CHECK override node {"$type": "Authz...", "data": {...}}. Only valid for UPDATE policies; NULL inherits the USING expression. */
+  withCheck?: unknown;
   smartTags?: unknown;
   category?: ObjectCategory;
   tags?: string[];
@@ -5124,6 +5109,27 @@ export interface ForeignKeyConstraintInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateAstMigrationInput {
+  clientMutationId?: string;
+  /** The `AstMigration` to be created by this mutation. */
+  astMigration: AstMigrationInput;
+}
+/** An input for mutations affecting `AstMigration` */
+export interface AstMigrationInput {
+  id?: number;
+  databaseId?: string;
+  name?: string;
+  requires?: string[];
+  payload?: unknown;
+  deploys?: string;
+  deploy?: unknown;
+  revert?: unknown;
+  verify?: unknown;
+  createdAt?: string;
+  action?: string;
+  actionId?: string;
+  actorId?: string;
+}
 export interface CreateEmbeddingChunkInput {
   clientMutationId?: string;
   /** The `EmbeddingChunk` to be created by this mutation. */
@@ -5197,27 +5203,6 @@ export interface WebauthnSettingInput {
   /** Challenge TTL in seconds (default 300 = 5 minutes) */
   challengeExpirySeconds?: string;
 }
-export interface CreateAstMigrationInput {
-  clientMutationId?: string;
-  /** The `AstMigration` to be created by this mutation. */
-  astMigration: AstMigrationInput;
-}
-/** An input for mutations affecting `AstMigration` */
-export interface AstMigrationInput {
-  id?: number;
-  databaseId?: string;
-  name?: string;
-  requires?: string[];
-  payload?: unknown;
-  deploys?: string;
-  deploy?: unknown;
-  revert?: unknown;
-  verify?: unknown;
-  createdAt?: string;
-  action?: string;
-  actionId?: string;
-  actorId?: string;
-}
 export interface CreateSchemaInput {
   clientMutationId?: string;
   /** The `Schema` to be created by this mutation. */
@@ -5256,6 +5241,8 @@ export interface FieldInput {
   isRequired?: boolean;
   apiRequired?: boolean;
   defaultValue?: unknown;
+  generationExpression?: unknown;
+  generationType?: string;
   type: unknown;
   fieldOrder?: number;
   regexp?: string;
@@ -5289,6 +5276,8 @@ export interface TableInput {
   pluralName?: string;
   singularName?: string;
   tags?: string[];
+  /** Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr. */
+  stepUp?: unknown;
   partitioned?: boolean;
   partitionStrategy?: string;
   partitionKeyNames?: string[];
@@ -5607,6 +5596,7 @@ export interface DatabasePatch {
   name?: string;
   label?: string;
   hash?: string;
+  platform?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -5910,6 +5900,8 @@ export interface PolicyPatch {
   disabled?: boolean;
   policyType?: string;
   data?: unknown;
+  /** Optional WITH CHECK override node {"$type": "Authz...", "data": {...}}. Only valid for UPDATE policies; NULL inherits the USING expression. */
+  withCheck?: unknown;
   smartTags?: unknown;
   category?: ObjectCategory;
   tags?: string[];
@@ -6262,6 +6254,8 @@ export interface FieldPatch {
   isRequired?: boolean;
   apiRequired?: boolean;
   defaultValue?: unknown;
+  generationExpression?: unknown;
+  generationType?: string;
   type?: unknown;
   fieldOrder?: number;
   regexp?: string;
@@ -6296,6 +6290,8 @@ export interface TablePatch {
   pluralName?: string;
   singularName?: string;
   tags?: string[];
+  /** Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr. */
+  stepUp?: unknown;
   partitioned?: boolean;
   partitionStrategy?: string;
   partitionKeyNames?: string[];
@@ -6780,6 +6776,13 @@ export interface ForeignKeyConstraintConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AstMigration` values. */
+export interface AstMigrationConnection {
+  nodes: AstMigration[];
+  edges: AstMigrationEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `EmbeddingChunk` values. */
 export interface EmbeddingChunkConnection {
   nodes: EmbeddingChunk[];
@@ -6791,13 +6794,6 @@ export interface EmbeddingChunkConnection {
 export interface WebauthnSettingConnection {
   nodes: WebauthnSetting[];
   edges: WebauthnSettingEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AstMigration` values. */
-export interface AstMigrationConnection {
-  nodes: AstMigration[];
-  edges: AstMigrationEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -6838,23 +6834,15 @@ export interface RejectDatabaseTransferPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
-export interface ProvisionDatabaseWithUserPayload {
-  clientMutationId?: string | null;
-  result?: ProvisionDatabaseWithUserRecord[] | null;
-}
-export interface BootstrapUserPayload {
-  clientMutationId?: string | null;
-  result?: BootstrapUserRecord[] | null;
-}
 export interface SetFieldOrderPayload {
   clientMutationId?: string | null;
 }
 export interface ApplyRlsPayload {
   clientMutationId?: string | null;
 }
-export interface CreateUserDatabasePayload {
+export interface RequestDatabasePayload {
   clientMutationId?: string | null;
-  result?: string | null;
+  result?: DatabaseProvisionModule | null;
 }
 export interface CreateFunctionPayload {
   clientMutationId?: string | null;
@@ -7094,6 +7082,11 @@ export interface CreateForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
+export interface CreateAstMigrationPayload {
+  clientMutationId?: string | null;
+  /** The `AstMigration` that was created by this mutation. */
+  astMigration?: AstMigration | null;
+}
 export interface CreateEmbeddingChunkPayload {
   clientMutationId?: string | null;
   /** The `EmbeddingChunk` that was created by this mutation. */
@@ -7105,11 +7098,6 @@ export interface CreateWebauthnSettingPayload {
   /** The `WebauthnSetting` that was created by this mutation. */
   webauthnSetting?: WebauthnSetting | null;
   webauthnSettingEdge?: WebauthnSettingEdge | null;
-}
-export interface CreateAstMigrationPayload {
-  clientMutationId?: string | null;
-  /** The `AstMigration` that was created by this mutation. */
-  astMigration?: AstMigration | null;
 }
 export interface CreateSchemaPayload {
   clientMutationId?: string | null;
@@ -7910,6 +7898,12 @@ export interface ForeignKeyConstraintEdge {
   /** The `ForeignKeyConstraint` at the end of the edge. */
   node?: ForeignKeyConstraint | null;
 }
+/** A `AstMigration` edge in the connection. */
+export interface AstMigrationEdge {
+  cursor?: string | null;
+  /** The `AstMigration` at the end of the edge. */
+  node?: AstMigration | null;
+}
 /** A `EmbeddingChunk` edge in the connection. */
 export interface EmbeddingChunkEdge {
   cursor?: string | null;
@@ -7921,12 +7915,6 @@ export interface WebauthnSettingEdge {
   cursor?: string | null;
   /** The `WebauthnSetting` at the end of the edge. */
   node?: WebauthnSetting | null;
-}
-/** A `AstMigration` edge in the connection. */
-export interface AstMigrationEdge {
-  cursor?: string | null;
-  /** The `AstMigration` at the end of the edge. */
-  node?: AstMigration | null;
 }
 /** A `Schema` edge in the connection. */
 export interface SchemaEdge {
@@ -7968,19 +7956,39 @@ export interface MetaTable {
   /** Realtime metadata (null if no @realtime tag) */
   realtime?: MetaRealtime | null;
 }
-export interface ProvisionDatabaseWithUserRecord {
-  outDatabaseId?: string | null;
-  outApiKey?: string | null;
-}
-export interface BootstrapUserRecord {
-  outUserId?: string | null;
-  outEmail?: string | null;
-  outUsername?: string | null;
-  outDisplayName?: string | null;
-  outIsAdmin?: boolean | null;
-  outIsOwner?: boolean | null;
-  outIsSudo?: boolean | null;
-  outApiKey?: string | null;
+/** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
+export interface DatabaseProvisionModule {
+  id: string;
+  /** The name for the new database */
+  databaseName: string;
+  /** UUID of the user who owns this database */
+  ownerId: string;
+  /** Subdomain prefix for the database. If null, auto-generated using unique_names + random chars */
+  subdomain?: string | null;
+  /** Base domain for the database (e.g., example.com) */
+  domain: string;
+  /** JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["permissions_module", {"scope": "app"}]) */
+  modules: unknown;
+  /** Additional configuration options for provisioning */
+  options: unknown;
+  /** When true, copies the owner user and password hash from source database to the newly provisioned database */
+  bootstrapUser: boolean;
+  /** Current status: pending, in_progress, completed, or failed */
+  status: string;
+  errorMessage?: string | null;
+  /** The database the owner user is copied from during bootstrap (captured from JWT context at provision time) */
+  sourceDatabaseId?: string | null;
+  /** Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed */
+  bootstrapStatus: string;
+  /** Error message from the most recent failed bootstrap attempt */
+  bootstrapError?: string | null;
+  /** The ID of the provisioned database (set by trigger before RLS check) */
+  databaseId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string | null;
+  /** Uniform billing anchor: when the request was fulfilled with a usable database (cold provision completion or warm pool claim). Platform absorbs all provisioning compute before this point */
+  fulfilledAt?: string | null;
 }
 /** Information about a table field/column */
 export interface MetaField {

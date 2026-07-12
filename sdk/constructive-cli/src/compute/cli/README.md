@@ -26,33 +26,57 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `infra-get-all-record` | infraGetAllRecord CRUD operations |
 | `get-all-record` | getAllRecord CRUD operations |
+| `infra-ref` | infraRef CRUD operations |
+| `infra-store` | infraStore CRUD operations |
 | `function-api-binding` | functionApiBinding CRUD operations |
-| `function-deployment` | functionDeployment CRUD operations |
-| `resource` | resource CRUD operations |
 | `function-graph-ref` | functionGraphRef CRUD operations |
 | `function-graph-store` | functionGraphStore CRUD operations |
+| `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
+| `platform-resources-requirements-state` | platformResourcesRequirementsState CRUD operations |
+| `resources-requirements-state` | resourcesRequirementsState CRUD operations |
+| `platform-resource-status-check` | platformResourceStatusCheck CRUD operations |
+| `platform-function-deployment` | platformFunctionDeployment CRUD operations |
+| `platform-resource` | platformResource CRUD operations |
+| `platform-resource-definition` | platformResourceDefinition CRUD operations |
+| `infra-object` | infraObject CRUD operations |
 | `function-graph-object` | functionGraphObject CRUD operations |
+| `platform-function-deployment-event` | platformFunctionDeploymentEvent CRUD operations |
+| `platform-resource-event` | platformResourceEvent CRUD operations |
+| `resource-status-check` | resourceStatusCheck CRUD operations |
+| `function-deployment` | functionDeployment CRUD operations |
+| `resource` | resource CRUD operations |
+| `resource-definition` | resourceDefinition CRUD operations |
 | `function-deployment-event` | functionDeploymentEvent CRUD operations |
-| `org-function-execution-log` | orgFunctionExecutionLog CRUD operations |
+| `platform-function-execution-log` | platformFunctionExecutionLog CRUD operations |
 | `resource-event` | resourceEvent CRUD operations |
 | `function-graph-execution-output` | functionGraphExecutionOutput CRUD operations |
+| `infra-commit` | infraCommit CRUD operations |
 | `function-graph-commit` | functionGraphCommit CRUD operations |
-| `secret-definition` | secretDefinition CRUD operations |
 | `function-execution-log` | functionExecutionLog CRUD operations |
+| `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
+| `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
+| `db-preset` | dbPreset CRUD operations |
+| `platform-namespace` | platformNamespace CRUD operations |
 | `function-graph` | functionGraph CRUD operations |
 | `function-graph-execution-node-state` | functionGraphExecutionNodeState CRUD operations |
-| `platform-namespace` | platformNamespace CRUD operations |
-| `org-function-invocation` | orgFunctionInvocation CRUD operations |
+| `namespace` | namespace CRUD operations |
+| `platform-function-invocation` | platformFunctionInvocation CRUD operations |
 | `function-invocation` | functionInvocation CRUD operations |
 | `platform-namespace-event` | platformNamespaceEvent CRUD operations |
+| `integration-provider` | integrationProvider CRUD operations |
+| `namespace-event` | namespaceEvent CRUD operations |
 | `function-graph-execution` | functionGraphExecution CRUD operations |
+| `platform-function-definition` | platformFunctionDefinition CRUD operations |
 | `function-definition` | functionDefinition CRUD operations |
 | `read-function-graph` | readFunctionGraph |
 | `validate-function-graph` | validateFunctionGraph |
+| `infra-init-empty-repo` | infraInitEmptyRepo |
 | `init-empty-repo` | initEmptyRepo |
-| `set-data-at-path` | setDataAtPath |
 | `import-definitions` | importDefinitions |
+| `infra-set-data-at-path` | infraSetDataAtPath |
+| `set-data-at-path` | setDataAtPath |
 | `copy-graph` | copyGraph |
 | `save-graph` | saveGraph |
 | `add-edge-and-save` | addEdgeAndSave |
@@ -60,6 +84,7 @@ csdk auth set-token <your-token>
 | `import-graph-json` | importGraphJson |
 | `add-edge` | addEdge |
 | `add-node` | addNode |
+| `infra-insert-node-at-path` | infraInsertNodeAtPath |
 | `insert-node-at-path` | insertNodeAtPath |
 | `start-execution` | startExecution |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
@@ -108,6 +133,28 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
+### `infra-get-all-record`
+
+CRUD operations for InfraGetAllRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all infraGetAllRecord records |
+| `find-first` | Find first matching infraGetAllRecord record |
+| `get` | Get a infraGetAllRecord by id |
+| `create` | Create a new infraGetAllRecord |
+| `update` | Update an existing infraGetAllRecord |
+| `delete` | Delete a infraGetAllRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `path` | String |
+| `data` | JSON |
+
+**Required create fields:** `path`, `data`
+
 ### `get-all-record`
 
 CRUD operations for GetAllRecord records.
@@ -129,6 +176,58 @@ CRUD operations for GetAllRecord records.
 | `data` | JSON |
 
 **Required create fields:** `path`, `data`
+
+### `infra-ref`
+
+CRUD operations for InfraRef records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all infraRef records |
+| `find-first` | Find first matching infraRef record |
+| `get` | Get a infraRef by id |
+| `create` | Create a new infraRef |
+| `update` | Update an existing infraRef |
+| `delete` | Delete a infraRef |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+| `commitId` | UUID |
+
+**Required create fields:** `name`, `scopeId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`
+
+### `infra-store`
+
+CRUD operations for InfraStore records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all infraStore records |
+| `find-first` | Find first matching infraStore record |
+| `get` | Get a infraStore by id |
+| `create` | Create a new infraStore |
+| `update` | Update an existing infraStore |
+| `delete` | Delete a infraStore |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+| `hash` | UUID |
+| `createdAt` | Datetime |
+
+**Required create fields:** `name`, `scopeId`
+**Optional create fields (backend defaults):** `hash`
 
 ### `function-api-binding`
 
@@ -156,6 +255,426 @@ CRUD operations for FunctionApiBinding records.
 **Required create fields:** `functionDefinitionId`, `apiId`
 **Optional create fields (backend defaults):** `alias`, `config`
 
+### `function-graph-ref`
+
+CRUD operations for FunctionGraphRef records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionGraphRef records |
+| `find-first` | Find first matching functionGraphRef record |
+| `get` | Get a functionGraphRef by id |
+| `create` | Create a new functionGraphRef |
+| `update` | Update an existing functionGraphRef |
+| `delete` | Delete a functionGraphRef |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+| `commitId` | UUID |
+
+**Required create fields:** `name`, `scopeId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`
+
+### `function-graph-store`
+
+CRUD operations for FunctionGraphStore records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionGraphStore records |
+| `find-first` | Find first matching functionGraphStore record |
+| `get` | Get a functionGraphStore by id |
+| `create` | Create a new functionGraphStore |
+| `update` | Update an existing functionGraphStore |
+| `delete` | Delete a functionGraphStore |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+| `hash` | UUID |
+| `createdAt` | Datetime |
+
+**Required create fields:** `name`, `scopeId`
+**Optional create fields (backend defaults):** `hash`
+
+### `platform-function-api-binding`
+
+CRUD operations for PlatformFunctionApiBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionApiBinding records |
+| `find-first` | Find first matching platformFunctionApiBinding record |
+| `get` | Get a platformFunctionApiBinding by id |
+| `create` | Create a new platformFunctionApiBinding |
+| `update` | Update an existing platformFunctionApiBinding |
+| `delete` | Delete a platformFunctionApiBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `functionDefinitionId` | UUID |
+| `apiId` | UUID |
+| `alias` | String |
+| `config` | JSON |
+
+**Required create fields:** `functionDefinitionId`, `apiId`
+**Optional create fields (backend defaults):** `alias`, `config`
+
+### `platform-resources-requirements-state`
+
+CRUD operations for PlatformResourcesRequirementsState records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourcesRequirementsState records |
+| `find-first` | Find first matching platformResourcesRequirementsState record |
+| `get` | Get a platformResourcesRequirementsState by id |
+| `create` | Create a new platformResourcesRequirementsState |
+| `update` | Update an existing platformResourcesRequirementsState |
+| `delete` | Delete a platformResourcesRequirementsState |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `resourceId` | UUID |
+| `slug` | String |
+| `secretsHash` | String |
+| `configHash` | String |
+| `requirementsHash` | String |
+| `secretsObjectName` | String |
+| `configObjectName` | String |
+
+**Required create fields:** `resourceId`, `slug`, `secretsHash`, `configHash`, `requirementsHash`, `secretsObjectName`, `configObjectName`
+
+### `resources-requirements-state`
+
+CRUD operations for ResourcesRequirementsState records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourcesRequirementsState records |
+| `find-first` | Find first matching resourcesRequirementsState record |
+| `get` | Get a resourcesRequirementsState by id |
+| `create` | Create a new resourcesRequirementsState |
+| `update` | Update an existing resourcesRequirementsState |
+| `delete` | Delete a resourcesRequirementsState |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `resourceId` | UUID |
+| `slug` | String |
+| `secretsHash` | String |
+| `configHash` | String |
+| `requirementsHash` | String |
+| `secretsObjectName` | String |
+| `configObjectName` | String |
+
+**Required create fields:** `resourceId`, `slug`, `secretsHash`, `configHash`, `requirementsHash`, `secretsObjectName`, `configObjectName`
+
+### `platform-resource-status-check`
+
+CRUD operations for PlatformResourceStatusCheck records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceStatusCheck records |
+| `find-first` | Find first matching platformResourceStatusCheck record |
+| `get` | Get a platformResourceStatusCheck by id |
+| `create` | Create a new platformResourceStatusCheck |
+| `update` | Update an existing platformResourceStatusCheck |
+| `delete` | Delete a platformResourceStatusCheck |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `resourceId` | UUID |
+| `requestedBy` | UUID |
+| `requestedAt` | Datetime |
+| `completedAt` | Datetime |
+| `status` | String |
+| `result` | JSON |
+
+**Required create fields:** `resourceId`
+**Optional create fields (backend defaults):** `requestedBy`, `requestedAt`, `completedAt`, `status`, `result`
+
+### `platform-function-deployment`
+
+CRUD operations for PlatformFunctionDeployment records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionDeployment records |
+| `find-first` | Find first matching platformFunctionDeployment record |
+| `get` | Get a platformFunctionDeployment by id |
+| `create` | Create a new platformFunctionDeployment |
+| `update` | Update an existing platformFunctionDeployment |
+| `delete` | Delete a platformFunctionDeployment |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `namespaceId` | UUID |
+| `status` | String |
+| `serviceUrl` | String |
+| `serviceName` | String |
+| `revision` | Int |
+| `image` | String |
+| `imageVersion` | String |
+| `handlerName` | String |
+| `concurrency` | Int |
+| `scaleMin` | Int |
+| `scaleMax` | Int |
+| `timeoutSeconds` | Int |
+| `resources` | JSON |
+| `lastError` | String |
+| `lastErrorAt` | Datetime |
+| `errorCount` | Int |
+| `labels` | JSON |
+| `annotations` | JSON |
+
+**Required create fields:** `namespaceId`, `image`
+**Optional create fields (backend defaults):** `status`, `serviceUrl`, `serviceName`, `revision`, `imageVersion`, `handlerName`, `concurrency`, `scaleMin`, `scaleMax`, `timeoutSeconds`, `resources`, `lastError`, `lastErrorAt`, `errorCount`, `labels`, `annotations`
+
+### `platform-resource`
+
+CRUD operations for PlatformResource records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResource records |
+| `find-first` | Find first matching platformResource record |
+| `get` | Get a platformResource by id |
+| `create` | Create a new platformResource |
+| `update` | Update an existing platformResource |
+| `delete` | Delete a platformResource |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `namespaceId` | UUID |
+| `kind` | String |
+| `name` | String |
+| `slug` | String |
+| `spec` | JSON |
+| `status` | String |
+| `statusObserved` | JSON |
+| `lastError` | String |
+| `errorCount` | Int |
+| `labels` | JSON |
+| `annotations` | JSON |
+| `requiredSecrets` | ResourceRequirement |
+| `requiredConfigs` | ResourceRequirement |
+| `integrations` | String |
+| `resourceDefinitionId` | UUID |
+
+**Required create fields:** `namespaceId`, `kind`, `name`, `slug`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `spec`, `status`, `statusObserved`, `lastError`, `errorCount`, `labels`, `annotations`, `requiredSecrets`, `requiredConfigs`, `integrations`, `resourceDefinitionId`
+
+### `platform-resource-definition`
+
+CRUD operations for PlatformResourceDefinition records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceDefinition records |
+| `find-first` | Find first matching platformResourceDefinition record |
+| `get` | Get a platformResourceDefinition by id |
+| `create` | Create a new platformResourceDefinition |
+| `update` | Update an existing platformResourceDefinition |
+| `delete` | Delete a platformResourceDefinition |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `namespaceId` | UUID |
+| `kind` | String |
+| `name` | String |
+| `slug` | String |
+| `description` | String |
+| `defaultSpec` | JSON |
+| `requiredSecrets` | ResourceRequirement |
+| `requiredConfigs` | ResourceRequirement |
+| `integrations` | String |
+| `labels` | JSON |
+| `annotations` | JSON |
+| `stepUpMinAge` | Interval |
+
+**Required create fields:** `namespaceId`, `kind`, `name`, `slug`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `description`, `defaultSpec`, `requiredSecrets`, `requiredConfigs`, `integrations`, `labels`, `annotations`, `stepUpMinAge`
+
+### `infra-object`
+
+CRUD operations for InfraObject records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all infraObject records |
+| `find-first` | Find first matching infraObject record |
+| `get` | Get a infraObject by id |
+| `create` | Create a new infraObject |
+| `update` | Update an existing infraObject |
+| `delete` | Delete a infraObject |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `scopeId` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+| `data` | JSON |
+| `createdAt` | Datetime |
+
+**Required create fields:** `scopeId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`
+
+### `function-graph-object`
+
+CRUD operations for FunctionGraphObject records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionGraphObject records |
+| `find-first` | Find first matching functionGraphObject record |
+| `get` | Get a functionGraphObject by id |
+| `create` | Create a new functionGraphObject |
+| `update` | Update an existing functionGraphObject |
+| `delete` | Delete a functionGraphObject |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `scopeId` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+| `data` | JSON |
+| `createdAt` | Datetime |
+
+**Required create fields:** `scopeId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`
+
+### `platform-function-deployment-event`
+
+CRUD operations for PlatformFunctionDeploymentEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionDeploymentEvent records |
+| `find-first` | Find first matching platformFunctionDeploymentEvent record |
+| `get` | Get a platformFunctionDeploymentEvent by id |
+| `create` | Create a new platformFunctionDeploymentEvent |
+| `update` | Update an existing platformFunctionDeploymentEvent |
+| `delete` | Delete a platformFunctionDeploymentEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `deploymentId` | UUID |
+| `eventType` | String |
+| `actorId` | UUID |
+| `message` | String |
+| `metadata` | JSON |
+
+**Required create fields:** `deploymentId`, `eventType`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
+
+### `platform-resource-event`
+
+CRUD operations for PlatformResourceEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceEvent records |
+| `find-first` | Find first matching platformResourceEvent record |
+| `get` | Get a platformResourceEvent by id |
+| `create` | Create a new platformResourceEvent |
+| `update` | Update an existing platformResourceEvent |
+| `delete` | Delete a platformResourceEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `resourceId` | UUID |
+| `eventType` | String |
+| `actorId` | UUID |
+| `message` | String |
+| `metadata` | JSON |
+
+**Required create fields:** `resourceId`, `eventType`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
+
+### `resource-status-check`
+
+CRUD operations for ResourceStatusCheck records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceStatusCheck records |
+| `find-first` | Find first matching resourceStatusCheck record |
+| `get` | Get a resourceStatusCheck by id |
+| `create` | Create a new resourceStatusCheck |
+| `update` | Update an existing resourceStatusCheck |
+| `delete` | Delete a resourceStatusCheck |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `resourceId` | UUID |
+| `databaseId` | UUID |
+| `requestedBy` | UUID |
+| `requestedAt` | Datetime |
+| `completedAt` | Datetime |
+| `status` | String |
+| `result` | JSON |
+
+**Required create fields:** `resourceId`, `databaseId`
+**Optional create fields (backend defaults):** `requestedBy`, `requestedAt`, `completedAt`, `status`, `result`
+
 ### `function-deployment`
 
 CRUD operations for FunctionDeployment records.
@@ -176,13 +695,14 @@ CRUD operations for FunctionDeployment records.
 | `id` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
-| `functionDefinitionId` | UUID |
 | `namespaceId` | UUID |
 | `status` | String |
 | `serviceUrl` | String |
 | `serviceName` | String |
 | `revision` | Int |
 | `image` | String |
+| `imageVersion` | String |
+| `handlerName` | String |
 | `concurrency` | Int |
 | `scaleMin` | Int |
 | `scaleMax` | Int |
@@ -195,8 +715,8 @@ CRUD operations for FunctionDeployment records.
 | `annotations` | JSON |
 | `databaseId` | UUID |
 
-**Required create fields:** `functionDefinitionId`, `namespaceId`, `databaseId`
-**Optional create fields (backend defaults):** `status`, `serviceUrl`, `serviceName`, `revision`, `image`, `concurrency`, `scaleMin`, `scaleMax`, `timeoutSeconds`, `resources`, `lastError`, `lastErrorAt`, `errorCount`, `labels`, `annotations`
+**Required create fields:** `namespaceId`, `image`, `databaseId`
+**Optional create fields (backend defaults):** `status`, `serviceUrl`, `serviceName`, `revision`, `imageVersion`, `handlerName`, `concurrency`, `scaleMin`, `scaleMax`, `timeoutSeconds`, `resources`, `lastError`, `lastErrorAt`, `errorCount`, `labels`, `annotations`
 
 ### `resource`
 
@@ -232,88 +752,52 @@ CRUD operations for Resource records.
 | `labels` | JSON |
 | `annotations` | JSON |
 | `databaseId` | UUID |
+| `requiredSecrets` | ResourceRequirement |
+| `requiredConfigs` | ResourceRequirement |
+| `integrations` | String |
+| `resourceDefinitionId` | UUID |
 
 **Required create fields:** `namespaceId`, `kind`, `name`, `slug`, `databaseId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `spec`, `status`, `statusObserved`, `lastError`, `errorCount`, `labels`, `annotations`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `spec`, `status`, `statusObserved`, `lastError`, `errorCount`, `labels`, `annotations`, `requiredSecrets`, `requiredConfigs`, `integrations`, `resourceDefinitionId`
 
-### `function-graph-ref`
+### `resource-definition`
 
-CRUD operations for FunctionGraphRef records.
+CRUD operations for ResourceDefinition records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all functionGraphRef records |
-| `find-first` | Find first matching functionGraphRef record |
-| `get` | Get a functionGraphRef by id |
-| `create` | Create a new functionGraphRef |
-| `update` | Update an existing functionGraphRef |
-| `delete` | Delete a functionGraphRef |
+| `list` | List all resourceDefinition records |
+| `find-first` | Find first matching resourceDefinition record |
+| `get` | Get a resourceDefinition by id |
+| `create` | Create a new resourceDefinition |
+| `update` | Update an existing resourceDefinition |
+| `delete` | Delete a resourceDefinition |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `name` | String |
-| `databaseId` | UUID |
-| `storeId` | UUID |
-| `commitId` | UUID |
-
-**Required create fields:** `name`, `databaseId`, `storeId`
-**Optional create fields (backend defaults):** `commitId`
-
-### `function-graph-store`
-
-CRUD operations for FunctionGraphStore records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all functionGraphStore records |
-| `find-first` | Find first matching functionGraphStore record |
-| `get` | Get a functionGraphStore by id |
-| `create` | Create a new functionGraphStore |
-| `update` | Update an existing functionGraphStore |
-| `delete` | Delete a functionGraphStore |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `databaseId` | UUID |
-| `hash` | UUID |
 | `createdAt` | Datetime |
-
-**Required create fields:** `name`, `databaseId`
-**Optional create fields (backend defaults):** `hash`
-
-### `function-graph-object`
-
-CRUD operations for FunctionGraphObject records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all functionGraphObject records |
-| `find-first` | Find first matching functionGraphObject record |
-| `get` | Get a functionGraphObject by id |
-| `create` | Create a new functionGraphObject |
-| `update` | Update an existing functionGraphObject |
-| `delete` | Delete a functionGraphObject |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `namespaceId` | UUID |
+| `kind` | String |
+| `name` | String |
+| `slug` | String |
+| `description` | String |
+| `defaultSpec` | JSON |
+| `requiredSecrets` | ResourceRequirement |
+| `requiredConfigs` | ResourceRequirement |
+| `integrations` | String |
+| `labels` | JSON |
+| `annotations` | JSON |
+| `stepUpMinAge` | Interval |
 | `databaseId` | UUID |
-| `kids` | UUID |
-| `ktree` | String |
-| `data` | JSON |
-| `createdAt` | Datetime |
 
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `kids`, `ktree`, `data`
+**Required create fields:** `namespaceId`, `kind`, `name`, `slug`, `databaseId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `description`, `defaultSpec`, `requiredSecrets`, `requiredConfigs`, `integrations`, `labels`, `annotations`, `stepUpMinAge`
 
 ### `function-deployment-event`
 
@@ -344,18 +828,18 @@ CRUD operations for FunctionDeploymentEvent records.
 **Required create fields:** `deploymentId`, `eventType`, `databaseId`
 **Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
 
-### `org-function-execution-log`
+### `platform-function-execution-log`
 
-CRUD operations for OrgFunctionExecutionLog records.
+CRUD operations for PlatformFunctionExecutionLog records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all orgFunctionExecutionLog records |
-| `find-first` | Find first matching orgFunctionExecutionLog record |
-| `get` | Get a orgFunctionExecutionLog by id |
-| `create` | Create a new orgFunctionExecutionLog |
-| `update` | Update an existing orgFunctionExecutionLog |
-| `delete` | Delete a orgFunctionExecutionLog |
+| `list` | List all platformFunctionExecutionLog records |
+| `find-first` | Find first matching platformFunctionExecutionLog record |
+| `get` | Get a platformFunctionExecutionLog by id |
+| `create` | Create a new platformFunctionExecutionLog |
+| `update` | Update an existing platformFunctionExecutionLog |
+| `delete` | Delete a platformFunctionExecutionLog |
 
 **Fields:**
 
@@ -421,11 +905,41 @@ CRUD operations for FunctionGraphExecutionOutput records.
 |-------|------|
 | `createdAt` | Datetime |
 | `id` | UUID |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `hash` | Base64EncodedBinary |
 | `data` | JSON |
 
-**Required create fields:** `databaseId`, `hash`, `data`
+**Required create fields:** `scopeId`, `hash`, `data`
+
+### `infra-commit`
+
+CRUD operations for InfraCommit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all infraCommit records |
+| `find-first` | Find first matching infraCommit record |
+| `get` | Get a infraCommit by id |
+| `create` | Create a new infraCommit |
+| `update` | Update an existing infraCommit |
+| `delete` | Delete a infraCommit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `message` | String |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+| `parentIds` | UUID |
+| `authorId` | UUID |
+| `committerId` | UUID |
+| `treeId` | UUID |
+| `date` | Datetime |
+
+**Required create fields:** `scopeId`, `storeId`
+**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ### `function-graph-commit`
 
@@ -446,7 +960,7 @@ CRUD operations for FunctionGraphCommit records.
 |-------|------|
 | `id` | UUID |
 | `message` | String |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `storeId` | UUID |
 | `parentIds` | UUID |
 | `authorId` | UUID |
@@ -454,38 +968,8 @@ CRUD operations for FunctionGraphCommit records.
 | `treeId` | UUID |
 | `date` | Datetime |
 
-**Required create fields:** `databaseId`, `storeId`
+**Required create fields:** `scopeId`, `storeId`
 **Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
-
-### `secret-definition`
-
-CRUD operations for SecretDefinition records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all secretDefinition records |
-| `find-first` | Find first matching secretDefinition record |
-| `get` | Get a secretDefinition by id |
-| `create` | Create a new secretDefinition |
-| `update` | Update an existing secretDefinition |
-| `delete` | Delete a secretDefinition |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `name` | String |
-| `description` | String |
-| `isBuiltIn` | Boolean |
-| `labels` | JSON |
-| `annotations` | JSON |
-| `databaseId` | UUID |
-
-**Required create fields:** `name`, `databaseId`
-**Optional create fields (backend defaults):** `description`, `isBuiltIn`, `labels`, `annotations`
 
 ### `function-execution-log`
 
@@ -517,70 +1001,97 @@ CRUD operations for FunctionExecutionLog records.
 **Required create fields:** `message`, `databaseId`
 **Optional create fields (backend defaults):** `invocationId`, `taskIdentifier`, `logLevel`, `metadata`, `actorId`
 
-### `function-graph`
+### `platform-resources-resolved-requirement`
 
-CRUD operations for FunctionGraph records.
+CRUD operations for PlatformResourcesResolvedRequirement records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all functionGraph records |
-| `find-first` | Find first matching functionGraph record |
-| `get` | Get a functionGraph by id |
-| `create` | Create a new functionGraph |
-| `update` | Update an existing functionGraph |
-| `delete` | Delete a functionGraph |
+| `list` | List all platformResourcesResolvedRequirement records |
+| `find-first` | Find first matching platformResourcesResolvedRequirement record |
+| `get` | Get a platformResourcesResolvedRequirement by id |
+| `create` | Create a new platformResourcesResolvedRequirement |
+| `update` | Update an existing platformResourcesResolvedRequirement |
+| `delete` | Delete a platformResourcesResolvedRequirement |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `resourceId` | UUID |
+| `slug` | String |
+| `namespaceId` | UUID |
+| `requirementKind` | String |
+| `name` | String |
+| `required` | Boolean |
+| `atomId` | UUID |
+| `present` | Boolean |
+| `secretsObjectName` | String |
+| `configObjectName` | String |
+
+**Required create fields:** `resourceId`, `slug`, `namespaceId`, `requirementKind`, `name`, `required`, `atomId`, `present`, `secretsObjectName`, `configObjectName`
+
+### `resources-resolved-requirement`
+
+CRUD operations for ResourcesResolvedRequirement records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourcesResolvedRequirement records |
+| `find-first` | Find first matching resourcesResolvedRequirement record |
+| `get` | Get a resourcesResolvedRequirement by id |
+| `create` | Create a new resourcesResolvedRequirement |
+| `update` | Update an existing resourcesResolvedRequirement |
+| `delete` | Delete a resourcesResolvedRequirement |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `resourceId` | UUID |
+| `slug` | String |
+| `namespaceId` | UUID |
+| `requirementKind` | String |
+| `name` | String |
+| `required` | Boolean |
+| `atomId` | UUID |
+| `present` | Boolean |
+| `secretsObjectName` | String |
+| `configObjectName` | String |
+
+**Required create fields:** `resourceId`, `slug`, `namespaceId`, `requirementKind`, `name`, `required`, `atomId`, `present`, `secretsObjectName`, `configObjectName`
+
+### `db-preset`
+
+CRUD operations for DbPreset records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all dbPreset records |
+| `find-first` | Find first matching dbPreset record |
+| `get` | Get a dbPreset by id |
+| `create` | Create a new dbPreset |
+| `update` | Update an existing dbPreset |
+| `delete` | Delete a dbPreset |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `databaseId` | UUID |
 | `storeId` | UUID |
-| `context` | String |
-| `name` | String |
+| `slug` | String |
+| `definition` | JSON |
+| `commitId` | UUID |
+| `modulesHash` | UUID |
+| `label` | String |
 | `description` | String |
-| `definitionsCommitId` | UUID |
-| `isValid` | Boolean |
-| `validationErrors` | JSON |
-| `createdBy` | UUID |
+| `active` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `databaseId`, `storeId`, `context`, `name`, `description`, `definitionsCommitId`, `isValid`, `validationErrors`, `createdBy`
-
-### `function-graph-execution-node-state`
-
-CRUD operations for FunctionGraphExecutionNodeState records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all functionGraphExecutionNodeState records |
-| `find-first` | Find first matching functionGraphExecutionNodeState record |
-| `get` | Get a functionGraphExecutionNodeState by id |
-| `create` | Create a new functionGraphExecutionNodeState |
-| `update` | Update an existing functionGraphExecutionNodeState |
-| `delete` | Delete a functionGraphExecutionNodeState |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `id` | UUID |
-| `executionId` | UUID |
-| `databaseId` | UUID |
-| `nodeName` | String |
-| `nodePath` | String |
-| `status` | String |
-| `startedAt` | Datetime |
-| `completedAt` | Datetime |
-| `errorCode` | String |
-| `errorMessage` | String |
-| `outputId` | UUID |
-
-**Required create fields:** `executionId`, `databaseId`, `nodeName`
-**Optional create fields (backend defaults):** `nodePath`, `status`, `startedAt`, `completedAt`, `errorCode`, `errorMessage`, `outputId`
+**Required create fields:** `slug`, `definition`
+**Optional create fields (backend defaults):** `storeId`, `commitId`, `modulesHash`, `label`, `description`, `active`
 
 ### `platform-namespace`
 
@@ -606,28 +1117,126 @@ CRUD operations for PlatformNamespace records.
 | `namespaceName` | String |
 | `description` | String |
 | `isActive` | Boolean |
+| `status` | String |
+| `lastError` | String |
 | `labels` | JSON |
 | `annotations` | JSON |
-| `databaseId` | UUID |
-| `sourceDatabaseId` | UUID |
-| `sourceScope` | String |
 | `isManaged` | Boolean |
 
-**Required create fields:** `name`, `namespaceName`, `databaseId`
-**Optional create fields (backend defaults):** `description`, `isActive`, `labels`, `annotations`, `sourceDatabaseId`, `sourceScope`, `isManaged`
+**Required create fields:** `name`, `namespaceName`
+**Optional create fields (backend defaults):** `description`, `isActive`, `status`, `lastError`, `labels`, `annotations`, `isManaged`
 
-### `org-function-invocation`
+### `function-graph`
 
-CRUD operations for OrgFunctionInvocation records.
+CRUD operations for FunctionGraph records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all orgFunctionInvocation records |
-| `find-first` | Find first matching orgFunctionInvocation record |
-| `get` | Get a orgFunctionInvocation by id |
-| `create` | Create a new orgFunctionInvocation |
-| `update` | Update an existing orgFunctionInvocation |
-| `delete` | Delete a orgFunctionInvocation |
+| `list` | List all functionGraph records |
+| `find-first` | Find first matching functionGraph record |
+| `get` | Get a functionGraph by id |
+| `create` | Create a new functionGraph |
+| `update` | Update an existing functionGraph |
+| `delete` | Delete a functionGraph |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+| `context` | String |
+| `name` | String |
+| `description` | String |
+| `definitionsCommitId` | UUID |
+| `isValid` | Boolean |
+| `validationErrors` | JSON |
+| `createdBy` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `scopeId`, `storeId`, `context`, `name`, `description`, `definitionsCommitId`, `isValid`, `validationErrors`, `createdBy`
+
+### `function-graph-execution-node-state`
+
+CRUD operations for FunctionGraphExecutionNodeState records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionGraphExecutionNodeState records |
+| `find-first` | Find first matching functionGraphExecutionNodeState record |
+| `get` | Get a functionGraphExecutionNodeState by id |
+| `create` | Create a new functionGraphExecutionNodeState |
+| `update` | Update an existing functionGraphExecutionNodeState |
+| `delete` | Delete a functionGraphExecutionNodeState |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `executionId` | UUID |
+| `scopeId` | UUID |
+| `nodeName` | String |
+| `nodePath` | String |
+| `status` | String |
+| `startedAt` | Datetime |
+| `completedAt` | Datetime |
+| `errorCode` | String |
+| `errorMessage` | String |
+| `outputId` | UUID |
+
+**Required create fields:** `executionId`, `scopeId`, `nodeName`
+**Optional create fields (backend defaults):** `nodePath`, `status`, `startedAt`, `completedAt`, `errorCode`, `errorMessage`, `outputId`
+
+### `namespace`
+
+CRUD operations for Namespace records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all namespace records |
+| `find-first` | Find first matching namespace record |
+| `get` | Get a namespace by id |
+| `create` | Create a new namespace |
+| `update` | Update an existing namespace |
+| `delete` | Delete a namespace |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `name` | String |
+| `namespaceName` | String |
+| `description` | String |
+| `isActive` | Boolean |
+| `status` | String |
+| `lastError` | String |
+| `labels` | JSON |
+| `annotations` | JSON |
+| `databaseId` | UUID |
+| `isManaged` | Boolean |
+
+**Required create fields:** `name`, `namespaceName`, `databaseId`
+**Optional create fields (backend defaults):** `description`, `isActive`, `status`, `lastError`, `labels`, `annotations`, `isManaged`
+
+### `platform-function-invocation`
+
+CRUD operations for PlatformFunctionInvocation records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionInvocation records |
+| `find-first` | Find first matching platformFunctionInvocation record |
+| `get` | Get a platformFunctionInvocation by id |
+| `create` | Create a new platformFunctionInvocation |
+| `update` | Update an existing platformFunctionInvocation |
+| `delete` | Delete a platformFunctionInvocation |
 
 **Fields:**
 
@@ -718,6 +1327,74 @@ CRUD operations for PlatformNamespaceEvent records.
 | `networkEgressBytes` | BigInt |
 | `podCount` | Int |
 | `metrics` | JSON |
+
+**Required create fields:** `namespaceId`, `eventType`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`, `cpuMillicores`, `memoryBytes`, `storageBytes`, `networkIngressBytes`, `networkEgressBytes`, `podCount`, `metrics`
+
+### `integration-provider`
+
+CRUD operations for IntegrationProvider records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all integrationProvider records |
+| `find-first` | Find first matching integrationProvider record |
+| `get` | Get a integrationProvider by id |
+| `create` | Create a new integrationProvider |
+| `update` | Update an existing integrationProvider |
+| `delete` | Delete a integrationProvider |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `slug` | String |
+| `name` | String |
+| `description` | String |
+| `category` | String |
+| `icon` | String |
+| `logo` | Image |
+| `brand` | JSON |
+| `requiredSecrets` | ResourceRequirement |
+| `requiredConfigs` | ResourceRequirement |
+
+**Required create fields:** `slug`, `name`
+**Optional create fields (backend defaults):** `description`, `category`, `icon`, `logo`, `brand`, `requiredSecrets`, `requiredConfigs`
+
+### `namespace-event`
+
+CRUD operations for NamespaceEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all namespaceEvent records |
+| `find-first` | Find first matching namespaceEvent record |
+| `get` | Get a namespaceEvent by id |
+| `create` | Create a new namespaceEvent |
+| `update` | Update an existing namespaceEvent |
+| `delete` | Delete a namespaceEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `id` | UUID |
+| `namespaceId` | UUID |
+| `eventType` | String |
+| `actorId` | UUID |
+| `message` | String |
+| `metadata` | JSON |
+| `cpuMillicores` | Int |
+| `memoryBytes` | BigInt |
+| `storageBytes` | BigInt |
+| `networkIngressBytes` | BigInt |
+| `networkEgressBytes` | BigInt |
+| `podCount` | Int |
+| `metrics` | JSON |
 | `databaseId` | UUID |
 
 **Required create fields:** `namespaceId`, `eventType`, `databaseId`
@@ -744,7 +1421,7 @@ CRUD operations for FunctionGraphExecution records.
 | `id` | UUID |
 | `graphId` | UUID |
 | `invocationId` | UUID |
-| `databaseId` | UUID |
+| `scopeId` | UUID |
 | `outputNode` | String |
 | `outputPort` | String |
 | `status` | String |
@@ -761,11 +1438,70 @@ CRUD operations for FunctionGraphExecution records.
 | `maxTicks` | Int |
 | `maxPendingJobs` | Int |
 | `timeoutAt` | Datetime |
+| `lastProgressAt` | Datetime |
 | `errorCode` | String |
 | `errorMessage` | String |
 
-**Required create fields:** `graphId`, `databaseId`, `outputNode`
-**Optional create fields (backend defaults):** `startedAt`, `invocationId`, `outputPort`, `status`, `inputPayload`, `outputPayload`, `nodeOutputs`, `executionPlan`, `currentWave`, `parentExecutionId`, `parentNodeName`, `definitionsCommitId`, `tickCount`, `completedAt`, `maxTicks`, `maxPendingJobs`, `timeoutAt`, `errorCode`, `errorMessage`
+**Required create fields:** `graphId`, `scopeId`
+**Optional create fields (backend defaults):** `startedAt`, `invocationId`, `outputNode`, `outputPort`, `status`, `inputPayload`, `outputPayload`, `nodeOutputs`, `executionPlan`, `currentWave`, `parentExecutionId`, `parentNodeName`, `definitionsCommitId`, `tickCount`, `completedAt`, `maxTicks`, `maxPendingJobs`, `timeoutAt`, `lastProgressAt`, `errorCode`, `errorMessage`
+
+### `platform-function-definition`
+
+CRUD operations for PlatformFunctionDefinition records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionDefinition records |
+| `find-first` | Find first matching platformFunctionDefinition record |
+| `get` | Get a platformFunctionDefinition by id |
+| `create` | Create a new platformFunctionDefinition |
+| `update` | Update an existing platformFunctionDefinition |
+| `delete` | Delete a platformFunctionDefinition |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `scope` | String |
+| `name` | String |
+| `taskIdentifier` | String |
+| `description` | String |
+| `isPublished` | Boolean |
+| `accessChannels` | String |
+| `publishedAt` | Datetime |
+| `maxAttempts` | Int |
+| `priority` | Int |
+| `queueName` | String |
+| `runtime` | String |
+| `targetSchema` | String |
+| `targetFunction` | String |
+| `moduleTable` | String |
+| `functionColumns` | JSON |
+| `payloadArgs` | JSON |
+| `image` | String |
+| `concurrency` | Int |
+| `scaleMin` | Int |
+| `scaleMax` | Int |
+| `timeoutSeconds` | Int |
+| `resources` | JSON |
+| `isBuiltIn` | Boolean |
+| `requiredSecrets` | ResourceRequirement |
+| `requiredConfigs` | ResourceRequirement |
+| `integrations` | String |
+| `requiredBuckets` | String |
+| `requiredModels` | String |
+| `inputs` | JSON |
+| `outputs` | JSON |
+| `props` | JSON |
+| `volatile` | Boolean |
+| `icon` | String |
+| `category` | String |
+
+**Required create fields:** `scope`, `name`, `taskIdentifier`
+**Optional create fields (backend defaults):** `description`, `isPublished`, `accessChannels`, `publishedAt`, `maxAttempts`, `priority`, `queueName`, `runtime`, `targetSchema`, `targetFunction`, `moduleTable`, `functionColumns`, `payloadArgs`, `image`, `concurrency`, `scaleMin`, `scaleMax`, `timeoutSeconds`, `resources`, `isBuiltIn`, `requiredSecrets`, `requiredConfigs`, `integrations`, `requiredBuckets`, `requiredModels`, `inputs`, `outputs`, `props`, `volatile`, `icon`, `category`
 
 ### `function-definition`
 
@@ -791,11 +1527,18 @@ CRUD operations for FunctionDefinition records.
 | `name` | String |
 | `taskIdentifier` | String |
 | `description` | String |
-| `isInvocable` | Boolean |
+| `isPublished` | Boolean |
+| `accessChannels` | String |
+| `publishedAt` | Datetime |
 | `maxAttempts` | Int |
 | `priority` | Int |
 | `queueName` | String |
 | `runtime` | String |
+| `targetSchema` | String |
+| `targetFunction` | String |
+| `moduleTable` | String |
+| `functionColumns` | JSON |
+| `payloadArgs` | JSON |
 | `image` | String |
 | `concurrency` | Int |
 | `scaleMin` | Int |
@@ -803,8 +1546,9 @@ CRUD operations for FunctionDefinition records.
 | `timeoutSeconds` | Int |
 | `resources` | JSON |
 | `isBuiltIn` | Boolean |
-| `requiredSecrets` | FunctionRequirement |
-| `requiredConfigs` | FunctionRequirement |
+| `requiredSecrets` | ResourceRequirement |
+| `requiredConfigs` | ResourceRequirement |
+| `integrations` | String |
 | `requiredBuckets` | String |
 | `requiredModels` | String |
 | `inputs` | JSON |
@@ -813,9 +1557,10 @@ CRUD operations for FunctionDefinition records.
 | `volatile` | Boolean |
 | `icon` | String |
 | `category` | String |
+| `databaseId` | UUID |
 
-**Required create fields:** `scope`, `name`, `taskIdentifier`
-**Optional create fields (backend defaults):** `description`, `isInvocable`, `maxAttempts`, `priority`, `queueName`, `runtime`, `image`, `concurrency`, `scaleMin`, `scaleMax`, `timeoutSeconds`, `resources`, `isBuiltIn`, `requiredSecrets`, `requiredConfigs`, `requiredBuckets`, `requiredModels`, `inputs`, `outputs`, `props`, `volatile`, `icon`, `category`
+**Required create fields:** `scope`, `name`, `taskIdentifier`, `databaseId`
+**Optional create fields (backend defaults):** `description`, `isPublished`, `accessChannels`, `publishedAt`, `maxAttempts`, `priority`, `queueName`, `runtime`, `targetSchema`, `targetFunction`, `moduleTable`, `functionColumns`, `payloadArgs`, `image`, `concurrency`, `scaleMin`, `scaleMax`, `timeoutSeconds`, `resources`, `isBuiltIn`, `requiredSecrets`, `requiredConfigs`, `integrations`, `requiredBuckets`, `requiredModels`, `inputs`, `outputs`, `props`, `volatile`, `icon`, `category`
 
 ## Custom Operations
 
@@ -842,6 +1587,19 @@ validateFunctionGraph
   | `--input.clientMutationId` | String |
   | `--input.graphId` | UUID |
 
+### `infra-init-empty-repo`
+
+infraInitEmptyRepo
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
 ### `init-empty-repo`
 
 initEmptyRepo
@@ -854,21 +1612,6 @@ initEmptyRepo
   | `--input.clientMutationId` | String |
   | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
-
-### `set-data-at-path`
-
-setDataAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.sId` | UUID |
-  | `--input.root` | UUID |
-  | `--input.path` | String |
-  | `--input.data` | JSON |
 
 ### `import-definitions`
 
@@ -885,6 +1628,36 @@ importDefinitions
   | `--input.sourceCommitId` | UUID |
   | `--input.contexts` | String |
 
+### `infra-set-data-at-path`
+
+infraSetDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+
+### `set-data-at-path`
+
+setDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+
 ### `copy-graph`
 
 copyGraph
@@ -895,7 +1668,7 @@ copyGraph
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
+  | `--input.scopeId` | UUID |
   | `--input.graphId` | UUID |
   | `--input.name` | String |
 
@@ -957,7 +1730,7 @@ importGraphJson
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
+  | `--input.scopeId` | UUID |
   | `--input.name` | String |
   | `--input.graphJson` | JSON |
   | `--input.context` | String |
@@ -975,7 +1748,7 @@ addEdge
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
+  | `--input.scopeId` | UUID |
   | `--input.rootHash` | UUID |
   | `--input.srcNode` | String |
   | `--input.srcPort` | String |
@@ -994,7 +1767,7 @@ addNode
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.databaseId` | UUID |
+  | `--input.scopeId` | UUID |
   | `--input.rootHash` | UUID |
   | `--input.nodeName` | String |
   | `--input.nodeType` | String |
@@ -1002,6 +1775,23 @@ addNode
   | `--input.graphName` | String |
   | `--input.props` | JSON |
   | `--input.meta` | JSON |
+
+### `infra-insert-node-at-path`
+
+infraInsertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
 
 ### `insert-node-at-path`
 

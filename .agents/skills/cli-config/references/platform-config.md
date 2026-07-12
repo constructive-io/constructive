@@ -12,8 +12,8 @@ csdk platform-config list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-config list --limit 10 --after <cursor>
 csdk platform-config find-first --where.<field>.<op> <value>
 csdk platform-config get --id <UUID>
-csdk platform-config create --namespaceId <UUID> --name <String> [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
-csdk platform-config update --id <UUID> [--namespaceId <UUID>] [--name <String>] [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
+csdk platform-config create --namespaceId <UUID> --name <String> [--provider <String>] [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
+csdk platform-config update --id <UUID> [--namespaceId <UUID>] [--name <String>] [--provider <String>] [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
 csdk platform-config delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-config list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformConfig
 
 ```bash
-csdk platform-config create --namespaceId <UUID> --name <String> [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
+csdk platform-config create --namespaceId <UUID> --name <String> [--provider <String>] [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
 ```
 
 ### Get a platformConfig by id

@@ -238,6 +238,35 @@ type Query {
     orderBy: [AuditLogAuthOrderBy!] = [PRIMARY_KEY_ASC]
   ): AuditLogAuthConnection
 
+  """Reads and enables pagination through a set of `OrgApiKeyList`."""
+  orgApiKeyLists(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgApiKeyListFilter
+
+    """The method to use when ordering `OrgApiKeyList`."""
+    orderBy: [OrgApiKeyListOrderBy!] = [NATURAL]
+  ): OrgApiKeyListConnection
+
   """
   Reads and enables pagination through a set of `PrincipalScopeOverride`.
   """
@@ -268,35 +297,6 @@ type Query {
     """The method to use when ordering `PrincipalScopeOverride`."""
     orderBy: [PrincipalScopeOverrideOrderBy!] = [PRIMARY_KEY_ASC]
   ): PrincipalScopeOverrideConnection
-
-  """Reads and enables pagination through a set of `OrgApiKeyList`."""
-  orgApiKeyLists(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgApiKeyListFilter
-
-    """The method to use when ordering `OrgApiKeyList`."""
-    orderBy: [OrgApiKeyListOrderBy!] = [NATURAL]
-  ): OrgApiKeyListConnection
 
   """Reads and enables pagination through a set of `Email`."""
   emails(
@@ -715,8 +715,8 @@ type Principal {
   """
   name: String!
 
-  """Permission bitmask subset; all-1s means inherit all parent permissions"""
-  allowedMask: BitString!
+  """Whether this principal inherits admin/owner privileges from the owner"""
+  useAdminOwner: Boolean!
 
   """Whether this principal is restricted to read-only operations"""
   isReadOnly: Boolean!
@@ -790,9 +790,6 @@ type Principal {
     orderBy: [PrincipalScopeOverrideOrderBy!] = [PRIMARY_KEY_ASC]
   ): PrincipalScopeOverrideConnection!
 }
-
-"""A string representing a series of binary bits"""
-scalar BitString
 
 """A connection to a list of `PrincipalEntity` values."""
 type PrincipalEntityConnection {
@@ -1569,8 +1566,8 @@ input PrincipalFilter {
   """Filter by the object’s `name` field."""
   name: StringFilter
 
-  """Filter by the object’s `allowedMask` field."""
-  allowedMask: BitStringFilter
+  """Filter by the object’s `useAdminOwner` field."""
+  useAdminOwner: BooleanFilter
 
   """Filter by the object’s `isReadOnly` field."""
   isReadOnly: BooleanFilter
@@ -1604,48 +1601,6 @@ input PrincipalFilter {
 
   """`principalScopeOverrides` exist."""
   principalScopeOverridesExist: Boolean
-}
-
-"""
-A filter to be used against BitString fields. All fields are combined with a logical ‘and.’
-"""
-input BitStringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: BitString
-
-  """Not equal to the specified value."""
-  notEqualTo: BitString
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: BitString
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: BitString
-
-  """Included in the specified list."""
-  in: [BitString!]
-
-  """Not included in the specified list."""
-  notIn: [BitString!]
-
-  """Less than the specified value."""
-  lessThan: BitString
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: BitString
-
-  """Greater than the specified value."""
-  greaterThan: BitString
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: BitString
 }
 
 """
@@ -1740,8 +1695,11 @@ input PrincipalScopeOverrideFilter {
   """Filter by the object’s `allowedMask` field."""
   allowedMask: BitStringFilter
 
-  """Filter by the object’s `isAdmin` field."""
-  isAdmin: BooleanFilter
+  """Filter by the object’s `useAdminOwner` field."""
+  useAdminOwner: BooleanFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
 
   """Filter by the object’s `isReadOnly` field."""
   isReadOnly: BooleanFilter
@@ -1758,6 +1716,51 @@ input PrincipalScopeOverrideFilter {
   """Filter by the object’s `principal` relation."""
   principal: PrincipalFilter
 }
+
+"""
+A filter to be used against BitString fields. All fields are combined with a logical ‘and.’
+"""
+input BitStringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: BitString
+
+  """Not equal to the specified value."""
+  notEqualTo: BitString
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BitString
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BitString
+
+  """Included in the specified list."""
+  in: [BitString!]
+
+  """Not included in the specified list."""
+  notIn: [BitString!]
+
+  """Less than the specified value."""
+  lessThan: BitString
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BitString
+
+  """Greater than the specified value."""
+  greaterThan: BitString
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BitString
+}
+
+"""A string representing a series of binary bits"""
+scalar BitString
 
 """
 A filter to be used against many `PrincipalEntity` object types. All fields are combined with a logical ‘and.’
@@ -2595,14 +2598,19 @@ type PrincipalScopeOverride {
   membershipType: Int!
 
   """
-  Permission bitmask for this scope; AND-masked with parent permissions during cascade
+  Optional permission mask; AND-masked with parent permissions during cascade. NULL means no extra mask.
   """
-  allowedMask: BitString!
+  allowedMask: BitString
 
   """
-  Whether this principal has admin access at this scope (default true = inherit from parent)
+  Whether this principal inherits admin/owner at this scope (default true = inherit from parent)
   """
-  isAdmin: Boolean!
+  useAdminOwner: Boolean!
+
+  """
+  Whether this scope is active for this principal; false disables all access at this scope
+  """
+  isActive: Boolean!
 
   """Whether this principal is restricted to read-only at this scope"""
   isReadOnly: Boolean!
@@ -2639,8 +2647,10 @@ enum PrincipalScopeOverrideOrderBy {
   MEMBERSHIP_TYPE_DESC
   ALLOWED_MASK_ASC
   ALLOWED_MASK_DESC
-  IS_ADMIN_ASC
-  IS_ADMIN_DESC
+  USE_ADMIN_OWNER_ASC
+  USE_ADMIN_OWNER_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
   IS_READ_ONLY_ASC
   IS_READ_ONLY_DESC
 }
@@ -2671,8 +2681,8 @@ enum PrincipalOrderBy {
   USER_ID_DESC
   NAME_ASC
   NAME_DESC
-  ALLOWED_MASK_ASC
-  ALLOWED_MASK_DESC
+  USE_ADMIN_OWNER_ASC
+  USE_ADMIN_OWNER_DESC
   IS_READ_ONLY_ASC
   IS_READ_ONLY_DESC
   BYPASS_STEP_UP_ASC
@@ -3914,6 +3924,12 @@ type Mutation {
     """
     input: ResetPasswordInput!
   ): ResetPasswordPayload
+  createOrgPrincipal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgPrincipalInput!
+  ): CreateOrgPrincipalPayload
   signInCrossOrigin(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3950,12 +3966,12 @@ type Mutation {
     """
     input: LinkIdentityInput!
   ): LinkIdentityPayload
-  createOrgPrincipal(
+  createPrincipal(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateOrgPrincipalInput!
-  ): CreateOrgPrincipalPayload
+    input: CreatePrincipalInput!
+  ): CreatePrincipalPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3980,12 +3996,6 @@ type Mutation {
     """
     input: RequestCrossOriginTokenInput!
   ): RequestCrossOriginTokenPayload
-  createPrincipal(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePrincipalInput!
-  ): CreatePrincipalPayload
   forgotPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4632,6 +4642,35 @@ input ResetPasswordInput {
   newPassword: String
 }
 
+"""The output of our `createOrgPrincipal` mutation."""
+type CreateOrgPrincipalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createOrgPrincipal` mutation."""
+input CreateOrgPrincipalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String
+  orgId: UUID
+  useAdminOwner: Boolean
+  isReadOnly: Boolean
+  bypassStepUp: Boolean
+}
+
 """The output of our `signInCrossOrigin` mutation."""
 type SignInCrossOriginPayload {
   """
@@ -4844,8 +4883,8 @@ input LinkIdentityInput {
   details: JSON
 }
 
-"""The output of our `createOrgPrincipal` mutation."""
-type CreateOrgPrincipalPayload {
+"""The output of our `createPrincipal` mutation."""
+type CreatePrincipalPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -4859,16 +4898,16 @@ type CreateOrgPrincipalPayload {
   query: Query
 }
 
-"""All input for the `createOrgPrincipal` mutation."""
-input CreateOrgPrincipalInput {
+"""All input for the `createPrincipal` mutation."""
+input CreatePrincipalInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   name: String
-  orgId: UUID
-  allowedMask: BitString
+  useAdminOwner: Boolean
+  entityIds: [UUID]
   isReadOnly: Boolean
   bypassStepUp: Boolean
 }
@@ -5028,35 +5067,6 @@ input RequestCrossOriginTokenInput {
   password: String
   origin: ConstructiveInternalTypeOrigin
   rememberMe: Boolean
-}
-
-"""The output of our `createPrincipal` mutation."""
-type CreatePrincipalPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `createPrincipal` mutation."""
-input CreatePrincipalInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  name: String
-  allowedMask: BitString
-  entityIds: [UUID]
-  isReadOnly: Boolean
-  bypassStepUp: Boolean
 }
 
 """The output of our `forgotPassword` mutation."""

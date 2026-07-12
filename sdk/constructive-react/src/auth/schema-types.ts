@@ -74,8 +74,10 @@ export type PrincipalScopeOverrideOrderBy =
   | 'MEMBERSHIP_TYPE_DESC'
   | 'ALLOWED_MASK_ASC'
   | 'ALLOWED_MASK_DESC'
-  | 'IS_ADMIN_ASC'
-  | 'IS_ADMIN_DESC'
+  | 'USE_ADMIN_OWNER_ASC'
+  | 'USE_ADMIN_OWNER_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
   | 'IS_READ_ONLY_ASC'
   | 'IS_READ_ONLY_DESC';
 /** Methods to use when ordering `Principal`. */
@@ -95,8 +97,8 @@ export type PrincipalOrderBy =
   | 'USER_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'ALLOWED_MASK_ASC'
-  | 'ALLOWED_MASK_DESC'
+  | 'USE_ADMIN_OWNER_ASC'
+  | 'USE_ADMIN_OWNER_DESC'
   | 'IS_READ_ONLY_ASC'
   | 'IS_READ_ONLY_DESC'
   | 'BYPASS_STEP_UP_ASC'
@@ -572,8 +574,8 @@ export interface PrincipalFilter {
   userId?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `allowedMask` field. */
-  allowedMask?: BitStringFilter;
+  /** Filter by the object’s `useAdminOwner` field. */
+  useAdminOwner?: BooleanFilter;
   /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
   /** Filter by the object’s `bypassStepUp` field. */
@@ -629,8 +631,10 @@ export interface PrincipalScopeOverrideFilter {
   membershipType?: IntFilter;
   /** Filter by the object’s `allowedMask` field. */
   allowedMask?: BitStringFilter;
-  /** Filter by the object’s `isAdmin` field. */
-  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `useAdminOwner` field. */
+  useAdminOwner?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
   /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
   /** Checks for all expressions in this list. */
@@ -1164,6 +1168,14 @@ export interface ResetPasswordInput {
   resetToken?: string;
   newPassword?: string;
 }
+export interface CreateOrgPrincipalInput {
+  clientMutationId?: string;
+  name?: string;
+  orgId?: string;
+  useAdminOwner?: boolean;
+  isReadOnly?: boolean;
+  bypassStepUp?: boolean;
+}
 export interface SignInCrossOriginInput {
   clientMutationId?: string;
   token?: string;
@@ -1209,11 +1221,11 @@ export interface LinkIdentityInput {
   identifier: string;
   details?: unknown;
 }
-export interface CreateOrgPrincipalInput {
+export interface CreatePrincipalInput {
   clientMutationId?: string;
   name?: string;
-  orgId?: string;
-  allowedMask?: string;
+  useAdminOwner?: boolean;
+  entityIds?: string[];
   isReadOnly?: boolean;
   bypassStepUp?: boolean;
 }
@@ -1263,14 +1275,6 @@ export interface RequestCrossOriginTokenInput {
   password?: string;
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
-}
-export interface CreatePrincipalInput {
-  clientMutationId?: string;
-  name?: string;
-  allowedMask?: string;
-  entityIds?: string[];
-  isReadOnly?: boolean;
-  bypassStepUp?: boolean;
 }
 export interface ForgotPasswordInput {
   clientMutationId?: string;
@@ -1758,17 +1762,17 @@ export interface AuditLogAuthConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `PrincipalScopeOverride` values. */
-export interface PrincipalScopeOverrideConnection {
-  nodes: PrincipalScopeOverride[];
-  edges: PrincipalScopeOverrideEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `OrgApiKeyList` values. */
 export interface OrgApiKeyListConnection {
   nodes: OrgApiKeyList[];
   edges: OrgApiKeyListEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PrincipalScopeOverride` values. */
+export interface PrincipalScopeOverrideConnection {
+  nodes: PrincipalScopeOverride[];
+  edges: PrincipalScopeOverrideEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1859,6 +1863,10 @@ export interface ResetPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
+export interface CreateOrgPrincipalPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
 export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
   result?: SignInCrossOriginRecord | null;
@@ -1883,7 +1891,7 @@ export interface LinkIdentityPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
-export interface CreateOrgPrincipalPayload {
+export interface CreatePrincipalPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -1900,10 +1908,6 @@ export interface CreateApiKeyPayload {
   result?: CreateApiKeyRecord | null;
 }
 export interface RequestCrossOriginTokenPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export interface CreatePrincipalPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -2146,17 +2150,17 @@ export interface AuditLogAuthEdge {
   /** The `AuditLogAuth` at the end of the edge. */
   node?: AuditLogAuth | null;
 }
-/** A `PrincipalScopeOverride` edge in the connection. */
-export interface PrincipalScopeOverrideEdge {
-  cursor?: string | null;
-  /** The `PrincipalScopeOverride` at the end of the edge. */
-  node?: PrincipalScopeOverride | null;
-}
 /** A `OrgApiKeyList` edge in the connection. */
 export interface OrgApiKeyListEdge {
   cursor?: string | null;
   /** The `OrgApiKeyList` at the end of the edge. */
   node?: OrgApiKeyList | null;
+}
+/** A `PrincipalScopeOverride` edge in the connection. */
+export interface PrincipalScopeOverrideEdge {
+  cursor?: string | null;
+  /** The `PrincipalScopeOverride` at the end of the edge. */
+  node?: PrincipalScopeOverride | null;
 }
 /** A `Email` edge in the connection. */
 export interface EmailEdge {

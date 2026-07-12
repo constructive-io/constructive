@@ -176,7 +176,7 @@ export class FunctionGraphRefModel {
       S,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       },
       FunctionGraphRefPatch
     > & {
@@ -199,7 +199,7 @@ export class FunctionGraphRefModel {
       'functionGraphRefPatch',
       connectionFieldsMap,
       {
-        databaseId: args.where.databaseId,
+        scopeId: args.where.scopeId,
       }
     );
     return new QueryBuilder({
@@ -215,7 +215,7 @@ export class FunctionGraphRefModel {
     args: DeleteArgs<
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       },
       S
     > & {
@@ -232,7 +232,7 @@ export class FunctionGraphRefModel {
       'functionGraphRef',
       {
         id: args.where.id,
-        databaseId: args.where.databaseId,
+        scopeId: args.where.scopeId,
       },
       'DeleteFunctionGraphRefInput',
       args.select,

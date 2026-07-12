@@ -1,13 +1,13 @@
 ---
 name: cli-api
-description: CLI tool (csdk) for the api API — provides CRUD commands for 46 tables and 10 custom operations
+description: CLI tool (csdk) for the api API — provides CRUD commands for 46 tables and 8 custom operations
 ---
 
 # cli-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the api API — provides CRUD commands for 46 tables and 10 custom operations
+CLI tool (csdk) for the api API — provides CRUD commands for 46 tables and 8 custom operations
 
 ## Usage
 
@@ -100,15 +100,13 @@ See the `references/` directory for detailed per-entity API documentation:
 - [rls-setting](references/rls-setting.md)
 - [sql-action](references/sql-action.md)
 - [database-setting](references/database-setting.md)
-- [webauthn-setting](references/webauthn-setting.md)
 - [ast-migration](references/ast-migration.md)
+- [webauthn-setting](references/webauthn-setting.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)
 - [reject-database-transfer](references/reject-database-transfer.md)
-- [provision-database-with-user](references/provision-database-with-user.md)
-- [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
 - [apply-rls](references/apply-rls.md)
-- [create-user-database](references/create-user-database.md)
+- [request-database](references/request-database.md)
 - [provision-bucket](references/provision-bucket.md)

@@ -7,8 +7,8 @@ Unified K8s resource declarations — stores desired state (spec) and observed s
 ## Usage
 
 ```typescript
-useResourcesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true } } })
-useResourceQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true } } })
+useResourcesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true, requiredSecrets: true, requiredConfigs: true, integrations: true, resourceDefinitionId: true } } })
+useResourceQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true, requiredSecrets: true, requiredConfigs: true, integrations: true, resourceDefinitionId: true } } })
 useCreateResourceMutation({ selection: { fields: { id: true } } })
 useUpdateResourceMutation({ selection: { fields: { id: true } } })
 useDeleteResourceMutation({})
@@ -20,7 +20,7 @@ useDeleteResourceMutation({})
 
 ```typescript
 const { data, isLoading } = useResourcesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, databaseId: true, requiredSecrets: true, requiredConfigs: true, integrations: true, resourceDefinitionId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useResourcesQuery({
 const { mutate } = useCreateResourceMutation({
   selection: { fields: { id: true } },
 });
-mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', namespaceId: '<UUID>', kind: '<String>', name: '<String>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', lastError: '<String>', errorCount: '<Int>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>' });
+mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', namespaceId: '<UUID>', kind: '<String>', name: '<String>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', lastError: '<String>', errorCount: '<Int>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>', requiredSecrets: '<ResourceRequirement>', requiredConfigs: '<ResourceRequirement>', integrations: '<String>', resourceDefinitionId: '<UUID>' });
 ```

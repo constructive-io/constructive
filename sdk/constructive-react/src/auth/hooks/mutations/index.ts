@@ -4,7 +4,6 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export * from './useCreatePrincipalMutation';
-export * from './useDeletePrincipalMutation';
 export * from './useCreatePrincipalEntityMutation';
 export * from './useUpdatePrincipalEntityMutation';
 export * from './useDeletePrincipalEntityMutation';
@@ -37,6 +36,7 @@ export * from './useSignOutMutation';
 export * from './useSendAccountDeletionEmailMutation';
 export * from './useCheckPasswordMutation';
 export * from './useDeleteOrgPrincipalMutation';
+export * from './useDeletePrincipalMutation';
 export * from './useDisconnectAccountMutation';
 export * from './useRevokeApiKeyMutation';
 export * from './useRevokeSessionMutation';
@@ -48,13 +48,13 @@ export * from './useSetPasswordMutation';
 export * from './useVerifyEmailMutation';
 export * from './useProvisionNewUserMutation';
 export * from './useResetPasswordMutation';
+export * from './useCreateOrgPrincipalMutation';
 export * from './useSignInCrossOriginMutation';
 export * from './useSignInSmsOtpMutation';
 export * from './useSignUpSmsMutation';
 export * from './useSignUpMutation';
 export * from './useSignInMutation';
 export * from './useLinkIdentityMutation';
-export * from './useCreateOrgPrincipalMutation';
 export * from './useExtendTokenExpiresMutation';
 export * from './useCreateOrgApiKeyMutation';
 export * from './useCreateApiKeyMutation';

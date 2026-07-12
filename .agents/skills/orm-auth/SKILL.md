@@ -1,13 +1,13 @@
 ---
 name: orm-auth
-description: ORM client for the auth API — provides typed CRUD operations for 13 tables and 34 custom operations
+description: ORM client for the auth API — provides typed CRUD operations for 13 tables and 35 custom operations
 ---
 
 # orm-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the auth API — provides typed CRUD operations for 13 tables and 34 custom operations
+ORM client for the auth API — provides typed CRUD operations for 13 tables and 35 custom operations
 
 ## Usage
 
@@ -59,6 +59,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [send-account-deletion-email](references/send-account-deletion-email.md)
 - [check-password](references/check-password.md)
 - [delete-org-principal](references/delete-org-principal.md)
+- [delete-principal](references/delete-principal.md)
 - [disconnect-account](references/disconnect-account.md)
 - [revoke-api-key](references/revoke-api-key.md)
 - [revoke-session](references/revoke-session.md)
@@ -70,13 +71,13 @@ See the `references/` directory for detailed per-entity API documentation:
 - [verify-email](references/verify-email.md)
 - [provision-new-user](references/provision-new-user.md)
 - [reset-password](references/reset-password.md)
+- [create-org-principal](references/create-org-principal.md)
 - [sign-in-cross-origin](references/sign-in-cross-origin.md)
 - [sign-in-sms-otp](references/sign-in-sms-otp.md)
 - [sign-up-sms](references/sign-up-sms.md)
 - [sign-up](references/sign-up.md)
 - [sign-in](references/sign-in.md)
 - [link-identity](references/link-identity.md)
-- [create-org-principal](references/create-org-principal.md)
 - [extend-token-expires](references/extend-token-expires.md)
 - [create-org-api-key](references/create-org-api-key.md)
 - [create-api-key](references/create-api-key.md)

@@ -7,7 +7,7 @@ Execute the addEdge mutation
 ## Usage
 
 ```bash
-csdk add-edge --input.clientMutationId <String> --input.databaseId <UUID> --input.rootHash <UUID> --input.srcNode <String> --input.srcPort <String> --input.dstNode <String> --input.dstPort <String> --input.context <String> --input.graphName <String>
+csdk add-edge --input.clientMutationId <String> --input.scopeId <UUID> --input.rootHash <UUID> --input.srcNode <String> --input.srcPort <String> --input.dstNode <String> --input.dstPort <String> --input.context <String> --input.graphName <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk add-edge --input.clientMutationId <String> --input.databaseId <UUID> --inpu
 ### Run addEdge
 
 ```bash
-csdk add-edge --input.clientMutationId <String> --input.databaseId <UUID> --input.rootHash <UUID> --input.srcNode <String> --input.srcPort <String> --input.dstNode <String> --input.dstPort <String> --input.context <String> --input.graphName <String>
+csdk add-edge --input.clientMutationId <String> --input.scopeId <UUID> --input.rootHash <UUID> --input.srcNode <String> --input.srcPort <String> --input.dstNode <String> --input.dstPort <String> --input.context <String> --input.graphName <String>
 ```

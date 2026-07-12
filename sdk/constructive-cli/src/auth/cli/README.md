@@ -48,6 +48,7 @@ csdk auth set-token <your-token>
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `check-password` | checkPassword |
 | `delete-org-principal` | deleteOrgPrincipal |
+| `delete-principal` | deletePrincipal |
 | `disconnect-account` | disconnectAccount |
 | `revoke-api-key` | revokeApiKey |
 | `revoke-session` | revokeSession |
@@ -59,13 +60,13 @@ csdk auth set-token <your-token>
 | `verify-email` | verifyEmail |
 | `provision-new-user` | provisionNewUser |
 | `reset-password` | resetPassword |
+| `create-org-principal` | createOrgPrincipal |
 | `sign-in-cross-origin` | signInCrossOrigin |
 | `sign-in-sms-otp` | signInSmsOtp |
 | `sign-up-sms` | signUpSms |
 | `sign-up` | signUp |
 | `sign-in` | signIn |
 | `link-identity` | linkIdentity |
-| `create-org-principal` | createOrgPrincipal |
 | `extend-token-expires` | extendTokenExpires |
 | `create-org-api-key` | createOrgApiKey |
 | `create-api-key` | createApiKey |
@@ -141,11 +142,11 @@ CRUD operations for Principal records.
 | `ownerId` | UUID |
 | `userId` | UUID |
 | `name` | String |
-| `allowedMask` | BitString |
+| `useAdminOwner` | Boolean |
 | `isReadOnly` | Boolean |
 | `bypassStepUp` | Boolean |
 
-**Required create fields:** `id`, `ownerId`, `userId`, `name`, `allowedMask`, `isReadOnly`, `bypassStepUp`
+**Required create fields:** `id`, `ownerId`, `userId`, `name`, `useAdminOwner`, `isReadOnly`, `bypassStepUp`
 
 ### `principal-entity`
 
@@ -196,10 +197,11 @@ CRUD operations for PrincipalScopeOverride records.
 | `principalId` | UUID |
 | `membershipType` | Int |
 | `allowedMask` | BitString |
-| `isAdmin` | Boolean |
+| `useAdminOwner` | Boolean |
+| `isActive` | Boolean |
 | `isReadOnly` | Boolean |
 
-**Required create fields:** `principalId`, `membershipType`, `allowedMask`, `isAdmin`, `isReadOnly`
+**Required create fields:** `principalId`, `membershipType`, `allowedMask`, `useAdminOwner`, `isActive`, `isReadOnly`
 
 ### `email`
 
@@ -605,6 +607,18 @@ deleteOrgPrincipal
   | `--input.clientMutationId` | String |
   | `--input.principalId` | UUID |
 
+### `delete-principal`
+
+deletePrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.principalId` | UUID |
+
 ### `disconnect-account`
 
 disconnectAccount
@@ -744,6 +758,22 @@ resetPassword
   | `--input.resetToken` | String |
   | `--input.newPassword` | String |
 
+### `create-org-principal`
+
+createOrgPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.name` | String |
+  | `--input.orgId` | UUID |
+  | `--input.useAdminOwner` | Boolean |
+  | `--input.isReadOnly` | Boolean |
+  | `--input.bypassStepUp` | Boolean |
+
 ### `sign-in-cross-origin`
 
 signInCrossOrigin
@@ -836,22 +866,6 @@ linkIdentity
   | `--input.service` | String (required) |
   | `--input.identifier` | String (required) |
   | `--input.details` | JSON |
-
-### `create-org-principal`
-
-createOrgPrincipal
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.name` | String |
-  | `--input.orgId` | UUID |
-  | `--input.allowedMask` | BitString |
-  | `--input.isReadOnly` | Boolean |
-  | `--input.bypassStepUp` | Boolean |
 
 ### `extend-token-expires`
 

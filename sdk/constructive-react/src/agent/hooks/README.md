@@ -89,20 +89,20 @@ and lifecycle settings. |
 ```typescript
 // List all agentPlans
 const { data, isLoading } = useAgentPlansQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, title: true, description: true, status: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, databaseId: true, title: true, description: true, status: true } },
 });
 
 // Get one agentPlan
 const { data: item } = useAgentPlanQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, title: true, description: true, status: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, databaseId: true, title: true, description: true, status: true } },
 });
 
 // Create a agentPlan
 const { mutate: create } = useCreateAgentPlanMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', threadId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' });
+create({ ownerId: '<UUID>', threadId: '<UUID>', databaseId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' });
 ```
 
 ### Agent
@@ -110,20 +110,20 @@ create({ ownerId: '<UUID>', threadId: '<UUID>', title: '<String>', description: 
 ```typescript
 // List all agents
 const { data, isLoading } = useAgentsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } },
 });
 
 // Get one agent
 const { data: item } = useAgentQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } },
 });
 
 // Create a agent
 const { mutate: create } = useCreateAgentMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<String>', systemPrompt: '<String>', config: '<JSON>', status: '<String>', isEphemeral: '<Boolean>' });
+create({ ownerId: '<UUID>', databaseId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<String>', systemPrompt: '<String>', config: '<JSON>', status: '<String>', isEphemeral: '<Boolean>' });
 ```
 
 ### AgentThread
@@ -131,20 +131,20 @@ create({ ownerId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<Str
 ```typescript
 // List all agentThreads
 const { data, isLoading } = useAgentThreadsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } },
 });
 
 // Get one agentThread
 const { data: item } = useAgentThreadQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } },
 });
 
 // Create a agentThread
 const { mutate: create } = useCreateAgentThreadMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', status: '<String>', isArchived: '<Boolean>', archivedAt: '<Datetime>', title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', tags: '<String>', promptTemplateId: '<UUID>', agentId: '<UUID>', parentThreadId: '<UUID>' });
+create({ ownerId: '<UUID>', databaseId: '<UUID>', status: '<String>', isArchived: '<Boolean>', archivedAt: '<Datetime>', title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', tags: '<String>', promptTemplateId: '<UUID>', agentId: '<UUID>', parentThreadId: '<UUID>' });
 ```
 
 ### AgentMessage
@@ -152,20 +152,20 @@ create({ ownerId: '<UUID>', status: '<String>', isArchived: '<Boolean>', archive
 ```typescript
 // List all agentMessages
 const { data, isLoading } = useAgentMessagesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, databaseId: true, authorRole: true, model: true, agentId: true } },
 });
 
 // Get one agentMessage
 const { data: item } = useAgentMessageQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, authorRole: true, model: true, agentId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, parts: true, threadId: true, databaseId: true, authorRole: true, model: true, agentId: true } },
 });
 
 // Create a agentMessage
 const { mutate: create } = useCreateAgentMessageMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<String>', model: '<String>', agentId: '<UUID>' });
+create({ actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', databaseId: '<UUID>', authorRole: '<String>', model: '<String>', agentId: '<UUID>' });
 ```
 
 ### AgentTask
@@ -173,20 +173,20 @@ create({ actorId: '<UUID>', parts: '<JSON>', threadId: '<UUID>', authorRole: '<S
 ```typescript
 // List all agentTasks
 const { data, isLoading } = useAgentTasksQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, databaseId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
 });
 
 // Get one agentTask
 const { data: item } = useAgentTaskQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, actorId: true, status: true, planId: true, databaseId: true, description: true, source: true, error: true, orderIndex: true, requiresApproval: true, approvalStatus: true, approvedBy: true, approvedAt: true, approvalFeedback: true } },
 });
 
 // Create a agentTask
 const { mutate: create } = useCreateAgentTaskMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', status: '<String>', planId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' });
+create({ actorId: '<UUID>', status: '<String>', planId: '<UUID>', databaseId: '<UUID>', description: '<String>', source: '<String>', error: '<String>', orderIndex: '<Int>', requiresApproval: '<Boolean>', approvalStatus: '<String>', approvedBy: '<UUID>', approvedAt: '<Datetime>', approvalFeedback: '<String>' });
 ```
 
 ### AgentPrompt
@@ -194,20 +194,20 @@ create({ actorId: '<UUID>', status: '<String>', planId: '<UUID>', description: '
 ```typescript
 // List all agentPrompts
 const { data, isLoading } = useAgentPromptsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, name: true, content: true, description: true, isDefault: true, metadata: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, name: true, content: true, description: true, isDefault: true, metadata: true } },
 });
 
 // Get one agentPrompt
 const { data: item } = useAgentPromptQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, name: true, content: true, description: true, isDefault: true, metadata: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, name: true, content: true, description: true, isDefault: true, metadata: true } },
 });
 
 // Create a agentPrompt
 const { mutate: create } = useCreateAgentPromptMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', name: '<String>', content: '<String>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', databaseId: '<UUID>', name: '<String>', content: '<String>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>' });
 ```
 
 ### AgentResourceChunk
@@ -236,20 +236,20 @@ create({ agentResourceId: '<UUID>', body: '<String>', chunkIndex: '<Int>', embed
 ```typescript
 // List all agentPersonas
 const { data, isLoading } = useAgentPersonasQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } },
 });
 
 // Get one agentPersona
 const { data: item } = useAgentPersonaQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, name: true, description: true, systemPrompt: true, resources: true, config: true, isActive: true } },
 });
 
 // Create a agentPersona
 const { mutate: create } = useCreateAgentPersonaMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', name: '<String>', description: '<String>', systemPrompt: '<String>', resources: '<String>', config: '<JSON>', isActive: '<Boolean>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', databaseId: '<UUID>', slug: '<String>', name: '<String>', description: '<String>', systemPrompt: '<String>', resources: '<String>', config: '<JSON>', isActive: '<Boolean>' });
 ```
 
 ### AgentResource
@@ -257,20 +257,20 @@ create({ createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', name: '<Str
 ```typescript
 // List all agentResources
 const { data, isLoading } = useAgentResourcesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one agentResource
 const { data: item } = useAgentResourceQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, slug: true, kind: true, title: true, description: true, body: true, keywords: true, isActive: true, metadata: true, isArchived: true, archivedAt: true, search: true, embedding: true, embeddingUpdatedAt: true, searchTsvRank: true, embeddingVectorDistance: true, kindTrgmSimilarity: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, bodyTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a agentResource
 const { mutate: create } = useCreateAgentResourceMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', slug: '<String>', kind: '<String>', title: '<String>', description: '<String>', body: '<String>', keywords: '<String>', isActive: '<Boolean>', metadata: '<JSON>', isArchived: '<Boolean>', archivedAt: '<Datetime>', search: '<FullText>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', searchTsvRank: '<Float>', embeddingVectorDistance: '<Float>', kindTrgmSimilarity: '<Float>', titleTrgmSimilarity: '<Float>', descriptionTrgmSimilarity: '<Float>', bodyTrgmSimilarity: '<Float>', searchScore: '<Float>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', databaseId: '<UUID>', slug: '<String>', kind: '<String>', title: '<String>', description: '<String>', body: '<String>', keywords: '<String>', isActive: '<Boolean>', metadata: '<JSON>', isArchived: '<Boolean>', archivedAt: '<Datetime>', search: '<FullText>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', searchTsvRank: '<Float>', embeddingVectorDistance: '<Float>', kindTrgmSimilarity: '<Float>', titleTrgmSimilarity: '<Float>', descriptionTrgmSimilarity: '<Float>', bodyTrgmSimilarity: '<Float>', searchScore: '<Float>' });
 ```
 
 ## Custom Operation Hooks

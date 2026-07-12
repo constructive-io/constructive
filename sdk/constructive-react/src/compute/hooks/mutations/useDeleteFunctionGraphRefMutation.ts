@@ -41,7 +41,7 @@ export function useDeleteFunctionGraphRefMutation<S extends FunctionGraphRefSele
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       }
     >,
     'mutationFn'
@@ -55,7 +55,7 @@ export function useDeleteFunctionGraphRefMutation<S extends FunctionGraphRefSele
   Error,
   {
     id: string;
-    databaseId: string;
+    scopeId: string;
   }
 >;
 export function useDeleteFunctionGraphRefMutation(
@@ -67,7 +67,7 @@ export function useDeleteFunctionGraphRefMutation(
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       }
     >,
     'mutationFn'
@@ -79,12 +79,12 @@ export function useDeleteFunctionGraphRefMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionGraphRefMutationKeys.all,
-    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
+    mutationFn: ({ id, scopeId }: { id: string; scopeId: string }) =>
       getClient()
         .functionGraphRef.delete({
           where: {
             id,
-            databaseId,
+            scopeId,
           },
           select: args.select,
         })

@@ -70,33 +70,21 @@ csdk auth set-token <your-token>
 | `rls-setting` | rlsSetting CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
 | `database-setting` | databaseSetting CRUD operations |
-| `webauthn-setting` | webauthnSetting CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
+| `webauthn-setting` | webauthnSetting CRUD operations |
 | `apply-registry-defaults` | applyRegistryDefaults |
 | `accept-database-transfer` | acceptDatabaseTransfer |
 | `cancel-database-transfer` | cancelDatabaseTransfer |
 | `reject-database-transfer` | rejectDatabaseTransfer |
-| `provision-database-with-user` | provisionDatabaseWithUser |
-| `bootstrap-user` | bootstrapUser |
 | `set-field-order` | setFieldOrder |
 | `apply-rls` | applyRls |
-| `create-user-database` | Creates a new user database with all required modules, permissions, and RLS policies.
+| `request-database` | Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Parameters:
-  - database_name: Name for the new database (required)
-  - owner_id: UUID of the owner user (required)
-  - include_invites: Include invite system (default: true)
-  - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include events/analytics (default: false)
-  - bitlen: Bit length for permission masks (default: 64)
-  - tokens_expiration: Token expiration interval (default: 30 days)
-
-Returns the database_id UUID of the newly created database.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups
- |
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb); |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -232,6 +220,7 @@ CRUD operations for Table records.
 | `pluralName` | String |
 | `singularName` | String |
 | `tags` | String |
+| `stepUp` | JSON |
 | `partitioned` | Boolean |
 | `partitionStrategy` | String |
 | `partitionKeyNames` | String |
@@ -241,7 +230,7 @@ CRUD operations for Table records.
 | `inheritsId` | UUID |
 
 **Required create fields:** `schemaId`, `name`
-**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `category`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `partitioned`, `partitionStrategy`, `partitionKeyNames`, `partitionKeyTypes`, `inheritsId`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `category`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `stepUp`, `partitioned`, `partitionStrategy`, `partitionKeyNames`, `partitionKeyTypes`, `inheritsId`
 
 ### `check-constraint`
 
@@ -303,6 +292,8 @@ CRUD operations for Field records.
 | `isRequired` | Boolean |
 | `apiRequired` | Boolean |
 | `defaultValue` | JSON |
+| `generationExpression` | JSON |
+| `generationType` | String |
 | `type` | JSON |
 | `fieldOrder` | Int |
 | `regexp` | String |
@@ -316,7 +307,7 @@ CRUD operations for Field records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `name`, `type`
-**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `apiRequired`, `defaultValue`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `apiRequired`, `defaultValue`, `generationExpression`, `generationType`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`
 
 ### `spatial-relation`
 
@@ -485,6 +476,7 @@ CRUD operations for Policy records.
 | `disabled` | Boolean |
 | `policyType` | String |
 | `data` | JSON |
+| `withCheck` | JSON |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
 | `tags` | String |
@@ -492,7 +484,7 @@ CRUD operations for Policy records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`
-**Optional create fields (backend defaults):** `databaseId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `smartTags`, `category`, `tags`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `withCheck`, `smartTags`, `category`, `tags`
 
 ### `primary-key-constraint`
 
@@ -1405,10 +1397,11 @@ CRUD operations for Database records.
 | `name` | String |
 | `label` | String |
 | `hash` | UUID |
+| `platform` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `ownerId`, `schemaHash`, `name`, `label`, `hash`
+**Optional create fields (backend defaults):** `ownerId`, `schemaHash`, `name`, `label`, `hash`, `platform`
 
 ### `rls-setting`
 
@@ -1512,6 +1505,39 @@ CRUD operations for DatabaseSetting records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `enableAggregates`, `enablePostgis`, `enableSearch`, `enableDirectUploads`, `enablePresignedUploads`, `enableManyToMany`, `enableConnectionFilter`, `enableLtree`, `enableLlm`, `enableRealtime`, `enableBulk`, `enableI18N`, `options`, `labels`, `annotations`
 
+### `ast-migration`
+
+CRUD operations for AstMigration records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all astMigration records |
+| `find-first` | Find first matching astMigration record |
+| `get` | Get a astMigration by id |
+| `create` | Create a new astMigration |
+| `update` | Update an existing astMigration |
+| `delete` | Delete a astMigration |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | Int |
+| `databaseId` | UUID |
+| `name` | String |
+| `requires` | String |
+| `payload` | JSON |
+| `deploys` | String |
+| `deploy` | JSON |
+| `revert` | JSON |
+| `verify` | JSON |
+| `createdAt` | Datetime |
+| `action` | String |
+| `actionId` | UUID |
+| `actorId` | UUID |
+
+**Optional create fields (backend defaults):** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
+
 ### `webauthn-setting`
 
 CRUD operations for WebauthnSetting records.
@@ -1550,39 +1576,6 @@ CRUD operations for WebauthnSetting records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `credentialsSchemaId`, `sessionsSchemaId`, `sessionSecretsSchemaId`, `credentialsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `sessionSecretsTableId`, `userFieldId`, `rpId`, `rpName`, `originAllowlist`, `attestationType`, `requireUserVerification`, `residentKey`, `challengeExpirySeconds`
-
-### `ast-migration`
-
-CRUD operations for AstMigration records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all astMigration records |
-| `find-first` | Find first matching astMigration record |
-| `get` | Get a astMigration by id |
-| `create` | Create a new astMigration |
-| `update` | Update an existing astMigration |
-| `delete` | Delete a astMigration |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `databaseId` | UUID |
-| `name` | String |
-| `requires` | String |
-| `payload` | JSON |
-| `deploys` | String |
-| `deploy` | JSON |
-| `revert` | JSON |
-| `verify` | JSON |
-| `createdAt` | Datetime |
-| `action` | String |
-| `actionId` | UUID |
-| `actorId` | UUID |
-
-**Optional create fields (backend defaults):** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
 
 ## Custom Operations
 
@@ -1634,40 +1627,6 @@ rejectDatabaseTransfer
   | `--input.clientMutationId` | String |
   | `--input.transferId` | UUID |
 
-### `provision-database-with-user`
-
-provisionDatabaseWithUser
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.pDatabaseName` | String |
-  | `--input.pDomain` | String |
-  | `--input.pSubdomain` | String |
-  | `--input.pModules` | JSON |
-  | `--input.pOptions` | JSON |
-
-### `bootstrap-user`
-
-bootstrapUser
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.targetDatabaseId` | UUID |
-  | `--input.password` | String |
-  | `--input.isAdmin` | Boolean |
-  | `--input.isOwner` | Boolean |
-  | `--input.username` | String |
-  | `--input.displayName` | String |
-  | `--input.returnApiKey` | Boolean |
-
 ### `set-field-order`
 
 setFieldOrder
@@ -1698,25 +1657,15 @@ applyRls
   | `--input.permissive` | Boolean |
   | `--input.name` | String |
 
-### `create-user-database`
+### `request-database`
 
-Creates a new user database with all required modules, permissions, and RLS policies.
+Requests a database and returns a ticket (database_provision_module row) to poll.
 
-Parameters:
-  - database_name: Name for the new database (required)
-  - owner_id: UUID of the owner user (required)
-  - include_invites: Include invite system (default: true)
-  - include_groups: Include group-level memberships (default: false)
-  - include_levels: Include events/analytics (default: false)
-  - bitlen: Bit length for permission masks (default: 64)
-  - tokens_expiration: Token expiration interval (default: 30 days)
-
-Returns the database_id UUID of the newly created database.
+Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
 
 Example usage:
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
-  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups
-
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
+  SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
 
 - **Type:** mutation
 - **Arguments:**
@@ -1725,12 +1674,11 @@ Example usage:
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.databaseName` | String |
-  | `--input.ownerId` | UUID |
-  | `--input.includeInvites` | Boolean |
-  | `--input.includeGroups` | Boolean |
-  | `--input.includeLevels` | Boolean |
-  | `--input.bitlen` | Int |
-  | `--input.tokensExpiration` | IntervalInput |
+  | `--input.domain` | String |
+  | `--input.presetSlug` | String |
+  | `--input.modules` | JSON |
+  | `--input.options` | JSON |
+  | `--input.subdomain` | String |
 
 ### `provision-bucket`
 

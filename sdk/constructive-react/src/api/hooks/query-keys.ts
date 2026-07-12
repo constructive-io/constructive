@@ -415,15 +415,6 @@ export const databaseSettingKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...databaseSettingKeys.details(), id] as const,
 } as const;
-export const webauthnSettingKeys = {
-  /** All webauthnSetting queries */ all: ['webauthnsetting'] as const,
-  /** List query keys */ lists: () => [...webauthnSettingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...webauthnSettingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...webauthnSettingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...webauthnSettingKeys.details(), id] as const,
-} as const;
 export const astMigrationKeys = {
   /** All astMigration queries */ all: ['astmigration'] as const,
   /** List query keys */ lists: () => [...astMigrationKeys.all, 'list'] as const,
@@ -432,6 +423,15 @@ export const astMigrationKeys = {
   /** Detail query keys */ details: () => [...astMigrationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...astMigrationKeys.details(), id] as const,
+} as const;
+export const webauthnSettingKeys = {
+  /** All webauthnSetting queries */ all: ['webauthnsetting'] as const,
+  /** List query keys */ lists: () => [...webauthnSettingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...webauthnSettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...webauthnSettingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...webauthnSettingKeys.details(), id] as const,
 } as const;
 
 // ============================================================================
@@ -509,8 +509,8 @@ export const queryKeys = {
   rlsSetting: rlsSettingKeys,
   sqlAction: sqlActionKeys,
   databaseSetting: databaseSettingKeys,
-  webauthnSetting: webauthnSettingKeys,
   astMigration: astMigrationKeys,
+  webauthnSetting: webauthnSettingKeys,
   custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */

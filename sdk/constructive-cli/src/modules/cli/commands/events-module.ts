@@ -18,6 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
+  entityField: 'string',
   schemaId: 'uuid',
   privateSchemaId: 'uuid',
   publicSchemaName: 'string',
@@ -44,7 +45,6 @@ const fieldSchema: FieldSchema = {
   tgEventBool: 'string',
   upsertAggregate: 'string',
   tgUpdateAggregates: 'string',
-  pruneEvents: 'string',
   stepsRequired: 'string',
   levelAchieved: 'string',
   tgCheckAchievements: 'string',
@@ -114,6 +114,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       privateSchemaId: true,
       publicSchemaName: true,
@@ -140,7 +141,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       tgEventBool: true,
       upsertAggregate: true,
       tgUpdateAggregates: true,
-      pruneEvents: true,
       stepsRequired: true,
       levelAchieved: true,
       tgCheckAchievements: true,
@@ -178,6 +178,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       id: true,
       databaseId: true,
+      entityField: true,
       schemaId: true,
       privateSchemaId: true,
       publicSchemaName: true,
@@ -204,7 +205,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tgEventBool: true,
       upsertAggregate: true,
       tgUpdateAggregates: true,
-      pruneEvents: true,
       stepsRequired: true,
       levelAchieved: true,
       tgCheckAchievements: true,
@@ -254,6 +254,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           publicSchemaName: true,
@@ -280,7 +281,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           tgEventBool: true,
           upsertAggregate: true,
           tgUpdateAggregates: true,
-          pruneEvents: true,
           stepsRequired: true,
           levelAchieved: true,
           tgCheckAchievements: true,
@@ -316,6 +316,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -496,13 +503,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'tgUpdateAggregates',
         message: 'tgUpdateAggregates',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'pruneEvents',
-        message: 'pruneEvents',
         required: false,
         skipPrompt: true,
       },
@@ -622,6 +622,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           publicSchemaName: cleanedData.publicSchemaName,
@@ -648,7 +649,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tgEventBool: cleanedData.tgEventBool,
           upsertAggregate: cleanedData.upsertAggregate,
           tgUpdateAggregates: cleanedData.tgUpdateAggregates,
-          pruneEvents: cleanedData.pruneEvents,
           stepsRequired: cleanedData.stepsRequired,
           levelAchieved: cleanedData.levelAchieved,
           tgCheckAchievements: cleanedData.tgCheckAchievements,
@@ -668,6 +668,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           publicSchemaName: true,
@@ -694,7 +695,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tgEventBool: true,
           upsertAggregate: true,
           tgUpdateAggregates: true,
-          pruneEvents: true,
           stepsRequired: true,
           levelAchieved: true,
           tgCheckAchievements: true,
@@ -736,6 +736,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'entityField',
+        message: 'entityField',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -921,13 +928,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'pruneEvents',
-        message: 'pruneEvents',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'stepsRequired',
         message: 'stepsRequired',
         required: false,
@@ -1042,6 +1042,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
+          entityField: cleanedData.entityField,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           publicSchemaName: cleanedData.publicSchemaName,
@@ -1068,7 +1069,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tgEventBool: cleanedData.tgEventBool,
           upsertAggregate: cleanedData.upsertAggregate,
           tgUpdateAggregates: cleanedData.tgUpdateAggregates,
-          pruneEvents: cleanedData.pruneEvents,
           stepsRequired: cleanedData.stepsRequired,
           levelAchieved: cleanedData.levelAchieved,
           tgCheckAchievements: cleanedData.tgCheckAchievements,
@@ -1088,6 +1088,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
+          entityField: true,
           schemaId: true,
           privateSchemaId: true,
           publicSchemaName: true,
@@ -1114,7 +1115,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tgEventBool: true,
           upsertAggregate: true,
           tgUpdateAggregates: true,
-          pruneEvents: true,
           stepsRequired: true,
           levelAchieved: true,
           tgCheckAchievements: true,
