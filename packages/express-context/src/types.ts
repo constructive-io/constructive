@@ -154,6 +154,14 @@ export interface AgentChatConfig {
   taskTableName: string | null;
 }
 
+export interface ComputeConfig {
+  schemaName: string;
+  definitionsTableName: string;
+  bindingsTableName: string;
+  invocationsSchemaName: string;
+  invocationsTableName: string;
+}
+
 export interface LlmConfig {
   embeddingProvider: string;
   embeddingModel: string;
@@ -188,6 +196,7 @@ export interface BuiltinModuleMap {
   inferenceLog: InferenceLogConfig;
   agentChat: AgentChatConfig;
   llm: LlmConfig;
+  compute: ComputeConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

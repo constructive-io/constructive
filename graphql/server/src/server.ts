@@ -27,6 +27,7 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
+import { createFnRouter } from './middleware/fn';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
@@ -38,7 +39,7 @@ import { createRequestLogger } from './middleware/observability/request-logger';
 import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { createAgenticRouter } from 'agentic-server';
-import { createContextMiddleware, requestIdMiddleware } from '@constructive-io/express-context';
+import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
 const log = new Logger('server');
@@ -164,7 +165,7 @@ class Server {
     app.use(requestLogger);
     app.use(api);
     app.use(authenticate);
-    app.use(createContextMiddleware({ pg: effectiveOpts.pg }));
+    app.use(createContextMiddleware({ pg: effectiveOpts.pg, loaders: createDefaultRegistry() }));
     app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests
@@ -199,6 +200,9 @@ class Server {
     // LLM Agent REST API — mounted before graphile so SSE streaming
     // routes are handled without going through PostGraphile
     app.use(createAgenticRouter());
+
+    // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
+    app.use(createFnRouter());
 
     app.use(graphile(effectiveOpts));
     app.use(flush);

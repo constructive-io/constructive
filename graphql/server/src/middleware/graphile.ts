@@ -236,6 +236,12 @@ const buildPreset = (
         if (req.databaseId) {
           context['jwt.claims.database_id'] = req.databaseId;
         }
+        // API provenance — which API surface this request arrived through.
+        // Derived server-side from hostname -> services_public.domains -> api_id;
+        // never taken from client-supplied headers, body, or token payload.
+        if (req.api?.apiId) {
+          context['jwt.claims.api_id'] = req.api.apiId;
+        }
         if (req.clientIp) {
           context['jwt.claims.ip_address'] = req.clientIp;
         }

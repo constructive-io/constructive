@@ -48,6 +48,7 @@ export { billingLoader } from './billing';
 export { inferenceLogLoader } from './inference-log';
 export { agentChatLoader } from './agent-chat';
 export { llmLoader } from './llm';
+export { computeLoader } from './compute';
 
 /**
  * Convenience: create a registry pre-loaded with all built-in loaders.
@@ -63,6 +64,7 @@ import { billingLoader } from './billing';
 import { inferenceLogLoader } from './inference-log';
 import { agentChatLoader } from './agent-chat';
 import { llmLoader } from './llm';
+import { computeLoader } from './compute';
 
 export function createDefaultRegistry() {
   const registry = createLoaderRegistry();
@@ -76,5 +78,6 @@ export function createDefaultRegistry() {
   registry.register(inferenceLogLoader);
   registry.register(agentChatLoader);
   registry.register(llmLoader);
+  registry.register(computeLoader);
   return registry;
 }
