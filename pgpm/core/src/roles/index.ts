@@ -127,16 +127,16 @@ export function generateCreateClientRoleSQL(
       'Ensure getConnEnvOptions().roles is defined.'
     );
   }
-  if (!roles.authenticated || !roles.authenticatedClient) {
+  if (!roles.authenticated) {
     throw new Error(
       'generateCreateClientRoleSQL: roles is missing required properties. ' +
-      `Got: authenticated=${roles.authenticated}, authenticatedClient=${roles.authenticatedClient}. ` +
+      `Got: authenticated=${roles.authenticated}. ` +
       'Ensure all role names are defined in your configuration.'
     );
   }
   const r = {
     authenticated: roles.authenticated,
-    authenticatedClient: roles.authenticatedClient
+    authenticatedClient: roles.authenticatedClient ?? 'authenticated_client'
   };
 
   return `

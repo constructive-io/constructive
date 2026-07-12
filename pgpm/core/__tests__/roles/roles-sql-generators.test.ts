@@ -1,8 +1,8 @@
 import {
   generateCreateBaseRolesSQL,
   generateCreateClientRoleSQL,
-  generateCreateUserSQL,
   generateCreateTestUsersSQL,
+  generateCreateUserSQL,
   generateRemoveUserSQL
 } from '../../src/roles';
 
@@ -75,12 +75,12 @@ describe('Role SQL Generators - Input Validation', () => {
       }).toThrow('generateCreateClientRoleSQL: roles is missing required properties');
     });
 
-    it('should throw an error when roles.authenticatedClient is missing', () => {
-      expect(() => {
-        generateCreateClientRoleSQL({
-          authenticated: 'authenticated'
-        });
-      }).toThrow('generateCreateClientRoleSQL: roles is missing required properties');
+    it('should default the client role name when roles.authenticatedClient is missing', () => {
+      const sql = generateCreateClientRoleSQL({
+        authenticated: 'authenticated'
+      });
+      expect(sql).toContain('authenticated_client');
+      expect(sql).toContain('CREATE ROLE');
     });
 
     it('should generate valid SQL when all roles are provided', () => {
