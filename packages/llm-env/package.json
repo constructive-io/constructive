@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/llm-env",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "LLM environment configuration — single source of truth for all LLM-related env vars and defaults",
   "main": "index.js",
