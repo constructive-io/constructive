@@ -56,6 +56,13 @@ export function buildPgSettings(input: PgSettingsInput): Record<string, string> 
     settings['jwt.claims.database_id'] = api.databaseId;
   }
 
+  // API provenance — which API surface this request arrived through.
+  // Derived server-side from hostname -> services_public.domains -> api_id;
+  // never taken from client-supplied headers, body, or token payload.
+  if (api.apiId) {
+    settings['jwt.claims.api_id'] = api.apiId;
+  }
+
   // Distributed tracing
   settings['request.id'] = requestId;
 
