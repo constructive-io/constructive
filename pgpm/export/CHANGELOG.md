@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.27.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.8...@pgpmjs/export@0.27.0) (2026-07-12)
+
+### Features
+
+- **export:** add integration_providers_module to meta export ([e497a00](https://github.com/constructive-io/constructive/commit/e497a00a7a0155c1ff57b5bfd097c018d212a979))
+
 ## [0.26.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.7...@pgpmjs/export@0.26.8) (2026-07-11)
 
 **Note:** Version bump only for package @pgpmjs/export
