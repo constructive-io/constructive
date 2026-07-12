@@ -28,3 +28,15 @@ import { getEnvOptions } from '@pgpmjs/env';
 
 const options = getEnvOptions(overrides, cwd);
 ```
+
+## Environment Variables
+
+Selected server/runtime variables parsed by this package:
+
+| Variable | Option |
+| --- | --- |
+| `OAUTH_STATE_SECRET` | `oauth.stateSecret` |
+| `RECAPTCHA_SECRET_KEY` | `captcha.recaptchaSecretKey` |
+| `MAX_UPLOAD_FILE_SIZE` | `upload.maxFileSize` |
+
+`RECAPTCHA_SECRET_KEY` is the server-side secret used to verify CAPTCHA tokens. `MAX_UPLOAD_FILE_SIZE` is parsed as bytes and controls GraphQL multipart upload limits.

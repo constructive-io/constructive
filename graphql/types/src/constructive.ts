@@ -7,6 +7,8 @@ import {
   DeploymentOptions,
   ServerOptions,
   CDNOptions,
+  CaptchaOptions,
+  UploadOptions,
   MigrationOptions,
   JobsConfig
 } from '@pgpmjs/types';
@@ -51,6 +53,10 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   api?: ApiOptions;
   /** CDN and file storage configuration */
   cdn?: CDNOptions;
+  /** CAPTCHA verification configuration */
+  captcha?: CaptchaOptions;
+  /** GraphQL upload configuration */
+  upload?: UploadOptions;
   /** Module deployment configuration */
   deployment?: DeploymentOptions;
   /** Migration and code generation options */

@@ -131,6 +131,22 @@ export interface CDNOptions {
 }
 
 /**
+ * CAPTCHA verification configuration
+ */
+export interface CaptchaOptions {
+    /** Secret key used by the server to verify reCAPTCHA tokens */
+    recaptchaSecretKey?: string;
+}
+
+/**
+ * GraphQL upload configuration
+ */
+export interface UploadOptions {
+    /** Maximum accepted GraphQL upload file size in bytes */
+    maxFileSize?: number;
+}
+
+/**
  * SMTP email configuration options
  */
 export interface SmtpOptions {
@@ -262,6 +278,10 @@ export interface PgpmOptions {
     server?: ServerOptions;
     /** CDN and file storage configuration */
     cdn?: CDNOptions;
+    /** CAPTCHA verification configuration */
+    captcha?: CaptchaOptions;
+    /** GraphQL upload configuration */
+    upload?: UploadOptions;
     /** Module deployment configuration */
     deployment?: DeploymentOptions;
     /** Migration and code generation options */
@@ -329,6 +349,10 @@ export const pgpmDefaults: PgpmOptions = {
     awsSecretKey: 'minioadmin',
     endpoint: 'http://localhost:9000',
     publicUrlPrefix: 'http://localhost:9000'
+  },
+  captcha: {},
+  upload: {
+    maxFileSize: 10 * 1024 * 1024
   },
   deployment: {
     useTx: true,
