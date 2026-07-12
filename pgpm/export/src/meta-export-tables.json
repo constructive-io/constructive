@@ -442,11 +442,6 @@
       "table": "embedding_chunks"
     },
     {
-      "key": "partition",
-      "schema": "metaschema_public",
-      "table": "partition"
-    },
-    {
       "key": "spatial_relation",
       "schema": "metaschema_public",
       "table": "spatial_relation"
@@ -548,10 +543,6 @@
       "updated_at"
     ],
     "metaschema_public.index": [
-      "created_at",
-      "updated_at"
-    ],
-    "metaschema_public.partition": [
       "created_at",
       "updated_at"
     ],
