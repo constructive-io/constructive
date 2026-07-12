@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-server",
-  "version": "2.14.5",
+  "version": "2.14.6",
   "description": "knative job server",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-server#readme",

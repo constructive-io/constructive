@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.26.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.4...@pgpmjs/env@2.26.5) (2026-07-12)
+
+### Bug Fixes
+
+- **pgpm:** drop authenticated_client from default roles map, default it in client role generator ([4b26a76](https://github.com/constructive-io/constructive/commit/4b26a760f853826489e86f27c9c547d12554096e))
+
 ## [2.26.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.26.3...@pgpmjs/env@2.26.4) (2026-07-11)
 
 **Note:** Version bump only for package @pgpmjs/env

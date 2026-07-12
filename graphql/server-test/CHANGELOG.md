@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.30.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.30.8...graphql-server-test@2.30.9) (2026-07-12)
+
+**Note:** Version bump only for package graphql-server-test
+
 ## [2.30.8](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.30.7...graphql-server-test@2.30.8) (2026-07-12)
 
 **Note:** Version bump only for package graphql-server-test
