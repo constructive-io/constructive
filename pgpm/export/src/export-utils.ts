@@ -167,6 +167,7 @@ export const META_TABLE_ORDER = [
   'billing_provider_module',
   'devices_module',
   'identity_providers_module',
+  'integration_providers_module',
   'notifications_module',
   'plans_module',
   'realtime_module',
@@ -535,6 +536,10 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
   identity_providers_module: {
     schema: 'metaschema_modules_public',
     table: 'identity_providers_module'
+  },
+  integration_providers_module: {
+    schema: 'metaschema_modules_public',
+    table: 'integration_providers_module'
   },
   notifications_module: {
     schema: 'metaschema_modules_public',
