@@ -46,6 +46,7 @@ export type {
   BillingConfig,
   BuiltinModuleMap,
   ComputeConfig,
+  ComputeModuleConfig,
   ConstructiveAPIToken,
   ConstructiveContext,
   CorsModuleData,

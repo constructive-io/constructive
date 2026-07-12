@@ -36,21 +36,31 @@ export interface FunctionBindingRow {
   payloadArgs: PayloadArg[] | null;
 }
 
+/**
+ * Physical names of one function-module scope's compute tables, resolved
+ * from the constructive metaschema (metaschema_modules_public.function_module
+ * / function_invocation_module) by the express-context compute module loader.
+ * The plugin never guesses or hard-codes physical names.
+ */
+export interface ComputeModuleNames {
+  /** Schema containing the bindings and definitions tables. */
+  computeSchema: string;
+  /** Bindings table name. */
+  bindingsTable: string;
+  /** Definitions table name. */
+  definitionsTable: string;
+  /** Schema containing the invocations table. */
+  invocationsSchema: string;
+  /** Invocations table name. */
+  invocationsTable: string;
+}
+
 export interface FunctionBindingsPluginOptions {
   /** Only bindings for this api are exposed as mutations. */
   apiId: string;
   /**
-   * Schema containing function_api_bindings / function_definitions.
-   * Typically resolved via the express-context compute module loader;
-   * auto-discovered from the pgService's exposed schemas when omitted.
+   * One entry per provisioned function-module scope. Bindings from every
+   * module are exposed; RLS on the underlying tables governs access.
    */
-  computeSchema?: string;
-  /** Bindings table name (default: function_api_bindings). */
-  bindingsTable?: string;
-  /** Definitions table name (default: function_definitions). */
-  definitionsTable?: string;
-  /** Schema containing the invocations table (default: computeSchema). */
-  invocationsSchema?: string;
-  /** Invocations table name (default: function_invocations). */
-  invocationsTable?: string;
+  modules: ComputeModuleNames[];
 }

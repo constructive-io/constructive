@@ -5,6 +5,11 @@
  * metaschema_modules_public.function_module and function_invocation_module.
  * Returns the schema and table names for function definitions, API bindings,
  * and invocations so REST routes can address the generated tables.
+ *
+ * Function modules are scoped: a database may provision one per scope, each
+ * with its own schema and tables. All of them are returned — REST routes and
+ * the GraphQL bindings plugin expose bindings from every module, and RLS on
+ * the underlying tables governs access.
  */
 
 import type { ComputeConfig } from '../types';
@@ -25,7 +30,7 @@ const COMPUTE_MODULE_SQL = `
     ON ivm.database_id = fm.database_id AND ivm.scope = fm.scope
   JOIN metaschema_public.schema ivs ON ivs.id = ivm.schema_id
   WHERE fm.database_id = $1
-  LIMIT 1
+  ORDER BY fs.schema_name
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -49,17 +54,19 @@ export const computeLoader: ModuleLoader<ComputeConfig> = createModuleLoader<Com
       COMPUTE_MODULE_SQL,
       [databaseId],
     );
-    const row = result.rows[0];
-    if (!row) return undefined;
+    if (result.rows.length === 0) return undefined;
 
     return {
-      schemaName: row.functions_schema_name,
-      definitionsTableName: row.definitions_table_name,
-      // The bindings table is generated alongside the definitions table
-      // (see metaschema_generators.function_module).
-      bindingsTableName: row.definitions_table_name.replace(/_definitions$/, '_api_bindings'),
-      invocationsSchemaName: row.invocations_schema_name,
-      invocationsTableName: row.invocations_table_name,
+      modules: result.rows.map((row) => ({
+        schemaName: row.functions_schema_name,
+        definitionsTableName: row.definitions_table_name,
+        // The bindings table name is derived exactly as the metaschema
+        // generator derives it (metaschema_generators.function_module:
+        // regexp_replace(definitions_table_name, '_definitions$', '_api_bindings')).
+        bindingsTableName: row.definitions_table_name.replace(/_definitions$/, '_api_bindings'),
+        invocationsSchemaName: row.invocations_schema_name,
+        invocationsTableName: row.invocations_table_name,
+      })),
     };
   },
 });

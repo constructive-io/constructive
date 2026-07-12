@@ -64,7 +64,20 @@ describe('function bindings plugin', () => {
   let query: QueryFn;
 
   beforeAll(async () => {
-    const plugin = createFunctionBindingsPlugin({ apiId: API_ID });
+    // In the server these names come from the express-context compute
+    // module loader (constructive metaschema); tests supply them directly.
+    const plugin = createFunctionBindingsPlugin({
+      apiId: API_ID,
+      modules: [
+        {
+          computeSchema: 'compute_public',
+          bindingsTable: 'function_api_bindings',
+          definitionsTable: 'function_definitions',
+          invocationsSchema: 'compute_public',
+          invocationsTable: 'function_invocations'
+        }
+      ]
+    });
 
     const connections = await (getConnections as any)(
       {

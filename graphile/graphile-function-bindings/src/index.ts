@@ -10,6 +10,7 @@ export {
 } from './derive';
 export { createFunctionBindingsPlugin } from './plugin';
 export type {
+  ComputeModuleNames,
   FunctionBindingRow,
   FunctionBindingsPluginOptions,
   JsonSchemaNode,

@@ -2,7 +2,9 @@
  * PostGraphile v5 Function Bindings Plugin
  *
  * Exposes API-bound compute functions as GraphQL mutations. At gather time
- * the plugin queries `function_api_bindings` joined to `function_definitions`
+ * the plugin queries the bindings table joined to the definitions table
+ * (schema/table names resolved from the constructive metaschema via the
+ * express-context compute module loader — never guessed or hard-coded)
  * for the configured api_id and emits one mutation per graphql-enabled
  * binding:
  *
@@ -37,7 +39,7 @@ import { escapeIdentifier } from 'pg';
 
 import type { DerivedField, DerivedInput } from './derive';
 import { buildInvocationPayload, deriveInputFields, isGraphqlEnabled } from './derive';
-import type { FunctionBindingRow, FunctionBindingsPluginOptions } from './types';
+import type { ComputeModuleNames, FunctionBindingRow, FunctionBindingsPluginOptions } from './types';
 
 const log = new Logger('graphile-function-bindings');
 
@@ -53,87 +55,64 @@ declare global {
   }
 }
 
-interface FunctionBindingsBuildInput {
-  schemaName: string;
-  invocationsSchemaName: string;
-  invocationsTableName: string;
-  bindings: FunctionBindingRow[];
+/** A binding together with the module (scope) it was loaded from. */
+interface LoadedBinding extends FunctionBindingRow {
+  module: ComputeModuleNames;
 }
 
-const BINDINGS_TABLE = 'function_api_bindings';
-const DEFINITIONS_TABLE = 'function_definitions';
-const INVOCATIONS_TABLE = 'function_invocations';
+interface FunctionBindingsBuildInput {
+  bindings: LoadedBinding[];
+}
 
 const IDENT_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 async function loadBindings(
   pgService: GraphileConfig.PgServiceConfiguration,
   options: FunctionBindingsPluginOptions
-): Promise<FunctionBindingsBuildInput | null> {
-  const bindingsTable = options.bindingsTable ?? BINDINGS_TABLE;
-  const definitionsTable = options.definitionsTable ?? DEFINITIONS_TABLE;
+): Promise<FunctionBindingsBuildInput> {
   return withPgClientFromPgService(pgService, null, async (client) => {
-    let schemaName = options.computeSchema;
-    if (!schemaName) {
-      const schemas: string[] = (pgService.schemas as string[]) ?? ['public'];
-      const { rows } = await client.query<{ nspname: string }>({
+    const bindings: LoadedBinding[] = [];
+    for (const module of options.modules) {
+      const { computeSchema, bindingsTable, definitionsTable } = module;
+      const { rows } = await client.query<{
+        id: string;
+        alias: string;
+        config: Record<string, unknown> | null;
+        function_definition_id: string;
+        task_identifier: string;
+        database_id: string | null;
+        description: string | null;
+        payload_args: FunctionBindingRow['payloadArgs'];
+      }>({
         text: `
-          SELECT n.nspname
-          FROM pg_class c
-          JOIN pg_namespace n ON n.oid = c.relnamespace
-          WHERE c.relname = $1 AND c.relkind IN ('r', 'p') AND n.nspname = ANY($2)
-          LIMIT 1
+          SELECT b.id, b.alias, b.config, b.function_definition_id,
+                 d.task_identifier, d.database_id, d.description, d.payload_args
+          FROM ${escapeIdentifier(computeSchema)}.${escapeIdentifier(bindingsTable)} b
+          JOIN ${escapeIdentifier(computeSchema)}.${escapeIdentifier(definitionsTable)} d
+            ON d.id = b.function_definition_id
+          WHERE b.api_id = $1
+          ORDER BY b.alias
         `,
-        values: [bindingsTable, schemas]
+        values: [options.apiId]
       });
-      schemaName = rows[0]?.nspname;
+
+      for (const row of rows) {
+        if (!isGraphqlEnabled(row.config)) continue;
+        bindings.push({
+          bindingId: row.id,
+          alias: row.alias,
+          config: row.config,
+          functionDefinitionId: row.function_definition_id,
+          taskIdentifier: row.task_identifier,
+          databaseId: row.database_id,
+          description: row.description,
+          payloadArgs: row.payload_args,
+          module
+        });
+      }
     }
-    if (!schemaName) {
-      log.debug('No function_api_bindings table found in exposed schemas; skipping');
-      return null;
-    }
 
-    const { rows } = await client.query<{
-      id: string;
-      alias: string;
-      config: Record<string, unknown> | null;
-      function_definition_id: string;
-      task_identifier: string;
-      database_id: string | null;
-      description: string | null;
-      payload_args: FunctionBindingRow['payloadArgs'];
-    }>({
-      text: `
-        SELECT b.id, b.alias, b.config, b.function_definition_id,
-               d.task_identifier, d.database_id, d.description, d.payload_args
-        FROM ${escapeIdentifier(schemaName)}.${escapeIdentifier(bindingsTable)} b
-        JOIN ${escapeIdentifier(schemaName)}.${escapeIdentifier(definitionsTable)} d
-          ON d.id = b.function_definition_id
-        WHERE b.api_id = $1
-        ORDER BY b.alias
-      `,
-      values: [options.apiId]
-    });
-
-    const bindings: FunctionBindingRow[] = rows
-      .filter((row) => isGraphqlEnabled(row.config))
-      .map((row) => ({
-        bindingId: row.id,
-        alias: row.alias,
-        config: row.config,
-        functionDefinitionId: row.function_definition_id,
-        taskIdentifier: row.task_identifier,
-        databaseId: row.database_id,
-        description: row.description,
-        payloadArgs: row.payload_args
-      }));
-
-    return {
-      schemaName,
-      invocationsSchemaName: options.invocationsSchema ?? schemaName,
-      invocationsTableName: options.invocationsTable ?? INVOCATIONS_TABLE,
-      bindings
-    };
+    return { bindings };
   });
 }
 
@@ -153,18 +132,20 @@ export function createFunctionBindingsPlugin(
       helpers: {},
       async main(output, info) {
         const pgService = info.resolvedPreset.pgServices?.[0];
-        if (!pgService || !options.apiId) return;
-        try {
-          const result = await loadBindings(pgService, options);
-          if (result) {
-            (output as Record<string, unknown>).functionApiBindings = result;
-            log.debug(
-              `Loaded ${result.bindings.length} graphql-enabled function binding(s) for api ${options.apiId}`
-            );
-          }
-        } catch (err) {
-          log.warn(`Failed to load function bindings: ${(err as Error).message}`);
+        if (!pgService) {
+          throw new Error('FunctionBindingsPlugin: no pgService configured');
         }
+        if (!options.apiId) {
+          throw new Error('FunctionBindingsPlugin: apiId is required');
+        }
+        if (!options.modules?.length) {
+          throw new Error('FunctionBindingsPlugin: at least one compute module is required');
+        }
+        const result = await loadBindings(pgService, options);
+        (output as Record<string, unknown>).functionApiBindings = result;
+        log.debug(
+          `Loaded ${result.bindings.length} graphql-enabled function binding(s) for api ${options.apiId}`
+        );
       }
     },
 
@@ -197,19 +178,15 @@ export function createFunctionBindingsPlugin(
             }
           };
 
-          const invocationsResource = Object.values(
-            (build.input.pgRegistry?.pgResources ?? {}) as Record<string, any>
-          ).find(
-            (resource: any) =>
-              resource?.codec?.extensions?.pg?.name === loaded.invocationsTableName &&
-              resource?.codec?.extensions?.pg?.schemaName === loaded.invocationsSchemaName &&
-              !resource.parameters
-          );
-          const invocationType = invocationsResource
-            ? (build.getGraphQLTypeByPgCodec?.(invocationsResource.codec, 'output') as
-                | import('graphql').GraphQLObjectType
-                | undefined)
-            : undefined;
+          const findInvocationsResource = (module: ComputeModuleNames) =>
+            Object.values(
+              (build.input.pgRegistry?.pgResources ?? {}) as Record<string, any>
+            ).find(
+              (resource: any) =>
+                resource?.codec?.extensions?.pg?.name === module.invocationsTable &&
+                resource?.codec?.extensions?.pg?.schemaName === module.invocationsSchema &&
+                !resource.parameters
+            );
 
           const newFields: Record<string, any> = {};
 
@@ -224,6 +201,13 @@ export function createFunctionBindingsPlugin(
               log.warn(`Skipping binding "${binding.alias}": mutation field "${fieldName}" already exists`);
               continue;
             }
+
+            const invocationsResource = findInvocationsResource(binding.module);
+            const invocationType = invocationsResource
+              ? (build.getGraphQLTypeByPgCodec?.(invocationsResource.codec, 'output') as
+                  | import('graphql').GraphQLObjectType
+                  | undefined)
+              : undefined;
 
             const derived: DerivedInput = deriveInputFields(binding);
 
@@ -263,8 +247,8 @@ export function createFunctionBindingsPlugin(
 
             const capturedBinding = binding;
             const capturedDerived = derived;
-            const capturedInvocationsSchema = loaded.invocationsSchemaName;
-            const capturedInvocationsTable = loaded.invocationsTableName;
+            const capturedInvocationsSchema = binding.module.invocationsSchema;
+            const capturedInvocationsTable = binding.module.invocationsTable;
             const capturedResource = invocationsResource;
 
             const PayloadType = new GraphQLObjectType({
@@ -323,7 +307,7 @@ export function createFunctionBindingsPlugin(
                     pgSettings: $pgSettings
                   });
 
-                  return lambda($combined, async (vals: any) => {
+                  const $result = lambda($combined, async (vals: any) => {
                     const { withPgClient, pgSettings, clientMutationId, ...input } = vals;
                     const payload = buildInvocationPayload(capturedDerived, input);
                     return withPgClient(pgSettings, async (pgClient: any) => {
@@ -355,6 +339,10 @@ export function createFunctionBindingsPlugin(
                       };
                     });
                   });
+                  // The insert is a side effect — grafast must not dedupe,
+                  // reorder, or defer it relative to dependent output plans.
+                  ($result as any).hasSideEffects = true;
+                  return $result;
                 }
               }
             );

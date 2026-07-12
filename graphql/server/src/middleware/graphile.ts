@@ -217,18 +217,21 @@ const buildPreset = (
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [
     AuthCookiePlugin,
-    ...(apiId
+    // Only registered when the compute module is provisioned for this
+    // database — all schema/table names come from the constructive
+    // metaschema (express-context compute module loader); the plugin has
+    // no fallbacks or discovery of its own.
+    ...(apiId && compute?.modules.length
       ? [
         createFunctionBindingsPlugin({
           apiId,
-          // Metaschema-resolved names from the express-context compute
-          // module loader; the plugin falls back to schema discovery
-          // when the compute module is not provisioned.
-          computeSchema: compute?.schemaName,
-          bindingsTable: compute?.bindingsTableName,
-          definitionsTable: compute?.definitionsTableName,
-          invocationsSchema: compute?.invocationsSchemaName,
-          invocationsTable: compute?.invocationsTableName,
+          modules: compute.modules.map((m) => ({
+            computeSchema: m.schemaName,
+            bindingsTable: m.bindingsTableName,
+            definitionsTable: m.definitionsTableName,
+            invocationsSchema: m.invocationsSchemaName,
+            invocationsTable: m.invocationsTableName,
+          })),
         }),
       ]
       : []),

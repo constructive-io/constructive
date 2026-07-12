@@ -4,9 +4,10 @@
  *   POST /fn/:alias           → invoke a function bound to this API (202 { invocationId })
  *   GET  /fn/invocations/:id  → read invocation status/result
  *
- * Routing is per-API: bindings are looked up in the function_api_bindings
- * table by (api_id, alias), where api_id comes from the server-side domain
- * resolution (req.constructive.api.apiId) — never from client input.
+ * Routing is per-API: bindings are looked up by (api_id, alias) across the
+ * bindings tables of every provisioned function-module scope, where api_id
+ * comes from the server-side domain resolution (req.constructive.api.apiId)
+ * — never from client input. RLS on the underlying tables governs access.
  *
  * Per-protocol enablement lives in the binding's `config` jsonb:
  *   { "graphql": true, "rest": { "path": "/...", "methods": ["POST"] } }
@@ -63,25 +64,39 @@ async function handleInvoke(req: Request, res: Response): Promise<void> {
   }
 
   const compute = await ctx.useModule('compute');
-  if (!compute) {
+  if (!compute?.modules.length) {
     notFound(res);
     return;
   }
 
-  const { schemaName, bindingsTableName, definitionsTableName } = compute;
   const alias = req.params.alias;
 
   try {
-    const binding = await ctx.withPgClient(async (client) => {
-      const { rows } = await client.query<BindingRow>(
-        `SELECT b.config, d.task_identifier, d.database_id
-         FROM ${escapeIdentifier(schemaName)}.${escapeIdentifier(bindingsTableName)} b
-         JOIN ${escapeIdentifier(schemaName)}.${escapeIdentifier(definitionsTableName)} d ON d.id = b.function_definition_id
-         WHERE b.api_id = $1 AND b.alias = $2`,
-        [ctx.api.apiId, alias]
-      );
-      return rows[0];
+    // Resolve the alias across every function-module scope's bindings table.
+    const resolved = await ctx.withPgClient(async (client) => {
+      const matches: Array<{ binding: BindingRow; module: (typeof compute.modules)[number] }> = [];
+      for (const module of compute.modules) {
+        const { rows } = await client.query<BindingRow>(
+          `SELECT b.config, d.task_identifier, d.database_id
+           FROM ${escapeIdentifier(module.schemaName)}.${escapeIdentifier(module.bindingsTableName)} b
+           JOIN ${escapeIdentifier(module.schemaName)}.${escapeIdentifier(module.definitionsTableName)} d ON d.id = b.function_definition_id
+           WHERE b.api_id = $1 AND b.alias = $2`,
+          [ctx.api.apiId, alias]
+        );
+        for (const row of rows) {
+          matches.push({ binding: row, module });
+        }
+      }
+      return matches;
     });
+
+    if (resolved.length > 1) {
+      // Same alias bound to this API from more than one scope — ambiguous.
+      res.status(409).json({ error: `Alias "${alias}" is ambiguous for this API` });
+      return;
+    }
+
+    const binding = resolved[0]?.binding;
 
     // 404 when the binding doesn't exist, REST is disabled for the binding
     // (absent `rest` config), or the HTTP method isn't allowed.
@@ -101,9 +116,10 @@ async function handleInvoke(req: Request, res: Response): Promise<void> {
     // input schema here, before the invocation row is inserted.
     const payload = req.body ?? {};
 
+    const { invocationsSchemaName, invocationsTableName } = resolved[0].module;
     const invocationId = await ctx.withPgClient(async (client) => {
       const { rows } = await client.query<{ id: string }>(
-        `INSERT INTO ${escapeIdentifier(compute.invocationsSchemaName)}.${escapeIdentifier(compute.invocationsTableName)}
+        `INSERT INTO ${escapeIdentifier(invocationsSchemaName)}.${escapeIdentifier(invocationsTableName)}
          (database_id, task_identifier, payload)
          VALUES ($1, $2, $3::jsonb)
          RETURNING id`,
@@ -138,20 +154,28 @@ async function handleGetInvocation(req: Request, res: Response): Promise<void> {
   }
 
   const compute = await ctx.useModule('compute');
-  if (!compute) {
+  if (!compute?.modules.length) {
     notFound(res);
     return;
   }
 
   try {
     const invocation = await ctx.withPgClient(async (client) => {
-      const { rows } = await client.query<InvocationRow>(
-        `SELECT id, status, result, error, created_at, started_at, completed_at, duration_ms
-         FROM ${escapeIdentifier(compute.invocationsSchemaName)}.${escapeIdentifier(compute.invocationsTableName)}
-         WHERE id = $1`,
-        [id]
-      );
-      return rows[0];
+      // Invocation tables are per-scope; search each distinct one.
+      const seen = new Set<string>();
+      for (const module of compute.modules) {
+        const key = `${module.invocationsSchemaName}.${module.invocationsTableName}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const { rows } = await client.query<InvocationRow>(
+          `SELECT id, status, result, error, created_at, started_at, completed_at, duration_ms
+           FROM ${escapeIdentifier(module.invocationsSchemaName)}.${escapeIdentifier(module.invocationsTableName)}
+           WHERE id = $1`,
+          [id]
+        );
+        if (rows[0]) return rows[0];
+      }
+      return undefined;
     });
 
     // RLS-filtered read: rows not visible to the caller simply aren't returned

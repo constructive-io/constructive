@@ -154,12 +154,21 @@ export interface AgentChatConfig {
   taskTableName: string | null;
 }
 
-export interface ComputeConfig {
+/** One provisioned function-module scope's compute table names. */
+export interface ComputeModuleConfig {
   schemaName: string;
   definitionsTableName: string;
   bindingsTableName: string;
   invocationsSchemaName: string;
   invocationsTableName: string;
+}
+
+/**
+ * All function modules provisioned on the database. A database may have one
+ * per scope; every module is exposed and RLS governs access to each.
+ */
+export interface ComputeConfig {
+  modules: ComputeModuleConfig[];
 }
 
 export interface LlmConfig {
