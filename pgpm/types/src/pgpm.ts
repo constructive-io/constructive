@@ -1,5 +1,6 @@
 import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
+
 import { PgpmDriverConfig } from './driver';
 import { JobsConfig } from './jobs';
 
@@ -303,7 +304,6 @@ export const pgpmDefaults: PgpmOptions = {
       anonymous: 'anonymous',
       authenticated: 'authenticated',
       administrator: 'administrator',
-      authenticatedClient: 'authenticated_client',
       default: 'anonymous'
     },
     useLocksForRoles: false
@@ -313,13 +313,13 @@ export const pgpmDefaults: PgpmOptions = {
     port: 5432,
     user: 'postgres',
     password: 'password',
-    database: 'postgres',
+    database: 'postgres'
   },
   server: {
     host: 'localhost',
     port: 3000,
     trustProxy: false,
-    strictAuth: false,
+    strictAuth: false
   },
   cdn: {
     provider: 'minio',

@@ -29,7 +29,6 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
       "administrator": "administrator",
       "anonymous": "anonymous",
       "authenticated": "authenticated",
-      "authenticatedClient": "authenticated_client",
       "default": "anonymous",
     },
     "rootDb": "postgres",
