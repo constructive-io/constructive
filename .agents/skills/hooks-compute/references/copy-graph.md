@@ -7,7 +7,7 @@ React Query mutation hook for copyGraph
 ## Usage
 
 ```typescript
-const { mutate } = useCopyGraphMutation(); mutate({ input: { databaseId: '<UUID>', graphId: '<UUID>', name: '<String>' } });
+const { mutate } = useCopyGraphMutation(); mutate({ input: { scopeId: '<UUID>', graphId: '<UUID>', name: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useCopyGraphMutation(); mutate({ input: { databaseId: '<UUID>
 
 ```typescript
 const { mutate, isLoading } = useCopyGraphMutation();
-mutate({ input: { databaseId: '<UUID>', graphId: '<UUID>', name: '<String>' } });
+mutate({ input: { scopeId: '<UUID>', graphId: '<UUID>', name: '<String>' } });
 ```

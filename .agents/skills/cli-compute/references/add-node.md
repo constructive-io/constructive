@@ -7,7 +7,7 @@ Execute the addNode mutation
 ## Usage
 
 ```bash
-csdk add-node --input.clientMutationId <String> --input.databaseId <UUID> --input.rootHash <UUID> --input.nodeName <String> --input.nodeType <String> --input.context <String> --input.graphName <String> --input.props <JSON> --input.meta <JSON>
+csdk add-node --input.clientMutationId <String> --input.scopeId <UUID> --input.rootHash <UUID> --input.nodeName <String> --input.nodeType <String> --input.context <String> --input.graphName <String> --input.props <JSON> --input.meta <JSON>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk add-node --input.clientMutationId <String> --input.databaseId <UUID> --inpu
 ### Run addNode
 
 ```bash
-csdk add-node --input.clientMutationId <String> --input.databaseId <UUID> --input.rootHash <UUID> --input.nodeName <String> --input.nodeType <String> --input.context <String> --input.graphName <String> --input.props <JSON> --input.meta <JSON>
+csdk add-node --input.clientMutationId <String> --input.scopeId <UUID> --input.rootHash <UUID> --input.nodeName <String> --input.nodeType <String> --input.context <String> --input.graphName <String> --input.props <JSON> --input.meta <JSON>
 ```

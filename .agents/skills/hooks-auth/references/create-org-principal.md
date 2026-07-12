@@ -7,7 +7,7 @@ React Query mutation hook for createOrgPrincipal
 ## Usage
 
 ```typescript
-const { mutate } = useCreateOrgPrincipalMutation(); mutate({ input: { name: '<String>', orgId: '<UUID>', allowedMask: '<BitString>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } });
+const { mutate } = useCreateOrgPrincipalMutation(); mutate({ input: { name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useCreateOrgPrincipalMutation(); mutate({ input: { name: '<St
 
 ```typescript
 const { mutate, isLoading } = useCreateOrgPrincipalMutation();
-mutate({ input: { name: '<String>', orgId: '<UUID>', allowedMask: '<BitString>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } });
+mutate({ input: { name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } });
 ```

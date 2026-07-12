@@ -10,7 +10,7 @@
 
 - **Tables:** 13
 - **Custom queries:** 5
-- **Custom mutations:** 29
+- **Custom mutations:** 30
 
 **Generators:** ORM, React Query
 

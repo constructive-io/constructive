@@ -51,7 +51,7 @@ CRUD operations for Principal records.
 | `ownerId` | UUID | Yes |
 | `userId` | UUID | Yes |
 | `name` | String | Yes |
-| `allowedMask` | BitString | Yes |
+| `useAdminOwner` | Boolean | Yes |
 | `isReadOnly` | Boolean | Yes |
 | `bypassStepUp` | Boolean | Yes |
 
@@ -59,13 +59,13 @@ CRUD operations for Principal records.
 
 ```typescript
 // List all principal records
-const items = await db.principal.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } }).execute();
+const items = await db.principal.findMany({ select: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, useAdminOwner: true, isReadOnly: true, bypassStepUp: true } }).execute();
 
 // Get one by principalId
-const item = await db.principal.findOne({ principalId: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, allowedMask: true, isReadOnly: true, bypassStepUp: true } }).execute();
+const item = await db.principal.findOne({ principalId: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, ownerId: true, userId: true, name: true, useAdminOwner: true, isReadOnly: true, bypassStepUp: true } }).execute();
 
 // Create
-const created = await db.principal.create({ data: { id: '<UUID>', ownerId: '<UUID>', userId: '<UUID>', name: '<String>', allowedMask: '<BitString>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' }, select: { principalId: true } }).execute();
+const created = await db.principal.create({ data: { id: '<UUID>', ownerId: '<UUID>', userId: '<UUID>', name: '<String>', useAdminOwner: '<Boolean>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' }, select: { principalId: true } }).execute();
 
 // Update
 const updated = await db.principal.update({ where: { principalId: '<UUID>' }, data: { id: '<UUID>' }, select: { principalId: true } }).execute();
@@ -122,20 +122,21 @@ CRUD operations for PrincipalScopeOverride records.
 | `principalId` | UUID | Yes |
 | `membershipType` | Int | Yes |
 | `allowedMask` | BitString | Yes |
-| `isAdmin` | Boolean | Yes |
+| `useAdminOwner` | Boolean | Yes |
+| `isActive` | Boolean | Yes |
 | `isReadOnly` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all principalScopeOverride records
-const items = await db.principalScopeOverride.findMany({ select: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } }).execute();
+const items = await db.principalScopeOverride.findMany({ select: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, useAdminOwner: true, isActive: true, isReadOnly: true } }).execute();
 
 // Get one by id
-const item = await db.principalScopeOverride.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, isAdmin: true, isReadOnly: true } }).execute();
+const item = await db.principalScopeOverride.findOne({ id: '<UUID>', select: { id: true, createdAt: true, updatedAt: true, principalId: true, membershipType: true, allowedMask: true, useAdminOwner: true, isActive: true, isReadOnly: true } }).execute();
 
 // Create
-const created = await db.principalScopeOverride.create({ data: { principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', isAdmin: '<Boolean>', isReadOnly: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.principalScopeOverride.create({ data: { principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', useAdminOwner: '<Boolean>', isActive: '<Boolean>', isReadOnly: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.principalScopeOverride.update({ where: { id: '<UUID>' }, data: { principalId: '<UUID>' }, select: { id: true } }).execute();
@@ -633,6 +634,21 @@ deleteOrgPrincipal
 const result = await db.mutation.deleteOrgPrincipal({ input: { principalId: '<UUID>' } }).execute();
 ```
 
+### `db.mutation.deletePrincipal`
+
+deletePrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DeletePrincipalInput (required) |
+
+```typescript
+const result = await db.mutation.deletePrincipal({ input: { principalId: '<UUID>' } }).execute();
+```
+
 ### `db.mutation.disconnectAccount`
 
 disconnectAccount
@@ -798,6 +814,21 @@ resetPassword
 const result = await db.mutation.resetPassword({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } }).execute();
 ```
 
+### `db.mutation.createOrgPrincipal`
+
+createOrgPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateOrgPrincipalInput (required) |
+
+```typescript
+const result = await db.mutation.createOrgPrincipal({ input: { name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } }).execute();
+```
+
 ### `db.mutation.signInCrossOrigin`
 
 signInCrossOrigin
@@ -886,21 +917,6 @@ linkIdentity
 
 ```typescript
 const result = await db.mutation.linkIdentity({ input: { service: '<String>', identifier: '<String>', details: '<JSON>' } }).execute();
-```
-
-### `db.mutation.createOrgPrincipal`
-
-createOrgPrincipal
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | CreateOrgPrincipalInput (required) |
-
-```typescript
-const result = await db.mutation.createOrgPrincipal({ input: { name: '<String>', orgId: '<UUID>', allowedMask: '<BitString>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } }).execute();
 ```
 
 ### `db.mutation.extendTokenExpires`

@@ -9,6 +9,7 @@ export interface AgentPlan {
   updatedAt: string | null;
   ownerId: string | null;
   threadId: string | null;
+  databaseId: string | null;
   title: string | null;
   description: string | null;
   status: string | null;
@@ -18,6 +19,7 @@ export interface Agent {
   createdAt: string | null;
   updatedAt: string | null;
   ownerId: string | null;
+  databaseId: string | null;
   personaId: string | null;
   parentId: string | null;
   name: string | null;
@@ -31,6 +33,7 @@ export interface AgentThread {
   createdAt: string | null;
   updatedAt: string | null;
   ownerId: string | null;
+  databaseId: string | null;
   status: string | null;
   isArchived: boolean | null;
   archivedAt: string | null;
@@ -50,6 +53,7 @@ export interface AgentMessage {
   actorId: string | null;
   parts: unknown | null;
   threadId: string | null;
+  databaseId: string | null;
   authorRole: string | null;
   model: string | null;
   agentId: string | null;
@@ -61,6 +65,7 @@ export interface AgentTask {
   actorId: string | null;
   status: string | null;
   planId: string | null;
+  databaseId: string | null;
   description: string | null;
   source: string | null;
   error: string | null;
@@ -77,6 +82,7 @@ export interface AgentPrompt {
   updatedAt: string | null;
   createdBy: string | null;
   updatedBy: string | null;
+  databaseId: string | null;
   name: string | null;
   content: string | null;
   description: string | null;
@@ -101,6 +107,7 @@ export interface AgentPersona {
   updatedAt: string | null;
   createdBy: string | null;
   updatedBy: string | null;
+  databaseId: string | null;
   slug: string | null;
   name: string | null;
   description: string | null;
@@ -115,6 +122,7 @@ export interface AgentResource {
   updatedAt: string | null;
   createdBy: string | null;
   updatedBy: string | null;
+  databaseId: string | null;
   slug: string | null;
   kind: string | null;
   title: string | null;

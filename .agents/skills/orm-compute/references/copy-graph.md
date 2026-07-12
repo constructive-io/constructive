@@ -7,7 +7,7 @@ Execute the copyGraph mutation
 ## Usage
 
 ```typescript
-db.mutation.copyGraph({ input: { databaseId: '<UUID>', graphId: '<UUID>', name: '<String>' } }).execute()
+db.mutation.copyGraph({ input: { scopeId: '<UUID>', graphId: '<UUID>', name: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.copyGraph({ input: { databaseId: '<UUID>', graphId: '<UUID>', name: 
 ### Run copyGraph
 
 ```typescript
-const result = await db.mutation.copyGraph({ input: { databaseId: '<UUID>', graphId: '<UUID>', name: '<String>' } }).execute();
+const result = await db.mutation.copyGraph({ input: { scopeId: '<UUID>', graphId: '<UUID>', name: '<String>' } }).execute();
 ```

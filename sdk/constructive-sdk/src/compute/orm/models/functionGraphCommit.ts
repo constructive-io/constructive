@@ -176,7 +176,7 @@ export class FunctionGraphCommitModel {
       S,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       },
       FunctionGraphCommitPatch
     > & {
@@ -199,7 +199,7 @@ export class FunctionGraphCommitModel {
       'functionGraphCommitPatch',
       connectionFieldsMap,
       {
-        databaseId: args.where.databaseId,
+        scopeId: args.where.scopeId,
       }
     );
     return new QueryBuilder({
@@ -215,7 +215,7 @@ export class FunctionGraphCommitModel {
     args: DeleteArgs<
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       },
       S
     > & {
@@ -232,7 +232,7 @@ export class FunctionGraphCommitModel {
       'functionGraphCommit',
       {
         id: args.where.id,
-        databaseId: args.where.databaseId,
+        scopeId: args.where.scopeId,
       },
       'DeleteFunctionGraphCommitInput',
       args.select,

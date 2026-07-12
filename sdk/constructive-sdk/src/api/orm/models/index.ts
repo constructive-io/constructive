@@ -47,5 +47,5 @@ export { DatabaseModel } from './database';
 export { RlsSettingModel } from './rlsSetting';
 export { SqlActionModel } from './sqlAction';
 export { DatabaseSettingModel } from './databaseSetting';
-export { WebauthnSettingModel } from './webauthnSetting';
 export { AstMigrationModel } from './astMigration';
+export { WebauthnSettingModel } from './webauthnSetting';

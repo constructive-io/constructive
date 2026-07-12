@@ -388,15 +388,6 @@ export const databaseSettingMutationKeys = {
   /** Delete databaseSetting mutation key */ delete: (id: string | number) =>
     ['mutation', 'databasesetting', 'delete', id] as const,
 } as const;
-export const webauthnSettingMutationKeys = {
-  /** All webauthnSetting mutation keys */ all: ['mutation', 'webauthnsetting'] as const,
-  /** Create webauthnSetting mutation key */ create: () =>
-    ['mutation', 'webauthnsetting', 'create'] as const,
-  /** Update webauthnSetting mutation key */ update: (id: string | number) =>
-    ['mutation', 'webauthnsetting', 'update', id] as const,
-  /** Delete webauthnSetting mutation key */ delete: (id: string | number) =>
-    ['mutation', 'webauthnsetting', 'delete', id] as const,
-} as const;
 export const astMigrationMutationKeys = {
   /** All astMigration mutation keys */ all: ['mutation', 'astmigration'] as const,
   /** Create astMigration mutation key */ create: () =>
@@ -405,6 +396,15 @@ export const astMigrationMutationKeys = {
     ['mutation', 'astmigration', 'update', id] as const,
   /** Delete astMigration mutation key */ delete: (id: string | number) =>
     ['mutation', 'astmigration', 'delete', id] as const,
+} as const;
+export const webauthnSettingMutationKeys = {
+  /** All webauthnSetting mutation keys */ all: ['mutation', 'webauthnsetting'] as const,
+  /** Create webauthnSetting mutation key */ create: () =>
+    ['mutation', 'webauthnsetting', 'create'] as const,
+  /** Update webauthnSetting mutation key */ update: (id: string | number) =>
+    ['mutation', 'webauthnsetting', 'update', id] as const,
+  /** Delete webauthnSetting mutation key */ delete: (id: string | number) =>
+    ['mutation', 'webauthnsetting', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -424,16 +424,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'rejectDatabaseTransfer', identifier] as const)
       : (['mutation', 'rejectDatabaseTransfer'] as const),
-  /** Mutation key for provisionDatabaseWithUser */ provisionDatabaseWithUser: (
-    identifier?: string
-  ) =>
-    identifier
-      ? (['mutation', 'provisionDatabaseWithUser', identifier] as const)
-      : (['mutation', 'provisionDatabaseWithUser'] as const),
-  /** Mutation key for bootstrapUser */ bootstrapUser: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'bootstrapUser', identifier] as const)
-      : (['mutation', 'bootstrapUser'] as const),
   /** Mutation key for setFieldOrder */ setFieldOrder: (identifier?: string) =>
     identifier
       ? (['mutation', 'setFieldOrder', identifier] as const)
@@ -442,10 +432,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'applyRls', identifier] as const)
       : (['mutation', 'applyRls'] as const),
-  /** Mutation key for createUserDatabase */ createUserDatabase: (identifier?: string) =>
+  /** Mutation key for requestDatabase */ requestDatabase: (identifier?: string) =>
     identifier
-      ? (['mutation', 'createUserDatabase', identifier] as const)
-      : (['mutation', 'createUserDatabase'] as const),
+      ? (['mutation', 'requestDatabase', identifier] as const)
+      : (['mutation', 'requestDatabase'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
@@ -518,7 +508,7 @@ export const mutationKeys = {
   rlsSetting: rlsSettingMutationKeys,
   sqlAction: sqlActionMutationKeys,
   databaseSetting: databaseSettingMutationKeys,
-  webauthnSetting: webauthnSettingMutationKeys,
   astMigration: astMigrationMutationKeys,
+  webauthnSetting: webauthnSettingMutationKeys,
   custom: customMutationKeys,
 } as const;

@@ -12,8 +12,8 @@ csdk resource list --where.<field>.<op> <value> --orderBy <values>
 csdk resource list --limit 10 --after <cursor>
 csdk resource find-first --where.<field>.<op> <value>
 csdk resource get --id <UUID>
-csdk resource create --namespaceId <UUID> --kind <String> --name <String> --slug <String> --databaseId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--lastError <String>] [--errorCount <Int>] [--labels <JSON>] [--annotations <JSON>]
-csdk resource update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--namespaceId <UUID>] [--kind <String>] [--name <String>] [--slug <String>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--lastError <String>] [--errorCount <Int>] [--labels <JSON>] [--annotations <JSON>] [--databaseId <UUID>]
+csdk resource create --namespaceId <UUID> --kind <String> --name <String> --slug <String> --databaseId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--lastError <String>] [--errorCount <Int>] [--labels <JSON>] [--annotations <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>] [--integrations <String>] [--resourceDefinitionId <UUID>]
+csdk resource update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--namespaceId <UUID>] [--kind <String>] [--name <String>] [--slug <String>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--lastError <String>] [--errorCount <Int>] [--labels <JSON>] [--annotations <JSON>] [--databaseId <UUID>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>] [--integrations <String>] [--resourceDefinitionId <UUID>]
 csdk resource delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk resource list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a resource
 
 ```bash
-csdk resource create --namespaceId <UUID> --kind <String> --name <String> --slug <String> --databaseId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--lastError <String>] [--errorCount <Int>] [--labels <JSON>] [--annotations <JSON>]
+csdk resource create --namespaceId <UUID> --kind <String> --name <String> --slug <String> --databaseId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--lastError <String>] [--errorCount <Int>] [--labels <JSON>] [--annotations <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>] [--integrations <String>] [--resourceDefinitionId <UUID>]
 ```
 
 ### Get a resource by id

@@ -12,8 +12,8 @@ csdk function-invocation-module list --where.<field>.<op> <value> --orderBy <val
 csdk function-invocation-module list --limit 10 --after <cursor>
 csdk function-invocation-module find-first --where.<field>.<op> <value>
 csdk function-invocation-module get --id <UUID>
-csdk function-invocation-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--invocationsTableId <UUID>] [--executionLogsTableId <UUID>] [--invocationsTableName <String>] [--executionLogsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
-csdk function-invocation-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--invocationsTableId <UUID>] [--executionLogsTableId <UUID>] [--invocationsTableName <String>] [--executionLogsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-invocation-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--invocationsTableId <UUID>] [--executionLogsTableId <UUID>] [--invocationsTableName <String>] [--executionLogsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-invocation-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--invocationsTableId <UUID>] [--executionLogsTableId <UUID>] [--invocationsTableName <String>] [--executionLogsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
 csdk function-invocation-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-invocation-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionInvocationModule
 
 ```bash
-csdk function-invocation-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--invocationsTableId <UUID>] [--executionLogsTableId <UUID>] [--invocationsTableName <String>] [--executionLogsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
+csdk function-invocation-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--invocationsTableId <UUID>] [--executionLogsTableId <UUID>] [--invocationsTableName <String>] [--executionLogsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>] [--defaultPermissions <String>]
 ```
 
 ### Get a functionInvocationModule by id

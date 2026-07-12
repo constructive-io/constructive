@@ -9,7 +9,7 @@ Commit history — each commit snapshots a tree root for a store
 ```typescript
 db.functionGraphCommit.findMany({ select: { id: true } }).execute()
 db.functionGraphCommit.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionGraphCommit.create({ data: { message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' }, select: { id: true } }).execute()
+db.functionGraphCommit.create({ data: { message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' }, select: { id: true } }).execute()
 db.functionGraphCommit.update({ where: { id: '<UUID>' }, data: { message: '<String>' }, select: { id: true } }).execute()
 db.functionGraphCommit.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.functionGraphCommit.findMany({
 
 ```typescript
 const item = await db.functionGraphCommit.create({
-  data: { message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' },
+  data: { message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' },
   select: { id: true }
 }).execute();
 ```

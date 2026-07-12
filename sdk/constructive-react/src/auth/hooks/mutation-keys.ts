@@ -158,6 +158,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'deleteOrgPrincipal', identifier] as const)
       : (['mutation', 'deleteOrgPrincipal'] as const),
+  /** Mutation key for deletePrincipal */ deletePrincipal: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'deletePrincipal', identifier] as const)
+      : (['mutation', 'deletePrincipal'] as const),
   /** Mutation key for disconnectAccount */ disconnectAccount: (identifier?: string) =>
     identifier
       ? (['mutation', 'disconnectAccount', identifier] as const)
@@ -202,6 +206,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'resetPassword', identifier] as const)
       : (['mutation', 'resetPassword'] as const),
+  /** Mutation key for createOrgPrincipal */ createOrgPrincipal: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'createOrgPrincipal', identifier] as const)
+      : (['mutation', 'createOrgPrincipal'] as const),
   /** Mutation key for signInCrossOrigin */ signInCrossOrigin: (identifier?: string) =>
     identifier
       ? (['mutation', 'signInCrossOrigin', identifier] as const)
@@ -222,10 +230,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'linkIdentity', identifier] as const)
       : (['mutation', 'linkIdentity'] as const),
-  /** Mutation key for createOrgPrincipal */ createOrgPrincipal: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'createOrgPrincipal', identifier] as const)
-      : (['mutation', 'createOrgPrincipal'] as const),
   /** Mutation key for extendTokenExpires */ extendTokenExpires: (identifier?: string) =>
     identifier
       ? (['mutation', 'extendTokenExpires', identifier] as const)

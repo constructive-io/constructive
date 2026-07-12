@@ -1162,6 +1162,35 @@ type Query {
     orderBy: [ForeignKeyConstraintOrderBy!] = [PRIMARY_KEY_ASC]
   ): ForeignKeyConstraintConnection
 
+  """Reads and enables pagination through a set of `AstMigration`."""
+  astMigrations(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AstMigrationFilter
+
+    """The method to use when ordering `AstMigration`."""
+    orderBy: [AstMigrationOrderBy!] = [NATURAL]
+  ): AstMigrationConnection
+
   """Reads and enables pagination through a set of `EmbeddingChunk`."""
   embeddingChunks(
     """Only read the first `n` values of the set."""
@@ -1219,35 +1248,6 @@ type Query {
     """The method to use when ordering `WebauthnSetting`."""
     orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
   ): WebauthnSettingConnection
-
-  """Reads and enables pagination through a set of `AstMigration`."""
-  astMigrations(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AstMigrationFilter
-
-    """The method to use when ordering `AstMigration`."""
-    orderBy: [AstMigrationOrderBy!] = [NATURAL]
-  ): AstMigrationConnection
 
   """Reads and enables pagination through a set of `Schema`."""
   schemas(
@@ -1389,6 +1389,7 @@ type Database {
   name: String
   label: String
   hash: UUID
+  platform: Boolean!
   createdAt: Datetime
   updatedAt: Datetime
 
@@ -2802,6 +2803,11 @@ type Table {
   pluralName: String
   singularName: String
   tags: [String]!
+
+  """
+  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
+  """
+  stepUp: JSON
   partitioned: Boolean!
   partitionStrategy: String
   partitionKeyNames: [String]
@@ -3873,6 +3879,9 @@ input DatabaseFilter {
   """Filter by the object’s `hash` field."""
   hash: UUIDFilter
 
+  """Filter by the object’s `platform` field."""
+  platform: BooleanFilter
+
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
@@ -4136,6 +4145,48 @@ input DatabaseFilter {
 }
 
 """
+A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
+"""
+input BooleanFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Boolean
+
+  """Not equal to the specified value."""
+  notEqualTo: Boolean
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Boolean
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Boolean
+
+  """Included in the specified list."""
+  in: [Boolean!]
+
+  """Not included in the specified list."""
+  notIn: [Boolean!]
+
+  """Less than the specified value."""
+  lessThan: Boolean
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Boolean
+
+  """Greater than the specified value."""
+  greaterThan: Boolean
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Boolean
+}
+
+"""
 A filter to be used against many `Schema` object types. All fields are combined with a logical ‘and.’
 """
 input DatabaseToManySchemaFilter {
@@ -4254,48 +4305,6 @@ input SchemaFilter {
 }
 
 """
-A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
-"""
-input BooleanFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Boolean
-
-  """Not equal to the specified value."""
-  notEqualTo: Boolean
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Boolean
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Boolean
-
-  """Included in the specified list."""
-  in: [Boolean!]
-
-  """Not included in the specified list."""
-  notIn: [Boolean!]
-
-  """Less than the specified value."""
-  lessThan: Boolean
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Boolean
-
-  """Greater than the specified value."""
-  greaterThan: Boolean
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Boolean
-}
-
-"""
 A filter to be used against ApiExposureLevel fields. All fields are combined with a logical ‘and.’
 """
 input ApiExposureLevelFilter {
@@ -4396,6 +4405,9 @@ input TableFilter {
 
   """Filter by the object’s `tags` field."""
   tags: StringListFilter
+
+  """Filter by the object’s `stepUp` field."""
+  stepUp: JSONFilter
 
   """Filter by the object’s `partitioned` field."""
   partitioned: BooleanFilter
@@ -4603,6 +4615,12 @@ input FieldFilter {
 
   """Filter by the object’s `defaultValue` field."""
   defaultValue: JSONFilter
+
+  """Filter by the object’s `generationExpression` field."""
+  generationExpression: JSONFilter
+
+  """Filter by the object’s `generationType` field."""
+  generationType: StringFilter
 
   """Filter by the object’s `type` field."""
   type: JSONFilter
@@ -5112,6 +5130,9 @@ input PolicyFilter {
 
   """Filter by the object’s `data` field."""
   data: JSONFilter
+
+  """Filter by the object’s `withCheck` field."""
+  withCheck: JSONFilter
 
   """Filter by the object’s `smartTags` field."""
   smartTags: JSONFilter
@@ -8352,6 +8373,8 @@ type Field {
   isRequired: Boolean!
   apiRequired: Boolean!
   defaultValue: JSON
+  generationExpression: JSON
+  generationType: String
   type: JSON!
   fieldOrder: Int!
   regexp: String
@@ -8555,6 +8578,10 @@ enum FieldOrderBy {
   API_REQUIRED_DESC
   DEFAULT_VALUE_ASC
   DEFAULT_VALUE_DESC
+  GENERATION_EXPRESSION_ASC
+  GENERATION_EXPRESSION_DESC
+  GENERATION_TYPE_ASC
+  GENERATION_TYPE_DESC
   TYPE_ASC
   TYPE_DESC
   FIELD_ORDER_ASC
@@ -8869,6 +8896,11 @@ type Policy {
   disabled: Boolean
   policyType: String
   data: JSON
+
+  """
+  Optional WITH CHECK override node {"$type": "Authz...", "data": {...}}. Only valid for UPDATE policies; NULL inherits the USING expression.
+  """
+  withCheck: JSON
   smartTags: JSON
   category: ObjectCategory!
   tags: [String]!
@@ -8916,6 +8948,8 @@ enum PolicyOrderBy {
   POLICY_TYPE_DESC
   DATA_ASC
   DATA_DESC
+  WITH_CHECK_ASC
+  WITH_CHECK_DESC
   SMART_TAGS_ASC
   SMART_TAGS_DESC
   CATEGORY_ASC
@@ -9777,6 +9811,8 @@ enum TableOrderBy {
   SINGULAR_NAME_DESC
   TAGS_ASC
   TAGS_DESC
+  STEP_UP_ASC
+  STEP_UP_DESC
   PARTITIONED_ASC
   PARTITIONED_DESC
   PARTITION_STRATEGY_ASC
@@ -12114,6 +12150,8 @@ enum DatabaseOrderBy {
   LABEL_DESC
   HASH_ASC
   HASH_DESC
+  PLATFORM_ASC
+  PLATFORM_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -12365,77 +12403,6 @@ enum DatabaseSettingOrderBy {
   ANNOTATIONS_DESC
 }
 
-"""A connection to a list of `WebauthnSetting` values."""
-type WebauthnSettingConnection {
-  """A list of `WebauthnSetting` objects."""
-  nodes: [WebauthnSetting]!
-
-  """
-  A list of edges which contains the `WebauthnSetting` and cursor to aid in pagination.
-  """
-  edges: [WebauthnSettingEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `WebauthnSetting` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A `WebauthnSetting` edge in the connection."""
-type WebauthnSettingEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `WebauthnSetting` at the end of the edge."""
-  node: WebauthnSetting
-}
-
-"""Methods to use when ordering `WebauthnSetting`."""
-enum WebauthnSettingOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  SCHEMA_ID_ASC
-  SCHEMA_ID_DESC
-  CREDENTIALS_SCHEMA_ID_ASC
-  CREDENTIALS_SCHEMA_ID_DESC
-  SESSIONS_SCHEMA_ID_ASC
-  SESSIONS_SCHEMA_ID_DESC
-  SESSION_SECRETS_SCHEMA_ID_ASC
-  SESSION_SECRETS_SCHEMA_ID_DESC
-  CREDENTIALS_TABLE_ID_ASC
-  CREDENTIALS_TABLE_ID_DESC
-  SESSIONS_TABLE_ID_ASC
-  SESSIONS_TABLE_ID_DESC
-  SESSION_CREDENTIALS_TABLE_ID_ASC
-  SESSION_CREDENTIALS_TABLE_ID_DESC
-  SESSION_SECRETS_TABLE_ID_ASC
-  SESSION_SECRETS_TABLE_ID_DESC
-  USER_FIELD_ID_ASC
-  USER_FIELD_ID_DESC
-  RP_ID_ASC
-  RP_ID_DESC
-  RP_NAME_ASC
-  RP_NAME_DESC
-  ORIGIN_ALLOWLIST_ASC
-  ORIGIN_ALLOWLIST_DESC
-  ATTESTATION_TYPE_ASC
-  ATTESTATION_TYPE_DESC
-  REQUIRE_USER_VERIFICATION_ASC
-  REQUIRE_USER_VERIFICATION_DESC
-  RESIDENT_KEY_ASC
-  RESIDENT_KEY_DESC
-  CHALLENGE_EXPIRY_SECONDS_ASC
-  CHALLENGE_EXPIRY_SECONDS_DESC
-}
-
 """A connection to a list of `AstMigration` values."""
 type AstMigrationConnection {
   """A list of `AstMigration` objects."""
@@ -12560,6 +12527,77 @@ enum AstMigrationOrderBy {
   ACTION_ID_DESC
   ACTOR_ID_ASC
   ACTOR_ID_DESC
+}
+
+"""A connection to a list of `WebauthnSetting` values."""
+type WebauthnSettingConnection {
+  """A list of `WebauthnSetting` objects."""
+  nodes: [WebauthnSetting]!
+
+  """
+  A list of edges which contains the `WebauthnSetting` and cursor to aid in pagination.
+  """
+  edges: [WebauthnSettingEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `WebauthnSetting` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `WebauthnSetting` edge in the connection."""
+type WebauthnSettingEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `WebauthnSetting` at the end of the edge."""
+  node: WebauthnSetting
+}
+
+"""Methods to use when ordering `WebauthnSetting`."""
+enum WebauthnSettingOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  CREDENTIALS_SCHEMA_ID_ASC
+  CREDENTIALS_SCHEMA_ID_DESC
+  SESSIONS_SCHEMA_ID_ASC
+  SESSIONS_SCHEMA_ID_DESC
+  SESSION_SECRETS_SCHEMA_ID_ASC
+  SESSION_SECRETS_SCHEMA_ID_DESC
+  CREDENTIALS_TABLE_ID_ASC
+  CREDENTIALS_TABLE_ID_DESC
+  SESSIONS_TABLE_ID_ASC
+  SESSIONS_TABLE_ID_DESC
+  SESSION_CREDENTIALS_TABLE_ID_ASC
+  SESSION_CREDENTIALS_TABLE_ID_DESC
+  SESSION_SECRETS_TABLE_ID_ASC
+  SESSION_SECRETS_TABLE_ID_DESC
+  USER_FIELD_ID_ASC
+  USER_FIELD_ID_DESC
+  RP_ID_ASC
+  RP_ID_DESC
+  RP_NAME_ASC
+  RP_NAME_DESC
+  ORIGIN_ALLOWLIST_ASC
+  ORIGIN_ALLOWLIST_DESC
+  ATTESTATION_TYPE_ASC
+  ATTESTATION_TYPE_DESC
+  REQUIRE_USER_VERIFICATION_ASC
+  REQUIRE_USER_VERIFICATION_DESC
+  RESIDENT_KEY_ASC
+  RESIDENT_KEY_DESC
+  CHALLENGE_EXPIRY_SECONDS_ASC
+  CHALLENGE_EXPIRY_SECONDS_DESC
 }
 
 """Root meta schema type"""
@@ -12830,18 +12868,6 @@ type Mutation {
     """
     input: RejectDatabaseTransferInput!
   ): RejectDatabaseTransferPayload
-  provisionDatabaseWithUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionDatabaseWithUserInput!
-  ): ProvisionDatabaseWithUserPayload
-  bootstrapUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: BootstrapUserInput!
-  ): BootstrapUserPayload
   setFieldOrder(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -12855,13 +12881,21 @@ type Mutation {
     input: ApplyRlsInput!
   ): ApplyRlsPayload
 
-  "Creates a new user database with all required modules, permissions, and RLS policies.\n\nParameters:\n  - database_name: Name for the new database (required)\n  - owner_id: UUID of the owner user (required)\n  - include_invites: Include invite system (default: true)\n  - include_groups: Include group-level memberships (default: false)\n  - include_levels: Include events/analytics (default: false)\n  - bitlen: Bit length for permission masks (default: 64)\n  - tokens_expiration: Token expiration interval (default: 30 days)\n\nReturns the database_id UUID of the newly created database.\n\nExample usage:\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups\n"
-  createUserDatabase(
+  """
+  Requests a database and returns a ticket (database_provision_module row) to poll.
+  
+  Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
+  
+  Example usage:
+    SELECT * FROM metaschema_public.request_database('my_app', 'example.com', preset_slug := 'full');
+    SELECT * FROM metaschema_public.request_database('my_app', 'example.com', modules := '["users_module", "emails_module"]'::jsonb);
+  """
+  requestDatabase(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateUserDatabaseInput!
-  ): CreateUserDatabasePayload
+    input: RequestDatabaseInput!
+  ): RequestDatabasePayload
 
   """Creates a single `Function`."""
   createFunction(
@@ -13183,6 +13217,14 @@ type Mutation {
     input: CreateForeignKeyConstraintInput!
   ): CreateForeignKeyConstraintPayload
 
+  """Creates a single `AstMigration`."""
+  createAstMigration(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAstMigrationInput!
+  ): CreateAstMigrationPayload
+
   """Creates a single `EmbeddingChunk`."""
   createEmbeddingChunk(
     """
@@ -13198,14 +13240,6 @@ type Mutation {
     """
     input: CreateWebauthnSettingInput!
   ): CreateWebauthnSettingPayload
-
-  """Creates a single `AstMigration`."""
-  createAstMigration(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAstMigrationInput!
-  ): CreateAstMigrationPayload
 
   """Creates a single `Schema`."""
   createSchema(
@@ -14012,82 +14046,6 @@ input RejectDatabaseTransferInput {
   transferId: UUID
 }
 
-"""The output of our `provisionDatabaseWithUser` mutation."""
-type ProvisionDatabaseWithUserPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: [ProvisionDatabaseWithUserRecord]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type ProvisionDatabaseWithUserRecord {
-  outDatabaseId: UUID
-  outApiKey: String
-}
-
-"""All input for the `provisionDatabaseWithUser` mutation."""
-input ProvisionDatabaseWithUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  pDatabaseName: String
-  pDomain: String
-  pSubdomain: String
-  pModules: JSON
-  pOptions: JSON
-}
-
-"""The output of our `bootstrapUser` mutation."""
-type BootstrapUserPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: [BootstrapUserRecord]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type BootstrapUserRecord {
-  outUserId: UUID
-  outEmail: String
-  outUsername: String
-  outDisplayName: String
-  outIsAdmin: Boolean
-  outIsOwner: Boolean
-  outIsSudo: Boolean
-  outApiKey: String
-}
-
-"""All input for the `bootstrapUser` mutation."""
-input BootstrapUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  targetDatabaseId: UUID
-  password: String
-  isAdmin: Boolean
-  isOwner: Boolean
-  username: String
-  displayName: String
-  returnApiKey: Boolean
-}
-
 """The output of our `setFieldOrder` mutation."""
 type SetFieldOrderPayload {
   """
@@ -14142,14 +14100,14 @@ input ApplyRlsInput {
   name: String
 }
 
-"""The output of our `createUserDatabase` mutation."""
-type CreateUserDatabasePayload {
+"""The output of our `requestDatabase` mutation."""
+type RequestDatabasePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: UUID
+  result: DatabaseProvisionModule
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -14157,47 +14115,81 @@ type CreateUserDatabasePayload {
   query: Query
 }
 
-"""All input for the `createUserDatabase` mutation."""
-input CreateUserDatabaseInput {
+"""
+Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated.
+"""
+type DatabaseProvisionModule {
+  id: UUID!
+
+  """The name for the new database"""
+  databaseName: String!
+
+  """UUID of the user who owns this database"""
+  ownerId: UUID!
+
+  """
+  Subdomain prefix for the database. If null, auto-generated using unique_names + random chars
+  """
+  subdomain: String
+
+  """Base domain for the database (e.g., example.com)"""
+  domain: String!
+
+  """
+  JSONB array of modules to install. Each element is either a string ("users_module") or a [name, options] tuple (["permissions_module", {"scope": "app"}])
+  """
+  modules: JSON!
+
+  """Additional configuration options for provisioning"""
+  options: JSON!
+
+  """
+  When true, copies the owner user and password hash from source database to the newly provisioned database
+  """
+  bootstrapUser: Boolean!
+
+  """Current status: pending, in_progress, completed, or failed"""
+  status: String!
+  errorMessage: String
+
+  """
+  The database the owner user is copied from during bootstrap (captured from JWT context at provision time)
+  """
+  sourceDatabaseId: UUID
+
+  """
+  Status of the deferred owner bootstrap job: not_requested, pending, completed, or failed
+  """
+  bootstrapStatus: String!
+
+  """Error message from the most recent failed bootstrap attempt"""
+  bootstrapError: String
+
+  """The ID of the provisioned database (set by trigger before RLS check)"""
+  databaseId: UUID
+  createdAt: Datetime!
+  updatedAt: Datetime!
+  completedAt: Datetime
+
+  """
+  Uniform billing anchor: when the request was fulfilled with a usable database (cold provision completion or warm pool claim). Platform absorbs all provisioning compute before this point
+  """
+  fulfilledAt: Datetime
+}
+
+"""All input for the `requestDatabase` mutation."""
+input RequestDatabaseInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   databaseName: String
-  ownerId: UUID
-  includeInvites: Boolean
-  includeGroups: Boolean
-  includeLevels: Boolean
-  bitlen: Int
-  tokensExpiration: IntervalInput
-}
-
-"""
-An interval of time that has passed where the smallest distinct unit is a second.
-"""
-input IntervalInput {
-  """
-  A quantity of seconds. This is the only non-integer field, as all the other
-  fields will dump their overflow into a smaller unit of time. Intervals don’t
-  have a smaller unit than seconds.
-  """
-  seconds: Float
-
-  """A quantity of minutes."""
-  minutes: Int
-
-  """A quantity of hours."""
-  hours: Int
-
-  """A quantity of days."""
-  days: Int
-
-  """A quantity of months."""
-  months: Int
-
-  """A quantity of years."""
-  years: Int
+  domain: String
+  presetSlug: String
+  modules: JSON
+  options: JSON
+  subdomain: String
 }
 
 """The output of our create `Function` mutation."""
@@ -15097,6 +15089,7 @@ input DatabaseInput {
   name: String
   label: String
   hash: UUID
+  platform: Boolean
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -15901,6 +15894,11 @@ input PolicyInput {
   disabled: Boolean
   policyType: String
   data: JSON
+
+  """
+  Optional WITH CHECK override node {"$type": "Authz...", "data": {...}}. Only valid for UPDATE policies; NULL inherits the USING expression.
+  """
+  withCheck: JSON
   smartTags: JSON
   category: ObjectCategory
   tags: [String]
@@ -16421,6 +16419,52 @@ input ForeignKeyConstraintInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `AstMigration` mutation."""
+type CreateAstMigrationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AstMigration` that was created by this mutation."""
+  astMigration: AstMigration
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `AstMigration` mutation."""
+input CreateAstMigrationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AstMigration` to be created by this mutation."""
+  astMigration: AstMigrationInput!
+}
+
+"""An input for mutations affecting `AstMigration`"""
+input AstMigrationInput {
+  id: Int
+  databaseId: UUID
+  name: String
+  requires: [String]
+  payload: JSON
+  deploys: String
+  deploy: JSON
+  revert: JSON
+  verify: JSON
+  createdAt: Datetime
+  action: String
+  actionId: UUID
+  actorId: UUID
+}
+
 """The output of our create `EmbeddingChunk` mutation."""
 type CreateEmbeddingChunkPayload {
   """
@@ -16583,52 +16627,6 @@ input WebauthnSettingInput {
   challengeExpirySeconds: BigInt
 }
 
-"""The output of our create `AstMigration` mutation."""
-type CreateAstMigrationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AstMigration` that was created by this mutation."""
-  astMigration: AstMigration
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `AstMigration` mutation."""
-input CreateAstMigrationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AstMigration` to be created by this mutation."""
-  astMigration: AstMigrationInput!
-}
-
-"""An input for mutations affecting `AstMigration`"""
-input AstMigrationInput {
-  id: Int
-  databaseId: UUID
-  name: String
-  requires: [String]
-  payload: JSON
-  deploys: String
-  deploy: JSON
-  revert: JSON
-  verify: JSON
-  createdAt: Datetime
-  action: String
-  actionId: UUID
-  actorId: UUID
-}
-
 """The output of our create `Schema` mutation."""
 type CreateSchemaPayload {
   """
@@ -16728,6 +16726,8 @@ input FieldInput {
   isRequired: Boolean
   apiRequired: Boolean
   defaultValue: JSON
+  generationExpression: JSON
+  generationType: String
   type: JSON!
   fieldOrder: Int
   regexp: String
@@ -16792,6 +16792,11 @@ input TableInput {
   pluralName: String
   singularName: String
   tags: [String]
+
+  """
+  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
+  """
+  stepUp: JSON
   partitioned: Boolean
   partitionStrategy: String
   partitionKeyNames: [String]
@@ -17767,6 +17772,7 @@ input DatabasePatch {
   name: String
   label: String
   hash: UUID
+  platform: Boolean
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -18595,6 +18601,11 @@ input PolicyPatch {
   disabled: Boolean
   policyType: String
   data: JSON
+
+  """
+  Optional WITH CHECK override node {"$type": "Authz...", "data": {...}}. Only valid for UPDATE policies; NULL inherits the USING expression.
+  """
+  withCheck: JSON
   smartTags: JSON
   category: ObjectCategory
   tags: [String]
@@ -19452,6 +19463,8 @@ input FieldPatch {
   isRequired: Boolean
   apiRequired: Boolean
   defaultValue: JSON
+  generationExpression: JSON
+  generationType: String
   type: JSON
   fieldOrder: Int
   regexp: String
@@ -19521,6 +19534,11 @@ input TablePatch {
   pluralName: String
   singularName: String
   tags: [String]
+
+  """
+  Declarative step-up auth guard: jsonb object mapping DML verbs (INSERT, UPDATE, DELETE) to a step-up spec. Values: true (default password_or_mfa), a type string (password / mfa / password_or_mfa), or an object {type, min_age, min_age_lookup, conditions} where min_age is an interval string (e.g. 6 hours) gating the guard to rows older than that age (UPDATE/DELETE only), min_age_lookup resolves per-row windows from a lookup table, and conditions is a declarative WHEN-clause tree compiled by build_condition_expr.
+  """
+  stepUp: JSON
   partitioned: Boolean
   partitionStrategy: String
   partitionKeyNames: [String]

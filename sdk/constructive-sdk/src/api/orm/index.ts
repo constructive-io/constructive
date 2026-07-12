@@ -49,8 +49,8 @@ import { DatabaseModel } from './models/database';
 import { RlsSettingModel } from './models/rlsSetting';
 import { SqlActionModel } from './models/sqlAction';
 import { DatabaseSettingModel } from './models/databaseSetting';
-import { WebauthnSettingModel } from './models/webauthnSetting';
 import { AstMigrationModel } from './models/astMigration';
+import { WebauthnSettingModel } from './models/webauthnSetting';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -130,8 +130,8 @@ export function createClient(config: OrmClientConfig) {
     rlsSetting: new RlsSettingModel(client),
     sqlAction: new SqlActionModel(client),
     databaseSetting: new DatabaseSettingModel(client),
-    webauthnSetting: new WebauthnSettingModel(client),
     astMigration: new AstMigrationModel(client),
+    webauthnSetting: new WebauthnSettingModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

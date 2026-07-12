@@ -7,7 +7,7 @@ Execute the createOrgPrincipal mutation
 ## Usage
 
 ```bash
-csdk create-org-principal --input.clientMutationId <String> --input.name <String> --input.orgId <UUID> --input.allowedMask <BitString> --input.isReadOnly <Boolean> --input.bypassStepUp <Boolean>
+csdk create-org-principal --input.clientMutationId <String> --input.name <String> --input.orgId <UUID> --input.useAdminOwner <Boolean> --input.isReadOnly <Boolean> --input.bypassStepUp <Boolean>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk create-org-principal --input.clientMutationId <String> --input.name <String
 ### Run createOrgPrincipal
 
 ```bash
-csdk create-org-principal --input.clientMutationId <String> --input.name <String> --input.orgId <UUID> --input.allowedMask <BitString> --input.isReadOnly <Boolean> --input.bypassStepUp <Boolean>
+csdk create-org-principal --input.clientMutationId <String> --input.name <String> --input.orgId <UUID> --input.useAdminOwner <Boolean> --input.isReadOnly <Boolean> --input.bypassStepUp <Boolean>
 ```

@@ -45,6 +45,8 @@ export type AgentOrderBy =
   | 'UPDATED_AT_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'PERSONA_ID_ASC'
   | 'PERSONA_ID_DESC'
   | 'PARENT_ID_ASC'
@@ -72,6 +74,8 @@ export type AgentThreadOrderBy =
   | 'UPDATED_AT_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'STATUS_ASC'
   | 'STATUS_DESC'
   | 'IS_ARCHIVED_ASC'
@@ -111,6 +115,8 @@ export type AgentMessageOrderBy =
   | 'PARTS_DESC'
   | 'THREAD_ID_ASC'
   | 'THREAD_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'AUTHOR_ROLE_ASC'
   | 'AUTHOR_ROLE_DESC'
   | 'MODEL_ASC'
@@ -132,6 +138,8 @@ export type AgentPlanOrderBy =
   | 'OWNER_ID_DESC'
   | 'THREAD_ID_ASC'
   | 'THREAD_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'TITLE_ASC'
   | 'TITLE_DESC'
   | 'DESCRIPTION_ASC'
@@ -155,6 +163,8 @@ export type AgentTaskOrderBy =
   | 'STATUS_DESC'
   | 'PLAN_ID_ASC'
   | 'PLAN_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
   | 'SOURCE_ASC'
@@ -188,6 +198,8 @@ export type AgentPromptOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'CONTENT_ASC'
@@ -240,6 +252,8 @@ export type AgentPersonaOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC'
   | 'NAME_ASC'
@@ -269,6 +283,8 @@ export type AgentResourceOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC'
   | 'KIND_ASC'
@@ -319,6 +335,8 @@ export interface AgentFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `personaId` field. */
   personaId?: UUIDFilter;
   /** Filter by the object’s `parentId` field. */
@@ -372,6 +390,8 @@ export interface AgentPersonaFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
   /** Filter by the object’s `name` field. */
@@ -425,6 +445,8 @@ export interface AgentThreadFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `isArchived` field. */
@@ -490,6 +512,8 @@ export interface AgentPromptFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Filter by the object’s `content` field. */
@@ -539,6 +563,8 @@ export interface AgentMessageFilter {
   parts?: JSONFilter;
   /** Filter by the object’s `threadId` field. */
   threadId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `authorRole` field. */
   authorRole?: StringFilter;
   /** Filter by the object’s `model` field. */
@@ -579,6 +605,8 @@ export interface AgentPlanFilter {
   ownerId?: UUIDFilter;
   /** Filter by the object’s `threadId` field. */
   threadId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `title` field. */
   title?: StringFilter;
   /** Filter by the object’s `description` field. */
@@ -621,6 +649,8 @@ export interface AgentTaskFilter {
   status?: StringFilter;
   /** Filter by the object’s `planId` field. */
   planId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
   /** Filter by the object’s `source` field. */
@@ -707,6 +737,8 @@ export interface AgentResourceFilter {
   createdBy?: UUIDFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `slug` field. */
   slug?: StringTrgmFilter;
   /** Filter by the object’s `kind` field. */
@@ -888,6 +920,8 @@ export interface AgentPlanInput {
   ownerId?: string;
   /** Foreign key to agent_thread */
   threadId: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Human-readable plan name */
   title: string;
   /** Overall goal or context for this plan */
@@ -907,6 +941,8 @@ export interface AgentPromptInput {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
   name: string;
   /** The system prompt template content */
@@ -930,6 +966,8 @@ export interface AgentInput {
   updatedAt?: string;
   /** Human who owns/manages this agent */
   ownerId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Persona template this agent was created from */
   personaId?: string;
   /** Parent agent (for sub-agent delegation hierarchy) */
@@ -961,47 +999,14 @@ export interface AgentMessageInput {
   parts?: unknown;
   /** Foreign key to agent_thread */
   threadId: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Who authored this message: user or assistant */
   authorRole: string;
   /** LLM model that generated this response */
   model?: string;
   /** Agent that authored this message (NULL for human messages) */
   agentId?: string;
-}
-export interface CreateAgentTaskInput {
-  clientMutationId?: string;
-  /** The `AgentTask` to be created by this mutation. */
-  agentTask: AgentTaskInput;
-}
-/** An input for mutations affecting `AgentTask` */
-export interface AgentTaskInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who authored this task */
-  actorId?: string;
-  /** Current status of this task */
-  status?: string;
-  /** Foreign key to agent_plan */
-  planId: string;
-  /** Natural-language description of the work to do */
-  description: string;
-  /** Who created the task: agent or user */
-  source?: string;
-  /** Error message captured when the task failed */
-  error?: string;
-  /** Position within the plan (for ordered task lists) */
-  orderIndex?: number;
-  /** Whether this task is an approval gate requiring human decision */
-  requiresApproval?: boolean;
-  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
-  approvalStatus?: string;
-  /** User who approved or rejected this task */
-  approvedBy?: string;
-  /** Timestamp of the approval or rejection decision */
-  approvedAt?: string;
-  /** Reviewer feedback or reason for the decision */
-  approvalFeedback?: string;
 }
 export interface CreateAgentResourceChunkInput {
   clientMutationId?: string;
@@ -1021,6 +1026,43 @@ export interface AgentResourceChunkInput {
   /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
 }
+export interface CreateAgentTaskInput {
+  clientMutationId?: string;
+  /** The `AgentTask` to be created by this mutation. */
+  agentTask: AgentTaskInput;
+}
+/** An input for mutations affecting `AgentTask` */
+export interface AgentTaskInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** User who authored this task */
+  actorId?: string;
+  /** Current status of this task */
+  status?: string;
+  /** Foreign key to agent_plan */
+  planId: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Natural-language description of the work to do */
+  description: string;
+  /** Who created the task: agent or user */
+  source?: string;
+  /** Error message captured when the task failed */
+  error?: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string;
+  /** User who approved or rejected this task */
+  approvedBy?: string;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string;
+}
 export interface CreateAgentPersonaInput {
   clientMutationId?: string;
   /** The `AgentPersona` to be created by this mutation. */
@@ -1033,6 +1075,8 @@ export interface AgentPersonaInput {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Unique human-readable identifier for this persona */
   slug: string;
   /** Display name for this persona */
@@ -1060,6 +1104,8 @@ export interface AgentThreadInput {
   updatedAt?: string;
   /** User who owns this thread */
   ownerId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Current status of this thread */
   status?: string;
   /** Whether this record has been archived by the user */
@@ -1095,6 +1141,8 @@ export interface AgentResourceInput {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
   /** Unique human-readable identifier for portable references */
   slug: string;
   /** Resource type: skill, knowledge, or convention */
@@ -1135,6 +1183,8 @@ export interface AgentPlanPatch {
   ownerId?: string;
   /** Foreign key to agent_thread */
   threadId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
   /** Human-readable plan name */
   title?: string;
   /** Overall goal or context for this plan */
@@ -1155,6 +1205,8 @@ export interface AgentPromptPatch {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
   /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
   name?: string;
   /** The system prompt template content */
@@ -1179,6 +1231,8 @@ export interface AgentPatch {
   updatedAt?: string;
   /** Human who owns/manages this agent */
   ownerId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
   /** Persona template this agent was created from */
   personaId?: string;
   /** Parent agent (for sub-agent delegation hierarchy) */
@@ -1211,48 +1265,14 @@ export interface AgentMessagePatch {
   parts?: unknown;
   /** Foreign key to agent_thread */
   threadId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
   /** Who authored this message: user or assistant */
   authorRole?: string;
   /** LLM model that generated this response */
   model?: string;
   /** Agent that authored this message (NULL for human messages) */
   agentId?: string;
-}
-export interface UpdateAgentTaskInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AgentTask` being updated. */
-  agentTaskPatch: AgentTaskPatch;
-}
-/** Represents an update to a `AgentTask`. Fields that are set will be updated. */
-export interface AgentTaskPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** User who authored this task */
-  actorId?: string;
-  /** Current status of this task */
-  status?: string;
-  /** Foreign key to agent_plan */
-  planId?: string;
-  /** Natural-language description of the work to do */
-  description?: string;
-  /** Who created the task: agent or user */
-  source?: string;
-  /** Error message captured when the task failed */
-  error?: string;
-  /** Position within the plan (for ordered task lists) */
-  orderIndex?: number;
-  /** Whether this task is an approval gate requiring human decision */
-  requiresApproval?: boolean;
-  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
-  approvalStatus?: string;
-  /** User who approved or rejected this task */
-  approvedBy?: string;
-  /** Timestamp of the approval or rejection decision */
-  approvedAt?: string;
-  /** Reviewer feedback or reason for the decision */
-  approvalFeedback?: string;
 }
 export interface UpdateAgentResourceChunkInput {
   clientMutationId?: string;
@@ -1273,6 +1293,44 @@ export interface AgentResourceChunkPatch {
   /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
 }
+export interface UpdateAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AgentTask` being updated. */
+  agentTaskPatch: AgentTaskPatch;
+}
+/** Represents an update to a `AgentTask`. Fields that are set will be updated. */
+export interface AgentTaskPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** User who authored this task */
+  actorId?: string;
+  /** Current status of this task */
+  status?: string;
+  /** Foreign key to agent_plan */
+  planId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Natural-language description of the work to do */
+  description?: string;
+  /** Who created the task: agent or user */
+  source?: string;
+  /** Error message captured when the task failed */
+  error?: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string;
+  /** User who approved or rejected this task */
+  approvedBy?: string;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string;
+}
 export interface UpdateAgentPersonaInput {
   clientMutationId?: string;
   id: string;
@@ -1286,6 +1344,8 @@ export interface AgentPersonaPatch {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
   /** Unique human-readable identifier for this persona */
   slug?: string;
   /** Display name for this persona */
@@ -1314,6 +1374,8 @@ export interface AgentThreadPatch {
   updatedAt?: string;
   /** User who owns this thread */
   ownerId?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
   /** Current status of this thread */
   status?: string;
   /** Whether this record has been archived by the user */
@@ -1350,6 +1412,8 @@ export interface AgentResourcePatch {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
   /** Unique human-readable identifier for portable references */
   slug?: string;
   /** Resource type: skill, knowledge, or convention */
@@ -1391,11 +1455,11 @@ export interface DeleteAgentMessageInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAgentTaskInput {
+export interface DeleteAgentResourceChunkInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAgentResourceChunkInput {
+export interface DeleteAgentTaskInput {
   clientMutationId?: string;
   id: string;
 }
@@ -1448,17 +1512,17 @@ export interface AgentMessageConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `AgentTask` values. */
-export interface AgentTaskConnection {
-  nodes: AgentTask[];
-  edges: AgentTaskEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `AgentResourceChunk` values. */
 export interface AgentResourceChunkConnection {
   nodes: AgentResourceChunk[];
   edges: AgentResourceChunkEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentTask` values. */
+export interface AgentTaskConnection {
+  nodes: AgentTask[];
+  edges: AgentTaskEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1511,17 +1575,17 @@ export interface CreateAgentMessagePayload {
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
 }
-export interface CreateAgentTaskPayload {
-  clientMutationId?: string | null;
-  /** The `AgentTask` that was created by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
 export interface CreateAgentResourceChunkPayload {
   clientMutationId?: string | null;
   /** The `AgentResourceChunk` that was created by this mutation. */
   agentResourceChunk?: AgentResourceChunk | null;
   agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+}
+export interface CreateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was created by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
 }
 export interface CreateAgentPersonaPayload {
   clientMutationId?: string | null;
@@ -1565,17 +1629,17 @@ export interface UpdateAgentMessagePayload {
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
 }
-export interface UpdateAgentTaskPayload {
-  clientMutationId?: string | null;
-  /** The `AgentTask` that was updated by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
 export interface UpdateAgentResourceChunkPayload {
   clientMutationId?: string | null;
   /** The `AgentResourceChunk` that was updated by this mutation. */
   agentResourceChunk?: AgentResourceChunk | null;
   agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+}
+export interface UpdateAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was updated by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
 }
 export interface UpdateAgentPersonaPayload {
   clientMutationId?: string | null;
@@ -1619,17 +1683,17 @@ export interface DeleteAgentMessagePayload {
   agentMessage?: AgentMessage | null;
   agentMessageEdge?: AgentMessageEdge | null;
 }
-export interface DeleteAgentTaskPayload {
-  clientMutationId?: string | null;
-  /** The `AgentTask` that was deleted by this mutation. */
-  agentTask?: AgentTask | null;
-  agentTaskEdge?: AgentTaskEdge | null;
-}
 export interface DeleteAgentResourceChunkPayload {
   clientMutationId?: string | null;
   /** The `AgentResourceChunk` that was deleted by this mutation. */
   agentResourceChunk?: AgentResourceChunk | null;
   agentResourceChunkEdge?: AgentResourceChunkEdge | null;
+}
+export interface DeleteAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `AgentTask` that was deleted by this mutation. */
+  agentTask?: AgentTask | null;
+  agentTaskEdge?: AgentTaskEdge | null;
 }
 export interface DeleteAgentPersonaPayload {
   clientMutationId?: string | null;
@@ -1698,17 +1762,17 @@ export interface AgentMessageEdge {
   /** The `AgentMessage` at the end of the edge. */
   node?: AgentMessage | null;
 }
-/** A `AgentTask` edge in the connection. */
-export interface AgentTaskEdge {
-  cursor?: string | null;
-  /** The `AgentTask` at the end of the edge. */
-  node?: AgentTask | null;
-}
 /** A `AgentResourceChunk` edge in the connection. */
 export interface AgentResourceChunkEdge {
   cursor?: string | null;
   /** The `AgentResourceChunk` at the end of the edge. */
   node?: AgentResourceChunk | null;
+}
+/** A `AgentTask` edge in the connection. */
+export interface AgentTaskEdge {
+  cursor?: string | null;
+  /** The `AgentTask` at the end of the edge. */
+  node?: AgentTask | null;
 }
 /** A `AgentPersona` edge in the connection. */
 export interface AgentPersonaEdge {

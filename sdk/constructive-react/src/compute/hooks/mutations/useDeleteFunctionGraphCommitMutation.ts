@@ -47,7 +47,7 @@ export function useDeleteFunctionGraphCommitMutation<S extends FunctionGraphComm
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       }
     >,
     'mutationFn'
@@ -61,7 +61,7 @@ export function useDeleteFunctionGraphCommitMutation<S extends FunctionGraphComm
   Error,
   {
     id: string;
-    databaseId: string;
+    scopeId: string;
   }
 >;
 export function useDeleteFunctionGraphCommitMutation(
@@ -73,7 +73,7 @@ export function useDeleteFunctionGraphCommitMutation(
       Error,
       {
         id: string;
-        databaseId: string;
+        scopeId: string;
       }
     >,
     'mutationFn'
@@ -85,12 +85,12 @@ export function useDeleteFunctionGraphCommitMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: functionGraphCommitMutationKeys.all,
-    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
+    mutationFn: ({ id, scopeId }: { id: string; scopeId: string }) =>
       getClient()
         .functionGraphCommit.delete({
           where: {
             id,
-            databaseId,
+            scopeId,
           },
           select: args.select,
         })

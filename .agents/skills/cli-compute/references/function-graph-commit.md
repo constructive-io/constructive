@@ -12,8 +12,8 @@ csdk function-graph-commit list --where.<field>.<op> <value> --orderBy <values>
 csdk function-graph-commit list --limit 10 --after <cursor>
 csdk function-graph-commit find-first --where.<field>.<op> <value>
 csdk function-graph-commit get --id <UUID>
-csdk function-graph-commit create --databaseId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
-csdk function-graph-commit update --id <UUID> [--message <String>] [--databaseId <UUID>] [--storeId <UUID>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk function-graph-commit create --scopeId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk function-graph-commit update --id <UUID> [--message <String>] [--scopeId <UUID>] [--storeId <UUID>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
 csdk function-graph-commit delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-graph-commit list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionGraphCommit
 
 ```bash
-csdk function-graph-commit create --databaseId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk function-graph-commit create --scopeId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
 ```
 
 ### Get a functionGraphCommit by id

@@ -9,7 +9,7 @@ Named stores — one per version-controlled tree (e.g. one graph, one definition
 ```typescript
 db.functionGraphStore.findMany({ select: { id: true } }).execute()
 db.functionGraphStore.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionGraphStore.create({ data: { name: '<String>', databaseId: '<UUID>', hash: '<UUID>' }, select: { id: true } }).execute()
+db.functionGraphStore.create({ data: { name: '<String>', scopeId: '<UUID>', hash: '<UUID>' }, select: { id: true } }).execute()
 db.functionGraphStore.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
 db.functionGraphStore.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.functionGraphStore.findMany({
 
 ```typescript
 const item = await db.functionGraphStore.create({
-  data: { name: '<String>', databaseId: '<UUID>', hash: '<UUID>' },
+  data: { name: '<String>', scopeId: '<UUID>', hash: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

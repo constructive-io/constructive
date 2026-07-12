@@ -7,8 +7,8 @@ Workflow plan attached to an agent thread with ordered tasks and optional approv
 ## Usage
 
 ```typescript
-useAgentPlansQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, title: true, description: true, status: true } } })
-useAgentPlanQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, title: true, description: true, status: true } } })
+useAgentPlansQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, databaseId: true, title: true, description: true, status: true } } })
+useAgentPlanQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, databaseId: true, title: true, description: true, status: true } } })
 useCreateAgentPlanMutation({ selection: { fields: { id: true } } })
 useUpdateAgentPlanMutation({ selection: { fields: { id: true } } })
 useDeleteAgentPlanMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentPlanMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentPlansQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, title: true, description: true, status: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, threadId: true, databaseId: true, title: true, description: true, status: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentPlansQuery({
 const { mutate } = useCreateAgentPlanMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', threadId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' });
+mutate({ ownerId: '<UUID>', threadId: '<UUID>', databaseId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' });
 ```

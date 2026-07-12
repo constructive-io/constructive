@@ -7,58 +7,82 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
+  PlatformInternalSecretsDelInput,
   PlatformSecretsDelInput,
-  OrgSecretsDelInput,
+  _SecretsDelInput,
+  PlatformInternalSecretsRemoveArrayInput,
   PlatformSecretsRemoveArrayInput,
-  OrgSecretsRemoveArrayInput,
+  _SecretsRemoveArrayInput,
+  PlatformInternalSecretsRotateInput,
+  PlatformInternalSecretsSetInput,
   PlatformSecretsRotateInput,
+  _SecretsRotateInput,
   PlatformSecretsSetInput,
-  OrgSecretsRotateInput,
-  OrgSecretsSetInput,
+  _SecretsSetInput,
   ProvisionBucketInput,
+  PlatformInternalSecretsDelPayload,
   PlatformSecretsDelPayload,
-  OrgSecretsDelPayload,
+  _SecretsDelPayload,
+  PlatformInternalSecretsRemoveArrayPayload,
   PlatformSecretsRemoveArrayPayload,
-  OrgSecretsRemoveArrayPayload,
+  _SecretsRemoveArrayPayload,
+  PlatformInternalSecretsRotatePayload,
+  PlatformInternalSecretsSetPayload,
   PlatformSecretsRotatePayload,
+  _SecretsRotatePayload,
   PlatformSecretsSetPayload,
-  OrgSecretsRotatePayload,
-  OrgSecretsSetPayload,
+  _SecretsSetPayload,
   ProvisionBucketPayload,
+  PlatformInternalSecretsDelPayloadSelect,
   PlatformSecretsDelPayloadSelect,
-  OrgSecretsDelPayloadSelect,
+  _SecretsDelPayloadSelect,
+  PlatformInternalSecretsRemoveArrayPayloadSelect,
   PlatformSecretsRemoveArrayPayloadSelect,
-  OrgSecretsRemoveArrayPayloadSelect,
+  _SecretsRemoveArrayPayloadSelect,
+  PlatformInternalSecretsRotatePayloadSelect,
+  PlatformInternalSecretsSetPayloadSelect,
   PlatformSecretsRotatePayloadSelect,
+  _SecretsRotatePayloadSelect,
   PlatformSecretsSetPayloadSelect,
-  OrgSecretsRotatePayloadSelect,
-  OrgSecretsSetPayloadSelect,
+  _SecretsSetPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface PlatformInternalSecretsDelVariables {
+  input: PlatformInternalSecretsDelInput;
+}
 export interface PlatformSecretsDelVariables {
   input: PlatformSecretsDelInput;
 }
-export interface OrgSecretsDelVariables {
-  input: OrgSecretsDelInput;
+export interface _secretsDelVariables {
+  input: _SecretsDelInput;
+}
+export interface PlatformInternalSecretsRemoveArrayVariables {
+  input: PlatformInternalSecretsRemoveArrayInput;
 }
 export interface PlatformSecretsRemoveArrayVariables {
   input: PlatformSecretsRemoveArrayInput;
 }
-export interface OrgSecretsRemoveArrayVariables {
-  input: OrgSecretsRemoveArrayInput;
+export interface _secretsRemoveArrayVariables {
+  input: _SecretsRemoveArrayInput;
+}
+export interface PlatformInternalSecretsRotateVariables {
+  input: PlatformInternalSecretsRotateInput;
+}
+export interface PlatformInternalSecretsSetVariables {
+  input: PlatformInternalSecretsSetInput;
 }
 export interface PlatformSecretsRotateVariables {
   input: PlatformSecretsRotateInput;
 }
+export interface _secretsRotateVariables {
+  input: _SecretsRotateInput;
+}
 export interface PlatformSecretsSetVariables {
   input: PlatformSecretsSetInput;
 }
-export interface OrgSecretsRotateVariables {
-  input: OrgSecretsRotateInput;
-}
-export interface OrgSecretsSetVariables {
-  input: OrgSecretsSetInput;
+export interface _secretsSetVariables {
+  input: _SecretsSetInput;
 }
 /**
  * Variables for provisionBucket
@@ -72,6 +96,35 @@ export interface ProvisionBucketVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
+    platformInternalSecretsDel: <S extends PlatformInternalSecretsDelPayloadSelect>(
+      args: PlatformInternalSecretsDelVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInternalSecretsDelPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInternalSecretsDel: InferSelectResult<PlatformInternalSecretsDelPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInternalSecretsDel',
+        fieldName: 'platformInternalSecretsDel',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInternalSecretsDel',
+          'platformInternalSecretsDel',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInternalSecretsDelInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInternalSecretsDelPayload'
+        ),
+      }),
     platformSecretsDel: <S extends PlatformSecretsDelPayloadSelect>(
       args: PlatformSecretsDelVariables,
       options: {
@@ -101,33 +154,65 @@ export function createMutationOperations(client: OrmClient) {
           'PlatformSecretsDelPayload'
         ),
       }),
-    orgSecretsDel: <S extends OrgSecretsDelPayloadSelect>(
-      args: OrgSecretsDelVariables,
+    _secretsDel: <S extends _SecretsDelPayloadSelect>(
+      args: _secretsDelVariables,
       options: {
         select: S;
-      } & StrictSelect<S, OrgSecretsDelPayloadSelect>
+      } & StrictSelect<S, _SecretsDelPayloadSelect>
     ) =>
       new QueryBuilder<{
-        orgSecretsDel: InferSelectResult<OrgSecretsDelPayload, S> | null;
+        _secretsDel: InferSelectResult<_SecretsDelPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'OrgSecretsDel',
-        fieldName: 'orgSecretsDel',
+        operationName: '_secretsDel',
+        fieldName: '_secretsDel',
         ...buildCustomDocument(
           'mutation',
-          'OrgSecretsDel',
-          'orgSecretsDel',
+          '_secretsDel',
+          '_secretsDel',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'OrgSecretsDelInput!',
+              type: '_SecretsDelInput!',
             },
           ],
           connectionFieldsMap,
-          'OrgSecretsDelPayload'
+          '_SecretsDelPayload'
+        ),
+      }),
+    platformInternalSecretsRemoveArray: <S extends PlatformInternalSecretsRemoveArrayPayloadSelect>(
+      args: PlatformInternalSecretsRemoveArrayVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInternalSecretsRemoveArrayPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInternalSecretsRemoveArray: InferSelectResult<
+          PlatformInternalSecretsRemoveArrayPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInternalSecretsRemoveArray',
+        fieldName: 'platformInternalSecretsRemoveArray',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInternalSecretsRemoveArray',
+          'platformInternalSecretsRemoveArray',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInternalSecretsRemoveArrayInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInternalSecretsRemoveArrayPayload'
         ),
       }),
     platformSecretsRemoveArray: <S extends PlatformSecretsRemoveArrayPayloadSelect>(
@@ -159,33 +244,94 @@ export function createMutationOperations(client: OrmClient) {
           'PlatformSecretsRemoveArrayPayload'
         ),
       }),
-    orgSecretsRemoveArray: <S extends OrgSecretsRemoveArrayPayloadSelect>(
-      args: OrgSecretsRemoveArrayVariables,
+    _secretsRemoveArray: <S extends _SecretsRemoveArrayPayloadSelect>(
+      args: _secretsRemoveArrayVariables,
       options: {
         select: S;
-      } & StrictSelect<S, OrgSecretsRemoveArrayPayloadSelect>
+      } & StrictSelect<S, _SecretsRemoveArrayPayloadSelect>
     ) =>
       new QueryBuilder<{
-        orgSecretsRemoveArray: InferSelectResult<OrgSecretsRemoveArrayPayload, S> | null;
+        _secretsRemoveArray: InferSelectResult<_SecretsRemoveArrayPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'OrgSecretsRemoveArray',
-        fieldName: 'orgSecretsRemoveArray',
+        operationName: '_secretsRemoveArray',
+        fieldName: '_secretsRemoveArray',
         ...buildCustomDocument(
           'mutation',
-          'OrgSecretsRemoveArray',
-          'orgSecretsRemoveArray',
+          '_secretsRemoveArray',
+          '_secretsRemoveArray',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'OrgSecretsRemoveArrayInput!',
+              type: '_SecretsRemoveArrayInput!',
             },
           ],
           connectionFieldsMap,
-          'OrgSecretsRemoveArrayPayload'
+          '_SecretsRemoveArrayPayload'
+        ),
+      }),
+    platformInternalSecretsRotate: <S extends PlatformInternalSecretsRotatePayloadSelect>(
+      args: PlatformInternalSecretsRotateVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInternalSecretsRotatePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInternalSecretsRotate: InferSelectResult<
+          PlatformInternalSecretsRotatePayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInternalSecretsRotate',
+        fieldName: 'platformInternalSecretsRotate',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInternalSecretsRotate',
+          'platformInternalSecretsRotate',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInternalSecretsRotateInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInternalSecretsRotatePayload'
+        ),
+      }),
+    platformInternalSecretsSet: <S extends PlatformInternalSecretsSetPayloadSelect>(
+      args: PlatformInternalSecretsSetVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInternalSecretsSetPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInternalSecretsSet: InferSelectResult<PlatformInternalSecretsSetPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInternalSecretsSet',
+        fieldName: 'platformInternalSecretsSet',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInternalSecretsSet',
+          'platformInternalSecretsSet',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInternalSecretsSetInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInternalSecretsSetPayload'
         ),
       }),
     platformSecretsRotate: <S extends PlatformSecretsRotatePayloadSelect>(
@@ -217,6 +363,35 @@ export function createMutationOperations(client: OrmClient) {
           'PlatformSecretsRotatePayload'
         ),
       }),
+    _secretsRotate: <S extends _SecretsRotatePayloadSelect>(
+      args: _secretsRotateVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, _SecretsRotatePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        _secretsRotate: InferSelectResult<_SecretsRotatePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: '_secretsRotate',
+        fieldName: '_secretsRotate',
+        ...buildCustomDocument(
+          'mutation',
+          '_secretsRotate',
+          '_secretsRotate',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: '_SecretsRotateInput!',
+            },
+          ],
+          connectionFieldsMap,
+          '_SecretsRotatePayload'
+        ),
+      }),
     platformSecretsSet: <S extends PlatformSecretsSetPayloadSelect>(
       args: PlatformSecretsSetVariables,
       options: {
@@ -246,62 +421,33 @@ export function createMutationOperations(client: OrmClient) {
           'PlatformSecretsSetPayload'
         ),
       }),
-    orgSecretsRotate: <S extends OrgSecretsRotatePayloadSelect>(
-      args: OrgSecretsRotateVariables,
+    _secretsSet: <S extends _SecretsSetPayloadSelect>(
+      args: _secretsSetVariables,
       options: {
         select: S;
-      } & StrictSelect<S, OrgSecretsRotatePayloadSelect>
+      } & StrictSelect<S, _SecretsSetPayloadSelect>
     ) =>
       new QueryBuilder<{
-        orgSecretsRotate: InferSelectResult<OrgSecretsRotatePayload, S> | null;
+        _secretsSet: InferSelectResult<_SecretsSetPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'OrgSecretsRotate',
-        fieldName: 'orgSecretsRotate',
+        operationName: '_secretsSet',
+        fieldName: '_secretsSet',
         ...buildCustomDocument(
           'mutation',
-          'OrgSecretsRotate',
-          'orgSecretsRotate',
+          '_secretsSet',
+          '_secretsSet',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'OrgSecretsRotateInput!',
+              type: '_SecretsSetInput!',
             },
           ],
           connectionFieldsMap,
-          'OrgSecretsRotatePayload'
-        ),
-      }),
-    orgSecretsSet: <S extends OrgSecretsSetPayloadSelect>(
-      args: OrgSecretsSetVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, OrgSecretsSetPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        orgSecretsSet: InferSelectResult<OrgSecretsSetPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'OrgSecretsSet',
-        fieldName: 'orgSecretsSet',
-        ...buildCustomDocument(
-          'mutation',
-          'OrgSecretsSet',
-          'orgSecretsSet',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'OrgSecretsSetInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'OrgSecretsSetPayload'
+          '_SecretsSetPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

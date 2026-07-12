@@ -9,7 +9,7 @@ Per-scope permission overrides for principals. No row = full access; row exists 
 ```typescript
 db.principalScopeOverride.findMany({ select: { id: true } }).execute()
 db.principalScopeOverride.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.principalScopeOverride.create({ data: { principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', isAdmin: '<Boolean>', isReadOnly: '<Boolean>' }, select: { id: true } }).execute()
+db.principalScopeOverride.create({ data: { principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', useAdminOwner: '<Boolean>', isActive: '<Boolean>', isReadOnly: '<Boolean>' }, select: { id: true } }).execute()
 db.principalScopeOverride.update({ where: { id: '<UUID>' }, data: { principalId: '<UUID>' }, select: { id: true } }).execute()
 db.principalScopeOverride.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.principalScopeOverride.findMany({
 
 ```typescript
 const item = await db.principalScopeOverride.create({
-  data: { principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', isAdmin: '<Boolean>', isReadOnly: '<Boolean>' },
+  data: { principalId: '<UUID>', membershipType: '<Int>', allowedMask: '<BitString>', useAdminOwner: '<Boolean>', isActive: '<Boolean>', isReadOnly: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```
