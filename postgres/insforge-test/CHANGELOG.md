@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.7](https://github.com/constructive-io/constructive/compare/insforge-test@0.4.6...insforge-test@0.4.7) (2026-07-12)
+
+**Note:** Version bump only for package insforge-test
+
 ## [0.4.6](https://github.com/constructive-io/constructive/compare/insforge-test@0.4.5...insforge-test@0.4.6) (2026-07-11)
 
 **Note:** Version bump only for package insforge-test
