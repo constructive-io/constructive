@@ -326,6 +326,7 @@ export const exportGraphQLMeta = async ({
     queryAndParse('billing_provider_module'),
     queryAndParse('devices_module'),
     queryAndParse('identity_providers_module'),
+    queryAndParse('integration_providers_module'),
     queryAndParse('notifications_module'),
     queryAndParse('plans_module'),
     queryAndParse('realtime_module'),

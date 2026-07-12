@@ -255,6 +255,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('billing_provider_module', `SELECT * FROM metaschema_modules_public.billing_provider_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('devices_module', `SELECT * FROM metaschema_modules_public.devices_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('identity_providers_module', `SELECT * FROM metaschema_modules_public.identity_providers_module WHERE database_id = $1 ORDER BY id`);
+  await queryAndParse('integration_providers_module', `SELECT * FROM metaschema_modules_public.integration_providers_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('notifications_module', `SELECT * FROM metaschema_modules_public.notifications_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('plans_module', `SELECT * FROM metaschema_modules_public.plans_module WHERE database_id = $1 ORDER BY id`);
   await queryAndParse('realtime_module', `SELECT * FROM metaschema_modules_public.realtime_module WHERE database_id = $1 ORDER BY id`);
