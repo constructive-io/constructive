@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.28.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.27.0...@pgpmjs/export@0.28.0) (2026-07-12)
+
+### Features
+
+- **export:** drive meta export table list from generated manifest ([fcbec38](https://github.com/constructive-io/constructive/commit/fcbec38527b2d47ebdd9460f1b664acb2a49a6a8))
+
 # [0.27.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.26.8...@pgpmjs/export@0.27.0) (2026-07-12)
 
 ### Features
