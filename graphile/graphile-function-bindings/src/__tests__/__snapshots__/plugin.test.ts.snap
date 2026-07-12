@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`function bindings plugin derives a typed input (enum + required) from a config JSON Schema 1`] = `
+{
+  "inputFields": [
+    {
+      "name": "clientMutationId",
+      "type": {
+        "kind": "SCALAR",
+        "name": "String",
+        "ofType": null,
+      },
+    },
+    {
+      "name": "mode",
+      "type": {
+        "kind": "NON_NULL",
+        "name": null,
+        "ofType": {
+          "kind": "ENUM",
+          "name": "ValidateOrderModeEnum",
+        },
+      },
+    },
+    {
+      "name": "count",
+      "type": {
+        "kind": "SCALAR",
+        "name": "Int",
+        "ofType": null,
+      },
+    },
+  ],
+  "name": "ValidateOrderInput",
+}
+`;
+
+exports[`function bindings plugin derives a typed input from payload_args 1`] = `
+{
+  "inputFields": [
+    {
+      "name": "clientMutationId",
+      "type": {
+        "kind": "SCALAR",
+        "name": "String",
+        "ofType": null,
+      },
+    },
+    {
+      "name": "url",
+      "type": {
+        "kind": "SCALAR",
+        "name": "String",
+        "ofType": null,
+      },
+    },
+    {
+      "name": "width",
+      "type": {
+        "kind": "SCALAR",
+        "name": "Int",
+        "ofType": null,
+      },
+    },
+  ],
+  "name": "ResizeImageInput",
+}
+`;

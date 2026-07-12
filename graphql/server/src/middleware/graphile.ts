@@ -6,6 +6,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
+import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
@@ -208,10 +209,14 @@ const buildPreset = (
   anonRole: string,
   roleName: string,
   databaseSettings?: DatabaseSettings,
+  apiId?: string,
 ): GraphileConfig.Preset => {
   return {
   extends: [createConstructivePreset(databaseSettings)],
-  plugins: [AuthCookiePlugin],
+  plugins: [
+    AuthCookiePlugin,
+    ...(apiId ? [createFunctionBindingsPlugin({ apiId })] : []),
+  ],
   pgServices: [
     makePgService({
       pool,
@@ -386,7 +391,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings);
+      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId);
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,
