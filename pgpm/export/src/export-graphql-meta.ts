@@ -8,7 +8,7 @@
 import { Parser } from 'csv-to-pg';
 import { toSnakeCase } from 'inflekt';
 
-import { FieldType, META_TABLE_CONFIG, TableConfig } from './export-utils';
+import { FieldType, META_TABLE_CONFIG, META_TABLE_ORDER, TableConfig } from './export-utils';
 import { GraphQLClient } from './graphql-client';
 import {
   buildFieldsFragment,
@@ -244,114 +244,17 @@ export const exportGraphQLMeta = async ({
 
   // Batch queries by schema group — independent HTTP requests run in parallel
   // within each group for significant speedup over sequential awaits.
-
-  // metaschema_public tables
-  await Promise.all([
-    queryAndParse('database'),
-    queryAndParse('schema'),
-    queryAndParse('function'),
-    queryAndParse('spatial_relation'),
-    queryAndParse('table'),
-    queryAndParse('field'),
-    queryAndParse('policy'),
-    queryAndParse('index'),
-    queryAndParse('trigger'),
-    queryAndParse('trigger_function'),
-    queryAndParse('rls_function'),
-    queryAndParse('foreign_key_constraint'),
-    queryAndParse('primary_key_constraint'),
-    queryAndParse('unique_constraint'),
-    queryAndParse('check_constraint'),
-    queryAndParse('full_text_search'),
-    queryAndParse('schema_grant'),
-    queryAndParse('table_grant'),
-    queryAndParse('default_privilege')
-  ]);
-
-  // services_public tables
-  await Promise.all([
-    queryAndParse('domains'),
-    queryAndParse('sites'),
-    queryAndParse('apis'),
-    queryAndParse('apps'),
-    queryAndParse('site_modules'),
-    queryAndParse('site_themes'),
-    queryAndParse('site_metadata'),
-    queryAndParse('api_modules'),
-    queryAndParse('api_extensions'),
-    queryAndParse('api_schemas'),
-    queryAndParse('database_settings'),
-    queryAndParse('api_settings'),
-    queryAndParse('rls_settings'),
-    queryAndParse('cors_settings'),
-    queryAndParse('pubkey_settings'),
-    queryAndParse('webauthn_settings')
-  ]);
-
-  // metaschema_modules_public tables
-  await Promise.all([
-    queryAndParse('rls_module'),
-    queryAndParse('user_auth_module'),
-    queryAndParse('memberships_module'),
-    queryAndParse('permissions_module'),
-    queryAndParse('limits_module'),
-    queryAndParse('levels_module'),
-    queryAndParse('events_module'),
-    queryAndParse('users_module'),
-    queryAndParse('hierarchy_module'),
-    queryAndParse('membership_types_module'),
-    queryAndParse('invites_module'),
-    queryAndParse('emails_module'),
-    queryAndParse('sessions_module'),
-    queryAndParse('user_state_module'),
-    queryAndParse('profiles_module'),
-    queryAndParse('config_secrets_user_module'),
-    queryAndParse('user_credentials_module'),
-    queryAndParse('user_settings_module'),
-    queryAndParse('connected_accounts_module'),
-    queryAndParse('phone_numbers_module'),
-    queryAndParse('crypto_addresses_module'),
-    queryAndParse('crypto_auth_module'),
-    queryAndParse('field_module'),
-    queryAndParse('table_module'),
-    queryAndParse('secure_table_provision'),
-    queryAndParse('uuid_module'),
-    queryAndParse('default_ids_module'),
-    queryAndParse('denormalized_table_field'),
-    queryAndParse('relation_provision'),
-    queryAndParse('entity_type_provision'),
-    queryAndParse('rate_limits_module'),
-    queryAndParse('storage_module'),
-    queryAndParse('billing_module'),
-    queryAndParse('billing_provider_module'),
-    queryAndParse('devices_module'),
-    queryAndParse('identity_providers_module'),
-    queryAndParse('integration_providers_module'),
-    queryAndParse('notifications_module'),
-    queryAndParse('plans_module'),
-    queryAndParse('realtime_module'),
-    queryAndParse('session_secrets_module'),
-    queryAndParse('infra_secrets_module'),
-    queryAndParse('infra_config_module'),
-    queryAndParse('internal_secrets_module'),
-    queryAndParse('i18n_module'),
-    queryAndParse('agent_module'),
-    queryAndParse('function_module'),
-    queryAndParse('namespace_module'),
-    queryAndParse('merkle_store_module'),
-    queryAndParse('graph_module'),
-    queryAndParse('graph_execution_module'),
-    queryAndParse('function_deployment_module'),
-    queryAndParse('function_invocation_module'),
-    queryAndParse('compute_log_module'),
-    queryAndParse('db_usage_module'),
-    queryAndParse('storage_log_module'),
-    queryAndParse('transfer_log_module'),
-    queryAndParse('webauthn_auth_module'),
-    queryAndParse('webauthn_credentials_module'),
-    queryAndParse('inference_log_module'),
-    queryAndParse('rate_limit_meters_module')
-  ]);
+  // Tables come from the generated manifest (see export-utils.ts); groups run
+  // sequentially in manifest schema order.
+  const keysBySchema = new Map<string, string[]>();
+  for (const key of META_TABLE_ORDER) {
+    const schema = META_TABLE_CONFIG[key].schema;
+    if (!keysBySchema.has(schema)) keysBySchema.set(schema, []);
+    keysBySchema.get(schema).push(key);
+  }
+  for (const keys of keysBySchema.values()) {
+    await Promise.all(keys.map(key => queryAndParse(key)));
+  }
 
   return sql;
 };

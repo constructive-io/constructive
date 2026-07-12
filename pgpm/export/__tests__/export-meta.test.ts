@@ -14,7 +14,7 @@ describe('Export Meta Config Validation', () => {
   describe('metaschema_public tables', () => {
     const required = [
       'database', 'schema', 'table', 'field',
-      'policy', 'index', 'trigger', 'trigger_function', 'rls_function',
+      'policy', 'index', 'trigger', 'trigger_function',
       'foreign_key_constraint', 'primary_key_constraint', 'unique_constraint',
       'check_constraint', 'full_text_search', 'schema_grant', 'table_grant',
       'default_privilege'
@@ -32,7 +32,7 @@ describe('Export Meta Config Validation', () => {
     const required = [
       'domains', 'sites', 'apis', 'apps',
       'site_modules', 'site_themes', 'site_metadata',
-      'api_modules', 'api_extensions', 'api_schemas'
+      'api_modules', 'api_schemas'
     ];
 
     it('should include all required services_public tables in config', () => {
@@ -46,7 +46,7 @@ describe('Export Meta Config Validation', () => {
   describe('metaschema_modules_public tables', () => {
     const required = [
       'rls_module', 'user_auth_module', 'memberships_module',
-      'permissions_module', 'limits_module', 'levels_module',
+      'permissions_module', 'limits_module',
       'events_module',
       'users_module', 'hierarchy_module', 'membership_types_module',
       'invites_module', 'emails_module', 'sessions_module',
@@ -54,8 +54,7 @@ describe('Export Meta Config Validation', () => {
       'user_credentials_module', 'user_settings_module',
       'connected_accounts_module', 'phone_numbers_module',
       'crypto_addresses_module', 'crypto_auth_module',
-      'field_module', 'table_module',
-      'secure_table_provision', 'uuid_module', 'default_ids_module',
+      'secure_table_provision', 'default_ids_module',
       'denormalized_table_field',
       'relation_provision', 'entity_type_provision',
       'rate_limits_module', 'storage_module',

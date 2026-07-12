@@ -11,6 +11,7 @@ export {
   META_COMMON_FOOTER,
   META_TABLE_ORDER,
   META_TABLE_CONFIG,
+  META_TABLE_OVERRIDES,
   mapPgTypeToFieldType,
   makeReplacer,
   preparePackage,
@@ -21,6 +22,7 @@ export {
 export type {
   FieldType,
   TableConfig,
+  MetaExportTableEntry,
   Schema,
   MakeReplacerOptions,
   ReplacerResult,
