@@ -39,7 +39,9 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "@pgpmjs/logger": "workspace:^"
+    "@pgpmjs/logger": "workspace:^",
+    "inflekt": "^0.7.1",
+    "pg": "^8.21.0"
   },
   "peerDependencies": {
     "@dataplan/pg": "1.0.3",
@@ -54,7 +56,6 @@
     "@types/pg": "^8.20.0",
     "graphile-test": "workspace:^",
     "makage": "^0.3.0",
-    "pg": "^8.21.0",
     "pgsql-test": "workspace:^"
   }
 }

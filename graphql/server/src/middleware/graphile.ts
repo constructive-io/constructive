@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { getNodeEnv } from '@pgpmjs/env';
+import type { ComputeConfig } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
@@ -210,12 +211,27 @@ const buildPreset = (
   roleName: string,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
+  compute?: ComputeConfig,
 ): GraphileConfig.Preset => {
   return {
   extends: [createConstructivePreset(databaseSettings)],
   plugins: [
     AuthCookiePlugin,
-    ...(apiId ? [createFunctionBindingsPlugin({ apiId })] : []),
+    ...(apiId
+      ? [
+        createFunctionBindingsPlugin({
+          apiId,
+          // Metaschema-resolved names from the express-context compute
+          // module loader; the plugin falls back to schema discovery
+          // when the compute module is not provisioned.
+          computeSchema: compute?.schemaName,
+          bindingsTable: compute?.bindingsTableName,
+          definitionsTable: compute?.definitionsTableName,
+          invocationsSchema: compute?.invocationsSchemaName,
+          invocationsTable: compute?.invocationsTableName,
+        }),
+      ]
+      : []),
   ],
   pgServices: [
     makePgService({
@@ -391,7 +407,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId);
+      const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
+      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

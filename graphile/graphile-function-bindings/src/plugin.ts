@@ -32,6 +32,8 @@ import { withPgClientFromPgService } from '@dataplan/pg';
 import { Logger } from '@pgpmjs/logger';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { toCamelCase, toConstantCase, toPascalCase } from 'inflekt';
+import { escapeIdentifier } from 'pg';
 
 import type { DerivedField, DerivedInput } from './derive';
 import { buildInvocationPayload, deriveInputFields, isGraphqlEnabled } from './derive';
@@ -53,6 +55,8 @@ declare global {
 
 interface FunctionBindingsBuildInput {
   schemaName: string;
+  invocationsSchemaName: string;
+  invocationsTableName: string;
   bindings: FunctionBindingRow[];
 }
 
@@ -62,39 +66,12 @@ const INVOCATIONS_TABLE = 'function_invocations';
 
 const IDENT_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
-function camelCase(value: string): string {
-  const parts = value.split(/[^a-zA-Z0-9]+/).filter(Boolean);
-  if (parts.length === 0) return value;
-  return (
-    parts[0].charAt(0).toLowerCase() +
-    parts[0].slice(1) +
-    parts
-      .slice(1)
-      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-      .join('')
-  );
-}
-
-function pascalCase(value: string): string {
-  const camel = camelCase(value);
-  return camel.charAt(0).toUpperCase() + camel.slice(1);
-}
-
-function constantCase(value: string): string {
-  return value
-    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
-    .replace(/[^a-zA-Z0-9]+/g, '_')
-    .toUpperCase();
-}
-
-function quoteIdent(ident: string): string {
-  return `"${ident.replace(/"/g, '""')}"`;
-}
-
 async function loadBindings(
   pgService: GraphileConfig.PgServiceConfiguration,
   options: FunctionBindingsPluginOptions
 ): Promise<FunctionBindingsBuildInput | null> {
+  const bindingsTable = options.bindingsTable ?? BINDINGS_TABLE;
+  const definitionsTable = options.definitionsTable ?? DEFINITIONS_TABLE;
   return withPgClientFromPgService(pgService, null, async (client) => {
     let schemaName = options.computeSchema;
     if (!schemaName) {
@@ -107,7 +84,7 @@ async function loadBindings(
           WHERE c.relname = $1 AND c.relkind IN ('r', 'p') AND n.nspname = ANY($2)
           LIMIT 1
         `,
-        values: [BINDINGS_TABLE, schemas]
+        values: [bindingsTable, schemas]
       });
       schemaName = rows[0]?.nspname;
     }
@@ -129,8 +106,8 @@ async function loadBindings(
       text: `
         SELECT b.id, b.alias, b.config, b.function_definition_id,
                d.task_identifier, d.database_id, d.description, d.payload_args
-        FROM ${quoteIdent(schemaName)}.${BINDINGS_TABLE} b
-        JOIN ${quoteIdent(schemaName)}.${DEFINITIONS_TABLE} d
+        FROM ${escapeIdentifier(schemaName)}.${escapeIdentifier(bindingsTable)} b
+        JOIN ${escapeIdentifier(schemaName)}.${escapeIdentifier(definitionsTable)} d
           ON d.id = b.function_definition_id
         WHERE b.api_id = $1
         ORDER BY b.alias
@@ -151,7 +128,12 @@ async function loadBindings(
         payloadArgs: row.payload_args
       }));
 
-    return { schemaName, bindings };
+    return {
+      schemaName,
+      invocationsSchemaName: options.invocationsSchema ?? schemaName,
+      invocationsTableName: options.invocationsTable ?? INVOCATIONS_TABLE,
+      bindings
+    };
   });
 }
 
@@ -219,8 +201,8 @@ export function createFunctionBindingsPlugin(
             (build.input.pgRegistry?.pgResources ?? {}) as Record<string, any>
           ).find(
             (resource: any) =>
-              resource?.codec?.extensions?.pg?.name === INVOCATIONS_TABLE &&
-              resource?.codec?.extensions?.pg?.schemaName === loaded.schemaName &&
+              resource?.codec?.extensions?.pg?.name === loaded.invocationsTableName &&
+              resource?.codec?.extensions?.pg?.schemaName === loaded.invocationsSchemaName &&
               !resource.parameters
           );
           const invocationType = invocationsResource
@@ -232,12 +214,12 @@ export function createFunctionBindingsPlugin(
           const newFields: Record<string, any> = {};
 
           for (const binding of loaded.bindings) {
-            if (!IDENT_RE.test(camelCase(binding.alias))) {
+            if (!IDENT_RE.test(toCamelCase(binding.alias))) {
               log.warn(`Skipping binding "${binding.alias}": alias is not a valid GraphQL name`);
               continue;
             }
-            const fieldName = camelCase(binding.alias);
-            const typePrefix = pascalCase(binding.alias);
+            const fieldName = toCamelCase(binding.alias);
+            const typePrefix = toPascalCase(binding.alias);
             if (fields[fieldName] || newFields[fieldName]) {
               log.warn(`Skipping binding "${binding.alias}": mutation field "${fieldName}" already exists`);
               continue;
@@ -249,9 +231,9 @@ export function createFunctionBindingsPlugin(
               let type: import('graphql').GraphQLInputType;
               if (field.enumValues) {
                 type = new GraphQLEnumType({
-                  name: `${typePrefix}${pascalCase(field.name)}Enum`,
+                  name: `${typePrefix}${toPascalCase(field.name)}Enum`,
                   values: Object.fromEntries(
-                    field.enumValues.map((v) => [constantCase(v), { value: v }])
+                    field.enumValues.map((v) => [toConstantCase(v), { value: v }])
                   )
                 });
               } else {
@@ -281,7 +263,8 @@ export function createFunctionBindingsPlugin(
 
             const capturedBinding = binding;
             const capturedDerived = derived;
-            const capturedSchema = loaded.schemaName;
+            const capturedInvocationsSchema = loaded.invocationsSchemaName;
+            const capturedInvocationsTable = loaded.invocationsTableName;
             const capturedResource = invocationsResource;
 
             const PayloadType = new GraphQLObjectType({
@@ -346,7 +329,7 @@ export function createFunctionBindingsPlugin(
                     return withPgClient(pgSettings, async (pgClient: any) => {
                       const { rows } = await pgClient.query({
                         text: `
-                          INSERT INTO ${quoteIdent(capturedSchema)}.${INVOCATIONS_TABLE}
+                          INSERT INTO ${escapeIdentifier(capturedInvocationsSchema)}.${escapeIdentifier(capturedInvocationsTable)}
                             (database_id, task_identifier, payload)
                           VALUES (
                             COALESCE(

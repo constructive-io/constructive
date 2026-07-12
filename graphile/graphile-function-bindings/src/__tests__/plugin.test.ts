@@ -1,8 +1,8 @@
 /**
  * Integration tests for the function bindings plugin.
  *
- * Uses graphile-test with a real PostgreSQL database seeded with minimal
- * compute tables (see setup.sql) to verify:
+ * Uses graphile-test with a real PostgreSQL database seeded with the shared
+ * compute fixtures (__fixtures__/seed/{services,compute}) to verify:
  * - one mutation per graphql-enabled binding for the configured api
  * - graphql-disabled bindings and other-api bindings are not exposed
  * - payload_args-derived and JSON-Schema-derived input types
@@ -16,7 +16,18 @@ import { join } from 'path';
 
 import { createFunctionBindingsPlugin } from '../plugin';
 
-const API_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+// The "app" API from the shared services fixture
+const API_ID = '6c9997a4-591b-4cb3-9313-4ef45d6f134e';
+
+const sharedSeedRoot = join(__dirname, '..', '..', '..', '..', '__fixtures__', 'seed');
+const shared = (...segments: string[]) => join(sharedSeedRoot, ...segments);
+
+const seedFiles = [
+  shared('services', 'setup.sql'),
+  shared('compute', 'setup.sql'),
+  shared('services', 'test-data.sql'),
+  shared('compute', 'test-data.sql')
+];
 
 type QueryFn = <TResult = unknown>(
   query: string,
@@ -57,12 +68,12 @@ describe('function bindings plugin', () => {
 
     const connections = await (getConnections as any)(
       {
-        schemas: ['fn_test'],
+        schemas: ['compute_public'],
         preset: { plugins: [plugin] },
         useRoot: true,
         authRole: 'postgres'
       },
-      [seed.sqlfile([join(__dirname, './setup.sql')])]
+      [seed.sqlfile(seedFiles)]
     );
 
     pg = connections.pg;
@@ -80,7 +91,7 @@ describe('function bindings plugin', () => {
     `);
     expect(result.errors).toBeUndefined();
     const names = result.data!.__schema.mutationType.fields.map((f) => f.name);
-    expect(names).toContain('resizeImage');
+    expect(names).toContain('resize');
     expect(names).toContain('sendEmail');
     expect(names).toContain('validateOrder');
   });
@@ -104,7 +115,7 @@ describe('function bindings plugin', () => {
   it('derives a typed input from payload_args', async () => {
     const result = await query<InputTypeResult>(`
       {
-        __type(name: "ResizeImageInput") {
+        __type(name: "ResizeInput") {
           name
           inputFields {
             name
@@ -155,11 +166,11 @@ describe('function bindings plugin', () => {
 
   it('inserts a function invocation row on mutation', async () => {
     const result = await query<{
-      resizeImage: { invocationId: string; status: string; clientMutationId: string | null };
+      resize: { invocationId: string; status: string; clientMutationId: string | null };
     }>(
       `
-        mutation ($input: ResizeImageInput!) {
-          resizeImage(input: $input) {
+        mutation ($input: ResizeInput!) {
+          resize(input: $input) {
             clientMutationId
             invocationId
             status
@@ -169,17 +180,17 @@ describe('function bindings plugin', () => {
       { input: { url: 'https://example.com/a.png', width: 640, clientMutationId: 'cm1' } }
     );
     expect(result.errors).toBeUndefined();
-    const payload = result.data!.resizeImage;
+    const payload = result.data!.resize;
     expect(payload.status).toBe('pending');
     expect(payload.clientMutationId).toBe('cm1');
     expect(payload.invocationId).toBeTruthy();
 
     const { rows } = await pg.query(
-      `SELECT task_identifier, payload, status FROM fn_test.function_invocations WHERE id = $1`,
+      `SELECT task_identifier, payload, status FROM compute_public.function_invocations WHERE id = $1`,
       [payload.invocationId]
     );
     expect(rows).toHaveLength(1);
-    expect(rows[0].task_identifier).toBe('images:resize');
+    expect(rows[0].task_identifier).toBe('app/resize_image');
     expect(rows[0].status).toBe('pending');
     expect(rows[0].payload).toEqual({ url: 'https://example.com/a.png', width: 640 });
   });
@@ -202,24 +213,24 @@ describe('function bindings plugin', () => {
     const payload = result.data!.sendEmail;
 
     const { rows } = await pg.query(
-      `SELECT task_identifier, payload FROM fn_test.function_invocations WHERE id = $1`,
+      `SELECT task_identifier, payload FROM compute_public.function_invocations WHERE id = $1`,
       [payload.invocationId]
     );
     expect(rows).toHaveLength(1);
-    expect(rows[0].task_identifier).toBe('emails:send');
+    expect(rows[0].task_identifier).toBe('app/send_email');
     expect(rows[0].payload).toEqual({ to: 'a@b.c', subject: 'hi' });
   });
 
   it('returns the created invocation via the FunctionInvocation type', async () => {
     const result = await query<{
-      resizeImage: {
+      resize: {
         invocationId: string;
         invocation: { rowId: string; status: string; taskIdentifier: string } | null;
       };
     }>(
       `
-        mutation ($input: ResizeImageInput!) {
-          resizeImage(input: $input) {
+        mutation ($input: ResizeInput!) {
+          resize(input: $input) {
             invocationId
             invocation {
               rowId
@@ -232,10 +243,10 @@ describe('function bindings plugin', () => {
       { input: { url: 'https://example.com/b.png' } }
     );
     expect(result.errors).toBeUndefined();
-    const payload = result.data!.resizeImage;
+    const payload = result.data!.resize;
     expect(payload.invocation).not.toBeNull();
     expect(payload.invocation!.rowId).toBe(payload.invocationId);
     expect(payload.invocation!.status).toBe('pending');
-    expect(payload.invocation!.taskIdentifier).toBe('images:resize');
+    expect(payload.invocation!.taskIdentifier).toBe('app/resize_image');
   });
 });

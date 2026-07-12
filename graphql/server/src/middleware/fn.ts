@@ -19,6 +19,7 @@
 
 import { Logger } from '@pgpmjs/logger';
 import express, { Request, Response, Router } from 'express';
+import { escapeIdentifier } from 'pg';
 
 const log = new Logger('fn');
 
@@ -50,9 +51,6 @@ interface InvocationRow {
   duration_ms: number | null;
 }
 
-/** Quote a trusted (metaschema-resolved) identifier for SQL interpolation. */
-const ident = (name: string): string => `"${name.replace(/"/g, '""')}"`;
-
 const notFound = (res: Response): void => {
   res.status(404).json({ error: 'Not found' });
 };
@@ -77,8 +75,8 @@ async function handleInvoke(req: Request, res: Response): Promise<void> {
     const binding = await ctx.withPgClient(async (client) => {
       const { rows } = await client.query<BindingRow>(
         `SELECT b.config, d.task_identifier, d.database_id
-         FROM ${ident(schemaName)}.${ident(bindingsTableName)} b
-         JOIN ${ident(schemaName)}.${ident(definitionsTableName)} d ON d.id = b.function_definition_id
+         FROM ${escapeIdentifier(schemaName)}.${escapeIdentifier(bindingsTableName)} b
+         JOIN ${escapeIdentifier(schemaName)}.${escapeIdentifier(definitionsTableName)} d ON d.id = b.function_definition_id
          WHERE b.api_id = $1 AND b.alias = $2`,
         [ctx.api.apiId, alias]
       );
@@ -105,7 +103,7 @@ async function handleInvoke(req: Request, res: Response): Promise<void> {
 
     const invocationId = await ctx.withPgClient(async (client) => {
       const { rows } = await client.query<{ id: string }>(
-        `INSERT INTO ${ident(compute.invocationsSchemaName)}.${ident(compute.invocationsTableName)}
+        `INSERT INTO ${escapeIdentifier(compute.invocationsSchemaName)}.${escapeIdentifier(compute.invocationsTableName)}
          (database_id, task_identifier, payload)
          VALUES ($1, $2, $3::jsonb)
          RETURNING id`,
@@ -149,7 +147,7 @@ async function handleGetInvocation(req: Request, res: Response): Promise<void> {
     const invocation = await ctx.withPgClient(async (client) => {
       const { rows } = await client.query<InvocationRow>(
         `SELECT id, status, result, error, created_at, started_at, completed_at, duration_ms
-         FROM ${ident(compute.invocationsSchemaName)}.${ident(compute.invocationsTableName)}
+         FROM ${escapeIdentifier(compute.invocationsSchemaName)}.${escapeIdentifier(compute.invocationsTableName)}
          WHERE id = $1`,
         [id]
       );

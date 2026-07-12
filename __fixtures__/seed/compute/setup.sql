@@ -46,7 +46,9 @@ CREATE TABLE IF NOT EXISTS compute_public.function_definitions (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   database_id uuid NOT NULL,
   name text NOT NULL,
-  task_identifier text NOT NULL
+  task_identifier text NOT NULL,
+  description text,
+  payload_args jsonb
 );
 
 CREATE TABLE IF NOT EXISTS compute_public.function_api_bindings (

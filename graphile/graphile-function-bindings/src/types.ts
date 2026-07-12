@@ -40,9 +40,17 @@ export interface FunctionBindingsPluginOptions {
   /** Only bindings for this api are exposed as mutations. */
   apiId: string;
   /**
-   * Schema containing function_api_bindings / function_definitions /
-   * function_invocations. Auto-discovered from the pgService's exposed
-   * schemas (or the search path) when omitted.
+   * Schema containing function_api_bindings / function_definitions.
+   * Typically resolved via the express-context compute module loader;
+   * auto-discovered from the pgService's exposed schemas when omitted.
    */
   computeSchema?: string;
+  /** Bindings table name (default: function_api_bindings). */
+  bindingsTable?: string;
+  /** Definitions table name (default: function_definitions). */
+  definitionsTable?: string;
+  /** Schema containing the invocations table (default: computeSchema). */
+  invocationsSchema?: string;
+  /** Invocations table name (default: function_invocations). */
+  invocationsTable?: string;
 }
