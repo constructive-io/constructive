@@ -380,7 +380,10 @@ export const installMissingModules = async (
 export const makeReplacer = ({ schemas, name, schemaPrefix }: MakeReplacerOptions): ReplacerResult => {
   const replacements: [string, string] = ['constructive-extension-name', name];
   const prefix = schemaPrefix || name;
-  const schemaReplacers: [string, string][] = schemas.map((schema) => [
+  const sortedSchemas = [...schemas].sort((a, b) =>
+    b.schema_name.length - a.schema_name.length || a.schema_name.localeCompare(b.schema_name)
+  );
+  const schemaReplacers: [string, string][] = sortedSchemas.map((schema) => [
     schema.schema_name,
     toSnakeCase(`${prefix}_${schema.name}`)
   ]);
@@ -423,7 +426,7 @@ export const preparePackage = async ({
   process.chdir(pgpmDir);
 
   try {
-    const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
+    const plan = glob(path.join(pgpmDir, 'pgpm.plan')).sort((a, b) => a.localeCompare(b));
     if (!plan.length) {
       const { fullName, email } = parseAuthor(author);
 

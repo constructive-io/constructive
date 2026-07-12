@@ -1,5 +1,5 @@
 import deepmerge from 'deepmerge'
-import { printSchema } from 'graphql'
+import { lexicographicSortSchema, printSchema } from 'graphql'
 import { ConstructivePreset, makePgService } from 'graphile-settings'
 import { makeSchema } from 'graphile-build'
 import { getPgPool } from 'pg-cache'
@@ -49,5 +49,5 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
   }
 
   const { schema } = await makeSchema(preset)
-  return printSchema(schema)
+  return printSchema(lexicographicSortSchema(schema))
 }

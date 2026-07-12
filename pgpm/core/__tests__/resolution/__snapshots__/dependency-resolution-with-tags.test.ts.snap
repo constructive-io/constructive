@@ -16,9 +16,6 @@ exports[`sqitch package dependencies [simple-w-tags/1st] 1`] = `
   "resolved": [
     "schema_myfirstapp",
     "table_users",
-    "schema_myfirstapp",
-    "schema_myfirstapp",
-    "table_users",
     "table_products",
   ],
   "resolvedTags": {},
@@ -41,11 +38,8 @@ exports[`sqitch package dependencies [simple-w-tags/2nd] 1`] = `
   },
   "external": [
     "my-first:@v1.0.0",
-    "my-first:@v1.0.0",
   ],
   "resolved": [
-    "create_schema",
-    "create_table",
     "create_schema",
     "create_table",
     "create_another_table",
