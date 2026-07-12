@@ -282,6 +282,11 @@
       "table": "infra_secrets_module"
     },
     {
+      "key": "integration_providers_module",
+      "schema": "metaschema_modules_public",
+      "table": "integration_providers_module"
+    },
+    {
       "key": "internal_secrets_module",
       "schema": "metaschema_modules_public",
       "table": "internal_secrets_module"
@@ -437,11 +442,6 @@
       "table": "embedding_chunks"
     },
     {
-      "key": "partition",
-      "schema": "metaschema_public",
-      "table": "partition"
-    },
-    {
       "key": "spatial_relation",
       "schema": "metaschema_public",
       "table": "spatial_relation"
@@ -501,5 +501,90 @@
       "schema": "metaschema_modules_public",
       "table": "graph_execution_module"
     }
-  ]
+  ],
+  "timestampDefaultColumns": {
+    "metaschema_modules_public.db_preset_module": [
+      "created_at"
+    ],
+    "metaschema_modules_public.graph_execution_module": [
+      "created_at"
+    ],
+    "metaschema_modules_public.graph_module": [
+      "created_at"
+    ],
+    "metaschema_modules_public.hierarchy_module": [
+      "created_at"
+    ],
+    "metaschema_modules_public.merkle_store_module": [
+      "created_at"
+    ],
+    "metaschema_public.check_constraint": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.database": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.embedding_chunks": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.field": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.foreign_key_constraint": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.full_text_search": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.index": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.policy": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.primary_key_constraint": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.schema": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.schema_grant": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.spatial_relation": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.table": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.table_grant": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.trigger": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.trigger_function": [
+      "created_at",
+      "updated_at"
+    ],
+    "metaschema_public.unique_constraint": [
+      "created_at",
+      "updated_at"
+    ]
+  }
 }

@@ -1,9 +1,15 @@
 import fs from 'fs';
 
 /**
- * Get a UTC timestamp string
+ * Fixed epoch timestamp used for deterministic plan generation.
+ * Can be overridden with the PGPM_FROZEN_TIME environment variable.
  */
-function getUTCTimestamp(d: Date = new Date()): string {
+const DEFAULT_FROZEN_TIME = '2017-08-11T08:11:51Z';
+
+/**
+ * Get a UTC timestamp string from a Date object.
+ */
+function getUTCTimestamp(d: Date): string {
   return (
     d.getUTCFullYear() +
     '-' + String(d.getUTCMonth() + 1).padStart(2, '0') +
@@ -16,12 +22,15 @@ function getUTCTimestamp(d: Date = new Date()): string {
 }
 
 /**
- * Get a timestamp for the plan file
+ * Get a timestamp for the plan file.
+ * Uses the PGPM_FROZEN_TIME env var if present, otherwise the fixed epoch.
  */
 export function getNow(): string {
-  return process.env.NODE_ENV === 'test'
-    ? getUTCTimestamp(new Date('2017-08-11T08:11:51Z'))
-    : getUTCTimestamp(new Date());
+  const frozen = process.env.PGPM_FROZEN_TIME;
+  if (frozen) {
+    return getUTCTimestamp(new Date(frozen));
+  }
+  return DEFAULT_FROZEN_TIME;
 }
 
 export interface PlanEntry {
@@ -37,6 +46,26 @@ export interface GeneratePlanOptions {
 }
 
 /**
+ * Sort dependencies by their order in the supplied plan, so prerequisites
+ * (parent migrations) appear before their dependents in the bracket.
+ * Internal dependencies are sorted by their plan index, and external
+ * dependencies (not in the plan) preserve their original order.
+ */
+const sortDependencies = (deps: string[], order: Map<string, number>): string[] => {
+  const originalOrder = new Map(deps.map((dep, index) => [dep, index]));
+  return [...deps].sort((a, b) => {
+    const aIndex = order.get(a);
+    const bIndex = order.get(b);
+    const aOriginal = originalOrder.get(a)!;
+    const bOriginal = originalOrder.get(b)!;
+    if (aIndex !== undefined && bIndex !== undefined) return aIndex - bIndex || aOriginal - bOriginal;
+    if (aIndex !== undefined) return -1;
+    if (bIndex !== undefined) return 1;
+    return aOriginal - bOriginal;
+  });
+};
+
+/**
  * Generate a plan file content from structured data
  */
 export function generatePlan(options: GeneratePlanOptions): string {
@@ -49,11 +78,15 @@ export function generatePlan(options: GeneratePlanOptions): string {
     `%uri=${uri || moduleName}`
   ];
 
+  // Build an order map from the entry list so brackets can be sorted by plan order
+  const entryOrder = new Map(entries.map((entry, index) => [entry.change, index]));
+
   // Generate the plan entries
   entries.forEach(entry => {
-    if (entry.dependencies && entry.dependencies.length > 0) {
+    const deps = sortDependencies(entry.dependencies || [], entryOrder);
+    if (deps.length > 0) {
       planfile.push(
-        `${entry.change} [${entry.dependencies.join(' ')}] ${now} constructive <constructive@5b0c196eeb62>${entry.comment ? ` # ${entry.comment}` : ''}`
+        `${entry.change} [${deps.join(' ')}] ${now} constructive <constructive@5b0c196eeb62>${entry.comment ? ` # ${entry.comment}` : ''}`
       );
     } else {
       planfile.push(
