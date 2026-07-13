@@ -86,8 +86,10 @@ function parseHasChunksTag(raw: any, codec: any): ChunkTableInfo | null {
 
 /**
  * Discover all chunk-aware tables from the pgRegistry.
+ *
+ * Exported for unit testing.
  */
-function discoverChunkTables(build: any): ChunkTableInfo[] {
+export function discoverChunkTables(build: any): ChunkTableInfo[] {
   const chunkTables: ChunkTableInfo[] = [];
   const pgRegistry = build.input?.pgRegistry ?? build.pgRegistry;
   if (!pgRegistry) return chunkTables;
@@ -111,17 +113,19 @@ function discoverChunkTables(build: any): ChunkTableInfo[] {
 
 /**
  * Build a SQL query string to search a chunks table for similar embeddings.
+ *
+ * Exported for unit testing.
  */
-function buildChunkSearchSql(
+export function buildChunkSearchSql(
   table: ChunkTableInfo,
   vectorString: string,
   limit: number,
   maxDistance: number | null
 ): { text: string; values: any[] } {
-  const schema = table.chunksSchema;
-  const qualifiedTable = schema
-    ? `"${schema}"."${table.chunksTableName}"`
-    : `"${table.chunksTableName}"`;
+  // Keep the schema-qualified reference when a schema is known.
+  const qualifiedTable = !table.chunksSchema
+    ? `"${table.chunksTableName}"`
+    : `"${table.chunksSchema}"."${table.chunksTableName}"`;
 
   const embeddingCol = `"${table.embeddingField}"`;
   const contentCol = `"${table.contentField}"`;

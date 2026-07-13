@@ -106,6 +106,12 @@ export interface ApiStructure {
   anonRole: string;
   roleName: string;
   schema: string[];
+  /**
+   * Logical schema names (tenant hash prefix stripped) derived from `schema`.
+   * Used by blueprint pooling to key a shared PostGraphile instance by
+   * schema-shape rather than by physical tenant schema.
+   */
+  logicalSchemas?: string[];
   apiModules: ApiModule[];
   rlsModule?: RlsModule;
   domains?: string[];

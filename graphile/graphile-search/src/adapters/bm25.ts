@@ -180,9 +180,11 @@ export function createBm25Adapter(
       const bm25Index = columnData.bm25Index;
       const columnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
 
-      // Use quoteQualifiedIdentifier to produce the qualified index name
-      const qualifiedIndexName = `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
-      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
+      // The store lookup (getBm25IndexForAttribute) keys off the build-time
+      // codec schema — correct, because the store was populated by the same
+      // representative gather.
+      const indexNameArg = `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
+      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(indexNameArg)})`;
       const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
 
       // Check for chunk-aware querying

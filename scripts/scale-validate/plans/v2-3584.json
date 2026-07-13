@@ -1,0 +1,19 @@
+{
+  "port": 3345,
+  "defaults": {
+    "heapMb": 3584,
+    "rps": 10,
+    "durationSec": 420,
+    "shape": "uniform",
+    "auth": 1,
+    "mix": "read:0.7,write:0.25,meta:0.05",
+    "serverEnv": { "GRAPHILE_CACHE_INSTANCE_HEAP_BYTES": "1450000000" }
+  },
+  "steps": [
+    { "name": "big-div-k1", "fleet": "out/fleet-k1.json" },
+    { "name": "big-div-k3", "fleet": "out/fleet-k3.json" },
+    { "name": "big-div-k5", "fleet": "out/fleet-k5.json" },
+    { "name": "big-ten-10", "fleet": "out/fleet-t10.json", "shape": "zipf", "rps": 15 },
+    { "name": "big-ten-33", "fleet": "out/fleet-t33.json", "shape": "zipf", "rps": 15 }
+  ]
+}

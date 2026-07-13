@@ -1,0 +1,16 @@
+{
+  "port": 3345,
+  "defaults": {
+    "heapMb": 2048,
+    "durationSec": 300,
+    "shape": "zipf",
+    "auth": 1,
+    "mix": "read:0.7,write:0.25,meta:0.05",
+    "serverEnv": { "GRAPHILE_CACHE_INSTANCE_HEAP_BYTES": "1450000000" }
+  },
+  "steps": [
+    { "name": "rps-s-50", "fleet": "out/fleet-t33.json", "rps": 50 },
+    { "name": "rps-s-100", "fleet": "out/fleet-t33.json", "rps": 100 },
+    { "name": "rps-s-200", "fleet": "out/fleet-t33.json", "rps": 200 }
+  ]
+}

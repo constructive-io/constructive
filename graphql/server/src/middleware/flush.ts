@@ -2,9 +2,11 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
-import { graphileCache } from 'graphile-cache';
+import { clearMatchingEntries, graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 import './types'; // for Request type
+import { isBlueprintPoolingEnabled } from './blueprint';
+import { clearPoolDecisions, clearPoolDecisionsForDatabase } from './pooling-decision';
 
 const log = new Logger('flush');
 
@@ -17,6 +19,12 @@ export const flush = async (
     // TODO: check bearer for a flush / special key
     graphileCache.delete((req as any).svc_key);
     svcCache.delete((req as any).svc_key);
+    // Under pooling the serving instance is stored under a `bp:` key, which the
+    // svc_key delete above cannot reach — mirror flushService's v1 semantics.
+    if (isBlueprintPoolingEnabled()) {
+      clearMatchingEntries(/^bp:/);
+      clearPoolDecisions();
+    }
     res.status(200).send('OK');
     return;
   }
@@ -29,6 +37,23 @@ export const flushService = async (
 ): Promise<void> => {
   const pgPool = getPgPool(opts.pg);
   log.info('flushing db ' + databaseId);
+
+  // Blueprint pooling: invalidate ONLY the changed database's decisions and the
+  // blueprint instance it was attached to. Fleet-wide `bp:` flushes on every
+  // schema:update turned each tenant PROVISION into a cold restart of every
+  // pooled instance — and the immediate rebuild raced the evicted instances'
+  // drain (~GB still live until release), which OOMed the 24h soak. New tenants
+  // have no memoized decisions, so provisioning is a no-op here (instances are
+  // shape-generic; a same-shape tenant attaches without any rebuild).
+  if (isBlueprintPoolingEnabled()) {
+    const bpKeys = clearPoolDecisionsForDatabase(databaseId);
+    for (const key of bpKeys) {
+      graphileCache.delete(key);
+    }
+    if (bpKeys.length > 0) {
+      log.info(`[pooling] flushed ${bpKeys.length} blueprint(s) for db ${databaseId}: ${bpKeys.join(', ')}`);
+    }
+  }
 
   const api = new RegExp(`^api:${databaseId}:.*`);
   const schemata = new RegExp(`^schemata:${databaseId}:.*`);
