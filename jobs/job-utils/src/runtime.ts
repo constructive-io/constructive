@@ -1,9 +1,9 @@
-import { getEnvOptions, getNodeEnv, parseEnvBoolean } from '@pgpmjs/env';
+import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
+import { jobsDefaults, type ConstructiveOptions } from '@constructive-io/graphql-types';
+import { parseEnvBoolean } from '@pgpmjs/env';
 import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
 import { buildConnectionString, getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
-import type { PgpmOptions } from '@pgpmjs/types';
-import { jobsDefaults } from '@pgpmjs/types';
 
 type Maybe<T> = T | null | undefined;
 
@@ -12,7 +12,7 @@ const toStrArray = (v: Maybe<string>): string[] | undefined =>
 
 // ---- PG config ----
 export const getJobPgConfig = (): PgConfig => {
-  const opts: PgpmOptions = getEnvOptions();
+  const opts: ConstructiveOptions = getEnvOptions();
   const envOnly = getPgEnvVars();
 
   return {
@@ -32,7 +32,7 @@ export const getJobConnectionString = (): string => {
 
 // ---- Schema ----
 export const getJobSchema = (): string => {
-  const opts: PgpmOptions = getEnvOptions();
+  const opts: ConstructiveOptions = getEnvOptions();
   const fromOpts: string | undefined = opts.jobs?.schema?.schema;
   return (
     fromOpts ||
@@ -43,7 +43,7 @@ export const getJobSchema = (): string => {
 
 // ---- SupportAny / Supported ----
 export const getJobSupportAny = (): boolean => {
-  const opts: PgpmOptions = getEnvOptions();
+  const opts: ConstructiveOptions = getEnvOptions();
   const envVal = parseEnvBoolean(process.env.JOBS_SUPPORT_ANY);
   if (typeof envVal === 'boolean') return envVal;
 
@@ -59,7 +59,7 @@ export const getJobSupportAny = (): boolean => {
 };
 
 export const getJobSupported = (): string[] => {
-  const opts: PgpmOptions = getEnvOptions();
+  const opts: ConstructiveOptions = getEnvOptions();
   const worker: string[] | undefined = opts.jobs?.worker?.supported;
   const scheduler: string[] | undefined = opts.jobs?.scheduler?.supported;
 
@@ -73,7 +73,7 @@ export const getJobSupported = (): string[] => {
 
 // ---- Hostnames ----
 export const getWorkerHostname = (): string => {
-  const opts: PgpmOptions = getEnvOptions();
+  const opts: ConstructiveOptions = getEnvOptions();
   return (
     process.env.HOSTNAME ||
     opts.jobs?.worker?.hostname ||
@@ -83,7 +83,7 @@ export const getWorkerHostname = (): string => {
 };
 
 export const getSchedulerHostname = (): string => {
-  const opts: PgpmOptions = getEnvOptions();
+  const opts: ConstructiveOptions = getEnvOptions();
   return (
     process.env.HOSTNAME ||
     opts.jobs?.scheduler?.hostname ||
@@ -94,7 +94,7 @@ export const getSchedulerHostname = (): string => {
 
 // ---- Job gateway config (generic HTTP gateway) ----
 export const getJobGatewayConfig = () => {
-  const opts: PgpmOptions = getEnvOptions();
+  const opts: ConstructiveOptions = getEnvOptions();
   const gateway = opts.jobs?.gateway ?? {};
   const defaults = jobsDefaults.gateway ?? {
     gatewayUrl: 'http://gateway:8080',

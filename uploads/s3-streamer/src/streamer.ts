@@ -1,6 +1,6 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { streamContentType } from '@constructive-io/content-type-stream';
-import type { BucketProvider } from '@pgpmjs/types';
+import type { BucketProvider } from '@constructive-io/graphql-types';
 import type { Readable } from 'stream';
 
 import getS3 from './s3';

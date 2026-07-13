@@ -1,4 +1,7 @@
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
+import {
+  BucketProvider,
+  ConstructiveOptions
+} from '@constructive-io/graphql-types';
 
 /**
  * Parse GraphQL-related environment variables.
@@ -7,6 +10,27 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
 const parseEnvBoolean = (val?: string): boolean | undefined => {
   if (val === undefined) return undefined;
   return ['true', '1', 'yes'].includes(val.toLowerCase());
+};
+
+const parseEnvNumber = (val?: string): number | undefined => {
+  const num = Number(val);
+  return !isNaN(num) ? num : undefined;
+};
+
+const parseEnvStringArray = (val?: string): string[] | undefined => {
+  if (!val) return undefined;
+  return val
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+};
+
+type NodeEnv = 'development' | 'production' | 'test';
+
+export const getNodeEnv = (): NodeEnv => {
+  const env = process.env.NODE_ENV?.toLowerCase();
+  if (env === 'production' || env === 'test') return env;
+  return 'development';
 };
 
 /**
@@ -27,6 +51,45 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     API_ANON_ROLE,
     API_ROLE_NAME,
     API_DEFAULT_DATABASE_ID,
+
+    PORT,
+    SERVER_HOST,
+    SERVER_TRUST_PROXY,
+    SERVER_ORIGIN,
+    SERVER_STRICT_AUTH,
+
+    BUCKET_PROVIDER,
+    BUCKET_NAME,
+    AWS_REGION,
+    AWS_ACCESS_KEY,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_KEY,
+    AWS_SECRET_ACCESS_KEY,
+    CDN_ENDPOINT,
+    CDN_PUBLIC_URL_PREFIX,
+
+    JOBS_SCHEMA,
+    JOBS_SUPPORT_ANY,
+    JOBS_SUPPORTED,
+    INTERNAL_GATEWAY_URL,
+    INTERNAL_JOBS_CALLBACK_URL,
+    INTERNAL_JOBS_CALLBACK_PORT,
+
+    SMTP_HOST,
+    SMTP_PORT,
+    SMTP_SECURE,
+    SMTP_USER,
+    SMTP_PASS,
+    SMTP_FROM,
+    SMTP_REPLY_TO,
+    SMTP_REQUIRE_TLS,
+    SMTP_TLS_REJECT_UNAUTHORIZED,
+    SMTP_POOL,
+    SMTP_MAX_CONNECTIONS,
+    SMTP_MAX_MESSAGES,
+    SMTP_NAME,
+    SMTP_LOGGER,
+    SMTP_DEBUG,
 
     EMBEDDER_PROVIDER,
     EMBEDDER_MODEL,
@@ -57,6 +120,95 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME }),
       ...(API_DEFAULT_DATABASE_ID && { defaultDatabaseId: API_DEFAULT_DATABASE_ID }),
+    },
+    server: {
+      ...(PORT && { port: parseEnvNumber(PORT) }),
+      ...(SERVER_HOST && { host: SERVER_HOST }),
+      ...(SERVER_TRUST_PROXY && {
+        trustProxy: parseEnvBoolean(SERVER_TRUST_PROXY)
+      }),
+      ...(SERVER_ORIGIN && { origin: SERVER_ORIGIN }),
+      ...(SERVER_STRICT_AUTH && {
+        strictAuth: parseEnvBoolean(SERVER_STRICT_AUTH)
+      })
+    },
+    cdn: {
+      ...(BUCKET_PROVIDER && { provider: BUCKET_PROVIDER as BucketProvider }),
+      ...(BUCKET_NAME && { bucketName: BUCKET_NAME }),
+      ...(AWS_REGION && { awsRegion: AWS_REGION }),
+      ...((AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID) && {
+        awsAccessKey: AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID
+      }),
+      ...((AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY) && {
+        awsSecretKey: AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY
+      }),
+      ...(CDN_ENDPOINT && { endpoint: CDN_ENDPOINT }),
+      ...(CDN_PUBLIC_URL_PREFIX && { publicUrlPrefix: CDN_PUBLIC_URL_PREFIX })
+    },
+    jobs: {
+      ...(JOBS_SCHEMA && {
+        schema: {
+          schema: JOBS_SCHEMA
+        }
+      }),
+      ...((JOBS_SUPPORT_ANY || JOBS_SUPPORTED) && {
+        worker: {
+          ...(JOBS_SUPPORT_ANY && {
+            supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
+          }),
+          ...(JOBS_SUPPORTED && {
+            supported: parseEnvStringArray(JOBS_SUPPORTED)
+          })
+        },
+        scheduler: {
+          ...(JOBS_SUPPORT_ANY && {
+            supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
+          }),
+          ...(JOBS_SUPPORTED && {
+            supported: parseEnvStringArray(JOBS_SUPPORTED)
+          })
+        }
+      }),
+      ...((INTERNAL_GATEWAY_URL ||
+        INTERNAL_JOBS_CALLBACK_URL ||
+        INTERNAL_JOBS_CALLBACK_PORT) && {
+        gateway: {
+          ...(INTERNAL_GATEWAY_URL && {
+            gatewayUrl: INTERNAL_GATEWAY_URL
+          }),
+          ...(INTERNAL_JOBS_CALLBACK_URL && {
+            callbackUrl: INTERNAL_JOBS_CALLBACK_URL
+          }),
+          ...(INTERNAL_JOBS_CALLBACK_PORT && {
+            callbackPort: parseEnvNumber(INTERNAL_JOBS_CALLBACK_PORT)
+          })
+        }
+      })
+    },
+    smtp: {
+      ...(SMTP_HOST && { host: SMTP_HOST }),
+      ...(SMTP_PORT && { port: parseEnvNumber(SMTP_PORT) }),
+      ...(SMTP_SECURE && { secure: parseEnvBoolean(SMTP_SECURE) }),
+      ...(SMTP_USER && { user: SMTP_USER }),
+      ...(SMTP_PASS && { pass: SMTP_PASS }),
+      ...(SMTP_FROM && { from: SMTP_FROM }),
+      ...(SMTP_REPLY_TO && { replyTo: SMTP_REPLY_TO }),
+      ...(SMTP_REQUIRE_TLS && {
+        requireTLS: parseEnvBoolean(SMTP_REQUIRE_TLS)
+      }),
+      ...(SMTP_TLS_REJECT_UNAUTHORIZED && {
+        tlsRejectUnauthorized: parseEnvBoolean(SMTP_TLS_REJECT_UNAUTHORIZED)
+      }),
+      ...(SMTP_POOL && { pool: parseEnvBoolean(SMTP_POOL) }),
+      ...(SMTP_MAX_CONNECTIONS && {
+        maxConnections: parseEnvNumber(SMTP_MAX_CONNECTIONS)
+      }),
+      ...(SMTP_MAX_MESSAGES && {
+        maxMessages: parseEnvNumber(SMTP_MAX_MESSAGES)
+      }),
+      ...(SMTP_NAME && { name: SMTP_NAME }),
+      ...(SMTP_LOGGER && { logger: parseEnvBoolean(SMTP_LOGGER) }),
+      ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) })
     },
     ...((EMBEDDER_PROVIDER || CHAT_PROVIDER) && {
       llm: {

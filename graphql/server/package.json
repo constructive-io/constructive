@@ -48,7 +48,6 @@
     "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.2",
-    "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",

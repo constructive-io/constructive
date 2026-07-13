@@ -12,19 +12,30 @@
    <a href="https://www.npmjs.com/package/@pgpmjs/env"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=pgpm%2Fenv%2Fpackage.json"/></a>
 </p>
 
-Environment management for PGPM (and Constructive) projects. Provides unified configuration resolution from defaults, config files, environment variables, and overrides.
+Lower-level environment management for PostgreSQL and the PGPM toolchain. It resolves PGPM defaults, config files, environment variables, and runtime overrides without taking ownership of Constructive application configuration.
+
+`@pgpmjs/env` owns database connections, test database settings, workspace/package configuration, deployment, migrations, and PGPM error output. HTTP server, CDN/storage, jobs, and SMTP configuration are owned by the upper-level `@constructive-io/graphql-env` resolver.
 
 ## Features
 
 - Config file discovery using `walkUp` utility
-- Environment variable parsing
+- PostgreSQL and PGPM environment variable parsing
 - Unified merge hierarchy: defaults → config → env vars → overrides
+- An explicit PGPM-only result boundary
 - TypeScript support with full type safety
 
 ## Usage
 
 ```typescript
-import { getEnvOptions } from '@pgpmjs/env';
+import { getPgpmEnvOptions } from '@pgpmjs/env';
 
-const options = getEnvOptions(overrides, cwd);
+const options = getPgpmEnvOptions(overrides, cwd);
 ```
+
+`getEnvOptions` is an exact alias of `getPgpmEnvOptions` for existing PGPM callers.
+
+For a complete Constructive configuration, including PGPM values plus GraphQL runtime configuration, use `getConstructiveEnvOptions` from `@constructive-io/graphql-env`.
+
+## Ownership change
+
+This refactor moves only the existing server, CDN/storage, jobs, and SMTP configuration, plus `getNodeEnv()`, from PGPM env to GraphQL env. It does not consolidate other environment variables currently read by Mailgun providers, functions, Knative runtimes, LLM integrations, or other packages; those remain follow-up work.

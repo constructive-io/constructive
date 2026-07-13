@@ -29,3 +29,6 @@ export {
   LlmEmbedderOptions,
   LlmChatOptions
 } from './llm';
+
+// Export Constructive runtime environment types and defaults
+export * from './environment';

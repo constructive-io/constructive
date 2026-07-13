@@ -36,9 +36,10 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "@constructive-io/graphql-env": "workspace:^",
+    "@constructive-io/graphql-types": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "@pgpmjs/types": "workspace:^",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^"
   }

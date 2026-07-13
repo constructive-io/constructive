@@ -1,6 +1,6 @@
-import { getNodeEnv } from '@pgpmjs/env';
+import { getNodeEnv } from '@constructive-io/graphql-env';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
@@ -27,7 +27,7 @@ const parseCookieToken = (req: Request, cookieName: string): string | undefined 
 };
 
 export const createAuthenticateMiddleware = (
-  opts: PgpmOptions
+  opts: ConstructiveOptions
 ): RequestHandler => {
   return async (
     req: Request,

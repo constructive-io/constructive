@@ -1,4 +1,8 @@
-import { getConnEnvOptions, getEnvOptions } from '../src/merge';
+import {
+  getConnEnvOptions,
+  getEnvOptions,
+  getPgpmEnvOptions
+} from '../src/merge';
 import { pgpmDefaults, PgpmOptions } from '@pgpmjs/types';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -111,13 +115,16 @@ describe('getConnEnvOptions', () => {
 
 describe('getEnvOptions', () => {
   let tempDir = '';
-  type PgpmOptionsWithPackages = PgpmOptions & { packages?: string[] };
 
   afterEach(() => {
     if (tempDir) {
       fs.rmSync(tempDir, { recursive: true, force: true });
       tempDir = '';
     }
+  });
+
+  it('is the exact alias of getPgpmEnvOptions', () => {
+    expect(getEnvOptions).toBe(getPgpmEnvOptions);
   });
 
   it('merges defaults, config, env, and overrides', () => {
@@ -158,7 +165,7 @@ describe('getEnvOptions', () => {
     };
 
     const result = getEnvOptions(
-      {
+      ({
         db: {
           prefix: 'override-',
           cwd: '<CWD>'
@@ -172,7 +179,7 @@ describe('getEnvOptions', () => {
         deployment: {
           cache: true
         }
-      },
+      } as unknown as PgpmOptions),
       tempDir,
       testEnv
     );
@@ -186,43 +193,67 @@ describe('getEnvOptions', () => {
       db: {
         extensions: ['uuid', 'postgis']
       },
-      jobs: {
-        worker: {
-          supported: ['alpha', 'beta']
-        },
-        scheduler: {
-          supported: ['beta', 'gamma']
-        }
-      },
       packages: ['testing/*', 'packages/*']
     });
 
     const testEnv: NodeJS.ProcessEnv = {
-      DB_EXTENSIONS: 'postgis,pgcrypto',
-      JOBS_SUPPORTED: 'beta,gamma,delta'
+      DB_EXTENSIONS: 'postgis,pgcrypto'
     };
 
-    const overrides: PgpmOptionsWithPackages = {
+    const overrides: PgpmOptions = {
       db: {
         extensions: ['uuid', 'hstore']
-      },
-      jobs: {
-        worker: {
-          supported: ['delta', 'epsilon']
-        },
-        scheduler: {
-          supported: ['gamma', 'zeta']
-        }
       },
       packages: ['testing/*', 'extensions/*']
     };
 
-    const result = getEnvOptions(overrides, tempDir, testEnv) as PgpmOptionsWithPackages;
+    const result = getEnvOptions(overrides, tempDir, testEnv);
 
     // Arrays are replaced, not merged - overrides win completely
     expect(result.db?.extensions).toEqual(['uuid', 'hstore']);
-    expect(result.jobs?.worker?.supported).toEqual(['delta', 'epsilon']);
-    expect(result.jobs?.scheduler?.supported).toEqual(['gamma', 'zeta']);
     expect(result.packages).toEqual(['testing/*', 'extensions/*']);
+  });
+
+  it('projects config, environment, and overrides to PGPM-owned keys', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-boundary-'));
+    writeConfig(tempDir, {
+      packages: ['modules/*'],
+      boilerplates: { repo: 'https://example.test/templates.git' },
+      driver: { plugin: '@pgpmjs/example-driver' },
+      server: { port: 4000 },
+      cdn: { bucketName: 'config-bucket' },
+      jobs: { schema: { schema: 'config_jobs' } },
+      smtp: { host: 'config-smtp' },
+      graphile: { schema: ['public'] }
+    });
+
+    const overrides = {
+      settings: { retained: true },
+      server: { port: 5000 },
+      cdn: { bucketName: 'override-bucket' },
+      jobs: { schema: { schema: 'override_jobs' } },
+      smtp: { host: 'override-smtp' },
+      api: { isPublic: false }
+    } as unknown as PgpmOptions;
+
+    const result = getPgpmEnvOptions(overrides, tempDir, {
+      PORT: '6000',
+      BUCKET_NAME: 'env-bucket',
+      JOBS_SCHEMA: 'env_jobs',
+      SMTP_HOST: 'env-smtp'
+    });
+
+    expect(result).not.toHaveProperty('server');
+    expect(result).not.toHaveProperty('cdn');
+    expect(result).not.toHaveProperty('jobs');
+    expect(result).not.toHaveProperty('smtp');
+    expect(result).not.toHaveProperty('graphile');
+    expect(result).not.toHaveProperty('api');
+    expect(result.packages).toEqual(['modules/*']);
+    expect(result.boilerplates).toEqual({
+      repo: 'https://example.test/templates.git'
+    });
+    expect(result.driver).toEqual({ plugin: '@pgpmjs/example-driver' });
+    expect(result.settings).toEqual({ retained: true });
   });
 });
