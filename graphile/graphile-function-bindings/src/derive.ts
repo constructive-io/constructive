@@ -14,7 +14,8 @@
  * performed here — this is type derivation only.
  */
 
-import { JSON_SCHEMA_SCALARS, PG_TYPE_SCALARS } from './scalar-maps';
+import { JSON_SCHEMA_SCALARS, PG_TYPE_SCALARS } from 'graphile-plugin-utils';
+
 import type { FunctionBindingRow, JsonSchemaNode, PayloadArg } from './types';
 
 /** Named scalar kinds the plugin knows how to resolve against the schema. */

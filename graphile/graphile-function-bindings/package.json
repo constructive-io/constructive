@@ -41,6 +41,7 @@
   "dependencies": {
     "@constructive-io/query-builder": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
+    "graphile-plugin-utils": "workspace:^",
     "inflekt": "^0.7.1",
     "pg": "^8.21.0"
   },
