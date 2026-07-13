@@ -14,6 +14,8 @@
  * performed here — this is type derivation only.
  */
 
+import { JSON_SCHEMA_SCALARS, PG_TYPE_SCALARS } from 'graphile-plugin-utils';
+
 import type { FunctionBindingRow, JsonSchemaNode, PayloadArg } from './types';
 
 /** Named scalar kinds the plugin knows how to resolve against the schema. */
@@ -42,27 +44,6 @@ export interface DerivedInput {
   source: 'schema' | 'payload-args' | 'fallback';
   fields: DerivedField[];
 }
-
-/** Postgres payload_args type → GraphQL scalar name. */
-const PG_TYPE_SCALARS: Record<string, DerivedScalar> = {
-  uuid: 'UUID',
-  text: 'String',
-  int: 'Int',
-  boolean: 'Boolean',
-  numeric: 'BigFloat',
-  jsonb: 'JSON',
-  timestamptz: 'Datetime'
-};
-
-/** JSON Schema type → GraphQL scalar name. */
-const JSON_SCHEMA_SCALARS: Record<string, DerivedScalar> = {
-  string: 'String',
-  integer: 'Int',
-  number: 'Float',
-  boolean: 'Boolean',
-  object: 'JSON',
-  null: 'JSON'
-};
 
 const FALLBACK_FIELD: DerivedField = {
   name: 'payload',
