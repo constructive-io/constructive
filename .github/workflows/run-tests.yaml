@@ -168,6 +168,8 @@ jobs:
             env: {}
           - package: graphile/graphile-bulk-mutations
             env: {}
+          - package: graphile/graphile-function-bindings
+            env: {}
           - package: graphql/orm-test
             env: {}
           - package: graphql/test

@@ -476,6 +476,56 @@ importers:
         version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
+  graphile/graphile-function-bindings:
+    dependencies:
+      '@constructive-io/query-builder':
+        specifier: workspace:^
+        version: link:../../postgres/query-builder/dist
+      '@dataplan/pg':
+        specifier: 1.0.3
+        version: 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../../pgpm/logger/dist
+      grafast:
+        specifier: 1.0.2
+        version: 1.0.2(graphql@16.13.0)
+      graphile-build:
+        specifier: 5.0.2
+        version: 5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)
+      graphile-build-pg:
+        specifier: 5.0.2
+        version: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.13.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config:
+        specifier: 1.0.1
+        version: 1.0.1
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
+      inflekt:
+        specifier: ^0.7.1
+        version: 0.7.1
+      pg:
+        specifier: ^8.21.0
+        version: 8.21.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.19
+      '@types/pg':
+        specifier: ^8.20.0
+        version: 8.20.0
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+    publishDirectory: dist
+
   graphile/graphile-i18n:
     dependencies:
       '@dataplan/pg':
@@ -1682,6 +1732,9 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
+      '@constructive-io/query-builder':
+        specifier: workspace:^
+        version: link:../../postgres/query-builder/dist
       '@constructive-io/s3-utils':
         specifier: workspace:^
         version: link:../../uploads/s3-utils/dist
@@ -1736,6 +1789,9 @@ importers:
       graphile-config:
         specifier: 1.0.1
         version: 1.0.1
+      graphile-function-bindings:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-function-bindings/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist

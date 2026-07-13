@@ -154,6 +154,31 @@ export interface AgentChatConfig {
   taskTableName: string | null;
 }
 
+/** One provisioned function-module scope's compute table names. */
+export interface ComputeModuleConfig {
+  schemaName: string;
+  definitionsTableName: string;
+  bindingsTableName: string;
+  invocationsSchemaName: string;
+  invocationsTableName: string;
+  /**
+   * Scope-key column of the invocations table, read from the metaschema
+   * (`function_invocation_module.entity_field`): `database_id` for the
+   * database scope, `NULL` for global scopes (platform/app), or the entity
+   * key column for entity scopes. Consumers set this column on invocation
+   * inserts instead of switching on scope name.
+   */
+  invocationsEntityField: string | null;
+}
+
+/**
+ * All function modules provisioned on the database. A database may have one
+ * per scope; every module is exposed and RLS governs access to each.
+ */
+export interface ComputeConfig {
+  modules: ComputeModuleConfig[];
+}
+
 export interface LlmConfig {
   embeddingProvider: string;
   embeddingModel: string;
@@ -188,6 +213,7 @@ export interface BuiltinModuleMap {
   inferenceLog: InferenceLogConfig;
   agentChat: AgentChatConfig;
   llm: LlmConfig;
+  compute: ComputeConfig;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────
