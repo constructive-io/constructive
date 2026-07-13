@@ -95,8 +95,6 @@ function createDependencyResolver(
     resolved: string[],
     unresolved: string[]
   ): void {
-    unresolved.push(sqlmodule);
-    
     let moduleToResolve = sqlmodule;
     let edges: string[] | undefined;
     let returnEarly = false;
@@ -109,6 +107,14 @@ function createDependencyResolver(
     } else {
       edges = deps[makeKey(sqlmodule)];
     }
+
+    // Avoid re-resolving a module already resolved; moduleToResolve may differ
+    // from sqlmodule when project-prefixed or tag-resolved references are normalized.
+    if (resolved.includes(moduleToResolve)) {
+      return;
+    }
+
+    unresolved.push(sqlmodule);
 
     // Handle external dependencies if no edges found
     if (!edges) {
@@ -466,7 +472,7 @@ export const resolveDependencies = (
   const tagMappings: Record<string, string> = {};
 
   // Process SQL files and build dependency graph
-  const files = glob(`${packageDir}/deploy/**/*.sql`);
+  const files = glob(`${packageDir}/deploy/**/*.sql`).sort((a, b) => a.localeCompare(b));
 
   for (const file of files) {
     const data = readFileSync(file, 'utf-8');

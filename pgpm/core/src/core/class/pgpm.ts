@@ -165,7 +165,7 @@ export class PgpmPackage {
     );
     const resolvedDirs = dirs.map(dir => path.resolve(dir));
     // Remove duplicates by converting to Set and back to array
-    return [...new Set(resolvedDirs)];
+    return [...new Set(resolvedDirs.sort((a, b) => a.localeCompare(b)))];
   }
 
   private loadAllowedParentDirs(): string[] {
@@ -286,7 +286,7 @@ export class PgpmPackage {
 
     const moduleFiles = glob.sync(`${this.workspacePath}/**/*.control`).filter(
       (file: string) => !/node_modules/.test(file)
-    );
+    ).sort((a, b) => a.localeCompare(b));
 
     // Group files by module name to handle collisions
     const filesByName = new Map<string, string[]>();

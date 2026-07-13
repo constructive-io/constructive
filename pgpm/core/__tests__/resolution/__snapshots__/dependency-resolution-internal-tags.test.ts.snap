@@ -16,9 +16,6 @@ exports[`sqitch package dependencies with internal tag resolution [simple-w-tags
   "resolved": [
     "schema_myfirstapp",
     "table_users",
-    "schema_myfirstapp",
-    "schema_myfirstapp",
-    "table_users",
     "table_products",
   ],
   "resolvedTags": {},
@@ -41,11 +38,8 @@ exports[`sqitch package dependencies with internal tag resolution [simple-w-tags
   },
   "external": [
     "my-first:@v1.0.0",
-    "my-first:@v1.0.0",
   ],
   "resolved": [
-    "create_schema",
-    "create_table",
     "create_schema",
     "create_table",
     "create_another_table",
@@ -155,9 +149,9 @@ exports[`w-exts fixture dependency resolution - internal tags resolves internal 
   "resolved": [
     "schemas/unique_names/schema",
     "schemas/unique_names/tables/words/table",
-    "schemas/unique_names/tables/words/indexes/words_type_idx",
-    "schemas/unique_names/tables/words/fixtures/1589271124916_fixture",
     "schemas/unique_names/procedures/generate_name",
+    "schemas/unique_names/tables/words/fixtures/1589271124916_fixture",
+    "schemas/unique_names/tables/words/indexes/words_type_idx",
   ],
   "resolvedTags": {},
 }
