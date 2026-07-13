@@ -2,7 +2,6 @@ import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
 
 import { PgpmDriverConfig } from './driver';
-import { JobsConfig } from './jobs';
 
 /**
  * Authentication options for test client sessions
@@ -88,83 +87,6 @@ export interface TestUserCredentials {
     app?: DatabaseConnectionOptions;
     /** Admin user credentials (for test admin operations) */
     admin?: DatabaseConnectionOptions;
-}
-
-/**
- * HTTP server configuration
- */
-export interface ServerOptions {
-    /** Server host address */
-    host?: string;
-    /** Server port number */
-    port?: number;
-    /** Whether to trust proxy headers */
-    trustProxy?: boolean;
-    /** CORS origin configuration */
-    origin?: string;
-    /** Whether to enforce strict authentication */
-    strictAuth?: boolean;
-}
-
-/**
- * Storage provider type for CDN/bucket operations
- */
-export type BucketProvider = 's3' | 'minio' | 'gcs';
-
-/**
- * CDN and file storage configuration
- */
-export interface CDNOptions {
-    /** Storage provider type (s3, minio, gcs). Defaults to 'minio' for local dev */
-    provider?: BucketProvider;
-    /** S3 bucket name for file storage */
-    bucketName?: string;
-    /** AWS region for S3 bucket */
-    awsRegion?: string;
-    /** AWS access key for S3 */
-    awsAccessKey?: string;
-    /** AWS secret key for S3 */
-    awsSecretKey?: string;
-    /** S3-compatible API endpoint URL (MinIO, R2, DO Spaces, GCS, etc.) */
-    endpoint?: string;
-    /** Public URL prefix for generating download URLs (e.g., CDN domain, S3 public URL) */
-    publicUrlPrefix?: string;
-}
-
-/**
- * SMTP email configuration options
- */
-export interface SmtpOptions {
-    /** SMTP server hostname */
-    host?: string;
-    /** SMTP server port (defaults to 587 for non-secure, 465 for secure) */
-    port?: number;
-    /** Use TLS/SSL connection (defaults based on port: true for 465, false otherwise) */
-    secure?: boolean;
-    /** SMTP authentication username */
-    user?: string;
-    /** SMTP authentication password */
-    pass?: string;
-    /** Default sender email address */
-    from?: string;
-    /** Default reply-to email address */
-    replyTo?: string;
-    /** Require TLS upgrade via STARTTLS */
-    requireTLS?: boolean;
-    /** Reject unauthorized TLS certificates */
-    tlsRejectUnauthorized?: boolean;
-    /** Use connection pooling for multiple emails */
-    pool?: boolean;
-    /** Maximum number of pooled connections */
-    maxConnections?: number;
-    /** Maximum messages per connection before reconnecting */
-    maxMessages?: number;
-    /** SMTP client hostname for EHLO/HELO */
-    name?: string;
-    /** Enable nodemailer logging */
-    logger?: boolean;
-    /** Enable nodemailer debug output */
-    debug?: boolean;
 }
 
 /**
@@ -254,25 +176,18 @@ export interface DeploymentOptions {
  * Main configuration options for the PGPM framework
  * Note: GraphQL/Graphile options (graphile, api, features) are in @constructive-io/graphql-types
  */
-export interface PgpmOptions {
+export interface PgpmOptions
+  extends Partial<Omit<PgpmWorkspaceConfig, 'deployment'>> {
     /** Test database configuration options */
     db?: Partial<PgTestConnectionOptions>;
     /** PostgreSQL connection configuration */
     pg?: Partial<PgConfig>;
-    /** HTTP server configuration */
-    server?: ServerOptions;
-    /** CDN and file storage configuration */
-    cdn?: CDNOptions;
     /** Module deployment configuration */
     deployment?: DeploymentOptions;
     /** Migration and code generation options */
     migrations?: MigrationOptions;
-    /** Job system configuration */
-    jobs?: JobsConfig;
     /** Error output formatting options */
     errorOutput?: ErrorOutputOptions;
-    /** SMTP email configuration */
-    smtp?: SmtpOptions;
     /**
      * Pluggable migration backend. Undefined = built-in `pg` (server) path.
      * Set `driver.plugin` to a package (e.g. `@pgpmjs/pglite-adapter`) resolved
@@ -315,21 +230,6 @@ export const pgpmDefaults: PgpmOptions = {
     password: 'password',
     database: 'postgres'
   },
-  server: {
-    host: 'localhost',
-    port: 3000,
-    trustProxy: false,
-    strictAuth: false
-  },
-  cdn: {
-    provider: 'minio',
-    bucketName: 'test-bucket',
-    awsRegion: 'us-east-1',
-    awsAccessKey: 'minioadmin',
-    awsSecretKey: 'minioadmin',
-    endpoint: 'http://localhost:9000',
-    publicUrlPrefix: 'http://localhost:9000'
-  },
   deployment: {
     useTx: true,
     fast: false,
@@ -343,39 +243,11 @@ export const pgpmDefaults: PgpmOptions = {
       useTx: false
     }
   },
-  jobs: {
-    schema: {
-      schema: 'app_jobs'
-    },
-    worker: {
-      schema: 'app_jobs',
-      hostname: 'worker-0',
-      supportAny: true,
-      supported: [],
-      pollInterval: 1000,
-      gracefulShutdown: true
-    },
-    scheduler: {
-      schema: 'app_jobs',
-      hostname: 'scheduler-0',
-      supportAny: true,
-      supported: [],
-      pollInterval: 1000,
-      gracefulShutdown: true
-    }
-  },
   errorOutput: {
     queryHistoryLimit: 30,
     maxLength: 10000,
     verbose: false
   },
-  smtp: {
-    port: 587,
-    secure: false,
-    pool: false,
-    logger: false,
-    debug: false
-  }
 };
 
 export function getGitConfigInfo(): { username: string; email: string } {

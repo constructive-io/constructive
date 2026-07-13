@@ -1691,9 +1691,6 @@ importers:
       '@graphile-contrib/pg-many-to-many':
         specifier: 2.0.0-rc.2
         version: 2.0.0-rc.2
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -2064,15 +2061,18 @@ importers:
 
   jobs/job-utils:
     dependencies:
+      '@constructive-io/graphql-env':
+        specifier: workspace:^
+        version: link:../../graphql/env/dist
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
       '@pgpmjs/env':
         specifier: workspace:^
         version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
       pg-cache:
         specifier: workspace:^
         version: link:../../postgres/pg-cache/dist
@@ -2659,12 +2659,12 @@ importers:
 
   packages/smtppostmaster:
     dependencies:
-      '@pgpmjs/env':
+      '@constructive-io/graphql-env':
         specifier: workspace:^
-        version: link:../../pgpm/env/dist
-      '@pgpmjs/types':
+        version: link:../../graphql/env/dist
+      '@constructive-io/graphql-types':
         specifier: workspace:^
-        version: link:../../pgpm/types/dist
+        version: link:../../graphql/types/dist
       nodemailer:
         specifier: ^6.9.13
         version: 6.10.1
@@ -3567,16 +3567,16 @@ importers:
       '@constructive-io/content-type-stream':
         specifier: workspace:^
         version: link:../content-type-stream/dist
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
       '@constructive-io/s3-utils':
         specifier: workspace:^
         version: link:../s3-utils/dist
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
     devDependencies:
-      '@pgpmjs/env':
+      '@constructive-io/graphql-env':
         specifier: workspace:^
-        version: link:../../pgpm/env/dist
+        version: link:../../graphql/env/dist
       glob:
         specifier: ^13.0.6
         version: 13.0.6

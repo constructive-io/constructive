@@ -6,7 +6,7 @@ import type {
   RunScheduledJobParams,
   ReleaseScheduledJobsParams,
   ReleaseJobsParams
-} from '@pgpmjs/types';
+} from '@constructive-io/graphql-types';
 
 import {
   getJobSchema,

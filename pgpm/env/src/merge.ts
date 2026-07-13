@@ -4,6 +4,35 @@ import { loadConfigSync } from './config';
 import { getEnvVars } from './env';
 import { replaceArrays } from './utils';
 
+const PGPM_OPTION_KEYS = [
+  'db',
+  'pg',
+  'packages',
+  'name',
+  'version',
+  'settings',
+  'boilerplates',
+  'deployment',
+  'migrations',
+  'errorOutput',
+  'driver'
+] as const;
+
+const projectPgpmOptions = (options: unknown): PgpmOptions => {
+  if (!options || typeof options !== 'object') return {};
+
+  const source = options as Record<string, unknown>;
+  const projected: Record<string, unknown> = {};
+
+  for (const key of PGPM_OPTION_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      projected[key] = source[key];
+    }
+  }
+
+  return projected as PgpmOptions;
+};
+
 /**
  * Get core PGPM environment options by merging:
  * 1. PGPM defaults
@@ -17,21 +46,26 @@ import { replaceArrays } from './utils';
  * @param cwd - Working directory for config file resolution
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
-export const getEnvOptions = (
+const resolvePgpmEnvOptions = (
   overrides: PgpmOptions = {}, 
   cwd: string = process.cwd(),
   env: NodeJS.ProcessEnv = process.env
 ): PgpmOptions => {
-  const configOptions = loadConfigSync(cwd);
-  const envOptions = getEnvVars(env);
-  
-  return deepmerge.all([pgpmDefaults, configOptions, envOptions, overrides], {
+  const defaultOptions = projectPgpmOptions(pgpmDefaults);
+  const configOptions = projectPgpmOptions(loadConfigSync(cwd));
+  const envOptions = projectPgpmOptions(getEnvVars(env));
+  const overrideOptions = projectPgpmOptions(overrides);
+
+  return deepmerge.all([defaultOptions, configOptions, envOptions, overrideOptions], {
     arrayMerge: replaceArrays
   });
 };
 
+export const getPgpmEnvOptions = resolvePgpmEnvOptions;
+export const getEnvOptions = getPgpmEnvOptions;
+
 export const getConnEnvOptions = (overrides: Partial<PgTestConnectionOptions> = {}, cwd: string = process.cwd()): PgTestConnectionOptions => {
-  const opts = getEnvOptions({
+  const opts = getPgpmEnvOptions({
     db: overrides
   }, cwd);
   
@@ -60,7 +94,7 @@ export const getConnEnvOptions = (overrides: Partial<PgTestConnectionOptions> = 
 };
 
 export const getDeploymentEnvOptions = (overrides: Partial<DeploymentOptions> = {}, cwd: string = process.cwd()): DeploymentOptions => {
-  const opts = getEnvOptions({
+  const opts = getPgpmEnvOptions({
     deployment: overrides
   }, cwd);
   return opts.deployment;

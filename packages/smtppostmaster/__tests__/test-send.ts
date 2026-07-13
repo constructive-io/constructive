@@ -1,5 +1,5 @@
-import { getEnvOptions } from '@pgpmjs/env';
-import { SmtpOptions } from '@pgpmjs/types';
+import { getEnvOptions } from '@constructive-io/graphql-env';
+import type { SmtpOptions } from '@constructive-io/graphql-types';
 import { send } from '../src/index';
 import { createSmtpCatcher } from './smtp-catcher';
 

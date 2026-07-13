@@ -1,7 +1,7 @@
 import { createS3Client } from '@constructive-io/s3-utils';
 import type { StorageProvider } from '@constructive-io/s3-utils';
+import type { BucketProvider } from '@constructive-io/graphql-types';
 import type { S3Client } from '@aws-sdk/client-s3';
-import type { BucketProvider } from '@pgpmjs/types';
 
 interface S3Options {
   awsAccessKey: string;

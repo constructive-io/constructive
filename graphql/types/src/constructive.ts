@@ -5,10 +5,7 @@ import {
   pgpmDefaults,
   PgTestConnectionOptions,
   DeploymentOptions,
-  ServerOptions,
-  CDNOptions,
-  MigrationOptions,
-  JobsConfig
+  MigrationOptions
 } from '@pgpmjs/types';
 import {
   GraphileOptions,
@@ -19,6 +16,16 @@ import {
   apiDefaults
 } from './graphile';
 import { LlmOptions } from './llm';
+import {
+  CDNOptions,
+  JobsConfig,
+  ServerOptions,
+  SmtpOptions,
+  cdnDefaults,
+  jobsDefaults,
+  serverDefaults,
+  smtpDefaults
+} from './environment';
 
 /**
  * GraphQL-specific options for Constructive
@@ -30,6 +37,14 @@ export interface ConstructiveGraphQLOptions {
   features?: GraphileFeatureOptions;
   /** API configuration options */
   api?: ApiOptions;
+  /** HTTP server configuration */
+  server?: ServerOptions;
+  /** CDN and file storage configuration */
+  cdn?: CDNOptions;
+  /** Job system configuration */
+  jobs?: JobsConfig;
+  /** SMTP email configuration */
+  smtp?: SmtpOptions;
 }
 
 /**
@@ -57,6 +72,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   migrations?: MigrationOptions;
   /** Job system configuration */
   jobs?: JobsConfig;
+  /** SMTP email configuration */
+  smtp?: SmtpOptions;
   /** LLM provider configuration (embeddings, chat, RAG) */
   llm?: LlmOptions;
 }
@@ -67,7 +84,15 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
 export const constructiveGraphqlDefaults: ConstructiveGraphQLOptions = {
   graphile: graphileDefaults,
   features: graphileFeatureDefaults,
-  api: apiDefaults
+  api: apiDefaults,
+  server: serverDefaults,
+  cdn: cdnDefaults,
+  jobs: {
+    schema: jobsDefaults.schema,
+    worker: jobsDefaults.worker,
+    scheduler: jobsDefaults.scheduler
+  },
+  smtp: smtpDefaults
 };
 
 /**

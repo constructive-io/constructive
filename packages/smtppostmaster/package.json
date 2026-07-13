@@ -31,8 +31,8 @@
     "test:send:dev": "ts-node __tests__/test-send.ts"
   },
   "dependencies": {
-    "@pgpmjs/env": "workspace:^",
-    "@pgpmjs/types": "workspace:^",
+    "@constructive-io/graphql-env": "workspace:^",
+    "@constructive-io/graphql-types": "workspace:^",
     "nodemailer": "^6.9.13"
   },
   "devDependencies": {

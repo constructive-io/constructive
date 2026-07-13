@@ -1,7 +1,7 @@
 import nodemailer, { SendMailOptions } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import { getEnvOptions } from '@pgpmjs/env';
-import { SmtpOptions } from '@pgpmjs/types';
+import { getEnvOptions } from '@constructive-io/graphql-env';
+import type { SmtpOptions } from '@constructive-io/graphql-types';
 
 type SendInput = {
   to: string | string[];

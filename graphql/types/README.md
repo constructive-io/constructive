@@ -12,9 +12,9 @@
    <a href="https://www.npmjs.com/package/@constructive-io/graphql-types"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphql%2Ftypes%2Fpackage.json"/></a>
 </p>
 
-GraphQL/Graphile types for the Constructive framework.
+Configuration types for the Constructive framework.
 
-This package contains TypeScript type definitions for PostGraphile/Graphile configuration used by Constructive server, explorer, and related packages.
+This package contains the upper-level `ConstructiveOptions` model used by Constructive servers, explorers, jobs, storage, email, and related packages. `ConstructiveOptions` extends the lower-level `PgpmOptions` model, so one resolved object contains both PostgreSQL/PGPM configuration and Constructive application configuration.
 
 ## Installation
 
@@ -25,12 +25,12 @@ npm install @constructive-io/graphql-types
 ## Usage
 
 ```typescript
-import { 
-  ConstructiveOptions, 
-  GraphileOptions, 
-  ApiOptions, 
+import {
+  ConstructiveOptions,
+  GraphileOptions,
+  ApiOptions,
   GraphileFeatureOptions,
-  constructiveDefaults 
+  constructiveDefaults,
 } from '@constructive-io/graphql-types';
 
 // ConstructiveOptions extends PgpmOptions with GraphQL configuration
@@ -47,6 +47,9 @@ const config: ConstructiveOptions = {
     simpleInflection: true,
     postgis: true,
   },
+  server: {
+    port: 4000,
+  },
 };
 ```
 
@@ -54,7 +57,18 @@ const config: ConstructiveOptions = {
 
 ### ConstructiveOptions
 
-Full configuration options for Constructive framework, extending `PgpmOptions` with GraphQL/Graphile configuration.
+Full configuration options for the Constructive framework. It extends `PgpmOptions` and owns GraphQL/Graphile configuration plus the server, CDN/storage, jobs, and SMTP sections moved out of PGPM.
+
+### Environment ownership types
+
+This package owns the following types and their defaults:
+
+- `ServerOptions`
+- `BucketProvider` and `CDNOptions`
+- jobs worker, scheduler, gateway, operation DTOs, and `JobsConfig`
+- `SmtpOptions`
+
+The lower-level `@pgpmjs/types` package continues to own PostgreSQL connections, test database settings, workspace/package configuration, deployment, migrations, and PGPM error output.
 
 ### GraphileOptions
 
@@ -68,6 +82,6 @@ Configuration for the Constructive API including meta API settings, exposed sche
 
 Feature flags for GraphQL/Graphile including inflection settings and PostGIS support.
 
-## Re-exports
+## Scope
 
-This package re-exports all types from `@pgpmjs/types` for convenience, so you can import both core PGPM types and GraphQL types from a single package.
+This ownership change is intentionally limited to server, CDN/storage, jobs, and SMTP configuration. Moving `getNodeEnv()` belongs to `@constructive-io/graphql-env`; consolidating Mailgun, function-specific, Knative, LLM, observability, CAPTCHA, Graphile runtime, and test-only environment models remains follow-up work.

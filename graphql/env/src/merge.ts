@@ -1,7 +1,37 @@
 import deepmerge from 'deepmerge';
-import { ConstructiveOptions, constructiveGraphqlDefaults } from '@constructive-io/graphql-types';
-import { getEnvOptions as getPgpmEnvOptions, loadConfigSync, replaceArrays } from '@pgpmjs/env';
+import {
+  ConstructiveOptions,
+  constructiveDefaults
+} from '@constructive-io/graphql-types';
+import { getPgpmEnvOptions, loadConfigSync, replaceArrays } from '@pgpmjs/env';
 import { getGraphQLEnvVars } from './env';
+
+const CONSTRUCTIVE_OPTION_KEYS = [
+  'graphile',
+  'features',
+  'api',
+  'server',
+  'cdn',
+  'jobs',
+  'smtp'
+] as const;
+
+const projectConstructiveOptions = (
+  options: unknown
+): Partial<ConstructiveOptions> => {
+  if (!options || typeof options !== 'object') return {};
+
+  const source = options as Record<string, unknown>;
+  const projected: Record<string, unknown> = {};
+
+  for (const key of CONSTRUCTIVE_OPTION_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      projected[key] = source[key];
+    }
+  }
+
+  return projected as Partial<ConstructiveOptions>;
+};
 
 /**
  * Get Constructive environment options by merging:
@@ -18,7 +48,7 @@ import { getGraphQLEnvVars } from './env';
  * @param cwd - Working directory for config file resolution
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
-export const getEnvOptions = (
+const resolveConstructiveEnvOptions = (
   overrides: Partial<ConstructiveOptions> = {}, 
   cwd: string = process.cwd(),
   env: NodeJS.ProcessEnv = process.env
@@ -26,24 +56,13 @@ export const getEnvOptions = (
   // Get core PGPM options (includes pgpmDefaults + config + core env vars)
   const coreOptions = getPgpmEnvOptions({}, cwd, env);
   
-  // Get GraphQL-specific env vars
+  const configOptions = projectConstructiveOptions(loadConfigSync(cwd));
   const graphqlEnvOptions = getGraphQLEnvVars(env);
-  
-  // Load config again to get any GraphQL-specific config
-  // Config files can contain Constructive options (graphile, features, api)
-  // even though loadConfigSync returns PgpmOptions type
-  const configOptions = loadConfigSync(cwd) as Partial<ConstructiveOptions>;
-  
-  // Merge in order: core -> graphql defaults -> config (for graphql keys) -> graphql env -> overrides
+
   return deepmerge.all([
+    constructiveDefaults,
     coreOptions,
-    constructiveGraphqlDefaults,
-    // Only merge graphql-related keys from config (if present)
-    {
-      ...(configOptions.graphile && { graphile: configOptions.graphile }),
-      ...(configOptions.features && { features: configOptions.features }),
-      ...(configOptions.api && { api: configOptions.api }),
-    },
+    configOptions,
     graphqlEnvOptions,
     overrides
   ], {
@@ -51,7 +70,5 @@ export const getEnvOptions = (
   }) as ConstructiveOptions;
 };
 
-/**
- * Alias - same as getEnvOptions
- */
-export const getConstructiveEnvOptions = getEnvOptions;
+export const getConstructiveEnvOptions = resolveConstructiveEnvOptions;
+export const getEnvOptions = getConstructiveEnvOptions;
