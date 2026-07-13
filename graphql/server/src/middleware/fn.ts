@@ -19,12 +19,11 @@
  */
 
 import { Logger } from '@pgpmjs/logger';
+import { isUuid } from '@pgpmjs/server-utils';
 import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import express, { Request, Response, Router } from 'express';
 
 const log = new Logger('fn');
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface BindingRow {
   id: string;
@@ -176,7 +175,7 @@ async function handleGetInvocation(req: Request, res: Response): Promise<void> {
   }
 
   const id = req.params.id;
-  if (!UUID_RE.test(id)) {
+  if (!isUuid(id)) {
     notFound(res);
     return;
   }
