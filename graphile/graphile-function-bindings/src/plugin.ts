@@ -35,6 +35,7 @@ import { Logger } from '@pgpmjs/logger';
 import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
+import { isValidNameError } from 'graphql';
 import { toCamelCase, toConstantCase, toPascalCase } from 'inflekt';
 
 import type { DerivedField, DerivedInput } from './derive';
@@ -63,8 +64,6 @@ interface LoadedBinding extends FunctionBindingRow {
 interface FunctionBindingsBuildInput {
   bindings: LoadedBinding[];
 }
-
-const IDENT_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 async function loadBindings(
   pgService: GraphileConfig.PgServiceConfiguration,
@@ -197,7 +196,7 @@ export function createFunctionBindingsPlugin(
           const newFields: Record<string, any> = {};
 
           for (const binding of loaded.bindings) {
-            if (!IDENT_RE.test(toCamelCase(binding.alias))) {
+            if (isValidNameError(toCamelCase(binding.alias))) {
               log.warn(`Skipping binding "${binding.alias}": alias is not a valid GraphQL name`);
               continue;
             }

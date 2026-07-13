@@ -1,7 +1,7 @@
 {
-  "name": "graphile-search",
-  "version": "1.20.1",
-  "description": "Unified PostGraphile v5 search plugin — abstracts tsvector, BM25, pg_trgm, and pgvector behind a single adapter-based architecture with composite searchScore",
+  "name": "graphile-plugin-utils",
+  "version": "1.0.0",
+  "description": "Shared internals for Constructive PostGraphile v5 plugins - PgCondition query-builder walker and pg-resource introspection helpers",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest --forceExit",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "publishConfig": {
@@ -25,20 +25,22 @@
     "type": "git",
     "url": "https://github.com/constructive-io/constructive"
   },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "plugin",
+    "postgres",
+    "graphql",
+    "utils",
+    "v5"
+  ],
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-  "dependencies": {
-    "graphile-plugin-utils": "workspace:^"
-  },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "@types/pg": "^8.20.0",
-    "graphile-connection-filter": "workspace:^",
-    "graphile-test": "workspace:^",
-    "makage": "^0.3.0",
-    "pg": "^8.21.0",
-    "pgsql-test": "workspace:^"
+    "makage": "^0.3.0"
   },
   "peerDependencies": {
     "@dataplan/pg": "1.0.3",
@@ -48,21 +50,5 @@
     "graphql": "16.13.0",
     "pg-sql2": "5.0.1",
     "postgraphile": "5.0.3"
-  },
-  "keywords": [
-    "postgraphile",
-    "graphile",
-    "constructive",
-    "plugin",
-    "postgres",
-    "graphql",
-    "search",
-    "unified-search",
-    "tsvector",
-    "bm25",
-    "pg_trgm",
-    "pgvector",
-    "hybrid-search",
-    "searchScore"
-  ]
+  }
 }
