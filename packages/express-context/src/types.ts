@@ -161,6 +161,14 @@ export interface ComputeModuleConfig {
   bindingsTableName: string;
   invocationsSchemaName: string;
   invocationsTableName: string;
+  /**
+   * Scope-key column of the invocations table, read from the metaschema
+   * (`function_invocation_module.entity_field`): `database_id` for the
+   * database scope, `NULL` for global scopes (platform/app), or the entity
+   * key column for entity scopes. Consumers set this column on invocation
+   * inserts instead of switching on scope name.
+   */
+  invocationsEntityField: string | null;
 }
 
 /**

@@ -11,7 +11,6 @@ const baseBinding: FunctionBindingRow = {
   config: null,
   functionDefinitionId: 'd1',
   taskIdentifier: 'images:resize',
-  databaseId: 'db1',
   description: null,
   payloadArgs: null
 };

@@ -19,17 +19,18 @@
  */
 
 import { Logger } from '@pgpmjs/logger';
+import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import express, { Request, Response, Router } from 'express';
-import { escapeIdentifier } from 'pg';
 
 const log = new Logger('fn');
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface BindingRow {
+  id: string;
+  function_definition_id: string;
   config: RestBindingConfig | null;
   task_identifier: string;
-  database_id: string;
 }
 
 interface RestBindingConfig {
@@ -76,13 +77,21 @@ async function handleInvoke(req: Request, res: Response): Promise<void> {
     const resolved = await ctx.withPgClient(async (client) => {
       const matches: Array<{ binding: BindingRow; module: (typeof compute.modules)[number] }> = [];
       for (const module of compute.modules) {
-        const { rows } = await client.query<BindingRow>(
-          `SELECT b.config, d.task_identifier, d.database_id
-           FROM ${escapeIdentifier(module.schemaName)}.${escapeIdentifier(module.bindingsTableName)} b
-           JOIN ${escapeIdentifier(module.schemaName)}.${escapeIdentifier(module.definitionsTableName)} d ON d.id = b.function_definition_id
-           WHERE b.api_id = $1 AND b.alias = $2`,
-          [ctx.api.apiId, alias]
-        );
+        // Binding lookup carries everything the invocation insert needs:
+        // the binding id (api_binding_id), the definition it points at
+        // (function_definition_id), the resolved task_identifier, and config.
+        const { text, values } = new QueryBuilder()
+          .schema(module.schemaName)
+          .table(module.bindingsTableName, 'b')
+          .select(['b.id', 'b.function_definition_id', 'b.config', 'd.task_identifier'])
+          .innerJoin(module.definitionsTableName, 'b.function_definition_id', '=', 'd.id', {
+            schema: module.schemaName,
+            alias: 'd',
+          })
+          .where('b.api_id', '=', ctx.api.apiId)
+          .where('b.alias', '=', alias)
+          .build();
+        const { rows } = await client.query<BindingRow>(text, values);
         for (const row of rows) {
           matches.push({ binding: row, module });
         }
@@ -116,15 +125,34 @@ async function handleInvoke(req: Request, res: Response): Promise<void> {
     // input schema here, before the invocation row is inserted.
     const payload = req.body ?? {};
 
-    const { invocationsSchemaName, invocationsTableName } = resolved[0].module;
+    const { invocationsSchemaName, invocationsTableName, invocationsEntityField } = resolved[0].module;
+
+    // API-channel provenance: set both the definition and the binding the
+    // invocation came through, at status 'pending'. The database's AFTER
+    // INSERT enqueue trigger schedules the job — the server never enqueues.
+    const insertData: Record<string, SqlValue> = {
+      task_identifier: binding.task_identifier,
+      function_definition_id: binding.function_definition_id,
+      api_binding_id: binding.id,
+      status: 'pending',
+      payload: JSON.stringify(payload),
+    };
+    // Scope-key column driven by the module's recorded entity_field: set for
+    // the database scope (database_id), absent for global scopes. Never a
+    // switch on scope name.
+    if (invocationsEntityField) {
+      insertData[invocationsEntityField] = ctx.api.databaseId ?? ctx.databaseId;
+    }
+
+    const { text, values } = new QueryBuilder()
+      .schema(invocationsSchemaName)
+      .table(invocationsTableName)
+      .insert(insertData)
+      .returning(['id'])
+      .build();
+
     const invocationId = await ctx.withPgClient(async (client) => {
-      const { rows } = await client.query<{ id: string }>(
-        `INSERT INTO ${escapeIdentifier(invocationsSchemaName)}.${escapeIdentifier(invocationsTableName)}
-         (database_id, task_identifier, payload)
-         VALUES ($1, $2, $3::jsonb)
-         RETURNING id`,
-        [binding.database_id, binding.task_identifier, JSON.stringify(payload)]
-      );
+      const { rows } = await client.query<{ id: string }>(text, values);
       return rows[0].id;
     });
 
@@ -167,12 +195,13 @@ async function handleGetInvocation(req: Request, res: Response): Promise<void> {
         const key = `${module.invocationsSchemaName}.${module.invocationsTableName}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        const { rows } = await client.query<InvocationRow>(
-          `SELECT id, status, result, error, created_at, started_at, completed_at, duration_ms
-           FROM ${escapeIdentifier(module.invocationsSchemaName)}.${escapeIdentifier(module.invocationsTableName)}
-           WHERE id = $1`,
-          [id]
-        );
+        const { text, values } = new QueryBuilder()
+          .schema(module.invocationsSchemaName)
+          .table(module.invocationsTableName)
+          .select(['id', 'status', 'result', 'error', 'created_at', 'started_at', 'completed_at', 'duration_ms'])
+          .where('id', '=', id)
+          .build();
+        const { rows } = await client.query<InvocationRow>(text, values);
         if (rows[0]) return rows[0];
       }
       return undefined;

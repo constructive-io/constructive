@@ -478,6 +478,9 @@ importers:
 
   graphile/graphile-function-bindings:
     dependencies:
+      '@constructive-io/query-builder':
+        specifier: workspace:^
+        version: link:../../postgres/query-builder/dist
       '@dataplan/pg':
         specifier: 1.0.3
         version: 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.13.0)))(grafast@1.0.2(graphql@16.13.0))(graphile-config@1.0.1)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
@@ -1729,6 +1732,9 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
+      '@constructive-io/query-builder':
+        specifier: workspace:^
+        version: link:../../postgres/query-builder/dist
       '@constructive-io/s3-utils':
         specifier: workspace:^
         version: link:../../uploads/s3-utils/dist

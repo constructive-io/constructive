@@ -22,8 +22,10 @@ const COMPUTE_MODULE_SQL = `
   SELECT
     fs.schema_name AS functions_schema_name,
     fm.definitions_table_name,
+    fm.bindings_table_name,
     ivs.schema_name AS invocations_schema_name,
-    ivm.invocations_table_name
+    ivm.invocations_table_name,
+    ivm.entity_field AS invocations_entity_field
   FROM metaschema_modules_public.function_module fm
   JOIN metaschema_public.schema fs ON fs.id = fm.schema_id
   JOIN metaschema_modules_public.function_invocation_module ivm
@@ -38,8 +40,10 @@ const COMPUTE_MODULE_SQL = `
 interface ComputeModuleRow {
   functions_schema_name: string;
   definitions_table_name: string;
+  bindings_table_name: string;
   invocations_schema_name: string;
   invocations_table_name: string;
+  invocations_entity_field: string | null;
 }
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
@@ -60,12 +64,15 @@ export const computeLoader: ModuleLoader<ComputeConfig> = createModuleLoader<Com
       modules: result.rows.map((row) => ({
         schemaName: row.functions_schema_name,
         definitionsTableName: row.definitions_table_name,
-        // The bindings table name is derived exactly as the metaschema
-        // generator derives it (metaschema_generators.function_module:
-        // regexp_replace(definitions_table_name, '_definitions$', '_api_bindings')).
-        bindingsTableName: row.definitions_table_name.replace(/_definitions$/, '_api_bindings'),
+        // Physical bindings table name, recorded by the metaschema generator
+        // on the function_module config row — read as a fact, never derived
+        // from the definitions table name.
+        bindingsTableName: row.bindings_table_name,
         invocationsSchemaName: row.invocations_schema_name,
         invocationsTableName: row.invocations_table_name,
+        // Scope-key column of the invocations table (entity_field), or NULL
+        // for global scopes. Consumers set this column on inserts.
+        invocationsEntityField: row.invocations_entity_field,
       })),
     };
   },

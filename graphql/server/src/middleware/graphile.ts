@@ -231,6 +231,7 @@ const buildPreset = (
             definitionsTable: m.definitionsTableName,
             invocationsSchema: m.invocationsSchemaName,
             invocationsTable: m.invocationsTableName,
+            invocationsEntityField: m.invocationsEntityField,
           })),
         }),
       ]

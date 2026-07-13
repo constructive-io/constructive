@@ -32,10 +32,10 @@ import 'graphile-build-pg';
 
 import { withPgClientFromPgService } from '@dataplan/pg';
 import { Logger } from '@pgpmjs/logger';
+import { QueryBuilder, type SqlValue } from '@constructive-io/query-builder';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { toCamelCase, toConstantCase, toPascalCase } from 'inflekt';
-import { escapeIdentifier } from 'pg';
 
 import type { DerivedField, DerivedInput } from './derive';
 import { buildInvocationPayload, deriveInputFields, isGraphqlEnabled } from './derive';
@@ -74,27 +74,34 @@ async function loadBindings(
     const bindings: LoadedBinding[] = [];
     for (const module of options.modules) {
       const { computeSchema, bindingsTable, definitionsTable } = module;
+      const { text, values } = new QueryBuilder()
+        .schema(computeSchema)
+        .table(bindingsTable, 'b')
+        .select([
+          'b.id',
+          'b.alias',
+          'b.config',
+          'b.function_definition_id',
+          'd.task_identifier',
+          'd.description',
+          'd.payload_args'
+        ])
+        .innerJoin(definitionsTable, 'b.function_definition_id', '=', 'd.id', {
+          schema: computeSchema,
+          alias: 'd'
+        })
+        .where('b.api_id', '=', options.apiId)
+        .orderBy('b.alias', 'ASC')
+        .build();
       const { rows } = await client.query<{
         id: string;
         alias: string;
         config: Record<string, unknown> | null;
         function_definition_id: string;
         task_identifier: string;
-        database_id: string | null;
         description: string | null;
         payload_args: FunctionBindingRow['payloadArgs'];
-      }>({
-        text: `
-          SELECT b.id, b.alias, b.config, b.function_definition_id,
-                 d.task_identifier, d.database_id, d.description, d.payload_args
-          FROM ${escapeIdentifier(computeSchema)}.${escapeIdentifier(bindingsTable)} b
-          JOIN ${escapeIdentifier(computeSchema)}.${escapeIdentifier(definitionsTable)} d
-            ON d.id = b.function_definition_id
-          WHERE b.api_id = $1
-          ORDER BY b.alias
-        `,
-        values: [options.apiId]
-      });
+      }>({ text, values });
 
       for (const row of rows) {
         if (!isGraphqlEnabled(row.config)) continue;
@@ -104,7 +111,6 @@ async function loadBindings(
           config: row.config,
           functionDefinitionId: row.function_definition_id,
           taskIdentifier: row.task_identifier,
-          databaseId: row.database_id,
           description: row.description,
           payloadArgs: row.payload_args,
           module
@@ -249,6 +255,7 @@ export function createFunctionBindingsPlugin(
             const capturedDerived = derived;
             const capturedInvocationsSchema = binding.module.invocationsSchema;
             const capturedInvocationsTable = binding.module.invocationsTable;
+            const capturedInvocationsEntityField = binding.module.invocationsEntityField;
             const capturedResource = invocationsResource;
 
             const PayloadType = new GraphQLObjectType({
@@ -310,27 +317,32 @@ export function createFunctionBindingsPlugin(
                   const $result = lambda($combined, async (vals: any) => {
                     const { withPgClient, pgSettings, clientMutationId, ...input } = vals;
                     const payload = buildInvocationPayload(capturedDerived, input);
+                    // API-channel provenance: set both the definition and the
+                    // binding the invocation came through, at status 'pending'.
+                    // The database's AFTER INSERT enqueue trigger schedules the
+                    // job — the plugin never enqueues.
+                    const insertData: Record<string, SqlValue> = {
+                      task_identifier: capturedBinding.taskIdentifier,
+                      function_definition_id: capturedBinding.functionDefinitionId,
+                      api_binding_id: capturedBinding.bindingId,
+                      status: 'pending',
+                      payload: payload === null ? null : JSON.stringify(payload)
+                    };
+                    // Scope-key column driven by the module's recorded
+                    // entity_field: set for the database scope (database_id
+                    // from the request's jwt claim), absent for global scopes.
+                    if (capturedInvocationsEntityField) {
+                      const dbId = pgSettings?.['jwt.claims.database_id'];
+                      insertData[capturedInvocationsEntityField] = dbId ? dbId : null;
+                    }
+                    const { text, values } = new QueryBuilder()
+                      .schema(capturedInvocationsSchema)
+                      .table(capturedInvocationsTable)
+                      .insert(insertData)
+                      .returning(['id', 'status'])
+                      .build();
                     return withPgClient(pgSettings, async (pgClient: any) => {
-                      const { rows } = await pgClient.query({
-                        text: `
-                          INSERT INTO ${escapeIdentifier(capturedInvocationsSchema)}.${escapeIdentifier(capturedInvocationsTable)}
-                            (database_id, task_identifier, payload)
-                          VALUES (
-                            COALESCE(
-                              $1::uuid,
-                              NULLIF(current_setting('jwt.claims.database_id', true), '')::uuid
-                            ),
-                            $2,
-                            $3::jsonb
-                          )
-                          RETURNING id, status
-                        `,
-                        values: [
-                          capturedBinding.databaseId,
-                          capturedBinding.taskIdentifier,
-                          payload === null ? null : JSON.stringify(payload)
-                        ]
-                      });
+                      const { rows } = await pgClient.query({ text, values });
                       const row = rows[0];
                       return {
                         clientMutationId: clientMutationId ?? null,

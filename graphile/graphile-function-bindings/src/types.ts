@@ -31,7 +31,6 @@ export interface FunctionBindingRow {
   config: Record<string, unknown> | null;
   functionDefinitionId: string;
   taskIdentifier: string;
-  databaseId: string | null;
   description: string | null;
   payloadArgs: PayloadArg[] | null;
 }
@@ -53,6 +52,12 @@ export interface ComputeModuleNames {
   invocationsSchema: string;
   /** Invocations table name. */
   invocationsTable: string;
+  /**
+   * Scope-key column of the invocations table (metaschema `entity_field`):
+   * `database_id` for the database scope, `null` for global scopes. Set on
+   * the invocation insert instead of switching on scope name.
+   */
+  invocationsEntityField: string | null;
 }
 
 export interface FunctionBindingsPluginOptions {

@@ -74,7 +74,8 @@ describe('function bindings plugin', () => {
           bindingsTable: 'function_api_bindings',
           definitionsTable: 'function_definitions',
           invocationsSchema: 'compute_public',
-          invocationsTable: 'function_invocations'
+          invocationsTable: 'function_invocations',
+          invocationsEntityField: null
         }
       ]
     });
@@ -203,7 +204,7 @@ describe('function bindings plugin', () => {
       [payload.invocationId]
     );
     expect(rows).toHaveLength(1);
-    expect(rows[0].task_identifier).toBe('app/resize_image');
+    expect(rows[0].task_identifier).toBe('app:resize_image');
     expect(rows[0].status).toBe('pending');
     expect(rows[0].payload).toEqual({ url: 'https://example.com/a.png', width: 640 });
   });
@@ -230,7 +231,7 @@ describe('function bindings plugin', () => {
       [payload.invocationId]
     );
     expect(rows).toHaveLength(1);
-    expect(rows[0].task_identifier).toBe('app/send_email');
+    expect(rows[0].task_identifier).toBe('app:send_email');
     expect(rows[0].payload).toEqual({ to: 'a@b.c', subject: 'hi' });
   });
 
@@ -260,6 +261,6 @@ describe('function bindings plugin', () => {
     expect(payload.invocation).not.toBeNull();
     expect(payload.invocation!.rowId).toBe(payload.invocationId);
     expect(payload.invocation!.status).toBe('pending');
-    expect(payload.invocation!.taskIdentifier).toBe('app/resize_image');
+    expect(payload.invocation!.taskIdentifier).toBe('app:resize_image');
   });
 });

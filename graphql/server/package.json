@@ -45,6 +45,7 @@
     "@constructive-io/express-context": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/query-builder": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.2",

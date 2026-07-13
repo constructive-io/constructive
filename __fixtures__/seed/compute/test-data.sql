@@ -45,38 +45,34 @@ VALUES (
   'app'
 ) ON CONFLICT (id) DO NOTHING;
 
--- Function definitions
-INSERT INTO compute_public.function_definitions (id, database_id, name, task_identifier, description, payload_args)
+-- Function definitions (task_identifier is generated = category || ':' || name)
+INSERT INTO compute_public.function_definitions (id, category, name, description, payload_args)
 VALUES
   (
     '9dba0004-0000-4000-8000-000000000004',
-    '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
-    'resize-image',
-    'app/resize_image',
+    'app',
+    'resize_image',
     'Resize an image',
     '[{"name": "url", "type": "text"}, {"name": "width", "type": "int"}]'
   ),
   (
     '9dba0007-0000-4000-8000-000000000007',
-    '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
-    'send-email',
-    'app/send_email',
+    'app',
+    'send_email',
     NULL,
     '[]'
   ),
   (
     '9dba0008-0000-4000-8000-000000000008',
-    '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
-    'secret-fn',
-    'app/secret_fn',
+    'app',
+    'secret_fn',
     NULL,
     '[]'
   ),
   (
     '9dba0009-0000-4000-8000-000000000009',
-    '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
-    'validate-order',
-    'app/validate_order',
+    'app',
+    'validate_order',
     NULL,
     '[]'
   )

@@ -39,6 +39,7 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
+    "@constructive-io/query-builder": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "inflekt": "^0.7.1",
     "pg": "^8.21.0"
