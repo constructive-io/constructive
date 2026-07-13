@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.9.0...@constructive-io/express-context@0.10.0) (2026-07-13)
+
+### Features
+
+- consume finalized DB invocation model (loader-resolved tables, provenance inserts) ([60a9b6e](https://github.com/constructive-io/constructive/commit/60a9b6e2347e286a68207f940a3384ede098734c))
+- inject jwt.claims.api_id provenance claim and add REST /fn routes ([0aa60ee](https://github.com/constructive-io/constructive/commit/0aa60ee7ccf2066a419301e1ec553119cde61bfb)), closes [constructive-io/constructive-planning#1149](https://github.com/constructive-io/constructive-planning/issues/1149)
+
 # [0.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.8.6...@constructive-io/express-context@0.9.0) (2026-07-12)
 
 **Note:** Version bump only for package @constructive-io/express-context

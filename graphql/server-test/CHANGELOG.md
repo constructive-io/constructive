@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.32.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.31.1...graphql-server-test@2.32.0) (2026-07-13)
+
+### Features
+
+- inject jwt.claims.api_id provenance claim and add REST /fn routes ([0aa60ee](https://github.com/constructive-io/constructive/commit/0aa60ee7ccf2066a419301e1ec553119cde61bfb)), closes [constructive-io/constructive-planning#1149](https://github.com/constructive-io/constructive-planning/issues/1149)
+
 ## [2.31.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.31.0...graphql-server-test@2.31.1) (2026-07-13)
 
 **Note:** Version bump only for package graphql-server-test
