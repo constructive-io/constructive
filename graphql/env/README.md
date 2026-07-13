@@ -56,6 +56,8 @@ PGPM and Constructive defaults
 
 In addition to the PostgreSQL/PGPM values supplied by `@pgpmjs/env`, this package parses the Constructive-owned variables below.
 
+The generic boolean, number, and comma-separated string conversions come from `12factor-env/parsers`. GraphQL env continues to own the variable names, defaults, output structure, and merge behavior listed here.
+
 ### Server
 
 - `PORT`
@@ -139,3 +141,5 @@ Constructive defaults are provided by `@constructive-io/graphql-types`. They inc
 ## Follow-up boundary
 
 This refactor moves only server, CDN/storage, jobs, SMTP, and `getNodeEnv()` ownership out of PGPM. It does not consolidate environment variables currently managed by Mailgun providers, individual functions, Knative runtimes, LLM integrations, observability, CAPTCHA, Graphile runtime helpers, or test harnesses. Existing behavior in those areas remains unchanged and can be addressed separately.
+
+Common parser functions are centralized in `12factor-env`, including the compatible boolean helper used by several jobs and function runtimes. That shared mechanism does not transfer ownership of those runtimes' environment variables to GraphQL env or `12factor-env`.

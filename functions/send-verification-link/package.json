@@ -33,11 +33,11 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@constructive-io/knative-job-fn": "workspace:^",
     "@constructive-io/postmaster": "workspace:^",
     "@launchql/mjml": "0.1.1",
     "@launchql/styled-email": "0.1.0",
-    "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "graphql-request": "^7.1.2",
     "graphql-tag": "^2.12.6",

@@ -33,9 +33,9 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@constructive-io/knative-job-fn": "workspace:^",
     "@constructive-io/postmaster": "workspace:^",
-    "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "simple-smtp-server": "workspace:^"
   }

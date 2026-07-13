@@ -2,28 +2,11 @@ import {
   BucketProvider,
   ConstructiveOptions
 } from '@constructive-io/graphql-types';
-
-/**
- * Parse GraphQL-related environment variables.
- * These are the env vars that Constructive packages need but pgpm doesn't.
- */
-const parseEnvBoolean = (val?: string): boolean | undefined => {
-  if (val === undefined) return undefined;
-  return ['true', '1', 'yes'].includes(val.toLowerCase());
-};
-
-const parseEnvNumber = (val?: string): number | undefined => {
-  const num = Number(val);
-  return !isNaN(num) ? num : undefined;
-};
-
-const parseEnvStringArray = (val?: string): string[] | undefined => {
-  if (!val) return undefined;
-  return val
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-};
+import {
+  parseEnvBoolean,
+  parseEnvNumber,
+  parseEnvStringArray
+} from '12factor-env/parsers';
 
 type NodeEnv = 'development' | 'production' | 'test';
 
@@ -34,6 +17,9 @@ export const getNodeEnv = (): NodeEnv => {
 };
 
 /**
+ * Parse GraphQL-related environment variables.
+ * These are the env vars that Constructive packages need but pgpm doesn't.
+ *
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
 export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {

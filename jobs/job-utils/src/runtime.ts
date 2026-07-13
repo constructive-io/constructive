@@ -1,14 +1,9 @@
 import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
 import { jobsDefaults, type ConstructiveOptions } from '@constructive-io/graphql-types';
-import { parseEnvBoolean } from '@pgpmjs/env';
+import { parseEnvBoolean } from '12factor-env/parsers';
 import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
 import { buildConnectionString, getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
-
-type Maybe<T> = T | null | undefined;
-
-const toStrArray = (v: Maybe<string>): string[] | undefined =>
-  v ? v.split(',').map(s => s.trim()).filter(Boolean) : undefined;
 
 // ---- PG config ----
 export const getJobPgConfig = (): PgConfig => {

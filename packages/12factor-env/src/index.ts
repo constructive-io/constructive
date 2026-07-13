@@ -174,3 +174,9 @@ export {
 };
 
 export type { ValidatorSpec, CleanedEnv };
+
+export {
+  parseEnvBoolean,
+  parseEnvNumber,
+  parseEnvStringArray,
+} from './parsers.js';

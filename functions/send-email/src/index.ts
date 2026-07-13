@@ -1,7 +1,7 @@
 import { createJobApp } from '@constructive-io/knative-job-fn';
 import { send as sendSmtp } from 'simple-smtp-server';
 import { send as sendPostmaster } from '@constructive-io/postmaster';
-import { parseEnvBoolean } from '@pgpmjs/env';
+import { parseEnvBoolean } from '12factor-env/parsers';
 import { createLogger } from '@pgpmjs/logger';
 
 type SimpleEmailPayload = {

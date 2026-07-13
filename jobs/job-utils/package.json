@@ -36,9 +36,9 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "12factor-env": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^"

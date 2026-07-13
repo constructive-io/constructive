@@ -246,23 +246,15 @@ const envOptions = getEnvVars();
 const envOptions = getEnvVars(process.env);
 ```
 
-### getNodeEnv()
+### Shared environment parsers
 
-Get normalized NODE_ENV:
+Generic string-to-value parsing is provided by the neutral `12factor-env`
+package rather than `@pgpmjs/env`:
 
-```typescript
-import { getNodeEnv } from '@pgpmjs/env';
-
-const env = getNodeEnv();
-// Returns 'development' | 'production' | 'test'
-```
-
-### parseEnvBoolean()
-
-Parse boolean environment variable:
+#### parseEnvBoolean()
 
 ```typescript
-import { parseEnvBoolean } from '@pgpmjs/env';
+import { parseEnvBoolean } from '12factor-env/parsers';
 
 parseEnvBoolean('true');  // true
 parseEnvBoolean('1');     // true
@@ -271,16 +263,23 @@ parseEnvBoolean('false'); // false
 parseEnvBoolean(undefined); // undefined
 ```
 
-### parseEnvNumber()
-
-Parse numeric environment variable:
+#### parseEnvNumber()
 
 ```typescript
-import { parseEnvNumber } from '@pgpmjs/env';
+import { parseEnvNumber } from '12factor-env/parsers';
 
 parseEnvNumber('5432');    // 5432
 parseEnvNumber('invalid'); // undefined
 parseEnvNumber(undefined); // undefined
+```
+
+#### parseEnvStringArray()
+
+```typescript
+import { parseEnvStringArray } from '12factor-env/parsers';
+
+parseEnvStringArray('jobs,email'); // ['jobs', 'email']
+parseEnvStringArray(undefined);    // undefined
 ```
 
 ## pgpm.json Configuration

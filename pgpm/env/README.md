@@ -16,6 +16,8 @@ Lower-level environment management for PostgreSQL and the PGPM toolchain. It res
 
 `@pgpmjs/env` owns database connections, test database settings, workspace/package configuration, deployment, migrations, and PGPM error output. HTTP server, CDN/storage, jobs, and SMTP configuration are owned by the upper-level `@constructive-io/graphql-env` resolver.
 
+Generic string-to-value conversion is provided by `12factor-env/parsers`. PGPM env still owns which PGPM variables are read and how their parsed values map into `PgpmOptions`.
+
 ## Features
 
 - Config file discovery using `walkUp` utility
@@ -39,3 +41,5 @@ For a complete Constructive configuration, including PGPM values plus GraphQL ru
 ## Ownership change
 
 This refactor moves only the existing server, CDN/storage, jobs, and SMTP configuration, plus `getNodeEnv()`, from PGPM env to GraphQL env. It does not consolidate other environment variables currently read by Mailgun providers, functions, Knative runtimes, LLM integrations, or other packages; those remain follow-up work.
+
+The shared boolean and number parser implementations are now owned by the neutral `12factor-env` mechanism layer rather than being public PGPM utilities. This changes parser ownership without moving any additional environment variables into or out of PGPM env.

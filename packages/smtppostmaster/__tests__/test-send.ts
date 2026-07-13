@@ -1,12 +1,8 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { SmtpOptions } from '@constructive-io/graphql-types';
+import { parseEnvBoolean } from '12factor-env/parsers';
 import { send } from '../src/index';
 import { createSmtpCatcher } from './smtp-catcher';
-
-const parseEnvBoolean = (val?: string): boolean | undefined => {
-  if (val === undefined) return undefined;
-  return ['true', '1', 'yes'].includes(val.toLowerCase());
-};
 
 const main = async () => {
   const useCatcher = parseEnvBoolean(process.env.SMTP_TEST_USE_CATCHER) ?? false;

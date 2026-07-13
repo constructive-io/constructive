@@ -50,6 +50,44 @@ console.log(config.DATABASE_URL); // Validated string
 console.log(config.PORT);         // Validated number
 ```
 
+## Permissive Parsers
+
+For callers that already decide whether a value is required and only need the
+historical Constructive conversion semantics, the package provides three pure
+parsers:
+
+```ts
+import {
+  parseEnvBoolean,
+  parseEnvNumber,
+  parseEnvStringArray,
+} from '12factor-env/parsers';
+
+parseEnvBoolean('yes'); // true
+parseEnvNumber('3000'); // 3000
+parseEnvStringArray('email, thumbnail'); // ['email', 'thumbnail']
+```
+
+They are also exported from the package root. The `parsers` entry has no access
+to `process.env`, the filesystem, secret files, or envalid; it only converts the
+value passed by the caller.
+
+These parsers are deliberately permissive to preserve existing runtime
+behavior:
+
+- `parseEnvBoolean()` returns `undefined` only for an absent value. It returns
+  `true` for `true`, `1`, or `yes` (case-insensitive), and `false` for every
+  other defined string.
+- `parseEnvNumber()` uses JavaScript `Number()` conversion and returns
+  `undefined` only when the result is `NaN`.
+- `parseEnvStringArray()` splits on commas, trims entries, and removes empty
+  entries.
+
+Use the envalid-backed validators such as `bool()`, `num()`, and `port()` when
+invalid or missing configuration must be rejected. Use the pure parsers when
+the caller owns defaults and validation and compatibility with the permissive
+conversion rules is required.
+
 ## Secret File Support
 
 This library supports reading secrets from files, which is useful for Docker secrets and Kubernetes secrets that are mounted as files.
