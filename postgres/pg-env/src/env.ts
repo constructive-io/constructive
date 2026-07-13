@@ -1,9 +1,5 @@
 import { defaultPgConfig,PgConfig } from './pg-config';
-
-const parseEnvNumber = (val?: string): number | undefined => {
-  const num = Number(val);
-  return !isNaN(num) ? num : undefined;
-};
+import { parseEnvNumber } from '12factor-env/parsers';
 
 export const getPgEnvVars = (): Partial<PgConfig> => {
   const {

@@ -36,6 +36,7 @@
     "nodemailer": "^6.9.13"
   },
   "devDependencies": {
+    "12factor-env": "workspace:^",
     "@types/nodemailer": "^7.0.11",
     "@types/smtp-server": "^3.5.13",
     "makage": "^0.3.0",

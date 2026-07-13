@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
 import { send as sendPostmaster } from '@constructive-io/postmaster';
 import { send as sendSmtp } from 'simple-smtp-server';
-import { parseEnvBoolean } from '@pgpmjs/env';
+import { parseEnvBoolean } from '12factor-env/parsers';
 import { createLogger } from '@pgpmjs/logger';
 
 const isDryRun = parseEnvBoolean(process.env.SEND_VERIFICATION_LINK_DRY_RUN ?? process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;

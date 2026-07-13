@@ -15,7 +15,7 @@ export {
   resolveWorkspaceByType
 } from './config';
 export type { WorkspaceType } from './config';
-export { getEnvVars, parseEnvBoolean, parseEnvNumber } from './env';
+export { getEnvVars } from './env';
 export { walkUp, replaceArrays } from './utils';
 
 export type { PgpmOptions, PgTestConnectionOptions, DeploymentOptions } from '@pgpmjs/types';

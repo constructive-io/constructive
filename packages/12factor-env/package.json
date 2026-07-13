@@ -6,6 +6,27 @@
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.js",
+      "default": "./index.js"
+    },
+    "./parsers": {
+      "types": "./parsers.d.ts",
+      "import": "./parsers.js",
+      "require": "./parsers.js",
+      "default": "./parsers.js"
+    },
+    "./index": "./index.js",
+    "./index.js": "./index.js",
+    "./parsers.js": "./parsers.js",
+    "./esm": "./esm/index.js",
+    "./esm/index": "./esm/index.js",
+    "./esm/index.js": "./esm/index.js",
+    "./package.json": "./package.json"
+  },
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
   "publishConfig": {

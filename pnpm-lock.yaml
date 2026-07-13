@@ -262,15 +262,15 @@ importers:
 
   functions/send-email:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn/dist
       '@constructive-io/postmaster':
         specifier: workspace:^
         version: link:../../packages/postmaster/dist
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -285,6 +285,9 @@ importers:
 
   functions/send-verification-link:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn/dist
@@ -297,9 +300,6 @@ importers:
       '@launchql/styled-email':
         specifier: 0.1.0
         version: 0.1.0(@babel/core@7.29.0)(encoding@0.1.13)(react-dom@19.2.5(react@19.2.5))(react-is@19.2.6)(react@19.2.5)
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -1356,6 +1356,9 @@ importers:
 
   graphql/env:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
@@ -2061,15 +2064,15 @@ importers:
 
   jobs/job-utils:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../../graphql/env/dist
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../../graphql/types/dist
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -2152,6 +2155,9 @@ importers:
 
   jobs/knative-job-service:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@constructive-io/job-pg':
         specifier: workspace:^
         version: link:../job-pg/dist
@@ -2176,9 +2182,6 @@ importers:
       '@constructive-io/send-verification-link-fn':
         specifier: workspace:^
         version: link:../../functions/send-verification-link/dist
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -2669,6 +2672,9 @@ importers:
         specifier: ^6.9.13
         version: 6.10.1
     devDependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../12factor-env/dist
       '@types/nodemailer':
         specifier: ^7.0.11
         version: 7.0.11
@@ -2870,6 +2876,9 @@ importers:
 
   pgpm/env:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
@@ -3122,6 +3131,10 @@ importers:
     publishDirectory: dist
 
   postgres/pg-env:
+    dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
     devDependencies:
       makage:
         specifier: ^0.3.0

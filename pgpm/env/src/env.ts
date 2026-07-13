@@ -1,14 +1,5 @@
 import { PgpmOptions } from '@pgpmjs/types';
-
-export const parseEnvNumber = (val?: string): number | undefined => {
-  const num = Number(val);
-  return !isNaN(num) ? num : undefined;
-};
-
-export const parseEnvBoolean = (val?: string): boolean | undefined => {
-  if (val === undefined) return undefined;
-  return ['true', '1', 'yes'].includes(val.toLowerCase());
-};
+import { parseEnvBoolean, parseEnvNumber } from '12factor-env/parsers';
 
 /**
  * Parse core PGPM environment variables.
