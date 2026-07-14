@@ -1224,11 +1224,11 @@ describe('QueryBuilder', () => {
   // Expression predicates and helpers
   // =========================================================================
   describe('Expression Predicates', () => {
-    it('should build whereExpr with eq / isNull / and', () => {
+    it('should build where() expression with eq / isNull / and', () => {
       const { text, values } = new QueryBuilder()
         .table('jobs')
         .select(['id'])
-        .whereExpr(and(eq(col('a'), col('b')), isNull(col('completed_at'))))
+        .where(and(eq(col('a'), col('b')), isNull(col('completed_at'))))
         .build();
 
       expect(text).toMatch(/a\s*=\s*b/);
@@ -1236,11 +1236,11 @@ describe('QueryBuilder', () => {
       expect(values).toEqual([]);
     });
 
-    it('should build whereExpr with or / not / isNotNull and bound values', () => {
+    it('should build where() expression with or / not / isNotNull and bound values', () => {
       const { text, values } = new QueryBuilder()
         .table('jobs')
         .select(['id'])
-        .whereExpr(or(gt(col('priority'), 5), not(isNotNull(col('locked_at')))))
+        .where(or(gt(col('priority'), 5), not(isNotNull(col('locked_at')))))
         .build();
 
       expect(text).toMatch(/priority\s*>\s*\$1/);
@@ -1248,12 +1248,12 @@ describe('QueryBuilder', () => {
       expect(values).toEqual([5]);
     });
 
-    it('should mix where filters and whereExpr predicates', () => {
+    it('should mix where filters and expression predicates', () => {
       const { text, values } = new QueryBuilder()
         .table('jobs')
         .select(['id'])
         .where({ status: { equalTo: 'queued' } })
-        .whereExpr(lte(col('attempts'), col('max_attempts')))
+        .where(lte(col('attempts'), col('max_attempts')))
         .build();
 
       expect(text).toMatch(/status\s*=\s*\$1/);
@@ -1261,12 +1261,12 @@ describe('QueryBuilder', () => {
       expect(values).toEqual(['queued']);
     });
 
-    it('should build havingExpr', () => {
+    it('should build having() expression', () => {
       const { text, values } = new QueryBuilder()
         .table('orders')
         .select(['customer_id'])
         .groupBy(['customer_id'])
-        .havingExpr(gt(fn('sum', [col('total')]), 1000))
+        .having(gt(fn('sum', [col('total')]), 1000))
         .build();
 
       expect(text).toMatch(/HAVING\s+sum\(\s*total\s*\)\s*>\s*\$1/);

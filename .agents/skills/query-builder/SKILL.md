@@ -89,7 +89,7 @@ Operands can be plain values (parameterized), expressions (`col()`, `fn()`), or 
 
 ## Expression Predicates and Helpers
 
-For predicates JSON can't express, use `.whereExpr()` / `.havingExpr()`:
+`.where()` / `.having()` also accept expressions directly, for predicates JSON can't express (column-to-column, arithmetic, function calls). Filters and expressions mix freely and AND-combine:
 
 ```typescript
 import {
@@ -100,7 +100,7 @@ import {
 new QueryBuilder()
   .table('jobs')
   .select(['id'])
-  .whereExpr(and(
+  .where(and(
     lte(col('attempts'), col('max_attempts')),
     or(gt(col('priority'), 5), isNull(col('locked_at')))
   ))
@@ -110,7 +110,7 @@ new QueryBuilder()
   .table('orders')
   .select(['customer_id'])
   .groupBy(['customer_id'])
-  .havingExpr(gt(fn('sum', [col('total')]), 1000))
+  .having(gt(fn('sum', [col('total')]), 1000))
   .build();
 ```
 

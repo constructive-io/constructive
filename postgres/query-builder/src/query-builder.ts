@@ -452,18 +452,12 @@ export class QueryBuilder {
   // WHERE
   // -------------------------------------------------------------------------
 
-  // SDK-style JSON filter, e.g.
+  // SDK-style JSON filter or boolean expression, e.g.
   // .where({ status: { in: ['queued', 'retry'] }, completed_at: { isNull: true } })
-  // Multiple where() calls AND-merge.
-  where(filter: Filter): this {
-    this._wherePredicates.push(filter);
-    return this;
-  }
-
-  // Arbitrary boolean expression predicate, e.g.
-  // .whereExpr(eq(col('a'), col('b')))
-  whereExpr(expr: Expr): this {
-    this._wherePredicates.push(expr);
+  // .where(eq(col('a'), col('b')))
+  // Multiple predicates and where() calls AND-merge.
+  where(...predicates: (Filter | Expr)[]): this {
+    this._wherePredicates.push(...predicates);
     return this;
   }
 
@@ -515,13 +509,8 @@ export class QueryBuilder {
     return this;
   }
 
-  having(filter: Filter): this {
-    this._havingPredicates.push(filter);
-    return this;
-  }
-
-  havingExpr(expr: Expr): this {
-    this._havingPredicates.push(expr);
+  having(...predicates: (Filter | Expr)[]): this {
+    this._havingPredicates.push(...predicates);
     return this;
   }
 

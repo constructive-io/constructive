@@ -130,7 +130,7 @@ new QueryBuilder()
 
 ### Expression predicates
 
-For predicates the JSON grammar can't express, use `.whereExpr()` / `.havingExpr()` with expression helpers:
+`.where()` / `.having()` also accept expressions directly, for predicates the JSON grammar can't express (column-to-column, arithmetic, function calls). Filters and expressions mix freely and AND-combine:
 
 ```ts
 import {
@@ -141,7 +141,7 @@ import {
 new QueryBuilder()
   .table('jobs')
   .select(['id'])
-  .whereExpr(and(
+  .where(and(
     lte(col('attempts'), col('max_attempts')),
     or(gt(col('priority'), 5), isNull(col('locked_at')))
   ))
@@ -151,7 +151,7 @@ new QueryBuilder()
   .table('orders')
   .select(['customer_id'])
   .groupBy(['customer_id'])
-  .havingExpr(gt(fn('sum', [col('total')]), 1000))
+  .having(gt(fn('sum', [col('total')]), 1000))
   .build();
 ```
 
@@ -454,16 +454,14 @@ new QueryBuilder()
 | `.insert(data)` | Build an INSERT (single row object or array of rows) |
 | `.update(data)` | Build an UPDATE with `{ column: value \| Expr }` SET pairs |
 | `.delete()` | Build a DELETE |
-| `.where(filter)` | Add a JSON filter (AND-combined across calls) |
-| `.whereExpr(expr)` | Add an expression predicate (AND-combined) |
+| `.where(...predicates)` | JSON filters and/or expressions (AND-combined across calls) |
 | `.innerJoin(table, leftCol, op, rightCol)` | INNER JOIN |
 | `.leftJoin(table, leftCol, op, rightCol)` | LEFT JOIN |
 | `.rightJoin(table, leftCol, op, rightCol)` | RIGHT JOIN |
 | `.fullJoin(table, leftCol, op, rightCol)` | FULL JOIN |
 | `.orderBy(col, dir?, nulls?)` | ORDER BY clause |
 | `.groupBy(columns)` | GROUP BY clause |
-| `.having(filter)` | HAVING clause (JSON filter) |
-| `.havingExpr(expr)` | HAVING clause (expression) |
+| `.having(...predicates)` | HAVING clause (JSON filters and/or expressions) |
 | `.limit(n)` | LIMIT clause |
 | `.offset(n)` | OFFSET clause |
 | `.distinct()` | SELECT DISTINCT |
