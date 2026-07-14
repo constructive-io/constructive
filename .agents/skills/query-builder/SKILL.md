@@ -1,9 +1,9 @@
 ---
 name: query-builder
-description: "AST-backed PostgreSQL query builder — fluent API for SELECT/INSERT/UPDATE/DELETE with JOINs, CTEs, ON CONFLICT, RETURNING, parameterized values. Uses pg-ast + pgsql-deparser. Use when building parameterized SQL queries, writing test helpers, or working with TableClient in constructive-test."
+description: "AST-backed PostgreSQL query builder — fluent API for SELECT/INSERT/UPDATE/DELETE with SDK-style JSON where filters, expression helpers, JOINs, CTEs, ON CONFLICT, RETURNING, parameterized values. Uses pg-ast + pgsql-deparser. Use when building parameterized SQL queries, writing test helpers, or working with TableClient in constructive-test."
 metadata:
   author: constructive-io
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # @constructive-io/query-builder
@@ -28,7 +28,7 @@ const { text, values } = new QueryBuilder()
   .schema('app_public')        // optional schema qualification
   .table('users')
   .select(['id', 'name'])
-  .where('active', '=', true)
+  .where({ active: { equalTo: true } })
   .orderBy('name', 'ASC')
   .limit(10)
   .offset(20)
@@ -45,16 +45,76 @@ const rows = await db.any(text, values);
 new QueryBuilder()
   .table('users')
   .select(['id', 'name', 'email'])
-  .where('age', '>', 18)
-  .where('status', '=', 'active')    // multiple .where() = AND
+  .where({ age: { greaterThan: 18 } })
+  .where({ status: { equalTo: 'active' } })    // multiple .where() = AND
   .distinct()
   .groupBy(['department'])
-  .having('COUNT(*)', '>', 5)
-  .orderBy('name', 'ASC', 'NULLS FIRST')
+  .having({ order_count: { greaterThan: 5 } })
+  .orderBy('name', 'ASC', 'FIRST')
   .limit(10)
   .offset(20)
   .build();
 ```
+
+## WHERE Filters (SDK JSON style)
+
+`.where()` and `.having()` take the same JSON filter shape as the generated ORM/SDK clients:
+
+```typescript
+new QueryBuilder()
+  .table('jobs')
+  .select(['id'])
+  .where({
+    status: { in: ['queued', 'retry'] },
+    attempts: { lessThan: 5 },
+    completed_at: { isNull: true },
+    or: [
+      { priority: { greaterThan: 0 } },
+      { escalated: { equalTo: true } },
+    ],
+  })
+  .build();
+```
+
+Field operators: `equalTo`, `notEqualTo`, `lessThan`, `lessThanOrEqualTo`, `greaterThan`, `greaterThanOrEqualTo`, `in`, `notIn` (array or subquery `QueryBuilder`), `isNull` (true/false), `distinctFrom`, `notDistinctFrom`, `like`, `notLike`, `likeInsensitive`, `notLikeInsensitive`, plus pattern sugar `includes`, `startsWith`, `endsWith` (and `not*` / `*Insensitive` variants).
+
+Combinators: `and: [...]`, `or: [...]`, `not: {...}` — nest arbitrarily. Unknown operators and empty `in` arrays throw at build time.
+
+Operands can be plain values (parameterized), expressions (`col()`, `fn()`), or subqueries:
+
+```typescript
+.where({ updated_at: { lessThan: fn('now') }, a: { equalTo: col('b') } })
+.where({ team_id: { in: subQueryBuilder } })
+```
+
+## Expression Predicates and Helpers
+
+For predicates JSON can't express, use `.whereExpr()` / `.havingExpr()`:
+
+```typescript
+import {
+  add, and, col, eq, fn, gt, gte, isNotNull, isNull,
+  lit, lt, lte, neq, not, or, param, sub, mul, div,
+} from '@constructive-io/query-builder';
+
+new QueryBuilder()
+  .table('jobs')
+  .select(['id'])
+  .whereExpr(and(
+    lte(col('attempts'), col('max_attempts')),
+    or(gt(col('priority'), 5), isNull(col('locked_at')))
+  ))
+  .build();
+
+new QueryBuilder()
+  .table('orders')
+  .select(['customer_id'])
+  .groupBy(['customer_id'])
+  .havingExpr(gt(fn('sum', [col('total')]), 1000))
+  .build();
+```
+
+Helpers: `eq/neq/lt/lte/gt/gte` (comparisons), `add/sub/mul/div` (arithmetic), `isNull/isNotNull`, `and/or/not`. All accept plain values (auto-parameterized) or expressions.
 
 ### INSERT
 ```typescript
@@ -68,7 +128,7 @@ new QueryBuilder()
 // Multi-row
 new QueryBuilder()
   .table('users')
-  .insertMany([
+  .insert([
     { name: 'Alice', email: 'alice@example.com' },
     { name: 'Bob', email: 'bob@example.com' },
   ])
@@ -81,7 +141,8 @@ new QueryBuilder()
   .onConflict({
     columns: ['email'],
     action: 'update',
-    updateColumns: { name: 'Alice Updated' },
+    updateColumns: { name: 'Alice Updated' },   // values may be Exprs
+    where: { locked: { equalTo: false } },       // optional JSON filter
   })
   .returning(['id'])
   .build();
@@ -99,8 +160,16 @@ new QueryBuilder()
 new QueryBuilder()
   .table('users')
   .update({ name: 'Alice Updated', status: 'inactive' })
-  .where('id', '=', userId)
+  .where({ id: { equalTo: userId } })
   .returning(['*'])
+  .build();
+
+// SET values accept expressions:
+new QueryBuilder()
+  .table('jobs')
+  .update({ attempts: add(col('attempts'), 1), updated_at: fn('now') })
+  .where({ completed_at: { isNull: true } })
+  .returning(['id', { expr: fn('lower', [col('name')]), as: 'name_lower' }])
   .build();
 ```
 
@@ -109,7 +178,7 @@ new QueryBuilder()
 new QueryBuilder()
   .table('users')
   .delete()
-  .where('expired', '=', true)
+  .where({ expired: { equalTo: true } })
   .returning(['id'])
   .build();
 ```
@@ -121,7 +190,7 @@ new QueryBuilder()
   .select(['orders.id', 'customers.name', 'products.title'])
   .innerJoin('customers', 'orders.customer_id', '=', 'customers.id')
   .leftJoin('products', 'orders.product_id', '=', 'products.id')
-  .where('orders.total', '>', 100)
+  .where({ 'orders.total': { greaterThan: 100 } })
   .build();
 // Also: .rightJoin(), .fullJoin()
 ```
@@ -131,7 +200,7 @@ new QueryBuilder()
 const activeCte = new QueryBuilder()
   .table('users')
   .select(['id', 'name'])
-  .where('active', '=', true);
+  .where({ active: { equalTo: true } });
 
 new QueryBuilder()
   .with('active_users', activeCte)
@@ -162,11 +231,34 @@ new QueryBuilder()
   .build();
 // => SELECT auth.authenticate(email => $1, password => $2)
 
-// With column selection
+// Result alias for a stable row key
 new QueryBuilder()
-  .call('get_users', [], ['id', 'name'])
+  .call('rollup_compute_daily', { day: '2026-01-01' }, { schema: 'private', as: 'result' })
+  .build();
+// => SELECT private.rollup_compute_daily(day => $1) AS result
+
+// Named args accept expressions (col/param/lit/fn)
+new QueryBuilder()
+  .schema('priv')
+  .call('secrets_get', { owner_id: col('s.owner_id'), default_value: lit(null) })
+  .build();
+// => SELECT priv.secrets_get(owner_id => s.owner_id, default_value => NULL)
+
+// Set-returning: SELECT columns FROM fn(...)
+new QueryBuilder()
+  .select(['id', 'name'])
+  .call('get_users', [])
   .build();
 // => SELECT id, name FROM get_users()
+
+// Computed function-call column over a base table
+new QueryBuilder()
+  .schema('priv')
+  .table('secrets', 's')
+  .select(['s.name'])
+  .selectCall('decrypted_value', 'secrets_get', { secret_name: col('s.name') }, { schema: 'priv' })
+  .build();
+// => SELECT s.name, priv.secrets_get(secret_name => s.name) AS decrypted_value FROM priv.secrets AS s
 ```
 
 ## Key Implementation Details
@@ -174,7 +266,7 @@ new QueryBuilder()
 - **AST node wrapping**: `relation` in INSERT/UPDATE/DELETE uses unwrapped `ast.rangeVar()`, while `fromClause` arrays in SELECT use wrapped `nodes.rangeVar()`.
 - **Auto-parameterization**: All values become `ParamRef` nodes (`$1`, `$2`, ...) — values are never inlined into SQL.
 - **Deparser output**: `deparseSync()` produces pretty-printed multiline SQL. Tests should use flexible regex patterns with `\s*` for whitespace matching.
-- **NULL handling**: `.where('col', 'IS', null)` produces `col IS NULL` (no parameterization for NULL).
+- **NULL handling**: `.where({ col: { isNull: true } })` produces `col IS NULL`; `{ isNull: false }` produces `col IS NOT NULL` (no parameterization for NULL).
 
 ## TableClient Integration
 
