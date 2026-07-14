@@ -16,17 +16,17 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  name: 'string',
-  provider: 'string',
-  namespaceId: 'uuid',
-  description: 'string',
-  labels: 'json',
   annotations: 'json',
   createdAt: 'string',
-  updatedAt: 'string',
-  rotatedAt: 'string',
+  description: 'string',
+  id: 'uuid',
+  labels: 'json',
+  name: 'string',
+  namespaceId: 'uuid',
+  provider: 'string',
   retiredAt: 'string',
+  rotatedAt: 'string',
+  updatedAt: 'string',
 };
 const usage =
   '\nplatform-secret <command>\n\nCommands:\n  list                  List platformSecret records\n  find-first            Find first matching platformSecret record\n  create                Create a new platformSecret\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,17 +73,17 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      name: true,
-      provider: true,
-      namespaceId: true,
-      description: true,
-      labels: true,
       annotations: true,
       createdAt: true,
-      updatedAt: true,
-      rotatedAt: true,
+      description: true,
+      id: true,
+      labels: true,
+      name: true,
+      namespaceId: true,
+      provider: true,
       retiredAt: true,
+      rotatedAt: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy> & {
@@ -104,17 +104,17 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      name: true,
-      provider: true,
-      namespaceId: true,
-      description: true,
-      labels: true,
       annotations: true,
       createdAt: true,
-      updatedAt: true,
-      rotatedAt: true,
+      description: true,
+      id: true,
+      labels: true,
+      name: true,
+      namespaceId: true,
+      provider: true,
       retiredAt: true,
+      rotatedAt: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PlatformSecretSelect, PlatformSecretFilter, PlatformSecretOrderBy> & {
@@ -136,23 +136,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'provider',
-        message: 'provider',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
+        type: 'json',
+        name: 'annotations',
+        message: 'annotations',
         required: false,
         skipPrompt: true,
       },
@@ -171,16 +157,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
-        name: 'annotations',
-        message: 'annotations',
+        type: 'text',
+        name: 'name',
+        message: 'name',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'rotatedAt',
-        message: 'rotatedAt',
+        name: 'namespaceId',
+        message: 'namespaceId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'provider',
+        message: 'provider',
         required: false,
         skipPrompt: true,
       },
@@ -188,6 +181,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'retiredAt',
         message: 'retiredAt',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'rotatedAt',
+        message: 'rotatedAt',
         required: false,
         skipPrompt: true,
       },
@@ -201,27 +201,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.platformSecret
       .create({
         data: {
-          name: cleanedData.name,
-          provider: cleanedData.provider,
-          namespaceId: cleanedData.namespaceId,
+          annotations: cleanedData.annotations,
           description: cleanedData.description,
           labels: cleanedData.labels,
-          annotations: cleanedData.annotations,
-          rotatedAt: cleanedData.rotatedAt,
+          name: cleanedData.name,
+          namespaceId: cleanedData.namespaceId,
+          provider: cleanedData.provider,
           retiredAt: cleanedData.retiredAt,
+          rotatedAt: cleanedData.rotatedAt,
         },
         select: {
-          id: true,
-          name: true,
-          provider: true,
-          namespaceId: true,
-          description: true,
-          labels: true,
           annotations: true,
           createdAt: true,
-          updatedAt: true,
-          rotatedAt: true,
+          description: true,
+          id: true,
+          labels: true,
+          name: true,
+          namespaceId: true,
+          provider: true,
           retiredAt: true,
+          rotatedAt: true,
+          updatedAt: true,
         },
       })
       .execute();

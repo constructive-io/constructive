@@ -9,8 +9,8 @@ Organizational chart edges defining parent-child reporting relationships between
 ```typescript
 db.orgChartEdge.findMany({ select: { id: true } }).execute()
 db.orgChartEdge.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgChartEdge.create({ data: { entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', positionTitle: '<String>', positionLevel: '<Int>' }, select: { id: true } }).execute()
-db.orgChartEdge.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
+db.orgChartEdge.create({ data: { childId: '<UUID>', entityId: '<UUID>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' }, select: { id: true } }).execute()
+db.orgChartEdge.update({ where: { id: '<UUID>' }, data: { childId: '<UUID>' }, select: { id: true } }).execute()
 db.orgChartEdge.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgChartEdge.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgChartEdge.findMany({
-  select: { id: true, entityId: true }
+  select: { id: true, childId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgChartEdge.findMany({
 
 ```typescript
 const item = await db.orgChartEdge.create({
-  data: { entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', positionTitle: '<String>', positionLevel: '<Int>' },
+  data: { childId: '<UUID>', entityId: '<UUID>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -12,8 +12,8 @@ csdk resource-definition list --where.<field>.<op> <value> --orderBy <values>
 csdk resource-definition list --limit 10 --after <cursor>
 csdk resource-definition find-first --where.<field>.<op> <value>
 csdk resource-definition get --id <UUID>
-csdk resource-definition create --namespaceId <UUID> --kind <String> --name <String> --slug <String> --databaseId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--defaultSpec <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>] [--integrations <String>] [--labels <JSON>] [--annotations <JSON>] [--stepUpMinAge <Interval>]
-csdk resource-definition update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--namespaceId <UUID>] [--kind <String>] [--name <String>] [--slug <String>] [--description <String>] [--defaultSpec <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>] [--integrations <String>] [--labels <JSON>] [--annotations <JSON>] [--stepUpMinAge <Interval>] [--databaseId <UUID>]
+csdk resource-definition create --databaseId <UUID> --kind <String> --name <String> --namespaceId <UUID> --slug <String> [--annotations <JSON>] [--createdBy <UUID>] [--defaultSpec <JSON>] [--description <String>] [--integrations <String>] [--labels <JSON>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--stepUpMinAge <Interval>] [--updatedBy <UUID>]
+csdk resource-definition update --id <UUID> [--annotations <JSON>] [--createdBy <UUID>] [--databaseId <UUID>] [--defaultSpec <JSON>] [--description <String>] [--integrations <String>] [--kind <String>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--slug <String>] [--stepUpMinAge <Interval>] [--updatedBy <UUID>]
 csdk resource-definition delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk resource-definition list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a resourceDefinition
 
 ```bash
-csdk resource-definition create --namespaceId <UUID> --kind <String> --name <String> --slug <String> --databaseId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--defaultSpec <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>] [--integrations <String>] [--labels <JSON>] [--annotations <JSON>] [--stepUpMinAge <Interval>]
+csdk resource-definition create --databaseId <UUID> --kind <String> --name <String> --namespaceId <UUID> --slug <String> [--annotations <JSON>] [--createdBy <UUID>] [--defaultSpec <JSON>] [--description <String>] [--integrations <String>] [--labels <JSON>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--stepUpMinAge <Interval>] [--updatedBy <UUID>]
 ```
 
 ### Get a resourceDefinition by id

@@ -9,8 +9,8 @@ Tracks aggregate entity-level usage counts (org-wide caps, no per-user breakdown
 ```typescript
 db.orgLimitAggregate.findMany({ select: { id: true } }).execute()
 db.orgLimitAggregate.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgLimitAggregate.create({ data: { name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', reserved: '<BigInt>', organizationId: '<UUID>', entityType: '<String>' }, select: { id: true } }).execute()
-db.orgLimitAggregate.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.orgLimitAggregate.create({ data: { entityId: '<UUID>', entityType: '<String>', max: '<BigInt>', name: '<String>', num: '<BigInt>', organizationId: '<UUID>', periodCredits: '<BigInt>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', reserved: '<BigInt>', softMax: '<BigInt>', windowDuration: '<Interval>', windowStart: '<Datetime>' }, select: { id: true } }).execute()
+db.orgLimitAggregate.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
 db.orgLimitAggregate.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgLimitAggregate.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgLimitAggregate.findMany({
-  select: { id: true, name: true }
+  select: { id: true, entityId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgLimitAggregate.findMany({
 
 ```typescript
 const item = await db.orgLimitAggregate.create({
-  data: { name: '<String>', entityId: '<UUID>', num: '<BigInt>', max: '<BigInt>', softMax: '<BigInt>', windowStart: '<Datetime>', windowDuration: '<Interval>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', periodCredits: '<BigInt>', reserved: '<BigInt>', organizationId: '<UUID>', entityType: '<String>' },
+  data: { entityId: '<UUID>', entityType: '<String>', max: '<BigInt>', name: '<String>', num: '<BigInt>', organizationId: '<UUID>', periodCredits: '<BigInt>', planMax: '<BigInt>', purchasedCredits: '<BigInt>', reserved: '<BigInt>', softMax: '<BigInt>', windowDuration: '<Interval>', windowStart: '<Datetime>' },
   select: { id: true }
 }).execute();
 ```

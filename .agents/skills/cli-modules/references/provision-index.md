@@ -7,7 +7,7 @@ Creates an index on a table. Accepts a jsonb definition with columns (array of n
 ## Usage
 
 ```bash
-csdk provision-index --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-index --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-index --input.clientMutationId <String> --input.databaseId <UUID>
 ### Run provisionIndex
 
 ```bash
-csdk provision-index --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-index --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```

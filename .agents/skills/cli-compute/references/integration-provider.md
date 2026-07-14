@@ -12,8 +12,8 @@ csdk integration-provider list --where.<field>.<op> <value> --orderBy <values>
 csdk integration-provider list --limit 10 --after <cursor>
 csdk integration-provider find-first --where.<field>.<op> <value>
 csdk integration-provider get --id <UUID>
-csdk integration-provider create --slug <String> --name <String> [--description <String>] [--category <String>] [--icon <String>] [--logo <Image>] [--brand <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>]
-csdk integration-provider update --id <UUID> [--slug <String>] [--name <String>] [--description <String>] [--category <String>] [--icon <String>] [--logo <Image>] [--brand <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>]
+csdk integration-provider create --name <String> --slug <String> [--brand <JSON>] [--category <String>] [--description <String>] [--icon <String>] [--logo <Image>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>]
+csdk integration-provider update --id <UUID> [--brand <JSON>] [--category <String>] [--description <String>] [--icon <String>] [--logo <Image>] [--name <String>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--slug <String>]
 csdk integration-provider delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk integration-provider list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a integrationProvider
 
 ```bash
-csdk integration-provider create --slug <String> --name <String> [--description <String>] [--category <String>] [--icon <String>] [--logo <Image>] [--brand <JSON>] [--requiredSecrets <ResourceRequirement>] [--requiredConfigs <ResourceRequirement>]
+csdk integration-provider create --name <String> --slug <String> [--brand <JSON>] [--category <String>] [--description <String>] [--icon <String>] [--logo <Image>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>]
 ```
 
 ### Get a integrationProvider by id

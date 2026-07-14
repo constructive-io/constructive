@@ -16,16 +16,16 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  resourceId: 'uuid',
-  slug: 'string',
-  namespaceId: 'uuid',
-  requirementKind: 'string',
-  name: 'string',
-  required: 'boolean',
   atomId: 'uuid',
-  present: 'boolean',
-  secretsObjectName: 'string',
   configObjectName: 'string',
+  name: 'string',
+  namespaceId: 'uuid',
+  present: 'boolean',
+  required: 'boolean',
+  requirementKind: 'string',
+  resourceId: 'uuid',
+  secretsObjectName: 'string',
+  slug: 'string',
 };
 const usage =
   '\nresources-resolved-requirement <command>\n\nCommands:\n  list                  List resourcesResolvedRequirement records\n  find-first            Find first matching resourcesResolvedRequirement record\n  create                Create a new resourcesResolvedRequirement\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -72,16 +72,16 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      resourceId: true,
-      slug: true,
-      namespaceId: true,
-      requirementKind: true,
-      name: true,
-      required: true,
       atomId: true,
-      present: true,
-      secretsObjectName: true,
       configObjectName: true,
+      name: true,
+      namespaceId: true,
+      present: true,
+      required: true,
+      requirementKind: true,
+      resourceId: true,
+      secretsObjectName: true,
+      slug: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -106,16 +106,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      resourceId: true,
-      slug: true,
-      namespaceId: true,
-      requirementKind: true,
-      name: true,
-      required: true,
       atomId: true,
-      present: true,
-      secretsObjectName: true,
       configObjectName: true,
+      name: true,
+      namespaceId: true,
+      present: true,
+      required: true,
+      requirementKind: true,
+      resourceId: true,
+      secretsObjectName: true,
+      slug: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -142,14 +142,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'resourceId',
-        message: 'resourceId',
+        name: 'atomId',
+        message: 'atomId',
         required: true,
       },
       {
         type: 'text',
-        name: 'slug',
-        message: 'slug',
+        name: 'configObjectName',
+        message: 'configObjectName',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
         required: true,
       },
       {
@@ -159,15 +165,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
-        name: 'requirementKind',
-        message: 'requirementKind',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
+        type: 'boolean',
+        name: 'present',
+        message: 'present',
         required: true,
       },
       {
@@ -178,14 +178,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'atomId',
-        message: 'atomId',
+        name: 'requirementKind',
+        message: 'requirementKind',
         required: true,
       },
       {
-        type: 'boolean',
-        name: 'present',
-        message: 'present',
+        type: 'text',
+        name: 'resourceId',
+        message: 'resourceId',
         required: true,
       },
       {
@@ -196,8 +196,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'configObjectName',
-        message: 'configObjectName',
+        name: 'slug',
+        message: 'slug',
         required: true,
       },
     ]);
@@ -210,28 +210,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.resourcesResolvedRequirement
       .create({
         data: {
-          resourceId: cleanedData.resourceId,
-          slug: cleanedData.slug,
-          namespaceId: cleanedData.namespaceId,
-          requirementKind: cleanedData.requirementKind,
-          name: cleanedData.name,
-          required: cleanedData.required,
           atomId: cleanedData.atomId,
-          present: cleanedData.present,
-          secretsObjectName: cleanedData.secretsObjectName,
           configObjectName: cleanedData.configObjectName,
+          name: cleanedData.name,
+          namespaceId: cleanedData.namespaceId,
+          present: cleanedData.present,
+          required: cleanedData.required,
+          requirementKind: cleanedData.requirementKind,
+          resourceId: cleanedData.resourceId,
+          secretsObjectName: cleanedData.secretsObjectName,
+          slug: cleanedData.slug,
         },
         select: {
-          resourceId: true,
-          slug: true,
-          namespaceId: true,
-          requirementKind: true,
-          name: true,
-          required: true,
           atomId: true,
-          present: true,
-          secretsObjectName: true,
           configObjectName: true,
+          name: true,
+          namespaceId: true,
+          present: true,
+          required: true,
+          requirementKind: true,
+          resourceId: true,
+          secretsObjectName: true,
+          slug: true,
         },
       })
       .execute();

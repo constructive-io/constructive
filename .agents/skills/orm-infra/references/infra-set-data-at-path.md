@@ -7,7 +7,7 @@ Execute the infraSetDataAtPath mutation
 ## Usage
 
 ```typescript
-db.mutation.infraSetDataAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute()
+db.mutation.infraSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.infraSetDataAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '
 ### Run infraSetDataAtPath
 
 ```typescript
-const result = await db.mutation.infraSetDataAtPath({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
+const result = await db.mutation.infraSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
 ```

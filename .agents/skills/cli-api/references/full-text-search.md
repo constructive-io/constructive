@@ -12,8 +12,8 @@ csdk full-text-search list --where.<field>.<op> <value> --orderBy <values>
 csdk full-text-search list --limit 10 --after <cursor>
 csdk full-text-search find-first --where.<field>.<op> <value>
 csdk full-text-search get --id <UUID>
-csdk full-text-search create --tableId <UUID> --fieldId <UUID> --fieldIds <UUID> --weights <String> --langs <String> [--databaseId <UUID>] [--langColumn <String>]
-csdk full-text-search update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--fieldId <UUID>] [--fieldIds <UUID>] [--weights <String>] [--langs <String>] [--langColumn <String>]
+csdk full-text-search create --fieldId <UUID> --fieldIds <UUID> --langs <String> --tableId <UUID> --weights <String> [--databaseId <UUID>] [--langColumn <String>]
+csdk full-text-search update --id <UUID> [--databaseId <UUID>] [--fieldId <UUID>] [--fieldIds <UUID>] [--langColumn <String>] [--langs <String>] [--tableId <UUID>] [--weights <String>]
 csdk full-text-search delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk full-text-search list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a fullTextSearch
 
 ```bash
-csdk full-text-search create --tableId <UUID> --fieldId <UUID> --fieldIds <UUID> --weights <String> --langs <String> [--databaseId <UUID>] [--langColumn <String>]
+csdk full-text-search create --fieldId <UUID> --fieldIds <UUID> --langs <String> --tableId <UUID> --weights <String> [--databaseId <UUID>] [--langColumn <String>]
 ```
 
 ### Get a fullTextSearch by id

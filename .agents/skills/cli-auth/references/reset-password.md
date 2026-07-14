@@ -7,7 +7,7 @@ Execute the resetPassword mutation
 ## Usage
 
 ```bash
-csdk reset-password --input.clientMutationId <String> --input.roleId <UUID> --input.resetToken <String> --input.newPassword <String>
+csdk reset-password --input.clientMutationId <String> --input.newPassword <String> --input.resetToken <String> --input.roleId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk reset-password --input.clientMutationId <String> --input.roleId <UUID> --in
 ### Run resetPassword
 
 ```bash
-csdk reset-password --input.clientMutationId <String> --input.roleId <UUID> --input.resetToken <String> --input.newPassword <String>
+csdk reset-password --input.clientMutationId <String> --input.newPassword <String> --input.resetToken <String> --input.roleId <UUID>
 ```

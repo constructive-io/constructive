@@ -6,15 +6,15 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
+import commitCmd from './commands/commit';
 import getAllRecordCmd from './commands/get-all-record';
+import objectCmd from './commands/object';
 import refCmd from './commands/ref';
 import storeCmd from './commands/store';
-import objectCmd from './commands/object';
-import commitCmd from './commands/commit';
 import initEmptyRepoCmd from './commands/init-empty-repo';
-import setDataAtPathCmd from './commands/set-data-at-path';
 import insertNodeAtPathCmd from './commands/insert-node-at-path';
 import provisionBucketCmd from './commands/provision-bucket';
+import setDataAtPathCmd from './commands/set-data-at-path';
 const createCommandMap: () => Record<
   string,
   (
@@ -25,18 +25,18 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
+  commit: commitCmd,
   'get-all-record': getAllRecordCmd,
+  object: objectCmd,
   ref: refCmd,
   store: storeCmd,
-  object: objectCmd,
-  commit: commitCmd,
   'init-empty-repo': initEmptyRepoCmd,
-  'set-data-at-path': setDataAtPathCmd,
   'insert-node-at-path': insertNodeAtPathCmd,
   'provision-bucket': provisionBucketCmd,
+  'set-data-at-path': setDataAtPathCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  get-all-record       getAllRecord CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  object               object CRUD operations\n  commit               commit CRUD operations\n  init-empty-repo      initEmptyRepo\n  set-data-at-path     setDataAtPath\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  commit               commit CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  set-data-at-path     setDataAtPath\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

@@ -9,8 +9,8 @@ Agent instance registry (human-managed or ephemeral sub-agents)
 ```typescript
 db.agent.findMany({ select: { id: true } }).execute()
 db.agent.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.agent.create({ data: { ownerId: '<UUID>', databaseId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<String>', systemPrompt: '<String>', config: '<JSON>', status: '<String>', isEphemeral: '<Boolean>' }, select: { id: true } }).execute()
-db.agent.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.agent.create({ data: { config: '<JSON>', databaseId: '<UUID>', isEphemeral: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentId: '<UUID>', personaId: '<UUID>', status: '<String>', systemPrompt: '<String>' }, select: { id: true } }).execute()
+db.agent.update({ where: { id: '<UUID>' }, data: { config: '<JSON>' }, select: { id: true } }).execute()
 db.agent.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.agent.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.agent.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, config: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.agent.findMany({
 
 ```typescript
 const item = await db.agent.create({
-  data: { ownerId: '<UUID>', databaseId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<String>', systemPrompt: '<String>', config: '<JSON>', status: '<String>', isEphemeral: '<Boolean>' },
+  data: { config: '<JSON>', databaseId: '<UUID>', isEphemeral: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentId: '<UUID>', personaId: '<UUID>', status: '<String>', systemPrompt: '<String>' },
   select: { id: true }
 }).execute();
 ```

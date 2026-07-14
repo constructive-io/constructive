@@ -12,8 +12,8 @@ csdk org-chart-edge-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk org-chart-edge-grant list --limit 10 --after <cursor>
 csdk org-chart-edge-grant find-first --where.<field>.<op> <value>
 csdk org-chart-edge-grant get --id <UUID>
-csdk org-chart-edge-grant create --entityId <UUID> --childId <UUID> [--parentId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--positionTitle <String>] [--positionLevel <Int>]
-csdk org-chart-edge-grant update --id <UUID> [--entityId <UUID>] [--childId <UUID>] [--parentId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--positionTitle <String>] [--positionLevel <Int>]
+csdk org-chart-edge-grant create --childId <UUID> --entityId <UUID> [--grantorId <UUID>] [--isGrant <Boolean>] [--parentId <UUID>] [--positionLevel <Int>] [--positionTitle <String>]
+csdk org-chart-edge-grant update --id <UUID> [--childId <UUID>] [--entityId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--parentId <UUID>] [--positionLevel <Int>] [--positionTitle <String>]
 csdk org-chart-edge-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-chart-edge-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgChartEdgeGrant
 
 ```bash
-csdk org-chart-edge-grant create --entityId <UUID> --childId <UUID> [--parentId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--positionTitle <String>] [--positionLevel <Int>]
+csdk org-chart-edge-grant create --childId <UUID> --entityId <UUID> [--grantorId <UUID>] [--isGrant <Boolean>] [--parentId <UUID>] [--positionLevel <Int>] [--positionTitle <String>]
 ```
 
 ### Get a orgChartEdgeGrant by id

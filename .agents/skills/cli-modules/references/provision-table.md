@@ -7,7 +7,7 @@ Composable table provisioning: creates or finds a table, then creates fields (so
 ## Usage
 
 ```bash
-csdk provision-table --input.clientMutationId <String> --input.databaseId <UUID> --input.schemaId <UUID> --input.tableName <String> --input.tableId <UUID> --input.nodes <JSON> --input.fields <JSON> --input.policies <JSON> --input.grants <JSON> --input.useRls <Boolean> --input.indexes <JSON> --input.fullTextSearches <JSON> --input.uniqueConstraints <JSON> --input.description <String>
+csdk provision-table --input.clientMutationId <String> --input.databaseId <UUID> --input.description <String> --input.fields <JSON> --input.fullTextSearches <JSON> --input.grants <JSON> --input.indexes <JSON> --input.nodes <JSON> --input.policies <JSON> --input.schemaId <UUID> --input.tableId <UUID> --input.tableName <String> --input.uniqueConstraints <JSON> --input.useRls <Boolean>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-table --input.clientMutationId <String> --input.databaseId <UUID>
 ### Run provisionTable
 
 ```bash
-csdk provision-table --input.clientMutationId <String> --input.databaseId <UUID> --input.schemaId <UUID> --input.tableName <String> --input.tableId <UUID> --input.nodes <JSON> --input.fields <JSON> --input.policies <JSON> --input.grants <JSON> --input.useRls <Boolean> --input.indexes <JSON> --input.fullTextSearches <JSON> --input.uniqueConstraints <JSON> --input.description <String>
+csdk provision-table --input.clientMutationId <String> --input.databaseId <UUID> --input.description <String> --input.fields <JSON> --input.fullTextSearches <JSON> --input.grants <JSON> --input.indexes <JSON> --input.nodes <JSON> --input.policies <JSON> --input.schemaId <UUID> --input.tableId <UUID> --input.tableName <String> --input.uniqueConstraints <JSON> --input.useRls <Boolean>
 ```

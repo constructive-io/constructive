@@ -9,8 +9,8 @@ Warm database pool entries. Rows are inserted as warming (which enqueues a db_po
 ```typescript
 db.dbPool.findMany({ select: { id: true } }).execute()
 db.dbPool.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.dbPool.create({ data: { presetSlug: '<String>', presetCommitId: '<UUID>', databaseId: '<UUID>', status: '<String>', errorMessage: '<String>', expiresAt: '<Datetime>', claimedBy: '<UUID>', claimedAt: '<Datetime>', bootstrapStatus: '<String>', bootstrapError: '<String>' }, select: { id: true } }).execute()
-db.dbPool.update({ where: { id: '<UUID>' }, data: { presetSlug: '<String>' }, select: { id: true } }).execute()
+db.dbPool.create({ data: { bootstrapError: '<String>', bootstrapStatus: '<String>', claimedAt: '<Datetime>', claimedBy: '<UUID>', databaseId: '<UUID>', errorMessage: '<String>', expiresAt: '<Datetime>', presetCommitId: '<UUID>', presetSlug: '<String>', status: '<String>' }, select: { id: true } }).execute()
+db.dbPool.update({ where: { id: '<UUID>' }, data: { bootstrapError: '<String>' }, select: { id: true } }).execute()
 db.dbPool.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.dbPool.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.dbPool.findMany({
-  select: { id: true, presetSlug: true }
+  select: { id: true, bootstrapError: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.dbPool.findMany({
 
 ```typescript
 const item = await db.dbPool.create({
-  data: { presetSlug: '<String>', presetCommitId: '<UUID>', databaseId: '<UUID>', status: '<String>', errorMessage: '<String>', expiresAt: '<Datetime>', claimedBy: '<UUID>', claimedAt: '<Datetime>', bootstrapStatus: '<String>', bootstrapError: '<String>' },
+  data: { bootstrapError: '<String>', bootstrapStatus: '<String>', claimedAt: '<Datetime>', claimedBy: '<UUID>', databaseId: '<UUID>', errorMessage: '<String>', expiresAt: '<Datetime>', presetCommitId: '<UUID>', presetSlug: '<String>', status: '<String>' },
   select: { id: true }
 }).execute();
 ```

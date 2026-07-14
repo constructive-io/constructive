@@ -7,8 +7,8 @@ Tracks membership records linking actors to entities with permission bitmasks, o
 ## Usage
 
 ```typescript
-useAppMembershipsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } } })
-useAppMembershipQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } } })
+useAppMembershipsQuery({ selection: { fields: { actorId: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, permissions: true, profileId: true, updatedAt: true, updatedBy: true } } })
+useAppMembershipQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, permissions: true, profileId: true, updatedAt: true, updatedBy: true } } })
 useCreateAppMembershipMutation({ selection: { fields: { id: true } } })
 useUpdateAppMembershipMutation({ selection: { fields: { id: true } } })
 useDeleteAppMembershipMutation({})
@@ -20,7 +20,7 @@ useDeleteAppMembershipMutation({})
 
 ```typescript
 const { data, isLoading } = useAppMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+  selection: { fields: { actorId: true, createdAt: true, createdBy: true, granted: true, id: true, isActive: true, isAdmin: true, isApproved: true, isBanned: true, isDisabled: true, isOwner: true, isVerified: true, permissions: true, profileId: true, updatedAt: true, updatedBy: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppMembershipsQuery({
 const { mutate } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
-mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
+mutate({ actorId: '<UUID>', createdBy: '<UUID>', granted: '<BitString>', isActive: '<Boolean>', isAdmin: '<Boolean>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isOwner: '<Boolean>', isVerified: '<Boolean>', permissions: '<BitString>', profileId: '<UUID>', updatedBy: '<UUID>' });
 ```

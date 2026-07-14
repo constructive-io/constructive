@@ -7,8 +7,8 @@ Append-only log of hierarchy edge grants and revocations; triggers apply changes
 ## Usage
 
 ```typescript
-useOrgChartEdgeGrantsQuery({ selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } } })
-useOrgChartEdgeGrantQuery({ id: '<UUID>', selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } } })
+useOrgChartEdgeGrantsQuery({ selection: { fields: { childId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, parentId: true, positionLevel: true, positionTitle: true } } })
+useOrgChartEdgeGrantQuery({ id: '<UUID>', selection: { fields: { childId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, parentId: true, positionLevel: true, positionTitle: true } } })
 useCreateOrgChartEdgeGrantMutation({ selection: { fields: { id: true } } })
 useUpdateOrgChartEdgeGrantMutation({ selection: { fields: { id: true } } })
 useDeleteOrgChartEdgeGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgChartEdgeGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgChartEdgeGrantsQuery({
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+  selection: { fields: { childId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, parentId: true, positionLevel: true, positionTitle: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgChartEdgeGrantsQuery({
 const { mutate } = useCreateOrgChartEdgeGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', positionTitle: '<String>', positionLevel: '<Int>' });
+mutate({ childId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' });
 ```

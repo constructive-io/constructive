@@ -9,8 +9,8 @@ Join table linking permission defaults to individual permissions; recompute trig
 ```typescript
 db.orgPermissionDefaultPermission.findMany({ select: { id: true } }).execute()
 db.orgPermissionDefaultPermission.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgPermissionDefaultPermission.create({ data: { permissionId: '<UUID>', entityId: '<UUID>' }, select: { id: true } }).execute()
-db.orgPermissionDefaultPermission.update({ where: { id: '<UUID>' }, data: { permissionId: '<UUID>' }, select: { id: true } }).execute()
+db.orgPermissionDefaultPermission.create({ data: { entityId: '<UUID>', permissionId: '<UUID>' }, select: { id: true } }).execute()
+db.orgPermissionDefaultPermission.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
 db.orgPermissionDefaultPermission.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgPermissionDefaultPermission.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgPermissionDefaultPermission.findMany({
-  select: { id: true, permissionId: true }
+  select: { id: true, entityId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgPermissionDefaultPermission.findMany({
 
 ```typescript
 const item = await db.orgPermissionDefaultPermission.create({
-  data: { permissionId: '<UUID>', entityId: '<UUID>' },
+  data: { entityId: '<UUID>', permissionId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

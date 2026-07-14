@@ -9,7 +9,7 @@ Append-only ledger of code redemptions; AFTER INSERT trigger validates and casca
 ```typescript
 db.appLimitCreditRedemption.findMany({ select: { id: true } }).execute()
 db.appLimitCreditRedemption.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appLimitCreditRedemption.create({ data: { creditCodeId: '<UUID>', entityId: '<UUID>', organizationId: '<UUID>', entityType: '<String>' }, select: { id: true } }).execute()
+db.appLimitCreditRedemption.create({ data: { creditCodeId: '<UUID>', entityId: '<UUID>', entityType: '<String>', organizationId: '<UUID>' }, select: { id: true } }).execute()
 db.appLimitCreditRedemption.update({ where: { id: '<UUID>' }, data: { creditCodeId: '<UUID>' }, select: { id: true } }).execute()
 db.appLimitCreditRedemption.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.appLimitCreditRedemption.findMany({
 
 ```typescript
 const item = await db.appLimitCreditRedemption.create({
-  data: { creditCodeId: '<UUID>', entityId: '<UUID>', organizationId: '<UUID>', entityType: '<String>' },
+  data: { creditCodeId: '<UUID>', entityId: '<UUID>', entityType: '<String>', organizationId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

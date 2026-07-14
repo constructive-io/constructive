@@ -7,8 +7,8 @@ Provisions security, fields, grants, and policies onto a table. Each row can ind
 ## Usage
 
 ```typescript
-useSecureTableProvisionsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grants: true, policies: true, outFields: true } } })
-useSecureTableProvisionQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grants: true, policies: true, outFields: true } } })
+useSecureTableProvisionsQuery({ selection: { fields: { databaseId: true, fields: true, grants: true, id: true, nodes: true, outFields: true, policies: true, schemaId: true, tableId: true, tableName: true, useRls: true } } })
+useSecureTableProvisionQuery({ id: '<UUID>', selection: { fields: { databaseId: true, fields: true, grants: true, id: true, nodes: true, outFields: true, policies: true, schemaId: true, tableId: true, tableName: true, useRls: true } } })
 useCreateSecureTableProvisionMutation({ selection: { fields: { id: true } } })
 useUpdateSecureTableProvisionMutation({ selection: { fields: { id: true } } })
 useDeleteSecureTableProvisionMutation({})
@@ -20,7 +20,7 @@ useDeleteSecureTableProvisionMutation({})
 
 ```typescript
 const { data, isLoading } = useSecureTableProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grants: true, policies: true, outFields: true } },
+  selection: { fields: { databaseId: true, fields: true, grants: true, id: true, nodes: true, outFields: true, policies: true, schemaId: true, tableId: true, tableName: true, useRls: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSecureTableProvisionsQuery({
 const { mutate } = useCreateSecureTableProvisionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodes: '<JSON>', useRls: '<Boolean>', fields: '<JSON>', grants: '<JSON>', policies: '<JSON>', outFields: '<UUID>' });
+mutate({ databaseId: '<UUID>', fields: '<JSON>', grants: '<JSON>', nodes: '<JSON>', outFields: '<UUID>', policies: '<JSON>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', useRls: '<Boolean>' });
 ```

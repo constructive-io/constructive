@@ -7,8 +7,8 @@ Association table scoping principals to specific organizations
 ## Usage
 
 ```typescript
-usePrincipalEntitiesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, entityId: true, ownerId: true } } })
-usePrincipalEntityQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, entityId: true, ownerId: true } } })
+usePrincipalEntitiesQuery({ selection: { fields: { createdAt: true, entityId: true, id: true, ownerId: true, principalId: true, updatedAt: true } } })
+usePrincipalEntityQuery({ id: '<UUID>', selection: { fields: { createdAt: true, entityId: true, id: true, ownerId: true, principalId: true, updatedAt: true } } })
 useCreatePrincipalEntityMutation({ selection: { fields: { id: true } } })
 useUpdatePrincipalEntityMutation({ selection: { fields: { id: true } } })
 useDeletePrincipalEntityMutation({})
@@ -20,7 +20,7 @@ useDeletePrincipalEntityMutation({})
 
 ```typescript
 const { data, isLoading } = usePrincipalEntitiesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, principalId: true, entityId: true, ownerId: true } },
+  selection: { fields: { createdAt: true, entityId: true, id: true, ownerId: true, principalId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePrincipalEntitiesQuery({
 const { mutate } = useCreatePrincipalEntityMutation({
   selection: { fields: { id: true } },
 });
-mutate({ principalId: '<UUID>', entityId: '<UUID>', ownerId: '<UUID>' });
+mutate({ entityId: '<UUID>', ownerId: '<UUID>', principalId: '<UUID>' });
 ```

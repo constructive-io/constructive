@@ -7,8 +7,8 @@ Shared system prompt templates for agent conversations
 ## Usage
 
 ```typescript
-useAgentPromptsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, name: true, content: true, description: true, isDefault: true, metadata: true } } })
-useAgentPromptQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, name: true, content: true, description: true, isDefault: true, metadata: true } } })
+useAgentPromptsQuery({ selection: { fields: { content: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isDefault: true, metadata: true, name: true, updatedAt: true, updatedBy: true } } })
+useAgentPromptQuery({ id: '<UUID>', selection: { fields: { content: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isDefault: true, metadata: true, name: true, updatedAt: true, updatedBy: true } } })
 useCreateAgentPromptMutation({ selection: { fields: { id: true } } })
 useUpdateAgentPromptMutation({ selection: { fields: { id: true } } })
 useDeleteAgentPromptMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentPromptMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentPromptsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, databaseId: true, name: true, content: true, description: true, isDefault: true, metadata: true } },
+  selection: { fields: { content: true, createdAt: true, createdBy: true, databaseId: true, description: true, id: true, isDefault: true, metadata: true, name: true, updatedAt: true, updatedBy: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentPromptsQuery({
 const { mutate } = useCreateAgentPromptMutation({
   selection: { fields: { id: true } },
 });
-mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', databaseId: '<UUID>', name: '<String>', content: '<String>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>' });
+mutate({ content: '<String>', createdBy: '<UUID>', databaseId: '<UUID>', description: '<String>', isDefault: '<Boolean>', metadata: '<JSON>', name: '<String>', updatedBy: '<UUID>' });
 ```

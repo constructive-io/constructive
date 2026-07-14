@@ -7,8 +7,8 @@ Default cap values for static configuration limits (max file size, feature flags
 ## Usage
 
 ```typescript
-useOrgLimitCapsDefaultsQuery({ selection: { fields: { id: true, name: true, max: true } } })
-useOrgLimitCapsDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, max: true } } })
+useOrgLimitCapsDefaultsQuery({ selection: { fields: { id: true, max: true, name: true } } })
+useOrgLimitCapsDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, max: true, name: true } } })
 useCreateOrgLimitCapsDefaultMutation({ selection: { fields: { id: true } } })
 useUpdateOrgLimitCapsDefaultMutation({ selection: { fields: { id: true } } })
 useDeleteOrgLimitCapsDefaultMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgLimitCapsDefaultMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgLimitCapsDefaultsQuery({
-  selection: { fields: { id: true, name: true, max: true } },
+  selection: { fields: { id: true, max: true, name: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgLimitCapsDefaultsQuery({
 const { mutate } = useCreateOrgLimitCapsDefaultMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', max: '<BigInt>' });
+mutate({ max: '<BigInt>', name: '<String>' });
 ```

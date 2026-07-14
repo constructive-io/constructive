@@ -12,8 +12,8 @@ csdk app-membership-default list --where.<field>.<op> <value> --orderBy <values>
 csdk app-membership-default list --limit 10 --after <cursor>
 csdk app-membership-default find-first --where.<field>.<op> <value>
 csdk app-membership-default get --id <UUID>
-csdk app-membership-default create [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isVerified <Boolean>]
-csdk app-membership-default update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isVerified <Boolean>]
+csdk app-membership-default create [--createdBy <UUID>] [--isApproved <Boolean>] [--isVerified <Boolean>] [--updatedBy <UUID>]
+csdk app-membership-default update --id <UUID> [--createdBy <UUID>] [--isApproved <Boolean>] [--isVerified <Boolean>] [--updatedBy <UUID>]
 csdk app-membership-default delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-membership-default list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appMembershipDefault
 
 ```bash
-csdk app-membership-default create [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isVerified <Boolean>]
+csdk app-membership-default create [--createdBy <UUID>] [--isApproved <Boolean>] [--isVerified <Boolean>] [--updatedBy <UUID>]
 ```
 
 ### Get a appMembershipDefault by id

@@ -7,8 +7,8 @@ React Query hooks for PhoneNumbersModule data operations
 ## Usage
 
 ```typescript
-usePhoneNumbersModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true, privateApiName: true } } })
-usePhoneNumbersModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true, privateApiName: true } } })
+usePhoneNumbersModulesQuery({ selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } } })
+usePhoneNumbersModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } } })
 useCreatePhoneNumbersModuleMutation({ selection: { fields: { id: true } } })
 useUpdatePhoneNumbersModuleMutation({ selection: { fields: { id: true } } })
 useDeletePhoneNumbersModuleMutation({})
@@ -20,7 +20,7 @@ useDeletePhoneNumbersModuleMutation({})
 
 ```typescript
 const { data, isLoading } = usePhoneNumbersModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true, privateApiName: true } },
+  selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePhoneNumbersModulesQuery({
 const { mutate } = useCreatePhoneNumbersModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```

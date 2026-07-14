@@ -16,19 +16,19 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'int',
-  name: 'string',
-  databaseId: 'uuid',
-  deploy: 'string',
-  deps: 'string',
-  payload: 'json',
-  content: 'string',
-  revert: 'string',
-  verify: 'string',
-  createdAt: 'string',
   action: 'string',
   actionId: 'uuid',
   actorId: 'uuid',
+  content: 'string',
+  createdAt: 'string',
+  databaseId: 'uuid',
+  deploy: 'string',
+  deps: 'string',
+  id: 'int',
+  name: 'string',
+  payload: 'json',
+  revert: 'string',
+  verify: 'string',
 };
 const usage =
   '\nsql-action <command>\n\nCommands:\n  list                  List sqlAction records\n  find-first            Find first matching sqlAction record\n  create                Create a new sqlAction\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,19 +75,19 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      name: true,
-      databaseId: true,
-      deploy: true,
-      deps: true,
-      payload: true,
-      content: true,
-      revert: true,
-      verify: true,
-      createdAt: true,
       action: true,
       actionId: true,
       actorId: true,
+      content: true,
+      createdAt: true,
+      databaseId: true,
+      deploy: true,
+      deps: true,
+      id: true,
+      name: true,
+      payload: true,
+      revert: true,
+      verify: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy> & {
@@ -108,19 +108,19 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      name: true,
-      databaseId: true,
-      deploy: true,
-      deps: true,
-      payload: true,
-      content: true,
-      revert: true,
-      verify: true,
-      createdAt: true,
       action: true,
       actionId: true,
       actorId: true,
+      content: true,
+      createdAt: true,
+      databaseId: true,
+      deploy: true,
+      deps: true,
+      id: true,
+      name: true,
+      payload: true,
+      revert: true,
+      verify: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy> & {
@@ -143,8 +143,29 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'name',
-        message: 'name',
+        name: 'action',
+        message: 'action',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'actionId',
+        message: 'actionId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'content',
+        message: 'content',
         required: false,
         skipPrompt: true,
       },
@@ -170,16 +191,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
-        name: 'payload',
-        message: 'payload',
+        type: 'text',
+        name: 'name',
+        message: 'name',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'text',
-        name: 'content',
-        message: 'content',
+        type: 'json',
+        name: 'payload',
+        message: 'payload',
         required: false,
         skipPrompt: true,
       },
@@ -197,27 +218,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'action',
-        message: 'action',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'actionId',
-        message: 'actionId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateSqlActionInput['sqlAction'];
@@ -225,32 +225,32 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.sqlAction
       .create({
         data: {
-          name: cleanedData.name,
-          databaseId: cleanedData.databaseId,
-          deploy: cleanedData.deploy,
-          deps: cleanedData.deps,
-          payload: cleanedData.payload,
-          content: cleanedData.content,
-          revert: cleanedData.revert,
-          verify: cleanedData.verify,
           action: cleanedData.action,
           actionId: cleanedData.actionId,
           actorId: cleanedData.actorId,
+          content: cleanedData.content,
+          databaseId: cleanedData.databaseId,
+          deploy: cleanedData.deploy,
+          deps: cleanedData.deps,
+          name: cleanedData.name,
+          payload: cleanedData.payload,
+          revert: cleanedData.revert,
+          verify: cleanedData.verify,
         },
         select: {
-          id: true,
-          name: true,
-          databaseId: true,
-          deploy: true,
-          deps: true,
-          payload: true,
-          content: true,
-          revert: true,
-          verify: true,
-          createdAt: true,
           action: true,
           actionId: true,
           actorId: true,
+          content: true,
+          createdAt: true,
+          databaseId: true,
+          deploy: true,
+          deps: true,
+          id: true,
+          name: true,
+          payload: true,
+          revert: true,
+          verify: true,
         },
       })
       .execute();

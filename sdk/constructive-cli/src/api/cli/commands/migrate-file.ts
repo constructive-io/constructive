@@ -16,8 +16,8 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
+  id: 'uuid',
   upload: 'string',
 };
 const usage =
@@ -65,8 +65,8 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       upload: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -88,8 +88,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       upload: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -139,8 +139,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           upload: cleanedData.upload,
         },
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           upload: true,
         },
       })

@@ -7,7 +7,7 @@ Execute the confirmDeleteAccount mutation
 ## Usage
 
 ```bash
-csdk confirm-delete-account --input.clientMutationId <String> --input.userId <UUID> --input.token <String>
+csdk confirm-delete-account --input.clientMutationId <String> --input.token <String> --input.userId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk confirm-delete-account --input.clientMutationId <String> --input.userId <UU
 ### Run confirmDeleteAccount
 
 ```bash
-csdk confirm-delete-account --input.clientMutationId <String> --input.userId <UUID> --input.token <String>
+csdk confirm-delete-account --input.clientMutationId <String> --input.token <String> --input.userId <UUID>
 ```

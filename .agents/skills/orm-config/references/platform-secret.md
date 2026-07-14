@@ -9,8 +9,8 @@ ORM operations for PlatformSecret records
 ```typescript
 db.platformSecret.findMany({ select: { id: true } }).execute()
 db.platformSecret.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformSecret.create({ data: { name: '<String>', provider: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' }, select: { id: true } }).execute()
-db.platformSecret.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.platformSecret.create({ data: { annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute()
+db.platformSecret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
 db.platformSecret.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.platformSecret.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.platformSecret.findMany({
-  select: { id: true, name: true }
+  select: { id: true, annotations: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.platformSecret.findMany({
 
 ```typescript
 const item = await db.platformSecret.create({
-  data: { name: '<String>', provider: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' },
+  data: { annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' },
   select: { id: true }
 }).execute();
 ```

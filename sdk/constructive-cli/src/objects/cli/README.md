@@ -26,18 +26,18 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
+| `commit` | commit CRUD operations |
 | `get-all-record` | getAllRecord CRUD operations |
+| `object` | object CRUD operations |
 | `ref` | ref CRUD operations |
 | `store` | store CRUD operations |
-| `object` | object CRUD operations |
-| `commit` | commit CRUD operations |
 | `init-empty-repo` | initEmptyRepo |
-| `set-data-at-path` | setDataAtPath |
 | `insert-node-at-path` | insertNodeAtPath |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `set-data-at-path` | setDataAtPath |
 
 ## Infrastructure Commands
 
@@ -80,6 +80,36 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
+### `commit`
+
+CRUD operations for Commit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all commit records |
+| `find-first` | Find first matching commit record |
+| `get` | Get a commit by id |
+| `create` | Create a new commit |
+| `update` | Update an existing commit |
+| `delete` | Delete a commit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `authorId` | UUID |
+| `committerId` | UUID |
+| `databaseId` | UUID |
+| `date` | Datetime |
+| `id` | UUID |
+| `message` | String |
+| `parentIds` | UUID |
+| `storeId` | UUID |
+| `treeId` | UUID |
+
+**Required create fields:** `databaseId`, `storeId`
+**Optional create fields (backend defaults):** `authorId`, `committerId`, `date`, `message`, `parentIds`, `treeId`
+
 ### `get-all-record`
 
 CRUD operations for GetAllRecord records.
@@ -97,10 +127,37 @@ CRUD operations for GetAllRecord records.
 
 | Field | Type |
 |-------|------|
-| `path` | String |
 | `data` | JSON |
+| `path` | String |
 
-**Required create fields:** `path`, `data`
+**Required create fields:** `data`, `path`
+
+### `object`
+
+CRUD operations for Object records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all object records |
+| `find-first` | Find first matching object record |
+| `get` | Get a object by id |
+| `create` | Create a new object |
+| `update` | Update an existing object |
+| `delete` | Delete a object |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `data` | JSON |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `data`, `kids`, `ktree`
 
 ### `ref`
 
@@ -119,13 +176,13 @@ CRUD operations for Ref records.
 
 | Field | Type |
 |-------|------|
+| `commitId` | UUID |
+| `databaseId` | UUID |
 | `id` | UUID |
 | `name` | String |
-| `databaseId` | UUID |
 | `storeId` | UUID |
-| `commitId` | UUID |
 
-**Required create fields:** `name`, `databaseId`, `storeId`
+**Required create fields:** `databaseId`, `name`, `storeId`
 **Optional create fields (backend defaults):** `commitId`
 
 ### `store`
@@ -145,71 +202,14 @@ CRUD operations for Store records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `name` | String |
+| `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `hash` | UUID |
-| `createdAt` | Datetime |
+| `id` | UUID |
+| `name` | String |
 
-**Required create fields:** `name`, `databaseId`
+**Required create fields:** `databaseId`, `name`
 **Optional create fields (backend defaults):** `hash`
-
-### `object`
-
-CRUD operations for Object records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all object records |
-| `find-first` | Find first matching object record |
-| `get` | Get a object by id |
-| `create` | Create a new object |
-| `update` | Update an existing object |
-| `delete` | Delete a object |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `kids` | UUID |
-| `ktree` | String |
-| `data` | JSON |
-| `createdAt` | Datetime |
-
-**Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `kids`, `ktree`, `data`
-
-### `commit`
-
-CRUD operations for Commit records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all commit records |
-| `find-first` | Find first matching commit record |
-| `get` | Get a commit by id |
-| `create` | Create a new commit |
-| `update` | Update an existing commit |
-| `delete` | Delete a commit |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `message` | String |
-| `databaseId` | UUID |
-| `storeId` | UUID |
-| `parentIds` | UUID |
-| `authorId` | UUID |
-| `committerId` | UUID |
-| `treeId` | UUID |
-| `date` | Datetime |
-
-**Required create fields:** `databaseId`, `storeId`
-**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ## Custom Operations
 
@@ -226,21 +226,6 @@ initEmptyRepo
   | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
 
-### `set-data-at-path`
-
-setDataAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.sId` | UUID |
-  | `--input.root` | UUID |
-  | `--input.path` | String |
-  | `--input.data` | JSON |
-
 ### `insert-node-at-path`
 
 insertNodeAtPath
@@ -251,12 +236,12 @@ insertNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.sId` | UUID |
-  | `--input.root` | UUID |
-  | `--input.path` | String |
   | `--input.data` | JSON |
   | `--input.kids` | UUID |
   | `--input.ktree` | String |
+  | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
 
 ### `provision-bucket`
 
@@ -272,6 +257,21 @@ and lifecycle settings.
   |----------|------|
   | `--input.bucketKey` | String (required) |
   | `--input.ownerId` | UUID |
+
+### `set-data-at-path`
+
+setDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
 
 ## Output
 

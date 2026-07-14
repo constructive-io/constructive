@@ -9,8 +9,8 @@ ORM operations for AstMigration records
 ```typescript
 db.astMigration.findMany({ select: { id: true } }).execute()
 db.astMigration.findOne({ id: '<Int>', select: { id: true } }).execute()
-db.astMigration.create({ data: { databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: '<JSON>', deploys: '<String>', deploy: '<JSON>', revert: '<JSON>', verify: '<JSON>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute()
-db.astMigration.update({ where: { id: '<Int>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.astMigration.create({ data: { action: '<String>', actionId: '<UUID>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' }, select: { id: true } }).execute()
+db.astMigration.update({ where: { id: '<Int>' }, data: { action: '<String>' }, select: { id: true } }).execute()
 db.astMigration.delete({ where: { id: '<Int>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.astMigration.delete({ where: { id: '<Int>' } }).execute()
 
 ```typescript
 const items = await db.astMigration.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, action: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.astMigration.findMany({
 
 ```typescript
 const item = await db.astMigration.create({
-  data: { databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: '<JSON>', deploys: '<String>', deploy: '<JSON>', revert: '<JSON>', verify: '<JSON>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' },
+  data: { action: '<String>', actionId: '<UUID>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' },
   select: { id: true }
 }).execute();
 ```

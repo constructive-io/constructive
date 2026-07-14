@@ -9,8 +9,8 @@ Append-only log of hierarchy edge grants and revocations; triggers apply changes
 ```typescript
 db.orgChartEdgeGrant.findMany({ select: { id: true } }).execute()
 db.orgChartEdgeGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgChartEdgeGrant.create({ data: { entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', positionTitle: '<String>', positionLevel: '<Int>' }, select: { id: true } }).execute()
-db.orgChartEdgeGrant.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
+db.orgChartEdgeGrant.create({ data: { childId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' }, select: { id: true } }).execute()
+db.orgChartEdgeGrant.update({ where: { id: '<UUID>' }, data: { childId: '<UUID>' }, select: { id: true } }).execute()
 db.orgChartEdgeGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgChartEdgeGrant.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgChartEdgeGrant.findMany({
-  select: { id: true, entityId: true }
+  select: { id: true, childId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgChartEdgeGrant.findMany({
 
 ```typescript
 const item = await db.orgChartEdgeGrant.create({
-  data: { entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', positionTitle: '<String>', positionLevel: '<Int>' },
+  data: { childId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' },
   select: { id: true }
 }).execute();
 ```

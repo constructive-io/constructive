@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
-  schemaId: 'uuid',
+  granteeName: 'string',
+  id: 'uuid',
+  isGrant: 'boolean',
   objectType: 'string',
   privilege: 'string',
-  granteeName: 'string',
-  isGrant: 'boolean',
+  schemaId: 'uuid',
 };
 const usage =
   '\ndefault-privilege <command>\n\nCommands:\n  list                  List defaultPrivilege records\n  find-first            Find first matching defaultPrivilege record\n  get                   Get a defaultPrivilege by ID\n  create                Create a new defaultPrivilege\n  update                Update an existing defaultPrivilege\n  delete                Delete a defaultPrivilege\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,13 +75,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      schemaId: true,
+      granteeName: true,
+      id: true,
+      isGrant: true,
       objectType: true,
       privilege: true,
-      granteeName: true,
-      isGrant: true,
+      schemaId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy> & {
@@ -102,13 +102,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      schemaId: true,
+      granteeName: true,
+      id: true,
+      isGrant: true,
       objectType: true,
       privilege: true,
-      granteeName: true,
-      isGrant: true,
+      schemaId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy> & {
@@ -141,13 +141,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
+          granteeName: true,
+          id: true,
+          isGrant: true,
           objectType: true,
           privilege: true,
-          granteeName: true,
-          isGrant: true,
+          schemaId: true,
         },
       })
       .execute();
@@ -172,9 +172,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'granteeName',
+        message: 'granteeName',
         required: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -190,16 +197,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'granteeName',
-        message: 'granteeName',
+        name: 'schemaId',
+        message: 'schemaId',
         required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -212,20 +212,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
-          objectType: cleanedData.objectType,
-          privilege: cleanedData.privilege,
           granteeName: cleanedData.granteeName,
           isGrant: cleanedData.isGrant,
+          objectType: cleanedData.objectType,
+          privilege: cleanedData.privilege,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
+          granteeName: true,
+          id: true,
+          isGrant: true,
           objectType: true,
           privilege: true,
-          granteeName: true,
-          isGrant: true,
+          schemaId: true,
         },
       })
       .execute();
@@ -256,9 +256,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'granteeName',
+        message: 'granteeName',
         required: false,
+      },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -274,16 +281,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'granteeName',
-        message: 'granteeName',
+        name: 'schemaId',
+        message: 'schemaId',
         required: false,
-      },
-      {
-        type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -296,20 +296,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
-          objectType: cleanedData.objectType,
-          privilege: cleanedData.privilege,
           granteeName: cleanedData.granteeName,
           isGrant: cleanedData.isGrant,
+          objectType: cleanedData.objectType,
+          privilege: cleanedData.privilege,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
+          granteeName: true,
+          id: true,
+          isGrant: true,
           objectType: true,
           privilege: true,
-          granteeName: true,
-          isGrant: true,
+          schemaId: true,
         },
       })
       .execute();

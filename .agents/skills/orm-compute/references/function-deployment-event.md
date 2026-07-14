@@ -9,8 +9,8 @@ Deployment lifecycle events — audit log of provisioning, scaling, and failure 
 ```typescript
 db.functionDeploymentEvent.findMany({ select: { id: true } }).execute()
 db.functionDeploymentEvent.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionDeploymentEvent.create({ data: { deploymentId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', databaseId: '<UUID>' }, select: { id: true } }).execute()
-db.functionDeploymentEvent.update({ where: { id: '<UUID>' }, data: { deploymentId: '<UUID>' }, select: { id: true } }).execute()
+db.functionDeploymentEvent.create({ data: { actorId: '<UUID>', databaseId: '<UUID>', deploymentId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute()
+db.functionDeploymentEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.functionDeploymentEvent.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.functionDeploymentEvent.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.functionDeploymentEvent.findMany({
-  select: { id: true, deploymentId: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.functionDeploymentEvent.findMany({
 
 ```typescript
 const item = await db.functionDeploymentEvent.create({
-  data: { deploymentId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', databaseId: '<UUID>' },
+  data: { actorId: '<UUID>', databaseId: '<UUID>', deploymentId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>' },
   select: { id: true }
 }).execute();
 ```

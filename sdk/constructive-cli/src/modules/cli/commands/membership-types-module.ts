@@ -16,8 +16,8 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
+  id: 'uuid',
   schemaId: 'uuid',
   tableId: 'uuid',
   tableName: 'string',
@@ -73,8 +73,8 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       schemaId: true,
       tableId: true,
       tableName: true,
@@ -102,8 +102,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       schemaId: true,
       tableId: true,
       tableName: true,
@@ -143,8 +143,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           schemaId: true,
           tableId: true,
           tableName: true,
@@ -206,8 +206,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tableName: cleanedData.tableName,
         },
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           schemaId: true,
           tableId: true,
           tableName: true,
@@ -275,8 +275,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tableName: cleanedData.tableName,
         },
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           schemaId: true,
           tableId: true,
           tableName: true,

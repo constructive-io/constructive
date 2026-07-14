@@ -7,8 +7,8 @@ Top-level AI/LLM conversation thread
 ## Usage
 
 ```typescript
-useAgentThreadsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } } })
-useAgentThreadQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } } })
+useAgentThreadsQuery({ selection: { fields: { agentId: true, archivedAt: true, createdAt: true, databaseId: true, id: true, isArchived: true, mode: true, model: true, ownerId: true, parentThreadId: true, promptTemplateId: true, status: true, systemPrompt: true, tags: true, title: true, updatedAt: true } } })
+useAgentThreadQuery({ id: '<UUID>', selection: { fields: { agentId: true, archivedAt: true, createdAt: true, databaseId: true, id: true, isArchived: true, mode: true, model: true, ownerId: true, parentThreadId: true, promptTemplateId: true, status: true, systemPrompt: true, tags: true, title: true, updatedAt: true } } })
 useCreateAgentThreadMutation({ selection: { fields: { id: true } } })
 useUpdateAgentThreadMutation({ selection: { fields: { id: true } } })
 useDeleteAgentThreadMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentThreadMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentThreadsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, status: true, isArchived: true, archivedAt: true, title: true, mode: true, model: true, systemPrompt: true, tags: true, promptTemplateId: true, agentId: true, parentThreadId: true } },
+  selection: { fields: { agentId: true, archivedAt: true, createdAt: true, databaseId: true, id: true, isArchived: true, mode: true, model: true, ownerId: true, parentThreadId: true, promptTemplateId: true, status: true, systemPrompt: true, tags: true, title: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentThreadsQuery({
 const { mutate } = useCreateAgentThreadMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', databaseId: '<UUID>', status: '<String>', isArchived: '<Boolean>', archivedAt: '<Datetime>', title: '<String>', mode: '<String>', model: '<String>', systemPrompt: '<String>', tags: '<String>', promptTemplateId: '<UUID>', agentId: '<UUID>', parentThreadId: '<UUID>' });
+mutate({ agentId: '<UUID>', archivedAt: '<Datetime>', databaseId: '<UUID>', isArchived: '<Boolean>', mode: '<String>', model: '<String>', ownerId: '<UUID>', parentThreadId: '<UUID>', promptTemplateId: '<UUID>', status: '<String>', systemPrompt: '<String>', tags: '<String>', title: '<String>' });
 ```

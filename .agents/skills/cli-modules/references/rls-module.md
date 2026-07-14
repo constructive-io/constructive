@@ -12,8 +12,8 @@ csdk rls-module list --where.<field>.<op> <value> --orderBy <values>
 csdk rls-module list --limit 10 --after <cursor>
 csdk rls-module find-first --where.<field>.<op> <value>
 csdk rls-module get --id <UUID>
-csdk rls-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--usersTableId <UUID>] [--authenticate <String>] [--authenticateStrict <String>] [--currentRole <String>] [--currentRoleId <String>] [--apiName <String>] [--privateApiName <String>]
-csdk rls-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--usersTableId <UUID>] [--authenticate <String>] [--authenticateStrict <String>] [--currentRole <String>] [--currentRoleId <String>] [--apiName <String>] [--privateApiName <String>]
+csdk rls-module create --databaseId <UUID> [--apiName <String>] [--authenticate <String>] [--authenticateStrict <String>] [--currentRole <String>] [--currentRoleId <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--usersTableId <UUID>]
+csdk rls-module update --id <UUID> [--apiName <String>] [--authenticate <String>] [--authenticateStrict <String>] [--currentRole <String>] [--currentRoleId <String>] [--databaseId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--usersTableId <UUID>]
 csdk rls-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk rls-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a rlsModule
 
 ```bash
-csdk rls-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--usersTableId <UUID>] [--authenticate <String>] [--authenticateStrict <String>] [--currentRole <String>] [--currentRoleId <String>] [--apiName <String>] [--privateApiName <String>]
+csdk rls-module create --databaseId <UUID> [--apiName <String>] [--authenticate <String>] [--authenticateStrict <String>] [--currentRole <String>] [--currentRoleId <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--usersTableId <UUID>]
 ```
 
 ### Get a rlsModule by id

@@ -7,8 +7,8 @@ On-demand resource status checks — diagnostic snapshots from the runtime (K8s 
 ## Usage
 
 ```typescript
-useResourceStatusChecksQuery({ selection: { fields: { id: true, resourceId: true, databaseId: true, requestedBy: true, requestedAt: true, completedAt: true, status: true, result: true } } })
-useResourceStatusCheckQuery({ id: '<UUID>', selection: { fields: { id: true, resourceId: true, databaseId: true, requestedBy: true, requestedAt: true, completedAt: true, status: true, result: true } } })
+useResourceStatusChecksQuery({ selection: { fields: { completedAt: true, databaseId: true, id: true, requestedAt: true, requestedBy: true, resourceId: true, result: true, status: true } } })
+useResourceStatusCheckQuery({ id: '<UUID>', selection: { fields: { completedAt: true, databaseId: true, id: true, requestedAt: true, requestedBy: true, resourceId: true, result: true, status: true } } })
 useCreateResourceStatusCheckMutation({ selection: { fields: { id: true } } })
 useUpdateResourceStatusCheckMutation({ selection: { fields: { id: true } } })
 useDeleteResourceStatusCheckMutation({})
@@ -20,7 +20,7 @@ useDeleteResourceStatusCheckMutation({})
 
 ```typescript
 const { data, isLoading } = useResourceStatusChecksQuery({
-  selection: { fields: { id: true, resourceId: true, databaseId: true, requestedBy: true, requestedAt: true, completedAt: true, status: true, result: true } },
+  selection: { fields: { completedAt: true, databaseId: true, id: true, requestedAt: true, requestedBy: true, resourceId: true, result: true, status: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useResourceStatusChecksQuery({
 const { mutate } = useCreateResourceStatusCheckMutation({
   selection: { fields: { id: true } },
 });
-mutate({ resourceId: '<UUID>', databaseId: '<UUID>', requestedBy: '<UUID>', requestedAt: '<Datetime>', completedAt: '<Datetime>', status: '<String>', result: '<JSON>' });
+mutate({ completedAt: '<Datetime>', databaseId: '<UUID>', requestedAt: '<Datetime>', requestedBy: '<UUID>', resourceId: '<UUID>', result: '<JSON>', status: '<String>' });
 ```

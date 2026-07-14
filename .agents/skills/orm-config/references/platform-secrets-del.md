@@ -7,7 +7,7 @@ Execute the platformSecretsDel mutation
 ## Usage
 
 ```typescript
-db.mutation.platformSecretsDel({ input: { secretName: '<String>', namespaceId: '<UUID>' } }).execute()
+db.mutation.platformSecretsDel({ input: { namespaceId: '<UUID>', secretName: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformSecretsDel({ input: { secretName: '<String>', namespaceId: '
 ### Run platformSecretsDel
 
 ```typescript
-const result = await db.mutation.platformSecretsDel({ input: { secretName: '<String>', namespaceId: '<UUID>' } }).execute();
+const result = await db.mutation.platformSecretsDel({ input: { namespaceId: '<UUID>', secretName: '<String>' } }).execute();
 ```

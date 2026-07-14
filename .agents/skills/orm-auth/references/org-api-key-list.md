@@ -9,8 +9,8 @@ ORM operations for OrgApiKeyList records
 ```typescript
 db.orgApiKeyList.findMany({ select: { id: true } }).execute()
 db.orgApiKeyList.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgApiKeyList.create({ data: { keyId: '<String>', name: '<String>', principalId: '<UUID>', orgId: '<UUID>', expiresAt: '<Datetime>', revokedAt: '<Datetime>', lastUsedAt: '<Datetime>', mfaLevel: '<String>', accessLevel: '<String>' }, select: { id: true } }).execute()
-db.orgApiKeyList.update({ where: { id: '<UUID>' }, data: { keyId: '<String>' }, select: { id: true } }).execute()
+db.orgApiKeyList.create({ data: { accessLevel: '<String>', expiresAt: '<Datetime>', keyId: '<String>', lastUsedAt: '<Datetime>', mfaLevel: '<String>', name: '<String>', orgId: '<UUID>', principalId: '<UUID>', revokedAt: '<Datetime>' }, select: { id: true } }).execute()
+db.orgApiKeyList.update({ where: { id: '<UUID>' }, data: { accessLevel: '<String>' }, select: { id: true } }).execute()
 db.orgApiKeyList.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgApiKeyList.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgApiKeyList.findMany({
-  select: { id: true, keyId: true }
+  select: { id: true, accessLevel: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgApiKeyList.findMany({
 
 ```typescript
 const item = await db.orgApiKeyList.create({
-  data: { keyId: '<String>', name: '<String>', principalId: '<UUID>', orgId: '<UUID>', expiresAt: '<Datetime>', revokedAt: '<Datetime>', lastUsedAt: '<Datetime>', mfaLevel: '<String>', accessLevel: '<String>' },
+  data: { accessLevel: '<String>', expiresAt: '<Datetime>', keyId: '<String>', lastUsedAt: '<Datetime>', mfaLevel: '<String>', name: '<String>', orgId: '<UUID>', principalId: '<UUID>', revokedAt: '<Datetime>' },
   select: { id: true }
 }).execute();
 ```

@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  schemaId: 'uuid',
-  granteeName: 'string',
   createdAt: 'string',
+  databaseId: 'uuid',
+  granteeName: 'string',
+  id: 'uuid',
+  schemaId: 'uuid',
   updatedAt: 'string',
 };
 const usage =
@@ -74,11 +74,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      schemaId: true,
-      granteeName: true,
       createdAt: true,
+      databaseId: true,
+      granteeName: true,
+      id: true,
+      schemaId: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -100,11 +100,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      schemaId: true,
-      granteeName: true,
       createdAt: true,
+      databaseId: true,
+      granteeName: true,
+      id: true,
+      schemaId: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -138,11 +138,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
-          granteeName: true,
           createdAt: true,
+          databaseId: true,
+          granteeName: true,
+          id: true,
+          schemaId: true,
           updatedAt: true,
         },
       })
@@ -168,14 +168,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'granteeName',
+        message: 'granteeName',
         required: true,
       },
       {
         type: 'text',
-        name: 'granteeName',
-        message: 'granteeName',
+        name: 'schemaId',
+        message: 'schemaId',
         required: true,
       },
     ]);
@@ -189,15 +189,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
           granteeName: cleanedData.granteeName,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
-          granteeName: true,
           createdAt: true,
+          databaseId: true,
+          granteeName: true,
+          id: true,
+          schemaId: true,
           updatedAt: true,
         },
       })
@@ -229,14 +229,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'granteeName',
+        message: 'granteeName',
         required: false,
       },
       {
         type: 'text',
-        name: 'granteeName',
-        message: 'granteeName',
+        name: 'schemaId',
+        message: 'schemaId',
         required: false,
       },
     ]);
@@ -250,15 +250,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
           granteeName: cleanedData.granteeName,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
-          granteeName: true,
           createdAt: true,
+          databaseId: true,
+          granteeName: true,
+          id: true,
+          schemaId: true,
           updatedAt: true,
         },
       })

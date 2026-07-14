@@ -7,8 +7,8 @@ Agent instance registry (human-managed or ephemeral sub-agents)
 ## Usage
 
 ```typescript
-useAgentsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } } })
-useAgentQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } } })
+useAgentsQuery({ selection: { fields: { config: true, createdAt: true, databaseId: true, id: true, isEphemeral: true, name: true, ownerId: true, parentId: true, personaId: true, status: true, systemPrompt: true, updatedAt: true } } })
+useAgentQuery({ id: '<UUID>', selection: { fields: { config: true, createdAt: true, databaseId: true, id: true, isEphemeral: true, name: true, ownerId: true, parentId: true, personaId: true, status: true, systemPrompt: true, updatedAt: true } } })
 useCreateAgentMutation({ selection: { fields: { id: true } } })
 useUpdateAgentMutation({ selection: { fields: { id: true } } })
 useDeleteAgentMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, ownerId: true, databaseId: true, personaId: true, parentId: true, name: true, systemPrompt: true, config: true, status: true, isEphemeral: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, id: true, isEphemeral: true, name: true, ownerId: true, parentId: true, personaId: true, status: true, systemPrompt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentsQuery({
 const { mutate } = useCreateAgentMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', databaseId: '<UUID>', personaId: '<UUID>', parentId: '<UUID>', name: '<String>', systemPrompt: '<String>', config: '<JSON>', status: '<String>', isEphemeral: '<Boolean>' });
+mutate({ config: '<JSON>', databaseId: '<UUID>', isEphemeral: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentId: '<UUID>', personaId: '<UUID>', status: '<String>', systemPrompt: '<String>' });
 ```

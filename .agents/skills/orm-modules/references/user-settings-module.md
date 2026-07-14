@@ -9,8 +9,8 @@ ORM operations for UserSettingsModule records
 ```typescript
 db.userSettingsModule.findMany({ select: { id: true } }).execute()
 db.userSettingsModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.userSettingsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', apiName: '<String>' }, select: { id: true } }).execute()
-db.userSettingsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.userSettingsModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute()
+db.userSettingsModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.userSettingsModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.userSettingsModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.userSettingsModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.userSettingsModule.findMany({
 
 ```typescript
 const item = await db.userSettingsModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', apiName: '<String>' },
+  data: { apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

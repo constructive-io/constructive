@@ -7,8 +7,8 @@ Items within a credit code — each row grants credits for a specific limit defi
 ## Usage
 
 ```typescript
-useAppLimitCreditCodeItemsQuery({ selection: { fields: { id: true, creditCodeId: true, defaultLimitId: true, amount: true, creditType: true } } })
-useAppLimitCreditCodeItemQuery({ id: '<UUID>', selection: { fields: { id: true, creditCodeId: true, defaultLimitId: true, amount: true, creditType: true } } })
+useAppLimitCreditCodeItemsQuery({ selection: { fields: { amount: true, creditCodeId: true, creditType: true, defaultLimitId: true, id: true } } })
+useAppLimitCreditCodeItemQuery({ id: '<UUID>', selection: { fields: { amount: true, creditCodeId: true, creditType: true, defaultLimitId: true, id: true } } })
 useCreateAppLimitCreditCodeItemMutation({ selection: { fields: { id: true } } })
 useUpdateAppLimitCreditCodeItemMutation({ selection: { fields: { id: true } } })
 useDeleteAppLimitCreditCodeItemMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLimitCreditCodeItemMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLimitCreditCodeItemsQuery({
-  selection: { fields: { id: true, creditCodeId: true, defaultLimitId: true, amount: true, creditType: true } },
+  selection: { fields: { amount: true, creditCodeId: true, creditType: true, defaultLimitId: true, id: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLimitCreditCodeItemsQuery({
 const { mutate } = useCreateAppLimitCreditCodeItemMutation({
   selection: { fields: { id: true } },
 });
-mutate({ creditCodeId: '<UUID>', defaultLimitId: '<UUID>', amount: '<BigInt>', creditType: '<String>' });
+mutate({ amount: '<BigInt>', creditCodeId: '<UUID>', creditType: '<String>', defaultLimitId: '<UUID>' });
 ```

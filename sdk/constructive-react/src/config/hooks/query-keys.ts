@@ -19,15 +19,6 @@
 // Entity Query Keys
 // ============================================================================
 
-export const platformConfigKeys = {
-  /** All platformConfig queries */ all: ['platformconfig'] as const,
-  /** List query keys */ lists: () => [...platformConfigKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...platformConfigKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformConfigKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformConfigKeys.details(), id] as const,
-} as const;
 export const configKeys = {
   /** All config queries */ all: ['config'] as const,
   /** List query keys */ lists: () => [...configKeys.all, 'list'] as const,
@@ -36,6 +27,15 @@ export const configKeys = {
   /** Detail query keys */ details: () => [...configKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...configKeys.details(), id] as const,
+} as const;
+export const platformConfigKeys = {
+  /** All platformConfig queries */ all: ['platformconfig'] as const,
+  /** List query keys */ lists: () => [...platformConfigKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformConfigKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformConfigKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformConfigKeys.details(), id] as const,
 } as const;
 export const platformInternalSecretKeys = {
   /** All platformInternalSecret queries */ all: ['platforminternalsecret'] as const,
@@ -87,8 +87,8 @@ export const secretKeys = {
  * ```
  */
 export const queryKeys = {
-  platformConfig: platformConfigKeys,
   config: configKeys,
+  platformConfig: platformConfigKeys,
   platformInternalSecret: platformInternalSecretKeys,
   platformSecret: platformSecretKeys,
   secret: secretKeys,

@@ -7,8 +7,8 @@ Config row for the session_secrets_module, which provisions a DB-private, sessio
 ## Usage
 
 ```typescript
-useSessionSecretsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, sessionsTableId: true } } })
-useSessionSecretsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, sessionsTableId: true } } })
+useSessionSecretsModulesQuery({ selection: { fields: { databaseId: true, id: true, schemaId: true, sessionsTableId: true, tableId: true, tableName: true } } })
+useSessionSecretsModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, schemaId: true, sessionsTableId: true, tableId: true, tableName: true } } })
 useCreateSessionSecretsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateSessionSecretsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteSessionSecretsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteSessionSecretsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useSessionSecretsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, sessionsTableId: true } },
+  selection: { fields: { databaseId: true, id: true, schemaId: true, sessionsTableId: true, tableId: true, tableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSessionSecretsModulesQuery({
 const { mutate } = useCreateSessionSecretsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', sessionsTableId: '<UUID>' });
+mutate({ databaseId: '<UUID>', schemaId: '<UUID>', sessionsTableId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```

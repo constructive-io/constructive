@@ -5,15 +5,15 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { AgentPlanModel } from './models/agentPlan';
 import { AgentModel } from './models/agent';
-import { AgentThreadModel } from './models/agentThread';
 import { AgentMessageModel } from './models/agentMessage';
-import { AgentTaskModel } from './models/agentTask';
+import { AgentPersonaModel } from './models/agentPersona';
+import { AgentPlanModel } from './models/agentPlan';
 import { AgentPromptModel } from './models/agentPrompt';
 import { AgentResourceChunkModel } from './models/agentResourceChunk';
-import { AgentPersonaModel } from './models/agentPersona';
 import { AgentResourceModel } from './models/agentResource';
+import { AgentTaskModel } from './models/agentTask';
+import { AgentThreadModel } from './models/agentThread';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
@@ -47,15 +47,15 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    agentPlan: new AgentPlanModel(client),
     agent: new AgentModel(client),
-    agentThread: new AgentThreadModel(client),
     agentMessage: new AgentMessageModel(client),
-    agentTask: new AgentTaskModel(client),
+    agentPersona: new AgentPersonaModel(client),
+    agentPlan: new AgentPlanModel(client),
     agentPrompt: new AgentPromptModel(client),
     agentResourceChunk: new AgentResourceChunkModel(client),
-    agentPersona: new AgentPersonaModel(client),
     agentResource: new AgentResourceModel(client),
+    agentTask: new AgentTaskModel(client),
+    agentThread: new AgentThreadModel(client),
     mutation: createMutationOperations(client),
   };
 }

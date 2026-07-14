@@ -7,7 +7,7 @@ React Query mutation hook for platformSecretsRotate
 ## Usage
 
 ```typescript
-const { mutate } = usePlatformSecretsRotateMutation(); mutate({ input: { secretName: '<String>', secretValue: '<String>', namespaceId: '<UUID>', algo: '<String>' } });
+const { mutate } = usePlatformSecretsRotateMutation(); mutate({ input: { algo: '<String>', namespaceId: '<UUID>', secretName: '<String>', secretValue: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = usePlatformSecretsRotateMutation(); mutate({ input: { secretN
 
 ```typescript
 const { mutate, isLoading } = usePlatformSecretsRotateMutation();
-mutate({ input: { secretName: '<String>', secretValue: '<String>', namespaceId: '<UUID>', algo: '<String>' } });
+mutate({ input: { algo: '<String>', namespaceId: '<UUID>', secretName: '<String>', secretValue: '<String>' } });
 ```

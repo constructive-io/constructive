@@ -12,8 +12,8 @@ csdk platform-namespace list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-namespace list --limit 10 --after <cursor>
 csdk platform-namespace find-first --where.<field>.<op> <value>
 csdk platform-namespace get --id <UUID>
-csdk platform-namespace create --name <String> --namespaceName <String> [--description <String>] [--isActive <Boolean>] [--status <String>] [--lastError <String>] [--labels <JSON>] [--annotations <JSON>] [--isManaged <Boolean>]
-csdk platform-namespace update --id <UUID> [--name <String>] [--namespaceName <String>] [--description <String>] [--isActive <Boolean>] [--status <String>] [--lastError <String>] [--labels <JSON>] [--annotations <JSON>] [--isManaged <Boolean>]
+csdk platform-namespace create --name <String> --namespaceName <String> [--annotations <JSON>] [--description <String>] [--isActive <Boolean>] [--isManaged <Boolean>] [--labels <JSON>] [--lastError <String>] [--status <String>]
+csdk platform-namespace update --id <UUID> [--annotations <JSON>] [--description <String>] [--isActive <Boolean>] [--isManaged <Boolean>] [--labels <JSON>] [--lastError <String>] [--name <String>] [--namespaceName <String>] [--status <String>]
 csdk platform-namespace delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-namespace list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformNamespace
 
 ```bash
-csdk platform-namespace create --name <String> --namespaceName <String> [--description <String>] [--isActive <Boolean>] [--status <String>] [--lastError <String>] [--labels <JSON>] [--annotations <JSON>] [--isManaged <Boolean>]
+csdk platform-namespace create --name <String> --namespaceName <String> [--annotations <JSON>] [--description <String>] [--isActive <Boolean>] [--isManaged <Boolean>] [--labels <JSON>] [--lastError <String>] [--status <String>]
 ```
 
 ### Get a platformNamespace by id

@@ -16,15 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  createdAt: 'string',
-  updatedAt: 'string',
-  ownerId: 'uuid',
-  userId: 'uuid',
-  name: 'string',
-  useAdminOwner: 'boolean',
-  isReadOnly: 'boolean',
   bypassStepUp: 'boolean',
+  createdAt: 'string',
+  id: 'uuid',
+  isReadOnly: 'boolean',
+  name: 'string',
+  ownerId: 'uuid',
+  updatedAt: 'string',
+  useAdminOwner: 'boolean',
+  userId: 'uuid',
 };
 const usage =
   '\nprincipal <command>\n\nCommands:\n  list                  List principal records\n  find-first            Find first matching principal record\n  create                Create a new principal\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -71,15 +71,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      ownerId: true,
-      userId: true,
-      name: true,
-      useAdminOwner: true,
-      isReadOnly: true,
       bypassStepUp: true,
+      createdAt: true,
+      id: true,
+      isReadOnly: true,
+      name: true,
+      ownerId: true,
+      updatedAt: true,
+      useAdminOwner: true,
+      userId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy> & {
@@ -100,15 +100,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      ownerId: true,
-      userId: true,
-      name: true,
-      useAdminOwner: true,
-      isReadOnly: true,
       bypassStepUp: true,
+      createdAt: true,
+      id: true,
+      isReadOnly: true,
+      name: true,
+      ownerId: true,
+      updatedAt: true,
+      useAdminOwner: true,
+      userId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PrincipalSelect, PrincipalFilter, PrincipalOrderBy> & {
@@ -130,27 +130,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'text',
-        name: 'ownerId',
-        message: 'ownerId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'userId',
-        message: 'userId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
         type: 'boolean',
-        name: 'useAdminOwner',
-        message: 'useAdminOwner',
+        name: 'bypassStepUp',
+        message: 'bypassStepUp',
         required: true,
       },
       {
@@ -160,9 +142,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'ownerId',
+        message: 'ownerId',
+        required: true,
+      },
+      {
         type: 'boolean',
-        name: 'bypassStepUp',
-        message: 'bypassStepUp',
+        name: 'useAdminOwner',
+        message: 'useAdminOwner',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'userId',
+        message: 'userId',
         required: true,
       },
     ]);
@@ -172,23 +172,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.principal
       .create({
         data: {
-          ownerId: cleanedData.ownerId,
-          userId: cleanedData.userId,
-          name: cleanedData.name,
-          useAdminOwner: cleanedData.useAdminOwner,
-          isReadOnly: cleanedData.isReadOnly,
           bypassStepUp: cleanedData.bypassStepUp,
+          isReadOnly: cleanedData.isReadOnly,
+          name: cleanedData.name,
+          ownerId: cleanedData.ownerId,
+          useAdminOwner: cleanedData.useAdminOwner,
+          userId: cleanedData.userId,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          ownerId: true,
-          userId: true,
-          name: true,
-          useAdminOwner: true,
-          isReadOnly: true,
           bypassStepUp: true,
+          createdAt: true,
+          id: true,
+          isReadOnly: true,
+          name: true,
+          ownerId: true,
+          updatedAt: true,
+          useAdminOwner: true,
+          userId: true,
         },
       })
       .execute();

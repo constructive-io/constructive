@@ -12,8 +12,8 @@ csdk function-execution-log list --where.<field>.<op> <value> --orderBy <values>
 csdk function-execution-log list --limit 10 --after <cursor>
 csdk function-execution-log find-first --where.<field>.<op> <value>
 csdk function-execution-log get --id <UUID>
-csdk function-execution-log create --message <String> --databaseId <UUID> [--invocationId <UUID>] [--taskIdentifier <String>] [--logLevel <String>] [--metadata <JSON>] [--actorId <UUID>]
-csdk function-execution-log update --id <UUID> [--invocationId <UUID>] [--taskIdentifier <String>] [--logLevel <String>] [--message <String>] [--metadata <JSON>] [--actorId <UUID>] [--databaseId <UUID>]
+csdk function-execution-log create --databaseId <UUID> --message <String> [--actorId <UUID>] [--invocationId <UUID>] [--logLevel <String>] [--metadata <JSON>] [--taskIdentifier <String>]
+csdk function-execution-log update --id <UUID> [--actorId <UUID>] [--databaseId <UUID>] [--invocationId <UUID>] [--logLevel <String>] [--message <String>] [--metadata <JSON>] [--taskIdentifier <String>]
 csdk function-execution-log delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-execution-log list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionExecutionLog
 
 ```bash
-csdk function-execution-log create --message <String> --databaseId <UUID> [--invocationId <UUID>] [--taskIdentifier <String>] [--logLevel <String>] [--metadata <JSON>] [--actorId <UUID>]
+csdk function-execution-log create --databaseId <UUID> --message <String> [--actorId <UUID>] [--invocationId <UUID>] [--logLevel <String>] [--metadata <JSON>] [--taskIdentifier <String>]
 ```
 
 ### Get a functionExecutionLog by id

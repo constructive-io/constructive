@@ -7,8 +7,8 @@ Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 ## Usage
 
 ```typescript
-useFunctionGraphObjectsQuery({ selection: { fields: { id: true, scopeId: true, kids: true, ktree: true, data: true, createdAt: true } } })
-useFunctionGraphObjectQuery({ id: '<UUID>', selection: { fields: { id: true, scopeId: true, kids: true, ktree: true, data: true, createdAt: true } } })
+useFunctionGraphObjectsQuery({ selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } } })
+useFunctionGraphObjectQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } } })
 useCreateFunctionGraphObjectMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionGraphObjectMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionGraphObjectMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionGraphObjectMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionGraphObjectsQuery({
-  selection: { fields: { id: true, scopeId: true, kids: true, ktree: true, data: true, createdAt: true } },
+  selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionGraphObjectsQuery({
 const { mutate } = useCreateFunctionGraphObjectMutation({
   selection: { fields: { id: true } },
 });
-mutate({ scopeId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>' });
+mutate({ data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' });
 ```

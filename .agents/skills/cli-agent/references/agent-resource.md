@@ -7,7 +7,7 @@ CRUD operations for AgentResource records via csdk CLI
 **pgvector embedding fields:** `embedding`
 High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-**Unified Search API fields:** `search`, `kindTrgmSimilarity`, `titleTrgmSimilarity`, `descriptionTrgmSimilarity`, `bodyTrgmSimilarity`, `searchScore`
+**Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `titleTrgmSimilarity`
 Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ## Usage
@@ -19,8 +19,8 @@ csdk agent-resource list --limit 10 --after <cursor>
 csdk agent-resource find-first --where.<field>.<op> <value>
 csdk agent-resource search <query>
 csdk agent-resource get --id <UUID>
-csdk agent-resource create --databaseId <UUID> --slug <String> --title <String> --body <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--kind <String>] [--description <String>] [--keywords <String>] [--isActive <Boolean>] [--metadata <JSON>] [--isArchived <Boolean>] [--archivedAt <Datetime>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>]
-csdk agent-resource update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--databaseId <UUID>] [--slug <String>] [--kind <String>] [--title <String>] [--description <String>] [--body <String>] [--keywords <String>] [--isActive <Boolean>] [--metadata <JSON>] [--isArchived <Boolean>] [--archivedAt <Datetime>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>]
+csdk agent-resource create --body <String> --databaseId <UUID> --slug <String> --title <String> [--archivedAt <Datetime>] [--createdBy <UUID>] [--description <String>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--updatedBy <UUID>]
+csdk agent-resource update --id <UUID> [--archivedAt <Datetime>] [--body <String>] [--createdBy <UUID>] [--databaseId <UUID>] [--description <String>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--slug <String>] [--title <String>] [--updatedBy <UUID>]
 csdk agent-resource delete --id <UUID>
 ```
 
@@ -85,22 +85,10 @@ EMBEDDER_PROVIDER=ollama csdk agent-resource create --embedding "text to embed" 
 EMBEDDER_PROVIDER=ollama csdk agent-resource update --embedding "new text to embed" --auto-embed
 ```
 
-### Full-text search via tsvector (`search`)
+### Fuzzy search via trigram similarity (`trgmBody`)
 
 ```bash
-csdk agent-resource list --where.search "search query" --select title,tsvRank
-```
-
-### Fuzzy search via trigram similarity (`trgmKind`)
-
-```bash
-csdk agent-resource list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
-```
-
-### Fuzzy search via trigram similarity (`trgmTitle`)
-
-```bash
-csdk agent-resource list --where.trgmTitle.value "approximate query" --where.trgmTitle.threshold 0.3 --select title,titleTrgmSimilarity
+csdk agent-resource list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
 ```
 
 ### Fuzzy search via trigram similarity (`trgmDescription`)
@@ -109,16 +97,28 @@ csdk agent-resource list --where.trgmTitle.value "approximate query" --where.trg
 csdk agent-resource list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
 ```
 
-### Fuzzy search via trigram similarity (`trgmBody`)
+### Fuzzy search via trigram similarity (`trgmKind`)
 
 ```bash
-csdk agent-resource list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+csdk agent-resource list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
+```
+
+### Full-text search via tsvector (`search`)
+
+```bash
+csdk agent-resource list --where.search "search query" --select title,tsvRank
+```
+
+### Fuzzy search via trigram similarity (`trgmTitle`)
+
+```bash
+csdk agent-resource list --where.trgmTitle.value "approximate query" --where.trgmTitle.threshold 0.3 --select title,titleTrgmSimilarity
 ```
 
 ### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk agent-resource list --where.unifiedSearch "search query" --select title,tsvRank,kindTrgmSimilarity,titleTrgmSimilarity,descriptionTrgmSimilarity,bodyTrgmSimilarity,searchScore
+csdk agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,kindTrgmSimilarity,tsvRank,searchScore,titleTrgmSimilarity
 ```
 
 ### Search with pagination and field projection
@@ -131,7 +131,7 @@ csdk agent-resource search "query" --limit 10 --select id,title,searchScore
 ### Create a agentResource
 
 ```bash
-csdk agent-resource create --databaseId <UUID> --slug <String> --title <String> --body <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--kind <String>] [--description <String>] [--keywords <String>] [--isActive <Boolean>] [--metadata <JSON>] [--isArchived <Boolean>] [--archivedAt <Datetime>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>]
+csdk agent-resource create --body <String> --databaseId <UUID> --slug <String> --title <String> [--archivedAt <Datetime>] [--createdBy <UUID>] [--description <String>] [--embedding <Vector>] [--embeddingUpdatedAt <Datetime>] [--isActive <Boolean>] [--isArchived <Boolean>] [--keywords <String>] [--kind <String>] [--metadata <JSON>] [--updatedBy <UUID>]
 ```
 
 ### Get a agentResource by id

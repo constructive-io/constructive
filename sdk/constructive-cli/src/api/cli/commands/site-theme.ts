@@ -16,8 +16,8 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
+  id: 'uuid',
   siteId: 'uuid',
   theme: 'json',
 };
@@ -72,8 +72,8 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       siteId: true,
       theme: true,
     };
@@ -96,8 +96,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       siteId: true,
       theme: true,
     };
@@ -132,8 +132,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           siteId: true,
           theme: true,
         },
@@ -181,8 +181,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           theme: cleanedData.theme,
         },
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           siteId: true,
           theme: true,
         },
@@ -239,8 +239,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           theme: cleanedData.theme,
         },
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           siteId: true,
           theme: true,
         },

@@ -9,8 +9,8 @@ Server-side module configuration for an API endpoint; stores module name and JSO
 ```typescript
 db.apiModule.findMany({ select: { id: true } }).execute()
 db.apiModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.apiModule.create({ data: { databaseId: '<UUID>', apiId: '<UUID>', name: '<String>', data: '<JSON>' }, select: { id: true } }).execute()
-db.apiModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.apiModule.create({ data: { apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>' }, select: { id: true } }).execute()
+db.apiModule.update({ where: { id: '<UUID>' }, data: { apiId: '<UUID>' }, select: { id: true } }).execute()
 db.apiModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.apiModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.apiModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.apiModule.findMany({
 
 ```typescript
 const item = await db.apiModule.create({
-  data: { databaseId: '<UUID>', apiId: '<UUID>', name: '<String>', data: '<JSON>' },
+  data: { apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>' },
   select: { id: true }
 }).execute();
 ```

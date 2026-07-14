@@ -13,7 +13,7 @@ csdk org-limit-caps-default list --limit 10 --after <cursor>
 csdk org-limit-caps-default find-first --where.<field>.<op> <value>
 csdk org-limit-caps-default get --id <UUID>
 csdk org-limit-caps-default create --name <String> [--max <BigInt>]
-csdk org-limit-caps-default update --id <UUID> [--name <String>] [--max <BigInt>]
+csdk org-limit-caps-default update --id <UUID> [--max <BigInt>] [--name <String>]
 csdk org-limit-caps-default delete --id <UUID>
 ```
 

@@ -7,8 +7,8 @@ Resource lifecycle events — audit log of provisioning, updates, and failure ev
 ## Usage
 
 ```typescript
-usePlatformResourceEventsQuery({ selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true } } })
-usePlatformResourceEventQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true } } })
+usePlatformResourceEventsQuery({ selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, resourceId: true } } })
+usePlatformResourceEventQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, resourceId: true } } })
 useCreatePlatformResourceEventMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformResourceEventMutation({ selection: { fields: { id: true } } })
 useDeletePlatformResourceEventMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformResourceEventMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformResourceEventsQuery({
-  selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true } },
+  selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, resourceId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformResourceEventsQuery({
 const { mutate } = useCreatePlatformResourceEventMutation({
   selection: { fields: { id: true } },
 });
-mutate({ resourceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>' });
+mutate({ actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', resourceId: '<UUID>' });
 ```

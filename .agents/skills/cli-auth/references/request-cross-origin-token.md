@@ -7,7 +7,7 @@ Execute the requestCrossOriginToken mutation
 ## Usage
 
 ```bash
-csdk request-cross-origin-token --input.clientMutationId <String> --input.email <String> --input.password <String> --input.origin <Origin> --input.rememberMe <Boolean>
+csdk request-cross-origin-token --input.clientMutationId <String> --input.email <String> --input.origin <Origin> --input.password <String> --input.rememberMe <Boolean>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk request-cross-origin-token --input.clientMutationId <String> --input.email 
 ### Run requestCrossOriginToken
 
 ```bash
-csdk request-cross-origin-token --input.clientMutationId <String> --input.email <String> --input.password <String> --input.origin <Origin> --input.rememberMe <Boolean>
+csdk request-cross-origin-token --input.clientMutationId <String> --input.email <String> --input.origin <Origin> --input.password <String> --input.rememberMe <Boolean>
 ```

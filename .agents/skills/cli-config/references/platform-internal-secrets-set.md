@@ -7,7 +7,7 @@ Execute the platformInternalSecretsSet mutation
 ## Usage
 
 ```bash
-csdk platform-internal-secrets-set --input.clientMutationId <String> --input.secretName <String> --input.secretValue <String> --input.secretNamespaceId <UUID> --input.algo <String>
+csdk platform-internal-secrets-set --input.algo <String> --input.clientMutationId <String> --input.secretName <String> --input.secretNamespaceId <UUID> --input.secretValue <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk platform-internal-secrets-set --input.clientMutationId <String> --input.sec
 ### Run platformInternalSecretsSet
 
 ```bash
-csdk platform-internal-secrets-set --input.clientMutationId <String> --input.secretName <String> --input.secretValue <String> --input.secretNamespaceId <UUID> --input.algo <String>
+csdk platform-internal-secrets-set --input.algo <String> --input.clientMutationId <String> --input.secretName <String> --input.secretNamespaceId <UUID> --input.secretValue <String>
 ```

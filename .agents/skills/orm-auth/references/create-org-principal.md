@@ -7,7 +7,7 @@ Execute the createOrgPrincipal mutation
 ## Usage
 
 ```typescript
-db.mutation.createOrgPrincipal({ input: { name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } }).execute()
+db.mutation.createOrgPrincipal({ input: { bypassStepUp: '<Boolean>', isReadOnly: '<Boolean>', name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.createOrgPrincipal({ input: { name: '<String>', orgId: '<UUID>', use
 ### Run createOrgPrincipal
 
 ```typescript
-const result = await db.mutation.createOrgPrincipal({ input: { name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>', isReadOnly: '<Boolean>', bypassStepUp: '<Boolean>' } }).execute();
+const result = await db.mutation.createOrgPrincipal({ input: { bypassStepUp: '<Boolean>', isReadOnly: '<Boolean>', name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>' } }).execute();
 ```

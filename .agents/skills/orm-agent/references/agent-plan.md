@@ -9,8 +9,8 @@ Workflow plan attached to an agent thread with ordered tasks and optional approv
 ```typescript
 db.agentPlan.findMany({ select: { id: true } }).execute()
 db.agentPlan.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.agentPlan.create({ data: { ownerId: '<UUID>', threadId: '<UUID>', databaseId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' }, select: { id: true } }).execute()
-db.agentPlan.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.agentPlan.create({ data: { databaseId: '<UUID>', description: '<String>', ownerId: '<UUID>', status: '<String>', threadId: '<UUID>', title: '<String>' }, select: { id: true } }).execute()
+db.agentPlan.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.agentPlan.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.agentPlan.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.agentPlan.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, databaseId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.agentPlan.findMany({
 
 ```typescript
 const item = await db.agentPlan.create({
-  data: { ownerId: '<UUID>', threadId: '<UUID>', databaseId: '<UUID>', title: '<String>', description: '<String>', status: '<String>' },
+  data: { databaseId: '<UUID>', description: '<String>', ownerId: '<UUID>', status: '<String>', threadId: '<UUID>', title: '<String>' },
   select: { id: true }
 }).execute();
 ```

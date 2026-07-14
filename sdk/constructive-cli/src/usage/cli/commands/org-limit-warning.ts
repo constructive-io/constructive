@@ -16,12 +16,12 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  entityId: 'uuid',
   id: 'uuid',
   name: 'string',
-  warningType: 'string',
-  thresholdValue: 'int',
   taskIdentifier: 'string',
-  entityId: 'uuid',
+  thresholdValue: 'int',
+  warningType: 'string',
 };
 const usage =
   '\norg-limit-warning <command>\n\nCommands:\n  list                  List orgLimitWarning records\n  find-first            Find first matching orgLimitWarning record\n  get                   Get a orgLimitWarning by ID\n  create                Create a new orgLimitWarning\n  update                Update an existing orgLimitWarning\n  delete                Delete a orgLimitWarning\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -74,12 +74,12 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      entityId: true,
       id: true,
       name: true,
-      warningType: true,
-      thresholdValue: true,
       taskIdentifier: true,
-      entityId: true,
+      thresholdValue: true,
+      warningType: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy> & {
@@ -100,12 +100,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      entityId: true,
       id: true,
       name: true,
-      warningType: true,
-      thresholdValue: true,
       taskIdentifier: true,
-      entityId: true,
+      thresholdValue: true,
+      warningType: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<OrgLimitWarningSelect, OrgLimitWarningFilter, OrgLimitWarningOrderBy> & {
@@ -138,12 +138,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          entityId: true,
           id: true,
           name: true,
-          warningType: true,
-          thresholdValue: true,
           taskIdentifier: true,
-          entityId: true,
+          thresholdValue: true,
+          warningType: true,
         },
       })
       .execute();
@@ -161,20 +161,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'entityId',
+        message: 'entityId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'warningType',
-        message: 'warningType',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'thresholdValue',
-        message: 'thresholdValue',
         required: true,
       },
       {
@@ -185,10 +180,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
-        required: false,
-        skipPrompt: true,
+        name: 'thresholdValue',
+        message: 'thresholdValue',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'warningType',
+        message: 'warningType',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -200,19 +200,19 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.orgLimitWarning
       .create({
         data: {
-          name: cleanedData.name,
-          warningType: cleanedData.warningType,
-          thresholdValue: cleanedData.thresholdValue,
-          taskIdentifier: cleanedData.taskIdentifier,
           entityId: cleanedData.entityId,
+          name: cleanedData.name,
+          taskIdentifier: cleanedData.taskIdentifier,
+          thresholdValue: cleanedData.thresholdValue,
+          warningType: cleanedData.warningType,
         },
         select: {
+          entityId: true,
           id: true,
           name: true,
-          warningType: true,
-          thresholdValue: true,
           taskIdentifier: true,
-          entityId: true,
+          thresholdValue: true,
+          warningType: true,
         },
       })
       .execute();
@@ -236,20 +236,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'entityId',
+        message: 'entityId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'warningType',
-        message: 'warningType',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'thresholdValue',
-        message: 'thresholdValue',
         required: false,
       },
       {
@@ -260,10 +255,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
+        name: 'thresholdValue',
+        message: 'thresholdValue',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'warningType',
+        message: 'warningType',
+        required: false,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -275,19 +275,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          name: cleanedData.name,
-          warningType: cleanedData.warningType,
-          thresholdValue: cleanedData.thresholdValue,
-          taskIdentifier: cleanedData.taskIdentifier,
           entityId: cleanedData.entityId,
+          name: cleanedData.name,
+          taskIdentifier: cleanedData.taskIdentifier,
+          thresholdValue: cleanedData.thresholdValue,
+          warningType: cleanedData.warningType,
         },
         select: {
+          entityId: true,
           id: true,
           name: true,
-          warningType: true,
-          thresholdValue: true,
           taskIdentifier: true,
-          entityId: true,
+          thresholdValue: true,
+          warningType: true,
         },
       })
       .execute();

@@ -9,8 +9,8 @@ ORM operations for Enum records
 ```typescript
 db.enum.findMany({ select: { id: true } }).execute()
 db.enum.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.enum.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute()
-db.enum.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.enum.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', label: '<String>', name: '<String>', schemaId: '<UUID>', smartTags: '<JSON>', tags: '<String>', values: '<String>' }, select: { id: true } }).execute()
+db.enum.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute()
 db.enum.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.enum.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.enum.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, category: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.enum.findMany({
 
 ```typescript
 const item = await db.enum.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' },
+  data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', label: '<String>', name: '<String>', schemaId: '<UUID>', smartTags: '<JSON>', tags: '<String>', values: '<String>' },
   select: { id: true }
 }).execute();
 ```

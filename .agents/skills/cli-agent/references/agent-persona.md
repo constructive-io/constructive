@@ -12,8 +12,8 @@ csdk agent-persona list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-persona list --limit 10 --after <cursor>
 csdk agent-persona find-first --where.<field>.<op> <value>
 csdk agent-persona get --id <UUID>
-csdk agent-persona create --databaseId <UUID> --slug <String> --name <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--systemPrompt <String>] [--resources <String>] [--config <JSON>] [--isActive <Boolean>]
-csdk agent-persona update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--databaseId <UUID>] [--slug <String>] [--name <String>] [--description <String>] [--systemPrompt <String>] [--resources <String>] [--config <JSON>] [--isActive <Boolean>]
+csdk agent-persona create --databaseId <UUID> --name <String> --slug <String> [--config <JSON>] [--createdBy <UUID>] [--description <String>] [--isActive <Boolean>] [--resources <String>] [--systemPrompt <String>] [--updatedBy <UUID>]
+csdk agent-persona update --id <UUID> [--config <JSON>] [--createdBy <UUID>] [--databaseId <UUID>] [--description <String>] [--isActive <Boolean>] [--name <String>] [--resources <String>] [--slug <String>] [--systemPrompt <String>] [--updatedBy <UUID>]
 csdk agent-persona delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-persona list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentPersona
 
 ```bash
-csdk agent-persona create --databaseId <UUID> --slug <String> --name <String> [--createdBy <UUID>] [--updatedBy <UUID>] [--description <String>] [--systemPrompt <String>] [--resources <String>] [--config <JSON>] [--isActive <Boolean>]
+csdk agent-persona create --databaseId <UUID> --name <String> --slug <String> [--config <JSON>] [--createdBy <UUID>] [--description <String>] [--isActive <Boolean>] [--resources <String>] [--systemPrompt <String>] [--updatedBy <UUID>]
 ```
 
 ### Get a agentPersona by id

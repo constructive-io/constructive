@@ -7,7 +7,7 @@ Execute the saveGraph mutation
 ## Usage
 
 ```typescript
-db.mutation.saveGraph({ input: { graphId: '<UUID>', rootHash: '<UUID>', message: '<String>' } }).execute()
+db.mutation.saveGraph({ input: { graphId: '<UUID>', message: '<String>', rootHash: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.saveGraph({ input: { graphId: '<UUID>', rootHash: '<UUID>', message:
 ### Run saveGraph
 
 ```typescript
-const result = await db.mutation.saveGraph({ input: { graphId: '<UUID>', rootHash: '<UUID>', message: '<String>' } }).execute();
+const result = await db.mutation.saveGraph({ input: { graphId: '<UUID>', message: '<String>', rootHash: '<UUID>' } }).execute();
 ```

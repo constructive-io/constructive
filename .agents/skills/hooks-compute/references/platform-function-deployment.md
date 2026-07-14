@@ -7,8 +7,8 @@ Function deployment bindings — ties a handler image to a namespace for Knative
 ## Usage
 
 ```typescript
-usePlatformFunctionDeploymentsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, namespaceId: true, status: true, serviceUrl: true, serviceName: true, revision: true, image: true, imageVersion: true, handlerName: true, concurrency: true, scaleMin: true, scaleMax: true, timeoutSeconds: true, resources: true, lastError: true, lastErrorAt: true, errorCount: true, labels: true, annotations: true } } })
-usePlatformFunctionDeploymentQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, namespaceId: true, status: true, serviceUrl: true, serviceName: true, revision: true, image: true, imageVersion: true, handlerName: true, concurrency: true, scaleMin: true, scaleMax: true, timeoutSeconds: true, resources: true, lastError: true, lastErrorAt: true, errorCount: true, labels: true, annotations: true } } })
+usePlatformFunctionDeploymentsQuery({ selection: { fields: { annotations: true, concurrency: true, createdAt: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } } })
+usePlatformFunctionDeploymentQuery({ id: '<UUID>', selection: { fields: { annotations: true, concurrency: true, createdAt: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } } })
 useCreatePlatformFunctionDeploymentMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformFunctionDeploymentMutation({ selection: { fields: { id: true } } })
 useDeletePlatformFunctionDeploymentMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformFunctionDeploymentMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformFunctionDeploymentsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, namespaceId: true, status: true, serviceUrl: true, serviceName: true, revision: true, image: true, imageVersion: true, handlerName: true, concurrency: true, scaleMin: true, scaleMax: true, timeoutSeconds: true, resources: true, lastError: true, lastErrorAt: true, errorCount: true, labels: true, annotations: true } },
+  selection: { fields: { annotations: true, concurrency: true, createdAt: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformFunctionDeploymentsQuery({
 const { mutate } = useCreatePlatformFunctionDeploymentMutation({
   selection: { fields: { id: true } },
 });
-mutate({ namespaceId: '<UUID>', status: '<String>', serviceUrl: '<String>', serviceName: '<String>', revision: '<Int>', image: '<String>', imageVersion: '<String>', handlerName: '<String>', concurrency: '<Int>', scaleMin: '<Int>', scaleMax: '<Int>', timeoutSeconds: '<Int>', resources: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', errorCount: '<Int>', labels: '<JSON>', annotations: '<JSON>' });
+mutate({ annotations: '<JSON>', concurrency: '<Int>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>' });
 ```

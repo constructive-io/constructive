@@ -16,15 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  message: 'string',
-  scopeId: 'uuid',
-  storeId: 'uuid',
-  parentIds: 'uuid',
   authorId: 'uuid',
   committerId: 'uuid',
-  treeId: 'uuid',
   date: 'string',
+  id: 'uuid',
+  message: 'string',
+  parentIds: 'uuid',
+  scopeId: 'uuid',
+  storeId: 'uuid',
+  treeId: 'uuid',
 };
 const usage =
   '\ninfra-commit <command>\n\nCommands:\n  list                  List infraCommit records\n  find-first            Find first matching infraCommit record\n  get                   Get a infraCommit by ID\n  create                Create a new infraCommit\n  update                Update an existing infraCommit\n  delete                Delete a infraCommit\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,15 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      message: true,
-      scopeId: true,
-      storeId: true,
-      parentIds: true,
       authorId: true,
       committerId: true,
-      treeId: true,
       date: true,
+      id: true,
+      message: true,
+      parentIds: true,
+      scopeId: true,
+      storeId: true,
+      treeId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<InfraCommitSelect, InfraCommitFilter, InfraCommitOrderBy> & {
@@ -106,15 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      message: true,
-      scopeId: true,
-      storeId: true,
-      parentIds: true,
       authorId: true,
       committerId: true,
-      treeId: true,
       date: true,
+      id: true,
+      message: true,
+      parentIds: true,
+      scopeId: true,
+      storeId: true,
+      treeId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<InfraCommitSelect, InfraCommitFilter, InfraCommitOrderBy> & {
@@ -147,15 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          message: true,
-          scopeId: true,
-          storeId: true,
-          parentIds: true,
           authorId: true,
           committerId: true,
-          treeId: true,
           date: true,
+          id: true,
+          message: true,
+          parentIds: true,
+          scopeId: true,
+          storeId: true,
+          treeId: true,
         },
       })
       .execute();
@@ -173,8 +173,36 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'authorId',
+        message: 'authorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'committerId',
+        message: 'committerId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'date',
+        message: 'date',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'message',
         message: 'message',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'parentIds',
+        message: 'parentIds',
         required: false,
         skipPrompt: true,
       },
@@ -192,36 +220,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'parentIds',
-        message: 'parentIds',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'authorId',
-        message: 'authorId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'committerId',
-        message: 'committerId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'treeId',
         message: 'treeId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'date',
-        message: 'date',
         required: false,
         skipPrompt: true,
       },
@@ -235,25 +235,25 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.infraCommit
       .create({
         data: {
-          message: cleanedData.message,
-          scopeId: cleanedData.scopeId,
-          storeId: cleanedData.storeId,
-          parentIds: cleanedData.parentIds,
           authorId: cleanedData.authorId,
           committerId: cleanedData.committerId,
-          treeId: cleanedData.treeId,
           date: cleanedData.date,
+          message: cleanedData.message,
+          parentIds: cleanedData.parentIds,
+          scopeId: cleanedData.scopeId,
+          storeId: cleanedData.storeId,
+          treeId: cleanedData.treeId,
         },
         select: {
-          id: true,
-          message: true,
-          scopeId: true,
-          storeId: true,
-          parentIds: true,
           authorId: true,
           committerId: true,
-          treeId: true,
           date: true,
+          id: true,
+          message: true,
+          parentIds: true,
+          scopeId: true,
+          storeId: true,
+          treeId: true,
         },
       })
       .execute();
@@ -283,26 +283,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'message',
-        message: 'message',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'storeId',
-        message: 'storeId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'parentIds',
-        message: 'parentIds',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'authorId',
         message: 'authorId',
         required: false,
@@ -317,15 +297,35 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'treeId',
-        message: 'treeId',
+        name: 'date',
+        message: 'date',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'date',
-        message: 'date',
+        name: 'message',
+        message: 'message',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'parentIds',
+        message: 'parentIds',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'storeId',
+        message: 'storeId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'treeId',
+        message: 'treeId',
         required: false,
         skipPrompt: true,
       },
@@ -340,24 +340,24 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scopeId: answers.scopeId as string,
         },
         data: {
-          message: cleanedData.message,
-          storeId: cleanedData.storeId,
-          parentIds: cleanedData.parentIds,
           authorId: cleanedData.authorId,
           committerId: cleanedData.committerId,
-          treeId: cleanedData.treeId,
           date: cleanedData.date,
+          message: cleanedData.message,
+          parentIds: cleanedData.parentIds,
+          storeId: cleanedData.storeId,
+          treeId: cleanedData.treeId,
         },
         select: {
-          id: true,
-          message: true,
-          scopeId: true,
-          storeId: true,
-          parentIds: true,
           authorId: true,
           committerId: true,
-          treeId: true,
           date: true,
+          id: true,
+          message: true,
+          parentIds: true,
+          scopeId: true,
+          storeId: true,
+          treeId: true,
         },
       })
       .execute();

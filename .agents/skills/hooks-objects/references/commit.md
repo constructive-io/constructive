@@ -7,8 +7,8 @@ Commit history — each commit snapshots a tree root for a store
 ## Usage
 
 ```typescript
-useCommitsQuery({ selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
-useCommitQuery({ id: '<UUID>', selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } } })
+useCommitsQuery({ selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } } })
+useCommitQuery({ id: '<UUID>', selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } } })
 useCreateCommitMutation({ selection: { fields: { id: true } } })
 useUpdateCommitMutation({ selection: { fields: { id: true } } })
 useDeleteCommitMutation({})
@@ -20,7 +20,7 @@ useDeleteCommitMutation({})
 
 ```typescript
 const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useCommitsQuery({
 const { mutate } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-mutate({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
+mutate({ authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
 ```

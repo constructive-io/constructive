@@ -7,8 +7,8 @@ React Query hooks for DbPresetModule data operations
 ## Usage
 
 ```typescript
-useDbPresetModulesQuery({ selection: { fields: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, dbPresetsTableId: true, storeName: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, createdAt: true } } })
-useDbPresetModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, dbPresetsTableId: true, storeName: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, createdAt: true } } })
+useDbPresetModulesQuery({ selection: { fields: { apiName: true, createdAt: true, databaseId: true, dbPresetsTableId: true, entityTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true, storeName: true } } })
+useDbPresetModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, createdAt: true, databaseId: true, dbPresetsTableId: true, entityTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true, storeName: true } } })
 useCreateDbPresetModuleMutation({ selection: { fields: { id: true } } })
 useUpdateDbPresetModuleMutation({ selection: { fields: { id: true } } })
 useDeleteDbPresetModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteDbPresetModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useDbPresetModulesQuery({
-  selection: { fields: { id: true, databaseId: true, publicSchemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, scope: true, prefix: true, merkleStoreModuleId: true, dbPresetsTableId: true, storeName: true, apiName: true, privateApiName: true, entityTableId: true, policies: true, provisions: true, createdAt: true } },
+  selection: { fields: { apiName: true, createdAt: true, databaseId: true, dbPresetsTableId: true, entityTableId: true, id: true, merkleStoreModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaId: true, publicSchemaName: true, scope: true, storeName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDbPresetModulesQuery({
 const { mutate } = useCreateDbPresetModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', publicSchemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', scope: '<String>', prefix: '<String>', merkleStoreModuleId: '<UUID>', dbPresetsTableId: '<UUID>', storeName: '<String>', apiName: '<String>', privateApiName: '<String>', entityTableId: '<UUID>', policies: '<JSON>', provisions: '<JSON>' });
+mutate({ apiName: '<String>', databaseId: '<UUID>', dbPresetsTableId: '<UUID>', entityTableId: '<UUID>', merkleStoreModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaId: '<UUID>', publicSchemaName: '<String>', scope: '<String>', storeName: '<String>' });
 ```

@@ -7,8 +7,8 @@ An owned, editable blueprint scoped to a specific database. Created by copying f
 ## Usage
 
 ```typescript
-useBlueprintsQuery({ selection: { fields: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } } })
-useBlueprintQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } } })
+useBlueprintsQuery({ selection: { fields: { createdAt: true, databaseId: true, definition: true, definitionHash: true, description: true, displayName: true, id: true, name: true, ownerId: true, tableHashes: true, templateId: true, updatedAt: true } } })
+useBlueprintQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, definition: true, definitionHash: true, description: true, displayName: true, id: true, name: true, ownerId: true, tableHashes: true, templateId: true, updatedAt: true } } })
 useCreateBlueprintMutation({ selection: { fields: { id: true } } })
 useUpdateBlueprintMutation({ selection: { fields: { id: true } } })
 useDeleteBlueprintMutation({})
@@ -20,7 +20,7 @@ useDeleteBlueprintMutation({})
 
 ```typescript
 const { data, isLoading } = useBlueprintsQuery({
-  selection: { fields: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, definition: true, definitionHash: true, description: true, displayName: true, id: true, name: true, ownerId: true, tableHashes: true, templateId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useBlueprintsQuery({
 const { mutate } = useCreateBlueprintMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', databaseId: '<UUID>', name: '<String>', displayName: '<String>', description: '<String>', definition: '<JSON>', templateId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' });
+mutate({ databaseId: '<UUID>', definition: '<JSON>', definitionHash: '<UUID>', description: '<String>', displayName: '<String>', name: '<String>', ownerId: '<UUID>', tableHashes: '<JSON>', templateId: '<UUID>' });
 ```

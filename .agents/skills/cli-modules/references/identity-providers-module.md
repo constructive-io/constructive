@@ -12,8 +12,8 @@ csdk identity-providers-module list --where.<field>.<op> <value> --orderBy <valu
 csdk identity-providers-module list --limit 10 --after <cursor>
 csdk identity-providers-module find-first --where.<field>.<op> <value>
 csdk identity-providers-module get --id <UUID>
-csdk identity-providers-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>]
-csdk identity-providers-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>]
+csdk identity-providers-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--tableId <UUID>] [--tableName <String>]
+csdk identity-providers-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--tableId <UUID>] [--tableName <String>]
 csdk identity-providers-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk identity-providers-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a identityProvidersModule
 
 ```bash
-csdk identity-providers-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>]
+csdk identity-providers-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>] [--tableId <UUID>] [--tableName <String>]
 ```
 
 ### Get a identityProvidersModule by id

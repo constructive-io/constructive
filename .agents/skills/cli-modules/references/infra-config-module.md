@@ -12,8 +12,8 @@ csdk infra-config-module list --where.<field>.<op> <value> --orderBy <values>
 csdk infra-config-module list --limit 10 --after <cursor>
 csdk infra-config-module find-first --where.<field>.<op> <value>
 csdk infra-config-module get --id <UUID>
-csdk infra-config-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--configTableId <UUID>] [--configTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>]
-csdk infra-config-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--configTableId <UUID>] [--configTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>]
+csdk infra-config-module create --databaseId <UUID> [--apiName <String>] [--configTableId <UUID>] [--configTableName <String>] [--entityField <String>] [--entityTableId <UUID>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
+csdk infra-config-module update --id <UUID> [--apiName <String>] [--configTableId <UUID>] [--configTableName <String>] [--databaseId <UUID>] [--entityField <String>] [--entityTableId <UUID>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
 csdk infra-config-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk infra-config-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a infraConfigModule
 
 ```bash
-csdk infra-config-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--configTableId <UUID>] [--configTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>]
+csdk infra-config-module create --databaseId <UUID> [--apiName <String>] [--configTableId <UUID>] [--configTableName <String>] [--entityField <String>] [--entityTableId <UUID>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
 ```
 
 ### Get a infraConfigModule by id

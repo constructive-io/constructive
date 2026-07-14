@@ -19,6 +19,15 @@
 // Entity Query Keys
 // ============================================================================
 
+export const commitKeys = {
+  /** All commit queries */ all: ['commit'] as const,
+  /** List query keys */ lists: () => [...commitKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...commitKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...commitKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...commitKeys.details(), id] as const,
+} as const;
 export const getAllRecordKeys = {
   /** All getAllRecord queries */ all: ['getallrecord'] as const,
   /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
@@ -27,6 +36,15 @@ export const getAllRecordKeys = {
   /** Detail query keys */ details: () => [...getAllRecordKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...getAllRecordKeys.details(), id] as const,
+} as const;
+export const objectKeys = {
+  /** All object queries */ all: ['object'] as const,
+  /** List query keys */ lists: () => [...objectKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...objectKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...objectKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...objectKeys.details(), id] as const,
 } as const;
 export const refKeys = {
   /** All ref queries */ all: ['ref'] as const,
@@ -45,24 +63,6 @@ export const storeKeys = {
   /** Detail query keys */ details: () => [...storeKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...storeKeys.details(), id] as const,
-} as const;
-export const objectKeys = {
-  /** All object queries */ all: ['object'] as const,
-  /** List query keys */ lists: () => [...objectKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...objectKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...objectKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...objectKeys.details(), id] as const,
-} as const;
-export const commitKeys = {
-  /** All commit queries */ all: ['commit'] as const,
-  /** List query keys */ lists: () => [...commitKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...commitKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...commitKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...commitKeys.details(), id] as const,
 } as const;
 /**
 
@@ -87,11 +87,11 @@ export const commitKeys = {
  * ```
  */
 export const queryKeys = {
+  commit: commitKeys,
   getAllRecord: getAllRecordKeys,
+  object: objectKeys,
   ref: refKeys,
   store: storeKeys,
-  object: objectKeys,
-  commit: commitKeys,
 } as const;
 /** Type representing all available query key scopes */
 export type QueryKeyScope = keyof typeof queryKeys;

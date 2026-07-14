@@ -12,8 +12,8 @@ csdk resources-requirements-state list --where.<field>.<op> <value> --orderBy <v
 csdk resources-requirements-state list --limit 10 --after <cursor>
 csdk resources-requirements-state find-first --where.<field>.<op> <value>
 csdk resources-requirements-state get --id <UUID>
-csdk resources-requirements-state create --resourceId <UUID> --slug <String> --secretsHash <String> --configHash <String> --requirementsHash <String> --secretsObjectName <String> --configObjectName <String>
-csdk resources-requirements-state update --id <UUID> [--resourceId <UUID>] [--slug <String>] [--secretsHash <String>] [--configHash <String>] [--requirementsHash <String>] [--secretsObjectName <String>] [--configObjectName <String>]
+csdk resources-requirements-state create --configHash <String> --configObjectName <String> --requirementsHash <String> --resourceId <UUID> --secretsHash <String> --secretsObjectName <String> --slug <String>
+csdk resources-requirements-state update --id <UUID> [--configHash <String>] [--configObjectName <String>] [--requirementsHash <String>] [--resourceId <UUID>] [--secretsHash <String>] [--secretsObjectName <String>] [--slug <String>]
 csdk resources-requirements-state delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk resources-requirements-state list --where.id.equalTo <value> --orderBy ID_A
 ### Create a resourcesRequirementsState
 
 ```bash
-csdk resources-requirements-state create --resourceId <UUID> --slug <String> --secretsHash <String> --configHash <String> --requirementsHash <String> --secretsObjectName <String> --configObjectName <String>
+csdk resources-requirements-state create --configHash <String> --configObjectName <String> --requirementsHash <String> --resourceId <UUID> --secretsHash <String> --secretsObjectName <String> --slug <String>
 ```
 
 ### Get a resourcesRequirementsState by id

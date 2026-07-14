@@ -9,8 +9,8 @@ Simplified view of active members in an entity, used for listing who belongs to 
 ```typescript
 db.orgMember.findMany({ select: { id: true } }).execute()
 db.orgMember.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgMember.create({ data: { isAdmin: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>' }, select: { id: true } }).execute()
-db.orgMember.update({ where: { id: '<UUID>' }, data: { isAdmin: '<Boolean>' }, select: { id: true } }).execute()
+db.orgMember.create({ data: { actorId: '<UUID>', entityId: '<UUID>', isAdmin: '<Boolean>' }, select: { id: true } }).execute()
+db.orgMember.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.orgMember.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgMember.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgMember.findMany({
-  select: { id: true, isAdmin: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgMember.findMany({
 
 ```typescript
 const item = await db.orgMember.create({
-  data: { isAdmin: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>' },
+  data: { actorId: '<UUID>', entityId: '<UUID>', isAdmin: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```

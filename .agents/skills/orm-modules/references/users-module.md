@@ -9,8 +9,8 @@ ORM operations for UsersModule records
 ```typescript
 db.usersModule.findMany({ select: { id: true } }).execute()
 db.usersModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.usersModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', typeTableId: '<UUID>', typeTableName: '<String>', apiName: '<String>', privateApiName: '<String>' }, select: { id: true } }).execute()
-db.usersModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.usersModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', typeTableId: '<UUID>', typeTableName: '<String>' }, select: { id: true } }).execute()
+db.usersModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.usersModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.usersModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.usersModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.usersModule.findMany({
 
 ```typescript
 const item = await db.usersModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', typeTableId: '<UUID>', typeTableName: '<String>', apiName: '<String>', privateApiName: '<String>' },
+  data: { apiName: '<String>', databaseId: '<UUID>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', typeTableId: '<UUID>', typeTableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

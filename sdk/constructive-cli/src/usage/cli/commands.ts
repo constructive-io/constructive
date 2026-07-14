@@ -6,29 +6,29 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
-import appLimitCapsDefaultCmd from './commands/app-limit-caps-default';
-import orgLimitCapsDefaultCmd from './commands/org-limit-caps-default';
 import appLimitCapCmd from './commands/app-limit-cap';
-import orgLimitCapCmd from './commands/org-limit-cap';
-import appLimitDefaultCmd from './commands/app-limit-default';
-import appLimitCreditCmd from './commands/app-limit-credit';
-import appLimitCreditCodeItemCmd from './commands/app-limit-credit-code-item';
-import appLimitCreditRedemptionCmd from './commands/app-limit-credit-redemption';
-import orgLimitDefaultCmd from './commands/org-limit-default';
-import orgLimitCreditCmd from './commands/org-limit-credit';
-import appLimitWarningCmd from './commands/app-limit-warning';
-import orgLimitWarningCmd from './commands/org-limit-warning';
-import appLimitCreditCodeCmd from './commands/app-limit-credit-code';
-import appLimitEventCmd from './commands/app-limit-event';
-import orgLimitEventCmd from './commands/org-limit-event';
+import appLimitCapsDefaultCmd from './commands/app-limit-caps-default';
 import appLimitCmd from './commands/app-limit';
+import appLimitCreditCodeCmd from './commands/app-limit-credit-code';
+import appLimitCreditCodeItemCmd from './commands/app-limit-credit-code-item';
+import appLimitCreditCmd from './commands/app-limit-credit';
+import appLimitCreditRedemptionCmd from './commands/app-limit-credit-redemption';
+import appLimitDefaultCmd from './commands/app-limit-default';
+import appLimitEventCmd from './commands/app-limit-event';
+import appLimitWarningCmd from './commands/app-limit-warning';
 import orgLimitAggregateCmd from './commands/org-limit-aggregate';
+import orgLimitCapCmd from './commands/org-limit-cap';
+import orgLimitCapsDefaultCmd from './commands/org-limit-caps-default';
 import orgLimitCmd from './commands/org-limit';
+import orgLimitCreditCmd from './commands/org-limit-credit';
+import orgLimitDefaultCmd from './commands/org-limit-default';
+import orgLimitEventCmd from './commands/org-limit-event';
+import orgLimitWarningCmd from './commands/org-limit-warning';
+import provisionBucketCmd from './commands/provision-bucket';
 import seedAppLimitCapsDefaultsCmd from './commands/seed-app-limit-caps-defaults';
 import seedAppLimitDefaultsCmd from './commands/seed-app-limit-defaults';
 import seedOrgLimitCapsDefaultsCmd from './commands/seed-org-limit-caps-defaults';
 import seedOrgLimitDefaultsCmd from './commands/seed-org-limit-defaults';
-import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
   (
@@ -39,32 +39,32 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
-  'app-limit-caps-default': appLimitCapsDefaultCmd,
-  'org-limit-caps-default': orgLimitCapsDefaultCmd,
   'app-limit-cap': appLimitCapCmd,
-  'org-limit-cap': orgLimitCapCmd,
-  'app-limit-default': appLimitDefaultCmd,
-  'app-limit-credit': appLimitCreditCmd,
-  'app-limit-credit-code-item': appLimitCreditCodeItemCmd,
-  'app-limit-credit-redemption': appLimitCreditRedemptionCmd,
-  'org-limit-default': orgLimitDefaultCmd,
-  'org-limit-credit': orgLimitCreditCmd,
-  'app-limit-warning': appLimitWarningCmd,
-  'org-limit-warning': orgLimitWarningCmd,
-  'app-limit-credit-code': appLimitCreditCodeCmd,
-  'app-limit-event': appLimitEventCmd,
-  'org-limit-event': orgLimitEventCmd,
+  'app-limit-caps-default': appLimitCapsDefaultCmd,
   'app-limit': appLimitCmd,
+  'app-limit-credit-code': appLimitCreditCodeCmd,
+  'app-limit-credit-code-item': appLimitCreditCodeItemCmd,
+  'app-limit-credit': appLimitCreditCmd,
+  'app-limit-credit-redemption': appLimitCreditRedemptionCmd,
+  'app-limit-default': appLimitDefaultCmd,
+  'app-limit-event': appLimitEventCmd,
+  'app-limit-warning': appLimitWarningCmd,
   'org-limit-aggregate': orgLimitAggregateCmd,
+  'org-limit-cap': orgLimitCapCmd,
+  'org-limit-caps-default': orgLimitCapsDefaultCmd,
   'org-limit': orgLimitCmd,
+  'org-limit-credit': orgLimitCreditCmd,
+  'org-limit-default': orgLimitDefaultCmd,
+  'org-limit-event': orgLimitEventCmd,
+  'org-limit-warning': orgLimitWarningCmd,
+  'provision-bucket': provisionBucketCmd,
   'seed-app-limit-caps-defaults': seedAppLimitCapsDefaultsCmd,
   'seed-app-limit-defaults': seedAppLimitDefaultsCmd,
   'seed-org-limit-caps-defaults': seedOrgLimitCapsDefaultsCmd,
   'seed-org-limit-defaults': seedOrgLimitDefaultsCmd,
-  'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  app-limit-caps-default appLimitCapsDefault CRUD operations\n  org-limit-caps-default orgLimitCapsDefault CRUD operations\n  app-limit-cap        appLimitCap CRUD operations\n  org-limit-cap        orgLimitCap CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  app-limit-credit     appLimitCredit CRUD operations\n  app-limit-credit-code-item appLimitCreditCodeItem CRUD operations\n  app-limit-credit-redemption appLimitCreditRedemption CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-limit-credit     orgLimitCredit CRUD operations\n  app-limit-warning    appLimitWarning CRUD operations\n  org-limit-warning    orgLimitWarning CRUD operations\n  app-limit-credit-code appLimitCreditCode CRUD operations\n  app-limit-event      appLimitEvent CRUD operations\n  org-limit-event      orgLimitEvent CRUD operations\n  app-limit            appLimit CRUD operations\n  org-limit-aggregate  orgLimitAggregate CRUD operations\n  org-limit            orgLimit CRUD operations\n  seed-app-limit-caps-defaults seedAppLimitCapsDefaults\n  seed-app-limit-defaults seedAppLimitDefaults\n  seed-org-limit-caps-defaults seedOrgLimitCapsDefaults\n  seed-org-limit-defaults seedOrgLimitDefaults\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  app-limit-cap        appLimitCap CRUD operations\n  app-limit-caps-default appLimitCapsDefault CRUD operations\n  app-limit            appLimit CRUD operations\n  app-limit-credit-code appLimitCreditCode CRUD operations\n  app-limit-credit-code-item appLimitCreditCodeItem CRUD operations\n  app-limit-credit     appLimitCredit CRUD operations\n  app-limit-credit-redemption appLimitCreditRedemption CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  app-limit-event      appLimitEvent CRUD operations\n  app-limit-warning    appLimitWarning CRUD operations\n  org-limit-aggregate  orgLimitAggregate CRUD operations\n  org-limit-cap        orgLimitCap CRUD operations\n  org-limit-caps-default orgLimitCapsDefault CRUD operations\n  org-limit            orgLimit CRUD operations\n  org-limit-credit     orgLimitCredit CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-limit-event      orgLimitEvent CRUD operations\n  org-limit-warning    orgLimitWarning CRUD operations\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  seed-app-limit-caps-defaults seedAppLimitCapsDefaults\n  seed-app-limit-defaults seedAppLimitDefaults\n  seed-org-limit-caps-defaults seedOrgLimitCapsDefaults\n  seed-org-limit-defaults seedOrgLimitDefaults\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

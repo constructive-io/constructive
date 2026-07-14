@@ -7,8 +7,8 @@ React Query hooks for Secret data operations
 ## Usage
 
 ```typescript
-useSecretsQuery({ selection: { fields: { databaseId: true, id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } } })
-useSecretQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } } })
+useSecretsQuery({ selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } } })
+useSecretQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } } })
 useCreateSecretMutation({ selection: { fields: { id: true } } })
 useUpdateSecretMutation({ selection: { fields: { id: true } } })
 useDeleteSecretMutation({})
@@ -20,7 +20,7 @@ useDeleteSecretMutation({})
 
 ```typescript
 const { data, isLoading } = useSecretsQuery({
-  selection: { fields: { databaseId: true, id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSecretsQuery({
 const { mutate } = useCreateSecretMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', name: '<String>', provider: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' });
+mutate({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```

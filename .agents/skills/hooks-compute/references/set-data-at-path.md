@@ -7,7 +7,7 @@ React Query mutation hook for setDataAtPath
 ## Usage
 
 ```typescript
-const { mutate } = useSetDataAtPathMutation(); mutate({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } });
+const { mutate } = useSetDataAtPathMutation(); mutate({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSetDataAtPathMutation(); mutate({ input: { sId: '<UUID>', 
 
 ```typescript
 const { mutate, isLoading } = useSetDataAtPathMutation();
-mutate({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } });
+mutate({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } });
 ```

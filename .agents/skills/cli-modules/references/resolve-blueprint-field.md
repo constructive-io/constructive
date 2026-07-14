@@ -7,7 +7,7 @@ Resolves a field_name within a given table_id to a field_id. Throws if no match 
 ## Usage
 
 ```bash
-csdk resolve-blueprint-field --databaseId <UUID> --tableId <UUID> --fieldName <String>
+csdk resolve-blueprint-field --databaseId <UUID> --fieldName <String> --tableId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk resolve-blueprint-field --databaseId <UUID> --tableId <UUID> --fieldName <S
 ### Run resolveBlueprintField
 
 ```bash
-csdk resolve-blueprint-field --databaseId <UUID> --tableId <UUID> --fieldName <String>
+csdk resolve-blueprint-field --databaseId <UUID> --fieldName <String> --tableId <UUID>
 ```

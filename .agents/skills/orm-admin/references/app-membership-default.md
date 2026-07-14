@@ -9,7 +9,7 @@ Default membership settings per entity, controlling initial approval and verific
 ```typescript
 db.appMembershipDefault.findMany({ select: { id: true } }).execute()
 db.appMembershipDefault.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appMembershipDefault.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' }, select: { id: true } }).execute()
+db.appMembershipDefault.create({ data: { createdBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
 db.appMembershipDefault.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute()
 db.appMembershipDefault.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.appMembershipDefault.findMany({
 
 ```typescript
 const item = await db.appMembershipDefault.create({
-  data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' },
+  data: { createdBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>', updatedBy: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

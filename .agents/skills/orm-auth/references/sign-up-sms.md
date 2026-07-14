@@ -7,7 +7,7 @@ Execute the signUpSms mutation
 ## Usage
 
 ```typescript
-db.mutation.signUpSms({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } }).execute()
+db.mutation.signUpSms({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.signUpSms({ input: { phone: '<String>', code: '<String>', credential
 ### Run signUpSms
 
 ```typescript
-const result = await db.mutation.signUpSms({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } }).execute();
+const result = await db.mutation.signUpSms({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } }).execute();
 ```

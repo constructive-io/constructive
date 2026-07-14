@@ -7,8 +7,8 @@ Deployment lifecycle events — audit log of provisioning, scaling, and failure 
 ## Usage
 
 ```typescript
-usePlatformFunctionDeploymentEventsQuery({ selection: { fields: { createdAt: true, id: true, deploymentId: true, eventType: true, actorId: true, message: true, metadata: true } } })
-usePlatformFunctionDeploymentEventQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, deploymentId: true, eventType: true, actorId: true, message: true, metadata: true } } })
+usePlatformFunctionDeploymentEventsQuery({ selection: { fields: { actorId: true, createdAt: true, deploymentId: true, eventType: true, id: true, message: true, metadata: true } } })
+usePlatformFunctionDeploymentEventQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, deploymentId: true, eventType: true, id: true, message: true, metadata: true } } })
 useCreatePlatformFunctionDeploymentEventMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformFunctionDeploymentEventMutation({ selection: { fields: { id: true } } })
 useDeletePlatformFunctionDeploymentEventMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformFunctionDeploymentEventMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformFunctionDeploymentEventsQuery({
-  selection: { fields: { createdAt: true, id: true, deploymentId: true, eventType: true, actorId: true, message: true, metadata: true } },
+  selection: { fields: { actorId: true, createdAt: true, deploymentId: true, eventType: true, id: true, message: true, metadata: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformFunctionDeploymentEventsQuery({
 const { mutate } = useCreatePlatformFunctionDeploymentEventMutation({
   selection: { fields: { id: true } },
 });
-mutate({ deploymentId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>' });
+mutate({ actorId: '<UUID>', deploymentId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>' });
 ```

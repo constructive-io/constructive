@@ -2,13 +2,13 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions by task_identifier string.
+Function invocation log — INSERT to call a function (business-layer, metered). Linked to definitions via function_definition_id FK, with task_identifier as the denormalized routing/audit slug.
 
 ## Usage
 
 ```typescript
-useFunctionInvocationsQuery({ selection: { fields: { createdAt: true, id: true, actorId: true, databaseId: true, taskIdentifier: true, payload: true, status: true, result: true, error: true, durationMs: true, jobId: true, startedAt: true, completedAt: true, parentInvocationId: true, graphExecutionId: true } } })
-useFunctionInvocationQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, actorId: true, databaseId: true, taskIdentifier: true, payload: true, status: true, result: true, error: true, durationMs: true, jobId: true, startedAt: true, completedAt: true, parentInvocationId: true, graphExecutionId: true } } })
+useFunctionInvocationsQuery({ selection: { fields: { actorId: true, apiBindingId: true, completedAt: true, createdAt: true, databaseId: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, result: true, startedAt: true, status: true, taskIdentifier: true } } })
+useFunctionInvocationQuery({ id: '<UUID>', selection: { fields: { actorId: true, apiBindingId: true, completedAt: true, createdAt: true, databaseId: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, result: true, startedAt: true, status: true, taskIdentifier: true } } })
 useCreateFunctionInvocationMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionInvocationMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionInvocationMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionInvocationMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionInvocationsQuery({
-  selection: { fields: { createdAt: true, id: true, actorId: true, databaseId: true, taskIdentifier: true, payload: true, status: true, result: true, error: true, durationMs: true, jobId: true, startedAt: true, completedAt: true, parentInvocationId: true, graphExecutionId: true } },
+  selection: { fields: { actorId: true, apiBindingId: true, completedAt: true, createdAt: true, databaseId: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionInvocationsQuery({
 const { mutate } = useCreateFunctionInvocationMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', databaseId: '<UUID>', taskIdentifier: '<String>', payload: '<JSON>', status: '<String>', result: '<JSON>', error: '<String>', durationMs: '<Int>', jobId: '<BigInt>', startedAt: '<Datetime>', completedAt: '<Datetime>', parentInvocationId: '<UUID>', graphExecutionId: '<UUID>' });
+mutate({ actorId: '<UUID>', apiBindingId: '<UUID>', completedAt: '<Datetime>', databaseId: '<UUID>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' });
 ```

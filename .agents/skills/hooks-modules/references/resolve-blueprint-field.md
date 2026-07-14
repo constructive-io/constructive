@@ -7,7 +7,7 @@ Resolves a field_name within a given table_id to a field_id. Throws if no match 
 ## Usage
 
 ```typescript
-useResolveBlueprintFieldQuery({ databaseId: '<UUID>', tableId: '<UUID>', fieldName: '<String>' })
+useResolveBlueprintFieldQuery({ databaseId: '<UUID>', fieldName: '<String>', tableId: '<UUID>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useResolveBlueprintFieldQuery({ databaseId: '<UUID>', tableId: '<UUID>', fieldNa
 ### Use useResolveBlueprintFieldQuery
 
 ```typescript
-const { data, isLoading } = useResolveBlueprintFieldQuery({ databaseId: '<UUID>', tableId: '<UUID>', fieldName: '<String>' });
+const { data, isLoading } = useResolveBlueprintFieldQuery({ databaseId: '<UUID>', fieldName: '<String>', tableId: '<UUID>' });
 ```

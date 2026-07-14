@@ -7,8 +7,8 @@ Ephemeral execution state for flow graph evaluation
 ## Usage
 
 ```typescript
-useFunctionGraphExecutionsQuery({ selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, scopeId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, lastProgressAt: true, errorCode: true, errorMessage: true } } })
-useFunctionGraphExecutionQuery({ id: '<UUID>', selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, scopeId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, lastProgressAt: true, errorCode: true, errorMessage: true } } })
+useFunctionGraphExecutionsQuery({ selection: { fields: { completedAt: true, currentWave: true, definitionsCommitId: true, errorCode: true, errorMessage: true, executionPlan: true, graphId: true, id: true, inputPayload: true, invocationId: true, lastProgressAt: true, maxPendingJobs: true, maxTicks: true, nodeOutputs: true, outputNode: true, outputPayload: true, outputPort: true, parentExecutionId: true, parentNodeName: true, scopeId: true, startedAt: true, status: true, tickCount: true, timeoutAt: true } } })
+useFunctionGraphExecutionQuery({ id: '<UUID>', selection: { fields: { completedAt: true, currentWave: true, definitionsCommitId: true, errorCode: true, errorMessage: true, executionPlan: true, graphId: true, id: true, inputPayload: true, invocationId: true, lastProgressAt: true, maxPendingJobs: true, maxTicks: true, nodeOutputs: true, outputNode: true, outputPayload: true, outputPort: true, parentExecutionId: true, parentNodeName: true, scopeId: true, startedAt: true, status: true, tickCount: true, timeoutAt: true } } })
 useCreateFunctionGraphExecutionMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionGraphExecutionMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionGraphExecutionMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionGraphExecutionMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionGraphExecutionsQuery({
-  selection: { fields: { startedAt: true, id: true, graphId: true, invocationId: true, scopeId: true, outputNode: true, outputPort: true, status: true, inputPayload: true, outputPayload: true, nodeOutputs: true, executionPlan: true, currentWave: true, parentExecutionId: true, parentNodeName: true, definitionsCommitId: true, tickCount: true, completedAt: true, maxTicks: true, maxPendingJobs: true, timeoutAt: true, lastProgressAt: true, errorCode: true, errorMessage: true } },
+  selection: { fields: { completedAt: true, currentWave: true, definitionsCommitId: true, errorCode: true, errorMessage: true, executionPlan: true, graphId: true, id: true, inputPayload: true, invocationId: true, lastProgressAt: true, maxPendingJobs: true, maxTicks: true, nodeOutputs: true, outputNode: true, outputPayload: true, outputPort: true, parentExecutionId: true, parentNodeName: true, scopeId: true, startedAt: true, status: true, tickCount: true, timeoutAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionGraphExecutionsQuery({
 const { mutate } = useCreateFunctionGraphExecutionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', scopeId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', lastProgressAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' });
+mutate({ completedAt: '<Datetime>', currentWave: '<Int>', definitionsCommitId: '<UUID>', errorCode: '<String>', errorMessage: '<String>', executionPlan: '<JSON>', graphId: '<UUID>', inputPayload: '<JSON>', invocationId: '<UUID>', lastProgressAt: '<Datetime>', maxPendingJobs: '<Int>', maxTicks: '<Int>', nodeOutputs: '<JSON>', outputNode: '<String>', outputPayload: '<JSON>', outputPort: '<String>', parentExecutionId: '<UUID>', parentNodeName: '<String>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>', tickCount: '<Int>', timeoutAt: '<Datetime>' });
 ```

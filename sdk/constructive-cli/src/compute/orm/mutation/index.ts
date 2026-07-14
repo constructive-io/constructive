@@ -7,106 +7,94 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  ValidateFunctionGraphInput,
-  InfraInitEmptyRepoInput,
-  InitEmptyRepoInput,
-  ImportDefinitionsInput,
-  InfraSetDataAtPathInput,
-  SetDataAtPathInput,
-  CopyGraphInput,
-  SaveGraphInput,
-  AddEdgeAndSaveInput,
-  AddNodeAndSaveInput,
-  ImportGraphJsonInput,
   AddEdgeInput,
+  AddEdgeAndSaveInput,
   AddNodeInput,
+  AddNodeAndSaveInput,
+  CopyGraphInput,
+  ImportDefinitionsInput,
+  ImportGraphJsonInput,
+  InfraInitEmptyRepoInput,
   InfraInsertNodeAtPathInput,
+  InfraSetDataAtPathInput,
+  InitEmptyRepoInput,
   InsertNodeAtPathInput,
-  StartExecutionInput,
   ProvisionBucketInput,
-  ValidateFunctionGraphPayload,
-  InfraInitEmptyRepoPayload,
-  InitEmptyRepoPayload,
-  ImportDefinitionsPayload,
-  InfraSetDataAtPathPayload,
-  SetDataAtPathPayload,
-  CopyGraphPayload,
-  SaveGraphPayload,
-  AddEdgeAndSavePayload,
-  AddNodeAndSavePayload,
-  ImportGraphJsonPayload,
+  SaveGraphInput,
+  SetDataAtPathInput,
+  StartExecutionInput,
+  ValidateFunctionGraphInput,
   AddEdgePayload,
+  AddEdgeAndSavePayload,
   AddNodePayload,
+  AddNodeAndSavePayload,
+  CopyGraphPayload,
+  ImportDefinitionsPayload,
+  ImportGraphJsonPayload,
+  InfraInitEmptyRepoPayload,
   InfraInsertNodeAtPathPayload,
+  InfraSetDataAtPathPayload,
+  InitEmptyRepoPayload,
   InsertNodeAtPathPayload,
-  StartExecutionPayload,
   ProvisionBucketPayload,
-  ValidateFunctionGraphPayloadSelect,
-  InfraInitEmptyRepoPayloadSelect,
-  InitEmptyRepoPayloadSelect,
-  ImportDefinitionsPayloadSelect,
-  InfraSetDataAtPathPayloadSelect,
-  SetDataAtPathPayloadSelect,
-  CopyGraphPayloadSelect,
-  SaveGraphPayloadSelect,
-  AddEdgeAndSavePayloadSelect,
-  AddNodeAndSavePayloadSelect,
-  ImportGraphJsonPayloadSelect,
+  SaveGraphPayload,
+  SetDataAtPathPayload,
+  StartExecutionPayload,
+  ValidateFunctionGraphPayload,
   AddEdgePayloadSelect,
+  AddEdgeAndSavePayloadSelect,
   AddNodePayloadSelect,
+  AddNodeAndSavePayloadSelect,
+  CopyGraphPayloadSelect,
+  ImportDefinitionsPayloadSelect,
+  ImportGraphJsonPayloadSelect,
+  InfraInitEmptyRepoPayloadSelect,
   InfraInsertNodeAtPathPayloadSelect,
+  InfraSetDataAtPathPayloadSelect,
+  InitEmptyRepoPayloadSelect,
   InsertNodeAtPathPayloadSelect,
-  StartExecutionPayloadSelect,
   ProvisionBucketPayloadSelect,
+  SaveGraphPayloadSelect,
+  SetDataAtPathPayloadSelect,
+  StartExecutionPayloadSelect,
+  ValidateFunctionGraphPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface ValidateFunctionGraphVariables {
-  input: ValidateFunctionGraphInput;
-}
-export interface InfraInitEmptyRepoVariables {
-  input: InfraInitEmptyRepoInput;
-}
-export interface InitEmptyRepoVariables {
-  input: InitEmptyRepoInput;
-}
-export interface ImportDefinitionsVariables {
-  input: ImportDefinitionsInput;
-}
-export interface InfraSetDataAtPathVariables {
-  input: InfraSetDataAtPathInput;
-}
-export interface SetDataAtPathVariables {
-  input: SetDataAtPathInput;
-}
-export interface CopyGraphVariables {
-  input: CopyGraphInput;
-}
-export interface SaveGraphVariables {
-  input: SaveGraphInput;
+export interface AddEdgeVariables {
+  input: AddEdgeInput;
 }
 export interface AddEdgeAndSaveVariables {
   input: AddEdgeAndSaveInput;
 }
+export interface AddNodeVariables {
+  input: AddNodeInput;
+}
 export interface AddNodeAndSaveVariables {
   input: AddNodeAndSaveInput;
+}
+export interface CopyGraphVariables {
+  input: CopyGraphInput;
+}
+export interface ImportDefinitionsVariables {
+  input: ImportDefinitionsInput;
 }
 export interface ImportGraphJsonVariables {
   input: ImportGraphJsonInput;
 }
-export interface AddEdgeVariables {
-  input: AddEdgeInput;
-}
-export interface AddNodeVariables {
-  input: AddNodeInput;
+export interface InfraInitEmptyRepoVariables {
+  input: InfraInitEmptyRepoInput;
 }
 export interface InfraInsertNodeAtPathVariables {
   input: InfraInsertNodeAtPathInput;
 }
+export interface InfraSetDataAtPathVariables {
+  input: InfraSetDataAtPathInput;
+}
+export interface InitEmptyRepoVariables {
+  input: InitEmptyRepoInput;
+}
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
-}
-export interface StartExecutionVariables {
-  input: StartExecutionInput;
 }
 /**
  * Variables for provisionBucket
@@ -118,238 +106,47 @@ and lifecycle settings.
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
 }
+export interface SaveGraphVariables {
+  input: SaveGraphInput;
+}
+export interface SetDataAtPathVariables {
+  input: SetDataAtPathInput;
+}
+export interface StartExecutionVariables {
+  input: StartExecutionInput;
+}
+export interface ValidateFunctionGraphVariables {
+  input: ValidateFunctionGraphInput;
+}
 export function createMutationOperations(client: OrmClient) {
   return {
-    validateFunctionGraph: <S extends ValidateFunctionGraphPayloadSelect>(
-      args: ValidateFunctionGraphVariables,
+    addEdge: <S extends AddEdgePayloadSelect>(
+      args: AddEdgeVariables,
       options: {
         select: S;
-      } & StrictSelect<S, ValidateFunctionGraphPayloadSelect>
+      } & StrictSelect<S, AddEdgePayloadSelect>
     ) =>
       new QueryBuilder<{
-        validateFunctionGraph: InferSelectResult<ValidateFunctionGraphPayload, S> | null;
+        addEdge: InferSelectResult<AddEdgePayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'ValidateFunctionGraph',
-        fieldName: 'validateFunctionGraph',
+        operationName: 'AddEdge',
+        fieldName: 'addEdge',
         ...buildCustomDocument(
           'mutation',
-          'ValidateFunctionGraph',
-          'validateFunctionGraph',
+          'AddEdge',
+          'addEdge',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'ValidateFunctionGraphInput!',
+              type: 'AddEdgeInput!',
             },
           ],
           connectionFieldsMap,
-          'ValidateFunctionGraphPayload'
-        ),
-      }),
-    infraInitEmptyRepo: <S extends InfraInitEmptyRepoPayloadSelect>(
-      args: InfraInitEmptyRepoVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, InfraInitEmptyRepoPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        infraInitEmptyRepo: InferSelectResult<InfraInitEmptyRepoPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'InfraInitEmptyRepo',
-        fieldName: 'infraInitEmptyRepo',
-        ...buildCustomDocument(
-          'mutation',
-          'InfraInitEmptyRepo',
-          'infraInitEmptyRepo',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'InfraInitEmptyRepoInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'InfraInitEmptyRepoPayload'
-        ),
-      }),
-    initEmptyRepo: <S extends InitEmptyRepoPayloadSelect>(
-      args: InitEmptyRepoVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, InitEmptyRepoPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        initEmptyRepo: InferSelectResult<InitEmptyRepoPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'InitEmptyRepo',
-        fieldName: 'initEmptyRepo',
-        ...buildCustomDocument(
-          'mutation',
-          'InitEmptyRepo',
-          'initEmptyRepo',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'InitEmptyRepoInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'InitEmptyRepoPayload'
-        ),
-      }),
-    importDefinitions: <S extends ImportDefinitionsPayloadSelect>(
-      args: ImportDefinitionsVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ImportDefinitionsPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        importDefinitions: InferSelectResult<ImportDefinitionsPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ImportDefinitions',
-        fieldName: 'importDefinitions',
-        ...buildCustomDocument(
-          'mutation',
-          'ImportDefinitions',
-          'importDefinitions',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ImportDefinitionsInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ImportDefinitionsPayload'
-        ),
-      }),
-    infraSetDataAtPath: <S extends InfraSetDataAtPathPayloadSelect>(
-      args: InfraSetDataAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, InfraSetDataAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        infraSetDataAtPath: InferSelectResult<InfraSetDataAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'InfraSetDataAtPath',
-        fieldName: 'infraSetDataAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'InfraSetDataAtPath',
-          'infraSetDataAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'InfraSetDataAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'InfraSetDataAtPathPayload'
-        ),
-      }),
-    setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
-      args: SetDataAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetDataAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setDataAtPath: InferSelectResult<SetDataAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetDataAtPath',
-        fieldName: 'setDataAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'SetDataAtPath',
-          'setDataAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetDataAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetDataAtPathPayload'
-        ),
-      }),
-    copyGraph: <S extends CopyGraphPayloadSelect>(
-      args: CopyGraphVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CopyGraphPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        copyGraph: InferSelectResult<CopyGraphPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CopyGraph',
-        fieldName: 'copyGraph',
-        ...buildCustomDocument(
-          'mutation',
-          'CopyGraph',
-          'copyGraph',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CopyGraphInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CopyGraphPayload'
-        ),
-      }),
-    saveGraph: <S extends SaveGraphPayloadSelect>(
-      args: SaveGraphVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SaveGraphPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        saveGraph: InferSelectResult<SaveGraphPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SaveGraph',
-        fieldName: 'saveGraph',
-        ...buildCustomDocument(
-          'mutation',
-          'SaveGraph',
-          'saveGraph',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SaveGraphInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SaveGraphPayload'
+          'AddEdgePayload'
         ),
       }),
     addEdgeAndSave: <S extends AddEdgeAndSavePayloadSelect>(
@@ -381,6 +178,35 @@ export function createMutationOperations(client: OrmClient) {
           'AddEdgeAndSavePayload'
         ),
       }),
+    addNode: <S extends AddNodePayloadSelect>(
+      args: AddNodeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, AddNodePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        addNode: InferSelectResult<AddNodePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'AddNode',
+        fieldName: 'addNode',
+        ...buildCustomDocument(
+          'mutation',
+          'AddNode',
+          'addNode',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'AddNodeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'AddNodePayload'
+        ),
+      }),
     addNodeAndSave: <S extends AddNodeAndSavePayloadSelect>(
       args: AddNodeAndSaveVariables,
       options: {
@@ -408,6 +234,64 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'AddNodeAndSavePayload'
+        ),
+      }),
+    copyGraph: <S extends CopyGraphPayloadSelect>(
+      args: CopyGraphVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CopyGraphPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        copyGraph: InferSelectResult<CopyGraphPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CopyGraph',
+        fieldName: 'copyGraph',
+        ...buildCustomDocument(
+          'mutation',
+          'CopyGraph',
+          'copyGraph',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CopyGraphInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CopyGraphPayload'
+        ),
+      }),
+    importDefinitions: <S extends ImportDefinitionsPayloadSelect>(
+      args: ImportDefinitionsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ImportDefinitionsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        importDefinitions: InferSelectResult<ImportDefinitionsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ImportDefinitions',
+        fieldName: 'importDefinitions',
+        ...buildCustomDocument(
+          'mutation',
+          'ImportDefinitions',
+          'importDefinitions',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ImportDefinitionsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ImportDefinitionsPayload'
         ),
       }),
     importGraphJson: <S extends ImportGraphJsonPayloadSelect>(
@@ -439,62 +323,33 @@ export function createMutationOperations(client: OrmClient) {
           'ImportGraphJsonPayload'
         ),
       }),
-    addEdge: <S extends AddEdgePayloadSelect>(
-      args: AddEdgeVariables,
+    infraInitEmptyRepo: <S extends InfraInitEmptyRepoPayloadSelect>(
+      args: InfraInitEmptyRepoVariables,
       options: {
         select: S;
-      } & StrictSelect<S, AddEdgePayloadSelect>
+      } & StrictSelect<S, InfraInitEmptyRepoPayloadSelect>
     ) =>
       new QueryBuilder<{
-        addEdge: InferSelectResult<AddEdgePayload, S> | null;
+        infraInitEmptyRepo: InferSelectResult<InfraInitEmptyRepoPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'AddEdge',
-        fieldName: 'addEdge',
+        operationName: 'InfraInitEmptyRepo',
+        fieldName: 'infraInitEmptyRepo',
         ...buildCustomDocument(
           'mutation',
-          'AddEdge',
-          'addEdge',
+          'InfraInitEmptyRepo',
+          'infraInitEmptyRepo',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'AddEdgeInput!',
+              type: 'InfraInitEmptyRepoInput!',
             },
           ],
           connectionFieldsMap,
-          'AddEdgePayload'
-        ),
-      }),
-    addNode: <S extends AddNodePayloadSelect>(
-      args: AddNodeVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, AddNodePayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        addNode: InferSelectResult<AddNodePayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'AddNode',
-        fieldName: 'addNode',
-        ...buildCustomDocument(
-          'mutation',
-          'AddNode',
-          'addNode',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'AddNodeInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'AddNodePayload'
+          'InfraInitEmptyRepoPayload'
         ),
       }),
     infraInsertNodeAtPath: <S extends InfraInsertNodeAtPathPayloadSelect>(
@@ -526,6 +381,64 @@ export function createMutationOperations(client: OrmClient) {
           'InfraInsertNodeAtPathPayload'
         ),
       }),
+    infraSetDataAtPath: <S extends InfraSetDataAtPathPayloadSelect>(
+      args: InfraSetDataAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InfraSetDataAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        infraSetDataAtPath: InferSelectResult<InfraSetDataAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InfraSetDataAtPath',
+        fieldName: 'infraSetDataAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'InfraSetDataAtPath',
+          'infraSetDataAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InfraSetDataAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InfraSetDataAtPathPayload'
+        ),
+      }),
+    initEmptyRepo: <S extends InitEmptyRepoPayloadSelect>(
+      args: InitEmptyRepoVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InitEmptyRepoPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        initEmptyRepo: InferSelectResult<InitEmptyRepoPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InitEmptyRepo',
+        fieldName: 'initEmptyRepo',
+        ...buildCustomDocument(
+          'mutation',
+          'InitEmptyRepo',
+          'initEmptyRepo',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InitEmptyRepoInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InitEmptyRepoPayload'
+        ),
+      }),
     insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
       args: InsertNodeAtPathVariables,
       options: {
@@ -553,6 +466,93 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'InsertNodeAtPathPayload'
+        ),
+      }),
+    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
+      args: ProvisionBucketVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionBucket',
+        fieldName: 'provisionBucket',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionBucket',
+          'provisionBucket',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionBucketInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionBucketPayload'
+        ),
+      }),
+    saveGraph: <S extends SaveGraphPayloadSelect>(
+      args: SaveGraphVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SaveGraphPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        saveGraph: InferSelectResult<SaveGraphPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SaveGraph',
+        fieldName: 'saveGraph',
+        ...buildCustomDocument(
+          'mutation',
+          'SaveGraph',
+          'saveGraph',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SaveGraphInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SaveGraphPayload'
+        ),
+      }),
+    setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
+      args: SetDataAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetDataAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setDataAtPath: InferSelectResult<SetDataAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetDataAtPath',
+        fieldName: 'setDataAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'SetDataAtPath',
+          'setDataAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetDataAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetDataAtPathPayload'
         ),
       }),
     startExecution: <S extends StartExecutionPayloadSelect>(
@@ -584,33 +584,33 @@ export function createMutationOperations(client: OrmClient) {
           'StartExecutionPayload'
         ),
       }),
-    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
-      args: ProvisionBucketVariables,
+    validateFunctionGraph: <S extends ValidateFunctionGraphPayloadSelect>(
+      args: ValidateFunctionGraphVariables,
       options: {
         select: S;
-      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+      } & StrictSelect<S, ValidateFunctionGraphPayloadSelect>
     ) =>
       new QueryBuilder<{
-        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+        validateFunctionGraph: InferSelectResult<ValidateFunctionGraphPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'ProvisionBucket',
-        fieldName: 'provisionBucket',
+        operationName: 'ValidateFunctionGraph',
+        fieldName: 'validateFunctionGraph',
         ...buildCustomDocument(
           'mutation',
-          'ProvisionBucket',
-          'provisionBucket',
+          'ValidateFunctionGraph',
+          'validateFunctionGraph',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'ProvisionBucketInput!',
+              type: 'ValidateFunctionGraphInput!',
             },
           ],
           connectionFieldsMap,
-          'ProvisionBucketPayload'
+          'ValidateFunctionGraphPayload'
         ),
       }),
   };

@@ -5,36 +5,36 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { AppAdminGrantModel } from './models/appAdminGrant';
+import { AppClaimedInviteModel } from './models/appClaimedInvite';
+import { AppGrantModel } from './models/appGrant';
+import { AppInviteModel } from './models/appInvite';
+import { AppMembershipModel } from './models/appMembership';
+import { AppMembershipDefaultModel } from './models/appMembershipDefault';
+import { AppOwnerGrantModel } from './models/appOwnerGrant';
+import { AppPermissionModel } from './models/appPermission';
+import { AppPermissionDefaultModel } from './models/appPermissionDefault';
+import { AppPermissionDefaultGrantModel } from './models/appPermissionDefaultGrant';
+import { AppPermissionDefaultPermissionModel } from './models/appPermissionDefaultPermission';
+import { MembershipTypeModel } from './models/membershipType';
+import { OrgAdminGrantModel } from './models/orgAdminGrant';
+import { OrgChartEdgeModel } from './models/orgChartEdge';
+import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
+import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { OrgGetManagersRecordModel } from './models/orgGetManagersRecord';
 import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord';
-import { AppPermissionModel } from './models/appPermission';
-import { AppPermissionDefaultGrantModel } from './models/appPermissionDefaultGrant';
-import { OrgPermissionModel } from './models/orgPermission';
-import { OrgPermissionDefaultPermissionModel } from './models/orgPermissionDefaultPermission';
-import { OrgPermissionDefaultGrantModel } from './models/orgPermissionDefaultGrant';
-import { OrgMemberModel } from './models/orgMember';
-import { AppPermissionDefaultModel } from './models/appPermissionDefault';
-import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
-import { AppPermissionDefaultPermissionModel } from './models/appPermissionDefaultPermission';
-import { AppAdminGrantModel } from './models/appAdminGrant';
-import { AppOwnerGrantModel } from './models/appOwnerGrant';
-import { OrgAdminGrantModel } from './models/orgAdminGrant';
-import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
-import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
-import { AppClaimedInviteModel } from './models/appClaimedInvite';
-import { MembershipTypeModel } from './models/membershipType';
-import { AppGrantModel } from './models/appGrant';
-import { AppMembershipDefaultModel } from './models/appMembershipDefault';
-import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
-import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { OrgGrantModel } from './models/orgGrant';
-import { OrgChartEdgeModel } from './models/orgChartEdge';
-import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
-import { AppMembershipModel } from './models/appMembership';
-import { OrgMembershipModel } from './models/orgMembership';
-import { OrgMemberProfileModel } from './models/orgMemberProfile';
-import { AppInviteModel } from './models/appInvite';
 import { OrgInviteModel } from './models/orgInvite';
+import { OrgMemberModel } from './models/orgMember';
+import { OrgMemberProfileModel } from './models/orgMemberProfile';
+import { OrgMembershipModel } from './models/orgMembership';
+import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
+import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
+import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
+import { OrgPermissionModel } from './models/orgPermission';
+import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
+import { OrgPermissionDefaultGrantModel } from './models/orgPermissionDefaultGrant';
+import { OrgPermissionDefaultPermissionModel } from './models/orgPermissionDefaultPermission';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -70,36 +70,36 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    appAdminGrant: new AppAdminGrantModel(client),
+    appClaimedInvite: new AppClaimedInviteModel(client),
+    appGrant: new AppGrantModel(client),
+    appInvite: new AppInviteModel(client),
+    appMembership: new AppMembershipModel(client),
+    appMembershipDefault: new AppMembershipDefaultModel(client),
+    appOwnerGrant: new AppOwnerGrantModel(client),
+    appPermission: new AppPermissionModel(client),
+    appPermissionDefault: new AppPermissionDefaultModel(client),
+    appPermissionDefaultGrant: new AppPermissionDefaultGrantModel(client),
+    appPermissionDefaultPermission: new AppPermissionDefaultPermissionModel(client),
+    membershipType: new MembershipTypeModel(client),
+    orgAdminGrant: new OrgAdminGrantModel(client),
+    orgChartEdge: new OrgChartEdgeModel(client),
+    orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
+    orgClaimedInvite: new OrgClaimedInviteModel(client),
     orgGetManagersRecord: new OrgGetManagersRecordModel(client),
     orgGetSubordinatesRecord: new OrgGetSubordinatesRecordModel(client),
-    appPermission: new AppPermissionModel(client),
-    appPermissionDefaultGrant: new AppPermissionDefaultGrantModel(client),
-    orgPermission: new OrgPermissionModel(client),
-    orgPermissionDefaultPermission: new OrgPermissionDefaultPermissionModel(client),
-    orgPermissionDefaultGrant: new OrgPermissionDefaultGrantModel(client),
-    orgMember: new OrgMemberModel(client),
-    appPermissionDefault: new AppPermissionDefaultModel(client),
-    orgPermissionDefault: new OrgPermissionDefaultModel(client),
-    appPermissionDefaultPermission: new AppPermissionDefaultPermissionModel(client),
-    appAdminGrant: new AppAdminGrantModel(client),
-    appOwnerGrant: new AppOwnerGrantModel(client),
-    orgAdminGrant: new OrgAdminGrantModel(client),
-    orgOwnerGrant: new OrgOwnerGrantModel(client),
-    orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
-    appClaimedInvite: new AppClaimedInviteModel(client),
-    membershipType: new MembershipTypeModel(client),
-    appGrant: new AppGrantModel(client),
-    appMembershipDefault: new AppMembershipDefaultModel(client),
-    orgMembershipDefault: new OrgMembershipDefaultModel(client),
-    orgClaimedInvite: new OrgClaimedInviteModel(client),
     orgGrant: new OrgGrantModel(client),
-    orgChartEdge: new OrgChartEdgeModel(client),
-    orgMembershipSetting: new OrgMembershipSettingModel(client),
-    appMembership: new AppMembershipModel(client),
-    orgMembership: new OrgMembershipModel(client),
-    orgMemberProfile: new OrgMemberProfileModel(client),
-    appInvite: new AppInviteModel(client),
     orgInvite: new OrgInviteModel(client),
+    orgMember: new OrgMemberModel(client),
+    orgMemberProfile: new OrgMemberProfileModel(client),
+    orgMembership: new OrgMembershipModel(client),
+    orgMembershipDefault: new OrgMembershipDefaultModel(client),
+    orgMembershipSetting: new OrgMembershipSettingModel(client),
+    orgOwnerGrant: new OrgOwnerGrantModel(client),
+    orgPermission: new OrgPermissionModel(client),
+    orgPermissionDefault: new OrgPermissionDefaultModel(client),
+    orgPermissionDefaultGrant: new OrgPermissionDefaultGrantModel(client),
+    orgPermissionDefaultPermission: new OrgPermissionDefaultPermissionModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

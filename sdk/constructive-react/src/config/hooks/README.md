@@ -32,16 +32,16 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
-| `usePlatformConfigsQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
-| `usePlatformConfigQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
-| `useCreatePlatformConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
-| `useUpdatePlatformConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
-| `useDeletePlatformConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
 | `useConfigsQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
 | `useConfigQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
 | `useCreateConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
 | `useUpdateConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
 | `useDeleteConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
+| `usePlatformConfigsQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
+| `usePlatformConfigQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
+| `useCreatePlatformConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
+| `useUpdatePlatformConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
+| `useDeletePlatformConfigMutation` | Mutation | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
 | `usePlatformInternalSecretsQuery` | Query | List all platformInternalSecrets |
 | `usePlatformInternalSecretQuery` | Query | Get one platformInternalSecret |
 | `useCreatePlatformInternalSecretMutation` | Mutation | Create a platformInternalSecret |
@@ -57,18 +57,18 @@ function App() {
 | `useCreateSecretMutation` | Mutation | Create a secret |
 | `useUpdateSecretMutation` | Mutation | Update a secret |
 | `useDeleteSecretMutation` | Mutation | Delete a secret |
-| `usePlatformInternalSecretsDelMutation` | Mutation | platformInternalSecretsDel |
-| `usePlatformSecretsDelMutation` | Mutation | platformSecretsDel |
 | `use_secretsDelMutation` | Mutation | _secretsDel |
-| `usePlatformInternalSecretsRemoveArrayMutation` | Mutation | platformInternalSecretsRemoveArray |
-| `usePlatformSecretsRemoveArrayMutation` | Mutation | platformSecretsRemoveArray |
 | `use_secretsRemoveArrayMutation` | Mutation | _secretsRemoveArray |
+| `use_secretsRotateMutation` | Mutation | _secretsRotate |
+| `use_secretsSetMutation` | Mutation | _secretsSet |
+| `usePlatformInternalSecretsDelMutation` | Mutation | platformInternalSecretsDel |
+| `usePlatformInternalSecretsRemoveArrayMutation` | Mutation | platformInternalSecretsRemoveArray |
 | `usePlatformInternalSecretsRotateMutation` | Mutation | platformInternalSecretsRotate |
 | `usePlatformInternalSecretsSetMutation` | Mutation | platformInternalSecretsSet |
+| `usePlatformSecretsDelMutation` | Mutation | platformSecretsDel |
+| `usePlatformSecretsRemoveArrayMutation` | Mutation | platformSecretsRemoveArray |
 | `usePlatformSecretsRotateMutation` | Mutation | platformSecretsRotate |
-| `use_secretsRotateMutation` | Mutation | _secretsRotate |
 | `usePlatformSecretsSetMutation` | Mutation | platformSecretsSet |
-| `use_secretsSetMutation` | Mutation | _secretsSet |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -76,46 +76,46 @@ and lifecycle settings. |
 
 ## Table Hooks
 
-### PlatformConfig
-
-```typescript
-// List all platformConfigs
-const { data, isLoading } = usePlatformConfigsQuery({
-  selection: { fields: { id: true, namespaceId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } },
-});
-
-// Get one platformConfig
-const { data: item } = usePlatformConfigQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, namespaceId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } },
-});
-
-// Create a platformConfig
-const { mutate: create } = useCreatePlatformConfigMutation({
-  selection: { fields: { id: true } },
-});
-create({ namespaceId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' });
-```
-
 ### Config
 
 ```typescript
 // List all configs
 const { data, isLoading } = useConfigsQuery({
-  selection: { fields: { id: true, namespaceId: true, databaseId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
 });
 
 // Get one config
 const { data: item } = useConfigQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, namespaceId: true, databaseId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
 });
 
 // Create a config
 const { mutate: create } = useCreateConfigMutation({
   selection: { fields: { id: true } },
 });
-create({ namespaceId: '<UUID>', databaseId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' });
+create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' });
+```
+
+### PlatformConfig
+
+```typescript
+// List all platformConfigs
+const { data, isLoading } = usePlatformConfigsQuery({
+  selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
+});
+
+// Get one platformConfig
+const { data: item } = usePlatformConfigQuery({
+  id: '<UUID>',
+  selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
+});
+
+// Create a platformConfig
+const { mutate: create } = useCreatePlatformConfigMutation({
+  selection: { fields: { id: true } },
+});
+create({ annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' });
 ```
 
 ### PlatformInternalSecret
@@ -123,20 +123,20 @@ create({ namespaceId: '<UUID>', databaseId: '<UUID>', name: '<String>', provider
 ```typescript
 // List all platformInternalSecrets
 const { data, isLoading } = usePlatformInternalSecretsQuery({
-  selection: { fields: { id: true, name: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Get one platformInternalSecret
 const { data: item } = usePlatformInternalSecretQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Create a platformInternalSecret
 const { mutate: create } = useCreatePlatformInternalSecretMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' });
+create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### PlatformSecret
@@ -144,20 +144,20 @@ create({ name: '<String>', namespaceId: '<UUID>', description: '<String>', label
 ```typescript
 // List all platformSecrets
 const { data, isLoading } = usePlatformSecretsQuery({
-  selection: { fields: { id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Get one platformSecret
 const { data: item } = usePlatformSecretQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Create a platformSecret
 const { mutate: create } = useCreatePlatformSecretMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', provider: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' });
+create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### Secret
@@ -165,45 +165,23 @@ create({ name: '<String>', provider: '<String>', namespaceId: '<UUID>', descript
 ```typescript
 // List all secrets
 const { data, isLoading } = useSecretsQuery({
-  selection: { fields: { databaseId: true, id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Get one secret
 const { data: item } = useSecretQuery({
   id: '<UUID>',
-  selection: { fields: { databaseId: true, id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
 // Create a secret
 const { mutate: create } = useCreateSecretMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', name: '<String>', provider: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' });
+create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ## Custom Operation Hooks
-
-### `usePlatformInternalSecretsDelMutation`
-
-platformInternalSecretsDel
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformInternalSecretsDelInput (required) |
-
-### `usePlatformSecretsDelMutation`
-
-platformSecretsDel
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformSecretsDelInput (required) |
 
 ### `use_secretsDelMutation`
 
@@ -216,28 +194,6 @@ _secretsDel
   |----------|------|
   | `input` | _SecretsDelInput (required) |
 
-### `usePlatformInternalSecretsRemoveArrayMutation`
-
-platformInternalSecretsRemoveArray
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformInternalSecretsRemoveArrayInput (required) |
-
-### `usePlatformSecretsRemoveArrayMutation`
-
-platformSecretsRemoveArray
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformSecretsRemoveArrayInput (required) |
-
 ### `use_secretsRemoveArrayMutation`
 
 _secretsRemoveArray
@@ -248,6 +204,50 @@ _secretsRemoveArray
   | Argument | Type |
   |----------|------|
   | `input` | _SecretsRemoveArrayInput (required) |
+
+### `use_secretsRotateMutation`
+
+_secretsRotate
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | _SecretsRotateInput (required) |
+
+### `use_secretsSetMutation`
+
+_secretsSet
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | _SecretsSetInput (required) |
+
+### `usePlatformInternalSecretsDelMutation`
+
+platformInternalSecretsDel
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInternalSecretsDelInput (required) |
+
+### `usePlatformInternalSecretsRemoveArrayMutation`
+
+platformInternalSecretsRemoveArray
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInternalSecretsRemoveArrayInput (required) |
 
 ### `usePlatformInternalSecretsRotateMutation`
 
@@ -271,6 +271,28 @@ platformInternalSecretsSet
   |----------|------|
   | `input` | PlatformInternalSecretsSetInput (required) |
 
+### `usePlatformSecretsDelMutation`
+
+platformSecretsDel
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSecretsDelInput (required) |
+
+### `usePlatformSecretsRemoveArrayMutation`
+
+platformSecretsRemoveArray
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSecretsRemoveArrayInput (required) |
+
 ### `usePlatformSecretsRotateMutation`
 
 platformSecretsRotate
@@ -282,17 +304,6 @@ platformSecretsRotate
   |----------|------|
   | `input` | PlatformSecretsRotateInput (required) |
 
-### `use_secretsRotateMutation`
-
-_secretsRotate
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | _SecretsRotateInput (required) |
-
 ### `usePlatformSecretsSetMutation`
 
 platformSecretsSet
@@ -303,17 +314,6 @@ platformSecretsSet
   | Argument | Type |
   |----------|------|
   | `input` | PlatformSecretsSetInput (required) |
-
-### `use_secretsSetMutation`
-
-_secretsSet
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | _SecretsSetInput (required) |
 
 ### `useProvisionBucketMutation`
 

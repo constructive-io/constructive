@@ -7,8 +7,8 @@ Per-database public-key crypto auth runtime configuration; typed replacement for
 ## Usage
 
 ```typescript
-usePubkeySettingsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, cryptoNetwork: true, userField: true, signUpWithKeyFunctionId: true, signInRequestChallengeFunctionId: true, signInRecordFailureFunctionId: true, signInWithChallengeFunctionId: true } } })
-usePubkeySettingQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, cryptoNetwork: true, userField: true, signUpWithKeyFunctionId: true, signInRequestChallengeFunctionId: true, signInRecordFailureFunctionId: true, signInWithChallengeFunctionId: true } } })
+usePubkeySettingsQuery({ selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } } })
+usePubkeySettingQuery({ id: '<UUID>', selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } } })
 useCreatePubkeySettingMutation({ selection: { fields: { id: true } } })
 useUpdatePubkeySettingMutation({ selection: { fields: { id: true } } })
 useDeletePubkeySettingMutation({})
@@ -20,7 +20,7 @@ useDeletePubkeySettingMutation({})
 
 ```typescript
 const { data, isLoading } = usePubkeySettingsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, cryptoNetwork: true, userField: true, signUpWithKeyFunctionId: true, signInRequestChallengeFunctionId: true, signInRecordFailureFunctionId: true, signInWithChallengeFunctionId: true } },
+  selection: { fields: { cryptoNetwork: true, databaseId: true, id: true, schemaId: true, signInRecordFailureFunctionId: true, signInRequestChallengeFunctionId: true, signInWithChallengeFunctionId: true, signUpWithKeyFunctionId: true, userField: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePubkeySettingsQuery({
 const { mutate } = useCreatePubkeySettingMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', cryptoNetwork: '<String>', userField: '<String>', signUpWithKeyFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>' });
+mutate({ cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>', signUpWithKeyFunctionId: '<UUID>', userField: '<String>' });
 ```

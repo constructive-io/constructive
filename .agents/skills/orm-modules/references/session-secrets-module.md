@@ -9,7 +9,7 @@ Config row for the session_secrets_module, which provisions a DB-private, sessio
 ```typescript
 db.sessionSecretsModule.findMany({ select: { id: true } }).execute()
 db.sessionSecretsModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.sessionSecretsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', sessionsTableId: '<UUID>' }, select: { id: true } }).execute()
+db.sessionSecretsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', sessionsTableId: '<UUID>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute()
 db.sessionSecretsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.sessionSecretsModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.sessionSecretsModule.findMany({
 
 ```typescript
 const item = await db.sessionSecretsModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', sessionsTableId: '<UUID>' },
+  data: { databaseId: '<UUID>', schemaId: '<UUID>', sessionsTableId: '<UUID>', tableId: '<UUID>', tableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

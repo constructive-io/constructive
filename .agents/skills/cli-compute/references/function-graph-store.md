@@ -13,7 +13,7 @@ csdk function-graph-store list --limit 10 --after <cursor>
 csdk function-graph-store find-first --where.<field>.<op> <value>
 csdk function-graph-store get --id <UUID>
 csdk function-graph-store create --name <String> --scopeId <UUID> [--hash <UUID>]
-csdk function-graph-store update --id <UUID> [--name <String>] [--scopeId <UUID>] [--hash <UUID>]
+csdk function-graph-store update --id <UUID> [--hash <UUID>] [--name <String>] [--scopeId <UUID>]
 csdk function-graph-store delete --id <UUID>
 ```
 

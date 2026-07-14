@@ -16,17 +16,17 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  createdAt: 'string',
-  updatedAt: 'string',
-  createdBy: 'uuid',
-  updatedBy: 'uuid',
-  databaseId: 'uuid',
-  name: 'string',
   content: 'string',
+  createdAt: 'string',
+  createdBy: 'uuid',
+  databaseId: 'uuid',
   description: 'string',
+  id: 'uuid',
   isDefault: 'boolean',
   metadata: 'json',
+  name: 'string',
+  updatedAt: 'string',
+  updatedBy: 'uuid',
 };
 const usage =
   '\nagent-prompt <command>\n\nCommands:\n  list                  List agentPrompt records\n  find-first            Find first matching agentPrompt record\n  get                   Get a agentPrompt by ID\n  create                Create a new agentPrompt\n  update                Update an existing agentPrompt\n  delete                Delete a agentPrompt\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -79,17 +79,17 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      createdBy: true,
-      updatedBy: true,
-      databaseId: true,
-      name: true,
       content: true,
+      createdAt: true,
+      createdBy: true,
+      databaseId: true,
       description: true,
+      id: true,
       isDefault: true,
       metadata: true,
+      name: true,
+      updatedAt: true,
+      updatedBy: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentPromptSelect, AgentPromptFilter, AgentPromptOrderBy> & {
@@ -110,17 +110,17 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      createdBy: true,
-      updatedBy: true,
-      databaseId: true,
-      name: true,
       content: true,
+      createdAt: true,
+      createdBy: true,
+      databaseId: true,
       description: true,
+      id: true,
       isDefault: true,
       metadata: true,
+      name: true,
+      updatedAt: true,
+      updatedBy: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentPromptSelect, AgentPromptFilter, AgentPromptOrderBy> & {
@@ -153,17 +153,17 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          createdBy: true,
-          updatedBy: true,
-          databaseId: true,
-          name: true,
           content: true,
+          createdAt: true,
+          createdBy: true,
+          databaseId: true,
           description: true,
+          id: true,
           isDefault: true,
           metadata: true,
+          name: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       })
       .execute();
@@ -181,6 +181,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'content',
+        message: 'content',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'createdBy',
         message: 'createdBy',
         required: false,
@@ -188,27 +194,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'updatedBy',
-        message: 'updatedBy',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'content',
-        message: 'content',
         required: true,
       },
       {
@@ -232,6 +219,19 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'updatedBy',
+        message: 'updatedBy',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -242,27 +242,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.agentPrompt
       .create({
         data: {
-          createdBy: cleanedData.createdBy,
-          updatedBy: cleanedData.updatedBy,
-          databaseId: cleanedData.databaseId,
-          name: cleanedData.name,
           content: cleanedData.content,
+          createdBy: cleanedData.createdBy,
+          databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           isDefault: cleanedData.isDefault,
           metadata: cleanedData.metadata,
+          name: cleanedData.name,
+          updatedBy: cleanedData.updatedBy,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          createdBy: true,
-          updatedBy: true,
-          databaseId: true,
-          name: true,
           content: true,
+          createdAt: true,
+          createdBy: true,
+          databaseId: true,
           description: true,
+          id: true,
           isDefault: true,
           metadata: true,
+          name: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       })
       .execute();
@@ -286,6 +286,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'content',
+        message: 'content',
+        required: false,
+      },
+      {
+        type: 'text',
         name: 'createdBy',
         message: 'createdBy',
         required: false,
@@ -293,27 +299,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'updatedBy',
-        message: 'updatedBy',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'content',
-        message: 'content',
         required: false,
       },
       {
@@ -337,6 +324,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'updatedBy',
+        message: 'updatedBy',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentPromptPatch;
@@ -347,27 +347,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          createdBy: cleanedData.createdBy,
-          updatedBy: cleanedData.updatedBy,
-          databaseId: cleanedData.databaseId,
-          name: cleanedData.name,
           content: cleanedData.content,
+          createdBy: cleanedData.createdBy,
+          databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           isDefault: cleanedData.isDefault,
           metadata: cleanedData.metadata,
+          name: cleanedData.name,
+          updatedBy: cleanedData.updatedBy,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          createdBy: true,
-          updatedBy: true,
-          databaseId: true,
-          name: true,
           content: true,
+          createdAt: true,
+          createdBy: true,
+          databaseId: true,
           description: true,
+          id: true,
           isDefault: true,
           metadata: true,
+          name: true,
+          updatedAt: true,
+          updatedBy: true,
         },
       })
       .execute();

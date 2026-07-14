@@ -7,7 +7,7 @@ React Query hooks for InfraGetAllRecord data operations
 ## Usage
 
 ```typescript
-useInfraGetAllQuery({ selection: { fields: { path: true, data: true } } })
+useInfraGetAllQuery({ selection: { fields: { data: true, path: true } } })
 useCreateInfraGetAllRecordMutation({ selection: { fields: { id: true } } })
 ```
 
@@ -17,7 +17,7 @@ useCreateInfraGetAllRecordMutation({ selection: { fields: { id: true } } })
 
 ```typescript
 const { data, isLoading } = useInfraGetAllQuery({
-  selection: { fields: { path: true, data: true } },
+  selection: { fields: { data: true, path: true } },
 });
 ```
 
@@ -27,5 +27,5 @@ const { data, isLoading } = useInfraGetAllQuery({
 const { mutate } = useCreateInfraGetAllRecordMutation({
   selection: { fields: { id: true } },
 });
-mutate({ path: '<String>', data: '<JSON>' });
+mutate({ data: '<JSON>', path: '<String>' });
 ```

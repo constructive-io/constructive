@@ -7,8 +7,8 @@ Join table linking permission defaults to individual permissions; recompute trig
 ## Usage
 
 ```typescript
-useOrgPermissionDefaultPermissionsQuery({ selection: { fields: { id: true, permissionId: true, entityId: true, createdAt: true, updatedAt: true } } })
-useOrgPermissionDefaultPermissionQuery({ id: '<UUID>', selection: { fields: { id: true, permissionId: true, entityId: true, createdAt: true, updatedAt: true } } })
+useOrgPermissionDefaultPermissionsQuery({ selection: { fields: { createdAt: true, entityId: true, id: true, permissionId: true, updatedAt: true } } })
+useOrgPermissionDefaultPermissionQuery({ id: '<UUID>', selection: { fields: { createdAt: true, entityId: true, id: true, permissionId: true, updatedAt: true } } })
 useCreateOrgPermissionDefaultPermissionMutation({ selection: { fields: { id: true } } })
 useUpdateOrgPermissionDefaultPermissionMutation({ selection: { fields: { id: true } } })
 useDeleteOrgPermissionDefaultPermissionMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgPermissionDefaultPermissionMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgPermissionDefaultPermissionsQuery({
-  selection: { fields: { id: true, permissionId: true, entityId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, entityId: true, id: true, permissionId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgPermissionDefaultPermissionsQuery({
 const { mutate } = useCreateOrgPermissionDefaultPermissionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ permissionId: '<UUID>', entityId: '<UUID>' });
+mutate({ entityId: '<UUID>', permissionId: '<UUID>' });
 ```

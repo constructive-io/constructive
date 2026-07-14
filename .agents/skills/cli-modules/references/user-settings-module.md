@@ -12,8 +12,8 @@ csdk user-settings-module list --where.<field>.<op> <value> --orderBy <values>
 csdk user-settings-module list --limit 10 --after <cursor>
 csdk user-settings-module find-first --where.<field>.<op> <value>
 csdk user-settings-module get --id <UUID>
-csdk user-settings-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>]
-csdk user-settings-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>]
+csdk user-settings-module create --databaseId <UUID> [--apiName <String>] [--ownerTableId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
+csdk user-settings-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--ownerTableId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk user-settings-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk user-settings-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a userSettingsModule
 
 ```bash
-csdk user-settings-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>]
+csdk user-settings-module create --databaseId <UUID> [--apiName <String>] [--ownerTableId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 ```
 
 ### Get a userSettingsModule by id

@@ -7,8 +7,8 @@ Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 ## Usage
 
 ```typescript
-useObjectsQuery({ selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } } })
-useObjectQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } } })
+useObjectsQuery({ selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } } })
+useObjectQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } } })
 useCreateObjectMutation({ selection: { fields: { id: true } } })
 useUpdateObjectMutation({ selection: { fields: { id: true } } })
 useDeleteObjectMutation({})
@@ -20,7 +20,7 @@ useDeleteObjectMutation({})
 
 ```typescript
 const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { id: true, databaseId: true, kids: true, ktree: true, data: true, createdAt: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, kids: true, ktree: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useObjectsQuery({
 const { mutate } = useCreateObjectMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>' });
+mutate({ data: '<JSON>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>' });
 ```

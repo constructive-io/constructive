@@ -7,8 +7,8 @@ Defines available permissions as named bits within a bitmask, used by the RBAC s
 ## Usage
 
 ```typescript
-useOrgPermissionsQuery({ selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } } })
-useOrgPermissionQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } } })
+useOrgPermissionsQuery({ selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, name: true } } })
+useOrgPermissionQuery({ id: '<UUID>', selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, name: true } } })
 useCreateOrgPermissionMutation({ selection: { fields: { id: true } } })
 useUpdateOrgPermissionMutation({ selection: { fields: { id: true } } })
 useDeleteOrgPermissionMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgPermissionMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { bitnum: true, bitstr: true, description: true, id: true, name: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgPermissionsQuery({
 const { mutate } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' });
+mutate({ bitnum: '<Int>', bitstr: '<BitString>', description: '<String>', name: '<String>' });
 ```

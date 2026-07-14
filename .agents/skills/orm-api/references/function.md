@@ -9,7 +9,7 @@ ORM operations for Function records
 ```typescript
 db.function.findMany({ select: { id: true } }).execute()
 db.function.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.function.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>' }, select: { id: true } }).execute()
+db.function.create({ data: { databaseId: '<UUID>', name: '<String>', schemaId: '<UUID>' }, select: { id: true } }).execute()
 db.function.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.function.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.function.findMany({
 
 ```typescript
 const item = await db.function.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>' },
+  data: { databaseId: '<UUID>', name: '<String>', schemaId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

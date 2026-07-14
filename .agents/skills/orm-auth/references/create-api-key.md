@@ -7,7 +7,7 @@ Execute the createApiKey mutation
 ## Usage
 
 ```typescript
-db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>', principalId: '<UUID>' } }).execute()
+db.mutation.createApiKey({ input: { accessLevel: '<String>', expiresIn: '<IntervalInput>', keyName: '<String>', mfaLevel: '<String>', principalId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>'
 ### Run createApiKey
 
 ```typescript
-const result = await db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>', principalId: '<UUID>' } }).execute();
+const result = await db.mutation.createApiKey({ input: { accessLevel: '<String>', expiresIn: '<IntervalInput>', keyName: '<String>', mfaLevel: '<String>', principalId: '<UUID>' } }).execute();
 ```

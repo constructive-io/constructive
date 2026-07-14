@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  actorId: 'uuid',
   createdAt: 'string',
-  id: 'uuid',
   deploymentId: 'uuid',
   eventType: 'string',
-  actorId: 'uuid',
+  id: 'uuid',
   message: 'string',
   metadata: 'json',
 };
@@ -75,11 +75,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       createdAt: true,
-      id: true,
       deploymentId: true,
       eventType: true,
-      actorId: true,
+      id: true,
       message: true,
       metadata: true,
     };
@@ -106,11 +106,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       createdAt: true,
-      id: true,
       deploymentId: true,
       eventType: true,
-      actorId: true,
+      id: true,
       message: true,
       metadata: true,
     };
@@ -149,11 +149,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          actorId: true,
           createdAt: true,
-          id: true,
           deploymentId: true,
           eventType: true,
-          actorId: true,
+          id: true,
           message: true,
           metadata: true,
         },
@@ -173,6 +173,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'deploymentId',
         message: 'deploymentId',
         required: true,
@@ -182,13 +189,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'eventType',
         message: 'eventType',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -214,18 +214,18 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.platformFunctionDeploymentEvent
       .create({
         data: {
+          actorId: cleanedData.actorId,
           deploymentId: cleanedData.deploymentId,
           eventType: cleanedData.eventType,
-          actorId: cleanedData.actorId,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
         },
         select: {
+          actorId: true,
           createdAt: true,
-          id: true,
           deploymentId: true,
           eventType: true,
-          actorId: true,
+          id: true,
           message: true,
           metadata: true,
         },
@@ -257,6 +257,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'deploymentId',
         message: 'deploymentId',
         required: false,
@@ -266,13 +273,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'eventType',
         message: 'eventType',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -302,18 +302,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           createdAt: answers.createdAt as string,
         },
         data: {
+          actorId: cleanedData.actorId,
           deploymentId: cleanedData.deploymentId,
           eventType: cleanedData.eventType,
-          actorId: cleanedData.actorId,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
         },
         select: {
+          actorId: true,
           createdAt: true,
-          id: true,
           deploymentId: true,
           eventType: true,
-          actorId: true,
+          id: true,
           message: true,
           metadata: true,
         },

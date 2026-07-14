@@ -7,8 +7,8 @@ Server-side module configuration for an API endpoint; stores module name and JSO
 ## Usage
 
 ```typescript
-useApiModulesQuery({ selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } } })
-useApiModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } } })
+useApiModulesQuery({ selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } } })
+useApiModuleQuery({ id: '<UUID>', selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } } })
 useCreateApiModuleMutation({ selection: { fields: { id: true } } })
 useUpdateApiModuleMutation({ selection: { fields: { id: true } } })
 useDeleteApiModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteApiModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useApiModulesQuery({
-  selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } },
+  selection: { fields: { apiId: true, data: true, databaseId: true, id: true, name: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useApiModulesQuery({
 const { mutate } = useCreateApiModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', apiId: '<UUID>', name: '<String>', data: '<JSON>' });
+mutate({ apiId: '<UUID>', data: '<JSON>', databaseId: '<UUID>', name: '<String>' });
 ```

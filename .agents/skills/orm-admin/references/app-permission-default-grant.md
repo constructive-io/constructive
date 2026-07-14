@@ -9,8 +9,8 @@ Audit log of permission additions and removals from the defaults bitmask
 ```typescript
 db.appPermissionDefaultGrant.findMany({ select: { id: true } }).execute()
 db.appPermissionDefaultGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appPermissionDefaultGrant.create({ data: { permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>' }, select: { id: true } }).execute()
-db.appPermissionDefaultGrant.update({ where: { id: '<UUID>' }, data: { permissionId: '<UUID>' }, select: { id: true } }).execute()
+db.appPermissionDefaultGrant.create({ data: { grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' }, select: { id: true } }).execute()
+db.appPermissionDefaultGrant.update({ where: { id: '<UUID>' }, data: { grantorId: '<UUID>' }, select: { id: true } }).execute()
 db.appPermissionDefaultGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.appPermissionDefaultGrant.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.appPermissionDefaultGrant.findMany({
-  select: { id: true, permissionId: true }
+  select: { id: true, grantorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.appPermissionDefaultGrant.findMany({
 
 ```typescript
 const item = await db.appPermissionDefaultGrant.create({
-  data: { permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>' },
+  data: { grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

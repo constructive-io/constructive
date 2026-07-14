@@ -16,12 +16,12 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
+  data: 'json',
   id: 'uuid',
-  scopeId: 'uuid',
   kids: 'uuid',
   ktree: 'string',
-  data: 'json',
-  createdAt: 'string',
+  scopeId: 'uuid',
 };
 const usage =
   '\ninfra-object <command>\n\nCommands:\n  list                  List infraObject records\n  find-first            Find first matching infraObject record\n  get                   Get a infraObject by ID\n  create                Create a new infraObject\n  update                Update an existing infraObject\n  delete                Delete a infraObject\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -74,12 +74,12 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      data: true,
       id: true,
-      scopeId: true,
       kids: true,
       ktree: true,
-      data: true,
-      createdAt: true,
+      scopeId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy> & {
@@ -100,12 +100,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      data: true,
       id: true,
-      scopeId: true,
       kids: true,
       ktree: true,
-      data: true,
-      createdAt: true,
+      scopeId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<InfraObjectSelect, InfraObjectFilter, InfraObjectOrderBy> & {
@@ -138,12 +138,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
+          data: true,
           id: true,
-          scopeId: true,
           kids: true,
           ktree: true,
-          data: true,
-          createdAt: true,
+          scopeId: true,
         },
       })
       .execute();
@@ -160,10 +160,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'text',
-        name: 'scopeId',
-        message: 'scopeId',
-        required: true,
+        type: 'json',
+        name: 'data',
+        message: 'data',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -180,11 +181,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
-        name: 'data',
-        message: 'data',
-        required: false,
-        skipPrompt: true,
+        type: 'text',
+        name: 'scopeId',
+        message: 'scopeId',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -196,18 +196,18 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.infraObject
       .create({
         data: {
-          scopeId: cleanedData.scopeId,
+          data: cleanedData.data,
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
-          data: cleanedData.data,
+          scopeId: cleanedData.scopeId,
         },
         select: {
+          createdAt: true,
+          data: true,
           id: true,
-          scopeId: true,
           kids: true,
           ktree: true,
-          data: true,
-          createdAt: true,
+          scopeId: true,
         },
       })
       .execute();
@@ -236,6 +236,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'json',
+        name: 'data',
+        message: 'data',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'kids',
         message: 'kids',
@@ -246,13 +253,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'ktree',
         message: 'ktree',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'json',
-        name: 'data',
-        message: 'data',
         required: false,
         skipPrompt: true,
       },
@@ -267,17 +267,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scopeId: answers.scopeId as string,
         },
         data: {
+          data: cleanedData.data,
           kids: cleanedData.kids,
           ktree: cleanedData.ktree,
-          data: cleanedData.data,
         },
         select: {
+          createdAt: true,
+          data: true,
           id: true,
-          scopeId: true,
           kids: true,
           ktree: true,
-          data: true,
-          createdAt: true,
+          scopeId: true,
         },
       })
       .execute();

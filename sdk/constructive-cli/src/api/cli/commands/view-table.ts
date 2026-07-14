@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
-  viewId: 'uuid',
-  tableId: 'uuid',
+  id: 'uuid',
   joinOrder: 'int',
+  tableId: 'uuid',
+  viewId: 'uuid',
 };
 const usage =
   '\nview-table <command>\n\nCommands:\n  list                  List viewTable records\n  find-first            Find first matching viewTable record\n  get                   Get a viewTable by ID\n  create                Create a new viewTable\n  update                Update an existing viewTable\n  delete                Delete a viewTable\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      viewId: true,
-      tableId: true,
+      id: true,
       joinOrder: true,
+      tableId: true,
+      viewId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy> & {
@@ -98,11 +98,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      viewId: true,
-      tableId: true,
+      id: true,
       joinOrder: true,
+      tableId: true,
+      viewId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy> & {
@@ -135,11 +135,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
-          viewId: true,
-          tableId: true,
+          id: true,
           joinOrder: true,
+          tableId: true,
+          viewId: true,
         },
       })
       .execute();
@@ -164,9 +164,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'viewId',
-        message: 'viewId',
-        required: true,
+        name: 'joinOrder',
+        message: 'joinOrder',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -176,10 +177,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'joinOrder',
-        message: 'joinOrder',
-        required: false,
-        skipPrompt: true,
+        name: 'viewId',
+        message: 'viewId',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -189,16 +189,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          viewId: cleanedData.viewId,
-          tableId: cleanedData.tableId,
           joinOrder: cleanedData.joinOrder,
+          tableId: cleanedData.tableId,
+          viewId: cleanedData.viewId,
         },
         select: {
-          id: true,
           databaseId: true,
-          viewId: true,
-          tableId: true,
+          id: true,
           joinOrder: true,
+          tableId: true,
+          viewId: true,
         },
       })
       .execute();
@@ -229,9 +229,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'viewId',
-        message: 'viewId',
+        name: 'joinOrder',
+        message: 'joinOrder',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -241,10 +242,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'joinOrder',
-        message: 'joinOrder',
+        name: 'viewId',
+        message: 'viewId',
         required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -257,16 +257,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          viewId: cleanedData.viewId,
-          tableId: cleanedData.tableId,
           joinOrder: cleanedData.joinOrder,
+          tableId: cleanedData.tableId,
+          viewId: cleanedData.viewId,
         },
         select: {
-          id: true,
           databaseId: true,
-          viewId: true,
-          tableId: true,
+          id: true,
           joinOrder: true,
+          tableId: true,
+          viewId: true,
         },
       })
       .execute();

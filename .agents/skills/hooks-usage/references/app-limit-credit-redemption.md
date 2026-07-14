@@ -7,8 +7,8 @@ Append-only ledger of code redemptions; AFTER INSERT trigger validates and casca
 ## Usage
 
 ```typescript
-useAppLimitCreditRedemptionsQuery({ selection: { fields: { id: true, creditCodeId: true, entityId: true, organizationId: true, entityType: true } } })
-useAppLimitCreditRedemptionQuery({ id: '<UUID>', selection: { fields: { id: true, creditCodeId: true, entityId: true, organizationId: true, entityType: true } } })
+useAppLimitCreditRedemptionsQuery({ selection: { fields: { creditCodeId: true, entityId: true, entityType: true, id: true, organizationId: true } } })
+useAppLimitCreditRedemptionQuery({ id: '<UUID>', selection: { fields: { creditCodeId: true, entityId: true, entityType: true, id: true, organizationId: true } } })
 useCreateAppLimitCreditRedemptionMutation({ selection: { fields: { id: true } } })
 useUpdateAppLimitCreditRedemptionMutation({ selection: { fields: { id: true } } })
 useDeleteAppLimitCreditRedemptionMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLimitCreditRedemptionMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLimitCreditRedemptionsQuery({
-  selection: { fields: { id: true, creditCodeId: true, entityId: true, organizationId: true, entityType: true } },
+  selection: { fields: { creditCodeId: true, entityId: true, entityType: true, id: true, organizationId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLimitCreditRedemptionsQuery({
 const { mutate } = useCreateAppLimitCreditRedemptionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ creditCodeId: '<UUID>', entityId: '<UUID>', organizationId: '<UUID>', entityType: '<String>' });
+mutate({ creditCodeId: '<UUID>', entityId: '<UUID>', entityType: '<String>', organizationId: '<UUID>' });
 ```

@@ -9,8 +9,8 @@ On-demand resource status checks — diagnostic snapshots from the runtime (K8s 
 ```typescript
 db.resourceStatusCheck.findMany({ select: { id: true } }).execute()
 db.resourceStatusCheck.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.resourceStatusCheck.create({ data: { resourceId: '<UUID>', databaseId: '<UUID>', requestedBy: '<UUID>', requestedAt: '<Datetime>', completedAt: '<Datetime>', status: '<String>', result: '<JSON>' }, select: { id: true } }).execute()
-db.resourceStatusCheck.update({ where: { id: '<UUID>' }, data: { resourceId: '<UUID>' }, select: { id: true } }).execute()
+db.resourceStatusCheck.create({ data: { completedAt: '<Datetime>', databaseId: '<UUID>', requestedAt: '<Datetime>', requestedBy: '<UUID>', resourceId: '<UUID>', result: '<JSON>', status: '<String>' }, select: { id: true } }).execute()
+db.resourceStatusCheck.update({ where: { id: '<UUID>' }, data: { completedAt: '<Datetime>' }, select: { id: true } }).execute()
 db.resourceStatusCheck.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.resourceStatusCheck.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.resourceStatusCheck.findMany({
-  select: { id: true, resourceId: true }
+  select: { id: true, completedAt: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.resourceStatusCheck.findMany({
 
 ```typescript
 const item = await db.resourceStatusCheck.create({
-  data: { resourceId: '<UUID>', databaseId: '<UUID>', requestedBy: '<UUID>', requestedAt: '<Datetime>', completedAt: '<Datetime>', status: '<String>', result: '<JSON>' },
+  data: { completedAt: '<Datetime>', databaseId: '<UUID>', requestedAt: '<Datetime>', requestedBy: '<UUID>', resourceId: '<UUID>', result: '<JSON>', status: '<String>' },
   select: { id: true }
 }).execute();
 ```

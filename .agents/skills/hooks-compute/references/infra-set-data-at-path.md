@@ -7,7 +7,7 @@ React Query mutation hook for infraSetDataAtPath
 ## Usage
 
 ```typescript
-const { mutate } = useInfraSetDataAtPathMutation(); mutate({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } });
+const { mutate } = useInfraSetDataAtPathMutation(); mutate({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useInfraSetDataAtPathMutation(); mutate({ input: { sId: '<UUI
 
 ```typescript
 const { mutate, isLoading } = useInfraSetDataAtPathMutation();
-mutate({ input: { sId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } });
+mutate({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } });
 ```

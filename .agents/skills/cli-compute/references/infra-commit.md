@@ -12,8 +12,8 @@ csdk infra-commit list --where.<field>.<op> <value> --orderBy <values>
 csdk infra-commit list --limit 10 --after <cursor>
 csdk infra-commit find-first --where.<field>.<op> <value>
 csdk infra-commit get --id <UUID>
-csdk infra-commit create --scopeId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
-csdk infra-commit update --id <UUID> [--message <String>] [--scopeId <UUID>] [--storeId <UUID>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk infra-commit create --scopeId <UUID> --storeId <UUID> [--authorId <UUID>] [--committerId <UUID>] [--date <Datetime>] [--message <String>] [--parentIds <UUID>] [--treeId <UUID>]
+csdk infra-commit update --id <UUID> [--authorId <UUID>] [--committerId <UUID>] [--date <Datetime>] [--message <String>] [--parentIds <UUID>] [--scopeId <UUID>] [--storeId <UUID>] [--treeId <UUID>]
 csdk infra-commit delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk infra-commit list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a infraCommit
 
 ```bash
-csdk infra-commit create --scopeId <UUID> --storeId <UUID> [--message <String>] [--parentIds <UUID>] [--authorId <UUID>] [--committerId <UUID>] [--treeId <UUID>] [--date <Datetime>]
+csdk infra-commit create --scopeId <UUID> --storeId <UUID> [--authorId <UUID>] [--committerId <UUID>] [--date <Datetime>] [--message <String>] [--parentIds <UUID>] [--treeId <UUID>]
 ```
 
 ### Get a infraCommit by id

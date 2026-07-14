@@ -7,8 +7,8 @@ Function execution logs — structured console output per invocation
 ## Usage
 
 ```typescript
-useFunctionExecutionLogsQuery({ selection: { fields: { createdAt: true, id: true, invocationId: true, taskIdentifier: true, logLevel: true, message: true, metadata: true, actorId: true, databaseId: true } } })
-useFunctionExecutionLogQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, invocationId: true, taskIdentifier: true, logLevel: true, message: true, metadata: true, actorId: true, databaseId: true } } })
+useFunctionExecutionLogsQuery({ selection: { fields: { actorId: true, createdAt: true, databaseId: true, id: true, invocationId: true, logLevel: true, message: true, metadata: true, taskIdentifier: true } } })
+useFunctionExecutionLogQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, databaseId: true, id: true, invocationId: true, logLevel: true, message: true, metadata: true, taskIdentifier: true } } })
 useCreateFunctionExecutionLogMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionExecutionLogMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionExecutionLogMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionExecutionLogMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionExecutionLogsQuery({
-  selection: { fields: { createdAt: true, id: true, invocationId: true, taskIdentifier: true, logLevel: true, message: true, metadata: true, actorId: true, databaseId: true } },
+  selection: { fields: { actorId: true, createdAt: true, databaseId: true, id: true, invocationId: true, logLevel: true, message: true, metadata: true, taskIdentifier: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionExecutionLogsQuery({
 const { mutate } = useCreateFunctionExecutionLogMutation({
   selection: { fields: { id: true } },
 });
-mutate({ invocationId: '<UUID>', taskIdentifier: '<String>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', actorId: '<UUID>', databaseId: '<UUID>' });
+mutate({ actorId: '<UUID>', databaseId: '<UUID>', invocationId: '<UUID>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', taskIdentifier: '<String>' });
 ```

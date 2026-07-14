@@ -9,8 +9,8 @@ ORM operations for DatabaseTransfer records
 ```typescript
 db.databaseTransfer.findMany({ select: { id: true } }).execute()
 db.databaseTransfer.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.databaseTransfer.create({ data: { databaseId: '<UUID>', targetOwnerId: '<UUID>', sourceApproved: '<Boolean>', targetApproved: '<Boolean>', sourceApprovedAt: '<Datetime>', targetApprovedAt: '<Datetime>', status: '<String>', initiatedBy: '<UUID>', notes: '<String>', expiresAt: '<Datetime>', completedAt: '<Datetime>' }, select: { id: true } }).execute()
-db.databaseTransfer.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.databaseTransfer.create({ data: { completedAt: '<Datetime>', databaseId: '<UUID>', expiresAt: '<Datetime>', initiatedBy: '<UUID>', notes: '<String>', sourceApproved: '<Boolean>', sourceApprovedAt: '<Datetime>', status: '<String>', targetApproved: '<Boolean>', targetApprovedAt: '<Datetime>', targetOwnerId: '<UUID>' }, select: { id: true } }).execute()
+db.databaseTransfer.update({ where: { id: '<UUID>' }, data: { completedAt: '<Datetime>' }, select: { id: true } }).execute()
 db.databaseTransfer.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.databaseTransfer.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.databaseTransfer.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, completedAt: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.databaseTransfer.findMany({
 
 ```typescript
 const item = await db.databaseTransfer.create({
-  data: { databaseId: '<UUID>', targetOwnerId: '<UUID>', sourceApproved: '<Boolean>', targetApproved: '<Boolean>', sourceApprovedAt: '<Datetime>', targetApprovedAt: '<Datetime>', status: '<String>', initiatedBy: '<UUID>', notes: '<String>', expiresAt: '<Datetime>', completedAt: '<Datetime>' },
+  data: { completedAt: '<Datetime>', databaseId: '<UUID>', expiresAt: '<Datetime>', initiatedBy: '<UUID>', notes: '<String>', sourceApproved: '<Boolean>', sourceApprovedAt: '<Datetime>', status: '<String>', targetApproved: '<Boolean>', targetApprovedAt: '<Datetime>', targetOwnerId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```
