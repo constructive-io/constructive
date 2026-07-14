@@ -13,7 +13,7 @@ csdk infra-store list --limit 10 --after <cursor>
 csdk infra-store find-first --where.<field>.<op> <value>
 csdk infra-store get --id <UUID>
 csdk infra-store create --name <String> --scopeId <UUID> [--hash <UUID>]
-csdk infra-store update --id <UUID> [--name <String>] [--scopeId <UUID>] [--hash <UUID>]
+csdk infra-store update --id <UUID> [--hash <UUID>] [--name <String>] [--scopeId <UUID>]
 csdk infra-store delete --id <UUID>
 ```
 

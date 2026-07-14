@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  siteId: 'uuid',
-  name: 'string',
   data: 'json',
+  databaseId: 'uuid',
+  id: 'uuid',
+  name: 'string',
+  siteId: 'uuid',
 };
 const usage =
   '\nsite-module <command>\n\nCommands:\n  list                  List siteModule records\n  find-first            Find first matching siteModule record\n  get                   Get a siteModule by ID\n  create                Create a new siteModule\n  update                Update an existing siteModule\n  delete                Delete a siteModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      siteId: true,
-      name: true,
       data: true,
+      databaseId: true,
+      id: true,
+      name: true,
+      siteId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<SiteModuleSelect, SiteModuleFilter, SiteModuleOrderBy> & {
@@ -98,11 +98,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      siteId: true,
-      name: true,
       data: true,
+      databaseId: true,
+      id: true,
+      name: true,
+      siteId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<SiteModuleSelect, SiteModuleFilter, SiteModuleOrderBy> & {
@@ -135,11 +135,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          siteId: true,
-          name: true,
           data: true,
+          databaseId: true,
+          id: true,
+          name: true,
+          siteId: true,
         },
       })
       .execute();
@@ -156,15 +156,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        type: 'json',
+        name: 'data',
+        message: 'data',
         required: true,
       },
       {
         type: 'text',
-        name: 'siteId',
-        message: 'siteId',
+        name: 'databaseId',
+        message: 'databaseId',
         required: true,
       },
       {
@@ -174,9 +174,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'json',
-        name: 'data',
-        message: 'data',
+        type: 'text',
+        name: 'siteId',
+        message: 'siteId',
         required: true,
       },
     ]);
@@ -186,17 +186,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.siteModule
       .create({
         data: {
-          databaseId: cleanedData.databaseId,
-          siteId: cleanedData.siteId,
-          name: cleanedData.name,
           data: cleanedData.data,
+          databaseId: cleanedData.databaseId,
+          name: cleanedData.name,
+          siteId: cleanedData.siteId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          siteId: true,
-          name: true,
           data: true,
+          databaseId: true,
+          id: true,
+          name: true,
+          siteId: true,
         },
       })
       .execute();
@@ -219,15 +219,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        type: 'json',
+        name: 'data',
+        message: 'data',
         required: false,
       },
       {
         type: 'text',
-        name: 'siteId',
-        message: 'siteId',
+        name: 'databaseId',
+        message: 'databaseId',
         required: false,
       },
       {
@@ -237,9 +237,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'json',
-        name: 'data',
-        message: 'data',
+        type: 'text',
+        name: 'siteId',
+        message: 'siteId',
         required: false,
       },
     ]);
@@ -252,17 +252,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
-          siteId: cleanedData.siteId,
-          name: cleanedData.name,
           data: cleanedData.data,
+          databaseId: cleanedData.databaseId,
+          name: cleanedData.name,
+          siteId: cleanedData.siteId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          siteId: true,
-          name: true,
           data: true,
+          databaseId: true,
+          id: true,
+          name: true,
+          siteId: true,
         },
       })
       .execute();

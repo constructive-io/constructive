@@ -9,8 +9,8 @@ Branded catalog of external service integrations and their canonical secret/conf
 ```typescript
 db.integrationProvider.findMany({ select: { id: true } }).execute()
 db.integrationProvider.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.integrationProvider.create({ data: { slug: '<String>', name: '<String>', description: '<String>', category: '<String>', icon: '<String>', logo: '<Image>', brand: '<JSON>', requiredSecrets: '<ResourceRequirement>', requiredConfigs: '<ResourceRequirement>' }, select: { id: true } }).execute()
-db.integrationProvider.update({ where: { id: '<UUID>' }, data: { slug: '<String>' }, select: { id: true } }).execute()
+db.integrationProvider.create({ data: { brand: '<JSON>', category: '<String>', description: '<String>', icon: '<String>', logo: '<Image>', name: '<String>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>' }, select: { id: true } }).execute()
+db.integrationProvider.update({ where: { id: '<UUID>' }, data: { brand: '<JSON>' }, select: { id: true } }).execute()
 db.integrationProvider.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.integrationProvider.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.integrationProvider.findMany({
-  select: { id: true, slug: true }
+  select: { id: true, brand: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.integrationProvider.findMany({
 
 ```typescript
 const item = await db.integrationProvider.create({
-  data: { slug: '<String>', name: '<String>', description: '<String>', category: '<String>', icon: '<String>', logo: '<Image>', brand: '<JSON>', requiredSecrets: '<ResourceRequirement>', requiredConfigs: '<ResourceRequirement>' },
+  data: { brand: '<JSON>', category: '<String>', description: '<String>', icon: '<String>', logo: '<Image>', name: '<String>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>' },
   select: { id: true }
 }).execute();
 ```

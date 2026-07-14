@@ -21,52 +21,13 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
-| `platformConfig` | findMany, findOne, create, update, delete |
 | `config` | findMany, findOne, create, update, delete |
+| `platformConfig` | findMany, findOne, create, update, delete |
 | `platformInternalSecret` | findMany, findOne, create, update, delete |
 | `platformSecret` | findMany, findOne, create, update, delete |
 | `secret` | findMany, findOne, create, update, delete |
 
 ## Table Operations
-
-### `db.platformConfig`
-
-CRUD operations for PlatformConfig records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `namespaceId` | UUID | Yes |
-| `name` | String | Yes |
-| `provider` | String | Yes |
-| `value` | String | Yes |
-| `labels` | JSON | Yes |
-| `annotations` | JSON | Yes |
-| `description` | String | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-| `expiresAt` | Datetime | Yes |
-
-**Operations:**
-
-```typescript
-// List all platformConfig records
-const items = await db.platformConfig.findMany({ select: { id: true, namespaceId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } }).execute();
-
-// Get one by id
-const item = await db.platformConfig.findOne({ id: '<UUID>', select: { id: true, namespaceId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } }).execute();
-
-// Create
-const created = await db.platformConfig.create({ data: { namespaceId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.platformConfig.update({ where: { id: '<UUID>' }, data: { namespaceId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.platformConfig.delete({ where: { id: '<UUID>' } }).execute();
-```
 
 ### `db.config`
 
@@ -76,36 +37,75 @@ CRUD operations for Config records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `id` | UUID | No |
-| `namespaceId` | UUID | Yes |
-| `databaseId` | UUID | Yes |
-| `name` | String | Yes |
-| `provider` | String | Yes |
-| `value` | String | Yes |
-| `labels` | JSON | Yes |
 | `annotations` | JSON | Yes |
-| `description` | String | Yes |
 | `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `description` | String | Yes |
 | `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `labels` | JSON | Yes |
+| `name` | String | Yes |
+| `namespaceId` | UUID | Yes |
+| `provider` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `value` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all config records
-const items = await db.config.findMany({ select: { id: true, namespaceId: true, databaseId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } }).execute();
+const items = await db.config.findMany({ select: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } }).execute();
 
 // Get one by id
-const item = await db.config.findOne({ id: '<UUID>', select: { id: true, namespaceId: true, databaseId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } }).execute();
+const item = await db.config.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } }).execute();
 
 // Create
-const created = await db.config.create({ data: { namespaceId: '<UUID>', databaseId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.config.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.config.update({ where: { id: '<UUID>' }, data: { namespaceId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.config.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.config.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformConfig`
+
+CRUD operations for PlatformConfig records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `annotations` | JSON | Yes |
+| `createdAt` | Datetime | No |
+| `description` | String | Yes |
+| `expiresAt` | Datetime | Yes |
+| `id` | UUID | No |
+| `labels` | JSON | Yes |
+| `name` | String | Yes |
+| `namespaceId` | UUID | Yes |
+| `provider` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `value` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformConfig records
+const items = await db.platformConfig.findMany({ select: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } }).execute();
+
+// Get one by id
+const item = await db.platformConfig.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } }).execute();
+
+// Create
+const created = await db.platformConfig.create({ data: { annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformConfig.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformConfig.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformInternalSecret`
@@ -116,31 +116,31 @@ CRUD operations for PlatformInternalSecret records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `namespaceId` | UUID | Yes |
-| `description` | String | Yes |
-| `labels` | JSON | Yes |
 | `annotations` | JSON | Yes |
 | `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-| `rotatedAt` | Datetime | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `labels` | JSON | Yes |
+| `name` | String | Yes |
+| `namespaceId` | UUID | Yes |
 | `retiredAt` | Datetime | Yes |
+| `rotatedAt` | Datetime | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all platformInternalSecret records
-const items = await db.platformInternalSecret.findMany({ select: { id: true, name: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } }).execute();
+const items = await db.platformInternalSecret.findMany({ select: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.platformInternalSecret.findOne({ id: '<UUID>', select: { id: true, name: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } }).execute();
+const item = await db.platformInternalSecret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.platformInternalSecret.create({ data: { name: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.platformInternalSecret.create({ data: { annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.platformInternalSecret.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+const updated = await db.platformInternalSecret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.platformInternalSecret.delete({ where: { id: '<UUID>' } }).execute();
@@ -154,32 +154,32 @@ CRUD operations for PlatformSecret records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `provider` | String | Yes |
-| `namespaceId` | UUID | Yes |
-| `description` | String | Yes |
-| `labels` | JSON | Yes |
 | `annotations` | JSON | Yes |
 | `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-| `rotatedAt` | Datetime | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `labels` | JSON | Yes |
+| `name` | String | Yes |
+| `namespaceId` | UUID | Yes |
+| `provider` | String | Yes |
 | `retiredAt` | Datetime | Yes |
+| `rotatedAt` | Datetime | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all platformSecret records
-const items = await db.platformSecret.findMany({ select: { id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } }).execute();
+const items = await db.platformSecret.findMany({ select: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.platformSecret.findOne({ id: '<UUID>', select: { id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } }).execute();
+const item = await db.platformSecret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.platformSecret.create({ data: { name: '<String>', provider: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.platformSecret.create({ data: { annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.platformSecret.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+const updated = await db.platformSecret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.platformSecret.delete({ where: { id: '<UUID>' } }).execute();
@@ -193,69 +193,39 @@ CRUD operations for Secret records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `databaseId` | UUID | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `provider` | String | Yes |
-| `namespaceId` | UUID | Yes |
-| `description` | String | Yes |
-| `labels` | JSON | Yes |
 | `annotations` | JSON | Yes |
 | `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-| `rotatedAt` | Datetime | Yes |
+| `databaseId` | UUID | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `labels` | JSON | Yes |
+| `name` | String | Yes |
+| `namespaceId` | UUID | Yes |
+| `provider` | String | Yes |
 | `retiredAt` | Datetime | Yes |
+| `rotatedAt` | Datetime | Yes |
+| `updatedAt` | Datetime | No |
 
 **Operations:**
 
 ```typescript
 // List all secret records
-const items = await db.secret.findMany({ select: { databaseId: true, id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } }).execute();
+const items = await db.secret.findMany({ select: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.secret.findOne({ id: '<UUID>', select: { databaseId: true, id: true, name: true, provider: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } }).execute();
+const item = await db.secret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.secret.create({ data: { databaseId: '<UUID>', name: '<String>', provider: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.secret.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.secret.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.secret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.secret.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ## Custom Operations
-
-### `db.mutation.platformInternalSecretsDel`
-
-platformInternalSecretsDel
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformInternalSecretsDelInput (required) |
-
-```typescript
-const result = await db.mutation.platformInternalSecretsDel({ input: { secretName: '<String>', namespaceId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.platformSecretsDel`
-
-platformSecretsDel
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformSecretsDelInput (required) |
-
-```typescript
-const result = await db.mutation.platformSecretsDel({ input: { secretName: '<String>', namespaceId: '<UUID>' } }).execute();
-```
 
 ### `db.mutation._secretsDel`
 
@@ -269,37 +239,7 @@ _secretsDel
   | `input` | _SecretsDelInput (required) |
 
 ```typescript
-const result = await db.mutation._secretsDel({ input: { databaseId: '<UUID>', secretName: '<String>', namespaceId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.platformInternalSecretsRemoveArray`
-
-platformInternalSecretsRemoveArray
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformInternalSecretsRemoveArrayInput (required) |
-
-```typescript
-const result = await db.mutation.platformInternalSecretsRemoveArray({ input: { secretNames: '<String>', namespaceId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.platformSecretsRemoveArray`
-
-platformSecretsRemoveArray
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformSecretsRemoveArrayInput (required) |
-
-```typescript
-const result = await db.mutation.platformSecretsRemoveArray({ input: { secretNames: '<String>', namespaceId: '<UUID>' } }).execute();
+const result = await db.mutation._secretsDel({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>' } }).execute();
 ```
 
 ### `db.mutation._secretsRemoveArray`
@@ -314,52 +254,7 @@ _secretsRemoveArray
   | `input` | _SecretsRemoveArrayInput (required) |
 
 ```typescript
-const result = await db.mutation._secretsRemoveArray({ input: { databaseId: '<UUID>', secretNames: '<String>', namespaceId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.platformInternalSecretsRotate`
-
-platformInternalSecretsRotate
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformInternalSecretsRotateInput (required) |
-
-```typescript
-const result = await db.mutation.platformInternalSecretsRotate({ input: { secretName: '<String>', secretValue: '<String>', namespaceId: '<UUID>', algo: '<String>' } }).execute();
-```
-
-### `db.mutation.platformInternalSecretsSet`
-
-platformInternalSecretsSet
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformInternalSecretsSetInput (required) |
-
-```typescript
-const result = await db.mutation.platformInternalSecretsSet({ input: { secretName: '<String>', secretValue: '<String>', secretNamespaceId: '<UUID>', algo: '<String>' } }).execute();
-```
-
-### `db.mutation.platformSecretsRotate`
-
-platformSecretsRotate
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformSecretsRotateInput (required) |
-
-```typescript
-const result = await db.mutation.platformSecretsRotate({ input: { secretName: '<String>', secretValue: '<String>', namespaceId: '<UUID>', algo: '<String>' } }).execute();
+const result = await db.mutation._secretsRemoveArray({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretNames: '<String>' } }).execute();
 ```
 
 ### `db.mutation._secretsRotate`
@@ -374,22 +269,7 @@ _secretsRotate
   | `input` | _SecretsRotateInput (required) |
 
 ```typescript
-const result = await db.mutation._secretsRotate({ input: { databaseId: '<UUID>', secretName: '<String>', secretValue: '<String>', namespaceId: '<UUID>', algo: '<String>' } }).execute();
-```
-
-### `db.mutation.platformSecretsSet`
-
-platformSecretsSet
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | PlatformSecretsSetInput (required) |
-
-```typescript
-const result = await db.mutation.platformSecretsSet({ input: { secretName: '<String>', secretValue: '<String>', secretNamespaceId: '<UUID>', algo: '<String>', provider: '<String>' } }).execute();
+const result = await db.mutation._secretsRotate({ input: { algo: '<String>', databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>', secretValue: '<String>' } }).execute();
 ```
 
 ### `db.mutation._secretsSet`
@@ -405,6 +285,126 @@ _secretsSet
 
 ```typescript
 const result = await db.mutation._secretsSet({ input: '<_SecretsSetInput>' }).execute();
+```
+
+### `db.mutation.platformInternalSecretsDel`
+
+platformInternalSecretsDel
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInternalSecretsDelInput (required) |
+
+```typescript
+const result = await db.mutation.platformInternalSecretsDel({ input: { namespaceId: '<UUID>', secretName: '<String>' } }).execute();
+```
+
+### `db.mutation.platformInternalSecretsRemoveArray`
+
+platformInternalSecretsRemoveArray
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInternalSecretsRemoveArrayInput (required) |
+
+```typescript
+const result = await db.mutation.platformInternalSecretsRemoveArray({ input: { namespaceId: '<UUID>', secretNames: '<String>' } }).execute();
+```
+
+### `db.mutation.platformInternalSecretsRotate`
+
+platformInternalSecretsRotate
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInternalSecretsRotateInput (required) |
+
+```typescript
+const result = await db.mutation.platformInternalSecretsRotate({ input: { algo: '<String>', namespaceId: '<UUID>', secretName: '<String>', secretValue: '<String>' } }).execute();
+```
+
+### `db.mutation.platformInternalSecretsSet`
+
+platformInternalSecretsSet
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInternalSecretsSetInput (required) |
+
+```typescript
+const result = await db.mutation.platformInternalSecretsSet({ input: { algo: '<String>', secretName: '<String>', secretNamespaceId: '<UUID>', secretValue: '<String>' } }).execute();
+```
+
+### `db.mutation.platformSecretsDel`
+
+platformSecretsDel
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSecretsDelInput (required) |
+
+```typescript
+const result = await db.mutation.platformSecretsDel({ input: { namespaceId: '<UUID>', secretName: '<String>' } }).execute();
+```
+
+### `db.mutation.platformSecretsRemoveArray`
+
+platformSecretsRemoveArray
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSecretsRemoveArrayInput (required) |
+
+```typescript
+const result = await db.mutation.platformSecretsRemoveArray({ input: { namespaceId: '<UUID>', secretNames: '<String>' } }).execute();
+```
+
+### `db.mutation.platformSecretsRotate`
+
+platformSecretsRotate
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSecretsRotateInput (required) |
+
+```typescript
+const result = await db.mutation.platformSecretsRotate({ input: { algo: '<String>', namespaceId: '<UUID>', secretName: '<String>', secretValue: '<String>' } }).execute();
+```
+
+### `db.mutation.platformSecretsSet`
+
+platformSecretsSet
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformSecretsSetInput (required) |
+
+```typescript
+const result = await db.mutation.platformSecretsSet({ input: { algo: '<String>', provider: '<String>', secretName: '<String>', secretNamespaceId: '<UUID>', secretValue: '<String>' } }).execute();
 ```
 
 ### `db.mutation.provisionBucket`

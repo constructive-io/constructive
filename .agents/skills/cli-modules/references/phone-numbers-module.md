@@ -12,8 +12,8 @@ csdk phone-numbers-module list --where.<field>.<op> <value> --orderBy <values>
 csdk phone-numbers-module list --limit 10 --after <cursor>
 csdk phone-numbers-module find-first --where.<field>.<op> <value>
 csdk phone-numbers-module get --id <UUID>
-csdk phone-numbers-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
-csdk phone-numbers-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk phone-numbers-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
+csdk phone-numbers-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk phone-numbers-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk phone-numbers-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a phoneNumbersModule
 
 ```bash
-csdk phone-numbers-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
+csdk phone-numbers-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
 ```
 
 ### Get a phoneNumbersModule by id

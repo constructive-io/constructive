@@ -7,7 +7,7 @@ Creates a new blueprint by copying a template definition. Checks visibility: own
 ## Usage
 
 ```typescript
-const { mutate } = useCopyTemplateToBlueprintMutation(); mutate({ input: { templateId: '<UUID>', databaseId: '<UUID>', ownerId: '<UUID>', nameOverride: '<String>', displayNameOverride: '<String>' } });
+const { mutate } = useCopyTemplateToBlueprintMutation(); mutate({ input: { databaseId: '<UUID>', displayNameOverride: '<String>', nameOverride: '<String>', ownerId: '<UUID>', templateId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useCopyTemplateToBlueprintMutation(); mutate({ input: { templ
 
 ```typescript
 const { mutate, isLoading } = useCopyTemplateToBlueprintMutation();
-mutate({ input: { templateId: '<UUID>', databaseId: '<UUID>', ownerId: '<UUID>', nameOverride: '<String>', displayNameOverride: '<String>' } });
+mutate({ input: { databaseId: '<UUID>', displayNameOverride: '<String>', nameOverride: '<String>', ownerId: '<UUID>', templateId: '<UUID>' } });
 ```

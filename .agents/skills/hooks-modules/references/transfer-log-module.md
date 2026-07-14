@@ -7,8 +7,8 @@ React Query hooks for TransferLogModule data operations
 ## Usage
 
 ```typescript
-useTransferLogModulesQuery({ selection: { fields: { id: true, databaseId: true, entityField: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true, interval: true, retention: true, premake: true, scope: true, actorFkTableId: true, entityFkTableId: true, prefix: true, apiName: true, privateApiName: true } } })
-useTransferLogModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, entityField: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true, interval: true, retention: true, premake: true, scope: true, actorFkTableId: true, entityFkTableId: true, prefix: true, apiName: true, privateApiName: true } } })
+useTransferLogModulesQuery({ selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true } } })
+useTransferLogModuleQuery({ id: '<UUID>', selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true } } })
 useCreateTransferLogModuleMutation({ selection: { fields: { id: true } } })
 useUpdateTransferLogModuleMutation({ selection: { fields: { id: true } } })
 useDeleteTransferLogModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteTransferLogModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useTransferLogModulesQuery({
-  selection: { fields: { id: true, databaseId: true, entityField: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true, interval: true, retention: true, premake: true, scope: true, actorFkTableId: true, entityFkTableId: true, prefix: true, apiName: true, privateApiName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useTransferLogModulesQuery({
 const { mutate } = useCreateTransferLogModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', entityField: '<String>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', transferLogTableId: '<UUID>', transferLogTableName: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>', interval: '<String>', retention: '<String>', premake: '<Int>', scope: '<String>', actorFkTableId: '<UUID>', entityFkTableId: '<UUID>', prefix: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ actorFkTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', transferLogTableId: '<UUID>', transferLogTableName: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>' });
 ```

@@ -26,8 +26,8 @@ export default async (
       },
       {
         type: 'text',
-        name: 'tableName',
-        message: 'tableName',
+        name: 'defaultSchemaId',
+        message: 'defaultSchemaId',
       },
       {
         type: 'text',
@@ -41,8 +41,8 @@ export default async (
       },
       {
         type: 'text',
-        name: 'defaultSchemaId',
-        message: 'defaultSchemaId',
+        name: 'tableName',
+        message: 'tableName',
       },
     ]);
     const client = getClient();

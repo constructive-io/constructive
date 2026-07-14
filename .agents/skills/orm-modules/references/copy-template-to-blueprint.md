@@ -7,7 +7,7 @@ Creates a new blueprint by copying a template definition. Checks visibility: own
 ## Usage
 
 ```typescript
-db.mutation.copyTemplateToBlueprint({ input: { templateId: '<UUID>', databaseId: '<UUID>', ownerId: '<UUID>', nameOverride: '<String>', displayNameOverride: '<String>' } }).execute()
+db.mutation.copyTemplateToBlueprint({ input: { databaseId: '<UUID>', displayNameOverride: '<String>', nameOverride: '<String>', ownerId: '<UUID>', templateId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.copyTemplateToBlueprint({ input: { templateId: '<UUID>', databaseId:
 ### Run copyTemplateToBlueprint
 
 ```typescript
-const result = await db.mutation.copyTemplateToBlueprint({ input: { templateId: '<UUID>', databaseId: '<UUID>', ownerId: '<UUID>', nameOverride: '<String>', displayNameOverride: '<String>' } }).execute();
+const result = await db.mutation.copyTemplateToBlueprint({ input: { databaseId: '<UUID>', displayNameOverride: '<String>', nameOverride: '<String>', ownerId: '<UUID>', templateId: '<UUID>' } }).execute();
 ```

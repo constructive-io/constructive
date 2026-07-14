@@ -7,8 +7,8 @@ Content-addressed store for execution outputs — hash-referenced from node_outp
 ## Usage
 
 ```typescript
-useFunctionGraphExecutionOutputsQuery({ selection: { fields: { createdAt: true, id: true, scopeId: true, hash: true, data: true } } })
-useFunctionGraphExecutionOutputQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, scopeId: true, hash: true, data: true } } })
+useFunctionGraphExecutionOutputsQuery({ selection: { fields: { createdAt: true, data: true, hash: true, id: true, scopeId: true } } })
+useFunctionGraphExecutionOutputQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, hash: true, id: true, scopeId: true } } })
 useCreateFunctionGraphExecutionOutputMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionGraphExecutionOutputMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionGraphExecutionOutputMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionGraphExecutionOutputMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionGraphExecutionOutputsQuery({
-  selection: { fields: { createdAt: true, id: true, scopeId: true, hash: true, data: true } },
+  selection: { fields: { createdAt: true, data: true, hash: true, id: true, scopeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionGraphExecutionOutputsQuery({
 const { mutate } = useCreateFunctionGraphExecutionOutputMutation({
   selection: { fields: { id: true } },
 });
-mutate({ scopeId: '<UUID>', hash: '<Base64EncodedBinary>', data: '<JSON>' });
+mutate({ data: '<JSON>', hash: '<Base64EncodedBinary>', scopeId: '<UUID>' });
 ```

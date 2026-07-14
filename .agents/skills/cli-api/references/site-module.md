@@ -12,8 +12,8 @@ csdk site-module list --where.<field>.<op> <value> --orderBy <values>
 csdk site-module list --limit 10 --after <cursor>
 csdk site-module find-first --where.<field>.<op> <value>
 csdk site-module get --id <UUID>
-csdk site-module create --databaseId <UUID> --siteId <UUID> --name <String> --data <JSON>
-csdk site-module update --id <UUID> [--databaseId <UUID>] [--siteId <UUID>] [--name <String>] [--data <JSON>]
+csdk site-module create --data <JSON> --databaseId <UUID> --name <String> --siteId <UUID>
+csdk site-module update --id <UUID> [--data <JSON>] [--databaseId <UUID>] [--name <String>] [--siteId <UUID>]
 csdk site-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk site-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a siteModule
 
 ```bash
-csdk site-module create --databaseId <UUID> --siteId <UUID> --name <String> --data <JSON>
+csdk site-module create --data <JSON> --databaseId <UUID> --name <String> --siteId <UUID>
 ```
 
 ### Get a siteModule by id

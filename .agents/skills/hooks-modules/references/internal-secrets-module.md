@@ -7,8 +7,8 @@ App-scoped PGP-encrypted internal secrets store. No namespace_module dependency 
 ## Usage
 
 ```typescript
-useInternalSecretsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, internalSecretsTableId: true, internalSecretsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, entityField: true, policies: true, provisions: true } } })
-useInternalSecretsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, internalSecretsTableId: true, internalSecretsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, entityField: true, policies: true, provisions: true } } })
+useInternalSecretsModulesQuery({ selection: { fields: { apiName: true, databaseId: true, entityField: true, entityTableId: true, id: true, internalSecretsTableId: true, internalSecretsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } } })
+useInternalSecretsModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, databaseId: true, entityField: true, entityTableId: true, id: true, internalSecretsTableId: true, internalSecretsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } } })
 useCreateInternalSecretsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateInternalSecretsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteInternalSecretsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteInternalSecretsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useInternalSecretsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, publicSchemaName: true, privateSchemaName: true, internalSecretsTableId: true, internalSecretsTableName: true, apiName: true, privateApiName: true, scope: true, prefix: true, entityTableId: true, entityField: true, policies: true, provisions: true } },
+  selection: { fields: { apiName: true, databaseId: true, entityField: true, entityTableId: true, id: true, internalSecretsTableId: true, internalSecretsTableName: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useInternalSecretsModulesQuery({
 const { mutate } = useCreateInternalSecretsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', internalSecretsTableId: '<UUID>', internalSecretsTableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>', entityField: '<String>', policies: '<JSON>', provisions: '<JSON>' });
+mutate({ apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', internalSecretsTableId: '<UUID>', internalSecretsTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' });
 ```

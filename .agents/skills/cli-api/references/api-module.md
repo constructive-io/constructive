@@ -12,8 +12,8 @@ csdk api-module list --where.<field>.<op> <value> --orderBy <values>
 csdk api-module list --limit 10 --after <cursor>
 csdk api-module find-first --where.<field>.<op> <value>
 csdk api-module get --id <UUID>
-csdk api-module create --databaseId <UUID> --apiId <UUID> --name <String> --data <JSON>
-csdk api-module update --id <UUID> [--databaseId <UUID>] [--apiId <UUID>] [--name <String>] [--data <JSON>]
+csdk api-module create --apiId <UUID> --data <JSON> --databaseId <UUID> --name <String>
+csdk api-module update --id <UUID> [--apiId <UUID>] [--data <JSON>] [--databaseId <UUID>] [--name <String>]
 csdk api-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk api-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a apiModule
 
 ```bash
-csdk api-module create --databaseId <UUID> --apiId <UUID> --name <String> --data <JSON>
+csdk api-module create --apiId <UUID> --data <JSON> --databaseId <UUID> --name <String>
 ```
 
 ### Get a apiModule by id

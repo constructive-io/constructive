@@ -7,7 +7,7 @@ Execute the addNodeAndSave mutation
 ## Usage
 
 ```bash
-csdk add-node-and-save --input.clientMutationId <String> --input.graphId <UUID> --input.nodeName <String> --input.nodeType <String> --input.props <JSON> --input.meta <JSON> --input.message <String>
+csdk add-node-and-save --input.clientMutationId <String> --input.graphId <UUID> --input.message <String> --input.meta <JSON> --input.nodeName <String> --input.nodeType <String> --input.props <JSON>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk add-node-and-save --input.clientMutationId <String> --input.graphId <UUID> 
 ### Run addNodeAndSave
 
 ```bash
-csdk add-node-and-save --input.clientMutationId <String> --input.graphId <UUID> --input.nodeName <String> --input.nodeType <String> --input.props <JSON> --input.meta <JSON> --input.message <String>
+csdk add-node-and-save --input.clientMutationId <String> --input.graphId <UUID> --input.message <String> --input.meta <JSON> --input.nodeName <String> --input.nodeType <String> --input.props <JSON>
 ```

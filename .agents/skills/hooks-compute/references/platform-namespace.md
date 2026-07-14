@@ -7,8 +7,8 @@ Logical namespace containers for grouping secrets, config, functions, and other 
 ## Usage
 
 ```typescript
-usePlatformNamespacesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, name: true, namespaceName: true, description: true, isActive: true, status: true, lastError: true, labels: true, annotations: true, isManaged: true } } })
-usePlatformNamespaceQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, name: true, namespaceName: true, description: true, isActive: true, status: true, lastError: true, labels: true, annotations: true, isManaged: true } } })
+usePlatformNamespacesQuery({ selection: { fields: { annotations: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } } })
+usePlatformNamespaceQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } } })
 useCreatePlatformNamespaceMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformNamespaceMutation({ selection: { fields: { id: true } } })
 useDeletePlatformNamespaceMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformNamespaceMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformNamespacesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, name: true, namespaceName: true, description: true, isActive: true, status: true, lastError: true, labels: true, annotations: true, isManaged: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, isActive: true, isManaged: true, labels: true, lastError: true, name: true, namespaceName: true, status: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformNamespacesQuery({
 const { mutate } = useCreatePlatformNamespaceMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', namespaceName: '<String>', description: '<String>', isActive: '<Boolean>', status: '<String>', lastError: '<String>', labels: '<JSON>', annotations: '<JSON>', isManaged: '<Boolean>' });
+mutate({ annotations: '<JSON>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' });
 ```

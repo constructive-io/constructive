@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  createdAt: 'string',
+  hash: 'uuid',
   id: 'uuid',
   name: 'string',
   scopeId: 'uuid',
-  hash: 'uuid',
-  createdAt: 'string',
 };
 const usage =
   '\ninfra-store <command>\n\nCommands:\n  list                  List infraStore records\n  find-first            Find first matching infraStore record\n  get                   Get a infraStore by ID\n  create                Create a new infraStore\n  update                Update an existing infraStore\n  delete                Delete a infraStore\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      hash: true,
       id: true,
       name: true,
       scopeId: true,
-      hash: true,
-      createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy> & {
@@ -98,11 +98,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      createdAt: true,
+      hash: true,
       id: true,
       name: true,
       scopeId: true,
-      hash: true,
-      createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<InfraStoreSelect, InfraStoreFilter, InfraStoreOrderBy> & {
@@ -135,11 +135,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          createdAt: true,
+          hash: true,
           id: true,
           name: true,
           scopeId: true,
-          hash: true,
-          createdAt: true,
         },
       })
       .execute();
@@ -157,6 +157,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'hash',
+        message: 'hash',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
         required: true,
@@ -167,13 +174,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'scopeId',
         required: true,
       },
-      {
-        type: 'text',
-        name: 'hash',
-        message: 'hash',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateInfraStoreInput['infraStore'];
@@ -181,16 +181,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.infraStore
       .create({
         data: {
+          hash: cleanedData.hash,
           name: cleanedData.name,
           scopeId: cleanedData.scopeId,
-          hash: cleanedData.hash,
         },
         select: {
+          createdAt: true,
+          hash: true,
           id: true,
           name: true,
           scopeId: true,
-          hash: true,
-          createdAt: true,
         },
       })
       .execute();
@@ -214,6 +214,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'hash',
+        message: 'hash',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
         required: false,
@@ -223,13 +230,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'scopeId',
         message: 'scopeId',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'hash',
-        message: 'hash',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -241,16 +241,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          hash: cleanedData.hash,
           name: cleanedData.name,
           scopeId: cleanedData.scopeId,
-          hash: cleanedData.hash,
         },
         select: {
+          createdAt: true,
+          hash: true,
           id: true,
           name: true,
           scopeId: true,
-          hash: true,
-          createdAt: true,
         },
       })
       .execute();

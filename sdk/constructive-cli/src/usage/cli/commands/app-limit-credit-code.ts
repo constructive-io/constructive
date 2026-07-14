@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   code: 'string',
-  maxRedemptions: 'int',
   currentRedemptions: 'int',
   expiresAt: 'string',
+  id: 'uuid',
+  maxRedemptions: 'int',
 };
 const usage =
   '\napp-limit-credit-code <command>\n\nCommands:\n  list                  List appLimitCreditCode records\n  find-first            Find first matching appLimitCreditCode record\n  get                   Get a appLimitCreditCode by ID\n  create                Create a new appLimitCreditCode\n  update                Update an existing appLimitCreditCode\n  delete                Delete a appLimitCreditCode\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       code: true,
-      maxRedemptions: true,
       currentRedemptions: true,
       expiresAt: true,
+      id: true,
+      maxRedemptions: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -102,11 +102,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       code: true,
-      maxRedemptions: true,
       currentRedemptions: true,
       expiresAt: true,
+      id: true,
+      maxRedemptions: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -143,11 +143,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           code: true,
-          maxRedemptions: true,
           currentRedemptions: true,
           expiresAt: true,
+          id: true,
+          maxRedemptions: true,
         },
       })
       .execute();
@@ -171,13 +171,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'maxRedemptions',
-        message: 'maxRedemptions',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'currentRedemptions',
         message: 'currentRedemptions',
         required: false,
@@ -187,6 +180,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'expiresAt',
         message: 'expiresAt',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'maxRedemptions',
+        message: 'maxRedemptions',
         required: false,
         skipPrompt: true,
       },
@@ -201,16 +201,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           code: cleanedData.code,
-          maxRedemptions: cleanedData.maxRedemptions,
           currentRedemptions: cleanedData.currentRedemptions,
           expiresAt: cleanedData.expiresAt,
+          maxRedemptions: cleanedData.maxRedemptions,
         },
         select: {
-          id: true,
           code: true,
-          maxRedemptions: true,
           currentRedemptions: true,
           expiresAt: true,
+          id: true,
+          maxRedemptions: true,
         },
       })
       .execute();
@@ -240,13 +240,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'maxRedemptions',
-        message: 'maxRedemptions',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'currentRedemptions',
         message: 'currentRedemptions',
         required: false,
@@ -256,6 +249,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'expiresAt',
         message: 'expiresAt',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'maxRedemptions',
+        message: 'maxRedemptions',
         required: false,
         skipPrompt: true,
       },
@@ -270,16 +270,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           code: cleanedData.code,
-          maxRedemptions: cleanedData.maxRedemptions,
           currentRedemptions: cleanedData.currentRedemptions,
           expiresAt: cleanedData.expiresAt,
+          maxRedemptions: cleanedData.maxRedemptions,
         },
         select: {
-          id: true,
           code: true,
-          maxRedemptions: true,
           currentRedemptions: true,
           expiresAt: true,
+          id: true,
+          maxRedemptions: true,
         },
       })
       .execute();

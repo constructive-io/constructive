@@ -9,7 +9,7 @@ ORM operations for DefaultPrivilege records
 ```typescript
 db.defaultPrivilege.findMany({ select: { id: true } }).execute()
 db.defaultPrivilege.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.defaultPrivilege.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', objectType: '<String>', privilege: '<String>', granteeName: '<String>', isGrant: '<Boolean>' }, select: { id: true } }).execute()
+db.defaultPrivilege.create({ data: { databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', objectType: '<String>', privilege: '<String>', schemaId: '<UUID>' }, select: { id: true } }).execute()
 db.defaultPrivilege.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.defaultPrivilege.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.defaultPrivilege.findMany({
 
 ```typescript
 const item = await db.defaultPrivilege.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', objectType: '<String>', privilege: '<String>', granteeName: '<String>', isGrant: '<Boolean>' },
+  data: { databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', objectType: '<String>', privilege: '<String>', schemaId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

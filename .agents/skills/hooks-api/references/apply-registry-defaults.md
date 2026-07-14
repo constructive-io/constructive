@@ -7,7 +7,7 @@ React Query query hook for applyRegistryDefaults
 ## Usage
 
 ```typescript
-useApplyRegistryDefaultsQuery({ nodeType: '<String>', data: '<JSON>' })
+useApplyRegistryDefaultsQuery({ data: '<JSON>', nodeType: '<String>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useApplyRegistryDefaultsQuery({ nodeType: '<String>', data: '<JSON>' })
 ### Use useApplyRegistryDefaultsQuery
 
 ```typescript
-const { data, isLoading } = useApplyRegistryDefaultsQuery({ nodeType: '<String>', data: '<JSON>' });
+const { data, isLoading } = useApplyRegistryDefaultsQuery({ data: '<JSON>', nodeType: '<String>' });
 ```

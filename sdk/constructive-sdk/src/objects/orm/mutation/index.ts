@@ -8,24 +8,21 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   InitEmptyRepoInput,
-  SetDataAtPathInput,
   InsertNodeAtPathInput,
   ProvisionBucketInput,
+  SetDataAtPathInput,
   InitEmptyRepoPayload,
-  SetDataAtPathPayload,
   InsertNodeAtPathPayload,
   ProvisionBucketPayload,
+  SetDataAtPathPayload,
   InitEmptyRepoPayloadSelect,
-  SetDataAtPathPayloadSelect,
   InsertNodeAtPathPayloadSelect,
   ProvisionBucketPayloadSelect,
+  SetDataAtPathPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface InitEmptyRepoVariables {
   input: InitEmptyRepoInput;
-}
-export interface SetDataAtPathVariables {
-  input: SetDataAtPathInput;
 }
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
@@ -39,6 +36,9 @@ and lifecycle settings.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
+}
+export interface SetDataAtPathVariables {
+  input: SetDataAtPathInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -69,35 +69,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'InitEmptyRepoPayload'
-        ),
-      }),
-    setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
-      args: SetDataAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetDataAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setDataAtPath: InferSelectResult<SetDataAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetDataAtPath',
-        fieldName: 'setDataAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'SetDataAtPath',
-          'setDataAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetDataAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetDataAtPathPayload'
         ),
       }),
     insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
@@ -156,6 +127,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
+        ),
+      }),
+    setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
+      args: SetDataAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetDataAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setDataAtPath: InferSelectResult<SetDataAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetDataAtPath',
+        fieldName: 'setDataAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'SetDataAtPath',
+          'setDataAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetDataAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetDataAtPathPayload'
         ),
       }),
   };

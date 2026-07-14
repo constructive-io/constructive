@@ -7,7 +7,7 @@ Execute the resetPassword mutation
 ## Usage
 
 ```typescript
-db.mutation.resetPassword({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } }).execute()
+db.mutation.resetPassword({ input: { newPassword: '<String>', resetToken: '<String>', roleId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.resetPassword({ input: { roleId: '<UUID>', resetToken: '<String>', n
 ### Run resetPassword
 
 ```typescript
-const result = await db.mutation.resetPassword({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } }).execute();
+const result = await db.mutation.resetPassword({ input: { newPassword: '<String>', resetToken: '<String>', roleId: '<UUID>' } }).execute();
 ```

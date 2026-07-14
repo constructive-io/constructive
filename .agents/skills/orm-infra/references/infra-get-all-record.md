@@ -9,8 +9,8 @@ ORM operations for InfraGetAllRecord records
 ```typescript
 db.infraGetAllRecord.findMany({ select: { id: true } }).execute()
 db.infraGetAllRecord.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.infraGetAllRecord.create({ data: { path: '<String>', data: '<JSON>' }, select: { id: true } }).execute()
-db.infraGetAllRecord.update({ where: { id: '<UUID>' }, data: { path: '<String>' }, select: { id: true } }).execute()
+db.infraGetAllRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute()
+db.infraGetAllRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute()
 db.infraGetAllRecord.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.infraGetAllRecord.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.infraGetAllRecord.findMany({
-  select: { id: true, path: true }
+  select: { id: true, data: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.infraGetAllRecord.findMany({
 
 ```typescript
 const item = await db.infraGetAllRecord.create({
-  data: { path: '<String>', data: '<JSON>' },
+  data: { data: '<JSON>', path: '<String>' },
   select: { id: true }
 }).execute();
 ```

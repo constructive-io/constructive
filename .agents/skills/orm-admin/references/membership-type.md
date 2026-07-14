@@ -9,8 +9,8 @@ Defines the different scopes of membership (e.g. App Member, Organization Member
 ```typescript
 db.membershipType.findMany({ select: { id: true } }).execute()
 db.membershipType.findOne({ id: '<Int>', select: { id: true } }).execute()
-db.membershipType.create({ data: { name: '<String>', description: '<String>', scope: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' }, select: { id: true } }).execute()
-db.membershipType.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.membershipType.create({ data: { description: '<String>', hasUsersTableEntry: '<Boolean>', name: '<String>', parentMembershipType: '<Int>', scope: '<String>' }, select: { id: true } }).execute()
+db.membershipType.update({ where: { id: '<Int>' }, data: { description: '<String>' }, select: { id: true } }).execute()
 db.membershipType.delete({ where: { id: '<Int>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.membershipType.delete({ where: { id: '<Int>' } }).execute()
 
 ```typescript
 const items = await db.membershipType.findMany({
-  select: { id: true, name: true }
+  select: { id: true, description: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.membershipType.findMany({
 
 ```typescript
 const item = await db.membershipType.create({
-  data: { name: '<String>', description: '<String>', scope: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' },
+  data: { description: '<String>', hasUsersTableEntry: '<Boolean>', name: '<String>', parentMembershipType: '<Int>', scope: '<String>' },
   select: { id: true }
 }).execute();
 ```

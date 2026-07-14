@@ -12,8 +12,8 @@ csdk session-secrets-module list --where.<field>.<op> <value> --orderBy <values>
 csdk session-secrets-module list --limit 10 --after <cursor>
 csdk session-secrets-module find-first --where.<field>.<op> <value>
 csdk session-secrets-module get --id <UUID>
-csdk session-secrets-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--sessionsTableId <UUID>]
-csdk session-secrets-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--sessionsTableId <UUID>]
+csdk session-secrets-module create --databaseId <UUID> [--schemaId <UUID>] [--sessionsTableId <UUID>] [--tableId <UUID>] [--tableName <String>]
+csdk session-secrets-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--sessionsTableId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk session-secrets-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk session-secrets-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a sessionSecretsModule
 
 ```bash
-csdk session-secrets-module create --databaseId <UUID> [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--sessionsTableId <UUID>]
+csdk session-secrets-module create --databaseId <UUID> [--schemaId <UUID>] [--sessionsTableId <UUID>] [--tableId <UUID>] [--tableName <String>]
 ```
 
 ### Get a sessionSecretsModule by id

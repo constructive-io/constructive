@@ -12,8 +12,8 @@ csdk resources-resolved-requirement list --where.<field>.<op> <value> --orderBy 
 csdk resources-resolved-requirement list --limit 10 --after <cursor>
 csdk resources-resolved-requirement find-first --where.<field>.<op> <value>
 csdk resources-resolved-requirement get --id <UUID>
-csdk resources-resolved-requirement create --resourceId <UUID> --slug <String> --namespaceId <UUID> --requirementKind <String> --name <String> --required <Boolean> --atomId <UUID> --present <Boolean> --secretsObjectName <String> --configObjectName <String>
-csdk resources-resolved-requirement update --id <UUID> [--resourceId <UUID>] [--slug <String>] [--namespaceId <UUID>] [--requirementKind <String>] [--name <String>] [--required <Boolean>] [--atomId <UUID>] [--present <Boolean>] [--secretsObjectName <String>] [--configObjectName <String>]
+csdk resources-resolved-requirement create --atomId <UUID> --configObjectName <String> --name <String> --namespaceId <UUID> --present <Boolean> --required <Boolean> --requirementKind <String> --resourceId <UUID> --secretsObjectName <String> --slug <String>
+csdk resources-resolved-requirement update --id <UUID> [--atomId <UUID>] [--configObjectName <String>] [--name <String>] [--namespaceId <UUID>] [--present <Boolean>] [--required <Boolean>] [--requirementKind <String>] [--resourceId <UUID>] [--secretsObjectName <String>] [--slug <String>]
 csdk resources-resolved-requirement delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk resources-resolved-requirement list --where.id.equalTo <value> --orderBy ID
 ### Create a resourcesResolvedRequirement
 
 ```bash
-csdk resources-resolved-requirement create --resourceId <UUID> --slug <String> --namespaceId <UUID> --requirementKind <String> --name <String> --required <Boolean> --atomId <UUID> --present <Boolean> --secretsObjectName <String> --configObjectName <String>
+csdk resources-resolved-requirement create --atomId <UUID> --configObjectName <String> --name <String> --namespaceId <UUID> --present <Boolean> --required <Boolean> --requirementKind <String> --resourceId <UUID> --secretsObjectName <String> --slug <String>
 ```
 
 ### Get a resourcesResolvedRequirement by id

@@ -12,8 +12,8 @@ csdk emails-module list --where.<field>.<op> <value> --orderBy <values>
 csdk emails-module list --limit 10 --after <cursor>
 csdk emails-module find-first --where.<field>.<op> <value>
 csdk emails-module get --id <UUID>
-csdk emails-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
-csdk emails-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk emails-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
+csdk emails-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk emails-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk emails-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a emailsModule
 
 ```bash
-csdk emails-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
+csdk emails-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
 ```
 
 ### Get a emailsModule by id

@@ -9,7 +9,7 @@ ORM operations for FullTextSearch records
 ```typescript
 db.fullTextSearch.findMany({ select: { id: true } }).execute()
 db.fullTextSearch.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.fullTextSearch.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', fieldIds: '<UUID>', weights: '<String>', langs: '<String>', langColumn: '<String>' }, select: { id: true } }).execute()
+db.fullTextSearch.create({ data: { databaseId: '<UUID>', fieldId: '<UUID>', fieldIds: '<UUID>', langColumn: '<String>', langs: '<String>', tableId: '<UUID>', weights: '<String>' }, select: { id: true } }).execute()
 db.fullTextSearch.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.fullTextSearch.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.fullTextSearch.findMany({
 
 ```typescript
 const item = await db.fullTextSearch.create({
-  data: { databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', fieldIds: '<UUID>', weights: '<String>', langs: '<String>', langColumn: '<String>' },
+  data: { databaseId: '<UUID>', fieldId: '<UUID>', fieldIds: '<UUID>', langColumn: '<String>', langs: '<String>', tableId: '<UUID>', weights: '<String>' },
   select: { id: true }
 }).execute();
 ```

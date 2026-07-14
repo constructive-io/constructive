@@ -7,7 +7,7 @@ Execute the _secretsRotate mutation
 ## Usage
 
 ```bash
-csdk secrets-rotate --input.clientMutationId <String> --input.databaseId <UUID> --input.secretName <String> --input.secretValue <String> --input.namespaceId <UUID> --input.algo <String>
+csdk secrets-rotate --input.algo <String> --input.clientMutationId <String> --input.databaseId <UUID> --input.namespaceId <UUID> --input.secretName <String> --input.secretValue <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk secrets-rotate --input.clientMutationId <String> --input.databaseId <UUID> 
 ### Run _secretsRotate
 
 ```bash
-csdk secrets-rotate --input.clientMutationId <String> --input.databaseId <UUID> --input.secretName <String> --input.secretValue <String> --input.namespaceId <UUID> --input.algo <String>
+csdk secrets-rotate --input.algo <String> --input.clientMutationId <String> --input.databaseId <UUID> --input.namespaceId <UUID> --input.secretName <String> --input.secretValue <String>
 ```

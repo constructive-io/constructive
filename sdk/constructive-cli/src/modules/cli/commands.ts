@@ -6,84 +6,84 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
+import agentModuleCmd from './commands/agent-module';
+import billingModuleCmd from './commands/billing-module';
+import billingProviderModuleCmd from './commands/billing-provider-module';
+import blueprintCmd from './commands/blueprint';
+import blueprintConstructionCmd from './commands/blueprint-construction';
+import blueprintTemplateCmd from './commands/blueprint-template';
+import computeLogModuleCmd from './commands/compute-log-module';
+import configSecretsUserModuleCmd from './commands/config-secrets-user-module';
+import connectedAccountsModuleCmd from './commands/connected-accounts-module';
+import cryptoAddressesModuleCmd from './commands/crypto-addresses-module';
+import cryptoAuthModuleCmd from './commands/crypto-auth-module';
+import databaseProvisionModuleCmd from './commands/database-provision-module';
+import dbPoolConfigCmd from './commands/db-pool-config';
+import dbPoolCmd from './commands/db-pool';
+import dbPresetModuleCmd from './commands/db-preset-module';
+import dbUsageModuleCmd from './commands/db-usage-module';
 import defaultIdsModuleCmd from './commands/default-ids-module';
-import membershipTypesModuleCmd from './commands/membership-types-module';
-import sessionSecretsModuleCmd from './commands/session-secrets-module';
+import denormalizedTableFieldCmd from './commands/denormalized-table-field';
 import devicesModuleCmd from './commands/devices-module';
+import emailsModuleCmd from './commands/emails-module';
+import entityTypeProvisionCmd from './commands/entity-type-provision';
+import eventsModuleCmd from './commands/events-module';
+import functionDeploymentModuleCmd from './commands/function-deployment-module';
+import functionInvocationModuleCmd from './commands/function-invocation-module';
+import functionModuleCmd from './commands/function-module';
+import graphExecutionModuleCmd from './commands/graph-execution-module';
+import graphModuleCmd from './commands/graph-module';
+import hierarchyModuleCmd from './commands/hierarchy-module';
 import i18NModuleCmd from './commands/i-18-n-module';
+import identityProvidersModuleCmd from './commands/identity-providers-module';
+import inferenceLogModuleCmd from './commands/inference-log-module';
+import infraConfigModuleCmd from './commands/infra-config-module';
+import infraSecretsModuleCmd from './commands/infra-secrets-module';
+import integrationProvidersModuleCmd from './commands/integration-providers-module';
+import internalSecretsModuleCmd from './commands/internal-secrets-module';
+import invitesModuleCmd from './commands/invites-module';
+import limitsModuleCmd from './commands/limits-module';
+import membershipTypesModuleCmd from './commands/membership-types-module';
+import membershipsModuleCmd from './commands/memberships-module';
+import merkleStoreModuleCmd from './commands/merkle-store-module';
+import namespaceModuleCmd from './commands/namespace-module';
+import notificationsModuleCmd from './commands/notifications-module';
+import permissionsModuleCmd from './commands/permissions-module';
+import phoneNumbersModuleCmd from './commands/phone-numbers-module';
+import plansModuleCmd from './commands/plans-module';
+import principalAuthModuleCmd from './commands/principal-auth-module';
+import profilesModuleCmd from './commands/profiles-module';
+import rateLimitMetersModuleCmd from './commands/rate-limit-meters-module';
+import rateLimitsModuleCmd from './commands/rate-limits-module';
+import realtimeModuleCmd from './commands/realtime-module';
+import relationProvisionCmd from './commands/relation-provision';
+import resourceModuleCmd from './commands/resource-module';
+import rlsModuleCmd from './commands/rls-module';
+import secureTableProvisionCmd from './commands/secure-table-provision';
+import sessionSecretsModuleCmd from './commands/session-secrets-module';
+import sessionsModuleCmd from './commands/sessions-module';
+import storageLogModuleCmd from './commands/storage-log-module';
+import storageModuleCmd from './commands/storage-module';
+import transferLogModuleCmd from './commands/transfer-log-module';
+import userAuthModuleCmd from './commands/user-auth-module';
+import userCredentialsModuleCmd from './commands/user-credentials-module';
 import userSettingsModuleCmd from './commands/user-settings-module';
 import userStateModuleCmd from './commands/user-state-module';
-import userCredentialsModuleCmd from './commands/user-credentials-module';
-import connectedAccountsModuleCmd from './commands/connected-accounts-module';
-import emailsModuleCmd from './commands/emails-module';
-import phoneNumbersModuleCmd from './commands/phone-numbers-module';
-import rateLimitsModuleCmd from './commands/rate-limits-module';
 import usersModuleCmd from './commands/users-module';
-import webauthnCredentialsModuleCmd from './commands/webauthn-credentials-module';
-import configSecretsUserModuleCmd from './commands/config-secrets-user-module';
-import cryptoAddressesModuleCmd from './commands/crypto-addresses-module';
-import denormalizedTableFieldCmd from './commands/denormalized-table-field';
-import rlsModuleCmd from './commands/rls-module';
-import blueprintCmd from './commands/blueprint';
-import blueprintTemplateCmd from './commands/blueprint-template';
-import blueprintConstructionCmd from './commands/blueprint-construction';
-import cryptoAuthModuleCmd from './commands/crypto-auth-module';
-import sessionsModuleCmd from './commands/sessions-module';
-import secureTableProvisionCmd from './commands/secure-table-provision';
-import identityProvidersModuleCmd from './commands/identity-providers-module';
-import integrationProvidersModuleCmd from './commands/integration-providers-module';
-import dbPoolConfigCmd from './commands/db-pool-config';
-import realtimeModuleCmd from './commands/realtime-module';
-import infraSecretsModuleCmd from './commands/infra-secrets-module';
-import internalSecretsModuleCmd from './commands/internal-secrets-module';
-import dbPresetModuleCmd from './commands/db-preset-module';
-import graphModuleCmd from './commands/graph-module';
-import rateLimitMetersModuleCmd from './commands/rate-limit-meters-module';
-import infraConfigModuleCmd from './commands/infra-config-module';
 import webauthnAuthModuleCmd from './commands/webauthn-auth-module';
-import principalAuthModuleCmd from './commands/principal-auth-module';
-import dbPoolCmd from './commands/db-pool';
-import functionModuleCmd from './commands/function-module';
-import merkleStoreModuleCmd from './commands/merkle-store-module';
-import databaseProvisionModuleCmd from './commands/database-provision-module';
-import functionInvocationModuleCmd from './commands/function-invocation-module';
-import invitesModuleCmd from './commands/invites-module';
-import namespaceModuleCmd from './commands/namespace-module';
-import plansModuleCmd from './commands/plans-module';
-import computeLogModuleCmd from './commands/compute-log-module';
-import inferenceLogModuleCmd from './commands/inference-log-module';
-import storageLogModuleCmd from './commands/storage-log-module';
-import transferLogModuleCmd from './commands/transfer-log-module';
-import billingProviderModuleCmd from './commands/billing-provider-module';
-import functionDeploymentModuleCmd from './commands/function-deployment-module';
-import permissionsModuleCmd from './commands/permissions-module';
-import graphExecutionModuleCmd from './commands/graph-execution-module';
-import hierarchyModuleCmd from './commands/hierarchy-module';
-import notificationsModuleCmd from './commands/notifications-module';
-import relationProvisionCmd from './commands/relation-provision';
-import profilesModuleCmd from './commands/profiles-module';
-import billingModuleCmd from './commands/billing-module';
-import resourceModuleCmd from './commands/resource-module';
-import userAuthModuleCmd from './commands/user-auth-module';
-import dbUsageModuleCmd from './commands/db-usage-module';
-import agentModuleCmd from './commands/agent-module';
-import limitsModuleCmd from './commands/limits-module';
-import entityTypeProvisionCmd from './commands/entity-type-provision';
-import storageModuleCmd from './commands/storage-module';
-import membershipsModuleCmd from './commands/memberships-module';
-import eventsModuleCmd from './commands/events-module';
+import webauthnCredentialsModuleCmd from './commands/webauthn-credentials-module';
 import resolveBlueprintFieldCmd from './commands/resolve-blueprint-field';
 import resolveBlueprintTableCmd from './commands/resolve-blueprint-table';
 import constructBlueprintCmd from './commands/construct-blueprint';
+import copyTemplateToBlueprintCmd from './commands/copy-template-to-blueprint';
+import provisionBucketCmd from './commands/provision-bucket';
+import provisionCheckConstraintCmd from './commands/provision-check-constraint';
 import provisionFullTextSearchCmd from './commands/provision-full-text-search';
 import provisionIndexCmd from './commands/provision-index';
-import provisionCheckConstraintCmd from './commands/provision-check-constraint';
-import provisionUniqueConstraintCmd from './commands/provision-unique-constraint';
-import copyTemplateToBlueprintCmd from './commands/copy-template-to-blueprint';
+import provisionRelationCmd from './commands/provision-relation';
 import provisionSpatialRelationCmd from './commands/provision-spatial-relation';
 import provisionTableCmd from './commands/provision-table';
-import provisionRelationCmd from './commands/provision-relation';
-import provisionBucketCmd from './commands/provision-bucket';
+import provisionUniqueConstraintCmd from './commands/provision-unique-constraint';
 const createCommandMap: () => Record<
   string,
   (
@@ -94,87 +94,87 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
+  'agent-module': agentModuleCmd,
+  'billing-module': billingModuleCmd,
+  'billing-provider-module': billingProviderModuleCmd,
+  blueprint: blueprintCmd,
+  'blueprint-construction': blueprintConstructionCmd,
+  'blueprint-template': blueprintTemplateCmd,
+  'compute-log-module': computeLogModuleCmd,
+  'config-secrets-user-module': configSecretsUserModuleCmd,
+  'connected-accounts-module': connectedAccountsModuleCmd,
+  'crypto-addresses-module': cryptoAddressesModuleCmd,
+  'crypto-auth-module': cryptoAuthModuleCmd,
+  'database-provision-module': databaseProvisionModuleCmd,
+  'db-pool-config': dbPoolConfigCmd,
+  'db-pool': dbPoolCmd,
+  'db-preset-module': dbPresetModuleCmd,
+  'db-usage-module': dbUsageModuleCmd,
   'default-ids-module': defaultIdsModuleCmd,
-  'membership-types-module': membershipTypesModuleCmd,
-  'session-secrets-module': sessionSecretsModuleCmd,
+  'denormalized-table-field': denormalizedTableFieldCmd,
   'devices-module': devicesModuleCmd,
+  'emails-module': emailsModuleCmd,
+  'entity-type-provision': entityTypeProvisionCmd,
+  'events-module': eventsModuleCmd,
+  'function-deployment-module': functionDeploymentModuleCmd,
+  'function-invocation-module': functionInvocationModuleCmd,
+  'function-module': functionModuleCmd,
+  'graph-execution-module': graphExecutionModuleCmd,
+  'graph-module': graphModuleCmd,
+  'hierarchy-module': hierarchyModuleCmd,
   'i-18-n-module': i18NModuleCmd,
+  'identity-providers-module': identityProvidersModuleCmd,
+  'inference-log-module': inferenceLogModuleCmd,
+  'infra-config-module': infraConfigModuleCmd,
+  'infra-secrets-module': infraSecretsModuleCmd,
+  'integration-providers-module': integrationProvidersModuleCmd,
+  'internal-secrets-module': internalSecretsModuleCmd,
+  'invites-module': invitesModuleCmd,
+  'limits-module': limitsModuleCmd,
+  'membership-types-module': membershipTypesModuleCmd,
+  'memberships-module': membershipsModuleCmd,
+  'merkle-store-module': merkleStoreModuleCmd,
+  'namespace-module': namespaceModuleCmd,
+  'notifications-module': notificationsModuleCmd,
+  'permissions-module': permissionsModuleCmd,
+  'phone-numbers-module': phoneNumbersModuleCmd,
+  'plans-module': plansModuleCmd,
+  'principal-auth-module': principalAuthModuleCmd,
+  'profiles-module': profilesModuleCmd,
+  'rate-limit-meters-module': rateLimitMetersModuleCmd,
+  'rate-limits-module': rateLimitsModuleCmd,
+  'realtime-module': realtimeModuleCmd,
+  'relation-provision': relationProvisionCmd,
+  'resource-module': resourceModuleCmd,
+  'rls-module': rlsModuleCmd,
+  'secure-table-provision': secureTableProvisionCmd,
+  'session-secrets-module': sessionSecretsModuleCmd,
+  'sessions-module': sessionsModuleCmd,
+  'storage-log-module': storageLogModuleCmd,
+  'storage-module': storageModuleCmd,
+  'transfer-log-module': transferLogModuleCmd,
+  'user-auth-module': userAuthModuleCmd,
+  'user-credentials-module': userCredentialsModuleCmd,
   'user-settings-module': userSettingsModuleCmd,
   'user-state-module': userStateModuleCmd,
-  'user-credentials-module': userCredentialsModuleCmd,
-  'connected-accounts-module': connectedAccountsModuleCmd,
-  'emails-module': emailsModuleCmd,
-  'phone-numbers-module': phoneNumbersModuleCmd,
-  'rate-limits-module': rateLimitsModuleCmd,
   'users-module': usersModuleCmd,
-  'webauthn-credentials-module': webauthnCredentialsModuleCmd,
-  'config-secrets-user-module': configSecretsUserModuleCmd,
-  'crypto-addresses-module': cryptoAddressesModuleCmd,
-  'denormalized-table-field': denormalizedTableFieldCmd,
-  'rls-module': rlsModuleCmd,
-  blueprint: blueprintCmd,
-  'blueprint-template': blueprintTemplateCmd,
-  'blueprint-construction': blueprintConstructionCmd,
-  'crypto-auth-module': cryptoAuthModuleCmd,
-  'sessions-module': sessionsModuleCmd,
-  'secure-table-provision': secureTableProvisionCmd,
-  'identity-providers-module': identityProvidersModuleCmd,
-  'integration-providers-module': integrationProvidersModuleCmd,
-  'db-pool-config': dbPoolConfigCmd,
-  'realtime-module': realtimeModuleCmd,
-  'infra-secrets-module': infraSecretsModuleCmd,
-  'internal-secrets-module': internalSecretsModuleCmd,
-  'db-preset-module': dbPresetModuleCmd,
-  'graph-module': graphModuleCmd,
-  'rate-limit-meters-module': rateLimitMetersModuleCmd,
-  'infra-config-module': infraConfigModuleCmd,
   'webauthn-auth-module': webauthnAuthModuleCmd,
-  'principal-auth-module': principalAuthModuleCmd,
-  'db-pool': dbPoolCmd,
-  'function-module': functionModuleCmd,
-  'merkle-store-module': merkleStoreModuleCmd,
-  'database-provision-module': databaseProvisionModuleCmd,
-  'function-invocation-module': functionInvocationModuleCmd,
-  'invites-module': invitesModuleCmd,
-  'namespace-module': namespaceModuleCmd,
-  'plans-module': plansModuleCmd,
-  'compute-log-module': computeLogModuleCmd,
-  'inference-log-module': inferenceLogModuleCmd,
-  'storage-log-module': storageLogModuleCmd,
-  'transfer-log-module': transferLogModuleCmd,
-  'billing-provider-module': billingProviderModuleCmd,
-  'function-deployment-module': functionDeploymentModuleCmd,
-  'permissions-module': permissionsModuleCmd,
-  'graph-execution-module': graphExecutionModuleCmd,
-  'hierarchy-module': hierarchyModuleCmd,
-  'notifications-module': notificationsModuleCmd,
-  'relation-provision': relationProvisionCmd,
-  'profiles-module': profilesModuleCmd,
-  'billing-module': billingModuleCmd,
-  'resource-module': resourceModuleCmd,
-  'user-auth-module': userAuthModuleCmd,
-  'db-usage-module': dbUsageModuleCmd,
-  'agent-module': agentModuleCmd,
-  'limits-module': limitsModuleCmd,
-  'entity-type-provision': entityTypeProvisionCmd,
-  'storage-module': storageModuleCmd,
-  'memberships-module': membershipsModuleCmd,
-  'events-module': eventsModuleCmd,
+  'webauthn-credentials-module': webauthnCredentialsModuleCmd,
   'resolve-blueprint-field': resolveBlueprintFieldCmd,
   'resolve-blueprint-table': resolveBlueprintTableCmd,
   'construct-blueprint': constructBlueprintCmd,
+  'copy-template-to-blueprint': copyTemplateToBlueprintCmd,
+  'provision-bucket': provisionBucketCmd,
+  'provision-check-constraint': provisionCheckConstraintCmd,
   'provision-full-text-search': provisionFullTextSearchCmd,
   'provision-index': provisionIndexCmd,
-  'provision-check-constraint': provisionCheckConstraintCmd,
-  'provision-unique-constraint': provisionUniqueConstraintCmd,
-  'copy-template-to-blueprint': copyTemplateToBlueprintCmd,
+  'provision-relation': provisionRelationCmd,
   'provision-spatial-relation': provisionSpatialRelationCmd,
   'provision-table': provisionTableCmd,
-  'provision-relation': provisionRelationCmd,
-  'provision-bucket': provisionBucketCmd,
+  'provision-unique-constraint': provisionUniqueConstraintCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  default-ids-module   defaultIdsModule CRUD operations\n  membership-types-module membershipTypesModule CRUD operations\n  session-secrets-module sessionSecretsModule CRUD operations\n  devices-module       devicesModule CRUD operations\n  i-18-n-module        i18NModule CRUD operations\n  user-settings-module userSettingsModule CRUD operations\n  user-state-module    userStateModule CRUD operations\n  user-credentials-module userCredentialsModule CRUD operations\n  connected-accounts-module connectedAccountsModule CRUD operations\n  emails-module        emailsModule CRUD operations\n  phone-numbers-module phoneNumbersModule CRUD operations\n  rate-limits-module   rateLimitsModule CRUD operations\n  users-module         usersModule CRUD operations\n  webauthn-credentials-module webauthnCredentialsModule CRUD operations\n  config-secrets-user-module configSecretsUserModule CRUD operations\n  crypto-addresses-module cryptoAddressesModule CRUD operations\n  denormalized-table-field denormalizedTableField CRUD operations\n  rls-module           rlsModule CRUD operations\n  blueprint            blueprint CRUD operations\n  blueprint-template   blueprintTemplate CRUD operations\n  blueprint-construction blueprintConstruction CRUD operations\n  crypto-auth-module   cryptoAuthModule CRUD operations\n  sessions-module      sessionsModule CRUD operations\n  secure-table-provision secureTableProvision CRUD operations\n  identity-providers-module identityProvidersModule CRUD operations\n  integration-providers-module integrationProvidersModule CRUD operations\n  db-pool-config       dbPoolConfig CRUD operations\n  realtime-module      realtimeModule CRUD operations\n  infra-secrets-module infraSecretsModule CRUD operations\n  internal-secrets-module internalSecretsModule CRUD operations\n  db-preset-module     dbPresetModule CRUD operations\n  graph-module         graphModule CRUD operations\n  rate-limit-meters-module rateLimitMetersModule CRUD operations\n  infra-config-module  infraConfigModule CRUD operations\n  webauthn-auth-module webauthnAuthModule CRUD operations\n  principal-auth-module principalAuthModule CRUD operations\n  db-pool              dbPool CRUD operations\n  function-module      functionModule CRUD operations\n  merkle-store-module  merkleStoreModule CRUD operations\n  database-provision-module databaseProvisionModule CRUD operations\n  function-invocation-module functionInvocationModule CRUD operations\n  invites-module       invitesModule CRUD operations\n  namespace-module     namespaceModule CRUD operations\n  plans-module         plansModule CRUD operations\n  compute-log-module   computeLogModule CRUD operations\n  inference-log-module inferenceLogModule CRUD operations\n  storage-log-module   storageLogModule CRUD operations\n  transfer-log-module  transferLogModule CRUD operations\n  billing-provider-module billingProviderModule CRUD operations\n  function-deployment-module functionDeploymentModule CRUD operations\n  permissions-module   permissionsModule CRUD operations\n  graph-execution-module graphExecutionModule CRUD operations\n  hierarchy-module     hierarchyModule CRUD operations\n  notifications-module notificationsModule CRUD operations\n  relation-provision   relationProvision CRUD operations\n  profiles-module      profilesModule CRUD operations\n  billing-module       billingModule CRUD operations\n  resource-module      resourceModule CRUD operations\n  user-auth-module     userAuthModule CRUD operations\n  db-usage-module      dbUsageModule CRUD operations\n  agent-module         agentModule CRUD operations\n  limits-module        limitsModule CRUD operations\n  entity-type-provision entityTypeProvision CRUD operations\n  storage-module       storageModule CRUD operations\n  memberships-module   membershipsModule CRUD operations\n  events-module        eventsModule CRUD operations\n  resolve-blueprint-field Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. \"location\") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.\n  resolve-blueprint-table Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.\n  construct-blueprint  Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry \u2014 provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] \u2014 resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.\n  provision-full-text-search Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.\n  provision-index      Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.\n  provision-check-constraint Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.\n  provision-unique-constraint Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.\n  copy-template-to-blueprint Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.\n  provision-spatial-relation Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin \u2194 param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist \u2014 this is a metadata-only insert.\n  provision-table      Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).\n  provision-relation   Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  agent-module         agentModule CRUD operations\n  billing-module       billingModule CRUD operations\n  billing-provider-module billingProviderModule CRUD operations\n  blueprint            blueprint CRUD operations\n  blueprint-construction blueprintConstruction CRUD operations\n  blueprint-template   blueprintTemplate CRUD operations\n  compute-log-module   computeLogModule CRUD operations\n  config-secrets-user-module configSecretsUserModule CRUD operations\n  connected-accounts-module connectedAccountsModule CRUD operations\n  crypto-addresses-module cryptoAddressesModule CRUD operations\n  crypto-auth-module   cryptoAuthModule CRUD operations\n  database-provision-module databaseProvisionModule CRUD operations\n  db-pool-config       dbPoolConfig CRUD operations\n  db-pool              dbPool CRUD operations\n  db-preset-module     dbPresetModule CRUD operations\n  db-usage-module      dbUsageModule CRUD operations\n  default-ids-module   defaultIdsModule CRUD operations\n  denormalized-table-field denormalizedTableField CRUD operations\n  devices-module       devicesModule CRUD operations\n  emails-module        emailsModule CRUD operations\n  entity-type-provision entityTypeProvision CRUD operations\n  events-module        eventsModule CRUD operations\n  function-deployment-module functionDeploymentModule CRUD operations\n  function-invocation-module functionInvocationModule CRUD operations\n  function-module      functionModule CRUD operations\n  graph-execution-module graphExecutionModule CRUD operations\n  graph-module         graphModule CRUD operations\n  hierarchy-module     hierarchyModule CRUD operations\n  i-18-n-module        i18NModule CRUD operations\n  identity-providers-module identityProvidersModule CRUD operations\n  inference-log-module inferenceLogModule CRUD operations\n  infra-config-module  infraConfigModule CRUD operations\n  infra-secrets-module infraSecretsModule CRUD operations\n  integration-providers-module integrationProvidersModule CRUD operations\n  internal-secrets-module internalSecretsModule CRUD operations\n  invites-module       invitesModule CRUD operations\n  limits-module        limitsModule CRUD operations\n  membership-types-module membershipTypesModule CRUD operations\n  memberships-module   membershipsModule CRUD operations\n  merkle-store-module  merkleStoreModule CRUD operations\n  namespace-module     namespaceModule CRUD operations\n  notifications-module notificationsModule CRUD operations\n  permissions-module   permissionsModule CRUD operations\n  phone-numbers-module phoneNumbersModule CRUD operations\n  plans-module         plansModule CRUD operations\n  principal-auth-module principalAuthModule CRUD operations\n  profiles-module      profilesModule CRUD operations\n  rate-limit-meters-module rateLimitMetersModule CRUD operations\n  rate-limits-module   rateLimitsModule CRUD operations\n  realtime-module      realtimeModule CRUD operations\n  relation-provision   relationProvision CRUD operations\n  resource-module      resourceModule CRUD operations\n  rls-module           rlsModule CRUD operations\n  secure-table-provision secureTableProvision CRUD operations\n  session-secrets-module sessionSecretsModule CRUD operations\n  sessions-module      sessionsModule CRUD operations\n  storage-log-module   storageLogModule CRUD operations\n  storage-module       storageModule CRUD operations\n  transfer-log-module  transferLogModule CRUD operations\n  user-auth-module     userAuthModule CRUD operations\n  user-credentials-module userCredentialsModule CRUD operations\n  user-settings-module userSettingsModule CRUD operations\n  user-state-module    userStateModule CRUD operations\n  users-module         usersModule CRUD operations\n  webauthn-auth-module webauthnAuthModule CRUD operations\n  webauthn-credentials-module webauthnCredentialsModule CRUD operations\n  resolve-blueprint-field Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. \"location\") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.\n  resolve-blueprint-table Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.\n  construct-blueprint  Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry \u2014 provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] \u2014 resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.\n  copy-template-to-blueprint Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  provision-check-constraint Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.\n  provision-full-text-search Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.\n  provision-index      Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.\n  provision-relation   Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).\n  provision-spatial-relation Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin \u2194 param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist \u2014 this is a metadata-only insert.\n  provision-table      Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).\n  provision-unique-constraint Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

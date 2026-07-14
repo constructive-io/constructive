@@ -7,8 +7,8 @@ Tracks database provisioning requests and their status. The BEFORE INSERT trigge
 ## Usage
 
 ```typescript
-useDatabaseProvisionModulesQuery({ selection: { fields: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, sourceDatabaseId: true, bootstrapStatus: true, bootstrapError: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true, fulfilledAt: true } } })
-useDatabaseProvisionModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, sourceDatabaseId: true, bootstrapStatus: true, bootstrapError: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true, fulfilledAt: true } } })
+useDatabaseProvisionModulesQuery({ selection: { fields: { bootstrapError: true, bootstrapStatus: true, bootstrapUser: true, completedAt: true, createdAt: true, databaseId: true, databaseName: true, domain: true, errorMessage: true, fulfilledAt: true, id: true, modules: true, options: true, ownerId: true, sourceDatabaseId: true, status: true, subdomain: true, updatedAt: true } } })
+useDatabaseProvisionModuleQuery({ id: '<UUID>', selection: { fields: { bootstrapError: true, bootstrapStatus: true, bootstrapUser: true, completedAt: true, createdAt: true, databaseId: true, databaseName: true, domain: true, errorMessage: true, fulfilledAt: true, id: true, modules: true, options: true, ownerId: true, sourceDatabaseId: true, status: true, subdomain: true, updatedAt: true } } })
 useCreateDatabaseProvisionModuleMutation({ selection: { fields: { id: true } } })
 useUpdateDatabaseProvisionModuleMutation({ selection: { fields: { id: true } } })
 useDeleteDatabaseProvisionModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteDatabaseProvisionModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useDatabaseProvisionModulesQuery({
-  selection: { fields: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, sourceDatabaseId: true, bootstrapStatus: true, bootstrapError: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true, fulfilledAt: true } },
+  selection: { fields: { bootstrapError: true, bootstrapStatus: true, bootstrapUser: true, completedAt: true, createdAt: true, databaseId: true, databaseName: true, domain: true, errorMessage: true, fulfilledAt: true, id: true, modules: true, options: true, ownerId: true, sourceDatabaseId: true, status: true, subdomain: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDatabaseProvisionModulesQuery({
 const { mutate } = useCreateDatabaseProvisionModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseName: '<String>', ownerId: '<UUID>', subdomain: '<String>', domain: '<String>', modules: '<JSON>', options: '<JSON>', bootstrapUser: '<Boolean>', status: '<String>', errorMessage: '<String>', sourceDatabaseId: '<UUID>', bootstrapStatus: '<String>', bootstrapError: '<String>', databaseId: '<UUID>', completedAt: '<Datetime>', fulfilledAt: '<Datetime>' });
+mutate({ bootstrapError: '<String>', bootstrapStatus: '<String>', bootstrapUser: '<Boolean>', completedAt: '<Datetime>', databaseId: '<UUID>', databaseName: '<String>', domain: '<String>', errorMessage: '<String>', fulfilledAt: '<Datetime>', modules: '<JSON>', options: '<JSON>', ownerId: '<UUID>', sourceDatabaseId: '<UUID>', status: '<String>', subdomain: '<String>' });
 ```

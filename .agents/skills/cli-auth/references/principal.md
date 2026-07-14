@@ -12,8 +12,8 @@ csdk principal list --where.<field>.<op> <value> --orderBy <values>
 csdk principal list --limit 10 --after <cursor>
 csdk principal find-first --where.<field>.<op> <value>
 csdk principal get --principalId <UUID>
-csdk principal create --id <UUID> --ownerId <UUID> --userId <UUID> --name <String> --useAdminOwner <Boolean> --isReadOnly <Boolean> --bypassStepUp <Boolean>
-csdk principal update --principalId <UUID> [--id <UUID>] [--ownerId <UUID>] [--userId <UUID>] [--name <String>] [--useAdminOwner <Boolean>] [--isReadOnly <Boolean>] [--bypassStepUp <Boolean>]
+csdk principal create --bypassStepUp <Boolean> --id <UUID> --isReadOnly <Boolean> --name <String> --ownerId <UUID> --useAdminOwner <Boolean> --userId <UUID>
+csdk principal update --principalId <UUID> [--bypassStepUp <Boolean>] [--id <UUID>] [--isReadOnly <Boolean>] [--name <String>] [--ownerId <UUID>] [--useAdminOwner <Boolean>] [--userId <UUID>]
 csdk principal delete --principalId <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk principal list --where.principalId.equalTo <value> --orderBy PRINCIPAL_ID_A
 ### Create a principal
 
 ```bash
-csdk principal create --id <UUID> --ownerId <UUID> --userId <UUID> --name <String> --useAdminOwner <Boolean> --isReadOnly <Boolean> --bypassStepUp <Boolean>
+csdk principal create --bypassStepUp <Boolean> --id <UUID> --isReadOnly <Boolean> --name <String> --ownerId <UUID> --useAdminOwner <Boolean> --userId <UUID>
 ```
 
 ### Get a principal by principalId

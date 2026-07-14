@@ -7,8 +7,8 @@ Per-preset configuration for the warm database pool: sizing, TTL, and the platfo
 ## Usage
 
 ```typescript
-useDbPoolConfigsQuery({ selection: { fields: { id: true, presetSlug: true, domain: true, poolOwnerId: true, min: true, max: true, warmTtl: true, enabled: true, createdAt: true, updatedAt: true } } })
-useDbPoolConfigQuery({ id: '<UUID>', selection: { fields: { id: true, presetSlug: true, domain: true, poolOwnerId: true, min: true, max: true, warmTtl: true, enabled: true, createdAt: true, updatedAt: true } } })
+useDbPoolConfigsQuery({ selection: { fields: { createdAt: true, domain: true, enabled: true, id: true, max: true, min: true, poolOwnerId: true, presetSlug: true, updatedAt: true, warmTtl: true } } })
+useDbPoolConfigQuery({ id: '<UUID>', selection: { fields: { createdAt: true, domain: true, enabled: true, id: true, max: true, min: true, poolOwnerId: true, presetSlug: true, updatedAt: true, warmTtl: true } } })
 useCreateDbPoolConfigMutation({ selection: { fields: { id: true } } })
 useUpdateDbPoolConfigMutation({ selection: { fields: { id: true } } })
 useDeleteDbPoolConfigMutation({})
@@ -20,7 +20,7 @@ useDeleteDbPoolConfigMutation({})
 
 ```typescript
 const { data, isLoading } = useDbPoolConfigsQuery({
-  selection: { fields: { id: true, presetSlug: true, domain: true, poolOwnerId: true, min: true, max: true, warmTtl: true, enabled: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, domain: true, enabled: true, id: true, max: true, min: true, poolOwnerId: true, presetSlug: true, updatedAt: true, warmTtl: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDbPoolConfigsQuery({
 const { mutate } = useCreateDbPoolConfigMutation({
   selection: { fields: { id: true } },
 });
-mutate({ presetSlug: '<String>', domain: '<String>', poolOwnerId: '<UUID>', min: '<Int>', max: '<Int>', warmTtl: '<Interval>', enabled: '<Boolean>' });
+mutate({ domain: '<String>', enabled: '<Boolean>', max: '<Int>', min: '<Int>', poolOwnerId: '<UUID>', presetSlug: '<String>', warmTtl: '<Interval>' });
 ```

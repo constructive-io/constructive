@@ -7,8 +7,8 @@ Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 ## Usage
 
 ```typescript
-useInfraObjectsQuery({ selection: { fields: { id: true, scopeId: true, kids: true, ktree: true, data: true, createdAt: true } } })
-useInfraObjectQuery({ id: '<UUID>', selection: { fields: { id: true, scopeId: true, kids: true, ktree: true, data: true, createdAt: true } } })
+useInfraObjectsQuery({ selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } } })
+useInfraObjectQuery({ id: '<UUID>', selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } } })
 useCreateInfraObjectMutation({ selection: { fields: { id: true } } })
 useUpdateInfraObjectMutation({ selection: { fields: { id: true } } })
 useDeleteInfraObjectMutation({})
@@ -20,7 +20,7 @@ useDeleteInfraObjectMutation({})
 
 ```typescript
 const { data, isLoading } = useInfraObjectsQuery({
-  selection: { fields: { id: true, scopeId: true, kids: true, ktree: true, data: true, createdAt: true } },
+  selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useInfraObjectsQuery({
 const { mutate } = useCreateInfraObjectMutation({
   selection: { fields: { id: true } },
 });
-mutate({ scopeId: '<UUID>', kids: '<UUID>', ktree: '<String>', data: '<JSON>' });
+mutate({ data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' });
 ```

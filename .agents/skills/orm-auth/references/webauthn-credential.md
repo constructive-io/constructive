@@ -9,8 +9,8 @@ WebAuthn/passkey credentials owned by users. One row per registered authenticato
 ```typescript
 db.webauthnCredential.findMany({ select: { id: true } }).execute()
 db.webauthnCredential.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.webauthnCredential.create({ data: { ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', webauthnUserId: '<String>', transports: '<String>', credentialDeviceType: '<String>', backupEligible: '<Boolean>', backupState: '<Boolean>', name: '<String>', lastUsedAt: '<Datetime>' }, select: { id: true } }).execute()
-db.webauthnCredential.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.webauthnCredential.create({ data: { backupEligible: '<Boolean>', backupState: '<Boolean>', credentialDeviceType: '<String>', credentialId: '<String>', lastUsedAt: '<Datetime>', name: '<String>', ownerId: '<UUID>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', transports: '<String>', webauthnUserId: '<String>' }, select: { id: true } }).execute()
+db.webauthnCredential.update({ where: { id: '<UUID>' }, data: { backupEligible: '<Boolean>' }, select: { id: true } }).execute()
 db.webauthnCredential.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.webauthnCredential.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.webauthnCredential.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, backupEligible: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.webauthnCredential.findMany({
 
 ```typescript
 const item = await db.webauthnCredential.create({
-  data: { ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', webauthnUserId: '<String>', transports: '<String>', credentialDeviceType: '<String>', backupEligible: '<Boolean>', backupState: '<Boolean>', name: '<String>', lastUsedAt: '<Datetime>' },
+  data: { backupEligible: '<Boolean>', backupState: '<Boolean>', credentialDeviceType: '<String>', credentialId: '<String>', lastUsedAt: '<Datetime>', name: '<String>', ownerId: '<UUID>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', transports: '<String>', webauthnUserId: '<String>' },
   select: { id: true }
 }).execute();
 ```

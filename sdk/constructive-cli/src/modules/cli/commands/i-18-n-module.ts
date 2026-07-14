@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  schemaId: 'uuid',
-  privateSchemaId: 'uuid',
-  settingsTableId: 'uuid',
   apiName: 'string',
+  databaseId: 'uuid',
+  id: 'uuid',
   privateApiName: 'string',
+  privateSchemaId: 'uuid',
+  schemaId: 'uuid',
+  settingsTableId: 'uuid',
 };
 const usage =
   '\ni-18-n-module <command>\n\nCommands:\n  list                  List i18NModule records\n  find-first            Find first matching i18NModule record\n  get                   Get a i18NModule by ID\n  create                Create a new i18NModule\n  update                Update an existing i18NModule\n  delete                Delete a i18NModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,13 +75,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      schemaId: true,
-      privateSchemaId: true,
-      settingsTableId: true,
       apiName: true,
+      databaseId: true,
+      id: true,
       privateApiName: true,
+      privateSchemaId: true,
+      schemaId: true,
+      settingsTableId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<I18NModuleSelect, I18NModuleFilter, I18NModuleOrderBy> & {
@@ -102,13 +102,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      schemaId: true,
-      privateSchemaId: true,
-      settingsTableId: true,
       apiName: true,
+      databaseId: true,
+      id: true,
       privateApiName: true,
+      privateSchemaId: true,
+      schemaId: true,
+      settingsTableId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<I18NModuleSelect, I18NModuleFilter, I18NModuleOrderBy> & {
@@ -141,13 +141,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
-          privateSchemaId: true,
-          settingsTableId: true,
           apiName: true,
+          databaseId: true,
+          id: true,
           privateApiName: true,
+          privateSchemaId: true,
+          schemaId: true,
+          settingsTableId: true,
         },
       })
       .execute();
@@ -165,14 +165,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'apiName',
+        message: 'apiName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'privateApiName',
+        message: 'privateApiName',
         required: false,
         skipPrompt: true,
       },
@@ -185,22 +192,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'schemaId',
+        message: 'schemaId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'settingsTableId',
         message: 'settingsTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'apiName',
-        message: 'apiName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'privateApiName',
-        message: 'privateApiName',
         required: false,
         skipPrompt: true,
       },
@@ -211,21 +211,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.i18NModule
       .create({
         data: {
-          databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
-          privateSchemaId: cleanedData.privateSchemaId,
-          settingsTableId: cleanedData.settingsTableId,
           apiName: cleanedData.apiName,
+          databaseId: cleanedData.databaseId,
           privateApiName: cleanedData.privateApiName,
+          privateSchemaId: cleanedData.privateSchemaId,
+          schemaId: cleanedData.schemaId,
+          settingsTableId: cleanedData.settingsTableId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
-          privateSchemaId: true,
-          settingsTableId: true,
           apiName: true,
+          databaseId: true,
+          id: true,
           privateApiName: true,
+          privateSchemaId: true,
+          schemaId: true,
+          settingsTableId: true,
         },
       })
       .execute();
@@ -249,14 +249,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'apiName',
+        message: 'apiName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'privateApiName',
+        message: 'privateApiName',
         required: false,
         skipPrompt: true,
       },
@@ -269,22 +276,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'schemaId',
+        message: 'schemaId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'settingsTableId',
         message: 'settingsTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'apiName',
-        message: 'apiName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'privateApiName',
-        message: 'privateApiName',
         required: false,
         skipPrompt: true,
       },
@@ -298,21 +298,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
-          privateSchemaId: cleanedData.privateSchemaId,
-          settingsTableId: cleanedData.settingsTableId,
           apiName: cleanedData.apiName,
+          databaseId: cleanedData.databaseId,
           privateApiName: cleanedData.privateApiName,
+          privateSchemaId: cleanedData.privateSchemaId,
+          schemaId: cleanedData.schemaId,
+          settingsTableId: cleanedData.settingsTableId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
-          privateSchemaId: true,
-          settingsTableId: true,
           apiName: true,
+          databaseId: true,
+          id: true,
           privateApiName: true,
+          privateSchemaId: true,
+          schemaId: true,
+          settingsTableId: true,
         },
       })
       .execute();

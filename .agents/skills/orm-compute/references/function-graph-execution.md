@@ -9,8 +9,8 @@ Ephemeral execution state for flow graph evaluation
 ```typescript
 db.functionGraphExecution.findMany({ select: { id: true } }).execute()
 db.functionGraphExecution.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionGraphExecution.create({ data: { startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', scopeId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', lastProgressAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' }, select: { id: true } }).execute()
-db.functionGraphExecution.update({ where: { id: '<UUID>' }, data: { startedAt: '<Datetime>' }, select: { id: true } }).execute()
+db.functionGraphExecution.create({ data: { completedAt: '<Datetime>', currentWave: '<Int>', definitionsCommitId: '<UUID>', errorCode: '<String>', errorMessage: '<String>', executionPlan: '<JSON>', graphId: '<UUID>', inputPayload: '<JSON>', invocationId: '<UUID>', lastProgressAt: '<Datetime>', maxPendingJobs: '<Int>', maxTicks: '<Int>', nodeOutputs: '<JSON>', outputNode: '<String>', outputPayload: '<JSON>', outputPort: '<String>', parentExecutionId: '<UUID>', parentNodeName: '<String>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>', tickCount: '<Int>', timeoutAt: '<Datetime>' }, select: { id: true } }).execute()
+db.functionGraphExecution.update({ where: { id: '<UUID>' }, data: { completedAt: '<Datetime>' }, select: { id: true } }).execute()
 db.functionGraphExecution.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.functionGraphExecution.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.functionGraphExecution.findMany({
-  select: { id: true, startedAt: true }
+  select: { id: true, completedAt: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.functionGraphExecution.findMany({
 
 ```typescript
 const item = await db.functionGraphExecution.create({
-  data: { startedAt: '<Datetime>', graphId: '<UUID>', invocationId: '<UUID>', scopeId: '<UUID>', outputNode: '<String>', outputPort: '<String>', status: '<String>', inputPayload: '<JSON>', outputPayload: '<JSON>', nodeOutputs: '<JSON>', executionPlan: '<JSON>', currentWave: '<Int>', parentExecutionId: '<UUID>', parentNodeName: '<String>', definitionsCommitId: '<UUID>', tickCount: '<Int>', completedAt: '<Datetime>', maxTicks: '<Int>', maxPendingJobs: '<Int>', timeoutAt: '<Datetime>', lastProgressAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>' },
+  data: { completedAt: '<Datetime>', currentWave: '<Int>', definitionsCommitId: '<UUID>', errorCode: '<String>', errorMessage: '<String>', executionPlan: '<JSON>', graphId: '<UUID>', inputPayload: '<JSON>', invocationId: '<UUID>', lastProgressAt: '<Datetime>', maxPendingJobs: '<Int>', maxTicks: '<Int>', nodeOutputs: '<JSON>', outputNode: '<String>', outputPayload: '<JSON>', outputPort: '<String>', parentExecutionId: '<UUID>', parentNodeName: '<String>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>', tickCount: '<Int>', timeoutAt: '<Datetime>' },
   select: { id: true }
 }).execute();
 ```

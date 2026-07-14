@@ -7,8 +7,8 @@ Organizational chart edges defining parent-child reporting relationships between
 ## Usage
 
 ```typescript
-useOrgChartEdgesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } } })
-useOrgChartEdgeQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } } })
+useOrgChartEdgesQuery({ selection: { fields: { childId: true, createdAt: true, entityId: true, id: true, parentId: true, positionLevel: true, positionTitle: true, updatedAt: true } } })
+useOrgChartEdgeQuery({ id: '<UUID>', selection: { fields: { childId: true, createdAt: true, entityId: true, id: true, parentId: true, positionLevel: true, positionTitle: true, updatedAt: true } } })
 useCreateOrgChartEdgeMutation({ selection: { fields: { id: true } } })
 useUpdateOrgChartEdgeMutation({ selection: { fields: { id: true } } })
 useDeleteOrgChartEdgeMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgChartEdgeMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgChartEdgesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
+  selection: { fields: { childId: true, createdAt: true, entityId: true, id: true, parentId: true, positionLevel: true, positionTitle: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgChartEdgesQuery({
 const { mutate } = useCreateOrgChartEdgeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', positionTitle: '<String>', positionLevel: '<Int>' });
+mutate({ childId: '<UUID>', entityId: '<UUID>', parentId: '<UUID>', positionLevel: '<Int>', positionTitle: '<String>' });
 ```

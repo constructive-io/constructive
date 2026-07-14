@@ -7,7 +7,7 @@ Execute the _secretsDel mutation
 ## Usage
 
 ```typescript
-db.mutation._secretsDel({ input: { databaseId: '<UUID>', secretName: '<String>', namespaceId: '<UUID>' } }).execute()
+db.mutation._secretsDel({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation._secretsDel({ input: { databaseId: '<UUID>', secretName: '<String>',
 ### Run _secretsDel
 
 ```typescript
-const result = await db.mutation._secretsDel({ input: { databaseId: '<UUID>', secretName: '<String>', namespaceId: '<UUID>' } }).execute();
+const result = await db.mutation._secretsDel({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretName: '<String>' } }).execute();
 ```

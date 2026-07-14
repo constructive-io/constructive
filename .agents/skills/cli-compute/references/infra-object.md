@@ -12,8 +12,8 @@ csdk infra-object list --where.<field>.<op> <value> --orderBy <values>
 csdk infra-object list --limit 10 --after <cursor>
 csdk infra-object find-first --where.<field>.<op> <value>
 csdk infra-object get --id <UUID>
-csdk infra-object create --scopeId <UUID> [--kids <UUID>] [--ktree <String>] [--data <JSON>]
-csdk infra-object update --id <UUID> [--scopeId <UUID>] [--kids <UUID>] [--ktree <String>] [--data <JSON>]
+csdk infra-object create --scopeId <UUID> [--data <JSON>] [--kids <UUID>] [--ktree <String>]
+csdk infra-object update --id <UUID> [--data <JSON>] [--kids <UUID>] [--ktree <String>] [--scopeId <UUID>]
 csdk infra-object delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk infra-object list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a infraObject
 
 ```bash
-csdk infra-object create --scopeId <UUID> [--kids <UUID>] [--ktree <String>] [--data <JSON>]
+csdk infra-object create --scopeId <UUID> [--data <JSON>] [--kids <UUID>] [--ktree <String>]
 ```
 
 ### Get a infraObject by id

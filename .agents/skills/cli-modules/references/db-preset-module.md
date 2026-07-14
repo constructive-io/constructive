@@ -12,8 +12,8 @@ csdk db-preset-module list --where.<field>.<op> <value> --orderBy <values>
 csdk db-preset-module list --limit 10 --after <cursor>
 csdk db-preset-module find-first --where.<field>.<op> <value>
 csdk db-preset-module get --id <UUID>
-csdk db-preset-module create --databaseId <UUID> --scope <String> --prefix <String> --merkleStoreModuleId <UUID> --storeName <String> [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--dbPresetsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>]
-csdk db-preset-module update --id <UUID> [--databaseId <UUID>] [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--scope <String>] [--prefix <String>] [--merkleStoreModuleId <UUID>] [--dbPresetsTableId <UUID>] [--storeName <String>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>]
+csdk db-preset-module create --databaseId <UUID> --merkleStoreModuleId <UUID> --prefix <String> --scope <String> --storeName <String> [--apiName <String>] [--dbPresetsTableId <UUID>] [--entityTableId <UUID>] [--policies <JSON>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaId <UUID>] [--publicSchemaName <String>]
+csdk db-preset-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--dbPresetsTableId <UUID>] [--entityTableId <UUID>] [--merkleStoreModuleId <UUID>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaId <UUID>] [--publicSchemaName <String>] [--scope <String>] [--storeName <String>]
 csdk db-preset-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk db-preset-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a dbPresetModule
 
 ```bash
-csdk db-preset-module create --databaseId <UUID> --scope <String> --prefix <String> --merkleStoreModuleId <UUID> --storeName <String> [--publicSchemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--dbPresetsTableId <UUID>] [--apiName <String>] [--privateApiName <String>] [--entityTableId <UUID>] [--policies <JSON>] [--provisions <JSON>]
+csdk db-preset-module create --databaseId <UUID> --merkleStoreModuleId <UUID> --prefix <String> --scope <String> --storeName <String> [--apiName <String>] [--dbPresetsTableId <UUID>] [--entityTableId <UUID>] [--policies <JSON>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaId <UUID>] [--publicSchemaName <String>]
 ```
 
 ### Get a dbPresetModule by id

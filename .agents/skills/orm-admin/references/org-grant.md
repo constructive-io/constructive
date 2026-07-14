@@ -9,8 +9,8 @@ Records of individual permission grants and revocations for members via bitmask
 ```typescript
 db.orgGrant.findMany({ select: { id: true } }).execute()
 db.orgGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgGrant.create({ data: { permissions: '<BitString>', isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' }, select: { id: true } }).execute()
-db.orgGrant.update({ where: { id: '<UUID>' }, data: { permissions: '<BitString>' }, select: { id: true } }).execute()
+db.orgGrant.create({ data: { actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' }, select: { id: true } }).execute()
+db.orgGrant.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.orgGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgGrant.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgGrant.findMany({
-  select: { id: true, permissions: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgGrant.findMany({
 
 ```typescript
 const item = await db.orgGrant.create({
-  data: { permissions: '<BitString>', isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' },
+  data: { actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissions: '<BitString>' },
   select: { id: true }
 }).execute();
 ```

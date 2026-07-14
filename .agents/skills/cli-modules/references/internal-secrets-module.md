@@ -12,8 +12,8 @@ csdk internal-secrets-module list --where.<field>.<op> <value> --orderBy <values
 csdk internal-secrets-module list --limit 10 --after <cursor>
 csdk internal-secrets-module find-first --where.<field>.<op> <value>
 csdk internal-secrets-module get --id <UUID>
-csdk internal-secrets-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--internalSecretsTableId <UUID>] [--internalSecretsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--entityField <String>] [--policies <JSON>] [--provisions <JSON>]
-csdk internal-secrets-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--internalSecretsTableId <UUID>] [--internalSecretsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--entityField <String>] [--policies <JSON>] [--provisions <JSON>]
+csdk internal-secrets-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--internalSecretsTableId <UUID>] [--internalSecretsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
+csdk internal-secrets-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--entityField <String>] [--entityTableId <UUID>] [--internalSecretsTableId <UUID>] [--internalSecretsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
 csdk internal-secrets-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk internal-secrets-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a internalSecretsModule
 
 ```bash
-csdk internal-secrets-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--internalSecretsTableId <UUID>] [--internalSecretsTableName <String>] [--apiName <String>] [--privateApiName <String>] [--scope <String>] [--prefix <String>] [--entityTableId <UUID>] [--entityField <String>] [--policies <JSON>] [--provisions <JSON>]
+csdk internal-secrets-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--entityTableId <UUID>] [--internalSecretsTableId <UUID>] [--internalSecretsTableName <String>] [--policies <JSON>] [--prefix <String>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--provisions <JSON>] [--publicSchemaName <String>] [--schemaId <UUID>] [--scope <String>]
 ```
 
 ### Get a internalSecretsModule by id

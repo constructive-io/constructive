@@ -7,7 +7,7 @@ Execute the infraInsertNodeAtPath mutation
 ## Usage
 
 ```bash
-csdk infra-insert-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk infra-insert-node-at-path --input.clientMutationId <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String> --input.path <String> --input.root <UUID> --input.sId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk infra-insert-node-at-path --input.clientMutationId <String> --input.sId <UU
 ### Run infraInsertNodeAtPath
 
 ```bash
-csdk infra-insert-node-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String>
+csdk infra-insert-node-at-path --input.clientMutationId <String> --input.data <JSON> --input.kids <UUID> --input.ktree <String> --input.path <String> --input.root <UUID> --input.sId <UUID>
 ```

@@ -9,8 +9,8 @@ Warning configuration for soft limits. Each row defines a warning threshold and 
 ```typescript
 db.orgLimitWarning.findMany({ select: { id: true } }).execute()
 db.orgLimitWarning.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgLimitWarning.create({ data: { name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>', entityId: '<UUID>' }, select: { id: true } }).execute()
-db.orgLimitWarning.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.orgLimitWarning.create({ data: { entityId: '<UUID>', name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' }, select: { id: true } }).execute()
+db.orgLimitWarning.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
 db.orgLimitWarning.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgLimitWarning.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgLimitWarning.findMany({
-  select: { id: true, name: true }
+  select: { id: true, entityId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgLimitWarning.findMany({
 
 ```typescript
 const item = await db.orgLimitWarning.create({
-  data: { name: '<String>', warningType: '<String>', thresholdValue: '<BigInt>', taskIdentifier: '<String>', entityId: '<UUID>' },
+  data: { entityId: '<UUID>', name: '<String>', taskIdentifier: '<String>', thresholdValue: '<BigInt>', warningType: '<String>' },
   select: { id: true }
 }).execute();
 ```

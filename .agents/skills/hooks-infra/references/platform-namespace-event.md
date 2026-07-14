@@ -7,8 +7,8 @@ Namespace lifecycle events — audit log of creation, activation, deactivation, 
 ## Usage
 
 ```typescript
-usePlatformNamespaceEventsQuery({ selection: { fields: { createdAt: true, id: true, namespaceId: true, eventType: true, actorId: true, message: true, metadata: true, cpuMillicores: true, memoryBytes: true, storageBytes: true, networkIngressBytes: true, networkEgressBytes: true, podCount: true, metrics: true } } })
-usePlatformNamespaceEventQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, namespaceId: true, eventType: true, actorId: true, message: true, metadata: true, cpuMillicores: true, memoryBytes: true, storageBytes: true, networkIngressBytes: true, networkEgressBytes: true, podCount: true, metrics: true } } })
+usePlatformNamespaceEventsQuery({ selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } } })
+usePlatformNamespaceEventQuery({ id: '<UUID>', selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } } })
 useCreatePlatformNamespaceEventMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformNamespaceEventMutation({ selection: { fields: { id: true } } })
 useDeletePlatformNamespaceEventMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformNamespaceEventMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformNamespaceEventsQuery({
-  selection: { fields: { createdAt: true, id: true, namespaceId: true, eventType: true, actorId: true, message: true, metadata: true, cpuMillicores: true, memoryBytes: true, storageBytes: true, networkIngressBytes: true, networkEgressBytes: true, podCount: true, metrics: true } },
+  selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformNamespaceEventsQuery({
 const { mutate } = useCreatePlatformNamespaceEventMutation({
   selection: { fields: { id: true } },
 });
-mutate({ namespaceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', cpuMillicores: '<Int>', memoryBytes: '<BigInt>', storageBytes: '<BigInt>', networkIngressBytes: '<BigInt>', networkEgressBytes: '<BigInt>', podCount: '<Int>', metrics: '<JSON>' });
+mutate({ actorId: '<UUID>', cpuMillicores: '<Int>', eventType: '<String>', memoryBytes: '<BigInt>', message: '<String>', metadata: '<JSON>', metrics: '<JSON>', namespaceId: '<UUID>', networkEgressBytes: '<BigInt>', networkIngressBytes: '<BigInt>', podCount: '<Int>', storageBytes: '<BigInt>' });
 ```

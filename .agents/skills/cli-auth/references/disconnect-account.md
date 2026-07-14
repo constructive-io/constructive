@@ -7,7 +7,7 @@ Execute the disconnectAccount mutation
 ## Usage
 
 ```bash
-csdk disconnect-account --input.clientMutationId <String> --input.accountId <UUID>
+csdk disconnect-account --input.accountId <UUID> --input.clientMutationId <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk disconnect-account --input.clientMutationId <String> --input.accountId <UUI
 ### Run disconnectAccount
 
 ```bash
-csdk disconnect-account --input.clientMutationId <String> --input.accountId <UUID>
+csdk disconnect-account --input.accountId <UUID> --input.clientMutationId <String>
 ```

@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  ownerId: 'uuid',
   address: 'string',
-  isVerified: 'boolean',
-  isPrimary: 'boolean',
-  name: 'string',
   createdAt: 'string',
+  id: 'uuid',
+  isPrimary: 'boolean',
+  isVerified: 'boolean',
+  name: 'string',
+  ownerId: 'uuid',
   updatedAt: 'string',
 };
 const usage =
@@ -76,13 +76,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      ownerId: true,
       address: true,
-      isVerified: true,
-      isPrimary: true,
-      name: true,
       createdAt: true,
+      id: true,
+      isPrimary: true,
+      isVerified: true,
+      name: true,
+      ownerId: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -104,13 +104,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      ownerId: true,
       address: true,
-      isVerified: true,
-      isPrimary: true,
-      name: true,
       createdAt: true,
+      id: true,
+      isPrimary: true,
+      isVerified: true,
+      name: true,
+      ownerId: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -144,13 +144,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          ownerId: true,
           address: true,
-          isVerified: true,
-          isPrimary: true,
-          name: true,
           createdAt: true,
+          id: true,
+          isPrimary: true,
+          isVerified: true,
+          name: true,
+          ownerId: true,
           updatedAt: true,
         },
       })
@@ -169,23 +169,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'ownerId',
-        message: 'ownerId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'address',
         message: 'address',
         required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isVerified',
-        message: 'isVerified',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -195,9 +181,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'isVerified',
+        message: 'isVerified',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'name',
         message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'ownerId',
+        message: 'ownerId',
         required: false,
         skipPrompt: true,
       },
@@ -211,20 +211,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.cryptoAddress
       .create({
         data: {
-          ownerId: cleanedData.ownerId,
           address: cleanedData.address,
-          isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          isVerified: cleanedData.isVerified,
           name: cleanedData.name,
+          ownerId: cleanedData.ownerId,
         },
         select: {
-          id: true,
-          ownerId: true,
           address: true,
-          isVerified: true,
-          isPrimary: true,
-          name: true,
           createdAt: true,
+          id: true,
+          isPrimary: true,
+          isVerified: true,
+          name: true,
+          ownerId: true,
           updatedAt: true,
         },
       })
@@ -249,23 +249,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'ownerId',
-        message: 'ownerId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'address',
         message: 'address',
         required: false,
-      },
-      {
-        type: 'boolean',
-        name: 'isVerified',
-        message: 'isVerified',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -275,9 +261,23 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'boolean',
+        name: 'isVerified',
+        message: 'isVerified',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'name',
         message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'ownerId',
+        message: 'ownerId',
         required: false,
         skipPrompt: true,
       },
@@ -291,20 +291,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          ownerId: cleanedData.ownerId,
           address: cleanedData.address,
-          isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          isVerified: cleanedData.isVerified,
           name: cleanedData.name,
+          ownerId: cleanedData.ownerId,
         },
         select: {
-          id: true,
-          ownerId: true,
           address: true,
-          isVerified: true,
-          isPrimary: true,
-          name: true,
           createdAt: true,
+          id: true,
+          isPrimary: true,
+          isVerified: true,
+          name: true,
+          ownerId: true,
           updatedAt: true,
         },
       })

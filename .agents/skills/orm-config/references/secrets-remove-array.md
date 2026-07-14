@@ -7,7 +7,7 @@ Execute the _secretsRemoveArray mutation
 ## Usage
 
 ```typescript
-db.mutation._secretsRemoveArray({ input: { databaseId: '<UUID>', secretNames: '<String>', namespaceId: '<UUID>' } }).execute()
+db.mutation._secretsRemoveArray({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretNames: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation._secretsRemoveArray({ input: { databaseId: '<UUID>', secretNames: '<
 ### Run _secretsRemoveArray
 
 ```typescript
-const result = await db.mutation._secretsRemoveArray({ input: { databaseId: '<UUID>', secretNames: '<String>', namespaceId: '<UUID>' } }).execute();
+const result = await db.mutation._secretsRemoveArray({ input: { databaseId: '<UUID>', namespaceId: '<UUID>', secretNames: '<String>' } }).execute();
 ```

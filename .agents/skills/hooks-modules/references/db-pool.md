@@ -7,8 +7,8 @@ Warm database pool entries. Rows are inserted as warming (which enqueues a db_po
 ## Usage
 
 ```typescript
-useDbPoolsQuery({ selection: { fields: { id: true, presetSlug: true, presetCommitId: true, databaseId: true, status: true, errorMessage: true, expiresAt: true, claimedBy: true, claimedAt: true, bootstrapStatus: true, bootstrapError: true, createdAt: true, updatedAt: true } } })
-useDbPoolQuery({ id: '<UUID>', selection: { fields: { id: true, presetSlug: true, presetCommitId: true, databaseId: true, status: true, errorMessage: true, expiresAt: true, claimedBy: true, claimedAt: true, bootstrapStatus: true, bootstrapError: true, createdAt: true, updatedAt: true } } })
+useDbPoolsQuery({ selection: { fields: { bootstrapError: true, bootstrapStatus: true, claimedAt: true, claimedBy: true, createdAt: true, databaseId: true, errorMessage: true, expiresAt: true, id: true, presetCommitId: true, presetSlug: true, status: true, updatedAt: true } } })
+useDbPoolQuery({ id: '<UUID>', selection: { fields: { bootstrapError: true, bootstrapStatus: true, claimedAt: true, claimedBy: true, createdAt: true, databaseId: true, errorMessage: true, expiresAt: true, id: true, presetCommitId: true, presetSlug: true, status: true, updatedAt: true } } })
 useCreateDbPoolMutation({ selection: { fields: { id: true } } })
 useUpdateDbPoolMutation({ selection: { fields: { id: true } } })
 useDeleteDbPoolMutation({})
@@ -20,7 +20,7 @@ useDeleteDbPoolMutation({})
 
 ```typescript
 const { data, isLoading } = useDbPoolsQuery({
-  selection: { fields: { id: true, presetSlug: true, presetCommitId: true, databaseId: true, status: true, errorMessage: true, expiresAt: true, claimedBy: true, claimedAt: true, bootstrapStatus: true, bootstrapError: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { bootstrapError: true, bootstrapStatus: true, claimedAt: true, claimedBy: true, createdAt: true, databaseId: true, errorMessage: true, expiresAt: true, id: true, presetCommitId: true, presetSlug: true, status: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDbPoolsQuery({
 const { mutate } = useCreateDbPoolMutation({
   selection: { fields: { id: true } },
 });
-mutate({ presetSlug: '<String>', presetCommitId: '<UUID>', databaseId: '<UUID>', status: '<String>', errorMessage: '<String>', expiresAt: '<Datetime>', claimedBy: '<UUID>', claimedAt: '<Datetime>', bootstrapStatus: '<String>', bootstrapError: '<String>' });
+mutate({ bootstrapError: '<String>', bootstrapStatus: '<String>', claimedAt: '<Datetime>', claimedBy: '<UUID>', databaseId: '<UUID>', errorMessage: '<String>', expiresAt: '<Datetime>', presetCommitId: '<UUID>', presetSlug: '<String>', status: '<String>' });
 ```

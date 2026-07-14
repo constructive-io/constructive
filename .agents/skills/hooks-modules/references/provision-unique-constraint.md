@@ -7,7 +7,7 @@ Creates a unique constraint on a table. Accepts a jsonb definition with columns 
 ## Usage
 
 ```typescript
-const { mutate } = useProvisionUniqueConstraintMutation(); mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+const { mutate } = useProvisionUniqueConstraintMutation(); mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useProvisionUniqueConstraintMutation(); mutate({ input: { dat
 
 ```typescript
 const { mutate, isLoading } = useProvisionUniqueConstraintMutation();
-mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```

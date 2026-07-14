@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
+  apiName: 'string',
   databaseId: 'uuid',
+  id: 'uuid',
+  ownerTableId: 'uuid',
   schemaId: 'uuid',
   tableId: 'uuid',
-  ownerTableId: 'uuid',
   tableName: 'string',
-  apiName: 'string',
 };
 const usage =
   '\nuser-settings-module <command>\n\nCommands:\n  list                  List userSettingsModule records\n  find-first            Find first matching userSettingsModule record\n  get                   Get a userSettingsModule by ID\n  create                Create a new userSettingsModule\n  update                Update an existing userSettingsModule\n  delete                Delete a userSettingsModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,13 +75,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      apiName: true,
       databaseId: true,
+      id: true,
+      ownerTableId: true,
       schemaId: true,
       tableId: true,
-      ownerTableId: true,
       tableName: true,
-      apiName: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -106,13 +106,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      apiName: true,
       databaseId: true,
+      id: true,
+      ownerTableId: true,
       schemaId: true,
       tableId: true,
-      ownerTableId: true,
       tableName: true,
-      apiName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -149,13 +149,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
+          apiName: true,
           databaseId: true,
+          id: true,
+          ownerTableId: true,
           schemaId: true,
           tableId: true,
-          ownerTableId: true,
           tableName: true,
-          apiName: true,
         },
       })
       .execute();
@@ -173,9 +173,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'apiName',
+        message: 'apiName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'ownerTableId',
+        message: 'ownerTableId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -193,22 +207,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'ownerTableId',
-        message: 'ownerTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'tableName',
         message: 'tableName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'apiName',
-        message: 'apiName',
         required: false,
         skipPrompt: true,
       },
@@ -222,21 +222,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.userSettingsModule
       .create({
         data: {
+          apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
+          ownerTableId: cleanedData.ownerTableId,
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
-          ownerTableId: cleanedData.ownerTableId,
           tableName: cleanedData.tableName,
-          apiName: cleanedData.apiName,
         },
         select: {
-          id: true,
+          apiName: true,
           databaseId: true,
+          id: true,
+          ownerTableId: true,
           schemaId: true,
           tableId: true,
-          ownerTableId: true,
           tableName: true,
-          apiName: true,
         },
       })
       .execute();
@@ -260,9 +260,23 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'apiName',
+        message: 'apiName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'ownerTableId',
+        message: 'ownerTableId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -280,22 +294,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'ownerTableId',
-        message: 'ownerTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'tableName',
         message: 'tableName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'apiName',
-        message: 'apiName',
         required: false,
         skipPrompt: true,
       },
@@ -309,21 +309,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
+          ownerTableId: cleanedData.ownerTableId,
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
-          ownerTableId: cleanedData.ownerTableId,
           tableName: cleanedData.tableName,
-          apiName: cleanedData.apiName,
         },
         select: {
-          id: true,
+          apiName: true,
           databaseId: true,
+          id: true,
+          ownerTableId: true,
           schemaId: true,
           tableId: true,
-          ownerTableId: true,
           tableName: true,
-          apiName: true,
         },
       })
       .execute();

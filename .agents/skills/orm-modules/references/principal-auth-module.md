@@ -9,8 +9,8 @@ Provisions the principals subsystem: a principals table, a principal_entities ju
 ```typescript
 db.principalAuthModule.findMany({ select: { id: true } }).execute()
 db.principalAuthModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.principalAuthModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', principalsTableId: '<UUID>', principalEntitiesTableId: '<UUID>', principalScopeOverridesTableId: '<UUID>', usersTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', auditsTableId: '<UUID>', principalsTableName: '<String>', createPrincipalFunction: '<String>', deletePrincipalFunction: '<String>', createOrgPrincipalFunction: '<String>', deleteOrgPrincipalFunction: '<String>', createOrgApiKeyFunction: '<String>', revokeOrgApiKeyFunction: '<String>', apiName: '<String>' }, select: { id: true } }).execute()
-db.principalAuthModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.principalAuthModule.create({ data: { apiName: '<String>', auditsTableId: '<UUID>', createOrgApiKeyFunction: '<String>', createOrgPrincipalFunction: '<String>', createPrincipalFunction: '<String>', databaseId: '<UUID>', deleteOrgPrincipalFunction: '<String>', deletePrincipalFunction: '<String>', principalEntitiesTableId: '<UUID>', principalScopeOverridesTableId: '<UUID>', principalsTableId: '<UUID>', principalsTableName: '<String>', revokeOrgApiKeyFunction: '<String>', schemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>' }, select: { id: true } }).execute()
+db.principalAuthModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.principalAuthModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.principalAuthModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.principalAuthModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.principalAuthModule.findMany({
 
 ```typescript
 const item = await db.principalAuthModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', principalsTableId: '<UUID>', principalEntitiesTableId: '<UUID>', principalScopeOverridesTableId: '<UUID>', usersTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', auditsTableId: '<UUID>', principalsTableName: '<String>', createPrincipalFunction: '<String>', deletePrincipalFunction: '<String>', createOrgPrincipalFunction: '<String>', deleteOrgPrincipalFunction: '<String>', createOrgApiKeyFunction: '<String>', revokeOrgApiKeyFunction: '<String>', apiName: '<String>' },
+  data: { apiName: '<String>', auditsTableId: '<UUID>', createOrgApiKeyFunction: '<String>', createOrgPrincipalFunction: '<String>', createPrincipalFunction: '<String>', databaseId: '<UUID>', deleteOrgPrincipalFunction: '<String>', deletePrincipalFunction: '<String>', principalEntitiesTableId: '<UUID>', principalScopeOverridesTableId: '<UUID>', principalsTableId: '<UUID>', principalsTableName: '<String>', revokeOrgApiKeyFunction: '<String>', schemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

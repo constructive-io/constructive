@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  creditCodeId: 'uuid',
-  defaultLimitId: 'uuid',
   amount: 'int',
+  creditCodeId: 'uuid',
   creditType: 'string',
+  defaultLimitId: 'uuid',
+  id: 'uuid',
 };
 const usage =
   '\napp-limit-credit-code-item <command>\n\nCommands:\n  list                  List appLimitCreditCodeItem records\n  find-first            Find first matching appLimitCreditCodeItem record\n  get                   Get a appLimitCreditCodeItem by ID\n  create                Create a new appLimitCreditCodeItem\n  update                Update an existing appLimitCreditCodeItem\n  delete                Delete a appLimitCreditCodeItem\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      creditCodeId: true,
-      defaultLimitId: true,
       amount: true,
+      creditCodeId: true,
       creditType: true,
+      defaultLimitId: true,
+      id: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -102,11 +102,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      creditCodeId: true,
-      defaultLimitId: true,
       amount: true,
+      creditCodeId: true,
       creditType: true,
+      defaultLimitId: true,
+      id: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -143,11 +143,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          creditCodeId: true,
-          defaultLimitId: true,
           amount: true,
+          creditCodeId: true,
           creditType: true,
+          defaultLimitId: true,
+          id: true,
         },
       })
       .execute();
@@ -165,20 +165,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'creditCodeId',
-        message: 'creditCodeId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'defaultLimitId',
-        message: 'defaultLimitId',
-        required: true,
-      },
-      {
-        type: 'text',
         name: 'amount',
         message: 'amount',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'creditCodeId',
+        message: 'creditCodeId',
         required: true,
       },
       {
@@ -187,6 +181,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'creditType',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'defaultLimitId',
+        message: 'defaultLimitId',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -198,17 +198,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.appLimitCreditCodeItem
       .create({
         data: {
-          creditCodeId: cleanedData.creditCodeId,
-          defaultLimitId: cleanedData.defaultLimitId,
           amount: cleanedData.amount,
+          creditCodeId: cleanedData.creditCodeId,
           creditType: cleanedData.creditType,
+          defaultLimitId: cleanedData.defaultLimitId,
         },
         select: {
-          id: true,
-          creditCodeId: true,
-          defaultLimitId: true,
           amount: true,
+          creditCodeId: true,
           creditType: true,
+          defaultLimitId: true,
+          id: true,
         },
       })
       .execute();
@@ -232,20 +232,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'creditCodeId',
-        message: 'creditCodeId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'defaultLimitId',
-        message: 'defaultLimitId',
-        required: false,
-      },
-      {
-        type: 'text',
         name: 'amount',
         message: 'amount',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'creditCodeId',
+        message: 'creditCodeId',
         required: false,
       },
       {
@@ -254,6 +248,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'creditType',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'defaultLimitId',
+        message: 'defaultLimitId',
+        required: false,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -265,17 +265,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          creditCodeId: cleanedData.creditCodeId,
-          defaultLimitId: cleanedData.defaultLimitId,
           amount: cleanedData.amount,
+          creditCodeId: cleanedData.creditCodeId,
           creditType: cleanedData.creditType,
+          defaultLimitId: cleanedData.defaultLimitId,
         },
         select: {
-          id: true,
-          creditCodeId: true,
-          defaultLimitId: true,
           amount: true,
+          creditCodeId: true,
           creditType: true,
+          defaultLimitId: true,
+          id: true,
         },
       })
       .execute();

@@ -12,8 +12,8 @@ csdk platform-function-execution-log list --where.<field>.<op> <value> --orderBy
 csdk platform-function-execution-log list --limit 10 --after <cursor>
 csdk platform-function-execution-log find-first --where.<field>.<op> <value>
 csdk platform-function-execution-log get --id <UUID>
-csdk platform-function-execution-log create --message <String> [--invocationId <UUID>] [--taskIdentifier <String>] [--logLevel <String>] [--metadata <JSON>] [--actorId <UUID>]
-csdk platform-function-execution-log update --id <UUID> [--invocationId <UUID>] [--taskIdentifier <String>] [--logLevel <String>] [--message <String>] [--metadata <JSON>] [--actorId <UUID>]
+csdk platform-function-execution-log create --message <String> [--actorId <UUID>] [--invocationId <UUID>] [--logLevel <String>] [--metadata <JSON>] [--taskIdentifier <String>]
+csdk platform-function-execution-log update --id <UUID> [--actorId <UUID>] [--invocationId <UUID>] [--logLevel <String>] [--message <String>] [--metadata <JSON>] [--taskIdentifier <String>]
 csdk platform-function-execution-log delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-function-execution-log list --where.id.equalTo <value> --orderBy I
 ### Create a platformFunctionExecutionLog
 
 ```bash
-csdk platform-function-execution-log create --message <String> [--invocationId <UUID>] [--taskIdentifier <String>] [--logLevel <String>] [--metadata <JSON>] [--actorId <UUID>]
+csdk platform-function-execution-log create --message <String> [--actorId <UUID>] [--invocationId <UUID>] [--logLevel <String>] [--metadata <JSON>] [--taskIdentifier <String>]
 ```
 
 ### Get a platformFunctionExecutionLog by id

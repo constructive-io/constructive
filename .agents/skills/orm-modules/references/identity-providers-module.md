@@ -17,8 +17,8 @@ Entity-aware config row for the identity_providers_module, which provisions a pe
 ```typescript
 db.identityProvidersModule.findMany({ select: { id: true } }).execute()
 db.identityProvidersModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.identityProvidersModule.create({ data: { databaseId: '<UUID>', entityField: '<String>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>' }, select: { id: true } }).execute()
-db.identityProvidersModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.identityProvidersModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute()
+db.identityProvidersModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.identityProvidersModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -28,7 +28,7 @@ db.identityProvidersModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.identityProvidersModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -36,7 +36,7 @@ const items = await db.identityProvidersModule.findMany({
 
 ```typescript
 const item = await db.identityProvidersModule.create({
-  data: { databaseId: '<UUID>', entityField: '<String>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>', scope: '<String>', prefix: '<String>', entityTableId: '<UUID>' },
+  data: { apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityTableId: '<UUID>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', tableId: '<UUID>', tableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

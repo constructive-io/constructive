@@ -12,8 +12,8 @@ csdk platform-resources-requirements-state list --where.<field>.<op> <value> --o
 csdk platform-resources-requirements-state list --limit 10 --after <cursor>
 csdk platform-resources-requirements-state find-first --where.<field>.<op> <value>
 csdk platform-resources-requirements-state get --id <UUID>
-csdk platform-resources-requirements-state create --resourceId <UUID> --slug <String> --secretsHash <String> --configHash <String> --requirementsHash <String> --secretsObjectName <String> --configObjectName <String>
-csdk platform-resources-requirements-state update --id <UUID> [--resourceId <UUID>] [--slug <String>] [--secretsHash <String>] [--configHash <String>] [--requirementsHash <String>] [--secretsObjectName <String>] [--configObjectName <String>]
+csdk platform-resources-requirements-state create --configHash <String> --configObjectName <String> --requirementsHash <String> --resourceId <UUID> --secretsHash <String> --secretsObjectName <String> --slug <String>
+csdk platform-resources-requirements-state update --id <UUID> [--configHash <String>] [--configObjectName <String>] [--requirementsHash <String>] [--resourceId <UUID>] [--secretsHash <String>] [--secretsObjectName <String>] [--slug <String>]
 csdk platform-resources-requirements-state delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-resources-requirements-state list --where.id.equalTo <value> --ord
 ### Create a platformResourcesRequirementsState
 
 ```bash
-csdk platform-resources-requirements-state create --resourceId <UUID> --slug <String> --secretsHash <String> --configHash <String> --requirementsHash <String> --secretsObjectName <String> --configObjectName <String>
+csdk platform-resources-requirements-state create --configHash <String> --configObjectName <String> --requirementsHash <String> --resourceId <UUID> --secretsHash <String> --secretsObjectName <String> --slug <String>
 ```
 
 ### Get a platformResourcesRequirementsState by id

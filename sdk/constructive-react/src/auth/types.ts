@@ -7,140 +7,139 @@ export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
-export interface Principal {
-  id: string | null;
+export interface AuditLogAuth {
+  actorId: string | null;
   createdAt: string | null;
-  updatedAt: string | null;
-  ownerId: string | null;
-  userId: string | null;
+  event: string | null;
+  id: string | null;
+  ipAddress: string | null;
+  origin: ConstructiveInternalTypeOrigin | null;
+  success: boolean | null;
+  userAgent: string | null;
+}
+export interface CryptoAddress {
+  address: string | null;
+  createdAt: string | null;
+  id: string | null;
+  isPrimary: boolean | null;
+  isVerified: boolean | null;
   name: string | null;
-  useAdminOwner: boolean | null;
-  isReadOnly: boolean | null;
-  bypassStepUp: boolean | null;
-}
-export interface PrincipalEntity {
-  id: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  principalId: string | null;
-  entityId: string | null;
   ownerId: string | null;
-}
-export interface PrincipalScopeOverride {
-  id: string | null;
-  createdAt: string | null;
   updatedAt: string | null;
-  principalId: string | null;
-  membershipType: number | null;
-  allowedMask: string | null;
-  useAdminOwner: boolean | null;
-  isActive: boolean | null;
-  isReadOnly: boolean | null;
 }
 export interface Email {
-  id: string | null;
-  ownerId: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  name: string | null;
   createdAt: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  id: string | null;
+  isPrimary: boolean | null;
+  isVerified: boolean | null;
+  name: string | null;
+  ownerId: string | null;
+  updatedAt: string | null;
+}
+export interface IdentityProvider {
+  displayName: string | null;
+  enabled: boolean | null;
+  kind: string | null;
+  slug: string | null;
+}
+export interface OrgApiKeyList {
+  accessLevel: string | null;
+  createdAt: string | null;
+  expiresAt: string | null;
+  id: string | null;
+  keyId: string | null;
+  lastUsedAt: string | null;
+  mfaLevel: string | null;
+  name: string | null;
+  orgId: string | null;
+  principalId: string | null;
+  revokedAt: string | null;
   updatedAt: string | null;
 }
 export interface PhoneNumber {
-  id: string | null;
-  ownerId: string | null;
   cc: string | null;
+  createdAt: string | null;
+  id: string | null;
+  isPrimary: boolean | null;
+  isVerified: boolean | null;
+  name: string | null;
   number: string | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  name: string | null;
-  createdAt: string | null;
+  ownerId: string | null;
   updatedAt: string | null;
 }
-export interface CryptoAddress {
+export interface Principal {
+  bypassStepUp: boolean | null;
+  createdAt: string | null;
+  id: string | null;
+  isReadOnly: boolean | null;
+  name: string | null;
+  ownerId: string | null;
+  updatedAt: string | null;
+  useAdminOwner: boolean | null;
+  userId: string | null;
+}
+export interface PrincipalEntity {
+  createdAt: string | null;
+  entityId: string | null;
   id: string | null;
   ownerId: string | null;
-  address: string | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  name: string | null;
-  createdAt: string | null;
+  principalId: string | null;
   updatedAt: string | null;
 }
-export interface WebauthnCredential {
-  id: string | null;
-  ownerId: string | null;
-  credentialId: string | null;
-  publicKey: Base64EncodedBinary | null;
-  signCount: string | null;
-  webauthnUserId: string | null;
-  transports: string[] | null;
-  credentialDeviceType: string | null;
-  backupEligible: boolean | null;
-  backupState: boolean | null;
-  name: string | null;
-  lastUsedAt: string | null;
+export interface PrincipalScopeOverride {
+  allowedMask: string | null;
   createdAt: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  isReadOnly: boolean | null;
+  membershipType: number | null;
+  principalId: string | null;
   updatedAt: string | null;
-}
-export interface AuditLogAuth {
-  createdAt: string | null;
-  id: string | null;
-  event: string | null;
-  actorId: string | null;
-  origin: ConstructiveInternalTypeOrigin | null;
-  userAgent: string | null;
-  ipAddress: string | null;
-  success: boolean | null;
-}
-export interface IdentityProvider {
-  slug: string | null;
-  kind: string | null;
-  displayName: string | null;
-  enabled: boolean | null;
-  isBuiltIn: boolean | null;
+  useAdminOwner: boolean | null;
 }
 export interface RoleType {
   id: number | null;
   name: string | null;
 }
 export interface UserConnectedAccount {
+  createdAt: string | null;
+  details: unknown | null;
   id: string | null;
+  identifier: string | null;
+  isVerified: boolean | null;
   ownerId: string | null;
   service: string | null;
-  identifier: string | null;
-  details: unknown | null;
-  isVerified: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface OrgApiKeyList {
-  id: string | null;
-  keyId: string | null;
-  name: string | null;
-  principalId: string | null;
-  orgId: string | null;
-  expiresAt: string | null;
-  revokedAt: string | null;
-  lastUsedAt: string | null;
-  mfaLevel: string | null;
-  accessLevel: string | null;
-  createdAt: string | null;
   updatedAt: string | null;
 }
 export interface User {
-  id: string | null;
-  username: string | null;
-  displayName: string | null;
-  profilePicture: ConstructiveInternalTypeImage | null;
-  searchTsv: string | null;
-  type: number | null;
   createdAt: string | null;
-  updatedAt: string | null;
-  searchTsvRank: number | null;
+  displayName: string | null;
   displayNameTrgmSimilarity: number | null;
+  id: string | null;
+  profilePicture: ConstructiveInternalTypeImage | null;
   searchScore: number | null;
+  searchTsv: string | null;
+  searchTsvRank: number | null;
+  type: number | null;
+  updatedAt: string | null;
+  username: string | null;
+}
+export interface WebauthnCredential {
+  backupEligible: boolean | null;
+  backupState: boolean | null;
+  createdAt: string | null;
+  credentialDeviceType: string | null;
+  credentialId: string | null;
+  id: string | null;
+  lastUsedAt: string | null;
+  name: string | null;
+  ownerId: string | null;
+  publicKey: Base64EncodedBinary | null;
+  signCount: string | null;
+  transports: string[] | null;
+  updatedAt: string | null;
+  webauthnUserId: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

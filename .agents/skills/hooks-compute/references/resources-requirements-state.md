@@ -7,7 +7,7 @@ React Query hooks for ResourcesRequirementsState data operations
 ## Usage
 
 ```typescript
-useResourcesRequirementsStatesQuery({ selection: { fields: { resourceId: true, slug: true, secretsHash: true, configHash: true, requirementsHash: true, secretsObjectName: true, configObjectName: true } } })
+useResourcesRequirementsStatesQuery({ selection: { fields: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } } })
 useCreateResourcesRequirementsStateMutation({ selection: { fields: { id: true } } })
 ```
 
@@ -17,7 +17,7 @@ useCreateResourcesRequirementsStateMutation({ selection: { fields: { id: true } 
 
 ```typescript
 const { data, isLoading } = useResourcesRequirementsStatesQuery({
-  selection: { fields: { resourceId: true, slug: true, secretsHash: true, configHash: true, requirementsHash: true, secretsObjectName: true, configObjectName: true } },
+  selection: { fields: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } },
 });
 ```
 
@@ -27,5 +27,5 @@ const { data, isLoading } = useResourcesRequirementsStatesQuery({
 const { mutate } = useCreateResourcesRequirementsStateMutation({
   selection: { fields: { id: true } },
 });
-mutate({ resourceId: '<UUID>', slug: '<String>', secretsHash: '<String>', configHash: '<String>', requirementsHash: '<String>', secretsObjectName: '<String>', configObjectName: '<String>' });
+mutate({ configHash: '<String>', configObjectName: '<String>', requirementsHash: '<String>', resourceId: '<UUID>', secretsHash: '<String>', secretsObjectName: '<String>', slug: '<String>' });
 ```

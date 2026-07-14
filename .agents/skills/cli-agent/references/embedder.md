@@ -36,7 +36,7 @@ csdk config set embedder.model nomic-embed-text
 csdk config set embedder.baseUrl http://localhost:11434
 
 # Now use --auto-embed with any vector field
-csdk agent-plan search "my query" --auto-embed
+csdk agent search "my query" --auto-embed
 ```
 
 ### OpenAI with an API key
@@ -48,5 +48,5 @@ csdk config set embedder.model text-embedding-3-small
 csdk config set embedder.apiKey sk-proj-...your-api-key
 
 # Or use environment variables
-EMBEDDER_PROVIDER=openai EMBEDDER_MODEL=text-embedding-3-small EMBEDDER_API_KEY=sk-proj-...your-api-key csdk agent-plan search "my query" --auto-embed
+EMBEDDER_PROVIDER=openai EMBEDDER_MODEL=text-embedding-3-small EMBEDDER_API_KEY=sk-proj-...your-api-key csdk agent search "my query" --auto-embed
 ```

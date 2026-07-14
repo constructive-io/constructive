@@ -12,8 +12,8 @@ csdk org-permission list --where.<field>.<op> <value> --orderBy <values>
 csdk org-permission list --limit 10 --after <cursor>
 csdk org-permission find-first --where.<field>.<op> <value>
 csdk org-permission get --id <UUID>
-csdk org-permission create [--name <String>] [--bitnum <Int>] [--bitstr <BitString>] [--description <String>]
-csdk org-permission update --id <UUID> [--name <String>] [--bitnum <Int>] [--bitstr <BitString>] [--description <String>]
+csdk org-permission create [--bitnum <Int>] [--bitstr <BitString>] [--description <String>] [--name <String>]
+csdk org-permission update --id <UUID> [--bitnum <Int>] [--bitstr <BitString>] [--description <String>] [--name <String>]
 csdk org-permission delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-permission list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgPermission
 
 ```bash
-csdk org-permission create [--name <String>] [--bitnum <Int>] [--bitstr <BitString>] [--description <String>]
+csdk org-permission create [--bitnum <Int>] [--bitstr <BitString>] [--description <String>] [--name <String>]
 ```
 
 ### Get a orgPermission by id

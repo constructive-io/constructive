@@ -9,8 +9,8 @@ Append-only ledger of credit grants that automatically update limit ceilings
 ```typescript
 db.appLimitCredit.findMany({ select: { id: true } }).execute()
 db.appLimitCredit.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appLimitCredit.create({ data: { defaultLimitId: '<UUID>', actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' }, select: { id: true } }).execute()
-db.appLimitCredit.update({ where: { id: '<UUID>' }, data: { defaultLimitId: '<UUID>' }, select: { id: true } }).execute()
+db.appLimitCredit.create({ data: { actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', defaultLimitId: '<UUID>', reason: '<String>' }, select: { id: true } }).execute()
+db.appLimitCredit.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.appLimitCredit.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.appLimitCredit.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.appLimitCredit.findMany({
-  select: { id: true, defaultLimitId: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.appLimitCredit.findMany({
 
 ```typescript
 const item = await db.appLimitCredit.create({
-  data: { defaultLimitId: '<UUID>', actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' },
+  data: { actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', defaultLimitId: '<UUID>', reason: '<String>' },
   select: { id: true }
 }).execute();
 ```

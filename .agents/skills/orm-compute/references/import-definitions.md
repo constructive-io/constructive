@@ -7,7 +7,7 @@ Execute the importDefinitions mutation
 ## Usage
 
 ```typescript
-db.mutation.importDefinitions({ input: { graphId: '<UUID>', sourceScopeId: '<UUID>', sourceCommitId: '<UUID>', contexts: '<String>' } }).execute()
+db.mutation.importDefinitions({ input: { contexts: '<String>', graphId: '<UUID>', sourceCommitId: '<UUID>', sourceScopeId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.importDefinitions({ input: { graphId: '<UUID>', sourceScopeId: '<UUI
 ### Run importDefinitions
 
 ```typescript
-const result = await db.mutation.importDefinitions({ input: { graphId: '<UUID>', sourceScopeId: '<UUID>', sourceCommitId: '<UUID>', contexts: '<String>' } }).execute();
+const result = await db.mutation.importDefinitions({ input: { contexts: '<String>', graphId: '<UUID>', sourceCommitId: '<UUID>', sourceScopeId: '<UUID>' } }).execute();
 ```

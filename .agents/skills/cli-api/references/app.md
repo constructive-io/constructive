@@ -12,8 +12,8 @@ csdk app list --where.<field>.<op> <value> --orderBy <values>
 csdk app list --limit 10 --after <cursor>
 csdk app find-first --where.<field>.<op> <value>
 csdk app get --id <UUID>
-csdk app create --databaseId <UUID> --siteId <UUID> [--name <String>] [--appImage <Image>] [--appStoreLink <Url>] [--appStoreId <String>] [--appIdPrefix <String>] [--playStoreLink <Url>]
-csdk app update --id <UUID> [--databaseId <UUID>] [--siteId <UUID>] [--name <String>] [--appImage <Image>] [--appStoreLink <Url>] [--appStoreId <String>] [--appIdPrefix <String>] [--playStoreLink <Url>]
+csdk app create --databaseId <UUID> --siteId <UUID> [--appIdPrefix <String>] [--appImage <Image>] [--appStoreId <String>] [--appStoreLink <Url>] [--name <String>] [--playStoreLink <Url>]
+csdk app update --id <UUID> [--appIdPrefix <String>] [--appImage <Image>] [--appStoreId <String>] [--appStoreLink <Url>] [--databaseId <UUID>] [--name <String>] [--playStoreLink <Url>] [--siteId <UUID>]
 csdk app delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a app
 
 ```bash
-csdk app create --databaseId <UUID> --siteId <UUID> [--name <String>] [--appImage <Image>] [--appStoreLink <Url>] [--appStoreId <String>] [--appIdPrefix <String>] [--playStoreLink <Url>]
+csdk app create --databaseId <UUID> --siteId <UUID> [--appIdPrefix <String>] [--appImage <Image>] [--appStoreId <String>] [--appStoreLink <Url>] [--name <String>] [--playStoreLink <Url>]
 ```
 
 ### Get a app by id

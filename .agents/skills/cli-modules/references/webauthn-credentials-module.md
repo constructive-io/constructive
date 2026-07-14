@@ -12,8 +12,8 @@ csdk webauthn-credentials-module list --where.<field>.<op> <value> --orderBy <va
 csdk webauthn-credentials-module list --limit 10 --after <cursor>
 csdk webauthn-credentials-module find-first --where.<field>.<op> <value>
 csdk webauthn-credentials-module get --id <UUID>
-csdk webauthn-credentials-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
-csdk webauthn-credentials-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk webauthn-credentials-module create --databaseId <UUID> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
+csdk webauthn-credentials-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk webauthn-credentials-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk webauthn-credentials-module list --where.id.equalTo <value> --orderBy ID_AS
 ### Create a webauthnCredentialsModule
 
 ```bash
-csdk webauthn-credentials-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk webauthn-credentials-module create --databaseId <UUID> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 ```
 
 ### Get a webauthnCredentialsModule by id

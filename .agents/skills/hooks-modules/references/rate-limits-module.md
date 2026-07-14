@@ -7,8 +7,8 @@ React Query hooks for RateLimitsModule data operations
 ## Usage
 
 ```typescript
-useRateLimitsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } } })
-useRateLimitsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } } })
+useRateLimitsModulesQuery({ selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } } })
+useRateLimitsModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } } })
 useCreateRateLimitsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateRateLimitsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteRateLimitsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteRateLimitsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useRateLimitsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } },
+  selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useRateLimitsModulesQuery({
 const { mutate } = useCreateRateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', rateLimitSettingsTableId: '<UUID>', ipRateLimitsTableId: '<UUID>', rateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', ipRateLimitsTable: '<String>', rateLimitsTable: '<String>' });
+mutate({ databaseId: '<UUID>', ipRateLimitsTable: '<String>', ipRateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', rateLimitSettingsTableId: '<UUID>', rateLimitsTable: '<String>', rateLimitsTableId: '<UUID>', schemaId: '<UUID>' });
 ```

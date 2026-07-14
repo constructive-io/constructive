@@ -9,8 +9,8 @@ On-demand resource status checks — diagnostic snapshots from the runtime (K8s 
 ```typescript
 db.platformResourceStatusCheck.findMany({ select: { id: true } }).execute()
 db.platformResourceStatusCheck.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformResourceStatusCheck.create({ data: { resourceId: '<UUID>', requestedBy: '<UUID>', requestedAt: '<Datetime>', completedAt: '<Datetime>', status: '<String>', result: '<JSON>' }, select: { id: true } }).execute()
-db.platformResourceStatusCheck.update({ where: { id: '<UUID>' }, data: { resourceId: '<UUID>' }, select: { id: true } }).execute()
+db.platformResourceStatusCheck.create({ data: { completedAt: '<Datetime>', requestedAt: '<Datetime>', requestedBy: '<UUID>', resourceId: '<UUID>', result: '<JSON>', status: '<String>' }, select: { id: true } }).execute()
+db.platformResourceStatusCheck.update({ where: { id: '<UUID>' }, data: { completedAt: '<Datetime>' }, select: { id: true } }).execute()
 db.platformResourceStatusCheck.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.platformResourceStatusCheck.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.platformResourceStatusCheck.findMany({
-  select: { id: true, resourceId: true }
+  select: { id: true, completedAt: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.platformResourceStatusCheck.findMany({
 
 ```typescript
 const item = await db.platformResourceStatusCheck.create({
-  data: { resourceId: '<UUID>', requestedBy: '<UUID>', requestedAt: '<Datetime>', completedAt: '<Datetime>', status: '<String>', result: '<JSON>' },
+  data: { completedAt: '<Datetime>', requestedAt: '<Datetime>', requestedBy: '<UUID>', resourceId: '<UUID>', result: '<JSON>', status: '<String>' },
   select: { id: true }
 }).execute();
 ```

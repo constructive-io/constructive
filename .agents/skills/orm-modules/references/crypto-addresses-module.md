@@ -9,8 +9,8 @@ ORM operations for CryptoAddressesModule records
 ```typescript
 db.cryptoAddressesModule.findMany({ select: { id: true } }).execute()
 db.cryptoAddressesModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.cryptoAddressesModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', cryptoNetwork: '<String>', apiName: '<String>', privateApiName: '<String>' }, select: { id: true } }).execute()
-db.cryptoAddressesModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.cryptoAddressesModule.create({ data: { apiName: '<String>', cryptoNetwork: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute()
+db.cryptoAddressesModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.cryptoAddressesModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.cryptoAddressesModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.cryptoAddressesModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.cryptoAddressesModule.findMany({
 
 ```typescript
 const item = await db.cryptoAddressesModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', cryptoNetwork: '<String>', apiName: '<String>', privateApiName: '<String>' },
+  data: { apiName: '<String>', cryptoNetwork: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -20,7 +20,7 @@ export const orgPermissionsGetByMaskQueryKey = customQueryKeys.orgPermissionsGet
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useOrgPermissionsGetByMaskQuery({ variables: { mask, first, offset, after } });
+ * const { data, isLoading } = useOrgPermissionsGetByMaskQuery({ variables: { after, first, mask, offset } });
  *
  * if (data?.orgPermissionsGetByMask) {
  *   console.log(data.orgPermissionsGetByMask);
@@ -77,7 +77,7 @@ export function useOrgPermissionsGetByMaskQuery<
  *
  * @example
  * ```ts
- * const data = await fetchOrgPermissionsGetByMaskQuery({ variables: { mask, first, offset, after } });
+ * const data = await fetchOrgPermissionsGetByMaskQuery({ variables: { after, first, mask, offset } });
  * ```
  */
 export async function fetchOrgPermissionsGetByMaskQuery(params?: {
@@ -91,7 +91,7 @@ export async function fetchOrgPermissionsGetByMaskQuery(params?: {
  *
  * @example
  * ```ts
- * await prefetchOrgPermissionsGetByMaskQuery(queryClient, { variables: { mask, first, offset, after } });
+ * await prefetchOrgPermissionsGetByMaskQuery(queryClient, { variables: { after, first, mask, offset } });
  * ```
  */
 export async function prefetchOrgPermissionsGetByMaskQuery(

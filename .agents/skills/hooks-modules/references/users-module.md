@@ -7,8 +7,8 @@ React Query hooks for UsersModule data operations
 ## Usage
 
 ```typescript
-useUsersModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, apiName: true, privateApiName: true } } })
-useUsersModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, apiName: true, privateApiName: true } } })
+useUsersModulesQuery({ selection: { fields: { apiName: true, databaseId: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } } })
+useUsersModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, databaseId: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } } })
 useCreateUsersModuleMutation({ selection: { fields: { id: true } } })
 useUpdateUsersModuleMutation({ selection: { fields: { id: true } } })
 useDeleteUsersModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteUsersModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useUsersModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, apiName: true, privateApiName: true } },
+  selection: { fields: { apiName: true, databaseId: true, id: true, privateApiName: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUsersModulesQuery({
 const { mutate } = useCreateUsersModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', typeTableId: '<UUID>', typeTableName: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ apiName: '<String>', databaseId: '<UUID>', privateApiName: '<String>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', typeTableId: '<UUID>', typeTableName: '<String>' });
 ```

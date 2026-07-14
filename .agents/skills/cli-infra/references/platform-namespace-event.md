@@ -12,8 +12,8 @@ csdk platform-namespace-event list --where.<field>.<op> <value> --orderBy <value
 csdk platform-namespace-event list --limit 10 --after <cursor>
 csdk platform-namespace-event find-first --where.<field>.<op> <value>
 csdk platform-namespace-event get --id <UUID>
-csdk platform-namespace-event create --namespaceId <UUID> --eventType <String> [--actorId <UUID>] [--message <String>] [--metadata <JSON>] [--cpuMillicores <Int>] [--memoryBytes <BigInt>] [--storageBytes <BigInt>] [--networkIngressBytes <BigInt>] [--networkEgressBytes <BigInt>] [--podCount <Int>] [--metrics <JSON>]
-csdk platform-namespace-event update --id <UUID> [--namespaceId <UUID>] [--eventType <String>] [--actorId <UUID>] [--message <String>] [--metadata <JSON>] [--cpuMillicores <Int>] [--memoryBytes <BigInt>] [--storageBytes <BigInt>] [--networkIngressBytes <BigInt>] [--networkEgressBytes <BigInt>] [--podCount <Int>] [--metrics <JSON>]
+csdk platform-namespace-event create --eventType <String> --namespaceId <UUID> [--actorId <UUID>] [--cpuMillicores <Int>] [--memoryBytes <BigInt>] [--message <String>] [--metadata <JSON>] [--metrics <JSON>] [--networkEgressBytes <BigInt>] [--networkIngressBytes <BigInt>] [--podCount <Int>] [--storageBytes <BigInt>]
+csdk platform-namespace-event update --id <UUID> [--actorId <UUID>] [--cpuMillicores <Int>] [--eventType <String>] [--memoryBytes <BigInt>] [--message <String>] [--metadata <JSON>] [--metrics <JSON>] [--namespaceId <UUID>] [--networkEgressBytes <BigInt>] [--networkIngressBytes <BigInt>] [--podCount <Int>] [--storageBytes <BigInt>]
 csdk platform-namespace-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-namespace-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformNamespaceEvent
 
 ```bash
-csdk platform-namespace-event create --namespaceId <UUID> --eventType <String> [--actorId <UUID>] [--message <String>] [--metadata <JSON>] [--cpuMillicores <Int>] [--memoryBytes <BigInt>] [--storageBytes <BigInt>] [--networkIngressBytes <BigInt>] [--networkEgressBytes <BigInt>] [--podCount <Int>] [--metrics <JSON>]
+csdk platform-namespace-event create --eventType <String> --namespaceId <UUID> [--actorId <UUID>] [--cpuMillicores <Int>] [--memoryBytes <BigInt>] [--message <String>] [--metadata <JSON>] [--metrics <JSON>] [--networkEgressBytes <BigInt>] [--networkIngressBytes <BigInt>] [--podCount <Int>] [--storageBytes <BigInt>]
 ```
 
 ### Get a platformNamespaceEvent by id

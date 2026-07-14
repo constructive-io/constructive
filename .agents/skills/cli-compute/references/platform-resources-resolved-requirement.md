@@ -12,8 +12,8 @@ csdk platform-resources-resolved-requirement list --where.<field>.<op> <value> -
 csdk platform-resources-resolved-requirement list --limit 10 --after <cursor>
 csdk platform-resources-resolved-requirement find-first --where.<field>.<op> <value>
 csdk platform-resources-resolved-requirement get --id <UUID>
-csdk platform-resources-resolved-requirement create --resourceId <UUID> --slug <String> --namespaceId <UUID> --requirementKind <String> --name <String> --required <Boolean> --atomId <UUID> --present <Boolean> --secretsObjectName <String> --configObjectName <String>
-csdk platform-resources-resolved-requirement update --id <UUID> [--resourceId <UUID>] [--slug <String>] [--namespaceId <UUID>] [--requirementKind <String>] [--name <String>] [--required <Boolean>] [--atomId <UUID>] [--present <Boolean>] [--secretsObjectName <String>] [--configObjectName <String>]
+csdk platform-resources-resolved-requirement create --atomId <UUID> --configObjectName <String> --name <String> --namespaceId <UUID> --present <Boolean> --required <Boolean> --requirementKind <String> --resourceId <UUID> --secretsObjectName <String> --slug <String>
+csdk platform-resources-resolved-requirement update --id <UUID> [--atomId <UUID>] [--configObjectName <String>] [--name <String>] [--namespaceId <UUID>] [--present <Boolean>] [--required <Boolean>] [--requirementKind <String>] [--resourceId <UUID>] [--secretsObjectName <String>] [--slug <String>]
 csdk platform-resources-resolved-requirement delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-resources-resolved-requirement list --where.id.equalTo <value> --o
 ### Create a platformResourcesResolvedRequirement
 
 ```bash
-csdk platform-resources-resolved-requirement create --resourceId <UUID> --slug <String> --namespaceId <UUID> --requirementKind <String> --name <String> --required <Boolean> --atomId <UUID> --present <Boolean> --secretsObjectName <String> --configObjectName <String>
+csdk platform-resources-resolved-requirement create --atomId <UUID> --configObjectName <String> --name <String> --namespaceId <UUID> --present <Boolean> --required <Boolean> --requirementKind <String> --resourceId <UUID> --secretsObjectName <String> --slug <String>
 ```
 
 ### Get a platformResourcesResolvedRequirement by id

@@ -9,8 +9,8 @@ Branch heads — mutable pointers into the commit chain
 ```typescript
 db.ref.findMany({ select: { id: true } }).execute()
 db.ref.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.ref.create({ data: { name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' }, select: { id: true } }).execute()
-db.ref.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.ref.create({ data: { commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute()
+db.ref.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute()
 db.ref.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.ref.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.ref.findMany({
-  select: { id: true, name: true }
+  select: { id: true, commitId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.ref.findMany({
 
 ```typescript
 const item = await db.ref.create({
-  data: { name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' },
+  data: { commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

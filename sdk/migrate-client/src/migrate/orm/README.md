@@ -34,18 +34,18 @@ CRUD operations for MigrateFile records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `id` | UUID | No |
 | `databaseId` | UUID | Yes |
+| `id` | UUID | No |
 | `upload` | ConstructiveInternalTypeUpload | Yes |
 
 **Operations:**
 
 ```typescript
 // List all migrateFile records
-const items = await db.migrateFile.findMany({ select: { id: true, databaseId: true, upload: true } }).execute();
+const items = await db.migrateFile.findMany({ select: { databaseId: true, id: true, upload: true } }).execute();
 
 // Get one by id
-const item = await db.migrateFile.findOne({ id: '<UUID>', select: { id: true, databaseId: true, upload: true } }).execute();
+const item = await db.migrateFile.findOne({ id: '<UUID>', select: { databaseId: true, id: true, upload: true } }).execute();
 
 // Create
 const created = await db.migrateFile.create({ data: { databaseId: '<UUID>', upload: '<Upload>' }, select: { id: true } }).execute();
@@ -65,35 +65,35 @@ CRUD operations for SqlAction records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `id` | Int | No |
-| `name` | String | Yes |
-| `databaseId` | UUID | Yes |
-| `deploy` | String | Yes |
-| `deps` | String | Yes |
-| `payload` | JSON | Yes |
-| `content` | String | Yes |
-| `revert` | String | Yes |
-| `verify` | String | Yes |
-| `createdAt` | Datetime | No |
-| `category` | String | Yes |
 | `action` | String | Yes |
 | `actionId` | UUID | Yes |
 | `actorId` | UUID | Yes |
+| `category` | String | Yes |
+| `content` | String | Yes |
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `deploy` | String | Yes |
+| `deps` | String | Yes |
+| `id` | Int | No |
+| `name` | String | Yes |
+| `payload` | JSON | Yes |
+| `revert` | String | Yes |
+| `verify` | String | Yes |
 
 **Operations:**
 
 ```typescript
 // List all sqlAction records
-const items = await db.sqlAction.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, category: true, action: true, actionId: true, actorId: true } }).execute();
+const items = await db.sqlAction.findMany({ select: { action: true, actionId: true, actorId: true, category: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
 
 // Get one by id
-const item = await db.sqlAction.findOne({ id: '<Int>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, category: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.sqlAction.findOne({ id: '<Int>', select: { action: true, actionId: true, actorId: true, category: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
 
 // Create
-const created = await db.sqlAction.create({ data: { name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', category: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.sqlAction.create({ data: { action: '<String>', actionId: '<UUID>', actorId: '<UUID>', category: '<String>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { action: '<String>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.sqlAction.delete({ where: { id: '<Int>' } }).execute();
@@ -116,21 +116,6 @@ executeSql
 const result = await db.mutation.executeSql({ input: { stmt: '<String>' } }).execute();
 ```
 
-### `db.mutation.runMigration`
-
-runMigration
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RunMigrationInput (required) |
-
-```typescript
-const result = await db.mutation.runMigration({ input: { databaseId: '<UUID>', migration: '<Int>', kind: '<String>' } }).execute();
-```
-
 ### `db.mutation.provisionBucket`
 
 Provision an S3 bucket for a logical bucket in the database.
@@ -147,6 +132,21 @@ and lifecycle settings.
 
 ```typescript
 const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.runMigration`
+
+runMigration
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RunMigrationInput (required) |
+
+```typescript
+const result = await db.mutation.runMigration({ input: { databaseId: '<UUID>', kind: '<String>', migration: '<Int>' } }).execute();
 ```
 
 ---

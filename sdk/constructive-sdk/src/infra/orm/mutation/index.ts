@@ -8,27 +8,27 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   InfraInitEmptyRepoInput,
-  InfraSetDataAtPathInput,
   InfraInsertNodeAtPathInput,
+  InfraSetDataAtPathInput,
   ProvisionBucketInput,
   InfraInitEmptyRepoPayload,
-  InfraSetDataAtPathPayload,
   InfraInsertNodeAtPathPayload,
+  InfraSetDataAtPathPayload,
   ProvisionBucketPayload,
   InfraInitEmptyRepoPayloadSelect,
-  InfraSetDataAtPathPayloadSelect,
   InfraInsertNodeAtPathPayloadSelect,
+  InfraSetDataAtPathPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface InfraInitEmptyRepoVariables {
   input: InfraInitEmptyRepoInput;
 }
-export interface InfraSetDataAtPathVariables {
-  input: InfraSetDataAtPathInput;
-}
 export interface InfraInsertNodeAtPathVariables {
   input: InfraInsertNodeAtPathInput;
+}
+export interface InfraSetDataAtPathVariables {
+  input: InfraSetDataAtPathInput;
 }
 /**
  * Variables for provisionBucket
@@ -71,35 +71,6 @@ export function createMutationOperations(client: OrmClient) {
           'InfraInitEmptyRepoPayload'
         ),
       }),
-    infraSetDataAtPath: <S extends InfraSetDataAtPathPayloadSelect>(
-      args: InfraSetDataAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, InfraSetDataAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        infraSetDataAtPath: InferSelectResult<InfraSetDataAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'InfraSetDataAtPath',
-        fieldName: 'infraSetDataAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'InfraSetDataAtPath',
-          'infraSetDataAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'InfraSetDataAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'InfraSetDataAtPathPayload'
-        ),
-      }),
     infraInsertNodeAtPath: <S extends InfraInsertNodeAtPathPayloadSelect>(
       args: InfraInsertNodeAtPathVariables,
       options: {
@@ -127,6 +98,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'InfraInsertNodeAtPathPayload'
+        ),
+      }),
+    infraSetDataAtPath: <S extends InfraSetDataAtPathPayloadSelect>(
+      args: InfraSetDataAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InfraSetDataAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        infraSetDataAtPath: InferSelectResult<InfraSetDataAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InfraSetDataAtPath',
+        fieldName: 'infraSetDataAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'InfraSetDataAtPath',
+          'infraSetDataAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InfraSetDataAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InfraSetDataAtPathPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

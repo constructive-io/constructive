@@ -7,8 +7,8 @@ WebAuthn/passkey credentials owned by users. One row per registered authenticato
 ## Usage
 
 ```typescript
-useWebauthnCredentialsQuery({ selection: { fields: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } } })
-useWebauthnCredentialQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } } })
+useWebauthnCredentialsQuery({ selection: { fields: { backupEligible: true, backupState: true, createdAt: true, credentialDeviceType: true, credentialId: true, id: true, lastUsedAt: true, name: true, ownerId: true, publicKey: true, signCount: true, transports: true, updatedAt: true, webauthnUserId: true } } })
+useWebauthnCredentialQuery({ id: '<UUID>', selection: { fields: { backupEligible: true, backupState: true, createdAt: true, credentialDeviceType: true, credentialId: true, id: true, lastUsedAt: true, name: true, ownerId: true, publicKey: true, signCount: true, transports: true, updatedAt: true, webauthnUserId: true } } })
 useCreateWebauthnCredentialMutation({ selection: { fields: { id: true } } })
 useUpdateWebauthnCredentialMutation({ selection: { fields: { id: true } } })
 useDeleteWebauthnCredentialMutation({})
@@ -20,7 +20,7 @@ useDeleteWebauthnCredentialMutation({})
 
 ```typescript
 const { data, isLoading } = useWebauthnCredentialsQuery({
-  selection: { fields: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { backupEligible: true, backupState: true, createdAt: true, credentialDeviceType: true, credentialId: true, id: true, lastUsedAt: true, name: true, ownerId: true, publicKey: true, signCount: true, transports: true, updatedAt: true, webauthnUserId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useWebauthnCredentialsQuery({
 const { mutate } = useCreateWebauthnCredentialMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', webauthnUserId: '<String>', transports: '<String>', credentialDeviceType: '<String>', backupEligible: '<Boolean>', backupState: '<Boolean>', name: '<String>', lastUsedAt: '<Datetime>' });
+mutate({ backupEligible: '<Boolean>', backupState: '<Boolean>', credentialDeviceType: '<String>', credentialId: '<String>', lastUsedAt: '<Datetime>', name: '<String>', ownerId: '<UUID>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', transports: '<String>', webauthnUserId: '<String>' });
 ```

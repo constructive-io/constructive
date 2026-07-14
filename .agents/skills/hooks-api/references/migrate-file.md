@@ -7,8 +7,8 @@ React Query hooks for MigrateFile data operations
 ## Usage
 
 ```typescript
-useMigrateFilesQuery({ selection: { fields: { id: true, databaseId: true, upload: true } } })
-useMigrateFileQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, upload: true } } })
+useMigrateFilesQuery({ selection: { fields: { databaseId: true, id: true, upload: true } } })
+useMigrateFileQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, upload: true } } })
 useCreateMigrateFileMutation({ selection: { fields: { id: true } } })
 useUpdateMigrateFileMutation({ selection: { fields: { id: true } } })
 useDeleteMigrateFileMutation({})
@@ -20,7 +20,7 @@ useDeleteMigrateFileMutation({})
 
 ```typescript
 const { data, isLoading } = useMigrateFilesQuery({
-  selection: { fields: { id: true, databaseId: true, upload: true } },
+  selection: { fields: { databaseId: true, id: true, upload: true } },
 });
 ```
 

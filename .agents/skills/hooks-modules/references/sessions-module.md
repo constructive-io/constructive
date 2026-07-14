@@ -7,8 +7,8 @@ React Query hooks for SessionsModule data operations
 ## Usage
 
 ```typescript
-useSessionsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } } })
-useSessionsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } } })
+useSessionsModulesQuery({ selection: { fields: { authSettingsTable: true, authSettingsTableId: true, databaseId: true, id: true, schemaId: true, sessionCredentialsTable: true, sessionCredentialsTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionsTableId: true, usersTableId: true } } })
+useSessionsModuleQuery({ id: '<UUID>', selection: { fields: { authSettingsTable: true, authSettingsTableId: true, databaseId: true, id: true, schemaId: true, sessionCredentialsTable: true, sessionCredentialsTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionsTableId: true, usersTableId: true } } })
 useCreateSessionsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateSessionsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteSessionsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteSessionsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useSessionsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } },
+  selection: { fields: { authSettingsTable: true, authSettingsTableId: true, databaseId: true, id: true, schemaId: true, sessionCredentialsTable: true, sessionCredentialsTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionsTableId: true, usersTableId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSessionsModulesQuery({
 const { mutate } = useCreateSessionsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', authSettingsTableId: '<UUID>', usersTableId: '<UUID>', sessionsDefaultExpiration: '<Interval>', sessionsTable: '<String>', sessionCredentialsTable: '<String>', authSettingsTable: '<String>' });
+mutate({ authSettingsTable: '<String>', authSettingsTableId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', sessionCredentialsTable: '<String>', sessionCredentialsTableId: '<UUID>', sessionsDefaultExpiration: '<Interval>', sessionsTable: '<String>', sessionsTableId: '<UUID>', usersTableId: '<UUID>' });
 ```

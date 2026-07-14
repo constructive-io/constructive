@@ -7,8 +7,8 @@ Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-
 ## Usage
 
 ```typescript
-useConfigsQuery({ selection: { fields: { id: true, namespaceId: true, databaseId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } } })
-useConfigQuery({ id: '<UUID>', selection: { fields: { id: true, namespaceId: true, databaseId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } } })
+useConfigsQuery({ selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } } })
+useConfigQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } } })
 useCreateConfigMutation({ selection: { fields: { id: true } } })
 useUpdateConfigMutation({ selection: { fields: { id: true } } })
 useDeleteConfigMutation({})
@@ -20,7 +20,7 @@ useDeleteConfigMutation({})
 
 ```typescript
 const { data, isLoading } = useConfigsQuery({
-  selection: { fields: { id: true, namespaceId: true, databaseId: true, name: true, provider: true, value: true, labels: true, annotations: true, description: true, createdAt: true, updatedAt: true, expiresAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, updatedAt: true, value: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useConfigsQuery({
 const { mutate } = useCreateConfigMutation({
   selection: { fields: { id: true } },
 });
-mutate({ namespaceId: '<UUID>', databaseId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' });
+mutate({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' });
 ```

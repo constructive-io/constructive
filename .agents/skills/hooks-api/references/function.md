@@ -7,8 +7,8 @@ React Query hooks for Function data operations
 ## Usage
 
 ```typescript
-useFunctionsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, name: true } } })
-useFunctionQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, name: true } } })
+useFunctionsQuery({ selection: { fields: { databaseId: true, id: true, name: true, schemaId: true } } })
+useFunctionQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, name: true, schemaId: true } } })
 useCreateFunctionMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true } },
+  selection: { fields: { databaseId: true, id: true, name: true, schemaId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionsQuery({
 const { mutate } = useCreateFunctionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>' });
+mutate({ databaseId: '<UUID>', name: '<String>', schemaId: '<UUID>' });
 ```

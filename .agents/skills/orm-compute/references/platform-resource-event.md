@@ -9,8 +9,8 @@ Resource lifecycle events — audit log of provisioning, updates, and failure ev
 ```typescript
 db.platformResourceEvent.findMany({ select: { id: true } }).execute()
 db.platformResourceEvent.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformResourceEvent.create({ data: { resourceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute()
-db.platformResourceEvent.update({ where: { id: '<UUID>' }, data: { resourceId: '<UUID>' }, select: { id: true } }).execute()
+db.platformResourceEvent.create({ data: { actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', resourceId: '<UUID>' }, select: { id: true } }).execute()
+db.platformResourceEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.platformResourceEvent.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.platformResourceEvent.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.platformResourceEvent.findMany({
-  select: { id: true, resourceId: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.platformResourceEvent.findMany({
 
 ```typescript
 const item = await db.platformResourceEvent.create({
-  data: { resourceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>' },
+  data: { actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', resourceId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

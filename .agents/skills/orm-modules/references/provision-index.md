@@ -7,7 +7,7 @@ Creates an index on a table. Accepts a jsonb definition with columns (array of n
 ## Usage
 
 ```typescript
-db.mutation.provisionIndex({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute()
+db.mutation.provisionIndex({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.provisionIndex({ input: { databaseId: '<UUID>', tableId: '<UUID>', d
 ### Run provisionIndex
 
 ```typescript
-const result = await db.mutation.provisionIndex({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute();
+const result = await db.mutation.provisionIndex({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
 ```

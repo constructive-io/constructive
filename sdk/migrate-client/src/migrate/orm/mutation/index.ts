@@ -8,21 +8,18 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   ExecuteSqlInput,
-  RunMigrationInput,
   ProvisionBucketInput,
+  RunMigrationInput,
   ExecuteSqlPayload,
-  RunMigrationPayload,
   ProvisionBucketPayload,
+  RunMigrationPayload,
   ExecuteSqlPayloadSelect,
-  RunMigrationPayloadSelect,
   ProvisionBucketPayloadSelect,
+  RunMigrationPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface ExecuteSqlVariables {
   input: ExecuteSqlInput;
-}
-export interface RunMigrationVariables {
-  input: RunMigrationInput;
 }
 /**
  * Variables for provisionBucket
@@ -33,6 +30,9 @@ and lifecycle settings.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
+}
+export interface RunMigrationVariables {
+  input: RunMigrationInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -65,35 +65,6 @@ export function createMutationOperations(client: OrmClient) {
           'ExecuteSqlPayload'
         ),
       }),
-    runMigration: <S extends RunMigrationPayloadSelect>(
-      args: RunMigrationVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RunMigrationPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        runMigration: InferSelectResult<RunMigrationPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RunMigration',
-        fieldName: 'runMigration',
-        ...buildCustomDocument(
-          'mutation',
-          'RunMigration',
-          'runMigration',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RunMigrationInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RunMigrationPayload'
-        ),
-      }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
       args: ProvisionBucketVariables,
       options: {
@@ -121,6 +92,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
+        ),
+      }),
+    runMigration: <S extends RunMigrationPayloadSelect>(
+      args: RunMigrationVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RunMigrationPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        runMigration: InferSelectResult<RunMigrationPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RunMigration',
+        fieldName: 'runMigration',
+        ...buildCustomDocument(
+          'mutation',
+          'RunMigration',
+          'runMigration',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RunMigrationInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RunMigrationPayload'
         ),
       }),
   };

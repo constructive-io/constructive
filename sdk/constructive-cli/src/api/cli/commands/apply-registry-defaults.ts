@@ -21,13 +21,13 @@ export default async (
     const answers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'nodeType',
-        message: 'nodeType',
+        name: 'data',
+        message: 'data',
       },
       {
         type: 'text',
-        name: 'data',
-        message: 'data',
+        name: 'nodeType',
+        message: 'nodeType',
       },
     ]);
     const client = getClient();

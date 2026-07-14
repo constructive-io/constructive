@@ -16,15 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  siteId: 'uuid',
-  name: 'string',
-  appImage: 'string',
-  appStoreLink: 'string',
-  appStoreId: 'string',
   appIdPrefix: 'string',
+  appImage: 'string',
+  appStoreId: 'string',
+  appStoreLink: 'string',
+  databaseId: 'uuid',
+  id: 'uuid',
+  name: 'string',
   playStoreLink: 'string',
+  siteId: 'uuid',
 };
 const usage =
   '\napp <command>\n\nCommands:\n  list                  List app records\n  find-first            Find first matching app record\n  get                   Get a app by ID\n  create                Create a new app\n  update                Update an existing app\n  delete                Delete a app\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,15 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      siteId: true,
-      name: true,
-      appImage: true,
-      appStoreLink: true,
-      appStoreId: true,
       appIdPrefix: true,
+      appImage: true,
+      appStoreId: true,
+      appStoreLink: true,
+      databaseId: true,
+      id: true,
+      name: true,
       playStoreLink: true,
+      siteId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AppSelect, AppFilter, AppOrderBy> & {
@@ -106,15 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      siteId: true,
-      name: true,
-      appImage: true,
-      appStoreLink: true,
-      appStoreId: true,
       appIdPrefix: true,
+      appImage: true,
+      appStoreId: true,
+      appStoreLink: true,
+      databaseId: true,
+      id: true,
+      name: true,
       playStoreLink: true,
+      siteId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AppSelect, AppFilter, AppOrderBy> & {
@@ -147,15 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          siteId: true,
-          name: true,
-          appImage: true,
-          appStoreLink: true,
-          appStoreId: true,
           appIdPrefix: true,
+          appImage: true,
+          appStoreId: true,
+          appStoreLink: true,
+          databaseId: true,
+          id: true,
+          name: true,
           playStoreLink: true,
+          siteId: true,
         },
       })
       .execute();
@@ -173,20 +173,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'siteId',
-        message: 'siteId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
+        name: 'appIdPrefix',
+        message: 'appIdPrefix',
         required: false,
         skipPrompt: true,
       },
@@ -199,13 +187,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'appStoreLink',
-        message: 'appStoreLink',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'appStoreId',
         message: 'appStoreId',
         required: false,
@@ -213,8 +194,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'appIdPrefix',
-        message: 'appIdPrefix',
+        name: 'appStoreLink',
+        message: 'appStoreLink',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
         required: false,
         skipPrompt: true,
       },
@@ -225,6 +219,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'siteId',
+        message: 'siteId',
+        required: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateAppInput['app'];
@@ -232,25 +232,25 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.app
       .create({
         data: {
-          databaseId: cleanedData.databaseId,
-          siteId: cleanedData.siteId,
-          name: cleanedData.name,
-          appImage: cleanedData.appImage,
-          appStoreLink: cleanedData.appStoreLink,
-          appStoreId: cleanedData.appStoreId,
           appIdPrefix: cleanedData.appIdPrefix,
+          appImage: cleanedData.appImage,
+          appStoreId: cleanedData.appStoreId,
+          appStoreLink: cleanedData.appStoreLink,
+          databaseId: cleanedData.databaseId,
+          name: cleanedData.name,
           playStoreLink: cleanedData.playStoreLink,
+          siteId: cleanedData.siteId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          siteId: true,
-          name: true,
-          appImage: true,
-          appStoreLink: true,
-          appStoreId: true,
           appIdPrefix: true,
+          appImage: true,
+          appStoreId: true,
+          appStoreLink: true,
+          databaseId: true,
+          id: true,
+          name: true,
           playStoreLink: true,
+          siteId: true,
         },
       })
       .execute();
@@ -274,20 +274,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'siteId',
-        message: 'siteId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
+        name: 'appIdPrefix',
+        message: 'appIdPrefix',
         required: false,
         skipPrompt: true,
       },
@@ -300,13 +288,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'appStoreLink',
-        message: 'appStoreLink',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'appStoreId',
         message: 'appStoreId',
         required: false,
@@ -314,8 +295,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'appIdPrefix',
-        message: 'appIdPrefix',
+        name: 'appStoreLink',
+        message: 'appStoreLink',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
         required: false,
         skipPrompt: true,
       },
@@ -325,6 +319,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'playStoreLink',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'siteId',
+        message: 'siteId',
+        required: false,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -336,25 +336,25 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
-          siteId: cleanedData.siteId,
-          name: cleanedData.name,
-          appImage: cleanedData.appImage,
-          appStoreLink: cleanedData.appStoreLink,
-          appStoreId: cleanedData.appStoreId,
           appIdPrefix: cleanedData.appIdPrefix,
+          appImage: cleanedData.appImage,
+          appStoreId: cleanedData.appStoreId,
+          appStoreLink: cleanedData.appStoreLink,
+          databaseId: cleanedData.databaseId,
+          name: cleanedData.name,
           playStoreLink: cleanedData.playStoreLink,
+          siteId: cleanedData.siteId,
         },
         select: {
-          id: true,
-          databaseId: true,
-          siteId: true,
-          name: true,
-          appImage: true,
-          appStoreLink: true,
-          appStoreId: true,
           appIdPrefix: true,
+          appImage: true,
+          appStoreId: true,
+          appStoreLink: true,
+          databaseId: true,
+          id: true,
+          name: true,
           playStoreLink: true,
+          siteId: true,
         },
       })
       .execute();

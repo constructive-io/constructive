@@ -26,23 +26,23 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
-| `platform-config` | platformConfig CRUD operations |
 | `config` | config CRUD operations |
+| `platform-config` | platformConfig CRUD operations |
 | `platform-internal-secret` | platformInternalSecret CRUD operations |
 | `platform-secret` | platformSecret CRUD operations |
 | `secret` | secret CRUD operations |
-| `platform-internal-secrets-del` | platformInternalSecretsDel |
-| `platform-secrets-del` | platformSecretsDel |
 | `secrets-del` | _secretsDel |
-| `platform-internal-secrets-remove-array` | platformInternalSecretsRemoveArray |
-| `platform-secrets-remove-array` | platformSecretsRemoveArray |
 | `secrets-remove-array` | _secretsRemoveArray |
+| `secrets-rotate` | _secretsRotate |
+| `secrets-set` | _secretsSet |
+| `platform-internal-secrets-del` | platformInternalSecretsDel |
+| `platform-internal-secrets-remove-array` | platformInternalSecretsRemoveArray |
 | `platform-internal-secrets-rotate` | platformInternalSecretsRotate |
 | `platform-internal-secrets-set` | platformInternalSecretsSet |
+| `platform-secrets-del` | platformSecretsDel |
+| `platform-secrets-remove-array` | platformSecretsRemoveArray |
 | `platform-secrets-rotate` | platformSecretsRotate |
-| `secrets-rotate` | _secretsRotate |
 | `platform-secrets-set` | platformSecretsSet |
-| `secrets-set` | _secretsSet |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -89,38 +89,6 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
-### `platform-config`
-
-CRUD operations for PlatformConfig records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformConfig records |
-| `find-first` | Find first matching platformConfig record |
-| `get` | Get a platformConfig by id |
-| `create` | Create a new platformConfig |
-| `update` | Update an existing platformConfig |
-| `delete` | Delete a platformConfig |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `namespaceId` | UUID |
-| `name` | String |
-| `provider` | String |
-| `value` | String |
-| `labels` | JSON |
-| `annotations` | JSON |
-| `description` | String |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `expiresAt` | Datetime |
-
-**Required create fields:** `namespaceId`, `name`
-**Optional create fields (backend defaults):** `provider`, `value`, `labels`, `annotations`, `description`, `expiresAt`
-
 ### `config`
 
 CRUD operations for Config records.
@@ -138,21 +106,53 @@ CRUD operations for Config records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `namespaceId` | UUID |
-| `databaseId` | UUID |
-| `name` | String |
-| `provider` | String |
-| `value` | String |
-| `labels` | JSON |
 | `annotations` | JSON |
-| `description` | String |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
+| `databaseId` | UUID |
+| `description` | String |
 | `expiresAt` | Datetime |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `namespaceId` | UUID |
+| `provider` | String |
+| `updatedAt` | Datetime |
+| `value` | String |
 
-**Required create fields:** `namespaceId`, `databaseId`, `name`
-**Optional create fields (backend defaults):** `provider`, `value`, `labels`, `annotations`, `description`, `expiresAt`
+**Required create fields:** `databaseId`, `name`, `namespaceId`
+**Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `value`
+
+### `platform-config`
+
+CRUD operations for PlatformConfig records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformConfig records |
+| `find-first` | Find first matching platformConfig record |
+| `get` | Get a platformConfig by id |
+| `create` | Create a new platformConfig |
+| `update` | Update an existing platformConfig |
+| `delete` | Delete a platformConfig |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `annotations` | JSON |
+| `createdAt` | Datetime |
+| `description` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `namespaceId` | UUID |
+| `provider` | String |
+| `updatedAt` | Datetime |
+| `value` | String |
+
+**Required create fields:** `name`, `namespaceId`
+**Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `value`
 
 ### `platform-internal-secret`
 
@@ -171,18 +171,18 @@ CRUD operations for PlatformInternalSecret records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `name` | String |
-| `namespaceId` | UUID |
-| `description` | String |
-| `labels` | JSON |
 | `annotations` | JSON |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `rotatedAt` | Datetime |
+| `description` | String |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `namespaceId` | UUID |
 | `retiredAt` | Datetime |
+| `rotatedAt` | Datetime |
+| `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `name`, `namespaceId`, `description`, `labels`, `annotations`, `rotatedAt`, `retiredAt`
+**Optional create fields (backend defaults):** `annotations`, `description`, `labels`, `name`, `namespaceId`, `retiredAt`, `rotatedAt`
 
 ### `platform-secret`
 
@@ -201,19 +201,19 @@ CRUD operations for PlatformSecret records.
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `name` | String |
-| `provider` | String |
-| `namespaceId` | UUID |
-| `description` | String |
-| `labels` | JSON |
 | `annotations` | JSON |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `rotatedAt` | Datetime |
+| `description` | String |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `namespaceId` | UUID |
+| `provider` | String |
 | `retiredAt` | Datetime |
+| `rotatedAt` | Datetime |
+| `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `name`, `provider`, `namespaceId`, `description`, `labels`, `annotations`, `rotatedAt`, `retiredAt`
+**Optional create fields (backend defaults):** `annotations`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
 
 ### `secret`
 
@@ -232,48 +232,22 @@ CRUD operations for Secret records.
 
 | Field | Type |
 |-------|------|
-| `databaseId` | UUID |
-| `id` | UUID |
-| `name` | String |
-| `provider` | String |
-| `namespaceId` | UUID |
-| `description` | String |
-| `labels` | JSON |
 | `annotations` | JSON |
 | `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `rotatedAt` | Datetime |
+| `databaseId` | UUID |
+| `description` | String |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `namespaceId` | UUID |
+| `provider` | String |
 | `retiredAt` | Datetime |
+| `rotatedAt` | Datetime |
+| `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `databaseId`, `name`, `provider`, `namespaceId`, `description`, `labels`, `annotations`, `rotatedAt`, `retiredAt`
+**Optional create fields (backend defaults):** `annotations`, `databaseId`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
 
 ## Custom Operations
-
-### `platform-internal-secrets-del`
-
-platformInternalSecretsDel
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.secretName` | String |
-  | `--input.namespaceId` | UUID |
-
-### `platform-secrets-del`
-
-platformSecretsDel
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.secretName` | String |
-  | `--input.namespaceId` | UUID |
 
 ### `secrets-del`
 
@@ -286,34 +260,8 @@ _secretsDel
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.databaseId` | UUID |
+  | `--input.namespaceId` | UUID |
   | `--input.secretName` | String |
-  | `--input.namespaceId` | UUID |
-
-### `platform-internal-secrets-remove-array`
-
-platformInternalSecretsRemoveArray
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.secretNames` | String |
-  | `--input.namespaceId` | UUID |
-
-### `platform-secrets-remove-array`
-
-platformSecretsRemoveArray
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.secretNames` | String |
-  | `--input.namespaceId` | UUID |
 
 ### `secrets-remove-array`
 
@@ -326,53 +274,8 @@ _secretsRemoveArray
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.databaseId` | UUID |
+  | `--input.namespaceId` | UUID |
   | `--input.secretNames` | String |
-  | `--input.namespaceId` | UUID |
-
-### `platform-internal-secrets-rotate`
-
-platformInternalSecretsRotate
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.secretName` | String |
-  | `--input.secretValue` | String |
-  | `--input.namespaceId` | UUID |
-  | `--input.algo` | String |
-
-### `platform-internal-secrets-set`
-
-platformInternalSecretsSet
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.secretName` | String |
-  | `--input.secretValue` | String |
-  | `--input.secretNamespaceId` | UUID |
-  | `--input.algo` | String |
-
-### `platform-secrets-rotate`
-
-platformSecretsRotate
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.secretName` | String |
-  | `--input.secretValue` | String |
-  | `--input.namespaceId` | UUID |
-  | `--input.algo` | String |
 
 ### `secrets-rotate`
 
@@ -383,28 +286,12 @@ _secretsRotate
 
   | Argument | Type |
   |----------|------|
+  | `--input.algo` | String |
   | `--input.clientMutationId` | String |
   | `--input.databaseId` | UUID |
-  | `--input.secretName` | String |
-  | `--input.secretValue` | String |
   | `--input.namespaceId` | UUID |
-  | `--input.algo` | String |
-
-### `platform-secrets-set`
-
-platformSecretsSet
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
   | `--input.secretName` | String |
   | `--input.secretValue` | String |
-  | `--input.secretNamespaceId` | UUID |
-  | `--input.algo` | String |
-  | `--input.provider` | String |
 
 ### `secrets-set`
 
@@ -415,13 +302,126 @@ _secretsSet
 
   | Argument | Type |
   |----------|------|
+  | `--input.algo` | String |
   | `--input.clientMutationId` | String |
+  | `--input.provider` | String |
   | `--input.scopeDatabaseId` | UUID |
   | `--input.secretName` | String |
-  | `--input.secretValue` | String |
   | `--input.secretNamespaceId` | UUID |
+  | `--input.secretValue` | String |
+
+### `platform-internal-secrets-del`
+
+platformInternalSecretsDel
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.secretName` | String |
+
+### `platform-internal-secrets-remove-array`
+
+platformInternalSecretsRemoveArray
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.secretNames` | String |
+
+### `platform-internal-secrets-rotate`
+
+platformInternalSecretsRotate
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
   | `--input.algo` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.secretName` | String |
+  | `--input.secretValue` | String |
+
+### `platform-internal-secrets-set`
+
+platformInternalSecretsSet
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.algo` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.secretName` | String |
+  | `--input.secretNamespaceId` | UUID |
+  | `--input.secretValue` | String |
+
+### `platform-secrets-del`
+
+platformSecretsDel
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.secretName` | String |
+
+### `platform-secrets-remove-array`
+
+platformSecretsRemoveArray
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.secretNames` | String |
+
+### `platform-secrets-rotate`
+
+platformSecretsRotate
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.algo` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.namespaceId` | UUID |
+  | `--input.secretName` | String |
+  | `--input.secretValue` | String |
+
+### `platform-secrets-set`
+
+platformSecretsSet
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.algo` | String |
+  | `--input.clientMutationId` | String |
   | `--input.provider` | String |
+  | `--input.secretName` | String |
+  | `--input.secretNamespaceId` | UUID |
+  | `--input.secretValue` | String |
 
 ### `provision-bucket`
 

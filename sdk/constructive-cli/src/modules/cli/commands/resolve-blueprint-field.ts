@@ -26,13 +26,13 @@ export default async (
       },
       {
         type: 'text',
-        name: 'tableId',
-        message: 'tableId',
+        name: 'fieldName',
+        message: 'fieldName',
       },
       {
         type: 'text',
-        name: 'fieldName',
-        message: 'fieldName',
+        name: 'tableId',
+        message: 'tableId',
       },
     ]);
     const client = getClient();

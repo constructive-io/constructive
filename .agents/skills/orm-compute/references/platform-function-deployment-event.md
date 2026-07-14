@@ -9,8 +9,8 @@ Deployment lifecycle events — audit log of provisioning, scaling, and failure 
 ```typescript
 db.platformFunctionDeploymentEvent.findMany({ select: { id: true } }).execute()
 db.platformFunctionDeploymentEvent.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformFunctionDeploymentEvent.create({ data: { deploymentId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute()
-db.platformFunctionDeploymentEvent.update({ where: { id: '<UUID>' }, data: { deploymentId: '<UUID>' }, select: { id: true } }).execute()
+db.platformFunctionDeploymentEvent.create({ data: { actorId: '<UUID>', deploymentId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>' }, select: { id: true } }).execute()
+db.platformFunctionDeploymentEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.platformFunctionDeploymentEvent.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.platformFunctionDeploymentEvent.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.platformFunctionDeploymentEvent.findMany({
-  select: { id: true, deploymentId: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.platformFunctionDeploymentEvent.findMany({
 
 ```typescript
 const item = await db.platformFunctionDeploymentEvent.create({
-  data: { deploymentId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>' },
+  data: { actorId: '<UUID>', deploymentId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>' },
   select: { id: true }
 }).execute();
 ```

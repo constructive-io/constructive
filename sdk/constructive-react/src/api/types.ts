@@ -9,586 +9,586 @@ export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
-export interface Function {
-  id: string | null;
+export interface Api {
+  annotations: unknown | null;
+  anonRole: string | null;
   databaseId: string | null;
-  schemaId: string | null;
-  name: string | null;
-}
-export interface Schema {
+  dbname: string | null;
   id: string | null;
-  databaseId: string | null;
-  name: string | null;
-  schemaName: string | null;
-  label: string | null;
-  description: string | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
   isPublic: boolean | null;
-  apiExposure: ApiExposureLevel | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface Table {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
+  labels: unknown | null;
   name: string | null;
-  label: string | null;
-  description: string | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  useRls: boolean | null;
-  timestamps: boolean | null;
-  peoplestamps: boolean | null;
-  pluralName: string | null;
-  singularName: string | null;
-  tags: string[] | null;
-  stepUp: unknown | null;
-  partitioned: boolean | null;
-  partitionStrategy: string | null;
-  partitionKeyNames: string[] | null;
-  partitionKeyTypes: string[] | null;
+  roleName: string | null;
+}
+export interface ApiModule {
+  apiId: string | null;
+  data: unknown | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+}
+export interface ApiSchema {
+  apiId: string | null;
+  databaseId: string | null;
+  id: string | null;
+  schemaId: string | null;
+}
+export interface ApiSetting {
+  apiId: string | null;
+  databaseId: string | null;
+  enableAggregates: boolean | null;
+  enableBulk: boolean | null;
+  enableConnectionFilter: boolean | null;
+  enableDirectUploads: boolean | null;
+  enableI18N: boolean | null;
+  enableLlm: boolean | null;
+  enableLtree: boolean | null;
+  enableManyToMany: boolean | null;
+  enablePostgis: boolean | null;
+  enablePresignedUploads: boolean | null;
+  enableRealtime: boolean | null;
+  enableSearch: boolean | null;
+  id: string | null;
+  options: unknown | null;
+}
+export interface App {
+  appIdPrefix: string | null;
+  appImage: ConstructiveInternalTypeImage | null;
+  appStoreId: string | null;
+  appStoreLink: ConstructiveInternalTypeUrl | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  playStoreLink: ConstructiveInternalTypeUrl | null;
+  siteId: string | null;
+}
+export interface AstMigration {
+  action: string | null;
+  actionId: string | null;
+  actorId: string | null;
   createdAt: string | null;
-  updatedAt: string | null;
-  inheritsId: string | null;
+  databaseId: string | null;
+  deploy: unknown | null;
+  deploys: string | null;
+  id: number | null;
+  name: string | null;
+  payload: unknown | null;
+  requires: string[] | null;
+  revert: unknown | null;
+  verify: unknown | null;
 }
 export interface CheckConstraint {
-  id: string | null;
+  category: ObjectCategory | null;
+  createdAt: string | null;
   databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  type: string | null;
-  fieldIds: string[] | null;
   expr: unknown | null;
+  fieldIds: string[] | null;
+  id: string | null;
+  name: string | null;
   smartTags: unknown | null;
-  category: ObjectCategory | null;
+  tableId: string | null;
   tags: string[] | null;
-  createdAt: string | null;
+  type: string | null;
   updatedAt: string | null;
 }
-export interface Field {
-  id: string | null;
+export interface CompositeType {
+  attributes: unknown | null;
+  category: ObjectCategory | null;
   databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
+  description: string | null;
+  id: string | null;
   label: string | null;
-  description: string | null;
+  name: string | null;
+  schemaId: string | null;
   smartTags: unknown | null;
-  isRequired: boolean | null;
-  apiRequired: boolean | null;
-  defaultValue: unknown | null;
-  generationExpression: unknown | null;
-  generationType: string | null;
-  type: unknown | null;
-  fieldOrder: number | null;
-  regexp: string | null;
-  chk: unknown | null;
-  chkExpr: unknown | null;
-  min: number | null;
-  max: number | null;
   tags: string[] | null;
-  category: ObjectCategory | null;
-  createdAt: string | null;
-  updatedAt: string | null;
 }
-export interface SpatialRelation {
-  id: string | null;
+export interface CorsSetting {
+  allowedOrigins: string[] | null;
+  apiId: string | null;
   databaseId: string | null;
-  tableId: string | null;
-  fieldId: string | null;
-  refTableId: string | null;
-  refFieldId: string | null;
+  id: string | null;
+}
+export interface Database {
+  createdAt: string | null;
+  hash: string | null;
+  id: string | null;
+  label: string | null;
   name: string | null;
-  operator: string | null;
-  paramName: string | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-  createdAt: string | null;
+  ownerId: string | null;
+  platform: boolean | null;
+  schemaHash: string | null;
   updatedAt: string | null;
 }
-export interface ForeignKeyConstraint {
-  id: string | null;
+export interface DatabaseSetting {
+  annotations: unknown | null;
   databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  description: string | null;
-  smartTags: unknown | null;
-  type: string | null;
-  fieldIds: string[] | null;
-  refTableId: string | null;
-  refFieldIds: string[] | null;
-  deleteAction: string | null;
-  updateAction: string | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface FullTextSearch {
+  enableAggregates: boolean | null;
+  enableBulk: boolean | null;
+  enableConnectionFilter: boolean | null;
+  enableDirectUploads: boolean | null;
+  enableI18N: boolean | null;
+  enableLlm: boolean | null;
+  enableLtree: boolean | null;
+  enableManyToMany: boolean | null;
+  enablePostgis: boolean | null;
+  enablePresignedUploads: boolean | null;
+  enableRealtime: boolean | null;
+  enableSearch: boolean | null;
   id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  fieldId: string | null;
-  fieldIds: string[] | null;
-  weights: string[] | null;
-  langs: string[] | null;
-  langColumn: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface Index {
-  id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  fieldIds: string[] | null;
-  includeFieldIds: string[] | null;
-  accessMethod: string | null;
-  indexParams: unknown | null;
-  whereClause: unknown | null;
-  isUnique: boolean | null;
+  labels: unknown | null;
   options: unknown | null;
-  opClasses: string[] | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
+}
+export interface DatabaseTransfer {
+  completedAt: string | null;
   createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface Policy {
-  id: string | null;
   databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  granteeName: string | null;
-  privilege: string | null;
-  permissive: boolean | null;
-  disabled: boolean | null;
-  policyType: string | null;
-  data: unknown | null;
-  withCheck: unknown | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface PrimaryKeyConstraint {
+  expiresAt: string | null;
   id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  type: string | null;
-  fieldIds: string[] | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface TableGrant {
-  id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  privilege: string | null;
-  granteeName: string | null;
-  fieldIds: string[] | null;
-  isGrant: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface Trigger {
-  id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  event: string | null;
-  functionName: string | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface UniqueConstraint {
-  id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  description: string | null;
-  smartTags: unknown | null;
-  type: string | null;
-  fieldIds: string[] | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface View {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  name: string | null;
-  tableId: string | null;
-  viewType: string | null;
-  data: unknown | null;
-  filterType: string | null;
-  filterData: unknown | null;
-  securityInvoker: boolean | null;
-  isReadOnly: boolean | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-}
-export interface ViewTable {
-  id: string | null;
-  databaseId: string | null;
-  viewId: string | null;
-  tableId: string | null;
-  joinOrder: number | null;
-}
-export interface ViewGrant {
-  id: string | null;
-  databaseId: string | null;
-  viewId: string | null;
-  granteeName: string | null;
-  privilege: string | null;
-  withGrantOption: boolean | null;
-  isGrant: boolean | null;
-}
-export interface ViewRule {
-  id: string | null;
-  databaseId: string | null;
-  viewId: string | null;
-  name: string | null;
-  event: string | null;
-  action: string | null;
-}
-export interface EmbeddingChunk {
-  id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  embeddingFieldId: string | null;
-  chunksTableId: string | null;
-  chunksTableName: string | null;
-  contentFieldName: string | null;
-  dimensions: number | null;
-  metric: string | null;
-  chunkSize: number | null;
-  chunkOverlap: number | null;
-  chunkStrategy: string | null;
-  metadataFields: unknown | null;
-  searchIndexes: unknown | null;
-  enqueueChunkingJob: boolean | null;
-  chunkingTaskName: string | null;
-  embeddingModel: string | null;
-  embeddingProvider: string | null;
-  parentFkFieldId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface SchemaGrant {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  granteeName: string | null;
-  createdAt: string | null;
+  initiatedBy: string | null;
+  notes: string | null;
+  sourceApproved: boolean | null;
+  sourceApprovedAt: string | null;
+  status: string | null;
+  targetApproved: boolean | null;
+  targetApprovedAt: string | null;
+  targetOwnerId: string | null;
   updatedAt: string | null;
 }
 export interface DefaultPrivilege {
-  id: string | null;
   databaseId: string | null;
-  schemaId: string | null;
+  granteeName: string | null;
+  id: string | null;
+  isGrant: boolean | null;
   objectType: string | null;
   privilege: string | null;
-  granteeName: string | null;
-  isGrant: boolean | null;
-}
-export interface Enum {
-  id: string | null;
-  databaseId: string | null;
   schemaId: string | null;
-  name: string | null;
-  label: string | null;
-  description: string | null;
-  values: string[] | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-}
-export interface CompositeType {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  name: string | null;
-  label: string | null;
-  description: string | null;
-  attributes: unknown | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  tags: string[] | null;
-}
-export interface ApiSchema {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  apiId: string | null;
-}
-export interface ApiModule {
-  id: string | null;
-  databaseId: string | null;
-  apiId: string | null;
-  name: string | null;
-  data: unknown | null;
 }
 export interface Domain {
-  id: string | null;
-  databaseId: string | null;
+  annotations: unknown | null;
   apiId: string | null;
-  siteId: string | null;
-  serviceId: string | null;
-  subdomain: ConstructiveInternalTypeHostname | null;
+  databaseId: string | null;
   domain: ConstructiveInternalTypeHostname | null;
+  id: string | null;
   labels: unknown | null;
-  annotations: unknown | null;
-}
-export interface SiteMetadatum {
-  id: string | null;
-  databaseId: string | null;
+  serviceId: string | null;
   siteId: string | null;
-  title: string | null;
-  description: string | null;
-  ogImage: ConstructiveInternalTypeImage | null;
+  subdomain: ConstructiveInternalTypeHostname | null;
 }
-export interface SiteModule {
-  id: string | null;
-  databaseId: string | null;
-  siteId: string | null;
-  name: string | null;
-  data: unknown | null;
-}
-export interface SiteTheme {
-  id: string | null;
-  databaseId: string | null;
-  siteId: string | null;
-  theme: unknown | null;
-}
-export interface CorsSetting {
-  id: string | null;
-  databaseId: string | null;
-  apiId: string | null;
-  allowedOrigins: string[] | null;
-}
-export interface TriggerFunction {
-  id: string | null;
-  databaseId: string | null;
-  name: string | null;
-  code: string | null;
+export interface EmbeddingChunk {
+  chunkOverlap: number | null;
+  chunkSize: number | null;
+  chunkStrategy: string | null;
+  chunkingTaskName: string | null;
+  chunksTableId: string | null;
+  chunksTableName: string | null;
+  contentFieldName: string | null;
   createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface Partition {
-  id: string | null;
   databaseId: string | null;
+  dimensions: number | null;
+  embeddingFieldId: string | null;
+  embeddingModel: string | null;
+  embeddingProvider: string | null;
+  enqueueChunkingJob: boolean | null;
+  id: string | null;
+  metadataFields: unknown | null;
+  metric: string | null;
+  parentFkFieldId: string | null;
+  searchIndexes: unknown | null;
   tableId: string | null;
-  strategy: string | null;
-  partitionKeyId: string | null;
-  interval: string | null;
-  retention: string | null;
-  retentionKeepTable: boolean | null;
-  premake: number | null;
-  namingPattern: string | null;
-  isParented: boolean | null;
-  createdAt: string | null;
   updatedAt: string | null;
 }
-export interface DatabaseTransfer {
-  id: string | null;
+export interface Enum {
+  category: ObjectCategory | null;
   databaseId: string | null;
-  targetOwnerId: string | null;
-  sourceApproved: boolean | null;
-  targetApproved: boolean | null;
-  sourceApprovedAt: string | null;
-  targetApprovedAt: string | null;
-  status: string | null;
-  initiatedBy: string | null;
-  notes: string | null;
-  expiresAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  completedAt: string | null;
-}
-export interface Api {
-  id: string | null;
-  databaseId: string | null;
-  name: string | null;
-  dbname: string | null;
-  roleName: string | null;
-  anonRole: string | null;
-  isPublic: boolean | null;
-  labels: unknown | null;
-  annotations: unknown | null;
-}
-export interface Site {
-  id: string | null;
-  databaseId: string | null;
-  title: string | null;
   description: string | null;
-  ogImage: ConstructiveInternalTypeImage | null;
-  favicon: ConstructiveInternalTypeAttachment | null;
-  appleTouchIcon: ConstructiveInternalTypeImage | null;
-  logo: ConstructiveInternalTypeImage | null;
-  dbname: string | null;
-  labels: unknown | null;
-  annotations: unknown | null;
-}
-export interface App {
   id: string | null;
-  databaseId: string | null;
-  siteId: string | null;
+  label: string | null;
   name: string | null;
-  appImage: ConstructiveInternalTypeImage | null;
-  appStoreLink: ConstructiveInternalTypeUrl | null;
-  appStoreId: string | null;
-  appIdPrefix: string | null;
-  playStoreLink: ConstructiveInternalTypeUrl | null;
+  schemaId: string | null;
+  smartTags: unknown | null;
+  tags: string[] | null;
+  values: string[] | null;
 }
-export interface ApiSetting {
-  id: string | null;
+export interface Field {
+  apiRequired: boolean | null;
+  category: ObjectCategory | null;
+  chk: unknown | null;
+  chkExpr: unknown | null;
+  createdAt: string | null;
   databaseId: string | null;
-  apiId: string | null;
-  enableAggregates: boolean | null;
-  enablePostgis: boolean | null;
-  enableSearch: boolean | null;
-  enableDirectUploads: boolean | null;
-  enablePresignedUploads: boolean | null;
-  enableManyToMany: boolean | null;
-  enableConnectionFilter: boolean | null;
-  enableLtree: boolean | null;
-  enableLlm: boolean | null;
-  enableRealtime: boolean | null;
-  enableBulk: boolean | null;
-  enableI18N: boolean | null;
+  defaultValue: unknown | null;
+  description: string | null;
+  fieldOrder: number | null;
+  generationExpression: unknown | null;
+  generationType: string | null;
+  id: string | null;
+  isRequired: boolean | null;
+  label: string | null;
+  max: number | null;
+  min: number | null;
+  name: string | null;
+  regexp: string | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  type: unknown | null;
+  updatedAt: string | null;
+}
+export interface ForeignKeyConstraint {
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  deleteAction: string | null;
+  description: string | null;
+  fieldIds: string[] | null;
+  id: string | null;
+  name: string | null;
+  refFieldIds: string[] | null;
+  refTableId: string | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  type: string | null;
+  updateAction: string | null;
+  updatedAt: string | null;
+}
+export interface FullTextSearch {
+  createdAt: string | null;
+  databaseId: string | null;
+  fieldId: string | null;
+  fieldIds: string[] | null;
+  id: string | null;
+  langColumn: string | null;
+  langs: string[] | null;
+  tableId: string | null;
+  updatedAt: string | null;
+  weights: string[] | null;
+}
+export interface Function {
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  schemaId: string | null;
+}
+export interface Index {
+  accessMethod: string | null;
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  fieldIds: string[] | null;
+  id: string | null;
+  includeFieldIds: string[] | null;
+  indexParams: unknown | null;
+  isUnique: boolean | null;
+  name: string | null;
+  opClasses: string[] | null;
   options: unknown | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  updatedAt: string | null;
+  whereClause: unknown | null;
 }
 export interface MigrateFile {
-  id: string | null;
   databaseId: string | null;
+  id: string | null;
   upload: ConstructiveInternalTypeUpload | null;
 }
 export interface NodeTypeRegistry {
-  name: string | null;
-  slug: string | null;
   category: string | null;
-  displayName: string | null;
   description: string | null;
+  displayName: string | null;
+  name: string | null;
   parameterSchema: unknown | null;
+  slug: string | null;
   tags: string[] | null;
 }
-export interface PubkeySetting {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  cryptoNetwork: string | null;
-  userField: string | null;
-  signUpWithKeyFunctionId: string | null;
-  signInRequestChallengeFunctionId: string | null;
-  signInRecordFailureFunctionId: string | null;
-  signInWithChallengeFunctionId: string | null;
-}
-export interface Database {
-  id: string | null;
-  ownerId: string | null;
-  schemaHash: string | null;
-  name: string | null;
-  label: string | null;
-  hash: string | null;
-  platform: boolean | null;
+export interface Partition {
   createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  interval: string | null;
+  isParented: boolean | null;
+  namingPattern: string | null;
+  partitionKeyId: string | null;
+  premake: number | null;
+  retention: string | null;
+  retentionKeepTable: boolean | null;
+  strategy: string | null;
+  tableId: string | null;
   updatedAt: string | null;
 }
-export interface RlsSetting {
-  id: string | null;
+export interface Policy {
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  data: unknown | null;
   databaseId: string | null;
-  authenticateSchemaId: string | null;
-  roleSchemaId: string | null;
+  disabled: boolean | null;
+  granteeName: string | null;
+  id: string | null;
+  name: string | null;
+  permissive: boolean | null;
+  policyType: string | null;
+  privilege: string | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  updatedAt: string | null;
+  withCheck: unknown | null;
+}
+export interface PrimaryKeyConstraint {
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  fieldIds: string[] | null;
+  id: string | null;
+  name: string | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  type: string | null;
+  updatedAt: string | null;
+}
+export interface PubkeySetting {
+  cryptoNetwork: string | null;
+  databaseId: string | null;
+  id: string | null;
+  schemaId: string | null;
+  signInRecordFailureFunctionId: string | null;
+  signInRequestChallengeFunctionId: string | null;
+  signInWithChallengeFunctionId: string | null;
+  signUpWithKeyFunctionId: string | null;
+  userField: string | null;
+}
+export interface RlsSetting {
   authenticateFunctionId: string | null;
+  authenticateSchemaId: string | null;
   authenticateStrictFunctionId: string | null;
+  currentIpAddressFunctionId: string | null;
   currentRoleFunctionId: string | null;
   currentRoleIdFunctionId: string | null;
   currentUserAgentFunctionId: string | null;
-  currentIpAddressFunctionId: string | null;
+  databaseId: string | null;
+  id: string | null;
+  roleSchemaId: string | null;
+}
+export interface Schema {
+  apiExposure: ApiExposureLevel | null;
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  description: string | null;
+  id: string | null;
+  isPublic: boolean | null;
+  label: string | null;
+  name: string | null;
+  schemaName: string | null;
+  smartTags: unknown | null;
+  tags: string[] | null;
+  updatedAt: string | null;
+}
+export interface SchemaGrant {
+  createdAt: string | null;
+  databaseId: string | null;
+  granteeName: string | null;
+  id: string | null;
+  schemaId: string | null;
+  updatedAt: string | null;
+}
+export interface Site {
+  annotations: unknown | null;
+  appleTouchIcon: ConstructiveInternalTypeImage | null;
+  databaseId: string | null;
+  dbname: string | null;
+  description: string | null;
+  favicon: ConstructiveInternalTypeAttachment | null;
+  id: string | null;
+  labels: unknown | null;
+  logo: ConstructiveInternalTypeImage | null;
+  ogImage: ConstructiveInternalTypeImage | null;
+  title: string | null;
+}
+export interface SiteMetadatum {
+  databaseId: string | null;
+  description: string | null;
+  id: string | null;
+  ogImage: ConstructiveInternalTypeImage | null;
+  siteId: string | null;
+  title: string | null;
+}
+export interface SiteModule {
+  data: unknown | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  siteId: string | null;
+}
+export interface SiteTheme {
+  databaseId: string | null;
+  id: string | null;
+  siteId: string | null;
+  theme: unknown | null;
+}
+export interface SpatialRelation {
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  fieldId: string | null;
+  id: string | null;
+  name: string | null;
+  operator: string | null;
+  paramName: string | null;
+  refFieldId: string | null;
+  refTableId: string | null;
+  tableId: string | null;
+  tags: string[] | null;
+  updatedAt: string | null;
 }
 export interface SqlAction {
-  id: number | null;
-  name: string | null;
+  action: string | null;
+  actionId: string | null;
+  actorId: string | null;
+  content: string | null;
+  createdAt: string | null;
   databaseId: string | null;
   deploy: string | null;
   deps: string[] | null;
+  id: number | null;
+  name: string | null;
   payload: unknown | null;
-  content: string | null;
   revert: string | null;
   verify: string | null;
-  createdAt: string | null;
-  action: string | null;
-  actionId: string | null;
-  actorId: string | null;
 }
-export interface DatabaseSetting {
+export interface Table {
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  description: string | null;
   id: string | null;
-  databaseId: string | null;
-  enableAggregates: boolean | null;
-  enablePostgis: boolean | null;
-  enableSearch: boolean | null;
-  enableDirectUploads: boolean | null;
-  enablePresignedUploads: boolean | null;
-  enableManyToMany: boolean | null;
-  enableConnectionFilter: boolean | null;
-  enableLtree: boolean | null;
-  enableLlm: boolean | null;
-  enableRealtime: boolean | null;
-  enableBulk: boolean | null;
-  enableI18N: boolean | null;
-  options: unknown | null;
-  labels: unknown | null;
-  annotations: unknown | null;
-}
-export interface AstMigration {
-  id: number | null;
-  databaseId: string | null;
+  inheritsId: string | null;
+  label: string | null;
   name: string | null;
-  requires: string[] | null;
-  payload: unknown | null;
-  deploys: string | null;
-  deploy: unknown | null;
-  revert: unknown | null;
-  verify: unknown | null;
+  partitionKeyNames: string[] | null;
+  partitionKeyTypes: string[] | null;
+  partitionStrategy: string | null;
+  partitioned: boolean | null;
+  peoplestamps: boolean | null;
+  pluralName: string | null;
+  schemaId: string | null;
+  singularName: string | null;
+  smartTags: unknown | null;
+  stepUp: unknown | null;
+  tags: string[] | null;
+  timestamps: boolean | null;
+  updatedAt: string | null;
+  useRls: boolean | null;
+}
+export interface TableGrant {
   createdAt: string | null;
+  databaseId: string | null;
+  fieldIds: string[] | null;
+  granteeName: string | null;
+  id: string | null;
+  isGrant: boolean | null;
+  privilege: string | null;
+  tableId: string | null;
+  updatedAt: string | null;
+}
+export interface Trigger {
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  event: string | null;
+  functionName: string | null;
+  id: string | null;
+  name: string | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  updatedAt: string | null;
+}
+export interface TriggerFunction {
+  code: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  updatedAt: string | null;
+}
+export interface UniqueConstraint {
+  category: ObjectCategory | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  description: string | null;
+  fieldIds: string[] | null;
+  id: string | null;
+  name: string | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  type: string | null;
+  updatedAt: string | null;
+}
+export interface View {
+  category: ObjectCategory | null;
+  data: unknown | null;
+  databaseId: string | null;
+  filterData: unknown | null;
+  filterType: string | null;
+  id: string | null;
+  isReadOnly: boolean | null;
+  name: string | null;
+  schemaId: string | null;
+  securityInvoker: boolean | null;
+  smartTags: unknown | null;
+  tableId: string | null;
+  tags: string[] | null;
+  viewType: string | null;
+}
+export interface ViewGrant {
+  databaseId: string | null;
+  granteeName: string | null;
+  id: string | null;
+  isGrant: boolean | null;
+  privilege: string | null;
+  viewId: string | null;
+  withGrantOption: boolean | null;
+}
+export interface ViewRule {
   action: string | null;
-  actionId: string | null;
-  actorId: string | null;
+  databaseId: string | null;
+  event: string | null;
+  id: string | null;
+  name: string | null;
+  viewId: string | null;
+}
+export interface ViewTable {
+  databaseId: string | null;
+  id: string | null;
+  joinOrder: number | null;
+  tableId: string | null;
+  viewId: string | null;
 }
 export interface WebauthnSetting {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  credentialsSchemaId: string | null;
-  sessionsSchemaId: string | null;
-  sessionSecretsSchemaId: string | null;
-  credentialsTableId: string | null;
-  sessionsTableId: string | null;
-  sessionCredentialsTableId: string | null;
-  sessionSecretsTableId: string | null;
-  userFieldId: string | null;
-  rpId: string | null;
-  rpName: string | null;
-  originAllowlist: string[] | null;
   attestationType: string | null;
+  challengeExpirySeconds: string | null;
+  credentialsSchemaId: string | null;
+  credentialsTableId: string | null;
+  databaseId: string | null;
+  id: string | null;
+  originAllowlist: string[] | null;
   requireUserVerification: boolean | null;
   residentKey: string | null;
-  challengeExpirySeconds: string | null;
+  rpId: string | null;
+  rpName: string | null;
+  schemaId: string | null;
+  sessionCredentialsTableId: string | null;
+  sessionSecretsSchemaId: string | null;
+  sessionSecretsTableId: string | null;
+  sessionsSchemaId: string | null;
+  sessionsTableId: string | null;
+  userFieldId: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

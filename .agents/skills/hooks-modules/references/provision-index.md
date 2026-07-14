@@ -7,7 +7,7 @@ Creates an index on a table. Accepts a jsonb definition with columns (array of n
 ## Usage
 
 ```typescript
-const { mutate } = useProvisionIndexMutation(); mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+const { mutate } = useProvisionIndexMutation(); mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useProvisionIndexMutation(); mutate({ input: { databaseId: '<
 
 ```typescript
 const { mutate, isLoading } = useProvisionIndexMutation();
-mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```

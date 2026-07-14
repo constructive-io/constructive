@@ -9,8 +9,8 @@ Logical namespace containers for grouping secrets, config, functions, and other 
 ```typescript
 db.namespace.findMany({ select: { id: true } }).execute()
 db.namespace.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.namespace.create({ data: { name: '<String>', namespaceName: '<String>', description: '<String>', isActive: '<Boolean>', status: '<String>', lastError: '<String>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>', isManaged: '<Boolean>' }, select: { id: true } }).execute()
-db.namespace.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.namespace.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' }, select: { id: true } }).execute()
+db.namespace.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
 db.namespace.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.namespace.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.namespace.findMany({
-  select: { id: true, name: true }
+  select: { id: true, annotations: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.namespace.findMany({
 
 ```typescript
 const item = await db.namespace.create({
-  data: { name: '<String>', namespaceName: '<String>', description: '<String>', isActive: '<Boolean>', status: '<String>', lastError: '<String>', labels: '<JSON>', annotations: '<JSON>', databaseId: '<UUID>', isManaged: '<Boolean>' },
+  data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', isActive: '<Boolean>', isManaged: '<Boolean>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceName: '<String>', status: '<String>' },
   select: { id: true }
 }).execute();
 ```

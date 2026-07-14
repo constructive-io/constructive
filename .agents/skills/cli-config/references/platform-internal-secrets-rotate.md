@@ -7,7 +7,7 @@ Execute the platformInternalSecretsRotate mutation
 ## Usage
 
 ```bash
-csdk platform-internal-secrets-rotate --input.clientMutationId <String> --input.secretName <String> --input.secretValue <String> --input.namespaceId <UUID> --input.algo <String>
+csdk platform-internal-secrets-rotate --input.algo <String> --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretName <String> --input.secretValue <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk platform-internal-secrets-rotate --input.clientMutationId <String> --input.
 ### Run platformInternalSecretsRotate
 
 ```bash
-csdk platform-internal-secrets-rotate --input.clientMutationId <String> --input.secretName <String> --input.secretValue <String> --input.namespaceId <UUID> --input.algo <String>
+csdk platform-internal-secrets-rotate --input.algo <String> --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretName <String> --input.secretValue <String>
 ```

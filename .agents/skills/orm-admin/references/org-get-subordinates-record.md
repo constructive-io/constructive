@@ -9,8 +9,8 @@ ORM operations for OrgGetSubordinatesRecord records
 ```typescript
 db.orgGetSubordinatesRecord.findMany({ select: { id: true } }).execute()
 db.orgGetSubordinatesRecord.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgGetSubordinatesRecord.create({ data: { userId: '<UUID>', depth: '<Int>' }, select: { id: true } }).execute()
-db.orgGetSubordinatesRecord.update({ where: { id: '<UUID>' }, data: { userId: '<UUID>' }, select: { id: true } }).execute()
+db.orgGetSubordinatesRecord.create({ data: { depth: '<Int>', userId: '<UUID>' }, select: { id: true } }).execute()
+db.orgGetSubordinatesRecord.update({ where: { id: '<UUID>' }, data: { depth: '<Int>' }, select: { id: true } }).execute()
 db.orgGetSubordinatesRecord.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgGetSubordinatesRecord.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgGetSubordinatesRecord.findMany({
-  select: { id: true, userId: true }
+  select: { id: true, depth: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgGetSubordinatesRecord.findMany({
 
 ```typescript
 const item = await db.orgGetSubordinatesRecord.create({
-  data: { userId: '<UUID>', depth: '<Int>' },
+  data: { depth: '<Int>', userId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

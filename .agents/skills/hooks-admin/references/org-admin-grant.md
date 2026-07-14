@@ -7,8 +7,8 @@ Records of admin role grants and revocations between members
 ## Usage
 
 ```typescript
-useOrgAdminGrantsQuery({ selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } } })
-useOrgAdminGrantQuery({ id: '<UUID>', selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } } })
+useOrgAdminGrantsQuery({ selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } } })
+useOrgAdminGrantQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } } })
 useCreateOrgAdminGrantMutation({ selection: { fields: { id: true } } })
 useUpdateOrgAdminGrantMutation({ selection: { fields: { id: true } } })
 useDeleteOrgAdminGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgAdminGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgAdminGrantsQuery({
-  selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { actorId: true, createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgAdminGrantsQuery({
 const { mutate } = useCreateOrgAdminGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
+mutate({ actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```

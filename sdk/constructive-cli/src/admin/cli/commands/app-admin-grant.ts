@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  actorId: 'uuid',
+  createdAt: 'string',
+  grantorId: 'uuid',
   id: 'uuid',
   isGrant: 'boolean',
-  actorId: 'uuid',
-  grantorId: 'uuid',
-  createdAt: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -74,11 +74,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
+      createdAt: true,
+      grantorId: true,
       id: true,
       isGrant: true,
-      actorId: true,
-      grantorId: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -100,11 +100,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
+      createdAt: true,
+      grantorId: true,
       id: true,
       isGrant: true,
-      actorId: true,
-      grantorId: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -138,11 +138,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          actorId: true,
+          createdAt: true,
+          grantorId: true,
           id: true,
           isGrant: true,
-          actorId: true,
-          grantorId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -160,13 +160,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
-        required: false,
-        skipPrompt: true,
-      },
-      {
         type: 'text',
         name: 'actorId',
         message: 'actorId',
@@ -180,6 +173,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -190,16 +190,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.appAdminGrant
       .create({
         data: {
-          isGrant: cleanedData.isGrant,
           actorId: cleanedData.actorId,
           grantorId: cleanedData.grantorId,
+          isGrant: cleanedData.isGrant,
         },
         select: {
+          actorId: true,
+          createdAt: true,
+          grantorId: true,
           id: true,
           isGrant: true,
-          actorId: true,
-          grantorId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -223,13 +223,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'boolean',
-        name: 'isGrant',
-        message: 'isGrant',
-        required: false,
-        skipPrompt: true,
-      },
-      {
         type: 'text',
         name: 'actorId',
         message: 'actorId',
@@ -243,6 +236,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'boolean',
+        name: 'isGrant',
+        message: 'isGrant',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AppAdminGrantPatch;
@@ -253,16 +253,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          isGrant: cleanedData.isGrant,
           actorId: cleanedData.actorId,
           grantorId: cleanedData.grantorId,
+          isGrant: cleanedData.isGrant,
         },
         select: {
+          actorId: true,
+          createdAt: true,
+          grantorId: true,
           id: true,
           isGrant: true,
-          actorId: true,
-          grantorId: true,
-          createdAt: true,
           updatedAt: true,
         },
       })

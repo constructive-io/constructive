@@ -9,8 +9,8 @@ ORM operations for UniqueConstraint records
 ```typescript
 db.uniqueConstraint.findMany({ select: { id: true } }).execute()
 db.uniqueConstraint.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.uniqueConstraint.create({ data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', tags: '<String>' }, select: { id: true } }).execute()
-db.uniqueConstraint.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.uniqueConstraint.create({ data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' }, select: { id: true } }).execute()
+db.uniqueConstraint.update({ where: { id: '<UUID>' }, data: { category: '<ObjectCategory>' }, select: { id: true } }).execute()
 db.uniqueConstraint.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.uniqueConstraint.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.uniqueConstraint.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, category: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.uniqueConstraint.findMany({
 
 ```typescript
 const item = await db.uniqueConstraint.create({
-  data: { databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', description: '<String>', smartTags: '<JSON>', type: '<String>', fieldIds: '<UUID>', category: '<ObjectCategory>', tags: '<String>' },
+  data: { category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' },
   select: { id: true }
 }).execute();
 ```

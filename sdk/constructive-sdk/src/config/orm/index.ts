@@ -5,8 +5,8 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { PlatformConfigModel } from './models/platformConfig';
 import { ConfigModel } from './models/config';
+import { PlatformConfigModel } from './models/platformConfig';
 import { PlatformInternalSecretModel } from './models/platformInternalSecret';
 import { PlatformSecretModel } from './models/platformSecret';
 import { SecretModel } from './models/secret';
@@ -43,8 +43,8 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    platformConfig: new PlatformConfigModel(client),
     config: new ConfigModel(client),
+    platformConfig: new PlatformConfigModel(client),
     platformInternalSecret: new PlatformInternalSecretModel(client),
     platformSecret: new PlatformSecretModel(client),
     secret: new SecretModel(client),

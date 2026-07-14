@@ -9,8 +9,8 @@ Per-entity cap overrides. Allows specific orgs/entities to have different cap va
 ```typescript
 db.orgLimitCap.findMany({ select: { id: true } }).execute()
 db.orgLimitCap.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgLimitCap.create({ data: { name: '<String>', entityId: '<UUID>', max: '<BigInt>' }, select: { id: true } }).execute()
-db.orgLimitCap.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.orgLimitCap.create({ data: { entityId: '<UUID>', max: '<BigInt>', name: '<String>' }, select: { id: true } }).execute()
+db.orgLimitCap.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute()
 db.orgLimitCap.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgLimitCap.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgLimitCap.findMany({
-  select: { id: true, name: true }
+  select: { id: true, entityId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgLimitCap.findMany({
 
 ```typescript
 const item = await db.orgLimitCap.create({
-  data: { name: '<String>', entityId: '<UUID>', max: '<BigInt>' },
+  data: { entityId: '<UUID>', max: '<BigInt>', name: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -12,8 +12,8 @@ csdk org-limit-credit list --where.<field>.<op> <value> --orderBy <values>
 csdk org-limit-credit list --limit 10 --after <cursor>
 csdk org-limit-credit find-first --where.<field>.<op> <value>
 csdk org-limit-credit get --id <UUID>
-csdk org-limit-credit create --defaultLimitId <UUID> --amount <BigInt> [--actorId <UUID>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>] [--creditType <String>] [--reason <String>]
-csdk org-limit-credit update --id <UUID> [--defaultLimitId <UUID>] [--actorId <UUID>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>] [--amount <BigInt>] [--creditType <String>] [--reason <String>]
+csdk org-limit-credit create --amount <BigInt> --defaultLimitId <UUID> [--actorId <UUID>] [--creditType <String>] [--entityId <UUID>] [--entityType <String>] [--organizationId <UUID>] [--reason <String>]
+csdk org-limit-credit update --id <UUID> [--actorId <UUID>] [--amount <BigInt>] [--creditType <String>] [--defaultLimitId <UUID>] [--entityId <UUID>] [--entityType <String>] [--organizationId <UUID>] [--reason <String>]
 csdk org-limit-credit delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-limit-credit list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgLimitCredit
 
 ```bash
-csdk org-limit-credit create --defaultLimitId <UUID> --amount <BigInt> [--actorId <UUID>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>] [--creditType <String>] [--reason <String>]
+csdk org-limit-credit create --amount <BigInt> --defaultLimitId <UUID> [--actorId <UUID>] [--creditType <String>] [--entityId <UUID>] [--entityType <String>] [--organizationId <UUID>] [--reason <String>]
 ```
 
 ### Get a orgLimitCredit by id

@@ -5,19 +5,19 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { AuditLogAuthModel } from './models/auditLogAuth';
+import { CryptoAddressModel } from './models/cryptoAddress';
+import { EmailModel } from './models/email';
+import { IdentityProviderModel } from './models/identityProvider';
+import { OrgApiKeyListModel } from './models/orgApiKeyList';
+import { PhoneNumberModel } from './models/phoneNumber';
 import { PrincipalModel } from './models/principal';
 import { PrincipalEntityModel } from './models/principalEntity';
 import { PrincipalScopeOverrideModel } from './models/principalScopeOverride';
-import { EmailModel } from './models/email';
-import { PhoneNumberModel } from './models/phoneNumber';
-import { CryptoAddressModel } from './models/cryptoAddress';
-import { WebauthnCredentialModel } from './models/webauthnCredential';
-import { AuditLogAuthModel } from './models/auditLogAuth';
-import { IdentityProviderModel } from './models/identityProvider';
 import { RoleTypeModel } from './models/roleType';
 import { UserConnectedAccountModel } from './models/userConnectedAccount';
-import { OrgApiKeyListModel } from './models/orgApiKeyList';
 import { UserModel } from './models/user';
+import { WebauthnCredentialModel } from './models/webauthnCredential';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -53,19 +53,19 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    auditLogAuth: new AuditLogAuthModel(client),
+    cryptoAddress: new CryptoAddressModel(client),
+    email: new EmailModel(client),
+    identityProvider: new IdentityProviderModel(client),
+    orgApiKeyList: new OrgApiKeyListModel(client),
+    phoneNumber: new PhoneNumberModel(client),
     principal: new PrincipalModel(client),
     principalEntity: new PrincipalEntityModel(client),
     principalScopeOverride: new PrincipalScopeOverrideModel(client),
-    email: new EmailModel(client),
-    phoneNumber: new PhoneNumberModel(client),
-    cryptoAddress: new CryptoAddressModel(client),
-    webauthnCredential: new WebauthnCredentialModel(client),
-    auditLogAuth: new AuditLogAuthModel(client),
-    identityProvider: new IdentityProviderModel(client),
     roleType: new RoleTypeModel(client),
     userConnectedAccount: new UserConnectedAccountModel(client),
-    orgApiKeyList: new OrgApiKeyListModel(client),
     user: new UserModel(client),
+    webauthnCredential: new WebauthnCredentialModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

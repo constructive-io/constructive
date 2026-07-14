@@ -15,8 +15,8 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  platformConfigKeys,
   configKeys,
+  platformConfigKeys,
   platformInternalSecretKeys,
   platformSecretKeys,
   secretKeys,
@@ -41,6 +41,20 @@ import {
  * ```
  */
 export const invalidate = {
+  /** Invalidate config queries */ config: {
+    /** Invalidate all config queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: configKeys.all,
+      }),
+    /** Invalidate config list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: configKeys.lists(),
+      }),
+    /** Invalidate a specific config */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: configKeys.detail(id),
+      }),
+  },
   /** Invalidate platformConfig queries */ platformConfig: {
     /** Invalidate all platformConfig queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -56,20 +70,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformConfigKeys.detail(id),
-      }),
-  },
-  /** Invalidate config queries */ config: {
-    /** Invalidate all config queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: configKeys.all,
-      }),
-    /** Invalidate config list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: configKeys.lists(),
-      }),
-    /** Invalidate a specific config */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: configKeys.detail(id),
       }),
   },
   /** Invalidate platformInternalSecret queries */ platformInternalSecret: {
@@ -133,17 +133,17 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
+  /** Remove config from cache */ config: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: configKeys.detail(id),
+    });
+  },
   /** Remove platformConfig from cache */ platformConfig: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: platformConfigKeys.detail(id),
-    });
-  },
-  /** Remove config from cache */ config: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: configKeys.detail(id),
     });
   },
   /** Remove platformInternalSecret from cache */ platformInternalSecret: (

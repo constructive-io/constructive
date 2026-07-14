@@ -9,8 +9,8 @@ Records of ownership transfers and grants between members
 ```typescript
 db.orgOwnerGrant.findMany({ select: { id: true } }).execute()
 db.orgOwnerGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgOwnerGrant.create({ data: { isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' }, select: { id: true } }).execute()
-db.orgOwnerGrant.update({ where: { id: '<UUID>' }, data: { isGrant: '<Boolean>' }, select: { id: true } }).execute()
+db.orgOwnerGrant.create({ data: { actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' }, select: { id: true } }).execute()
+db.orgOwnerGrant.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.orgOwnerGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgOwnerGrant.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgOwnerGrant.findMany({
-  select: { id: true, isGrant: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgOwnerGrant.findMany({
 
 ```typescript
 const item = await db.orgOwnerGrant.create({
-  data: { isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' },
+  data: { actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```

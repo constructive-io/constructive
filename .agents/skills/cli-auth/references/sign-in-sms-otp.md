@@ -7,7 +7,7 @@ Execute the signInSmsOtp mutation
 ## Usage
 
 ```bash
-csdk sign-in-sms-otp --input.clientMutationId <String> --input.phone <String> --input.code <String> --input.credentialKind <String> --input.rememberMe <Boolean> --input.deviceToken <String>
+csdk sign-in-sms-otp --input.clientMutationId <String> --input.code <String> --input.credentialKind <String> --input.deviceToken <String> --input.phone <String> --input.rememberMe <Boolean>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk sign-in-sms-otp --input.clientMutationId <String> --input.phone <String> --
 ### Run signInSmsOtp
 
 ```bash
-csdk sign-in-sms-otp --input.clientMutationId <String> --input.phone <String> --input.code <String> --input.credentialKind <String> --input.rememberMe <Boolean> --input.deviceToken <String>
+csdk sign-in-sms-otp --input.clientMutationId <String> --input.code <String> --input.credentialKind <String> --input.deviceToken <String> --input.phone <String> --input.rememberMe <Boolean>
 ```

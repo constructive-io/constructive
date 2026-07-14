@@ -12,8 +12,8 @@ csdk app-permission-default-grant list --where.<field>.<op> <value> --orderBy <v
 csdk app-permission-default-grant list --limit 10 --after <cursor>
 csdk app-permission-default-grant find-first --where.<field>.<op> <value>
 csdk app-permission-default-grant get --id <UUID>
-csdk app-permission-default-grant create --permissionId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
-csdk app-permission-default-grant update --id <UUID> [--permissionId <UUID>] [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk app-permission-default-grant create --permissionId <UUID> [--grantorId <UUID>] [--isGrant <Boolean>]
+csdk app-permission-default-grant update --id <UUID> [--grantorId <UUID>] [--isGrant <Boolean>] [--permissionId <UUID>]
 csdk app-permission-default-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-permission-default-grant list --where.id.equalTo <value> --orderBy ID_A
 ### Create a appPermissionDefaultGrant
 
 ```bash
-csdk app-permission-default-grant create --permissionId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk app-permission-default-grant create --permissionId <UUID> [--grantorId <UUID>] [--isGrant <Boolean>]
 ```
 
 ### Get a appPermissionDefaultGrant by id

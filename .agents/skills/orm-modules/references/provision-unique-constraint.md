@@ -7,7 +7,7 @@ Creates a unique constraint on a table. Accepts a jsonb definition with columns 
 ## Usage
 
 ```typescript
-db.mutation.provisionUniqueConstraint({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute()
+db.mutation.provisionUniqueConstraint({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.provisionUniqueConstraint({ input: { databaseId: '<UUID>', tableId: 
 ### Run provisionUniqueConstraint
 
 ```typescript
-const result = await db.mutation.provisionUniqueConstraint({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute();
+const result = await db.mutation.provisionUniqueConstraint({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } }).execute();
 ```

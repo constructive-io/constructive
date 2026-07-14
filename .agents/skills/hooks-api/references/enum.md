@@ -7,8 +7,8 @@ React Query hooks for Enum data operations
 ## Usage
 
 ```typescript
-useEnumsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, tags: true } } })
-useEnumQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, tags: true } } })
+useEnumsQuery({ selection: { fields: { category: true, databaseId: true, description: true, id: true, label: true, name: true, schemaId: true, smartTags: true, tags: true, values: true } } })
+useEnumQuery({ id: '<UUID>', selection: { fields: { category: true, databaseId: true, description: true, id: true, label: true, name: true, schemaId: true, smartTags: true, tags: true, values: true } } })
 useCreateEnumMutation({ selection: { fields: { id: true } } })
 useUpdateEnumMutation({ selection: { fields: { id: true } } })
 useDeleteEnumMutation({})
@@ -20,7 +20,7 @@ useDeleteEnumMutation({})
 
 ```typescript
 const { data, isLoading } = useEnumsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, values: true, smartTags: true, category: true, tags: true } },
+  selection: { fields: { category: true, databaseId: true, description: true, id: true, label: true, name: true, schemaId: true, smartTags: true, tags: true, values: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useEnumsQuery({
 const { mutate } = useCreateEnumMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', values: '<String>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', label: '<String>', name: '<String>', schemaId: '<UUID>', smartTags: '<JSON>', tags: '<String>', values: '<String>' });
 ```

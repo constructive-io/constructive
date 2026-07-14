@@ -9,8 +9,8 @@ Resource definitions — templates for resource kinds declaring default spec and
 ```typescript
 db.resourceDefinition.findMany({ select: { id: true } }).execute()
 db.resourceDefinition.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.resourceDefinition.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', namespaceId: '<UUID>', kind: '<String>', name: '<String>', slug: '<String>', description: '<String>', defaultSpec: '<JSON>', requiredSecrets: '<ResourceRequirement>', requiredConfigs: '<ResourceRequirement>', integrations: '<String>', labels: '<JSON>', annotations: '<JSON>', stepUpMinAge: '<Interval>', databaseId: '<UUID>' }, select: { id: true } }).execute()
-db.resourceDefinition.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute()
+db.resourceDefinition.create({ data: { annotations: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
+db.resourceDefinition.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
 db.resourceDefinition.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.resourceDefinition.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.resourceDefinition.findMany({
-  select: { id: true, createdBy: true }
+  select: { id: true, annotations: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.resourceDefinition.findMany({
 
 ```typescript
 const item = await db.resourceDefinition.create({
-  data: { createdBy: '<UUID>', updatedBy: '<UUID>', namespaceId: '<UUID>', kind: '<String>', name: '<String>', slug: '<String>', description: '<String>', defaultSpec: '<JSON>', requiredSecrets: '<ResourceRequirement>', requiredConfigs: '<ResourceRequirement>', integrations: '<String>', labels: '<JSON>', annotations: '<JSON>', stepUpMinAge: '<Interval>', databaseId: '<UUID>' },
+  data: { annotations: '<JSON>', createdBy: '<UUID>', databaseId: '<UUID>', defaultSpec: '<JSON>', description: '<String>', integrations: '<String>', kind: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>', stepUpMinAge: '<Interval>', updatedBy: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

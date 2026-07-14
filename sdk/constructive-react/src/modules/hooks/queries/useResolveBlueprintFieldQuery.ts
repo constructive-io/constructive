@@ -19,7 +19,7 @@ export const resolveBlueprintFieldQueryKey = customQueryKeys.resolveBlueprintFie
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useResolveBlueprintFieldQuery({ variables: { databaseId, tableId, fieldName } });
+ * const { data, isLoading } = useResolveBlueprintFieldQuery({ variables: { databaseId, fieldName, tableId } });
  *
  * if (data?.resolveBlueprintField) {
  *   console.log(data.resolveBlueprintField);
@@ -76,7 +76,7 @@ export function useResolveBlueprintFieldQuery<
  *
  * @example
  * ```ts
- * const data = await fetchResolveBlueprintFieldQuery({ variables: { databaseId, tableId, fieldName } });
+ * const data = await fetchResolveBlueprintFieldQuery({ variables: { databaseId, fieldName, tableId } });
  * ```
  */
 export async function fetchResolveBlueprintFieldQuery(params?: {
@@ -90,7 +90,7 @@ export async function fetchResolveBlueprintFieldQuery(params?: {
  *
  * @example
  * ```ts
- * await prefetchResolveBlueprintFieldQuery(queryClient, { variables: { databaseId, tableId, fieldName } });
+ * await prefetchResolveBlueprintFieldQuery(queryClient, { variables: { databaseId, fieldName, tableId } });
  * ```
  */
 export async function prefetchResolveBlueprintFieldQuery(

@@ -12,8 +12,8 @@ csdk config list --where.<field>.<op> <value> --orderBy <values>
 csdk config list --limit 10 --after <cursor>
 csdk config find-first --where.<field>.<op> <value>
 csdk config get --id <UUID>
-csdk config create --namespaceId <UUID> --databaseId <UUID> --name <String> [--provider <String>] [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
-csdk config update --id <UUID> [--namespaceId <UUID>] [--databaseId <UUID>] [--name <String>] [--provider <String>] [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
+csdk config create --databaseId <UUID> --name <String> --namespaceId <UUID> [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>] [--labels <JSON>] [--provider <String>] [--value <String>]
+csdk config update --id <UUID> [--annotations <JSON>] [--databaseId <UUID>] [--description <String>] [--expiresAt <Datetime>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--provider <String>] [--value <String>]
 csdk config delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk config list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a config
 
 ```bash
-csdk config create --namespaceId <UUID> --databaseId <UUID> --name <String> [--provider <String>] [--value <String>] [--labels <JSON>] [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>]
+csdk config create --databaseId <UUID> --name <String> --namespaceId <UUID> [--annotations <JSON>] [--description <String>] [--expiresAt <Datetime>] [--labels <JSON>] [--provider <String>] [--value <String>]
 ```
 
 ### Get a config by id

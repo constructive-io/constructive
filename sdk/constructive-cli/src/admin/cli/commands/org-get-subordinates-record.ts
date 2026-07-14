@@ -16,8 +16,8 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  userId: 'uuid',
   depth: 'int',
+  userId: 'uuid',
 };
 const usage =
   '\norg-get-subordinates-record <command>\n\nCommands:\n  list                  List orgGetSubordinatesRecord records\n  find-first            Find first matching orgGetSubordinatesRecord record\n  create                Create a new orgGetSubordinatesRecord\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -64,8 +64,8 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      userId: true,
       depth: true,
+      userId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -90,8 +90,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      userId: true,
       depth: true,
+      userId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -118,14 +118,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'userId',
-        message: 'userId',
+        name: 'depth',
+        message: 'depth',
         required: true,
       },
       {
         type: 'text',
-        name: 'depth',
-        message: 'depth',
+        name: 'userId',
+        message: 'userId',
         required: true,
       },
     ]);
@@ -138,12 +138,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.orgGetSubordinatesRecord
       .create({
         data: {
-          userId: cleanedData.userId,
           depth: cleanedData.depth,
+          userId: cleanedData.userId,
         },
         select: {
-          userId: true,
           depth: true,
+          userId: true,
         },
       })
       .execute();

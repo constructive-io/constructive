@@ -12,8 +12,8 @@ csdk infra-get-all-record list --where.<field>.<op> <value> --orderBy <values>
 csdk infra-get-all-record list --limit 10 --after <cursor>
 csdk infra-get-all-record find-first --where.<field>.<op> <value>
 csdk infra-get-all-record get --id <UUID>
-csdk infra-get-all-record create --path <String> --data <JSON>
-csdk infra-get-all-record update --id <UUID> [--path <String>] [--data <JSON>]
+csdk infra-get-all-record create --data <JSON> --path <String>
+csdk infra-get-all-record update --id <UUID> [--data <JSON>] [--path <String>]
 csdk infra-get-all-record delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk infra-get-all-record list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a infraGetAllRecord
 
 ```bash
-csdk infra-get-all-record create --path <String> --data <JSON>
+csdk infra-get-all-record create --data <JSON> --path <String>
 ```
 
 ### Get a infraGetAllRecord by id

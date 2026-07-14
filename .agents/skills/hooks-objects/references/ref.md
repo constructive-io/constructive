@@ -7,8 +7,8 @@ Branch heads — mutable pointers into the commit chain
 ## Usage
 
 ```typescript
-useRefsQuery({ selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } } })
-useRefQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } } })
+useRefsQuery({ selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } } })
+useRefQuery({ id: '<UUID>', selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } } })
 useCreateRefMutation({ selection: { fields: { id: true } } })
 useUpdateRefMutation({ selection: { fields: { id: true } } })
 useDeleteRefMutation({})
@@ -20,7 +20,7 @@ useDeleteRefMutation({})
 
 ```typescript
 const { data, isLoading } = useRefsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useRefsQuery({
 const { mutate } = useCreateRefMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', databaseId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' });
+mutate({ commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' });
 ```

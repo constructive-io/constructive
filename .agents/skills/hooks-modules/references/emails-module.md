@@ -7,8 +7,8 @@ React Query hooks for EmailsModule data operations
 ## Usage
 
 ```typescript
-useEmailsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true, privateApiName: true } } })
-useEmailsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true, privateApiName: true } } })
+useEmailsModulesQuery({ selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } } })
+useEmailsModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } } })
 useCreateEmailsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateEmailsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteEmailsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteEmailsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useEmailsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, apiName: true, privateApiName: true } },
+  selection: { fields: { apiName: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useEmailsModulesQuery({
 const { mutate } = useCreateEmailsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```

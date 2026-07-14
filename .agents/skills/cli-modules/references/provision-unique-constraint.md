@@ -7,7 +7,7 @@ Creates a unique constraint on a table. Accepts a jsonb definition with columns 
 ## Usage
 
 ```bash
-csdk provision-unique-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-unique-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-unique-constraint --input.clientMutationId <String> --input.datab
 ### Run provisionUniqueConstraint
 
 ```bash
-csdk provision-unique-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-unique-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```

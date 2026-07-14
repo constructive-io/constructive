@@ -7,7 +7,7 @@ Execute the platformSecretsRemoveArray mutation
 ## Usage
 
 ```bash
-csdk platform-secrets-remove-array --input.clientMutationId <String> --input.secretNames <String> --input.namespaceId <UUID>
+csdk platform-secrets-remove-array --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretNames <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk platform-secrets-remove-array --input.clientMutationId <String> --input.sec
 ### Run platformSecretsRemoveArray
 
 ```bash
-csdk platform-secrets-remove-array --input.clientMutationId <String> --input.secretNames <String> --input.namespaceId <UUID>
+csdk platform-secrets-remove-array --input.clientMutationId <String> --input.namespaceId <UUID> --input.secretNames <String>
 ```

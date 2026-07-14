@@ -7,7 +7,7 @@ React Query mutation hook for saveGraph
 ## Usage
 
 ```typescript
-const { mutate } = useSaveGraphMutation(); mutate({ input: { graphId: '<UUID>', rootHash: '<UUID>', message: '<String>' } });
+const { mutate } = useSaveGraphMutation(); mutate({ input: { graphId: '<UUID>', message: '<String>', rootHash: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSaveGraphMutation(); mutate({ input: { graphId: '<UUID>', 
 
 ```typescript
 const { mutate, isLoading } = useSaveGraphMutation();
-mutate({ input: { graphId: '<UUID>', rootHash: '<UUID>', message: '<String>' } });
+mutate({ input: { graphId: '<UUID>', message: '<String>', rootHash: '<UUID>' } });
 ```

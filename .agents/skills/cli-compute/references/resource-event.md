@@ -12,8 +12,8 @@ csdk resource-event list --where.<field>.<op> <value> --orderBy <values>
 csdk resource-event list --limit 10 --after <cursor>
 csdk resource-event find-first --where.<field>.<op> <value>
 csdk resource-event get --id <UUID>
-csdk resource-event create --resourceId <UUID> --eventType <String> --databaseId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
-csdk resource-event update --id <UUID> [--resourceId <UUID>] [--eventType <String>] [--actorId <UUID>] [--message <String>] [--metadata <JSON>] [--databaseId <UUID>]
+csdk resource-event create --databaseId <UUID> --eventType <String> --resourceId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
+csdk resource-event update --id <UUID> [--actorId <UUID>] [--databaseId <UUID>] [--eventType <String>] [--message <String>] [--metadata <JSON>] [--resourceId <UUID>]
 csdk resource-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk resource-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a resourceEvent
 
 ```bash
-csdk resource-event create --resourceId <UUID> --eventType <String> --databaseId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
+csdk resource-event create --databaseId <UUID> --eventType <String> --resourceId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
 ```
 
 ### Get a resourceEvent by id

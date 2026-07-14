@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  resourceId: 'uuid',
-  slug: 'string',
-  secretsHash: 'string',
   configHash: 'string',
-  requirementsHash: 'string',
-  secretsObjectName: 'string',
   configObjectName: 'string',
+  requirementsHash: 'string',
+  resourceId: 'uuid',
+  secretsHash: 'string',
+  secretsObjectName: 'string',
+  slug: 'string',
 };
 const usage =
   '\nresources-requirements-state <command>\n\nCommands:\n  list                  List resourcesRequirementsState records\n  find-first            Find first matching resourcesRequirementsState record\n  create                Create a new resourcesRequirementsState\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -69,13 +69,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      resourceId: true,
-      slug: true,
-      secretsHash: true,
       configHash: true,
-      requirementsHash: true,
-      secretsObjectName: true,
       configObjectName: true,
+      requirementsHash: true,
+      resourceId: true,
+      secretsHash: true,
+      secretsObjectName: true,
+      slug: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -100,13 +100,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      resourceId: true,
-      slug: true,
-      secretsHash: true,
       configHash: true,
-      requirementsHash: true,
-      secretsObjectName: true,
       configObjectName: true,
+      requirementsHash: true,
+      resourceId: true,
+      secretsHash: true,
+      secretsObjectName: true,
+      slug: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -133,26 +133,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'resourceId',
-        message: 'resourceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'slug',
-        message: 'slug',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'secretsHash',
-        message: 'secretsHash',
-        required: true,
-      },
-      {
-        type: 'text',
         name: 'configHash',
         message: 'configHash',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'configObjectName',
+        message: 'configObjectName',
         required: true,
       },
       {
@@ -163,14 +151,26 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'resourceId',
+        message: 'resourceId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'secretsHash',
+        message: 'secretsHash',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'secretsObjectName',
         message: 'secretsObjectName',
         required: true,
       },
       {
         type: 'text',
-        name: 'configObjectName',
-        message: 'configObjectName',
+        name: 'slug',
+        message: 'slug',
         required: true,
       },
     ]);
@@ -183,22 +183,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.resourcesRequirementsState
       .create({
         data: {
-          resourceId: cleanedData.resourceId,
-          slug: cleanedData.slug,
-          secretsHash: cleanedData.secretsHash,
           configHash: cleanedData.configHash,
-          requirementsHash: cleanedData.requirementsHash,
-          secretsObjectName: cleanedData.secretsObjectName,
           configObjectName: cleanedData.configObjectName,
+          requirementsHash: cleanedData.requirementsHash,
+          resourceId: cleanedData.resourceId,
+          secretsHash: cleanedData.secretsHash,
+          secretsObjectName: cleanedData.secretsObjectName,
+          slug: cleanedData.slug,
         },
         select: {
-          resourceId: true,
-          slug: true,
-          secretsHash: true,
           configHash: true,
-          requirementsHash: true,
-          secretsObjectName: true,
           configObjectName: true,
+          requirementsHash: true,
+          resourceId: true,
+          secretsHash: true,
+          secretsObjectName: true,
+          slug: true,
         },
       })
       .execute();

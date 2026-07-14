@@ -5,50 +5,50 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { InfraGetAllRecordModel } from './models/infraGetAllRecord';
-import { GetAllRecordModel } from './models/getAllRecord';
-import { InfraRefModel } from './models/infraRef';
-import { InfraStoreModel } from './models/infraStore';
+import { DbPresetModel } from './models/dbPreset';
 import { FunctionApiBindingModel } from './models/functionApiBinding';
+import { FunctionDefinitionModel } from './models/functionDefinition';
+import { FunctionDeploymentModel } from './models/functionDeployment';
+import { FunctionDeploymentEventModel } from './models/functionDeploymentEvent';
+import { FunctionExecutionLogModel } from './models/functionExecutionLog';
+import { FunctionGraphCommitModel } from './models/functionGraphCommit';
+import { FunctionGraphModel } from './models/functionGraph';
+import { FunctionGraphExecutionModel } from './models/functionGraphExecution';
+import { FunctionGraphExecutionNodeStateModel } from './models/functionGraphExecutionNodeState';
+import { FunctionGraphExecutionOutputModel } from './models/functionGraphExecutionOutput';
+import { FunctionGraphObjectModel } from './models/functionGraphObject';
 import { FunctionGraphRefModel } from './models/functionGraphRef';
 import { FunctionGraphStoreModel } from './models/functionGraphStore';
+import { FunctionInvocationModel } from './models/functionInvocation';
+import { GetAllRecordModel } from './models/getAllRecord';
+import { InfraCommitModel } from './models/infraCommit';
+import { InfraGetAllRecordModel } from './models/infraGetAllRecord';
+import { InfraObjectModel } from './models/infraObject';
+import { InfraRefModel } from './models/infraRef';
+import { InfraStoreModel } from './models/infraStore';
+import { IntegrationProviderModel } from './models/integrationProvider';
+import { NamespaceModel } from './models/namespace';
+import { NamespaceEventModel } from './models/namespaceEvent';
 import { PlatformFunctionApiBindingModel } from './models/platformFunctionApiBinding';
-import { PlatformResourcesRequirementsStateModel } from './models/platformResourcesRequirementsState';
-import { ResourcesRequirementsStateModel } from './models/resourcesRequirementsState';
-import { PlatformResourceStatusCheckModel } from './models/platformResourceStatusCheck';
+import { PlatformFunctionDefinitionModel } from './models/platformFunctionDefinition';
 import { PlatformFunctionDeploymentModel } from './models/platformFunctionDeployment';
+import { PlatformFunctionDeploymentEventModel } from './models/platformFunctionDeploymentEvent';
+import { PlatformFunctionExecutionLogModel } from './models/platformFunctionExecutionLog';
+import { PlatformFunctionInvocationModel } from './models/platformFunctionInvocation';
+import { PlatformNamespaceModel } from './models/platformNamespace';
+import { PlatformNamespaceEventModel } from './models/platformNamespaceEvent';
 import { PlatformResourceModel } from './models/platformResource';
 import { PlatformResourceDefinitionModel } from './models/platformResourceDefinition';
-import { InfraObjectModel } from './models/infraObject';
-import { FunctionGraphObjectModel } from './models/functionGraphObject';
-import { PlatformFunctionDeploymentEventModel } from './models/platformFunctionDeploymentEvent';
 import { PlatformResourceEventModel } from './models/platformResourceEvent';
-import { ResourceStatusCheckModel } from './models/resourceStatusCheck';
-import { FunctionDeploymentModel } from './models/functionDeployment';
+import { PlatformResourceStatusCheckModel } from './models/platformResourceStatusCheck';
+import { PlatformResourcesRequirementsStateModel } from './models/platformResourcesRequirementsState';
+import { PlatformResourcesResolvedRequirementModel } from './models/platformResourcesResolvedRequirement';
 import { ResourceModel } from './models/resource';
 import { ResourceDefinitionModel } from './models/resourceDefinition';
-import { FunctionDeploymentEventModel } from './models/functionDeploymentEvent';
-import { PlatformFunctionExecutionLogModel } from './models/platformFunctionExecutionLog';
 import { ResourceEventModel } from './models/resourceEvent';
-import { FunctionGraphExecutionOutputModel } from './models/functionGraphExecutionOutput';
-import { InfraCommitModel } from './models/infraCommit';
-import { FunctionGraphCommitModel } from './models/functionGraphCommit';
-import { FunctionExecutionLogModel } from './models/functionExecutionLog';
-import { PlatformResourcesResolvedRequirementModel } from './models/platformResourcesResolvedRequirement';
+import { ResourceStatusCheckModel } from './models/resourceStatusCheck';
+import { ResourcesRequirementsStateModel } from './models/resourcesRequirementsState';
 import { ResourcesResolvedRequirementModel } from './models/resourcesResolvedRequirement';
-import { DbPresetModel } from './models/dbPreset';
-import { PlatformNamespaceModel } from './models/platformNamespace';
-import { FunctionGraphModel } from './models/functionGraph';
-import { FunctionGraphExecutionNodeStateModel } from './models/functionGraphExecutionNodeState';
-import { NamespaceModel } from './models/namespace';
-import { PlatformFunctionInvocationModel } from './models/platformFunctionInvocation';
-import { FunctionInvocationModel } from './models/functionInvocation';
-import { PlatformNamespaceEventModel } from './models/platformNamespaceEvent';
-import { IntegrationProviderModel } from './models/integrationProvider';
-import { NamespaceEventModel } from './models/namespaceEvent';
-import { FunctionGraphExecutionModel } from './models/functionGraphExecution';
-import { PlatformFunctionDefinitionModel } from './models/platformFunctionDefinition';
-import { FunctionDefinitionModel } from './models/functionDefinition';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -84,50 +84,50 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    infraGetAllRecord: new InfraGetAllRecordModel(client),
-    getAllRecord: new GetAllRecordModel(client),
-    infraRef: new InfraRefModel(client),
-    infraStore: new InfraStoreModel(client),
+    dbPreset: new DbPresetModel(client),
     functionApiBinding: new FunctionApiBindingModel(client),
+    functionDefinition: new FunctionDefinitionModel(client),
+    functionDeployment: new FunctionDeploymentModel(client),
+    functionDeploymentEvent: new FunctionDeploymentEventModel(client),
+    functionExecutionLog: new FunctionExecutionLogModel(client),
+    functionGraphCommit: new FunctionGraphCommitModel(client),
+    functionGraph: new FunctionGraphModel(client),
+    functionGraphExecution: new FunctionGraphExecutionModel(client),
+    functionGraphExecutionNodeState: new FunctionGraphExecutionNodeStateModel(client),
+    functionGraphExecutionOutput: new FunctionGraphExecutionOutputModel(client),
+    functionGraphObject: new FunctionGraphObjectModel(client),
     functionGraphRef: new FunctionGraphRefModel(client),
     functionGraphStore: new FunctionGraphStoreModel(client),
+    functionInvocation: new FunctionInvocationModel(client),
+    getAllRecord: new GetAllRecordModel(client),
+    infraCommit: new InfraCommitModel(client),
+    infraGetAllRecord: new InfraGetAllRecordModel(client),
+    infraObject: new InfraObjectModel(client),
+    infraRef: new InfraRefModel(client),
+    infraStore: new InfraStoreModel(client),
+    integrationProvider: new IntegrationProviderModel(client),
+    namespace: new NamespaceModel(client),
+    namespaceEvent: new NamespaceEventModel(client),
     platformFunctionApiBinding: new PlatformFunctionApiBindingModel(client),
-    platformResourcesRequirementsState: new PlatformResourcesRequirementsStateModel(client),
-    resourcesRequirementsState: new ResourcesRequirementsStateModel(client),
-    platformResourceStatusCheck: new PlatformResourceStatusCheckModel(client),
+    platformFunctionDefinition: new PlatformFunctionDefinitionModel(client),
     platformFunctionDeployment: new PlatformFunctionDeploymentModel(client),
+    platformFunctionDeploymentEvent: new PlatformFunctionDeploymentEventModel(client),
+    platformFunctionExecutionLog: new PlatformFunctionExecutionLogModel(client),
+    platformFunctionInvocation: new PlatformFunctionInvocationModel(client),
+    platformNamespace: new PlatformNamespaceModel(client),
+    platformNamespaceEvent: new PlatformNamespaceEventModel(client),
     platformResource: new PlatformResourceModel(client),
     platformResourceDefinition: new PlatformResourceDefinitionModel(client),
-    infraObject: new InfraObjectModel(client),
-    functionGraphObject: new FunctionGraphObjectModel(client),
-    platformFunctionDeploymentEvent: new PlatformFunctionDeploymentEventModel(client),
     platformResourceEvent: new PlatformResourceEventModel(client),
-    resourceStatusCheck: new ResourceStatusCheckModel(client),
-    functionDeployment: new FunctionDeploymentModel(client),
+    platformResourceStatusCheck: new PlatformResourceStatusCheckModel(client),
+    platformResourcesRequirementsState: new PlatformResourcesRequirementsStateModel(client),
+    platformResourcesResolvedRequirement: new PlatformResourcesResolvedRequirementModel(client),
     resource: new ResourceModel(client),
     resourceDefinition: new ResourceDefinitionModel(client),
-    functionDeploymentEvent: new FunctionDeploymentEventModel(client),
-    platformFunctionExecutionLog: new PlatformFunctionExecutionLogModel(client),
     resourceEvent: new ResourceEventModel(client),
-    functionGraphExecutionOutput: new FunctionGraphExecutionOutputModel(client),
-    infraCommit: new InfraCommitModel(client),
-    functionGraphCommit: new FunctionGraphCommitModel(client),
-    functionExecutionLog: new FunctionExecutionLogModel(client),
-    platformResourcesResolvedRequirement: new PlatformResourcesResolvedRequirementModel(client),
+    resourceStatusCheck: new ResourceStatusCheckModel(client),
+    resourcesRequirementsState: new ResourcesRequirementsStateModel(client),
     resourcesResolvedRequirement: new ResourcesResolvedRequirementModel(client),
-    dbPreset: new DbPresetModel(client),
-    platformNamespace: new PlatformNamespaceModel(client),
-    functionGraph: new FunctionGraphModel(client),
-    functionGraphExecutionNodeState: new FunctionGraphExecutionNodeStateModel(client),
-    namespace: new NamespaceModel(client),
-    platformFunctionInvocation: new PlatformFunctionInvocationModel(client),
-    functionInvocation: new FunctionInvocationModel(client),
-    platformNamespaceEvent: new PlatformNamespaceEventModel(client),
-    integrationProvider: new IntegrationProviderModel(client),
-    namespaceEvent: new NamespaceEventModel(client),
-    functionGraphExecution: new FunctionGraphExecutionModel(client),
-    platformFunctionDefinition: new PlatformFunctionDefinitionModel(client),
-    functionDefinition: new FunctionDefinitionModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

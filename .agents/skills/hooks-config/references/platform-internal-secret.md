@@ -7,8 +7,8 @@ React Query hooks for PlatformInternalSecret data operations
 ## Usage
 
 ```typescript
-usePlatformInternalSecretsQuery({ selection: { fields: { id: true, name: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } } })
-usePlatformInternalSecretQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } } })
+usePlatformInternalSecretsQuery({ selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } } })
+usePlatformInternalSecretQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } } })
 useCreatePlatformInternalSecretMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformInternalSecretMutation({ selection: { fields: { id: true } } })
 useDeletePlatformInternalSecretMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformInternalSecretMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformInternalSecretsQuery({
-  selection: { fields: { id: true, name: true, namespaceId: true, description: true, labels: true, annotations: true, createdAt: true, updatedAt: true, rotatedAt: true, retiredAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformInternalSecretsQuery({
 const { mutate } = useCreatePlatformInternalSecretMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', namespaceId: '<UUID>', description: '<String>', labels: '<JSON>', annotations: '<JSON>', rotatedAt: '<Datetime>', retiredAt: '<Datetime>' });
+mutate({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```

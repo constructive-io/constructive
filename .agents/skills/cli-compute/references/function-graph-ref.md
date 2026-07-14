@@ -13,7 +13,7 @@ csdk function-graph-ref list --limit 10 --after <cursor>
 csdk function-graph-ref find-first --where.<field>.<op> <value>
 csdk function-graph-ref get --id <UUID>
 csdk function-graph-ref create --name <String> --scopeId <UUID> --storeId <UUID> [--commitId <UUID>]
-csdk function-graph-ref update --id <UUID> [--name <String>] [--scopeId <UUID>] [--storeId <UUID>] [--commitId <UUID>]
+csdk function-graph-ref update --id <UUID> [--commitId <UUID>] [--name <String>] [--scopeId <UUID>] [--storeId <UUID>]
 csdk function-graph-ref delete --id <UUID>
 ```
 

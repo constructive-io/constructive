@@ -16,12 +16,12 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  name: 'string',
-  slug: 'string',
   category: 'string',
-  displayName: 'string',
   description: 'string',
+  displayName: 'string',
+  name: 'string',
   parameterSchema: 'json',
+  slug: 'string',
   tags: 'string',
 };
 const usage =
@@ -75,12 +75,12 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      name: true,
-      slug: true,
       category: true,
-      displayName: true,
       description: true,
+      displayName: true,
+      name: true,
       parameterSchema: true,
+      slug: true,
       tags: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -102,12 +102,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      name: true,
-      slug: true,
       category: true,
-      displayName: true,
       description: true,
+      displayName: true,
+      name: true,
       parameterSchema: true,
+      slug: true,
       tags: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -141,12 +141,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         name: answers.name as string,
         select: {
-          name: true,
-          slug: true,
           category: true,
-          displayName: true,
           description: true,
+          displayName: true,
+          name: true,
           parameterSchema: true,
+          slug: true,
           tags: true,
         },
       })
@@ -165,21 +165,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'slug',
-        message: 'slug',
-        required: true,
-      },
-      {
-        type: 'text',
         name: 'category',
         message: 'category',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'description',
+        message: 'description',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -190,10 +185,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'description',
-        message: 'description',
-        required: false,
-        skipPrompt: true,
+        name: 'name',
+        message: 'name',
+        required: true,
       },
       {
         type: 'json',
@@ -201,6 +195,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'parameterSchema',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'slug',
+        message: 'slug',
+        required: true,
       },
       {
         type: 'text',
@@ -219,21 +219,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.nodeTypeRegistry
       .create({
         data: {
-          name: cleanedData.name,
-          slug: cleanedData.slug,
           category: cleanedData.category,
-          displayName: cleanedData.displayName,
           description: cleanedData.description,
+          displayName: cleanedData.displayName,
+          name: cleanedData.name,
           parameterSchema: cleanedData.parameterSchema,
+          slug: cleanedData.slug,
           tags: cleanedData.tags,
         },
         select: {
-          name: true,
-          slug: true,
           category: true,
-          displayName: true,
           description: true,
+          displayName: true,
+          name: true,
           parameterSchema: true,
+          slug: true,
           tags: true,
         },
       })
@@ -258,22 +258,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'slug',
-        message: 'slug',
-        required: false,
-      },
-      {
-        type: 'text',
         name: 'category',
         message: 'category',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'displayName',
-        message: 'displayName',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -283,11 +270,24 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'displayName',
+        message: 'displayName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'parameterSchema',
         message: 'parameterSchema',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'slug',
+        message: 'slug',
+        required: false,
       },
       {
         type: 'text',
@@ -306,20 +306,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: answers.name as string,
         },
         data: {
-          slug: cleanedData.slug,
           category: cleanedData.category,
-          displayName: cleanedData.displayName,
           description: cleanedData.description,
+          displayName: cleanedData.displayName,
           parameterSchema: cleanedData.parameterSchema,
+          slug: cleanedData.slug,
           tags: cleanedData.tags,
         },
         select: {
-          name: true,
-          slug: true,
           category: true,
-          displayName: true,
           description: true,
+          displayName: true,
+          name: true,
           parameterSchema: true,
+          slug: true,
           tags: true,
         },
       })

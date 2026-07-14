@@ -16,15 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
-  schemaId: 'uuid',
-  rateLimitSettingsTableId: 'uuid',
-  ipRateLimitsTableId: 'uuid',
-  rateLimitsTableId: 'uuid',
-  rateLimitSettingsTable: 'string',
+  id: 'uuid',
   ipRateLimitsTable: 'string',
+  ipRateLimitsTableId: 'uuid',
+  rateLimitSettingsTable: 'string',
+  rateLimitSettingsTableId: 'uuid',
   rateLimitsTable: 'string',
+  rateLimitsTableId: 'uuid',
+  schemaId: 'uuid',
 };
 const usage =
   '\nrate-limits-module <command>\n\nCommands:\n  list                  List rateLimitsModule records\n  find-first            Find first matching rateLimitsModule record\n  get                   Get a rateLimitsModule by ID\n  create                Create a new rateLimitsModule\n  update                Update an existing rateLimitsModule\n  delete                Delete a rateLimitsModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,15 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      schemaId: true,
-      rateLimitSettingsTableId: true,
-      ipRateLimitsTableId: true,
-      rateLimitsTableId: true,
-      rateLimitSettingsTable: true,
+      id: true,
       ipRateLimitsTable: true,
+      ipRateLimitsTableId: true,
+      rateLimitSettingsTable: true,
+      rateLimitSettingsTableId: true,
       rateLimitsTable: true,
+      rateLimitsTableId: true,
+      schemaId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy> & {
@@ -106,15 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      schemaId: true,
-      rateLimitSettingsTableId: true,
-      ipRateLimitsTableId: true,
-      rateLimitsTableId: true,
-      rateLimitSettingsTable: true,
+      id: true,
       ipRateLimitsTable: true,
+      ipRateLimitsTableId: true,
+      rateLimitSettingsTable: true,
+      rateLimitSettingsTableId: true,
       rateLimitsTable: true,
+      rateLimitsTableId: true,
+      schemaId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<RateLimitsModuleSelect, RateLimitsModuleFilter, RateLimitsModuleOrderBy> & {
@@ -147,15 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
-          rateLimitSettingsTableId: true,
-          ipRateLimitsTableId: true,
-          rateLimitsTableId: true,
-          rateLimitSettingsTable: true,
+          id: true,
           ipRateLimitsTable: true,
+          ipRateLimitsTableId: true,
+          rateLimitSettingsTable: true,
+          rateLimitSettingsTableId: true,
           rateLimitsTable: true,
+          rateLimitsTableId: true,
+          schemaId: true,
         },
       })
       .execute();
@@ -179,15 +179,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'rateLimitSettingsTableId',
-        message: 'rateLimitSettingsTableId',
+        name: 'ipRateLimitsTable',
+        message: 'ipRateLimitsTable',
         required: false,
         skipPrompt: true,
       },
@@ -200,13 +193,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'rateLimitsTableId',
-        message: 'rateLimitsTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'rateLimitSettingsTable',
         message: 'rateLimitSettingsTable',
         required: false,
@@ -214,8 +200,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'ipRateLimitsTable',
-        message: 'ipRateLimitsTable',
+        name: 'rateLimitSettingsTableId',
+        message: 'rateLimitSettingsTableId',
         required: false,
         skipPrompt: true,
       },
@@ -223,6 +209,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'rateLimitsTable',
         message: 'rateLimitsTable',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'rateLimitsTableId',
+        message: 'rateLimitsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'schemaId',
+        message: 'schemaId',
         required: false,
         skipPrompt: true,
       },
@@ -237,24 +237,24 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
-          rateLimitSettingsTableId: cleanedData.rateLimitSettingsTableId,
-          ipRateLimitsTableId: cleanedData.ipRateLimitsTableId,
-          rateLimitsTableId: cleanedData.rateLimitsTableId,
-          rateLimitSettingsTable: cleanedData.rateLimitSettingsTable,
           ipRateLimitsTable: cleanedData.ipRateLimitsTable,
+          ipRateLimitsTableId: cleanedData.ipRateLimitsTableId,
+          rateLimitSettingsTable: cleanedData.rateLimitSettingsTable,
+          rateLimitSettingsTableId: cleanedData.rateLimitSettingsTableId,
           rateLimitsTable: cleanedData.rateLimitsTable,
+          rateLimitsTableId: cleanedData.rateLimitsTableId,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
-          rateLimitSettingsTableId: true,
-          ipRateLimitsTableId: true,
-          rateLimitsTableId: true,
-          rateLimitSettingsTable: true,
+          id: true,
           ipRateLimitsTable: true,
+          ipRateLimitsTableId: true,
+          rateLimitSettingsTable: true,
+          rateLimitSettingsTableId: true,
           rateLimitsTable: true,
+          rateLimitsTableId: true,
+          schemaId: true,
         },
       })
       .execute();
@@ -284,15 +284,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'rateLimitSettingsTableId',
-        message: 'rateLimitSettingsTableId',
+        name: 'ipRateLimitsTable',
+        message: 'ipRateLimitsTable',
         required: false,
         skipPrompt: true,
       },
@@ -305,13 +298,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'rateLimitsTableId',
-        message: 'rateLimitsTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'rateLimitSettingsTable',
         message: 'rateLimitSettingsTable',
         required: false,
@@ -319,8 +305,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'ipRateLimitsTable',
-        message: 'ipRateLimitsTable',
+        name: 'rateLimitSettingsTableId',
+        message: 'rateLimitSettingsTableId',
         required: false,
         skipPrompt: true,
       },
@@ -328,6 +314,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'rateLimitsTable',
         message: 'rateLimitsTable',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'rateLimitsTableId',
+        message: 'rateLimitsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'schemaId',
+        message: 'schemaId',
         required: false,
         skipPrompt: true,
       },
@@ -342,24 +342,24 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
-          rateLimitSettingsTableId: cleanedData.rateLimitSettingsTableId,
-          ipRateLimitsTableId: cleanedData.ipRateLimitsTableId,
-          rateLimitsTableId: cleanedData.rateLimitsTableId,
-          rateLimitSettingsTable: cleanedData.rateLimitSettingsTable,
           ipRateLimitsTable: cleanedData.ipRateLimitsTable,
+          ipRateLimitsTableId: cleanedData.ipRateLimitsTableId,
+          rateLimitSettingsTable: cleanedData.rateLimitSettingsTable,
+          rateLimitSettingsTableId: cleanedData.rateLimitSettingsTableId,
           rateLimitsTable: cleanedData.rateLimitsTable,
+          rateLimitsTableId: cleanedData.rateLimitsTableId,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
-          rateLimitSettingsTableId: true,
-          ipRateLimitsTableId: true,
-          rateLimitsTableId: true,
-          rateLimitSettingsTable: true,
+          id: true,
           ipRateLimitsTable: true,
+          ipRateLimitsTableId: true,
+          rateLimitSettingsTable: true,
+          rateLimitSettingsTableId: true,
           rateLimitsTable: true,
+          rateLimitsTableId: true,
+          schemaId: true,
         },
       })
       .execute();

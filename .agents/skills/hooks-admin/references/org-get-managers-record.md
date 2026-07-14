@@ -7,7 +7,7 @@ React Query hooks for OrgGetManagersRecord data operations
 ## Usage
 
 ```typescript
-useOrgGetManagersQuery({ selection: { fields: { userId: true, depth: true } } })
+useOrgGetManagersQuery({ selection: { fields: { depth: true, userId: true } } })
 useCreateOrgGetManagersRecordMutation({ selection: { fields: { id: true } } })
 ```
 
@@ -17,7 +17,7 @@ useCreateOrgGetManagersRecordMutation({ selection: { fields: { id: true } } })
 
 ```typescript
 const { data, isLoading } = useOrgGetManagersQuery({
-  selection: { fields: { userId: true, depth: true } },
+  selection: { fields: { depth: true, userId: true } },
 });
 ```
 
@@ -27,5 +27,5 @@ const { data, isLoading } = useOrgGetManagersQuery({
 const { mutate } = useCreateOrgGetManagersRecordMutation({
   selection: { fields: { id: true } },
 });
-mutate({ userId: '<UUID>', depth: '<Int>' });
+mutate({ depth: '<Int>', userId: '<UUID>' });
 ```

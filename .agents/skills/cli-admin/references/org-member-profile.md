@@ -12,8 +12,8 @@ csdk org-member-profile list --where.<field>.<op> <value> --orderBy <values>
 csdk org-member-profile list --limit 10 --after <cursor>
 csdk org-member-profile find-first --where.<field>.<op> <value>
 csdk org-member-profile get --id <UUID>
-csdk org-member-profile create --membershipId <UUID> --entityId <UUID> --actorId <UUID> [--displayName <String>] [--email <String>] [--title <String>] [--bio <String>] [--profilePicture <Image>]
-csdk org-member-profile update --id <UUID> [--membershipId <UUID>] [--entityId <UUID>] [--actorId <UUID>] [--displayName <String>] [--email <String>] [--title <String>] [--bio <String>] [--profilePicture <Image>]
+csdk org-member-profile create --actorId <UUID> --entityId <UUID> --membershipId <UUID> [--bio <String>] [--displayName <String>] [--email <String>] [--profilePicture <Image>] [--title <String>]
+csdk org-member-profile update --id <UUID> [--actorId <UUID>] [--bio <String>] [--displayName <String>] [--email <String>] [--entityId <UUID>] [--membershipId <UUID>] [--profilePicture <Image>] [--title <String>]
 csdk org-member-profile delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-member-profile list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgMemberProfile
 
 ```bash
-csdk org-member-profile create --membershipId <UUID> --entityId <UUID> --actorId <UUID> [--displayName <String>] [--email <String>] [--title <String>] [--bio <String>] [--profilePicture <Image>]
+csdk org-member-profile create --actorId <UUID> --entityId <UUID> --membershipId <UUID> [--bio <String>] [--displayName <String>] [--email <String>] [--profilePicture <Image>] [--title <String>]
 ```
 
 ### Get a orgMemberProfile by id
