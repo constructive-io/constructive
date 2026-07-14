@@ -89,7 +89,7 @@ async function loadBindings(
           schema: computeSchema,
           alias: 'd'
         })
-        .where('b.api_id', '=', options.apiId)
+        .where({ 'b.api_id': { equalTo: options.apiId } })
         .orderBy('b.alias', 'ASC')
         .build();
       const { rows } = await client.query<{

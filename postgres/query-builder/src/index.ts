@@ -1,11 +1,35 @@
-export { QueryBuilder, col, lit, param, fn } from './query-builder';
+export {
+  add,
+  and,
+  col,
+  div,
+  eq,
+  fn,
+  gt,
+  gte,
+  isNotNull,
+  isNull,
+  lit,
+  lt,
+  lte,
+  mul,
+  neq,
+  not,
+  or,
+  param,
+  QueryBuilder,
+  sub
+} from './query-builder';
 export type {
-  QueryOutput,
-  SqlValue,
   Expr,
+  FieldFilter,
+  Filter,
   FnArg,
   FnArgs,
+  Operand,
   ParamAllocator,
+  QueryOutput,
   SelectExpr,
   SelectItem,
+  SqlValue,
 } from './query-builder';
