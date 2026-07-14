@@ -87,8 +87,8 @@ async function handleInvoke(req: Request, res: Response): Promise<void> {
             schema: module.schemaName,
             alias: 'd',
           })
-          .where('b.api_id', '=', ctx.api.apiId)
-          .where('b.alias', '=', alias)
+          .where({ 'b.api_id': { equalTo: ctx.api.apiId } })
+          .where({ 'b.alias': { equalTo: alias } })
           .build();
         const { rows } = await client.query<BindingRow>(text, values);
         for (const row of rows) {
@@ -198,7 +198,7 @@ async function handleGetInvocation(req: Request, res: Response): Promise<void> {
           .schema(module.invocationsSchemaName)
           .table(module.invocationsTableName)
           .select(['id', 'status', 'result', 'error', 'created_at', 'started_at', 'completed_at', 'duration_ms'])
-          .where('id', '=', id)
+          .where({ id: { equalTo: id } })
           .build();
         const { rows } = await client.query<InvocationRow>(text, values);
         if (rows[0]) return rows[0];
