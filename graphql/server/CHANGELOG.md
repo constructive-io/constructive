@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.43.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.42.1...@constructive-io/graphql-server@4.43.0) (2026-07-14)
+
+### Bug Fixes
+
+- migrate internal query-builder consumers to JSON where filters ([8a40624](https://github.com/constructive-io/constructive/commit/8a406247cbffaceeadbd9f59a00a700a36f2d9a5))
+
 ## [4.42.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.42.0...@constructive-io/graphql-server@4.42.1) (2026-07-14)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

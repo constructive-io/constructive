@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@0.2.1...graphile-function-bindings@0.3.0) (2026-07-14)
+
+### Bug Fixes
+
+- migrate internal query-builder consumers to JSON where filters ([8a40624](https://github.com/constructive-io/constructive/commit/8a406247cbffaceeadbd9f59a00a700a36f2d9a5))
+
 ## [0.2.1](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@0.2.0...graphile-function-bindings@0.2.1) (2026-07-14)
 
 **Note:** Version bump only for package graphile-function-bindings

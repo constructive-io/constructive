@@ -1,6 +1,6 @@
 {
   "name": "graphql-orm-test",
-  "version": "0.21.3",
+  "version": "0.22.0",
   "private": true,
   "author": "Constructive <developers@constructive.io>",
   "description": "ORM integration tests against real PostgreSQL via graphile-test",

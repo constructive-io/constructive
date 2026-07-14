@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.30.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.29.3...@pgpmjs/export@0.30.0) (2026-07-14)
+
+### Bug Fixes
+
+- **export:** remove field conflictDoNothing override ([de5c4c0](https://github.com/constructive-io/constructive/commit/de5c4c0829e4632f877400d28ded261ad686ddcf))
+
 ## [0.29.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.29.2...@pgpmjs/export@0.29.3) (2026-07-14)
 
 **Note:** Version bump only for package @pgpmjs/export
