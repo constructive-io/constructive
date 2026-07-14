@@ -9,8 +9,8 @@ Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-
 ```typescript
 db.config.findMany({ select: { id: true } }).execute()
 db.config.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.config.create({ data: { namespaceId: '<UUID>', databaseId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' }, select: { id: true } }).execute()
-db.config.update({ where: { id: '<UUID>' }, data: { namespaceId: '<UUID>' }, select: { id: true } }).execute()
+db.config.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' }, select: { id: true } }).execute()
+db.config.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
 db.config.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.config.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.config.findMany({
-  select: { id: true, namespaceId: true }
+  select: { id: true, annotations: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.config.findMany({
 
 ```typescript
 const item = await db.config.create({
-  data: { namespaceId: '<UUID>', databaseId: '<UUID>', name: '<String>', provider: '<String>', value: '<String>', labels: '<JSON>', annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>' },
+  data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', value: '<String>' },
   select: { id: true }
 }).execute();
 ```

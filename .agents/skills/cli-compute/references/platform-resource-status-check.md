@@ -12,8 +12,8 @@ csdk platform-resource-status-check list --where.<field>.<op> <value> --orderBy 
 csdk platform-resource-status-check list --limit 10 --after <cursor>
 csdk platform-resource-status-check find-first --where.<field>.<op> <value>
 csdk platform-resource-status-check get --id <UUID>
-csdk platform-resource-status-check create --resourceId <UUID> [--requestedBy <UUID>] [--requestedAt <Datetime>] [--completedAt <Datetime>] [--status <String>] [--result <JSON>]
-csdk platform-resource-status-check update --id <UUID> [--resourceId <UUID>] [--requestedBy <UUID>] [--requestedAt <Datetime>] [--completedAt <Datetime>] [--status <String>] [--result <JSON>]
+csdk platform-resource-status-check create --resourceId <UUID> [--completedAt <Datetime>] [--requestedAt <Datetime>] [--requestedBy <UUID>] [--result <JSON>] [--status <String>]
+csdk platform-resource-status-check update --id <UUID> [--completedAt <Datetime>] [--requestedAt <Datetime>] [--requestedBy <UUID>] [--resourceId <UUID>] [--result <JSON>] [--status <String>]
 csdk platform-resource-status-check delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-resource-status-check list --where.id.equalTo <value> --orderBy ID
 ### Create a platformResourceStatusCheck
 
 ```bash
-csdk platform-resource-status-check create --resourceId <UUID> [--requestedBy <UUID>] [--requestedAt <Datetime>] [--completedAt <Datetime>] [--status <String>] [--result <JSON>]
+csdk platform-resource-status-check create --resourceId <UUID> [--completedAt <Datetime>] [--requestedAt <Datetime>] [--requestedBy <UUID>] [--result <JSON>] [--status <String>]
 ```
 
 ### Get a platformResourceStatusCheck by id

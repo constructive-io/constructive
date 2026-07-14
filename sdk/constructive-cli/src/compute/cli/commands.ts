@@ -6,68 +6,68 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
-import infraGetAllRecordCmd from './commands/infra-get-all-record';
-import getAllRecordCmd from './commands/get-all-record';
-import infraRefCmd from './commands/infra-ref';
-import infraStoreCmd from './commands/infra-store';
+import dbPresetCmd from './commands/db-preset';
 import functionApiBindingCmd from './commands/function-api-binding';
+import functionDefinitionCmd from './commands/function-definition';
+import functionDeploymentCmd from './commands/function-deployment';
+import functionDeploymentEventCmd from './commands/function-deployment-event';
+import functionExecutionLogCmd from './commands/function-execution-log';
+import functionGraphCommitCmd from './commands/function-graph-commit';
+import functionGraphCmd from './commands/function-graph';
+import functionGraphExecutionCmd from './commands/function-graph-execution';
+import functionGraphExecutionNodeStateCmd from './commands/function-graph-execution-node-state';
+import functionGraphExecutionOutputCmd from './commands/function-graph-execution-output';
+import functionGraphObjectCmd from './commands/function-graph-object';
 import functionGraphRefCmd from './commands/function-graph-ref';
 import functionGraphStoreCmd from './commands/function-graph-store';
+import functionInvocationCmd from './commands/function-invocation';
+import getAllRecordCmd from './commands/get-all-record';
+import infraCommitCmd from './commands/infra-commit';
+import infraGetAllRecordCmd from './commands/infra-get-all-record';
+import infraObjectCmd from './commands/infra-object';
+import infraRefCmd from './commands/infra-ref';
+import infraStoreCmd from './commands/infra-store';
+import integrationProviderCmd from './commands/integration-provider';
+import namespaceCmd from './commands/namespace';
+import namespaceEventCmd from './commands/namespace-event';
 import platformFunctionApiBindingCmd from './commands/platform-function-api-binding';
-import platformResourcesRequirementsStateCmd from './commands/platform-resources-requirements-state';
-import resourcesRequirementsStateCmd from './commands/resources-requirements-state';
-import platformResourceStatusCheckCmd from './commands/platform-resource-status-check';
+import platformFunctionDefinitionCmd from './commands/platform-function-definition';
 import platformFunctionDeploymentCmd from './commands/platform-function-deployment';
+import platformFunctionDeploymentEventCmd from './commands/platform-function-deployment-event';
+import platformFunctionExecutionLogCmd from './commands/platform-function-execution-log';
+import platformFunctionInvocationCmd from './commands/platform-function-invocation';
+import platformNamespaceCmd from './commands/platform-namespace';
+import platformNamespaceEventCmd from './commands/platform-namespace-event';
 import platformResourceCmd from './commands/platform-resource';
 import platformResourceDefinitionCmd from './commands/platform-resource-definition';
-import infraObjectCmd from './commands/infra-object';
-import functionGraphObjectCmd from './commands/function-graph-object';
-import platformFunctionDeploymentEventCmd from './commands/platform-function-deployment-event';
 import platformResourceEventCmd from './commands/platform-resource-event';
-import resourceStatusCheckCmd from './commands/resource-status-check';
-import functionDeploymentCmd from './commands/function-deployment';
+import platformResourceStatusCheckCmd from './commands/platform-resource-status-check';
+import platformResourcesRequirementsStateCmd from './commands/platform-resources-requirements-state';
+import platformResourcesResolvedRequirementCmd from './commands/platform-resources-resolved-requirement';
 import resourceCmd from './commands/resource';
 import resourceDefinitionCmd from './commands/resource-definition';
-import functionDeploymentEventCmd from './commands/function-deployment-event';
-import platformFunctionExecutionLogCmd from './commands/platform-function-execution-log';
 import resourceEventCmd from './commands/resource-event';
-import functionGraphExecutionOutputCmd from './commands/function-graph-execution-output';
-import infraCommitCmd from './commands/infra-commit';
-import functionGraphCommitCmd from './commands/function-graph-commit';
-import functionExecutionLogCmd from './commands/function-execution-log';
-import platformResourcesResolvedRequirementCmd from './commands/platform-resources-resolved-requirement';
+import resourceStatusCheckCmd from './commands/resource-status-check';
+import resourcesRequirementsStateCmd from './commands/resources-requirements-state';
 import resourcesResolvedRequirementCmd from './commands/resources-resolved-requirement';
-import dbPresetCmd from './commands/db-preset';
-import platformNamespaceCmd from './commands/platform-namespace';
-import functionGraphCmd from './commands/function-graph';
-import functionGraphExecutionNodeStateCmd from './commands/function-graph-execution-node-state';
-import namespaceCmd from './commands/namespace';
-import platformFunctionInvocationCmd from './commands/platform-function-invocation';
-import functionInvocationCmd from './commands/function-invocation';
-import platformNamespaceEventCmd from './commands/platform-namespace-event';
-import integrationProviderCmd from './commands/integration-provider';
-import namespaceEventCmd from './commands/namespace-event';
-import functionGraphExecutionCmd from './commands/function-graph-execution';
-import platformFunctionDefinitionCmd from './commands/platform-function-definition';
-import functionDefinitionCmd from './commands/function-definition';
 import readFunctionGraphCmd from './commands/read-function-graph';
-import validateFunctionGraphCmd from './commands/validate-function-graph';
-import infraInitEmptyRepoCmd from './commands/infra-init-empty-repo';
-import initEmptyRepoCmd from './commands/init-empty-repo';
-import importDefinitionsCmd from './commands/import-definitions';
-import infraSetDataAtPathCmd from './commands/infra-set-data-at-path';
-import setDataAtPathCmd from './commands/set-data-at-path';
-import copyGraphCmd from './commands/copy-graph';
-import saveGraphCmd from './commands/save-graph';
-import addEdgeAndSaveCmd from './commands/add-edge-and-save';
-import addNodeAndSaveCmd from './commands/add-node-and-save';
-import importGraphJsonCmd from './commands/import-graph-json';
 import addEdgeCmd from './commands/add-edge';
+import addEdgeAndSaveCmd from './commands/add-edge-and-save';
 import addNodeCmd from './commands/add-node';
+import addNodeAndSaveCmd from './commands/add-node-and-save';
+import copyGraphCmd from './commands/copy-graph';
+import importDefinitionsCmd from './commands/import-definitions';
+import importGraphJsonCmd from './commands/import-graph-json';
+import infraInitEmptyRepoCmd from './commands/infra-init-empty-repo';
 import infraInsertNodeAtPathCmd from './commands/infra-insert-node-at-path';
+import infraSetDataAtPathCmd from './commands/infra-set-data-at-path';
+import initEmptyRepoCmd from './commands/init-empty-repo';
 import insertNodeAtPathCmd from './commands/insert-node-at-path';
-import startExecutionCmd from './commands/start-execution';
 import provisionBucketCmd from './commands/provision-bucket';
+import saveGraphCmd from './commands/save-graph';
+import setDataAtPathCmd from './commands/set-data-at-path';
+import startExecutionCmd from './commands/start-execution';
+import validateFunctionGraphCmd from './commands/validate-function-graph';
 const createCommandMap: () => Record<
   string,
   (
@@ -78,71 +78,71 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
-  'infra-get-all-record': infraGetAllRecordCmd,
-  'get-all-record': getAllRecordCmd,
-  'infra-ref': infraRefCmd,
-  'infra-store': infraStoreCmd,
+  'db-preset': dbPresetCmd,
   'function-api-binding': functionApiBindingCmd,
+  'function-definition': functionDefinitionCmd,
+  'function-deployment': functionDeploymentCmd,
+  'function-deployment-event': functionDeploymentEventCmd,
+  'function-execution-log': functionExecutionLogCmd,
+  'function-graph-commit': functionGraphCommitCmd,
+  'function-graph': functionGraphCmd,
+  'function-graph-execution': functionGraphExecutionCmd,
+  'function-graph-execution-node-state': functionGraphExecutionNodeStateCmd,
+  'function-graph-execution-output': functionGraphExecutionOutputCmd,
+  'function-graph-object': functionGraphObjectCmd,
   'function-graph-ref': functionGraphRefCmd,
   'function-graph-store': functionGraphStoreCmd,
+  'function-invocation': functionInvocationCmd,
+  'get-all-record': getAllRecordCmd,
+  'infra-commit': infraCommitCmd,
+  'infra-get-all-record': infraGetAllRecordCmd,
+  'infra-object': infraObjectCmd,
+  'infra-ref': infraRefCmd,
+  'infra-store': infraStoreCmd,
+  'integration-provider': integrationProviderCmd,
+  namespace: namespaceCmd,
+  'namespace-event': namespaceEventCmd,
   'platform-function-api-binding': platformFunctionApiBindingCmd,
-  'platform-resources-requirements-state': platformResourcesRequirementsStateCmd,
-  'resources-requirements-state': resourcesRequirementsStateCmd,
-  'platform-resource-status-check': platformResourceStatusCheckCmd,
+  'platform-function-definition': platformFunctionDefinitionCmd,
   'platform-function-deployment': platformFunctionDeploymentCmd,
+  'platform-function-deployment-event': platformFunctionDeploymentEventCmd,
+  'platform-function-execution-log': platformFunctionExecutionLogCmd,
+  'platform-function-invocation': platformFunctionInvocationCmd,
+  'platform-namespace': platformNamespaceCmd,
+  'platform-namespace-event': platformNamespaceEventCmd,
   'platform-resource': platformResourceCmd,
   'platform-resource-definition': platformResourceDefinitionCmd,
-  'infra-object': infraObjectCmd,
-  'function-graph-object': functionGraphObjectCmd,
-  'platform-function-deployment-event': platformFunctionDeploymentEventCmd,
   'platform-resource-event': platformResourceEventCmd,
-  'resource-status-check': resourceStatusCheckCmd,
-  'function-deployment': functionDeploymentCmd,
+  'platform-resource-status-check': platformResourceStatusCheckCmd,
+  'platform-resources-requirements-state': platformResourcesRequirementsStateCmd,
+  'platform-resources-resolved-requirement': platformResourcesResolvedRequirementCmd,
   resource: resourceCmd,
   'resource-definition': resourceDefinitionCmd,
-  'function-deployment-event': functionDeploymentEventCmd,
-  'platform-function-execution-log': platformFunctionExecutionLogCmd,
   'resource-event': resourceEventCmd,
-  'function-graph-execution-output': functionGraphExecutionOutputCmd,
-  'infra-commit': infraCommitCmd,
-  'function-graph-commit': functionGraphCommitCmd,
-  'function-execution-log': functionExecutionLogCmd,
-  'platform-resources-resolved-requirement': platformResourcesResolvedRequirementCmd,
+  'resource-status-check': resourceStatusCheckCmd,
+  'resources-requirements-state': resourcesRequirementsStateCmd,
   'resources-resolved-requirement': resourcesResolvedRequirementCmd,
-  'db-preset': dbPresetCmd,
-  'platform-namespace': platformNamespaceCmd,
-  'function-graph': functionGraphCmd,
-  'function-graph-execution-node-state': functionGraphExecutionNodeStateCmd,
-  namespace: namespaceCmd,
-  'platform-function-invocation': platformFunctionInvocationCmd,
-  'function-invocation': functionInvocationCmd,
-  'platform-namespace-event': platformNamespaceEventCmd,
-  'integration-provider': integrationProviderCmd,
-  'namespace-event': namespaceEventCmd,
-  'function-graph-execution': functionGraphExecutionCmd,
-  'platform-function-definition': platformFunctionDefinitionCmd,
-  'function-definition': functionDefinitionCmd,
   'read-function-graph': readFunctionGraphCmd,
-  'validate-function-graph': validateFunctionGraphCmd,
-  'infra-init-empty-repo': infraInitEmptyRepoCmd,
-  'init-empty-repo': initEmptyRepoCmd,
-  'import-definitions': importDefinitionsCmd,
-  'infra-set-data-at-path': infraSetDataAtPathCmd,
-  'set-data-at-path': setDataAtPathCmd,
-  'copy-graph': copyGraphCmd,
-  'save-graph': saveGraphCmd,
-  'add-edge-and-save': addEdgeAndSaveCmd,
-  'add-node-and-save': addNodeAndSaveCmd,
-  'import-graph-json': importGraphJsonCmd,
   'add-edge': addEdgeCmd,
+  'add-edge-and-save': addEdgeAndSaveCmd,
   'add-node': addNodeCmd,
+  'add-node-and-save': addNodeAndSaveCmd,
+  'copy-graph': copyGraphCmd,
+  'import-definitions': importDefinitionsCmd,
+  'import-graph-json': importGraphJsonCmd,
+  'infra-init-empty-repo': infraInitEmptyRepoCmd,
   'infra-insert-node-at-path': infraInsertNodeAtPathCmd,
+  'infra-set-data-at-path': infraSetDataAtPathCmd,
+  'init-empty-repo': initEmptyRepoCmd,
   'insert-node-at-path': insertNodeAtPathCmd,
-  'start-execution': startExecutionCmd,
   'provision-bucket': provisionBucketCmd,
+  'save-graph': saveGraphCmd,
+  'set-data-at-path': setDataAtPathCmd,
+  'start-execution': startExecutionCmd,
+  'validate-function-graph': validateFunctionGraphCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  infra-get-all-record infraGetAllRecord CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  infra-ref            infraRef CRUD operations\n  infra-store          infraStore CRUD operations\n  function-api-binding functionApiBinding CRUD operations\n  function-graph-ref   functionGraphRef CRUD operations\n  function-graph-store functionGraphStore CRUD operations\n  platform-function-api-binding platformFunctionApiBinding CRUD operations\n  platform-resources-requirements-state platformResourcesRequirementsState CRUD operations\n  resources-requirements-state resourcesRequirementsState CRUD operations\n  platform-resource-status-check platformResourceStatusCheck CRUD operations\n  platform-function-deployment platformFunctionDeployment CRUD operations\n  platform-resource    platformResource CRUD operations\n  platform-resource-definition platformResourceDefinition CRUD operations\n  infra-object         infraObject CRUD operations\n  function-graph-object functionGraphObject CRUD operations\n  platform-function-deployment-event platformFunctionDeploymentEvent CRUD operations\n  platform-resource-event platformResourceEvent CRUD operations\n  resource-status-check resourceStatusCheck CRUD operations\n  function-deployment  functionDeployment CRUD operations\n  resource             resource CRUD operations\n  resource-definition  resourceDefinition CRUD operations\n  function-deployment-event functionDeploymentEvent CRUD operations\n  platform-function-execution-log platformFunctionExecutionLog CRUD operations\n  resource-event       resourceEvent CRUD operations\n  function-graph-execution-output functionGraphExecutionOutput CRUD operations\n  infra-commit         infraCommit CRUD operations\n  function-graph-commit functionGraphCommit CRUD operations\n  function-execution-log functionExecutionLog CRUD operations\n  platform-resources-resolved-requirement platformResourcesResolvedRequirement CRUD operations\n  resources-resolved-requirement resourcesResolvedRequirement CRUD operations\n  db-preset            dbPreset CRUD operations\n  platform-namespace   platformNamespace CRUD operations\n  function-graph       functionGraph CRUD operations\n  function-graph-execution-node-state functionGraphExecutionNodeState CRUD operations\n  namespace            namespace CRUD operations\n  platform-function-invocation platformFunctionInvocation CRUD operations\n  function-invocation  functionInvocation CRUD operations\n  platform-namespace-event platformNamespaceEvent CRUD operations\n  integration-provider integrationProvider CRUD operations\n  namespace-event      namespaceEvent CRUD operations\n  function-graph-execution functionGraphExecution CRUD operations\n  platform-function-definition platformFunctionDefinition CRUD operations\n  function-definition  functionDefinition CRUD operations\n  read-function-graph  readFunctionGraph\n  validate-function-graph validateFunctionGraph\n  infra-init-empty-repo infraInitEmptyRepo\n  init-empty-repo      initEmptyRepo\n  import-definitions   importDefinitions\n  infra-set-data-at-path infraSetDataAtPath\n  set-data-at-path     setDataAtPath\n  copy-graph           copyGraph\n  save-graph           saveGraph\n  add-edge-and-save    addEdgeAndSave\n  add-node-and-save    addNodeAndSave\n  import-graph-json    importGraphJson\n  add-edge             addEdge\n  add-node             addNode\n  infra-insert-node-at-path infraInsertNodeAtPath\n  insert-node-at-path  insertNodeAtPath\n  start-execution      startExecution\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  db-preset            dbPreset CRUD operations\n  function-api-binding functionApiBinding CRUD operations\n  function-definition  functionDefinition CRUD operations\n  function-deployment  functionDeployment CRUD operations\n  function-deployment-event functionDeploymentEvent CRUD operations\n  function-execution-log functionExecutionLog CRUD operations\n  function-graph-commit functionGraphCommit CRUD operations\n  function-graph       functionGraph CRUD operations\n  function-graph-execution functionGraphExecution CRUD operations\n  function-graph-execution-node-state functionGraphExecutionNodeState CRUD operations\n  function-graph-execution-output functionGraphExecutionOutput CRUD operations\n  function-graph-object functionGraphObject CRUD operations\n  function-graph-ref   functionGraphRef CRUD operations\n  function-graph-store functionGraphStore CRUD operations\n  function-invocation  functionInvocation CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  infra-commit         infraCommit CRUD operations\n  infra-get-all-record infraGetAllRecord CRUD operations\n  infra-object         infraObject CRUD operations\n  infra-ref            infraRef CRUD operations\n  infra-store          infraStore CRUD operations\n  integration-provider integrationProvider CRUD operations\n  namespace            namespace CRUD operations\n  namespace-event      namespaceEvent CRUD operations\n  platform-function-api-binding platformFunctionApiBinding CRUD operations\n  platform-function-definition platformFunctionDefinition CRUD operations\n  platform-function-deployment platformFunctionDeployment CRUD operations\n  platform-function-deployment-event platformFunctionDeploymentEvent CRUD operations\n  platform-function-execution-log platformFunctionExecutionLog CRUD operations\n  platform-function-invocation platformFunctionInvocation CRUD operations\n  platform-namespace   platformNamespace CRUD operations\n  platform-namespace-event platformNamespaceEvent CRUD operations\n  platform-resource    platformResource CRUD operations\n  platform-resource-definition platformResourceDefinition CRUD operations\n  platform-resource-event platformResourceEvent CRUD operations\n  platform-resource-status-check platformResourceStatusCheck CRUD operations\n  platform-resources-requirements-state platformResourcesRequirementsState CRUD operations\n  platform-resources-resolved-requirement platformResourcesResolvedRequirement CRUD operations\n  resource             resource CRUD operations\n  resource-definition  resourceDefinition CRUD operations\n  resource-event       resourceEvent CRUD operations\n  resource-status-check resourceStatusCheck CRUD operations\n  resources-requirements-state resourcesRequirementsState CRUD operations\n  resources-resolved-requirement resourcesResolvedRequirement CRUD operations\n  read-function-graph  readFunctionGraph\n  add-edge             addEdge\n  add-edge-and-save    addEdgeAndSave\n  add-node             addNode\n  add-node-and-save    addNodeAndSave\n  copy-graph           copyGraph\n  import-definitions   importDefinitions\n  import-graph-json    importGraphJson\n  infra-init-empty-repo infraInitEmptyRepo\n  infra-insert-node-at-path infraInsertNodeAtPath\n  infra-set-data-at-path infraSetDataAtPath\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  save-graph           saveGraph\n  set-data-at-path     setDataAtPath\n  start-execution      startExecution\n  validate-function-graph validateFunctionGraph\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

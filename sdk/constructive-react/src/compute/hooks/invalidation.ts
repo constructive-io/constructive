@@ -15,50 +15,50 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  infraGetAllRecordKeys,
-  getAllRecordKeys,
-  infraRefKeys,
-  infraStoreKeys,
+  dbPresetKeys,
   functionApiBindingKeys,
+  functionDefinitionKeys,
+  functionDeploymentKeys,
+  functionDeploymentEventKeys,
+  functionExecutionLogKeys,
+  functionGraphCommitKeys,
+  functionGraphKeys,
+  functionGraphExecutionKeys,
+  functionGraphExecutionNodeStateKeys,
+  functionGraphExecutionOutputKeys,
+  functionGraphObjectKeys,
   functionGraphRefKeys,
   functionGraphStoreKeys,
+  functionInvocationKeys,
+  getAllRecordKeys,
+  infraCommitKeys,
+  infraGetAllRecordKeys,
+  infraObjectKeys,
+  infraRefKeys,
+  infraStoreKeys,
+  integrationProviderKeys,
+  namespaceKeys,
+  namespaceEventKeys,
   platformFunctionApiBindingKeys,
-  platformResourcesRequirementsStateKeys,
-  resourcesRequirementsStateKeys,
-  platformResourceStatusCheckKeys,
+  platformFunctionDefinitionKeys,
   platformFunctionDeploymentKeys,
+  platformFunctionDeploymentEventKeys,
+  platformFunctionExecutionLogKeys,
+  platformFunctionInvocationKeys,
+  platformNamespaceKeys,
+  platformNamespaceEventKeys,
   platformResourceKeys,
   platformResourceDefinitionKeys,
-  infraObjectKeys,
-  functionGraphObjectKeys,
-  platformFunctionDeploymentEventKeys,
   platformResourceEventKeys,
-  resourceStatusCheckKeys,
-  functionDeploymentKeys,
+  platformResourceStatusCheckKeys,
+  platformResourcesRequirementsStateKeys,
+  platformResourcesResolvedRequirementKeys,
   resourceKeys,
   resourceDefinitionKeys,
-  functionDeploymentEventKeys,
-  platformFunctionExecutionLogKeys,
   resourceEventKeys,
-  functionGraphExecutionOutputKeys,
-  infraCommitKeys,
-  functionGraphCommitKeys,
-  functionExecutionLogKeys,
-  platformResourcesResolvedRequirementKeys,
+  resourceStatusCheckKeys,
+  resourcesRequirementsStateKeys,
   resourcesResolvedRequirementKeys,
-  dbPresetKeys,
-  platformNamespaceKeys,
-  functionGraphKeys,
-  functionGraphExecutionNodeStateKeys,
-  namespaceKeys,
-  platformFunctionInvocationKeys,
-  functionInvocationKeys,
-  platformNamespaceEventKeys,
-  integrationProviderKeys,
-  namespaceEventKeys,
-  functionGraphExecutionKeys,
-  platformFunctionDefinitionKeys,
-  functionDefinitionKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -80,69 +80,18 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate infraGetAllRecord queries */ infraGetAllRecord: {
-    /** Invalidate all infraGetAllRecord queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate dbPreset queries */ dbPreset: {
+    /** Invalidate all dbPreset queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: infraGetAllRecordKeys.all,
+        queryKey: dbPresetKeys.all,
       }),
-    /** Invalidate infraGetAllRecord list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate dbPreset list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: infraGetAllRecordKeys.lists(),
+        queryKey: dbPresetKeys.lists(),
       }),
-    /** Invalidate a specific infraGetAllRecord */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
+    /** Invalidate a specific dbPreset */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
-        queryKey: infraGetAllRecordKeys.detail(id),
-      }),
-  },
-  /** Invalidate getAllRecord queries */ getAllRecord: {
-    /** Invalidate all getAllRecord queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.all,
-      }),
-    /** Invalidate getAllRecord list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.lists(),
-      }),
-    /** Invalidate a specific getAllRecord */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.detail(id),
-      }),
-  },
-  /** Invalidate infraRef queries */ infraRef: {
-    /** Invalidate all infraRef queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraRefKeys.all,
-      }),
-    /** Invalidate infraRef list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraRefKeys.lists(),
-      }),
-    /** Invalidate a specific infraRef */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: infraRefKeys.detail(id),
-      }),
-  },
-  /** Invalidate infraStore queries */ infraStore: {
-    /** Invalidate all infraStore queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraStoreKeys.all,
-      }),
-    /** Invalidate infraStore list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraStoreKeys.lists(),
-      }),
-    /** Invalidate a specific infraStore */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: infraStoreKeys.detail(id),
+        queryKey: dbPresetKeys.detail(id),
       }),
   },
   /** Invalidate functionApiBinding queries */ functionApiBinding: {
@@ -160,6 +109,178 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: functionApiBindingKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionDefinition queries */ functionDefinition: {
+    /** Invalidate all functionDefinition queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDefinitionKeys.all,
+      }),
+    /** Invalidate functionDefinition list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDefinitionKeys.lists(),
+      }),
+    /** Invalidate a specific functionDefinition */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDefinitionKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionDeployment queries */ functionDeployment: {
+    /** Invalidate all functionDeployment queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentKeys.all,
+      }),
+    /** Invalidate functionDeployment list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentKeys.lists(),
+      }),
+    /** Invalidate a specific functionDeployment */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionDeploymentEvent queries */ functionDeploymentEvent: {
+    /** Invalidate all functionDeploymentEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentEventKeys.all,
+      }),
+    /** Invalidate functionDeploymentEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentEventKeys.lists(),
+      }),
+    /** Invalidate a specific functionDeploymentEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionDeploymentEventKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionExecutionLog queries */ functionExecutionLog: {
+    /** Invalidate all functionExecutionLog queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionExecutionLogKeys.all,
+      }),
+    /** Invalidate functionExecutionLog list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionExecutionLogKeys.lists(),
+      }),
+    /** Invalidate a specific functionExecutionLog */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionExecutionLogKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionGraphCommit queries */ functionGraphCommit: {
+    /** Invalidate all functionGraphCommit queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphCommitKeys.all,
+      }),
+    /** Invalidate functionGraphCommit list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphCommitKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraphCommit */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphCommitKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionGraph queries */ functionGraph: {
+    /** Invalidate all functionGraph queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.all,
+      }),
+    /** Invalidate functionGraph list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraph */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionGraphExecution queries */ functionGraphExecution: {
+    /** Invalidate all functionGraphExecution queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionKeys.all,
+      }),
+    /** Invalidate functionGraphExecution list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraphExecution */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionGraphExecutionNodeState queries */ functionGraphExecutionNodeState: {
+    /** Invalidate all functionGraphExecutionNodeState queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionNodeStateKeys.all,
+      }),
+    /** Invalidate functionGraphExecutionNodeState list queries */ lists: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionNodeStateKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraphExecutionNodeState */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionNodeStateKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionGraphExecutionOutput queries */ functionGraphExecutionOutput: {
+    /** Invalidate all functionGraphExecutionOutput queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionOutputKeys.all,
+      }),
+    /** Invalidate functionGraphExecutionOutput list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionOutputKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraphExecutionOutput */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphExecutionOutputKeys.detail(id),
+      }),
+  },
+  /** Invalidate functionGraphObject queries */ functionGraphObject: {
+    /** Invalidate all functionGraphObject queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphObjectKeys.all,
+      }),
+    /** Invalidate functionGraphObject list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphObjectKeys.lists(),
+      }),
+    /** Invalidate a specific functionGraphObject */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionGraphObjectKeys.detail(id),
       }),
   },
   /** Invalidate functionGraphRef queries */ functionGraphRef: {
@@ -196,6 +317,173 @@ export const invalidate = {
         queryKey: functionGraphStoreKeys.detail(id),
       }),
   },
+  /** Invalidate functionInvocation queries */ functionInvocation: {
+    /** Invalidate all functionInvocation queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationKeys.all,
+      }),
+    /** Invalidate functionInvocation list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationKeys.lists(),
+      }),
+    /** Invalidate a specific functionInvocation */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: functionInvocationKeys.detail(id),
+      }),
+  },
+  /** Invalidate getAllRecord queries */ getAllRecord: {
+    /** Invalidate all getAllRecord queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllRecordKeys.all,
+      }),
+    /** Invalidate getAllRecord list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllRecordKeys.lists(),
+      }),
+    /** Invalidate a specific getAllRecord */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllRecordKeys.detail(id),
+      }),
+  },
+  /** Invalidate infraCommit queries */ infraCommit: {
+    /** Invalidate all infraCommit queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraCommitKeys.all,
+      }),
+    /** Invalidate infraCommit list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraCommitKeys.lists(),
+      }),
+    /** Invalidate a specific infraCommit */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: infraCommitKeys.detail(id),
+      }),
+  },
+  /** Invalidate infraGetAllRecord queries */ infraGetAllRecord: {
+    /** Invalidate all infraGetAllRecord queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraGetAllRecordKeys.all,
+      }),
+    /** Invalidate infraGetAllRecord list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraGetAllRecordKeys.lists(),
+      }),
+    /** Invalidate a specific infraGetAllRecord */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: infraGetAllRecordKeys.detail(id),
+      }),
+  },
+  /** Invalidate infraObject queries */ infraObject: {
+    /** Invalidate all infraObject queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraObjectKeys.all,
+      }),
+    /** Invalidate infraObject list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraObjectKeys.lists(),
+      }),
+    /** Invalidate a specific infraObject */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: infraObjectKeys.detail(id),
+      }),
+  },
+  /** Invalidate infraRef queries */ infraRef: {
+    /** Invalidate all infraRef queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraRefKeys.all,
+      }),
+    /** Invalidate infraRef list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraRefKeys.lists(),
+      }),
+    /** Invalidate a specific infraRef */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: infraRefKeys.detail(id),
+      }),
+  },
+  /** Invalidate infraStore queries */ infraStore: {
+    /** Invalidate all infraStore queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraStoreKeys.all,
+      }),
+    /** Invalidate infraStore list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: infraStoreKeys.lists(),
+      }),
+    /** Invalidate a specific infraStore */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: infraStoreKeys.detail(id),
+      }),
+  },
+  /** Invalidate integrationProvider queries */ integrationProvider: {
+    /** Invalidate all integrationProvider queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: integrationProviderKeys.all,
+      }),
+    /** Invalidate integrationProvider list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: integrationProviderKeys.lists(),
+      }),
+    /** Invalidate a specific integrationProvider */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: integrationProviderKeys.detail(id),
+      }),
+  },
+  /** Invalidate namespace queries */ namespace: {
+    /** Invalidate all namespace queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceKeys.all,
+      }),
+    /** Invalidate namespace list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceKeys.lists(),
+      }),
+    /** Invalidate a specific namespace */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceKeys.detail(id),
+      }),
+  },
+  /** Invalidate namespaceEvent queries */ namespaceEvent: {
+    /** Invalidate all namespaceEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceEventKeys.all,
+      }),
+    /** Invalidate namespaceEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceEventKeys.lists(),
+      }),
+    /** Invalidate a specific namespaceEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: namespaceEventKeys.detail(id),
+      }),
+  },
   /** Invalidate platformFunctionApiBinding queries */ platformFunctionApiBinding: {
     /** Invalidate all platformFunctionApiBinding queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -213,59 +501,21 @@ export const invalidate = {
         queryKey: platformFunctionApiBindingKeys.detail(id),
       }),
   },
-  /** Invalidate platformResourcesRequirementsState queries */ platformResourcesRequirementsState: {
-    /** Invalidate all platformResourcesRequirementsState queries */ all: (
-      queryClient: QueryClient
-    ) =>
+  /** Invalidate platformFunctionDefinition queries */ platformFunctionDefinition: {
+    /** Invalidate all platformFunctionDefinition queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: platformResourcesRequirementsStateKeys.all,
+        queryKey: platformFunctionDefinitionKeys.all,
       }),
-    /** Invalidate platformResourcesRequirementsState list queries */ lists: (
-      queryClient: QueryClient
-    ) =>
+    /** Invalidate platformFunctionDefinition list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: platformResourcesRequirementsStateKeys.lists(),
+        queryKey: platformFunctionDefinitionKeys.lists(),
       }),
-    /** Invalidate a specific platformResourcesRequirementsState */ detail: (
+    /** Invalidate a specific platformFunctionDefinition */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: platformResourcesRequirementsStateKeys.detail(id),
-      }),
-  },
-  /** Invalidate resourcesRequirementsState queries */ resourcesRequirementsState: {
-    /** Invalidate all resourcesRequirementsState queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: resourcesRequirementsStateKeys.all,
-      }),
-    /** Invalidate resourcesRequirementsState list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: resourcesRequirementsStateKeys.lists(),
-      }),
-    /** Invalidate a specific resourcesRequirementsState */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: resourcesRequirementsStateKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformResourceStatusCheck queries */ platformResourceStatusCheck: {
-    /** Invalidate all platformResourceStatusCheck queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformResourceStatusCheckKeys.all,
-      }),
-    /** Invalidate platformResourceStatusCheck list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformResourceStatusCheckKeys.lists(),
-      }),
-    /** Invalidate a specific platformResourceStatusCheck */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformResourceStatusCheckKeys.detail(id),
+        queryKey: platformFunctionDefinitionKeys.detail(id),
       }),
   },
   /** Invalidate platformFunctionDeployment queries */ platformFunctionDeployment: {
@@ -283,6 +533,93 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformFunctionDeploymentKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformFunctionDeploymentEvent queries */ platformFunctionDeploymentEvent: {
+    /** Invalidate all platformFunctionDeploymentEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionDeploymentEventKeys.all,
+      }),
+    /** Invalidate platformFunctionDeploymentEvent list queries */ lists: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionDeploymentEventKeys.lists(),
+      }),
+    /** Invalidate a specific platformFunctionDeploymentEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionDeploymentEventKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformFunctionExecutionLog queries */ platformFunctionExecutionLog: {
+    /** Invalidate all platformFunctionExecutionLog queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionExecutionLogKeys.all,
+      }),
+    /** Invalidate platformFunctionExecutionLog list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionExecutionLogKeys.lists(),
+      }),
+    /** Invalidate a specific platformFunctionExecutionLog */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionExecutionLogKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformFunctionInvocation queries */ platformFunctionInvocation: {
+    /** Invalidate all platformFunctionInvocation queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionInvocationKeys.all,
+      }),
+    /** Invalidate platformFunctionInvocation list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionInvocationKeys.lists(),
+      }),
+    /** Invalidate a specific platformFunctionInvocation */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformFunctionInvocationKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformNamespace queries */ platformNamespace: {
+    /** Invalidate all platformNamespace queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceKeys.all,
+      }),
+    /** Invalidate platformNamespace list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceKeys.lists(),
+      }),
+    /** Invalidate a specific platformNamespace */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformNamespaceEvent queries */ platformNamespaceEvent: {
+    /** Invalidate all platformNamespaceEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceEventKeys.all,
+      }),
+    /** Invalidate platformNamespaceEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceEventKeys.lists(),
+      }),
+    /** Invalidate a specific platformNamespaceEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformNamespaceEventKeys.detail(id),
       }),
   },
   /** Invalidate platformResource queries */ platformResource: {
@@ -319,59 +656,6 @@ export const invalidate = {
         queryKey: platformResourceDefinitionKeys.detail(id),
       }),
   },
-  /** Invalidate infraObject queries */ infraObject: {
-    /** Invalidate all infraObject queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.all,
-      }),
-    /** Invalidate infraObject list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.lists(),
-      }),
-    /** Invalidate a specific infraObject */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionGraphObject queries */ functionGraphObject: {
-    /** Invalidate all functionGraphObject queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphObjectKeys.all,
-      }),
-    /** Invalidate functionGraphObject list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphObjectKeys.lists(),
-      }),
-    /** Invalidate a specific functionGraphObject */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphObjectKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformFunctionDeploymentEvent queries */ platformFunctionDeploymentEvent: {
-    /** Invalidate all platformFunctionDeploymentEvent queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionDeploymentEventKeys.all,
-      }),
-    /** Invalidate platformFunctionDeploymentEvent list queries */ lists: (
-      queryClient: QueryClient
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionDeploymentEventKeys.lists(),
-      }),
-    /** Invalidate a specific platformFunctionDeploymentEvent */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionDeploymentEventKeys.detail(id),
-      }),
-  },
   /** Invalidate platformResourceEvent queries */ platformResourceEvent: {
     /** Invalidate all platformResourceEvent queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -389,40 +673,66 @@ export const invalidate = {
         queryKey: platformResourceEventKeys.detail(id),
       }),
   },
-  /** Invalidate resourceStatusCheck queries */ resourceStatusCheck: {
-    /** Invalidate all resourceStatusCheck queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate platformResourceStatusCheck queries */ platformResourceStatusCheck: {
+    /** Invalidate all platformResourceStatusCheck queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: resourceStatusCheckKeys.all,
+        queryKey: platformResourceStatusCheckKeys.all,
       }),
-    /** Invalidate resourceStatusCheck list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate platformResourceStatusCheck list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: resourceStatusCheckKeys.lists(),
+        queryKey: platformResourceStatusCheckKeys.lists(),
       }),
-    /** Invalidate a specific resourceStatusCheck */ detail: (
+    /** Invalidate a specific platformResourceStatusCheck */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: resourceStatusCheckKeys.detail(id),
+        queryKey: platformResourceStatusCheckKeys.detail(id),
       }),
   },
-  /** Invalidate functionDeployment queries */ functionDeployment: {
-    /** Invalidate all functionDeployment queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate platformResourcesRequirementsState queries */ platformResourcesRequirementsState: {
+    /** Invalidate all platformResourcesRequirementsState queries */ all: (
+      queryClient: QueryClient
+    ) =>
       queryClient.invalidateQueries({
-        queryKey: functionDeploymentKeys.all,
+        queryKey: platformResourcesRequirementsStateKeys.all,
       }),
-    /** Invalidate functionDeployment list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate platformResourcesRequirementsState list queries */ lists: (
+      queryClient: QueryClient
+    ) =>
       queryClient.invalidateQueries({
-        queryKey: functionDeploymentKeys.lists(),
+        queryKey: platformResourcesRequirementsStateKeys.lists(),
       }),
-    /** Invalidate a specific functionDeployment */ detail: (
+    /** Invalidate a specific platformResourcesRequirementsState */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: functionDeploymentKeys.detail(id),
+        queryKey: platformResourcesRequirementsStateKeys.detail(id),
       }),
   },
+  /** Invalidate platformResourcesResolvedRequirement queries */ platformResourcesResolvedRequirement:
+    {
+      /** Invalidate all platformResourcesResolvedRequirement queries */ all: (
+        queryClient: QueryClient
+      ) =>
+        queryClient.invalidateQueries({
+          queryKey: platformResourcesResolvedRequirementKeys.all,
+        }),
+      /** Invalidate platformResourcesResolvedRequirement list queries */ lists: (
+        queryClient: QueryClient
+      ) =>
+        queryClient.invalidateQueries({
+          queryKey: platformResourcesResolvedRequirementKeys.lists(),
+        }),
+      /** Invalidate a specific platformResourcesResolvedRequirement */ detail: (
+        queryClient: QueryClient,
+        id: string | number
+      ) =>
+        queryClient.invalidateQueries({
+          queryKey: platformResourcesResolvedRequirementKeys.detail(id),
+        }),
+    },
   /** Invalidate resource queries */ resource: {
     /** Invalidate all resource queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -454,40 +764,6 @@ export const invalidate = {
         queryKey: resourceDefinitionKeys.detail(id),
       }),
   },
-  /** Invalidate functionDeploymentEvent queries */ functionDeploymentEvent: {
-    /** Invalidate all functionDeploymentEvent queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionDeploymentEventKeys.all,
-      }),
-    /** Invalidate functionDeploymentEvent list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionDeploymentEventKeys.lists(),
-      }),
-    /** Invalidate a specific functionDeploymentEvent */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionDeploymentEventKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformFunctionExecutionLog queries */ platformFunctionExecutionLog: {
-    /** Invalidate all platformFunctionExecutionLog queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionExecutionLogKeys.all,
-      }),
-    /** Invalidate platformFunctionExecutionLog list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionExecutionLogKeys.lists(),
-      }),
-    /** Invalidate a specific platformFunctionExecutionLog */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionExecutionLogKeys.detail(id),
-      }),
-  },
   /** Invalidate resourceEvent queries */ resourceEvent: {
     /** Invalidate all resourceEvent queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -505,96 +781,40 @@ export const invalidate = {
         queryKey: resourceEventKeys.detail(id),
       }),
   },
-  /** Invalidate functionGraphExecutionOutput queries */ functionGraphExecutionOutput: {
-    /** Invalidate all functionGraphExecutionOutput queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate resourceStatusCheck queries */ resourceStatusCheck: {
+    /** Invalidate all resourceStatusCheck queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionOutputKeys.all,
+        queryKey: resourceStatusCheckKeys.all,
       }),
-    /** Invalidate functionGraphExecutionOutput list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate resourceStatusCheck list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionOutputKeys.lists(),
+        queryKey: resourceStatusCheckKeys.lists(),
       }),
-    /** Invalidate a specific functionGraphExecutionOutput */ detail: (
+    /** Invalidate a specific resourceStatusCheck */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionOutputKeys.detail(id),
+        queryKey: resourceStatusCheckKeys.detail(id),
       }),
   },
-  /** Invalidate infraCommit queries */ infraCommit: {
-    /** Invalidate all infraCommit queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate resourcesRequirementsState queries */ resourcesRequirementsState: {
+    /** Invalidate all resourcesRequirementsState queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: infraCommitKeys.all,
+        queryKey: resourcesRequirementsStateKeys.all,
       }),
-    /** Invalidate infraCommit list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate resourcesRequirementsState list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: infraCommitKeys.lists(),
+        queryKey: resourcesRequirementsStateKeys.lists(),
       }),
-    /** Invalidate a specific infraCommit */ detail: (
+    /** Invalidate a specific resourcesRequirementsState */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: infraCommitKeys.detail(id),
+        queryKey: resourcesRequirementsStateKeys.detail(id),
       }),
   },
-  /** Invalidate functionGraphCommit queries */ functionGraphCommit: {
-    /** Invalidate all functionGraphCommit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphCommitKeys.all,
-      }),
-    /** Invalidate functionGraphCommit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphCommitKeys.lists(),
-      }),
-    /** Invalidate a specific functionGraphCommit */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphCommitKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionExecutionLog queries */ functionExecutionLog: {
-    /** Invalidate all functionExecutionLog queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionExecutionLogKeys.all,
-      }),
-    /** Invalidate functionExecutionLog list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionExecutionLogKeys.lists(),
-      }),
-    /** Invalidate a specific functionExecutionLog */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionExecutionLogKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformResourcesResolvedRequirement queries */ platformResourcesResolvedRequirement:
-    {
-      /** Invalidate all platformResourcesResolvedRequirement queries */ all: (
-        queryClient: QueryClient
-      ) =>
-        queryClient.invalidateQueries({
-          queryKey: platformResourcesResolvedRequirementKeys.all,
-        }),
-      /** Invalidate platformResourcesResolvedRequirement list queries */ lists: (
-        queryClient: QueryClient
-      ) =>
-        queryClient.invalidateQueries({
-          queryKey: platformResourcesResolvedRequirementKeys.lists(),
-        }),
-      /** Invalidate a specific platformResourcesResolvedRequirement */ detail: (
-        queryClient: QueryClient,
-        id: string | number
-      ) =>
-        queryClient.invalidateQueries({
-          queryKey: platformResourcesResolvedRequirementKeys.detail(id),
-        }),
-    },
   /** Invalidate resourcesResolvedRequirement queries */ resourcesResolvedRequirement: {
     /** Invalidate all resourcesResolvedRequirement queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -612,226 +832,6 @@ export const invalidate = {
         queryKey: resourcesResolvedRequirementKeys.detail(id),
       }),
   },
-  /** Invalidate dbPreset queries */ dbPreset: {
-    /** Invalidate all dbPreset queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: dbPresetKeys.all,
-      }),
-    /** Invalidate dbPreset list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: dbPresetKeys.lists(),
-      }),
-    /** Invalidate a specific dbPreset */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: dbPresetKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformNamespace queries */ platformNamespace: {
-    /** Invalidate all platformNamespace queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformNamespaceKeys.all,
-      }),
-    /** Invalidate platformNamespace list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformNamespaceKeys.lists(),
-      }),
-    /** Invalidate a specific platformNamespace */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformNamespaceKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionGraph queries */ functionGraph: {
-    /** Invalidate all functionGraph queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.all,
-      }),
-    /** Invalidate functionGraph list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.lists(),
-      }),
-    /** Invalidate a specific functionGraph */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionGraphExecutionNodeState queries */ functionGraphExecutionNodeState: {
-    /** Invalidate all functionGraphExecutionNodeState queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionNodeStateKeys.all,
-      }),
-    /** Invalidate functionGraphExecutionNodeState list queries */ lists: (
-      queryClient: QueryClient
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionNodeStateKeys.lists(),
-      }),
-    /** Invalidate a specific functionGraphExecutionNodeState */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionNodeStateKeys.detail(id),
-      }),
-  },
-  /** Invalidate namespace queries */ namespace: {
-    /** Invalidate all namespace queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceKeys.all,
-      }),
-    /** Invalidate namespace list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceKeys.lists(),
-      }),
-    /** Invalidate a specific namespace */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformFunctionInvocation queries */ platformFunctionInvocation: {
-    /** Invalidate all platformFunctionInvocation queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionInvocationKeys.all,
-      }),
-    /** Invalidate platformFunctionInvocation list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionInvocationKeys.lists(),
-      }),
-    /** Invalidate a specific platformFunctionInvocation */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionInvocationKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionInvocation queries */ functionInvocation: {
-    /** Invalidate all functionInvocation queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionInvocationKeys.all,
-      }),
-    /** Invalidate functionInvocation list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionInvocationKeys.lists(),
-      }),
-    /** Invalidate a specific functionInvocation */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionInvocationKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformNamespaceEvent queries */ platformNamespaceEvent: {
-    /** Invalidate all platformNamespaceEvent queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformNamespaceEventKeys.all,
-      }),
-    /** Invalidate platformNamespaceEvent list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformNamespaceEventKeys.lists(),
-      }),
-    /** Invalidate a specific platformNamespaceEvent */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformNamespaceEventKeys.detail(id),
-      }),
-  },
-  /** Invalidate integrationProvider queries */ integrationProvider: {
-    /** Invalidate all integrationProvider queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: integrationProviderKeys.all,
-      }),
-    /** Invalidate integrationProvider list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: integrationProviderKeys.lists(),
-      }),
-    /** Invalidate a specific integrationProvider */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: integrationProviderKeys.detail(id),
-      }),
-  },
-  /** Invalidate namespaceEvent queries */ namespaceEvent: {
-    /** Invalidate all namespaceEvent queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceEventKeys.all,
-      }),
-    /** Invalidate namespaceEvent list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceEventKeys.lists(),
-      }),
-    /** Invalidate a specific namespaceEvent */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: namespaceEventKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionGraphExecution queries */ functionGraphExecution: {
-    /** Invalidate all functionGraphExecution queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionKeys.all,
-      }),
-    /** Invalidate functionGraphExecution list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionKeys.lists(),
-      }),
-    /** Invalidate a specific functionGraphExecution */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionGraphExecutionKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformFunctionDefinition queries */ platformFunctionDefinition: {
-    /** Invalidate all platformFunctionDefinition queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionDefinitionKeys.all,
-      }),
-    /** Invalidate platformFunctionDefinition list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionDefinitionKeys.lists(),
-      }),
-    /** Invalidate a specific platformFunctionDefinition */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformFunctionDefinitionKeys.detail(id),
-      }),
-  },
-  /** Invalidate functionDefinition queries */ functionDefinition: {
-    /** Invalidate all functionDefinition queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionDefinitionKeys.all,
-      }),
-    /** Invalidate functionDefinition list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: functionDefinitionKeys.lists(),
-      }),
-    /** Invalidate a specific functionDefinition */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: functionDefinitionKeys.detail(id),
-      }),
-  },
 } as const;
 /**
 
@@ -845,33 +845,9 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove infraGetAllRecord from cache */ infraGetAllRecord: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove dbPreset from cache */ dbPreset: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: infraGetAllRecordKeys.detail(id),
-    });
-  },
-  /** Remove getAllRecord from cache */ getAllRecord: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: getAllRecordKeys.detail(id),
-    });
-  },
-  /** Remove infraRef from cache */ infraRef: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: infraRefKeys.detail(id),
-    });
-  },
-  /** Remove infraStore from cache */ infraStore: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: infraStoreKeys.detail(id),
+      queryKey: dbPresetKeys.detail(id),
     });
   },
   /** Remove functionApiBinding from cache */ functionApiBinding: (
@@ -880,6 +856,86 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: functionApiBindingKeys.detail(id),
+    });
+  },
+  /** Remove functionDefinition from cache */ functionDefinition: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionDefinitionKeys.detail(id),
+    });
+  },
+  /** Remove functionDeployment from cache */ functionDeployment: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionDeploymentKeys.detail(id),
+    });
+  },
+  /** Remove functionDeploymentEvent from cache */ functionDeploymentEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionDeploymentEventKeys.detail(id),
+    });
+  },
+  /** Remove functionExecutionLog from cache */ functionExecutionLog: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionExecutionLogKeys.detail(id),
+    });
+  },
+  /** Remove functionGraphCommit from cache */ functionGraphCommit: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphCommitKeys.detail(id),
+    });
+  },
+  /** Remove functionGraph from cache */ functionGraph: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphKeys.detail(id),
+    });
+  },
+  /** Remove functionGraphExecution from cache */ functionGraphExecution: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphExecutionKeys.detail(id),
+    });
+  },
+  /** Remove functionGraphExecutionNodeState from cache */ functionGraphExecutionNodeState: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphExecutionNodeStateKeys.detail(id),
+    });
+  },
+  /** Remove functionGraphExecutionOutput from cache */ functionGraphExecutionOutput: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphExecutionOutputKeys.detail(id),
+    });
+  },
+  /** Remove functionGraphObject from cache */ functionGraphObject: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionGraphObjectKeys.detail(id),
     });
   },
   /** Remove functionGraphRef from cache */ functionGraphRef: (
@@ -898,6 +954,80 @@ export const remove = {
       queryKey: functionGraphStoreKeys.detail(id),
     });
   },
+  /** Remove functionInvocation from cache */ functionInvocation: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: functionInvocationKeys.detail(id),
+    });
+  },
+  /** Remove getAllRecord from cache */ getAllRecord: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: getAllRecordKeys.detail(id),
+    });
+  },
+  /** Remove infraCommit from cache */ infraCommit: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: infraCommitKeys.detail(id),
+    });
+  },
+  /** Remove infraGetAllRecord from cache */ infraGetAllRecord: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: infraGetAllRecordKeys.detail(id),
+    });
+  },
+  /** Remove infraObject from cache */ infraObject: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: infraObjectKeys.detail(id),
+    });
+  },
+  /** Remove infraRef from cache */ infraRef: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: infraRefKeys.detail(id),
+    });
+  },
+  /** Remove infraStore from cache */ infraStore: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: infraStoreKeys.detail(id),
+    });
+  },
+  /** Remove integrationProvider from cache */ integrationProvider: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: integrationProviderKeys.detail(id),
+    });
+  },
+  /** Remove namespace from cache */ namespace: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: namespaceKeys.detail(id),
+    });
+  },
+  /** Remove namespaceEvent from cache */ namespaceEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: namespaceEventKeys.detail(id),
+    });
+  },
   /** Remove platformFunctionApiBinding from cache */ platformFunctionApiBinding: (
     queryClient: QueryClient,
     id: string | number
@@ -906,28 +1036,12 @@ export const remove = {
       queryKey: platformFunctionApiBindingKeys.detail(id),
     });
   },
-  /** Remove platformResourcesRequirementsState from cache */ platformResourcesRequirementsState: (
+  /** Remove platformFunctionDefinition from cache */ platformFunctionDefinition: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: platformResourcesRequirementsStateKeys.detail(id),
-    });
-  },
-  /** Remove resourcesRequirementsState from cache */ resourcesRequirementsState: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: resourcesRequirementsStateKeys.detail(id),
-    });
-  },
-  /** Remove platformResourceStatusCheck from cache */ platformResourceStatusCheck: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformResourceStatusCheckKeys.detail(id),
+      queryKey: platformFunctionDefinitionKeys.detail(id),
     });
   },
   /** Remove platformFunctionDeployment from cache */ platformFunctionDeployment: (
@@ -936,6 +1050,46 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: platformFunctionDeploymentKeys.detail(id),
+    });
+  },
+  /** Remove platformFunctionDeploymentEvent from cache */ platformFunctionDeploymentEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformFunctionDeploymentEventKeys.detail(id),
+    });
+  },
+  /** Remove platformFunctionExecutionLog from cache */ platformFunctionExecutionLog: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformFunctionExecutionLogKeys.detail(id),
+    });
+  },
+  /** Remove platformFunctionInvocation from cache */ platformFunctionInvocation: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformFunctionInvocationKeys.detail(id),
+    });
+  },
+  /** Remove platformNamespace from cache */ platformNamespace: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformNamespaceKeys.detail(id),
+    });
+  },
+  /** Remove platformNamespaceEvent from cache */ platformNamespaceEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformNamespaceEventKeys.detail(id),
     });
   },
   /** Remove platformResource from cache */ platformResource: (
@@ -954,30 +1108,6 @@ export const remove = {
       queryKey: platformResourceDefinitionKeys.detail(id),
     });
   },
-  /** Remove infraObject from cache */ infraObject: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: infraObjectKeys.detail(id),
-    });
-  },
-  /** Remove functionGraphObject from cache */ functionGraphObject: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionGraphObjectKeys.detail(id),
-    });
-  },
-  /** Remove platformFunctionDeploymentEvent from cache */ platformFunctionDeploymentEvent: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformFunctionDeploymentEventKeys.detail(id),
-    });
-  },
   /** Remove platformResourceEvent from cache */ platformResourceEvent: (
     queryClient: QueryClient,
     id: string | number
@@ -986,22 +1116,28 @@ export const remove = {
       queryKey: platformResourceEventKeys.detail(id),
     });
   },
-  /** Remove resourceStatusCheck from cache */ resourceStatusCheck: (
+  /** Remove platformResourceStatusCheck from cache */ platformResourceStatusCheck: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: resourceStatusCheckKeys.detail(id),
+      queryKey: platformResourceStatusCheckKeys.detail(id),
     });
   },
-  /** Remove functionDeployment from cache */ functionDeployment: (
+  /** Remove platformResourcesRequirementsState from cache */ platformResourcesRequirementsState: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: functionDeploymentKeys.detail(id),
+      queryKey: platformResourcesRequirementsStateKeys.detail(id),
     });
   },
+  /** Remove platformResourcesResolvedRequirement from cache */ platformResourcesResolvedRequirement:
+    (queryClient: QueryClient, id: string | number) => {
+      queryClient.removeQueries({
+        queryKey: platformResourcesResolvedRequirementKeys.detail(id),
+      });
+    },
   /** Remove resource from cache */ resource: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: resourceKeys.detail(id),
@@ -1015,22 +1151,6 @@ export const remove = {
       queryKey: resourceDefinitionKeys.detail(id),
     });
   },
-  /** Remove functionDeploymentEvent from cache */ functionDeploymentEvent: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionDeploymentEventKeys.detail(id),
-    });
-  },
-  /** Remove platformFunctionExecutionLog from cache */ platformFunctionExecutionLog: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformFunctionExecutionLogKeys.detail(id),
-    });
-  },
   /** Remove resourceEvent from cache */ resourceEvent: (
     queryClient: QueryClient,
     id: string | number
@@ -1039,148 +1159,28 @@ export const remove = {
       queryKey: resourceEventKeys.detail(id),
     });
   },
-  /** Remove functionGraphExecutionOutput from cache */ functionGraphExecutionOutput: (
+  /** Remove resourceStatusCheck from cache */ resourceStatusCheck: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: functionGraphExecutionOutputKeys.detail(id),
+      queryKey: resourceStatusCheckKeys.detail(id),
     });
   },
-  /** Remove infraCommit from cache */ infraCommit: (
+  /** Remove resourcesRequirementsState from cache */ resourcesRequirementsState: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: infraCommitKeys.detail(id),
+      queryKey: resourcesRequirementsStateKeys.detail(id),
     });
   },
-  /** Remove functionGraphCommit from cache */ functionGraphCommit: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionGraphCommitKeys.detail(id),
-    });
-  },
-  /** Remove functionExecutionLog from cache */ functionExecutionLog: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionExecutionLogKeys.detail(id),
-    });
-  },
-  /** Remove platformResourcesResolvedRequirement from cache */ platformResourcesResolvedRequirement:
-    (queryClient: QueryClient, id: string | number) => {
-      queryClient.removeQueries({
-        queryKey: platformResourcesResolvedRequirementKeys.detail(id),
-      });
-    },
   /** Remove resourcesResolvedRequirement from cache */ resourcesResolvedRequirement: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: resourcesResolvedRequirementKeys.detail(id),
-    });
-  },
-  /** Remove dbPreset from cache */ dbPreset: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: dbPresetKeys.detail(id),
-    });
-  },
-  /** Remove platformNamespace from cache */ platformNamespace: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformNamespaceKeys.detail(id),
-    });
-  },
-  /** Remove functionGraph from cache */ functionGraph: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionGraphKeys.detail(id),
-    });
-  },
-  /** Remove functionGraphExecutionNodeState from cache */ functionGraphExecutionNodeState: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionGraphExecutionNodeStateKeys.detail(id),
-    });
-  },
-  /** Remove namespace from cache */ namespace: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: namespaceKeys.detail(id),
-    });
-  },
-  /** Remove platformFunctionInvocation from cache */ platformFunctionInvocation: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformFunctionInvocationKeys.detail(id),
-    });
-  },
-  /** Remove functionInvocation from cache */ functionInvocation: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionInvocationKeys.detail(id),
-    });
-  },
-  /** Remove platformNamespaceEvent from cache */ platformNamespaceEvent: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformNamespaceEventKeys.detail(id),
-    });
-  },
-  /** Remove integrationProvider from cache */ integrationProvider: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: integrationProviderKeys.detail(id),
-    });
-  },
-  /** Remove namespaceEvent from cache */ namespaceEvent: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: namespaceEventKeys.detail(id),
-    });
-  },
-  /** Remove functionGraphExecution from cache */ functionGraphExecution: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionGraphExecutionKeys.detail(id),
-    });
-  },
-  /** Remove platformFunctionDefinition from cache */ platformFunctionDefinition: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformFunctionDefinitionKeys.detail(id),
-    });
-  },
-  /** Remove functionDefinition from cache */ functionDefinition: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: functionDefinitionKeys.detail(id),
     });
   },
 } as const;

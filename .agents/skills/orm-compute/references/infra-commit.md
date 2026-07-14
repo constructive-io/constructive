@@ -9,8 +9,8 @@ Commit history — each commit snapshots a tree root for a store
 ```typescript
 db.infraCommit.findMany({ select: { id: true } }).execute()
 db.infraCommit.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.infraCommit.create({ data: { message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' }, select: { id: true } }).execute()
-db.infraCommit.update({ where: { id: '<UUID>' }, data: { message: '<String>' }, select: { id: true } }).execute()
+db.infraCommit.create({ data: { authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' }, select: { id: true } }).execute()
+db.infraCommit.update({ where: { id: '<UUID>' }, data: { authorId: '<UUID>' }, select: { id: true } }).execute()
 db.infraCommit.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.infraCommit.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.infraCommit.findMany({
-  select: { id: true, message: true }
+  select: { id: true, authorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.infraCommit.findMany({
 
 ```typescript
 const item = await db.infraCommit.create({
-  data: { message: '<String>', scopeId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' },
+  data: { authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

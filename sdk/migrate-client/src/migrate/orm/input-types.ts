@@ -234,25 +234,25 @@ export interface UUIDListFilter {
 export type ConstructiveInternalTypeUpload = unknown;
 // ============ Entity Types ============
 export interface MigrateFile {
-  id: string;
   databaseId?: string | null;
+  id: string;
   upload?: ConstructiveInternalTypeUpload | null;
 }
 export interface SqlAction {
-  id: number;
-  name?: string | null;
-  databaseId?: string | null;
-  deploy?: string | null;
-  deps?: string[] | null;
-  payload?: Record<string, unknown> | null;
-  content?: string | null;
-  revert?: string | null;
-  verify?: string | null;
-  createdAt?: string | null;
-  category?: string | null;
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
+  category?: string | null;
+  content?: string | null;
+  createdAt?: string | null;
+  databaseId?: string | null;
+  deploy?: string | null;
+  deps?: string[] | null;
+  id: number;
+  name?: string | null;
+  payload?: Record<string, unknown> | null;
+  revert?: string | null;
+  verify?: string | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -274,62 +274,42 @@ export type MigrateFileWithRelations = MigrateFile & MigrateFileRelations;
 export type SqlActionWithRelations = SqlAction & SqlActionRelations;
 // ============ Entity Select Types ============
 export type MigrateFileSelect = {
-  id?: boolean;
   databaseId?: boolean;
+  id?: boolean;
   upload?: boolean;
 };
 export type SqlActionSelect = {
-  id?: boolean;
-  name?: boolean;
-  databaseId?: boolean;
-  deploy?: boolean;
-  deps?: boolean;
-  payload?: boolean;
-  content?: boolean;
-  revert?: boolean;
-  verify?: boolean;
-  createdAt?: boolean;
-  category?: boolean;
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
+  category?: boolean;
+  content?: boolean;
+  createdAt?: boolean;
+  databaseId?: boolean;
+  deploy?: boolean;
+  deps?: boolean;
+  id?: boolean;
+  name?: boolean;
+  payload?: boolean;
+  revert?: boolean;
+  verify?: boolean;
 };
 // ============ Table Filter Types ============
 export interface MigrateFileFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `upload` field. */
-  upload?: ConstructiveInternalTypeUploadFilter;
   /** Checks for all expressions in this list. */
   and?: MigrateFileFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MigrateFileFilter[];
-  /** Negates the expression. */
-  not?: MigrateFileFilter;
-}
-export interface SqlActionFilter {
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `deploy` field. */
-  deploy?: StringFilter;
-  /** Filter by the object’s `deps` field. */
-  deps?: StringListFilter;
-  /** Filter by the object’s `content` field. */
-  content?: StringFilter;
-  /** Filter by the object’s `revert` field. */
-  revert?: StringFilter;
-  /** Filter by the object’s `verify` field. */
-  verify?: StringFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `category` field. */
-  category?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: MigrateFileFilter;
+  /** Checks for any expressions in this list. */
+  or?: MigrateFileFilter[];
+  /** Filter by the object’s `upload` field. */
+  upload?: ConstructiveInternalTypeUploadFilter;
+}
+export interface SqlActionFilter {
   /** Filter by the object’s `action` field. */
   action?: StringFilter;
   /** Filter by the object’s `actionId` field. */
@@ -338,54 +318,74 @@ export interface SqlActionFilter {
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: SqlActionFilter[];
-  /** Checks for any expressions in this list. */
-  or?: SqlActionFilter[];
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `content` field. */
+  content?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploy` field. */
+  deploy?: StringFilter;
+  /** Filter by the object’s `deps` field. */
+  deps?: StringListFilter;
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Negates the expression. */
   not?: SqlActionFilter;
+  /** Checks for any expressions in this list. */
+  or?: SqlActionFilter[];
+  /** Filter by the object’s `revert` field. */
+  revert?: StringFilter;
+  /** Filter by the object’s `verify` field. */
+  verify?: StringFilter;
 }
 // ============ OrderBy Types ============
 export type MigrateFileOrderBy =
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
   | 'UPLOAD_ASC'
   | 'UPLOAD_DESC';
 export type SqlActionOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
+  | 'ACTION_ASC'
+  | 'ACTION_DESC'
+  | 'ACTION_ID_ASC'
+  | 'ACTION_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC'
+  | 'CONTENT_ASC'
+  | 'CONTENT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEPLOY_ASC'
   | 'DEPLOY_DESC'
   | 'DEPS_ASC'
   | 'DEPS_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
   | 'PAYLOAD_ASC'
   | 'PAYLOAD_DESC'
-  | 'CONTENT_ASC'
-  | 'CONTENT_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
   | 'REVERT_ASC'
   | 'REVERT_DESC'
   | 'VERIFY_ASC'
-  | 'VERIFY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'ACTION_ASC'
-  | 'ACTION_DESC'
-  | 'ACTION_ID_ASC'
-  | 'ACTION_ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC';
+  | 'VERIFY_DESC';
 // ============ CRUD Input Types ============
 export interface CreateMigrateFileInput {
   clientMutationId?: string;
@@ -411,33 +411,33 @@ export interface DeleteMigrateFileInput {
 export interface CreateSqlActionInput {
   clientMutationId?: string;
   sqlAction: {
-    name?: string;
-    databaseId?: string;
-    deploy?: string;
-    deps?: string[];
-    payload?: Record<string, unknown>;
-    content?: string;
-    revert?: string;
-    verify?: string;
-    category?: string;
     action?: string;
     actionId?: string;
     actorId?: string;
+    category?: string;
+    content?: string;
+    databaseId?: string;
+    deploy?: string;
+    deps?: string[];
+    name?: string;
+    payload?: Record<string, unknown>;
+    revert?: string;
+    verify?: string;
   };
 }
 export interface SqlActionPatch {
-  name?: string | null;
-  databaseId?: string | null;
-  deploy?: string | null;
-  deps?: string[] | null;
-  payload?: Record<string, unknown> | null;
-  content?: string | null;
-  revert?: string | null;
-  verify?: string | null;
-  category?: string | null;
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
+  category?: string | null;
+  content?: string | null;
+  databaseId?: string | null;
+  deploy?: string | null;
+  deps?: string[] | null;
+  name?: string | null;
+  payload?: Record<string, unknown> | null;
+  revert?: string | null;
+  verify?: string | null;
 }
 export interface UpdateSqlActionInput {
   clientMutationId?: string;
@@ -455,12 +455,6 @@ export interface ExecuteSqlInput {
   clientMutationId?: string;
   stmt?: string;
 }
-export interface RunMigrationInput {
-  clientMutationId?: string;
-  databaseId?: string;
-  migration?: number;
-  kind?: string;
-}
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
@@ -470,63 +464,69 @@ export interface ProvisionBucketInput {
    */
   ownerId?: string;
 }
+export interface RunMigrationInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  kind?: string;
+  migration?: number;
+}
 /** A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeUploadFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: ConstructiveInternalTypeUpload;
-  /** Not equal to the specified value. */
-  notEqualTo?: ConstructiveInternalTypeUpload;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: ConstructiveInternalTypeUpload;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: ConstructiveInternalTypeUpload;
-  /** Included in the specified list. */
-  in?: ConstructiveInternalTypeUpload[];
-  /** Not included in the specified list. */
-  notIn?: ConstructiveInternalTypeUpload[];
-  /** Less than the specified value. */
-  lessThan?: ConstructiveInternalTypeUpload;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: ConstructiveInternalTypeUpload;
-  /** Greater than the specified value. */
-  greaterThan?: ConstructiveInternalTypeUpload;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeUpload;
   /** Contains the specified JSON. */
   contains?: ConstructiveInternalTypeUpload;
-  /** Contains the specified key. */
-  containsKey?: string;
   /** Contains all of the specified keys. */
   containsAllKeys?: string[];
   /** Contains any of the specified keys. */
   containsAnyKeys?: string[];
-  /** Contained by the specified JSON. */
-  containedBy?: ConstructiveInternalTypeUpload;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeUpload;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeUpload;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeUpload;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeUpload[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeUpload;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeUpload;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeUpload;
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeUpload[];
 }
 /** An input for mutations affecting `MigrateFile` */
 export interface MigrateFileInput {
-  id?: string;
   databaseId?: string;
+  id?: string;
   upload?: ConstructiveInternalTypeUpload;
 }
 /** An input for mutations affecting `SqlAction` */
 export interface SqlActionInput {
-  id?: number;
-  name?: string;
-  databaseId?: string;
-  deploy?: string;
-  deps?: string[];
-  payload?: Record<string, unknown>;
-  content?: string;
-  revert?: string;
-  verify?: string;
-  createdAt?: string;
-  category?: string;
   action?: string;
   actionId?: string;
   actorId?: string;
+  category?: string;
+  content?: string;
+  createdAt?: string;
+  databaseId?: string;
+  deploy?: string;
+  deps?: string[];
+  id?: number;
+  name?: string;
+  payload?: Record<string, unknown>;
+  revert?: string;
+  verify?: string;
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface ExecuteSqlPayload {
@@ -535,33 +535,33 @@ export interface ExecuteSqlPayload {
 export type ExecuteSqlPayloadSelect = {
   clientMutationId?: boolean;
 };
+export interface ProvisionBucketPayload {
+  /** The access type applied */
+  accessType: string;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
+  /** The S3 endpoint (null for AWS S3 default) */
+  endpoint?: string | null;
+  /** Error message if provisioning failed */
+  error?: string | null;
+  /** The storage provider used */
+  provider: string;
+  /** Whether provisioning succeeded */
+  success: boolean;
+}
+export type ProvisionBucketPayloadSelect = {
+  accessType?: boolean;
+  bucketName?: boolean;
+  endpoint?: boolean;
+  error?: boolean;
+  provider?: boolean;
+  success?: boolean;
+};
 export interface RunMigrationPayload {
   clientMutationId?: string | null;
 }
 export type RunMigrationPayloadSelect = {
   clientMutationId?: boolean;
-};
-export interface ProvisionBucketPayload {
-  /** Whether provisioning succeeded */
-  success: boolean;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The access type applied */
-  accessType: string;
-  /** The storage provider used */
-  provider: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-}
-export type ProvisionBucketPayloadSelect = {
-  success?: boolean;
-  bucketName?: boolean;
-  accessType?: boolean;
-  provider?: boolean;
-  endpoint?: boolean;
-  error?: boolean;
 };
 export interface CreateMigrateFilePayload {
   clientMutationId?: string | null;

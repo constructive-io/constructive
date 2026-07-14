@@ -7,8 +7,8 @@ Top-level site configuration: branding assets, title, and description for a depl
 ## Usage
 
 ```typescript
-useSitesQuery({ selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, labels: true, annotations: true } } })
-useSiteQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, labels: true, annotations: true } } })
+useSitesQuery({ selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } } })
+useSiteQuery({ id: '<UUID>', selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } } })
 useCreateSiteMutation({ selection: { fields: { id: true } } })
 useUpdateSiteMutation({ selection: { fields: { id: true } } })
 useDeleteSiteMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteMutation({})
 
 ```typescript
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, labels: true, annotations: true } },
+  selection: { fields: { annotations: true, appleTouchIcon: true, databaseId: true, dbname: true, description: true, favicon: true, id: true, labels: true, logo: true, ogImage: true, title: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSitesQuery({
 const { mutate } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', title: '<String>', description: '<String>', ogImage: '<Image>', favicon: '<Attachment>', appleTouchIcon: '<Image>', logo: '<Image>', dbname: '<String>', labels: '<JSON>', annotations: '<JSON>' });
+mutate({ annotations: '<JSON>', appleTouchIcon: '<Image>', databaseId: '<UUID>', dbname: '<String>', description: '<String>', favicon: '<Attachment>', labels: '<JSON>', logo: '<Image>', ogImage: '<Image>', title: '<String>' });
 ```

@@ -9,8 +9,8 @@ ORM operations for GetAllRecord records
 ```typescript
 db.getAllRecord.findMany({ select: { id: true } }).execute()
 db.getAllRecord.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.getAllRecord.create({ data: { path: '<String>', data: '<JSON>' }, select: { id: true } }).execute()
-db.getAllRecord.update({ where: { id: '<UUID>' }, data: { path: '<String>' }, select: { id: true } }).execute()
+db.getAllRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute()
+db.getAllRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute()
 db.getAllRecord.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.getAllRecord.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.getAllRecord.findMany({
-  select: { id: true, path: true }
+  select: { id: true, data: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.getAllRecord.findMany({
 
 ```typescript
 const item = await db.getAllRecord.create({
-  data: { path: '<String>', data: '<JSON>' },
+  data: { data: '<JSON>', path: '<String>' },
   select: { id: true }
 }).execute();
 ```

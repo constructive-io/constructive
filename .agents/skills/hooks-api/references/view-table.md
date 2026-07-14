@@ -7,8 +7,8 @@ Junction table linking views to their joined tables for referential integrity
 ## Usage
 
 ```typescript
-useViewTablesQuery({ selection: { fields: { id: true, databaseId: true, viewId: true, tableId: true, joinOrder: true } } })
-useViewTableQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, viewId: true, tableId: true, joinOrder: true } } })
+useViewTablesQuery({ selection: { fields: { databaseId: true, id: true, joinOrder: true, tableId: true, viewId: true } } })
+useViewTableQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, joinOrder: true, tableId: true, viewId: true } } })
 useCreateViewTableMutation({ selection: { fields: { id: true } } })
 useUpdateViewTableMutation({ selection: { fields: { id: true } } })
 useDeleteViewTableMutation({})
@@ -20,7 +20,7 @@ useDeleteViewTableMutation({})
 
 ```typescript
 const { data, isLoading } = useViewTablesQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, tableId: true, joinOrder: true } },
+  selection: { fields: { databaseId: true, id: true, joinOrder: true, tableId: true, viewId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useViewTablesQuery({
 const { mutate } = useCreateViewTableMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', viewId: '<UUID>', tableId: '<UUID>', joinOrder: '<Int>' });
+mutate({ databaseId: '<UUID>', joinOrder: '<Int>', tableId: '<UUID>', viewId: '<UUID>' });
 ```

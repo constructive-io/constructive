@@ -12,8 +12,8 @@ csdk db-pool list --where.<field>.<op> <value> --orderBy <values>
 csdk db-pool list --limit 10 --after <cursor>
 csdk db-pool find-first --where.<field>.<op> <value>
 csdk db-pool get --id <UUID>
-csdk db-pool create --presetSlug <String> [--presetCommitId <UUID>] [--databaseId <UUID>] [--status <String>] [--errorMessage <String>] [--expiresAt <Datetime>] [--claimedBy <UUID>] [--claimedAt <Datetime>] [--bootstrapStatus <String>] [--bootstrapError <String>]
-csdk db-pool update --id <UUID> [--presetSlug <String>] [--presetCommitId <UUID>] [--databaseId <UUID>] [--status <String>] [--errorMessage <String>] [--expiresAt <Datetime>] [--claimedBy <UUID>] [--claimedAt <Datetime>] [--bootstrapStatus <String>] [--bootstrapError <String>]
+csdk db-pool create --presetSlug <String> [--bootstrapError <String>] [--bootstrapStatus <String>] [--claimedAt <Datetime>] [--claimedBy <UUID>] [--databaseId <UUID>] [--errorMessage <String>] [--expiresAt <Datetime>] [--presetCommitId <UUID>] [--status <String>]
+csdk db-pool update --id <UUID> [--bootstrapError <String>] [--bootstrapStatus <String>] [--claimedAt <Datetime>] [--claimedBy <UUID>] [--databaseId <UUID>] [--errorMessage <String>] [--expiresAt <Datetime>] [--presetCommitId <UUID>] [--presetSlug <String>] [--status <String>]
 csdk db-pool delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk db-pool list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a dbPool
 
 ```bash
-csdk db-pool create --presetSlug <String> [--presetCommitId <UUID>] [--databaseId <UUID>] [--status <String>] [--errorMessage <String>] [--expiresAt <Datetime>] [--claimedBy <UUID>] [--claimedAt <Datetime>] [--bootstrapStatus <String>] [--bootstrapError <String>]
+csdk db-pool create --presetSlug <String> [--bootstrapError <String>] [--bootstrapStatus <String>] [--claimedAt <Datetime>] [--claimedBy <UUID>] [--databaseId <UUID>] [--errorMessage <String>] [--expiresAt <Datetime>] [--presetCommitId <UUID>] [--status <String>]
 ```
 
 ### Get a dbPool by id

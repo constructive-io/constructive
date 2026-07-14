@@ -7,7 +7,7 @@ Creates a full-text search configuration on a table. Accepts a jsonb definition 
 ## Usage
 
 ```typescript
-const { mutate } = useProvisionFullTextSearchMutation(); mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+const { mutate } = useProvisionFullTextSearchMutation(); mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useProvisionFullTextSearchMutation(); mutate({ input: { datab
 
 ```typescript
 const { mutate, isLoading } = useProvisionFullTextSearchMutation();
-mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```

@@ -12,8 +12,8 @@ csdk principal-entity list --where.<field>.<op> <value> --orderBy <values>
 csdk principal-entity list --limit 10 --after <cursor>
 csdk principal-entity find-first --where.<field>.<op> <value>
 csdk principal-entity get --id <UUID>
-csdk principal-entity create --principalId <UUID> --entityId <UUID> --ownerId <UUID>
-csdk principal-entity update --id <UUID> [--principalId <UUID>] [--entityId <UUID>] [--ownerId <UUID>]
+csdk principal-entity create --entityId <UUID> --ownerId <UUID> --principalId <UUID>
+csdk principal-entity update --id <UUID> [--entityId <UUID>] [--ownerId <UUID>] [--principalId <UUID>]
 csdk principal-entity delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk principal-entity list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a principalEntity
 
 ```bash
-csdk principal-entity create --principalId <UUID> --entityId <UUID> --ownerId <UUID>
+csdk principal-entity create --entityId <UUID> --ownerId <UUID> --principalId <UUID>
 ```
 
 ### Get a principalEntity by id

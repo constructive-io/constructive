@@ -9,7 +9,7 @@ ORM operations for SchemaGrant records
 ```typescript
 db.schemaGrant.findMany({ select: { id: true } }).execute()
 db.schemaGrant.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.schemaGrant.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', granteeName: '<String>' }, select: { id: true } }).execute()
+db.schemaGrant.create({ data: { databaseId: '<UUID>', granteeName: '<String>', schemaId: '<UUID>' }, select: { id: true } }).execute()
 db.schemaGrant.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.schemaGrant.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.schemaGrant.findMany({
 
 ```typescript
 const item = await db.schemaGrant.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', granteeName: '<String>' },
+  data: { databaseId: '<UUID>', granteeName: '<String>', schemaId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

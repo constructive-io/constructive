@@ -7,7 +7,7 @@ React Query mutation hook for resetPassword
 ## Usage
 
 ```typescript
-const { mutate } = useResetPasswordMutation(); mutate({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } });
+const { mutate } = useResetPasswordMutation(); mutate({ input: { newPassword: '<String>', resetToken: '<String>', roleId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useResetPasswordMutation(); mutate({ input: { roleId: '<UUID>
 
 ```typescript
 const { mutate, isLoading } = useResetPasswordMutation();
-mutate({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } });
+mutate({ input: { newPassword: '<String>', resetToken: '<String>', roleId: '<UUID>' } });
 ```

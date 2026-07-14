@@ -12,8 +12,8 @@ csdk default-privilege list --where.<field>.<op> <value> --orderBy <values>
 csdk default-privilege list --limit 10 --after <cursor>
 csdk default-privilege find-first --where.<field>.<op> <value>
 csdk default-privilege get --id <UUID>
-csdk default-privilege create --schemaId <UUID> --objectType <String> --privilege <String> --granteeName <String> [--databaseId <UUID>] [--isGrant <Boolean>]
-csdk default-privilege update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--objectType <String>] [--privilege <String>] [--granteeName <String>] [--isGrant <Boolean>]
+csdk default-privilege create --granteeName <String> --objectType <String> --privilege <String> --schemaId <UUID> [--databaseId <UUID>] [--isGrant <Boolean>]
+csdk default-privilege update --id <UUID> [--databaseId <UUID>] [--granteeName <String>] [--isGrant <Boolean>] [--objectType <String>] [--privilege <String>] [--schemaId <UUID>]
 csdk default-privilege delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk default-privilege list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a defaultPrivilege
 
 ```bash
-csdk default-privilege create --schemaId <UUID> --objectType <String> --privilege <String> --granteeName <String> [--databaseId <UUID>] [--isGrant <Boolean>]
+csdk default-privilege create --granteeName <String> --objectType <String> --privilege <String> --schemaId <UUID> [--databaseId <UUID>] [--isGrant <Boolean>]
 ```
 
 ### Get a defaultPrivilege by id

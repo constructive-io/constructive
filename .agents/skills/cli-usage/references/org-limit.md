@@ -12,8 +12,8 @@ csdk org-limit list --where.<field>.<op> <value> --orderBy <values>
 csdk org-limit list --limit 10 --after <cursor>
 csdk org-limit find-first --where.<field>.<op> <value>
 csdk org-limit get --id <UUID>
-csdk org-limit create --actorId <UUID> --entityId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>] [--organizationId <UUID>] [--entityType <String>]
-csdk org-limit update --id <UUID> [--name <String>] [--actorId <UUID>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>]
+csdk org-limit create --actorId <UUID> --entityId <UUID> [--entityType <String>] [--max <BigInt>] [--name <String>] [--num <BigInt>] [--organizationId <UUID>] [--periodCredits <BigInt>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--softMax <BigInt>] [--windowDuration <Interval>] [--windowStart <Datetime>]
+csdk org-limit update --id <UUID> [--actorId <UUID>] [--entityId <UUID>] [--entityType <String>] [--max <BigInt>] [--name <String>] [--num <BigInt>] [--organizationId <UUID>] [--periodCredits <BigInt>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--softMax <BigInt>] [--windowDuration <Interval>] [--windowStart <Datetime>]
 csdk org-limit delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-limit list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgLimit
 
 ```bash
-csdk org-limit create --actorId <UUID> --entityId <UUID> [--name <String>] [--num <BigInt>] [--max <BigInt>] [--softMax <BigInt>] [--windowStart <Datetime>] [--windowDuration <Interval>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--periodCredits <BigInt>] [--organizationId <UUID>] [--entityType <String>]
+csdk org-limit create --actorId <UUID> --entityId <UUID> [--entityType <String>] [--max <BigInt>] [--name <String>] [--num <BigInt>] [--organizationId <UUID>] [--periodCredits <BigInt>] [--planMax <BigInt>] [--purchasedCredits <BigInt>] [--softMax <BigInt>] [--windowDuration <Interval>] [--windowStart <Datetime>]
 ```
 
 ### Get a orgLimit by id

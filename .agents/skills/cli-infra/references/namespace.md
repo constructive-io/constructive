@@ -12,8 +12,8 @@ csdk namespace list --where.<field>.<op> <value> --orderBy <values>
 csdk namespace list --limit 10 --after <cursor>
 csdk namespace find-first --where.<field>.<op> <value>
 csdk namespace get --id <UUID>
-csdk namespace create --name <String> --namespaceName <String> --databaseId <UUID> [--description <String>] [--isActive <Boolean>] [--status <String>] [--lastError <String>] [--labels <JSON>] [--annotations <JSON>] [--isManaged <Boolean>]
-csdk namespace update --id <UUID> [--name <String>] [--namespaceName <String>] [--description <String>] [--isActive <Boolean>] [--status <String>] [--lastError <String>] [--labels <JSON>] [--annotations <JSON>] [--databaseId <UUID>] [--isManaged <Boolean>]
+csdk namespace create --databaseId <UUID> --name <String> --namespaceName <String> [--annotations <JSON>] [--description <String>] [--isActive <Boolean>] [--isManaged <Boolean>] [--labels <JSON>] [--lastError <String>] [--status <String>]
+csdk namespace update --id <UUID> [--annotations <JSON>] [--databaseId <UUID>] [--description <String>] [--isActive <Boolean>] [--isManaged <Boolean>] [--labels <JSON>] [--lastError <String>] [--name <String>] [--namespaceName <String>] [--status <String>]
 csdk namespace delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk namespace list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a namespace
 
 ```bash
-csdk namespace create --name <String> --namespaceName <String> --databaseId <UUID> [--description <String>] [--isActive <Boolean>] [--status <String>] [--lastError <String>] [--labels <JSON>] [--annotations <JSON>] [--isManaged <Boolean>]
+csdk namespace create --databaseId <UUID> --name <String> --namespaceName <String> [--annotations <JSON>] [--description <String>] [--isActive <Boolean>] [--isManaged <Boolean>] [--labels <JSON>] [--lastError <String>] [--status <String>]
 ```
 
 ### Get a namespace by id

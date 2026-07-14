@@ -12,8 +12,8 @@ csdk org-claimed-invite list --where.<field>.<op> <value> --orderBy <values>
 csdk org-claimed-invite list --limit 10 --after <cursor>
 csdk org-claimed-invite find-first --where.<field>.<op> <value>
 csdk org-claimed-invite get --id <UUID>
-csdk org-claimed-invite create --entityId <UUID> [--data <JSON>] [--senderId <UUID>] [--receiverId <UUID>]
-csdk org-claimed-invite update --id <UUID> [--data <JSON>] [--senderId <UUID>] [--receiverId <UUID>] [--entityId <UUID>]
+csdk org-claimed-invite create --entityId <UUID> [--data <JSON>] [--receiverId <UUID>] [--senderId <UUID>]
+csdk org-claimed-invite update --id <UUID> [--data <JSON>] [--entityId <UUID>] [--receiverId <UUID>] [--senderId <UUID>]
 csdk org-claimed-invite delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-claimed-invite list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgClaimedInvite
 
 ```bash
-csdk org-claimed-invite create --entityId <UUID> [--data <JSON>] [--senderId <UUID>] [--receiverId <UUID>]
+csdk org-claimed-invite create --entityId <UUID> [--data <JSON>] [--receiverId <UUID>] [--senderId <UUID>]
 ```
 
 ### Get a orgClaimedInvite by id

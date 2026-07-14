@@ -7,7 +7,7 @@ Execute the saveGraph mutation
 ## Usage
 
 ```bash
-csdk save-graph --input.clientMutationId <String> --input.graphId <UUID> --input.rootHash <UUID> --input.message <String>
+csdk save-graph --input.clientMutationId <String> --input.graphId <UUID> --input.message <String> --input.rootHash <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk save-graph --input.clientMutationId <String> --input.graphId <UUID> --input
 ### Run saveGraph
 
 ```bash
-csdk save-graph --input.clientMutationId <String> --input.graphId <UUID> --input.rootHash <UUID> --input.message <String>
+csdk save-graph --input.clientMutationId <String> --input.graphId <UUID> --input.message <String> --input.rootHash <UUID>
 ```

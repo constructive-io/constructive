@@ -12,8 +12,8 @@ csdk object list --where.<field>.<op> <value> --orderBy <values>
 csdk object list --limit 10 --after <cursor>
 csdk object find-first --where.<field>.<op> <value>
 csdk object get --id <UUID>
-csdk object create --databaseId <UUID> [--kids <UUID>] [--ktree <String>] [--data <JSON>]
-csdk object update --id <UUID> [--databaseId <UUID>] [--kids <UUID>] [--ktree <String>] [--data <JSON>]
+csdk object create --databaseId <UUID> [--data <JSON>] [--kids <UUID>] [--ktree <String>]
+csdk object update --id <UUID> [--data <JSON>] [--databaseId <UUID>] [--kids <UUID>] [--ktree <String>]
 csdk object delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk object list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a object
 
 ```bash
-csdk object create --databaseId <UUID> [--kids <UUID>] [--ktree <String>] [--data <JSON>]
+csdk object create --databaseId <UUID> [--data <JSON>] [--kids <UUID>] [--ktree <String>]
 ```
 
 ### Get a object by id

@@ -9,8 +9,8 @@ ORM operations for DbUsageModule records
 ```typescript
 db.dbUsageModule.findMany({ select: { id: true } }).execute()
 db.dbUsageModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.dbUsageModule.create({ data: { databaseId: '<UUID>', entityField: '<String>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>', tableStatsDailyTableId: '<UUID>', tableStatsDailyTableName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', queryStatsDailyTableId: '<UUID>', queryStatsDailyTableName: '<String>', collectDbTableStatsFunction: '<String>', collectDbQueryStatsFunction: '<String>', rollupDbTableStatsDailyFunction: '<String>', rollupDbQueryStatsDailyFunction: '<String>', interval: '<String>', retention: '<String>', premake: '<Int>', scope: '<String>', prefix: '<String>', defaultPermissions: '<String>', apiName: '<String>', privateApiName: '<String>' }, select: { id: true } }).execute()
-db.dbUsageModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.dbUsageModule.create({ data: { apiName: '<String>', collectDbQueryStatsFunction: '<String>', collectDbTableStatsFunction: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', queryStatsDailyTableId: '<UUID>', queryStatsDailyTableName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', retention: '<String>', rollupDbQueryStatsDailyFunction: '<String>', rollupDbTableStatsDailyFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableStatsDailyTableId: '<UUID>', tableStatsDailyTableName: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>' }, select: { id: true } }).execute()
+db.dbUsageModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.dbUsageModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.dbUsageModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.dbUsageModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.dbUsageModule.findMany({
 
 ```typescript
 const item = await db.dbUsageModule.create({
-  data: { databaseId: '<UUID>', entityField: '<String>', schemaId: '<UUID>', privateSchemaId: '<UUID>', publicSchemaName: '<String>', privateSchemaName: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>', tableStatsDailyTableId: '<UUID>', tableStatsDailyTableName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', queryStatsDailyTableId: '<UUID>', queryStatsDailyTableName: '<String>', collectDbTableStatsFunction: '<String>', collectDbQueryStatsFunction: '<String>', rollupDbTableStatsDailyFunction: '<String>', rollupDbQueryStatsDailyFunction: '<String>', interval: '<String>', retention: '<String>', premake: '<Int>', scope: '<String>', prefix: '<String>', defaultPermissions: '<String>', apiName: '<String>', privateApiName: '<String>' },
+  data: { apiName: '<String>', collectDbQueryStatsFunction: '<String>', collectDbTableStatsFunction: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', queryStatsDailyTableId: '<UUID>', queryStatsDailyTableName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', retention: '<String>', rollupDbQueryStatsDailyFunction: '<String>', rollupDbTableStatsDailyFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableStatsDailyTableId: '<UUID>', tableStatsDailyTableName: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -9,8 +9,8 @@ ORM operations for I18NModule records
 ```typescript
 db.i18NModule.findMany({ select: { id: true } }).execute()
 db.i18NModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.i18NModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', settingsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>' }, select: { id: true } }).execute()
-db.i18NModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.i18NModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', settingsTableId: '<UUID>' }, select: { id: true } }).execute()
+db.i18NModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.i18NModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.i18NModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.i18NModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.i18NModule.findMany({
 
 ```typescript
 const item = await db.i18NModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', settingsTableId: '<UUID>', apiName: '<String>', privateApiName: '<String>' },
+  data: { apiName: '<String>', databaseId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', settingsTableId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

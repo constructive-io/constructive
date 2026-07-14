@@ -13,7 +13,7 @@ csdk platform-function-deployment-event list --limit 10 --after <cursor>
 csdk platform-function-deployment-event find-first --where.<field>.<op> <value>
 csdk platform-function-deployment-event get --id <UUID>
 csdk platform-function-deployment-event create --deploymentId <UUID> --eventType <String> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
-csdk platform-function-deployment-event update --id <UUID> [--deploymentId <UUID>] [--eventType <String>] [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
+csdk platform-function-deployment-event update --id <UUID> [--actorId <UUID>] [--deploymentId <UUID>] [--eventType <String>] [--message <String>] [--metadata <JSON>]
 csdk platform-function-deployment-event delete --id <UUID>
 ```
 

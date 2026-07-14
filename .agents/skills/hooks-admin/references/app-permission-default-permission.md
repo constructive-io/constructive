@@ -7,8 +7,8 @@ Join table linking permission defaults to individual permissions; recompute trig
 ## Usage
 
 ```typescript
-useAppPermissionDefaultPermissionsQuery({ selection: { fields: { id: true, permissionId: true, createdAt: true, updatedAt: true } } })
-useAppPermissionDefaultPermissionQuery({ id: '<UUID>', selection: { fields: { id: true, permissionId: true, createdAt: true, updatedAt: true } } })
+useAppPermissionDefaultPermissionsQuery({ selection: { fields: { createdAt: true, id: true, permissionId: true, updatedAt: true } } })
+useAppPermissionDefaultPermissionQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, permissionId: true, updatedAt: true } } })
 useCreateAppPermissionDefaultPermissionMutation({ selection: { fields: { id: true } } })
 useUpdateAppPermissionDefaultPermissionMutation({ selection: { fields: { id: true } } })
 useDeleteAppPermissionDefaultPermissionMutation({})
@@ -20,7 +20,7 @@ useDeleteAppPermissionDefaultPermissionMutation({})
 
 ```typescript
 const { data, isLoading } = useAppPermissionDefaultPermissionsQuery({
-  selection: { fields: { id: true, permissionId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, id: true, permissionId: true, updatedAt: true } },
 });
 ```
 

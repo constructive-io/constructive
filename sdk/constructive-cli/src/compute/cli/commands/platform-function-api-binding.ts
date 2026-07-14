@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  functionDefinitionId: 'uuid',
-  apiId: 'uuid',
   alias: 'string',
+  apiId: 'uuid',
   config: 'json',
+  functionDefinitionId: 'uuid',
+  id: 'uuid',
 };
 const usage =
   '\nplatform-function-api-binding <command>\n\nCommands:\n  list                  List platformFunctionApiBinding records\n  find-first            Find first matching platformFunctionApiBinding record\n  get                   Get a platformFunctionApiBinding by ID\n  create                Create a new platformFunctionApiBinding\n  update                Update an existing platformFunctionApiBinding\n  delete                Delete a platformFunctionApiBinding\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      functionDefinitionId: true,
-      apiId: true,
       alias: true,
+      apiId: true,
       config: true,
+      functionDefinitionId: true,
+      id: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -102,11 +102,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      functionDefinitionId: true,
-      apiId: true,
       alias: true,
+      apiId: true,
       config: true,
+      functionDefinitionId: true,
+      id: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -143,11 +143,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          functionDefinitionId: true,
-          apiId: true,
           alias: true,
+          apiId: true,
           config: true,
+          functionDefinitionId: true,
+          id: true,
         },
       })
       .execute();
@@ -165,9 +165,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'functionDefinitionId',
-        message: 'functionDefinitionId',
-        required: true,
+        name: 'alias',
+        message: 'alias',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -176,18 +177,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
-        name: 'alias',
-        message: 'alias',
-        required: false,
-        skipPrompt: true,
-      },
-      {
         type: 'json',
         name: 'config',
         message: 'config',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'functionDefinitionId',
+        message: 'functionDefinitionId',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -199,17 +199,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.platformFunctionApiBinding
       .create({
         data: {
-          functionDefinitionId: cleanedData.functionDefinitionId,
-          apiId: cleanedData.apiId,
           alias: cleanedData.alias,
+          apiId: cleanedData.apiId,
           config: cleanedData.config,
+          functionDefinitionId: cleanedData.functionDefinitionId,
         },
         select: {
-          id: true,
-          functionDefinitionId: true,
-          apiId: true,
           alias: true,
+          apiId: true,
           config: true,
+          functionDefinitionId: true,
+          id: true,
         },
       })
       .execute();
@@ -233,9 +233,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'functionDefinitionId',
-        message: 'functionDefinitionId',
+        name: 'alias',
+        message: 'alias',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -244,18 +245,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'text',
-        name: 'alias',
-        message: 'alias',
-        required: false,
-        skipPrompt: true,
-      },
-      {
         type: 'json',
         name: 'config',
         message: 'config',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'functionDefinitionId',
+        message: 'functionDefinitionId',
+        required: false,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -267,17 +267,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          functionDefinitionId: cleanedData.functionDefinitionId,
-          apiId: cleanedData.apiId,
           alias: cleanedData.alias,
+          apiId: cleanedData.apiId,
           config: cleanedData.config,
+          functionDefinitionId: cleanedData.functionDefinitionId,
         },
         select: {
-          id: true,
-          functionDefinitionId: true,
-          apiId: true,
           alias: true,
+          apiId: true,
           config: true,
+          functionDefinitionId: true,
+          id: true,
         },
       })
       .execute();

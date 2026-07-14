@@ -15,7 +15,7 @@ ORM client for the objects API — provides typed CRUD operations for 5 tables a
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: getAllRecord, ref, store, object, commit
+// Available models: commit, getAllRecord, object, ref, store
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.getAllRecord.findMany({
+const items = await db.commit.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,12 +37,12 @@ const items = await db.getAllRecord.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
+- [commit](references/commit.md)
 - [get-all-record](references/get-all-record.md)
+- [object](references/object.md)
 - [ref](references/ref.md)
 - [store](references/store.md)
-- [object](references/object.md)
-- [commit](references/commit.md)
 - [init-empty-repo](references/init-empty-repo.md)
-- [set-data-at-path](references/set-data-at-path.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
 - [provision-bucket](references/provision-bucket.md)
+- [set-data-at-path](references/set-data-at-path.md)

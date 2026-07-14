@@ -12,8 +12,8 @@ Fields provided by the Unified Search plugin. Includes full-text search (tsvecto
 ```typescript
 db.user.findMany({ select: { id: true } }).execute()
 db.user.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.user.create({ data: { username: '<String>', displayName: '<String>', profilePicture: '<Image>', searchTsv: '<FullText>', type: '<Int>', searchTsvRank: '<Float>', displayNameTrgmSimilarity: '<Float>', searchScore: '<Float>' }, select: { id: true } }).execute()
-db.user.update({ where: { id: '<UUID>' }, data: { username: '<String>' }, select: { id: true } }).execute()
+db.user.create({ data: { displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' }, select: { id: true } }).execute()
+db.user.update({ where: { id: '<UUID>' }, data: { displayName: '<String>' }, select: { id: true } }).execute()
 db.user.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -23,7 +23,7 @@ db.user.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.user.findMany({
-  select: { id: true, username: true }
+  select: { id: true, displayName: true }
 }).execute();
 ```
 
@@ -31,7 +31,7 @@ const items = await db.user.findMany({
 
 ```typescript
 const item = await db.user.create({
-  data: { username: '<String>', displayName: '<String>', profilePicture: '<Image>', searchTsv: '<FullText>', type: '<Int>', searchTsvRank: '<Float>', displayNameTrgmSimilarity: '<Float>', searchScore: '<Float>' },
+  data: { displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' },
   select: { id: true }
 }).execute();
 ```

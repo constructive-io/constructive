@@ -7,23 +7,33 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
+  ProvisionBucketInput,
   SeedAppLimitCapsDefaultsInput,
   SeedAppLimitDefaultsInput,
   SeedOrgLimitCapsDefaultsInput,
   SeedOrgLimitDefaultsInput,
-  ProvisionBucketInput,
+  ProvisionBucketPayload,
   SeedAppLimitCapsDefaultsPayload,
   SeedAppLimitDefaultsPayload,
   SeedOrgLimitCapsDefaultsPayload,
   SeedOrgLimitDefaultsPayload,
-  ProvisionBucketPayload,
+  ProvisionBucketPayloadSelect,
   SeedAppLimitCapsDefaultsPayloadSelect,
   SeedAppLimitDefaultsPayloadSelect,
   SeedOrgLimitCapsDefaultsPayloadSelect,
   SeedOrgLimitDefaultsPayloadSelect,
-  ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+/**
+ * Variables for provisionBucket
+ * Provision an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then creates and configures
+the S3 bucket with the appropriate privacy policies, CORS rules,
+and lifecycle settings.
+ */
+export interface ProvisionBucketVariables {
+  input: ProvisionBucketInput;
+}
 export interface SeedAppLimitCapsDefaultsVariables {
   input: SeedAppLimitCapsDefaultsInput;
 }
@@ -36,18 +46,37 @@ export interface SeedOrgLimitCapsDefaultsVariables {
 export interface SeedOrgLimitDefaultsVariables {
   input: SeedOrgLimitDefaultsInput;
 }
-/**
- * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
- */
-export interface ProvisionBucketVariables {
-  input: ProvisionBucketInput;
-}
 export function createMutationOperations(client: OrmClient) {
   return {
+    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
+      args: ProvisionBucketVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionBucket',
+        fieldName: 'provisionBucket',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionBucket',
+          'provisionBucket',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionBucketInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionBucketPayload'
+        ),
+      }),
     seedAppLimitCapsDefaults: <S extends SeedAppLimitCapsDefaultsPayloadSelect>(
       args: SeedAppLimitCapsDefaultsVariables,
       options: {
@@ -162,35 +191,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SeedOrgLimitDefaultsPayload'
-        ),
-      }),
-    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
-      args: ProvisionBucketVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionBucketPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionBucket',
-        fieldName: 'provisionBucket',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionBucket',
-          'provisionBucket',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionBucketInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionBucketPayload'
         ),
       }),
   };

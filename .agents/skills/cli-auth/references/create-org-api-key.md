@@ -7,7 +7,7 @@ Execute the createOrgApiKey mutation
 ## Usage
 
 ```bash
-csdk create-org-api-key --input.clientMutationId <String> --input.orgId <UUID> --input.principalId <UUID> --input.keyName <String> --input.accessLevel <String> --input.mfaLevel <String> --input.expiresIn <IntervalInput>
+csdk create-org-api-key --input.accessLevel <String> --input.clientMutationId <String> --input.expiresIn <IntervalInput> --input.keyName <String> --input.mfaLevel <String> --input.orgId <UUID> --input.principalId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk create-org-api-key --input.clientMutationId <String> --input.orgId <UUID> -
 ### Run createOrgApiKey
 
 ```bash
-csdk create-org-api-key --input.clientMutationId <String> --input.orgId <UUID> --input.principalId <UUID> --input.keyName <String> --input.accessLevel <String> --input.mfaLevel <String> --input.expiresIn <IntervalInput>
+csdk create-org-api-key --input.accessLevel <String> --input.clientMutationId <String> --input.expiresIn <IntervalInput> --input.keyName <String> --input.mfaLevel <String> --input.orgId <UUID> --input.principalId <UUID>
 ```

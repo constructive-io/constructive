@@ -1,0 +1,63 @@
+{
+  "name": "graphile-function-bindings",
+  "version": "0.2.1",
+  "description": "PostGraphile v5 plugin — exposes API-bound compute functions as typed GraphQL mutations backed by function_invocations inserts",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "plugin",
+    "postgres",
+    "graphql",
+    "functions",
+    "mutations"
+  ],
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "dependencies": {
+    "@constructive-io/query-builder": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "graphile-plugin-utils": "workspace:^",
+    "inflekt": "^0.7.1",
+    "pg": "^8.21.0"
+  },
+  "peerDependencies": {
+    "@dataplan/pg": "1.0.3",
+    "grafast": "1.0.2",
+    "graphile-build": "5.0.2",
+    "graphile-build-pg": "5.0.2",
+    "graphile-config": "1.0.1",
+    "graphql": "16.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "@types/pg": "^8.20.0",
+    "graphile-test": "workspace:^",
+    "makage": "^0.3.0",
+    "pgsql-test": "workspace:^"
+  }
+}

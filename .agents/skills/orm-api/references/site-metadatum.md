@@ -9,7 +9,7 @@ SEO and social sharing metadata for a site: page title, description, and Open Gr
 ```typescript
 db.siteMetadatum.findMany({ select: { id: true } }).execute()
 db.siteMetadatum.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.siteMetadatum.create({ data: { databaseId: '<UUID>', siteId: '<UUID>', title: '<String>', description: '<String>', ogImage: '<Image>' }, select: { id: true } }).execute()
+db.siteMetadatum.create({ data: { databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' }, select: { id: true } }).execute()
 db.siteMetadatum.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.siteMetadatum.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.siteMetadatum.findMany({
 
 ```typescript
 const item = await db.siteMetadatum.create({
-  data: { databaseId: '<UUID>', siteId: '<UUID>', title: '<String>', description: '<String>', ogImage: '<Image>' },
+  data: { databaseId: '<UUID>', description: '<String>', ogImage: '<Image>', siteId: '<UUID>', title: '<String>' },
   select: { id: true }
 }).execute();
 ```

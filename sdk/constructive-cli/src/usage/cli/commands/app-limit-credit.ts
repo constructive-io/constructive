@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  defaultLimitId: 'uuid',
   actorId: 'uuid',
   amount: 'int',
   creditType: 'string',
+  defaultLimitId: 'uuid',
+  id: 'uuid',
   reason: 'string',
 };
 const usage =
@@ -74,11 +74,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      defaultLimitId: true,
       actorId: true,
       amount: true,
       creditType: true,
+      defaultLimitId: true,
+      id: true,
       reason: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -100,11 +100,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      defaultLimitId: true,
       actorId: true,
       amount: true,
       creditType: true,
+      defaultLimitId: true,
+      id: true,
       reason: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -138,11 +138,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          defaultLimitId: true,
           actorId: true,
           amount: true,
           creditType: true,
+          defaultLimitId: true,
+          id: true,
           reason: true,
         },
       })
@@ -159,12 +159,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'defaultLimitId',
-        message: 'defaultLimitId',
-        required: true,
-      },
       {
         type: 'text',
         name: 'actorId',
@@ -187,6 +181,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'defaultLimitId',
+        message: 'defaultLimitId',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'reason',
         message: 'reason',
         required: false,
@@ -202,18 +202,18 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.appLimitCredit
       .create({
         data: {
-          defaultLimitId: cleanedData.defaultLimitId,
           actorId: cleanedData.actorId,
           amount: cleanedData.amount,
           creditType: cleanedData.creditType,
+          defaultLimitId: cleanedData.defaultLimitId,
           reason: cleanedData.reason,
         },
         select: {
-          id: true,
-          defaultLimitId: true,
           actorId: true,
           amount: true,
           creditType: true,
+          defaultLimitId: true,
+          id: true,
           reason: true,
         },
       })
@@ -238,12 +238,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'defaultLimitId',
-        message: 'defaultLimitId',
-        required: false,
-      },
-      {
-        type: 'text',
         name: 'actorId',
         message: 'actorId',
         required: false,
@@ -264,6 +258,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'defaultLimitId',
+        message: 'defaultLimitId',
+        required: false,
+      },
+      {
+        type: 'text',
         name: 'reason',
         message: 'reason',
         required: false,
@@ -279,18 +279,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          defaultLimitId: cleanedData.defaultLimitId,
           actorId: cleanedData.actorId,
           amount: cleanedData.amount,
           creditType: cleanedData.creditType,
+          defaultLimitId: cleanedData.defaultLimitId,
           reason: cleanedData.reason,
         },
         select: {
-          id: true,
-          defaultLimitId: true,
           actorId: true,
           amount: true,
           creditType: true,
+          defaultLimitId: true,
+          id: true,
           reason: true,
         },
       })

@@ -8,42 +8,49 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   AcceptDatabaseTransferInput,
-  CancelDatabaseTransferInput,
-  RejectDatabaseTransferInput,
-  SetFieldOrderInput,
   ApplyRlsInput,
-  RequestDatabaseInput,
+  CancelDatabaseTransferInput,
   ProvisionBucketInput,
+  RejectDatabaseTransferInput,
+  RequestDatabaseInput,
+  SetFieldOrderInput,
   AcceptDatabaseTransferPayload,
-  CancelDatabaseTransferPayload,
-  RejectDatabaseTransferPayload,
-  SetFieldOrderPayload,
   ApplyRlsPayload,
-  RequestDatabasePayload,
+  CancelDatabaseTransferPayload,
   ProvisionBucketPayload,
+  RejectDatabaseTransferPayload,
+  RequestDatabasePayload,
+  SetFieldOrderPayload,
   AcceptDatabaseTransferPayloadSelect,
-  CancelDatabaseTransferPayloadSelect,
-  RejectDatabaseTransferPayloadSelect,
-  SetFieldOrderPayloadSelect,
   ApplyRlsPayloadSelect,
-  RequestDatabasePayloadSelect,
+  CancelDatabaseTransferPayloadSelect,
   ProvisionBucketPayloadSelect,
+  RejectDatabaseTransferPayloadSelect,
+  RequestDatabasePayloadSelect,
+  SetFieldOrderPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface AcceptDatabaseTransferVariables {
   input: AcceptDatabaseTransferInput;
 }
+export interface ApplyRlsVariables {
+  input: ApplyRlsInput;
+}
 export interface CancelDatabaseTransferVariables {
   input: CancelDatabaseTransferInput;
 }
+/**
+ * Variables for provisionBucket
+ * Provision an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then creates and configures
+the S3 bucket with the appropriate privacy policies, CORS rules,
+and lifecycle settings.
+ */
+export interface ProvisionBucketVariables {
+  input: ProvisionBucketInput;
+}
 export interface RejectDatabaseTransferVariables {
   input: RejectDatabaseTransferInput;
-}
-export interface SetFieldOrderVariables {
-  input: SetFieldOrderInput;
-}
-export interface ApplyRlsVariables {
-  input: ApplyRlsInput;
 }
 /**
  * Variables for requestDatabase
@@ -58,15 +65,8 @@ Example usage:
 export interface RequestDatabaseVariables {
   input: RequestDatabaseInput;
 }
-/**
- * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
- */
-export interface ProvisionBucketVariables {
-  input: ProvisionBucketInput;
+export interface SetFieldOrderVariables {
+  input: SetFieldOrderInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -99,6 +99,35 @@ export function createMutationOperations(client: OrmClient) {
           'AcceptDatabaseTransferPayload'
         ),
       }),
+    applyRls: <S extends ApplyRlsPayloadSelect>(
+      args: ApplyRlsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ApplyRlsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        applyRls: InferSelectResult<ApplyRlsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ApplyRls',
+        fieldName: 'applyRls',
+        ...buildCustomDocument(
+          'mutation',
+          'ApplyRls',
+          'applyRls',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ApplyRlsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ApplyRlsPayload'
+        ),
+      }),
     cancelDatabaseTransfer: <S extends CancelDatabaseTransferPayloadSelect>(
       args: CancelDatabaseTransferVariables,
       options: {
@@ -126,6 +155,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CancelDatabaseTransferPayload'
+        ),
+      }),
+    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
+      args: ProvisionBucketVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionBucket',
+        fieldName: 'provisionBucket',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionBucket',
+          'provisionBucket',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionBucketInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionBucketPayload'
         ),
       }),
     rejectDatabaseTransfer: <S extends RejectDatabaseTransferPayloadSelect>(
@@ -157,64 +215,6 @@ export function createMutationOperations(client: OrmClient) {
           'RejectDatabaseTransferPayload'
         ),
       }),
-    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
-      args: SetFieldOrderVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetFieldOrderPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetFieldOrder',
-        fieldName: 'setFieldOrder',
-        ...buildCustomDocument(
-          'mutation',
-          'SetFieldOrder',
-          'setFieldOrder',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetFieldOrderInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetFieldOrderPayload'
-        ),
-      }),
-    applyRls: <S extends ApplyRlsPayloadSelect>(
-      args: ApplyRlsVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ApplyRlsPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        applyRls: InferSelectResult<ApplyRlsPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ApplyRls',
-        fieldName: 'applyRls',
-        ...buildCustomDocument(
-          'mutation',
-          'ApplyRls',
-          'applyRls',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ApplyRlsInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ApplyRlsPayload'
-        ),
-      }),
     requestDatabase: <S extends RequestDatabasePayloadSelect>(
       args: RequestDatabaseVariables,
       options: {
@@ -244,33 +244,33 @@ export function createMutationOperations(client: OrmClient) {
           'RequestDatabasePayload'
         ),
       }),
-    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
-      args: ProvisionBucketVariables,
+    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
+      args: SetFieldOrderVariables,
       options: {
         select: S;
-      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+      } & StrictSelect<S, SetFieldOrderPayloadSelect>
     ) =>
       new QueryBuilder<{
-        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'ProvisionBucket',
-        fieldName: 'provisionBucket',
+        operationName: 'SetFieldOrder',
+        fieldName: 'setFieldOrder',
         ...buildCustomDocument(
           'mutation',
-          'ProvisionBucket',
-          'provisionBucket',
+          'SetFieldOrder',
+          'setFieldOrder',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'ProvisionBucketInput!',
+              type: 'SetFieldOrderInput!',
             },
           ],
           connectionFieldsMap,
-          'ProvisionBucketPayload'
+          'SetFieldOrderPayload'
         ),
       }),
   };

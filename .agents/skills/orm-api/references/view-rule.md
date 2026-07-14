@@ -9,8 +9,8 @@ DO INSTEAD rules for views (e.g., read-only enforcement)
 ```typescript
 db.viewRule.findMany({ select: { id: true } }).execute()
 db.viewRule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.viewRule.create({ data: { databaseId: '<UUID>', viewId: '<UUID>', name: '<String>', event: '<String>', action: '<String>' }, select: { id: true } }).execute()
-db.viewRule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.viewRule.create({ data: { action: '<String>', databaseId: '<UUID>', event: '<String>', name: '<String>', viewId: '<UUID>' }, select: { id: true } }).execute()
+db.viewRule.update({ where: { id: '<UUID>' }, data: { action: '<String>' }, select: { id: true } }).execute()
 db.viewRule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.viewRule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.viewRule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, action: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.viewRule.findMany({
 
 ```typescript
 const item = await db.viewRule.create({
-  data: { databaseId: '<UUID>', viewId: '<UUID>', name: '<String>', event: '<String>', action: '<String>' },
+  data: { action: '<String>', databaseId: '<UUID>', event: '<String>', name: '<String>', viewId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

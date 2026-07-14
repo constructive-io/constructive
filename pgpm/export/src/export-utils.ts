@@ -178,9 +178,6 @@ export interface MetaExportTableEntry {
  * values must come from DDL defaults at deploy time.
  */
 export const META_TABLE_OVERRIDES: Record<string, Omit<TableConfig, 'schema' | 'table'>> = {
-  field: {
-    conflictDoNothing: true
-  },
   sites: {
     typeOverrides: {
       og_image: 'image',

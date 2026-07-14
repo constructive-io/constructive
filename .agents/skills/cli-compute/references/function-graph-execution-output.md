@@ -12,8 +12,8 @@ csdk function-graph-execution-output list --where.<field>.<op> <value> --orderBy
 csdk function-graph-execution-output list --limit 10 --after <cursor>
 csdk function-graph-execution-output find-first --where.<field>.<op> <value>
 csdk function-graph-execution-output get --id <UUID>
-csdk function-graph-execution-output create --scopeId <UUID> --hash <Base64EncodedBinary> --data <JSON>
-csdk function-graph-execution-output update --id <UUID> [--scopeId <UUID>] [--hash <Base64EncodedBinary>] [--data <JSON>]
+csdk function-graph-execution-output create --data <JSON> --hash <Base64EncodedBinary> --scopeId <UUID>
+csdk function-graph-execution-output update --id <UUID> [--data <JSON>] [--hash <Base64EncodedBinary>] [--scopeId <UUID>]
 csdk function-graph-execution-output delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-graph-execution-output list --where.id.equalTo <value> --orderBy I
 ### Create a functionGraphExecutionOutput
 
 ```bash
-csdk function-graph-execution-output create --scopeId <UUID> --hash <Base64EncodedBinary> --data <JSON>
+csdk function-graph-execution-output create --data <JSON> --hash <Base64EncodedBinary> --scopeId <UUID>
 ```
 
 ### Get a functionGraphExecutionOutput by id

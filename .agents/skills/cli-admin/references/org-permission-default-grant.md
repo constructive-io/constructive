@@ -12,8 +12,8 @@ csdk org-permission-default-grant list --where.<field>.<op> <value> --orderBy <v
 csdk org-permission-default-grant list --limit 10 --after <cursor>
 csdk org-permission-default-grant find-first --where.<field>.<op> <value>
 csdk org-permission-default-grant get --id <UUID>
-csdk org-permission-default-grant create --permissionId <UUID> --entityId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
-csdk org-permission-default-grant update --id <UUID> [--permissionId <UUID>] [--isGrant <Boolean>] [--grantorId <UUID>] [--entityId <UUID>]
+csdk org-permission-default-grant create --entityId <UUID> --permissionId <UUID> [--grantorId <UUID>] [--isGrant <Boolean>]
+csdk org-permission-default-grant update --id <UUID> [--entityId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--permissionId <UUID>]
 csdk org-permission-default-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-permission-default-grant list --where.id.equalTo <value> --orderBy ID_A
 ### Create a orgPermissionDefaultGrant
 
 ```bash
-csdk org-permission-default-grant create --permissionId <UUID> --entityId <UUID> [--isGrant <Boolean>] [--grantorId <UUID>]
+csdk org-permission-default-grant create --entityId <UUID> --permissionId <UUID> [--grantorId <UUID>] [--isGrant <Boolean>]
 ```
 
 ### Get a orgPermissionDefaultGrant by id

@@ -16,16 +16,16 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
+  category: 'string',
+  createdAt: 'string',
   databaseId: 'uuid',
-  tableId: 'uuid',
-  name: 'string',
   event: 'string',
   functionName: 'string',
+  id: 'uuid',
+  name: 'string',
   smartTags: 'json',
-  category: 'string',
+  tableId: 'uuid',
   tags: 'string',
-  createdAt: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -79,16 +79,16 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      category: true,
+      createdAt: true,
       databaseId: true,
-      tableId: true,
-      name: true,
       event: true,
       functionName: true,
+      id: true,
+      name: true,
       smartTags: true,
-      category: true,
+      tableId: true,
       tags: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -110,16 +110,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      category: true,
+      createdAt: true,
       databaseId: true,
-      tableId: true,
-      name: true,
       event: true,
       functionName: true,
+      id: true,
+      name: true,
       smartTags: true,
-      category: true,
+      tableId: true,
       tags: true,
-      createdAt: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -153,16 +153,16 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
+          category: true,
+          createdAt: true,
           databaseId: true,
-          tableId: true,
-          name: true,
           event: true,
           functionName: true,
+          id: true,
+          name: true,
           smartTags: true,
-          category: true,
+          tableId: true,
           tags: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -181,22 +181,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'category',
+        message: 'category',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'tableId',
-        message: 'tableId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -213,6 +208,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: true,
+      },
+      {
         type: 'json',
         name: 'smartTags',
         message: 'smartTags',
@@ -221,10 +222,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'category',
-        message: 'category',
-        required: false,
-        skipPrompt: true,
+        name: 'tableId',
+        message: 'tableId',
+        required: true,
       },
       {
         type: 'text',
@@ -240,26 +240,26 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.trigger
       .create({
         data: {
+          category: cleanedData.category,
           databaseId: cleanedData.databaseId,
-          tableId: cleanedData.tableId,
-          name: cleanedData.name,
           event: cleanedData.event,
           functionName: cleanedData.functionName,
+          name: cleanedData.name,
           smartTags: cleanedData.smartTags,
-          category: cleanedData.category,
+          tableId: cleanedData.tableId,
           tags: cleanedData.tags,
         },
         select: {
-          id: true,
+          category: true,
+          createdAt: true,
           databaseId: true,
-          tableId: true,
-          name: true,
           event: true,
           functionName: true,
+          id: true,
+          name: true,
           smartTags: true,
-          category: true,
+          tableId: true,
           tags: true,
-          createdAt: true,
           updatedAt: true,
         },
       })
@@ -284,22 +284,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
+        name: 'category',
+        message: 'category',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'tableId',
-        message: 'tableId',
+        name: 'databaseId',
+        message: 'databaseId',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -316,6 +311,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+      },
+      {
         type: 'json',
         name: 'smartTags',
         message: 'smartTags',
@@ -324,10 +325,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'category',
-        message: 'category',
+        name: 'tableId',
+        message: 'tableId',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -346,26 +346,26 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          category: cleanedData.category,
           databaseId: cleanedData.databaseId,
-          tableId: cleanedData.tableId,
-          name: cleanedData.name,
           event: cleanedData.event,
           functionName: cleanedData.functionName,
+          name: cleanedData.name,
           smartTags: cleanedData.smartTags,
-          category: cleanedData.category,
+          tableId: cleanedData.tableId,
           tags: cleanedData.tags,
         },
         select: {
-          id: true,
+          category: true,
+          createdAt: true,
           databaseId: true,
-          tableId: true,
-          name: true,
           event: true,
           functionName: true,
+          id: true,
+          name: true,
           smartTags: true,
-          category: true,
+          tableId: true,
           tags: true,
-          createdAt: true,
           updatedAt: true,
         },
       })

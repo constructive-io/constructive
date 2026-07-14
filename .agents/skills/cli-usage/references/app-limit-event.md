@@ -12,8 +12,8 @@ csdk app-limit-event list --where.<field>.<op> <value> --orderBy <values>
 csdk app-limit-event list --limit 10 --after <cursor>
 csdk app-limit-event find-first --where.<field>.<op> <value>
 csdk app-limit-event get --id <UUID>
-csdk app-limit-event create [--name <String>] [--actorId <UUID>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>] [--eventType <String>] [--delta <BigInt>] [--numBefore <BigInt>] [--numAfter <BigInt>] [--maxAtEvent <BigInt>] [--reason <String>]
-csdk app-limit-event update --id <UUID> [--name <String>] [--actorId <UUID>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>] [--eventType <String>] [--delta <BigInt>] [--numBefore <BigInt>] [--numAfter <BigInt>] [--maxAtEvent <BigInt>] [--reason <String>]
+csdk app-limit-event create [--actorId <UUID>] [--delta <BigInt>] [--entityId <UUID>] [--entityType <String>] [--eventType <String>] [--maxAtEvent <BigInt>] [--name <String>] [--numAfter <BigInt>] [--numBefore <BigInt>] [--organizationId <UUID>] [--reason <String>]
+csdk app-limit-event update --id <UUID> [--actorId <UUID>] [--delta <BigInt>] [--entityId <UUID>] [--entityType <String>] [--eventType <String>] [--maxAtEvent <BigInt>] [--name <String>] [--numAfter <BigInt>] [--numBefore <BigInt>] [--organizationId <UUID>] [--reason <String>]
 csdk app-limit-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-limit-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appLimitEvent
 
 ```bash
-csdk app-limit-event create [--name <String>] [--actorId <UUID>] [--entityId <UUID>] [--organizationId <UUID>] [--entityType <String>] [--eventType <String>] [--delta <BigInt>] [--numBefore <BigInt>] [--numAfter <BigInt>] [--maxAtEvent <BigInt>] [--reason <String>]
+csdk app-limit-event create [--actorId <UUID>] [--delta <BigInt>] [--entityId <UUID>] [--entityType <String>] [--eventType <String>] [--maxAtEvent <BigInt>] [--name <String>] [--numAfter <BigInt>] [--numBefore <BigInt>] [--organizationId <UUID>] [--reason <String>]
 ```
 
 ### Get a appLimitEvent by id

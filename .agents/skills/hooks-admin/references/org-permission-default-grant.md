@@ -7,8 +7,8 @@ Audit log of permission additions and removals from the defaults bitmask
 ## Usage
 
 ```typescript
-useOrgPermissionDefaultGrantsQuery({ selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, entityId: true, createdAt: true, updatedAt: true } } })
-useOrgPermissionDefaultGrantQuery({ id: '<UUID>', selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, entityId: true, createdAt: true, updatedAt: true } } })
+useOrgPermissionDefaultGrantsQuery({ selection: { fields: { createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } } })
+useOrgPermissionDefaultGrantQuery({ id: '<UUID>', selection: { fields: { createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } } })
 useCreateOrgPermissionDefaultGrantMutation({ selection: { fields: { id: true } } })
 useUpdateOrgPermissionDefaultGrantMutation({ selection: { fields: { id: true } } })
 useDeleteOrgPermissionDefaultGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgPermissionDefaultGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgPermissionDefaultGrantsQuery({
-  selection: { fields: { id: true, permissionId: true, isGrant: true, grantorId: true, entityId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, entityId: true, grantorId: true, id: true, isGrant: true, permissionId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgPermissionDefaultGrantsQuery({
 const { mutate } = useCreateOrgPermissionDefaultGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ permissionId: '<UUID>', isGrant: '<Boolean>', grantorId: '<UUID>', entityId: '<UUID>' });
+mutate({ entityId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', permissionId: '<UUID>' });
 ```

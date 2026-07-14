@@ -13,6 +13,48 @@ export interface RequireStepUpVariables {
 }
 export function createQueryOperations(client: OrmClient) {
   return {
+    currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
+      new QueryBuilder<{
+        currentIpAddress: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'CurrentIpAddress',
+        fieldName: 'currentIpAddress',
+        ...buildCustomDocument(
+          'query',
+          'CurrentIpAddress',
+          'currentIpAddress',
+          options?.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    currentUser: <S extends UserSelect>(
+      options: {
+        select: S;
+      } & StrictSelect<S, UserSelect>
+    ) =>
+      new QueryBuilder<{
+        currentUser: InferSelectResult<User, S> | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'CurrentUser',
+        fieldName: 'currentUser',
+        ...buildCustomDocument(
+          'query',
+          'CurrentUser',
+          'currentUser',
+          options.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          'User'
+        ),
+      }),
     currentUserAgent: (options?: { select?: Record<string, unknown> }) =>
       new QueryBuilder<{
         currentUserAgent: string | null;
@@ -51,25 +93,6 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
-      new QueryBuilder<{
-        currentIpAddress: string | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'CurrentIpAddress',
-        fieldName: 'currentIpAddress',
-        ...buildCustomDocument(
-          'query',
-          'CurrentIpAddress',
-          'currentIpAddress',
-          options?.select,
-          undefined,
-          [],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
     requireStepUp: (
       args: RequireStepUpVariables,
       options?: {
@@ -97,29 +120,6 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           undefined
-        ),
-      }),
-    currentUser: <S extends UserSelect>(
-      options: {
-        select: S;
-      } & StrictSelect<S, UserSelect>
-    ) =>
-      new QueryBuilder<{
-        currentUser: InferSelectResult<User, S> | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'CurrentUser',
-        fieldName: 'currentUser',
-        ...buildCustomDocument(
-          'query',
-          'CurrentUser',
-          'currentUser',
-          options.select,
-          undefined,
-          [],
-          connectionFieldsMap,
-          'User'
         ),
       }),
   };

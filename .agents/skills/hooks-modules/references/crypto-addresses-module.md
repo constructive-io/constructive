@@ -7,8 +7,8 @@ React Query hooks for CryptoAddressesModule data operations
 ## Usage
 
 ```typescript
-useCryptoAddressesModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true, apiName: true, privateApiName: true } } })
-useCryptoAddressesModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true, apiName: true, privateApiName: true } } })
+useCryptoAddressesModulesQuery({ selection: { fields: { apiName: true, cryptoNetwork: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } } })
+useCryptoAddressesModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, cryptoNetwork: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } } })
 useCreateCryptoAddressesModuleMutation({ selection: { fields: { id: true } } })
 useUpdateCryptoAddressesModuleMutation({ selection: { fields: { id: true } } })
 useDeleteCryptoAddressesModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteCryptoAddressesModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useCryptoAddressesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true, apiName: true, privateApiName: true } },
+  selection: { fields: { apiName: true, cryptoNetwork: true, databaseId: true, id: true, ownerTableId: true, privateApiName: true, privateSchemaId: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useCryptoAddressesModulesQuery({
 const { mutate } = useCreateCryptoAddressesModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', cryptoNetwork: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ apiName: '<String>', cryptoNetwork: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```

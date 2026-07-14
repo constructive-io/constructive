@@ -12,8 +12,8 @@ csdk resource-status-check list --where.<field>.<op> <value> --orderBy <values>
 csdk resource-status-check list --limit 10 --after <cursor>
 csdk resource-status-check find-first --where.<field>.<op> <value>
 csdk resource-status-check get --id <UUID>
-csdk resource-status-check create --resourceId <UUID> --databaseId <UUID> [--requestedBy <UUID>] [--requestedAt <Datetime>] [--completedAt <Datetime>] [--status <String>] [--result <JSON>]
-csdk resource-status-check update --id <UUID> [--resourceId <UUID>] [--databaseId <UUID>] [--requestedBy <UUID>] [--requestedAt <Datetime>] [--completedAt <Datetime>] [--status <String>] [--result <JSON>]
+csdk resource-status-check create --databaseId <UUID> --resourceId <UUID> [--completedAt <Datetime>] [--requestedAt <Datetime>] [--requestedBy <UUID>] [--result <JSON>] [--status <String>]
+csdk resource-status-check update --id <UUID> [--completedAt <Datetime>] [--databaseId <UUID>] [--requestedAt <Datetime>] [--requestedBy <UUID>] [--resourceId <UUID>] [--result <JSON>] [--status <String>]
 csdk resource-status-check delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk resource-status-check list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a resourceStatusCheck
 
 ```bash
-csdk resource-status-check create --resourceId <UUID> --databaseId <UUID> [--requestedBy <UUID>] [--requestedAt <Datetime>] [--completedAt <Datetime>] [--status <String>] [--result <JSON>]
+csdk resource-status-check create --databaseId <UUID> --resourceId <UUID> [--completedAt <Datetime>] [--requestedAt <Datetime>] [--requestedBy <UUID>] [--result <JSON>] [--status <String>]
 ```
 
 ### Get a resourceStatusCheck by id

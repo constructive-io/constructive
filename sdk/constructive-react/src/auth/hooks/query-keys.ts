@@ -19,6 +19,60 @@
 // Entity Query Keys
 // ============================================================================
 
+export const auditLogAuthKeys = {
+  /** All auditLogAuth queries */ all: ['auditlogauth'] as const,
+  /** List query keys */ lists: () => [...auditLogAuthKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...auditLogAuthKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...auditLogAuthKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...auditLogAuthKeys.details(), id] as const,
+} as const;
+export const cryptoAddressKeys = {
+  /** All cryptoAddress queries */ all: ['cryptoaddress'] as const,
+  /** List query keys */ lists: () => [...cryptoAddressKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...cryptoAddressKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...cryptoAddressKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...cryptoAddressKeys.details(), id] as const,
+} as const;
+export const emailKeys = {
+  /** All email queries */ all: ['email'] as const,
+  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...emailKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...emailKeys.details(), id] as const,
+} as const;
+export const identityProviderKeys = {
+  /** All identityProvider queries */ all: ['identityprovider'] as const,
+  /** List query keys */ lists: () => [...identityProviderKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...identityProviderKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...identityProviderKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...identityProviderKeys.details(), id] as const,
+} as const;
+export const orgApiKeyListKeys = {
+  /** All orgApiKeyList queries */ all: ['orgapikeylist'] as const,
+  /** List query keys */ lists: () => [...orgApiKeyListKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...orgApiKeyListKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...orgApiKeyListKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...orgApiKeyListKeys.details(), id] as const,
+} as const;
+export const phoneNumberKeys = {
+  /** All phoneNumber queries */ all: ['phonenumber'] as const,
+  /** List query keys */ lists: () => [...phoneNumberKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...phoneNumberKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...phoneNumberKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...phoneNumberKeys.details(), id] as const,
+} as const;
 export const principalKeys = {
   /** All principal queries */ all: ['principal'] as const,
   /** List query keys */ lists: () => [...principalKeys.all, 'list'] as const,
@@ -46,60 +100,6 @@ export const principalScopeOverrideKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...principalScopeOverrideKeys.details(), id] as const,
 } as const;
-export const emailKeys = {
-  /** All email queries */ all: ['email'] as const,
-  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...emailKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...emailKeys.details(), id] as const,
-} as const;
-export const phoneNumberKeys = {
-  /** All phoneNumber queries */ all: ['phonenumber'] as const,
-  /** List query keys */ lists: () => [...phoneNumberKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...phoneNumberKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...phoneNumberKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...phoneNumberKeys.details(), id] as const,
-} as const;
-export const cryptoAddressKeys = {
-  /** All cryptoAddress queries */ all: ['cryptoaddress'] as const,
-  /** List query keys */ lists: () => [...cryptoAddressKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...cryptoAddressKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...cryptoAddressKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...cryptoAddressKeys.details(), id] as const,
-} as const;
-export const webauthnCredentialKeys = {
-  /** All webauthnCredential queries */ all: ['webauthncredential'] as const,
-  /** List query keys */ lists: () => [...webauthnCredentialKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...webauthnCredentialKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...webauthnCredentialKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...webauthnCredentialKeys.details(), id] as const,
-} as const;
-export const auditLogAuthKeys = {
-  /** All auditLogAuth queries */ all: ['auditlogauth'] as const,
-  /** List query keys */ lists: () => [...auditLogAuthKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...auditLogAuthKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...auditLogAuthKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...auditLogAuthKeys.details(), id] as const,
-} as const;
-export const identityProviderKeys = {
-  /** All identityProvider queries */ all: ['identityprovider'] as const,
-  /** List query keys */ lists: () => [...identityProviderKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...identityProviderKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...identityProviderKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...identityProviderKeys.details(), id] as const,
-} as const;
 export const roleTypeKeys = {
   /** All roleType queries */ all: ['roletype'] as const,
   /** List query keys */ lists: () => [...roleTypeKeys.all, 'list'] as const,
@@ -118,15 +118,6 @@ export const userConnectedAccountKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...userConnectedAccountKeys.details(), id] as const,
 } as const;
-export const orgApiKeyListKeys = {
-  /** All orgApiKeyList queries */ all: ['orgapikeylist'] as const,
-  /** List query keys */ lists: () => [...orgApiKeyListKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...orgApiKeyListKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgApiKeyListKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgApiKeyListKeys.details(), id] as const,
-} as const;
 export const userKeys = {
   /** All user queries */ all: ['user'] as const,
   /** List query keys */ lists: () => [...userKeys.all, 'list'] as const,
@@ -136,18 +127,27 @@ export const userKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...userKeys.details(), id] as const,
 } as const;
+export const webauthnCredentialKeys = {
+  /** All webauthnCredential queries */ all: ['webauthncredential'] as const,
+  /** List query keys */ lists: () => [...webauthnCredentialKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...webauthnCredentialKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...webauthnCredentialKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...webauthnCredentialKeys.details(), id] as const,
+} as const;
 
 // ============================================================================
 // Custom Query Keys
 // ============================================================================
 
 export const customQueryKeys = {
+  /** Query key for currentIpAddress */ currentIpAddress: () => ['currentIpAddress'] as const,
+  /** Query key for currentUser */ currentUser: () => ['currentUser'] as const,
   /** Query key for currentUserAgent */ currentUserAgent: () => ['currentUserAgent'] as const,
   /** Query key for currentUserId */ currentUserId: () => ['currentUserId'] as const,
-  /** Query key for currentIpAddress */ currentIpAddress: () => ['currentIpAddress'] as const,
   /** Query key for requireStepUp */ requireStepUp: (variables?: object) =>
     ['requireStepUp', variables] as const,
-  /** Query key for currentUser */ currentUser: () => ['currentUser'] as const,
 } as const;
 /**
 
@@ -172,19 +172,19 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
+  auditLogAuth: auditLogAuthKeys,
+  cryptoAddress: cryptoAddressKeys,
+  email: emailKeys,
+  identityProvider: identityProviderKeys,
+  orgApiKeyList: orgApiKeyListKeys,
+  phoneNumber: phoneNumberKeys,
   principal: principalKeys,
   principalEntity: principalEntityKeys,
   principalScopeOverride: principalScopeOverrideKeys,
-  email: emailKeys,
-  phoneNumber: phoneNumberKeys,
-  cryptoAddress: cryptoAddressKeys,
-  webauthnCredential: webauthnCredentialKeys,
-  auditLogAuth: auditLogAuthKeys,
-  identityProvider: identityProviderKeys,
   roleType: roleTypeKeys,
   userConnectedAccount: userConnectedAccountKeys,
-  orgApiKeyList: orgApiKeyListKeys,
   user: userKeys,
+  webauthnCredential: webauthnCredentialKeys,
   custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */

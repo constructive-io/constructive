@@ -7,8 +7,8 @@ Append-only ledger of credit grants that automatically update limit ceilings
 ## Usage
 
 ```typescript
-useAppLimitCreditsQuery({ selection: { fields: { id: true, defaultLimitId: true, actorId: true, amount: true, creditType: true, reason: true } } })
-useAppLimitCreditQuery({ id: '<UUID>', selection: { fields: { id: true, defaultLimitId: true, actorId: true, amount: true, creditType: true, reason: true } } })
+useAppLimitCreditsQuery({ selection: { fields: { actorId: true, amount: true, creditType: true, defaultLimitId: true, id: true, reason: true } } })
+useAppLimitCreditQuery({ id: '<UUID>', selection: { fields: { actorId: true, amount: true, creditType: true, defaultLimitId: true, id: true, reason: true } } })
 useCreateAppLimitCreditMutation({ selection: { fields: { id: true } } })
 useUpdateAppLimitCreditMutation({ selection: { fields: { id: true } } })
 useDeleteAppLimitCreditMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLimitCreditMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLimitCreditsQuery({
-  selection: { fields: { id: true, defaultLimitId: true, actorId: true, amount: true, creditType: true, reason: true } },
+  selection: { fields: { actorId: true, amount: true, creditType: true, defaultLimitId: true, id: true, reason: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLimitCreditsQuery({
 const { mutate } = useCreateAppLimitCreditMutation({
   selection: { fields: { id: true } },
 });
-mutate({ defaultLimitId: '<UUID>', actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' });
+mutate({ actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', defaultLimitId: '<UUID>', reason: '<String>' });
 ```

@@ -7,8 +7,8 @@ Unified K8s resource declarations — stores desired state (spec) and observed s
 ## Usage
 
 ```typescript
-usePlatformResourcesQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, requiredSecrets: true, requiredConfigs: true, integrations: true, resourceDefinitionId: true } } })
-usePlatformResourceQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, requiredSecrets: true, requiredConfigs: true, integrations: true, resourceDefinitionId: true } } })
+usePlatformResourcesQuery({ selection: { fields: { annotations: true, createdAt: true, createdBy: true, errorCount: true, id: true, integrations: true, kind: true, labels: true, lastError: true, name: true, namespaceId: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, updatedAt: true, updatedBy: true } } })
+usePlatformResourceQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, createdBy: true, errorCount: true, id: true, integrations: true, kind: true, labels: true, lastError: true, name: true, namespaceId: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, updatedAt: true, updatedBy: true } } })
 useCreatePlatformResourceMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformResourceMutation({ selection: { fields: { id: true } } })
 useDeletePlatformResourceMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformResourceMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformResourcesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, namespaceId: true, kind: true, name: true, slug: true, spec: true, status: true, statusObserved: true, lastError: true, errorCount: true, labels: true, annotations: true, requiredSecrets: true, requiredConfigs: true, integrations: true, resourceDefinitionId: true } },
+  selection: { fields: { annotations: true, createdAt: true, createdBy: true, errorCount: true, id: true, integrations: true, kind: true, labels: true, lastError: true, name: true, namespaceId: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusObserved: true, updatedAt: true, updatedBy: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformResourcesQuery({
 const { mutate } = useCreatePlatformResourceMutation({
   selection: { fields: { id: true } },
 });
-mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', namespaceId: '<UUID>', kind: '<String>', name: '<String>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', lastError: '<String>', errorCount: '<Int>', labels: '<JSON>', annotations: '<JSON>', requiredSecrets: '<ResourceRequirement>', requiredConfigs: '<ResourceRequirement>', integrations: '<String>', resourceDefinitionId: '<UUID>' });
+mutate({ annotations: '<JSON>', createdBy: '<UUID>', errorCount: '<Int>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', name: '<String>', namespaceId: '<UUID>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusObserved: '<JSON>', updatedBy: '<UUID>' });
 ```

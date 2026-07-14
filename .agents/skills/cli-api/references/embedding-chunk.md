@@ -12,8 +12,8 @@ csdk embedding-chunk list --where.<field>.<op> <value> --orderBy <values>
 csdk embedding-chunk list --limit 10 --after <cursor>
 csdk embedding-chunk find-first --where.<field>.<op> <value>
 csdk embedding-chunk get --id <UUID>
-csdk embedding-chunk create --tableId <UUID> [--databaseId <UUID>] [--embeddingFieldId <UUID>] [--chunksTableId <UUID>] [--chunksTableName <String>] [--contentFieldName <String>] [--dimensions <Int>] [--metric <String>] [--chunkSize <Int>] [--chunkOverlap <Int>] [--chunkStrategy <String>] [--metadataFields <JSON>] [--searchIndexes <JSON>] [--enqueueChunkingJob <Boolean>] [--chunkingTaskName <String>] [--embeddingModel <String>] [--embeddingProvider <String>] [--parentFkFieldId <UUID>]
-csdk embedding-chunk update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--embeddingFieldId <UUID>] [--chunksTableId <UUID>] [--chunksTableName <String>] [--contentFieldName <String>] [--dimensions <Int>] [--metric <String>] [--chunkSize <Int>] [--chunkOverlap <Int>] [--chunkStrategy <String>] [--metadataFields <JSON>] [--searchIndexes <JSON>] [--enqueueChunkingJob <Boolean>] [--chunkingTaskName <String>] [--embeddingModel <String>] [--embeddingProvider <String>] [--parentFkFieldId <UUID>]
+csdk embedding-chunk create --tableId <UUID> [--chunkOverlap <Int>] [--chunkSize <Int>] [--chunkStrategy <String>] [--chunkingTaskName <String>] [--chunksTableId <UUID>] [--chunksTableName <String>] [--contentFieldName <String>] [--databaseId <UUID>] [--dimensions <Int>] [--embeddingFieldId <UUID>] [--embeddingModel <String>] [--embeddingProvider <String>] [--enqueueChunkingJob <Boolean>] [--metadataFields <JSON>] [--metric <String>] [--parentFkFieldId <UUID>] [--searchIndexes <JSON>]
+csdk embedding-chunk update --id <UUID> [--chunkOverlap <Int>] [--chunkSize <Int>] [--chunkStrategy <String>] [--chunkingTaskName <String>] [--chunksTableId <UUID>] [--chunksTableName <String>] [--contentFieldName <String>] [--databaseId <UUID>] [--dimensions <Int>] [--embeddingFieldId <UUID>] [--embeddingModel <String>] [--embeddingProvider <String>] [--enqueueChunkingJob <Boolean>] [--metadataFields <JSON>] [--metric <String>] [--parentFkFieldId <UUID>] [--searchIndexes <JSON>] [--tableId <UUID>]
 csdk embedding-chunk delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk embedding-chunk list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a embeddingChunk
 
 ```bash
-csdk embedding-chunk create --tableId <UUID> [--databaseId <UUID>] [--embeddingFieldId <UUID>] [--chunksTableId <UUID>] [--chunksTableName <String>] [--contentFieldName <String>] [--dimensions <Int>] [--metric <String>] [--chunkSize <Int>] [--chunkOverlap <Int>] [--chunkStrategy <String>] [--metadataFields <JSON>] [--searchIndexes <JSON>] [--enqueueChunkingJob <Boolean>] [--chunkingTaskName <String>] [--embeddingModel <String>] [--embeddingProvider <String>] [--parentFkFieldId <UUID>]
+csdk embedding-chunk create --tableId <UUID> [--chunkOverlap <Int>] [--chunkSize <Int>] [--chunkStrategy <String>] [--chunkingTaskName <String>] [--chunksTableId <UUID>] [--chunksTableName <String>] [--contentFieldName <String>] [--databaseId <UUID>] [--dimensions <Int>] [--embeddingFieldId <UUID>] [--embeddingModel <String>] [--embeddingProvider <String>] [--enqueueChunkingJob <Boolean>] [--metadataFields <JSON>] [--metric <String>] [--parentFkFieldId <UUID>] [--searchIndexes <JSON>]
 ```
 
 ### Get a embeddingChunk by id

@@ -16,15 +16,15 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
+  apiName: 'string',
   databaseId: 'uuid',
+  id: 'uuid',
+  privateApiName: 'string',
   schemaId: 'uuid',
   tableId: 'uuid',
   tableName: 'string',
   typeTableId: 'uuid',
   typeTableName: 'string',
-  apiName: 'string',
-  privateApiName: 'string',
 };
 const usage =
   '\nusers-module <command>\n\nCommands:\n  list                  List usersModule records\n  find-first            Find first matching usersModule record\n  get                   Get a usersModule by ID\n  create                Create a new usersModule\n  update                Update an existing usersModule\n  delete                Delete a usersModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -77,15 +77,15 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      apiName: true,
       databaseId: true,
+      id: true,
+      privateApiName: true,
       schemaId: true,
       tableId: true,
       tableName: true,
       typeTableId: true,
       typeTableName: true,
-      apiName: true,
-      privateApiName: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<UsersModuleSelect, UsersModuleFilter, UsersModuleOrderBy> & {
@@ -106,15 +106,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
+      apiName: true,
       databaseId: true,
+      id: true,
+      privateApiName: true,
       schemaId: true,
       tableId: true,
       tableName: true,
       typeTableId: true,
       typeTableName: true,
-      apiName: true,
-      privateApiName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<UsersModuleSelect, UsersModuleFilter, UsersModuleOrderBy> & {
@@ -147,15 +147,15 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
+          apiName: true,
           databaseId: true,
+          id: true,
+          privateApiName: true,
           schemaId: true,
           tableId: true,
           tableName: true,
           typeTableId: true,
           typeTableName: true,
-          apiName: true,
-          privateApiName: true,
         },
       })
       .execute();
@@ -173,9 +173,23 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'apiName',
+        message: 'apiName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'privateApiName',
+        message: 'privateApiName',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -212,20 +226,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'apiName',
-        message: 'apiName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'privateApiName',
-        message: 'privateApiName',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -236,25 +236,25 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.usersModule
       .create({
         data: {
+          apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
+          privateApiName: cleanedData.privateApiName,
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
           typeTableId: cleanedData.typeTableId,
           typeTableName: cleanedData.typeTableName,
-          apiName: cleanedData.apiName,
-          privateApiName: cleanedData.privateApiName,
         },
         select: {
-          id: true,
+          apiName: true,
           databaseId: true,
+          id: true,
+          privateApiName: true,
           schemaId: true,
           tableId: true,
           tableName: true,
           typeTableId: true,
           typeTableName: true,
-          apiName: true,
-          privateApiName: true,
         },
       })
       .execute();
@@ -278,9 +278,23 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'apiName',
+        message: 'apiName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'privateApiName',
+        message: 'privateApiName',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -317,20 +331,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
-      {
-        type: 'text',
-        name: 'apiName',
-        message: 'apiName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'privateApiName',
-        message: 'privateApiName',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as UsersModulePatch;
@@ -341,25 +341,25 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          apiName: cleanedData.apiName,
           databaseId: cleanedData.databaseId,
+          privateApiName: cleanedData.privateApiName,
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
           typeTableId: cleanedData.typeTableId,
           typeTableName: cleanedData.typeTableName,
-          apiName: cleanedData.apiName,
-          privateApiName: cleanedData.privateApiName,
         },
         select: {
-          id: true,
+          apiName: true,
           databaseId: true,
+          id: true,
+          privateApiName: true,
           schemaId: true,
           tableId: true,
           tableName: true,
           typeTableId: true,
           typeTableName: true,
-          apiName: true,
-          privateApiName: true,
         },
       })
       .execute();

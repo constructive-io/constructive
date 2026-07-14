@@ -41,527 +41,428 @@ import type {
   UUIDListFilter,
   VectorFilter,
 } from './types';
-/** Methods to use when ordering `AppLimitCapsDefault`. */
-export type AppLimitCapsDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
-/** Methods to use when ordering `OrgLimitCapsDefault`. */
-export type OrgLimitCapsDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
 /** Methods to use when ordering `AppLimitCap`. */
 export type AppLimitCapOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
-/** Methods to use when ordering `OrgLimitCap`. */
-export type OrgLimitCapOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
-/** Methods to use when ordering `AppLimitCredit`. */
-export type AppLimitCreditOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `AppLimitCapsDefault`. */
+export type AppLimitCapsDefaultOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
+  | 'MAX_ASC'
+  | 'MAX_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `AppLimitCreditCodeItem`. */
 export type AppLimitCreditCodeItemOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREDIT_CODE_ID_ASC'
-  | 'CREDIT_CODE_ID_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
   | 'AMOUNT_ASC'
   | 'AMOUNT_DESC'
-  | 'CREDIT_TYPE_ASC'
-  | 'CREDIT_TYPE_DESC';
-/** Methods to use when ordering `AppLimitCreditRedemption`. */
-export type AppLimitCreditRedemptionOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
   | 'CREDIT_CODE_ID_ASC'
   | 'CREDIT_CODE_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC';
-/** Methods to use when ordering `AppLimitDefault`. */
-export type AppLimitDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC';
-/** Methods to use when ordering `OrgLimitCredit`. */
-export type OrgLimitCreditOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DEFAULT_LIMIT_ID_ASC'
-  | 'DEFAULT_LIMIT_ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'AMOUNT_ASC'
-  | 'AMOUNT_DESC'
   | 'CREDIT_TYPE_ASC'
   | 'CREDIT_TYPE_DESC'
-  | 'REASON_ASC'
-  | 'REASON_DESC';
-/** Methods to use when ordering `OrgLimitDefault`. */
-export type OrgLimitDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
+  | 'DEFAULT_LIMIT_ID_ASC'
+  | 'DEFAULT_LIMIT_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC';
-/** Methods to use when ordering `AppLimitWarning`. */
-export type AppLimitWarningOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'WARNING_TYPE_ASC'
-  | 'WARNING_TYPE_DESC'
-  | 'THRESHOLD_VALUE_ASC'
-  | 'THRESHOLD_VALUE_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC';
-/** Methods to use when ordering `OrgLimitWarning`. */
-export type OrgLimitWarningOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'WARNING_TYPE_ASC'
-  | 'WARNING_TYPE_DESC'
-  | 'THRESHOLD_VALUE_ASC'
-  | 'THRESHOLD_VALUE_DESC'
-  | 'TASK_IDENTIFIER_ASC'
-  | 'TASK_IDENTIFIER_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `AppLimitCreditCode`. */
 export type AppLimitCreditCodeOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
   | 'CODE_ASC'
   | 'CODE_DESC'
-  | 'MAX_REDEMPTIONS_ASC'
-  | 'MAX_REDEMPTIONS_DESC'
   | 'CURRENT_REDEMPTIONS_ASC'
   | 'CURRENT_REDEMPTIONS_DESC'
   | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC';
-/** Methods to use when ordering `AppLimitEvent`. */
-export type AppLimitEventOrderBy =
+  | 'EXPIRES_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_REDEMPTIONS_ASC'
+  | 'MAX_REDEMPTIONS_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `AppLimitCredit`. */
+export type AppLimitCreditOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'AMOUNT_ASC'
+  | 'AMOUNT_DESC'
+  | 'CREDIT_TYPE_ASC'
+  | 'CREDIT_TYPE_DESC'
+  | 'DEFAULT_LIMIT_ID_ASC'
+  | 'DEFAULT_LIMIT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC'
-  | 'EVENT_TYPE_ASC'
-  | 'EVENT_TYPE_DESC'
-  | 'DELTA_ASC'
-  | 'DELTA_DESC'
-  | 'NUM_BEFORE_ASC'
-  | 'NUM_BEFORE_DESC'
-  | 'NUM_AFTER_ASC'
-  | 'NUM_AFTER_DESC'
-  | 'MAX_AT_EVENT_ASC'
-  | 'MAX_AT_EVENT_DESC'
   | 'REASON_ASC'
   | 'REASON_DESC';
-/** Methods to use when ordering `OrgLimitEvent`. */
-export type OrgLimitEventOrderBy =
+/** Methods to use when ordering `AppLimitCreditRedemption`. */
+export type AppLimitCreditRedemptionOrderBy =
+  | 'CREDIT_CODE_ID_ASC'
+  | 'CREDIT_CODE_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `AppLimitDefault`. */
+export type AppLimitDefaultOrderBy =
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
+  | 'SOFT_MAX_ASC'
+  | 'SOFT_MAX_DESC';
+/** Methods to use when ordering `AppLimitEvent`. */
+export type AppLimitEventOrderBy =
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DELTA_ASC'
+  | 'DELTA_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
   | 'ENTITY_TYPE_ASC'
   | 'ENTITY_TYPE_DESC'
   | 'EVENT_TYPE_ASC'
   | 'EVENT_TYPE_DESC'
-  | 'DELTA_ASC'
-  | 'DELTA_DESC'
-  | 'NUM_BEFORE_ASC'
-  | 'NUM_BEFORE_DESC'
-  | 'NUM_AFTER_ASC'
-  | 'NUM_AFTER_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'MAX_AT_EVENT_ASC'
   | 'MAX_AT_EVENT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'NUM_AFTER_ASC'
+  | 'NUM_AFTER_DESC'
+  | 'NUM_BEFORE_ASC'
+  | 'NUM_BEFORE_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
   | 'REASON_ASC'
   | 'REASON_DESC';
 /** Methods to use when ordering `AppLimit`. */
 export type AppLimitOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'NATURAL'
+  | 'NUM_ASC'
+  | 'NUM_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PERIOD_CREDITS_ASC'
+  | 'PERIOD_CREDITS_DESC'
+  | 'PLAN_MAX_ASC'
+  | 'PLAN_MAX_DESC'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'PURCHASED_CREDITS_ASC'
+  | 'PURCHASED_CREDITS_DESC'
+  | 'SOFT_MAX_ASC'
+  | 'SOFT_MAX_DESC'
+  | 'WINDOW_DURATION_ASC'
+  | 'WINDOW_DURATION_DESC'
+  | 'WINDOW_START_ASC'
+  | 'WINDOW_START_DESC';
+/** Methods to use when ordering `AppLimitWarning`. */
+export type AppLimitWarningOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC';
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC'
+  | 'THRESHOLD_VALUE_ASC'
+  | 'THRESHOLD_VALUE_DESC'
+  | 'WARNING_TYPE_ASC'
+  | 'WARNING_TYPE_DESC';
 /** Methods to use when ordering `OrgLimitAggregate`. */
 export type OrgLimitAggregateOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'MAX_ASC'
   | 'MAX_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'NUM_ASC'
+  | 'NUM_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
   | 'PERIOD_CREDITS_ASC'
   | 'PERIOD_CREDITS_DESC'
+  | 'PLAN_MAX_ASC'
+  | 'PLAN_MAX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PURCHASED_CREDITS_ASC'
+  | 'PURCHASED_CREDITS_DESC'
   | 'RESERVED_ASC'
   | 'RESERVED_DESC'
+  | 'SOFT_MAX_ASC'
+  | 'SOFT_MAX_DESC'
+  | 'WINDOW_DURATION_ASC'
+  | 'WINDOW_DURATION_DESC'
+  | 'WINDOW_START_ASC'
+  | 'WINDOW_START_DESC';
+/** Methods to use when ordering `OrgLimitCap`. */
+export type OrgLimitCapOrderBy =
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `OrgLimitCapsDefault`. */
+export type OrgLimitCapsDefaultOrderBy =
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC';
+/** Methods to use when ordering `OrgLimitCredit`. */
+export type OrgLimitCreditOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'AMOUNT_ASC'
+  | 'AMOUNT_DESC'
+  | 'CREDIT_TYPE_ASC'
+  | 'CREDIT_TYPE_DESC'
+  | 'DEFAULT_LIMIT_ID_ASC'
+  | 'DEFAULT_LIMIT_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
   | 'ORGANIZATION_ID_ASC'
   | 'ORGANIZATION_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC';
-/** Methods to use when ordering `OrgLimit`. */
-export type OrgLimitOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC';
+/** Methods to use when ordering `OrgLimitDefault`. */
+export type OrgLimitDefaultOrderBy =
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'SOFT_MAX_ASC'
+  | 'SOFT_MAX_DESC';
+/** Methods to use when ordering `OrgLimitEvent`. */
+export type OrgLimitEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DELTA_ASC'
+  | 'DELTA_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'EVENT_TYPE_ASC'
+  | 'EVENT_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_AT_EVENT_ASC'
+  | 'MAX_AT_EVENT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'NUM_AFTER_ASC'
+  | 'NUM_AFTER_DESC'
+  | 'NUM_BEFORE_ASC'
+  | 'NUM_BEFORE_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC';
+/** Methods to use when ordering `OrgLimit`. */
+export type OrgLimitOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ENTITY_TYPE_ASC'
+  | 'ENTITY_TYPE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'NUM_ASC'
+  | 'NUM_DESC'
+  | 'ORGANIZATION_ID_ASC'
+  | 'ORGANIZATION_ID_DESC'
+  | 'PERIOD_CREDITS_ASC'
+  | 'PERIOD_CREDITS_DESC'
+  | 'PLAN_MAX_ASC'
+  | 'PLAN_MAX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PURCHASED_CREDITS_ASC'
+  | 'PURCHASED_CREDITS_DESC'
+  | 'SOFT_MAX_ASC'
+  | 'SOFT_MAX_DESC'
+  | 'WINDOW_DURATION_ASC'
+  | 'WINDOW_DURATION_DESC'
+  | 'WINDOW_START_ASC'
+  | 'WINDOW_START_DESC';
+/** Methods to use when ordering `OrgLimitWarning`. */
+export type OrgLimitWarningOrderBy =
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'SOFT_MAX_ASC'
-  | 'SOFT_MAX_DESC'
-  | 'WINDOW_START_ASC'
-  | 'WINDOW_START_DESC'
-  | 'WINDOW_DURATION_ASC'
-  | 'WINDOW_DURATION_DESC'
-  | 'PLAN_MAX_ASC'
-  | 'PLAN_MAX_DESC'
-  | 'PURCHASED_CREDITS_ASC'
-  | 'PURCHASED_CREDITS_DESC'
-  | 'PERIOD_CREDITS_ASC'
-  | 'PERIOD_CREDITS_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'ORGANIZATION_ID_ASC'
-  | 'ORGANIZATION_ID_DESC'
-  | 'ENTITY_TYPE_ASC'
-  | 'ENTITY_TYPE_DESC';
-/** A filter to be used against `AppLimitCapsDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitCapsDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `max` field. */
-  max?: BigIntFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitCapsDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitCapsDefaultFilter[];
-  /** Negates the expression. */
-  not?: AppLimitCapsDefaultFilter;
-}
-/** A filter to be used against `OrgLimitCapsDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitCapsDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `max` field. */
-  max?: BigIntFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitCapsDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitCapsDefaultFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitCapsDefaultFilter;
-}
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TASK_IDENTIFIER_ASC'
+  | 'TASK_IDENTIFIER_DESC'
+  | 'THRESHOLD_VALUE_ASC'
+  | 'THRESHOLD_VALUE_DESC'
+  | 'WARNING_TYPE_ASC'
+  | 'WARNING_TYPE_DESC';
 /** A filter to be used against `AppLimitCap` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCapFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `max` field. */
-  max?: BigIntFilter;
   /** Checks for all expressions in this list. */
   and?: AppLimitCapFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitCapFilter[];
-  /** Negates the expression. */
-  not?: AppLimitCapFilter;
-}
-/** A filter to be used against `OrgLimitCap` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitCapFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Filter by the object’s `max` field. */
   max?: BigIntFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitCapFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitCapFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitCapFilter;
-}
-/** A filter to be used against `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitCreditFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `defaultLimitId` field. */
-  defaultLimitId?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `amount` field. */
-  amount?: BigIntFilter;
-  /** Filter by the object’s `creditType` field. */
-  creditType?: StringFilter;
-  /** Filter by the object’s `reason` field. */
-  reason?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitCreditFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitCreditFilter[];
-  /** Negates the expression. */
-  not?: AppLimitCreditFilter;
-  /** Filter by the object’s `defaultLimit` relation. */
-  defaultLimit?: AppLimitDefaultFilter;
-}
-/** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `max` field. */
-  max?: BigIntFilter;
-  /** Filter by the object’s `softMax` field. */
-  softMax?: BigIntFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitDefaultFilter[];
   /** Negates the expression. */
-  not?: AppLimitDefaultFilter;
-  /** Filter by the object’s `appLimitCreditsByDefaultLimitId` relation. */
-  appLimitCreditsByDefaultLimitId?: AppLimitDefaultToManyAppLimitCreditFilter;
-  /** `appLimitCreditsByDefaultLimitId` exist. */
-  appLimitCreditsByDefaultLimitIdExist?: boolean;
-  /** Filter by the object’s `appLimitCreditCodeItemsByDefaultLimitId` relation. */
-  appLimitCreditCodeItemsByDefaultLimitId?: AppLimitDefaultToManyAppLimitCreditCodeItemFilter;
-  /** `appLimitCreditCodeItemsByDefaultLimitId` exist. */
-  appLimitCreditCodeItemsByDefaultLimitIdExist?: boolean;
+  not?: AppLimitCapFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCapFilter[];
 }
-/** A filter to be used against many `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitDefaultToManyAppLimitCreditFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppLimitCreditFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AppLimitCreditFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AppLimitCreditFilter;
+/** An input for mutations affecting `AppLimitCap` */
+export interface AppLimitCapInput {
+  /** Entity this cap override applies to */
+  entityId: string;
+  id?: string;
+  /** Override cap value for this entity */
+  max?: string;
+  /** Name identifier of the cap being overridden */
+  name: string;
 }
-/** A filter to be used against many `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitDefaultToManyAppLimitCreditCodeItemFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppLimitCreditCodeItemFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: AppLimitCreditCodeItemFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: AppLimitCreditCodeItemFilter;
+/** Represents an update to a `AppLimitCap`. Fields that are set will be updated. */
+export interface AppLimitCapPatch {
+  /** Entity this cap override applies to */
+  entityId?: string;
+  id?: string;
+  /** Override cap value for this entity */
+  max?: string;
+  /** Name identifier of the cap being overridden */
+  name?: string;
 }
-/** A filter to be used against `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitCreditCodeItemFilter {
+/** A filter to be used against `AppLimitCapsDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCapsDefaultFilter {
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCapsDefaultFilter[];
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `creditCodeId` field. */
-  creditCodeId?: UUIDFilter;
-  /** Filter by the object’s `defaultLimitId` field. */
-  defaultLimitId?: UUIDFilter;
-  /** Filter by the object’s `amount` field. */
-  amount?: BigIntFilter;
-  /** Filter by the object’s `creditType` field. */
-  creditType?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitCreditCodeItemFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitCreditCodeItemFilter[];
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Negates the expression. */
-  not?: AppLimitCreditCodeItemFilter;
-  /** Filter by the object’s `creditCode` relation. */
-  creditCode?: AppLimitCreditCodeFilter;
-  /** Filter by the object’s `defaultLimit` relation. */
-  defaultLimit?: AppLimitDefaultFilter;
+  not?: AppLimitCapsDefaultFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCapsDefaultFilter[];
+}
+/** An input for mutations affecting `AppLimitCapsDefault` */
+export interface AppLimitCapsDefaultInput {
+  id?: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name: string;
+}
+/** Represents an update to a `AppLimitCapsDefault`. Fields that are set will be updated. */
+export interface AppLimitCapsDefaultPatch {
+  id?: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name?: string;
 }
 /** A filter to be used against `AppLimitCreditCode` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCreditCodeFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `code` field. */
-  code?: StringFilter;
-  /** Filter by the object’s `maxRedemptions` field. */
-  maxRedemptions?: IntFilter;
-  /** Filter by the object’s `currentRedemptions` field. */
-  currentRedemptions?: IntFilter;
-  /** Filter by the object’s `expiresAt` field. */
-  expiresAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
   and?: AppLimitCreditCodeFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitCreditCodeFilter[];
-  /** Negates the expression. */
-  not?: AppLimitCreditCodeFilter;
   /** Filter by the object’s `appLimitCreditCodeItemsByCreditCodeId` relation. */
   appLimitCreditCodeItemsByCreditCodeId?: AppLimitCreditCodeToManyAppLimitCreditCodeItemFilter;
   /** `appLimitCreditCodeItemsByCreditCodeId` exist. */
@@ -570,367 +471,1231 @@ export interface AppLimitCreditCodeFilter {
   appLimitCreditRedemptionsByCreditCodeId?: AppLimitCreditCodeToManyAppLimitCreditRedemptionFilter;
   /** `appLimitCreditRedemptionsByCreditCodeId` exist. */
   appLimitCreditRedemptionsByCreditCodeIdExist?: boolean;
+  /** Filter by the object’s `code` field. */
+  code?: StringFilter;
+  /** Filter by the object’s `currentRedemptions` field. */
+  currentRedemptions?: IntFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `maxRedemptions` field. */
+  maxRedemptions?: IntFilter;
+  /** Negates the expression. */
+  not?: AppLimitCreditCodeFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditCodeFilter[];
+}
+/** An input for mutations affecting `AppLimitCreditCode` */
+export interface AppLimitCreditCodeInput {
+  /** Human-readable credit code (case-insensitive, unique) */
+  code: string;
+  /** Current number of redemptions (incremented by trigger on credit_redemptions) */
+  currentRedemptions?: number;
+  /** Expiration timestamp; NULL for no expiry */
+  expiresAt?: string;
+  id?: string;
+  /** Maximum total redemptions allowed; NULL for unlimited */
+  maxRedemptions?: number;
+}
+/** A filter to be used against `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditCodeItemFilter {
+  /** Filter by the object’s `amount` field. */
+  amount?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCreditCodeItemFilter[];
+  /** Filter by the object’s `creditCode` relation. */
+  creditCode?: AppLimitCreditCodeFilter;
+  /** Filter by the object’s `creditCodeId` field. */
+  creditCodeId?: UUIDFilter;
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Filter by the object’s `defaultLimit` relation. */
+  defaultLimit?: AppLimitDefaultFilter;
+  /** Filter by the object’s `defaultLimitId` field. */
+  defaultLimitId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AppLimitCreditCodeItemFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditCodeItemFilter[];
+}
+/** An input for mutations affecting `AppLimitCreditCodeItem` */
+export interface AppLimitCreditCodeItemInput {
+  /** Number of credits this item grants per redemption */
+  amount: string;
+  /** FK to credit_codes — which code this item belongs to */
+  creditCodeId: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** FK to default_limits — which limit this item grants credits for */
+  defaultLimitId: string;
+  id?: string;
+}
+/** Represents an update to a `AppLimitCreditCodeItem`. Fields that are set will be updated. */
+export interface AppLimitCreditCodeItemPatch {
+  /** Number of credits this item grants per redemption */
+  amount?: string;
+  /** FK to credit_codes — which code this item belongs to */
+  creditCodeId?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** FK to default_limits — which limit this item grants credits for */
+  defaultLimitId?: string;
+  id?: string;
+}
+/** Represents an update to a `AppLimitCreditCode`. Fields that are set will be updated. */
+export interface AppLimitCreditCodePatch {
+  /** Human-readable credit code (case-insensitive, unique) */
+  code?: string;
+  /** Current number of redemptions (incremented by trigger on credit_redemptions) */
+  currentRedemptions?: number;
+  /** Expiration timestamp; NULL for no expiry */
+  expiresAt?: string;
+  id?: string;
+  /** Maximum total redemptions allowed; NULL for unlimited */
+  maxRedemptions?: number;
 }
 /** A filter to be used against many `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCreditCodeToManyAppLimitCreditCodeItemFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppLimitCreditCodeItemFilter;
   /** Filters to entities where every related entity matches. */
   every?: AppLimitCreditCodeItemFilter;
   /** Filters to entities where no related entity matches. */
   none?: AppLimitCreditCodeItemFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditCodeItemFilter;
 }
 /** A filter to be used against many `AppLimitCreditRedemption` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCreditCodeToManyAppLimitCreditRedemptionFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: AppLimitCreditRedemptionFilter;
   /** Filters to entities where every related entity matches. */
   every?: AppLimitCreditRedemptionFilter;
   /** Filters to entities where no related entity matches. */
   none?: AppLimitCreditRedemptionFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditRedemptionFilter;
+}
+/** A filter to be used against `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitCreditFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `amount` field. */
+  amount?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCreditFilter[];
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Filter by the object’s `defaultLimit` relation. */
+  defaultLimit?: AppLimitDefaultFilter;
+  /** Filter by the object’s `defaultLimitId` field. */
+  defaultLimitId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AppLimitCreditFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditFilter[];
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+}
+/** An input for mutations affecting `AppLimitCredit` */
+export interface AppLimitCreditInput {
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  id?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+/** Represents an update to a `AppLimitCredit`. Fields that are set will be updated. */
+export interface AppLimitCreditPatch {
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId?: string;
+  id?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
 }
 /** A filter to be used against `AppLimitCreditRedemption` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitCreditRedemptionFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitCreditRedemptionFilter[];
+  /** Filter by the object’s `creditCode` relation. */
+  creditCode?: AppLimitCreditCodeFilter;
   /** Filter by the object’s `creditCodeId` field. */
   creditCodeId?: UUIDFilter;
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
-  /** Filter by the object’s `organizationId` field. */
-  organizationId?: UUIDFilter;
   /** Filter by the object’s `entityType` field. */
   entityType?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitCreditRedemptionFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitCreditRedemptionFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Negates the expression. */
   not?: AppLimitCreditRedemptionFilter;
-  /** Filter by the object’s `creditCode` relation. */
-  creditCode?: AppLimitCreditCodeFilter;
-}
-/** A filter to be used against `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitCreditFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `defaultLimitId` field. */
-  defaultLimitId?: UUIDFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitCreditRedemptionFilter[];
   /** Filter by the object’s `organizationId` field. */
   organizationId?: UUIDFilter;
-  /** Filter by the object’s `entityType` field. */
-  entityType?: StringFilter;
-  /** Filter by the object’s `amount` field. */
-  amount?: BigIntFilter;
-  /** Filter by the object’s `creditType` field. */
-  creditType?: StringFilter;
-  /** Filter by the object’s `reason` field. */
-  reason?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitCreditFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitCreditFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitCreditFilter;
-  /** Filter by the object’s `defaultLimit` relation. */
-  defaultLimit?: OrgLimitDefaultFilter;
 }
-/** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitDefaultFilter {
+/** An input for mutations affecting `AppLimitCreditRedemption` */
+export interface AppLimitCreditRedemptionInput {
+  /** FK to credit_codes — which code is being redeemed */
+  creditCodeId: string;
+  /** Entity receiving the credits (personal org user_id or org entity_id) */
+  entityId: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  id?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+}
+/** Represents an update to a `AppLimitCreditRedemption`. Fields that are set will be updated. */
+export interface AppLimitCreditRedemptionPatch {
+  /** FK to credit_codes — which code is being redeemed */
+  creditCodeId?: string;
+  /** Entity receiving the credits (personal org user_id or org entity_id) */
+  entityId?: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  id?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+}
+/** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitDefaultFilter {
+  /** Checks for all expressions in this list. */
+  and?: AppLimitDefaultFilter[];
+  /** Filter by the object’s `appLimitCreditCodeItemsByDefaultLimitId` relation. */
+  appLimitCreditCodeItemsByDefaultLimitId?: AppLimitDefaultToManyAppLimitCreditCodeItemFilter;
+  /** `appLimitCreditCodeItemsByDefaultLimitId` exist. */
+  appLimitCreditCodeItemsByDefaultLimitIdExist?: boolean;
+  /** Filter by the object’s `appLimitCreditsByDefaultLimitId` relation. */
+  appLimitCreditsByDefaultLimitId?: AppLimitDefaultToManyAppLimitCreditFilter;
+  /** `appLimitCreditsByDefaultLimitId` exist. */
+  appLimitCreditsByDefaultLimitIdExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
   /** Filter by the object’s `max` field. */
   max?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppLimitDefaultFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitDefaultFilter[];
   /** Filter by the object’s `softMax` field. */
   softMax?: BigIntFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitDefaultFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitDefaultFilter;
-  /** Filter by the object’s `orgLimitCreditsByDefaultLimitId` relation. */
-  orgLimitCreditsByDefaultLimitId?: OrgLimitDefaultToManyOrgLimitCreditFilter;
-  /** `orgLimitCreditsByDefaultLimitId` exist. */
-  orgLimitCreditsByDefaultLimitIdExist?: boolean;
 }
-/** A filter to be used against many `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitDefaultToManyOrgLimitCreditFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: OrgLimitCreditFilter;
+/** An input for mutations affecting `AppLimitDefault` */
+export interface AppLimitDefaultInput {
+  id?: string;
+  /** Default maximum usage allowed for this limit */
+  max?: string;
+  /** Name identifier of the limit this default applies to */
+  name: string;
+  /** Default soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+}
+/** Represents an update to a `AppLimitDefault`. Fields that are set will be updated. */
+export interface AppLimitDefaultPatch {
+  id?: string;
+  /** Default maximum usage allowed for this limit */
+  max?: string;
+  /** Name identifier of the limit this default applies to */
+  name?: string;
+  /** Default soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+}
+/** A filter to be used against many `AppLimitCreditCodeItem` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitDefaultToManyAppLimitCreditCodeItemFilter {
   /** Filters to entities where every related entity matches. */
-  every?: OrgLimitCreditFilter;
+  every?: AppLimitCreditCodeItemFilter;
   /** Filters to entities where no related entity matches. */
-  none?: OrgLimitCreditFilter;
+  none?: AppLimitCreditCodeItemFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditCodeItemFilter;
 }
-/** A filter to be used against `AppLimitWarning` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitWarningFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `warningType` field. */
-  warningType?: StringFilter;
-  /** Filter by the object’s `thresholdValue` field. */
-  thresholdValue?: BigIntFilter;
-  /** Filter by the object’s `taskIdentifier` field. */
-  taskIdentifier?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitWarningFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitWarningFilter[];
-  /** Negates the expression. */
-  not?: AppLimitWarningFilter;
-}
-/** A filter to be used against `OrgLimitWarning` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitWarningFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `warningType` field. */
-  warningType?: StringFilter;
-  /** Filter by the object’s `thresholdValue` field. */
-  thresholdValue?: BigIntFilter;
-  /** Filter by the object’s `taskIdentifier` field. */
-  taskIdentifier?: StringFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitWarningFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitWarningFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitWarningFilter;
+/** A filter to be used against many `AppLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitDefaultToManyAppLimitCreditFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitCreditFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitCreditFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitCreditFilter;
 }
 /** A filter to be used against `AppLimitEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitEventFilter {
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `organizationId` field. */
-  organizationId?: UUIDFilter;
-  /** Filter by the object’s `entityType` field. */
-  entityType?: StringFilter;
-  /** Filter by the object’s `eventType` field. */
-  eventType?: StringFilter;
-  /** Filter by the object’s `delta` field. */
-  delta?: BigIntFilter;
-  /** Filter by the object’s `numBefore` field. */
-  numBefore?: BigIntFilter;
-  /** Filter by the object’s `numAfter` field. */
-  numAfter?: BigIntFilter;
-  /** Filter by the object’s `maxAtEvent` field. */
-  maxAtEvent?: BigIntFilter;
-  /** Filter by the object’s `reason` field. */
-  reason?: StringFilter;
   /** Checks for all expressions in this list. */
   and?: AppLimitEventFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitEventFilter[];
-  /** Negates the expression. */
-  not?: AppLimitEventFilter;
-}
-/** A filter to be used against `OrgLimitEvent` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitEventFilter {
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
+  /** Filter by the object’s `delta` field. */
+  delta?: BigIntFilter;
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
-  /** Filter by the object’s `organizationId` field. */
-  organizationId?: UUIDFilter;
   /** Filter by the object’s `entityType` field. */
   entityType?: StringFilter;
   /** Filter by the object’s `eventType` field. */
   eventType?: StringFilter;
-  /** Filter by the object’s `delta` field. */
-  delta?: BigIntFilter;
-  /** Filter by the object’s `numBefore` field. */
-  numBefore?: BigIntFilter;
-  /** Filter by the object’s `numAfter` field. */
-  numAfter?: BigIntFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Filter by the object’s `maxAtEvent` field. */
   maxAtEvent?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppLimitEventFilter;
+  /** Filter by the object’s `numAfter` field. */
+  numAfter?: BigIntFilter;
+  /** Filter by the object’s `numBefore` field. */
+  numBefore?: BigIntFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitEventFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
   /** Filter by the object’s `reason` field. */
   reason?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitEventFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitEventFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitEventFilter;
+}
+/** An input for mutations affecting `AppLimitEvent` */
+export interface AppLimitEventInput {
+  /** User who triggered this event; NULL for system/aggregate events */
+  actorId?: string;
+  createdAt?: string;
+  /** Change amount: positive for increment, negative for decrement */
+  delta?: string;
+  /** Entity this event applies to; NULL for app-level events */
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
+  eventType?: string;
+  /** Unique identifier for each limit event */
+  id?: string;
+  /** Max limit ceiling at the time of this event */
+  maxAtEvent?: string;
+  /** Limit name this event applies to */
+  name?: string;
+  /** Usage count after this event */
+  numAfter?: string;
+  /** Usage count before this event */
+  numBefore?: string;
+  /** Resolved billable organization via get_organization_id; NULL for app-level events */
+  organizationId?: string;
+  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
+  reason?: string;
+}
+/** Represents an update to a `AppLimitEvent`. Fields that are set will be updated. */
+export interface AppLimitEventPatch {
+  /** User who triggered this event; NULL for system/aggregate events */
+  actorId?: string;
+  createdAt?: string;
+  /** Change amount: positive for increment, negative for decrement */
+  delta?: string;
+  /** Entity this event applies to; NULL for app-level events */
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
+  eventType?: string;
+  /** Unique identifier for each limit event */
+  id?: string;
+  /** Max limit ceiling at the time of this event */
+  maxAtEvent?: string;
+  /** Limit name this event applies to */
+  name?: string;
+  /** Usage count after this event */
+  numAfter?: string;
+  /** Usage count before this event */
+  numBefore?: string;
+  /** Resolved billable organization via get_organization_id; NULL for app-level events */
+  organizationId?: string;
+  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
+  reason?: string;
 }
 /** A filter to be used against `AppLimit` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  /** Filter by the object’s `num` field. */
-  num?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitFilter[];
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Filter by the object’s `max` field. */
   max?: BigIntFilter;
-  /** Filter by the object’s `softMax` field. */
-  softMax?: BigIntFilter;
-  /** Filter by the object’s `windowStart` field. */
-  windowStart?: DatetimeFilter;
-  /** Filter by the object’s `windowDuration` field. */
-  windowDuration?: IntervalFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: AppLimitFilter;
+  /** Filter by the object’s `num` field. */
+  num?: BigIntFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `periodCredits` field. */
+  periodCredits?: BigIntFilter;
   /** Filter by the object’s `planMax` field. */
   planMax?: BigIntFilter;
   /** Filter by the object’s `purchasedCredits` field. */
   purchasedCredits?: BigIntFilter;
-  /** Filter by the object’s `periodCredits` field. */
-  periodCredits?: BigIntFilter;
-  /** Filter by the object’s `organizationId` field. */
-  organizationId?: UUIDFilter;
-  /** Filter by the object’s `entityType` field. */
-  entityType?: StringFilter;
+  /** Filter by the object’s `softMax` field. */
+  softMax?: BigIntFilter;
+  /** Filter by the object’s `windowDuration` field. */
+  windowDuration?: IntervalFilter;
+  /** Filter by the object’s `windowStart` field. */
+  windowStart?: DatetimeFilter;
+}
+/** An input for mutations affecting `AppLimit` */
+export interface AppLimitInput {
+  /** User whose usage is being tracked against this limit */
+  actorId: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+}
+/** Represents an update to a `AppLimit`. Fields that are set will be updated. */
+export interface AppLimitPatch {
+  /** User whose usage is being tracked against this limit */
+  actorId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+}
+/** A filter to be used against `AppLimitWarning` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitWarningFilter {
   /** Checks for all expressions in this list. */
-  and?: AppLimitFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitFilter[];
+  and?: AppLimitWarningFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Negates the expression. */
-  not?: AppLimitFilter;
+  not?: AppLimitWarningFilter;
+  /** Checks for any expressions in this list. */
+  or?: AppLimitWarningFilter[];
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+  /** Filter by the object’s `thresholdValue` field. */
+  thresholdValue?: BigIntFilter;
+  /** Filter by the object’s `warningType` field. */
+  warningType?: StringFilter;
+}
+/** An input for mutations affecting `AppLimitWarning` */
+export interface AppLimitWarningInput {
+  id?: string;
+  /** Limit name this warning applies to (must match a default_limits entry) */
+  name: string;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier: string;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue: string;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType: string;
+}
+/** Represents an update to a `AppLimitWarning`. Fields that are set will be updated. */
+export interface AppLimitWarningPatch {
+  id?: string;
+  /** Limit name this warning applies to (must match a default_limits entry) */
+  name?: string;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier?: string;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue?: string;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType?: string;
+}
+export interface CreateAppLimitCapInput {
+  /** The `AppLimitCap` to be created by this mutation. */
+  appLimitCap: AppLimitCapInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitCapsDefaultInput {
+  /** The `AppLimitCapsDefault` to be created by this mutation. */
+  appLimitCapsDefault: AppLimitCapsDefaultInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitCreditCodeInput {
+  /** The `AppLimitCreditCode` to be created by this mutation. */
+  appLimitCreditCode: AppLimitCreditCodeInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitCreditCodeItemInput {
+  /** The `AppLimitCreditCodeItem` to be created by this mutation. */
+  appLimitCreditCodeItem: AppLimitCreditCodeItemInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitCreditInput {
+  /** The `AppLimitCredit` to be created by this mutation. */
+  appLimitCredit: AppLimitCreditInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitCreditRedemptionInput {
+  /** The `AppLimitCreditRedemption` to be created by this mutation. */
+  appLimitCreditRedemption: AppLimitCreditRedemptionInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitDefaultInput {
+  /** The `AppLimitDefault` to be created by this mutation. */
+  appLimitDefault: AppLimitDefaultInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitEventInput {
+  /** The `AppLimitEvent` to be created by this mutation. */
+  appLimitEvent: AppLimitEventInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitInput {
+  /** The `AppLimit` to be created by this mutation. */
+  appLimit: AppLimitInput;
+  clientMutationId?: string;
+}
+export interface CreateAppLimitWarningInput {
+  /** The `AppLimitWarning` to be created by this mutation. */
+  appLimitWarning: AppLimitWarningInput;
+  clientMutationId?: string;
+}
+export interface CreateOrgLimitAggregateInput {
+  clientMutationId?: string;
+  /** The `OrgLimitAggregate` to be created by this mutation. */
+  orgLimitAggregate: OrgLimitAggregateInput;
+}
+export interface CreateOrgLimitCapInput {
+  clientMutationId?: string;
+  /** The `OrgLimitCap` to be created by this mutation. */
+  orgLimitCap: OrgLimitCapInput;
+}
+export interface CreateOrgLimitCapsDefaultInput {
+  clientMutationId?: string;
+  /** The `OrgLimitCapsDefault` to be created by this mutation. */
+  orgLimitCapsDefault: OrgLimitCapsDefaultInput;
+}
+export interface CreateOrgLimitCreditInput {
+  clientMutationId?: string;
+  /** The `OrgLimitCredit` to be created by this mutation. */
+  orgLimitCredit: OrgLimitCreditInput;
+}
+export interface CreateOrgLimitDefaultInput {
+  clientMutationId?: string;
+  /** The `OrgLimitDefault` to be created by this mutation. */
+  orgLimitDefault: OrgLimitDefaultInput;
+}
+export interface CreateOrgLimitEventInput {
+  clientMutationId?: string;
+  /** The `OrgLimitEvent` to be created by this mutation. */
+  orgLimitEvent: OrgLimitEventInput;
+}
+export interface CreateOrgLimitInput {
+  clientMutationId?: string;
+  /** The `OrgLimit` to be created by this mutation. */
+  orgLimit: OrgLimitInput;
+}
+export interface CreateOrgLimitWarningInput {
+  clientMutationId?: string;
+  /** The `OrgLimitWarning` to be created by this mutation. */
+  orgLimitWarning: OrgLimitWarningInput;
+}
+export interface DeleteAppLimitCapInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitCapsDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitCreditCodeInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitCreditCodeItemInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitCreditRedemptionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitEventInput {
+  clientMutationId?: string;
+  createdAt: string;
+  /** Unique identifier for each limit event */
+  id: string;
+}
+export interface DeleteAppLimitInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLimitWarningInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitAggregateInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitCapInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitCapsDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitCreditInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitEventInput {
+  clientMutationId?: string;
+  createdAt: string;
+  /** Unique identifier for each limit event */
+  id: string;
+}
+export interface DeleteOrgLimitInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgLimitWarningInput {
+  clientMutationId?: string;
+  id: string;
 }
 /** A filter to be used against Interval fields. All fields are combined with a logical ‘and.’ */
 export interface IntervalFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: IntervalInput;
-  /** Not equal to the specified value. */
-  notEqualTo?: IntervalInput;
   /** Not equal to the specified value, treating null like an ordinary value. */
   distinctFrom?: IntervalInput;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: IntervalInput;
-  /** Included in the specified list. */
-  in?: IntervalInput[];
-  /** Not included in the specified list. */
-  notIn?: IntervalInput[];
-  /** Less than the specified value. */
-  lessThan?: IntervalInput;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: IntervalInput;
+  /** Equal to the specified value. */
+  equalTo?: IntervalInput;
   /** Greater than the specified value. */
   greaterThan?: IntervalInput;
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: IntervalInput;
+  /** Included in the specified list. */
+  in?: IntervalInput[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: IntervalInput;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: IntervalInput;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: IntervalInput;
+  /** Not equal to the specified value. */
+  notEqualTo?: IntervalInput;
+  /** Not included in the specified list. */
+  notIn?: IntervalInput[];
 }
 /** An interval of time that has passed where the smallest distinct unit is a second. */
 export interface IntervalInput {
+  /** A quantity of days. */
+  days?: number;
+  /** A quantity of hours. */
+  hours?: number;
+  /** A quantity of minutes. */
+  minutes?: number;
+  /** A quantity of months. */
+  months?: number;
   /**
    * A quantity of seconds. This is the only non-integer field, as all the other
    * fields will dump their overflow into a smaller unit of time. Intervals don’t
    * have a smaller unit than seconds.
    */
   seconds?: number;
-  /** A quantity of minutes. */
-  minutes?: number;
-  /** A quantity of hours. */
-  hours?: number;
-  /** A quantity of days. */
-  days?: number;
-  /** A quantity of months. */
-  months?: number;
   /** A quantity of years. */
   years?: number;
 }
 /** A filter to be used against `OrgLimitAggregate` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgLimitAggregateFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitAggregateFilter[];
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
-  /** Filter by the object’s `num` field. */
-  num?: BigIntFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Filter by the object’s `max` field. */
   max?: BigIntFilter;
-  /** Filter by the object’s `softMax` field. */
-  softMax?: BigIntFilter;
-  /** Filter by the object’s `windowStart` field. */
-  windowStart?: DatetimeFilter;
-  /** Filter by the object’s `windowDuration` field. */
-  windowDuration?: IntervalFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: OrgLimitAggregateFilter;
+  /** Filter by the object’s `num` field. */
+  num?: BigIntFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitAggregateFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `periodCredits` field. */
+  periodCredits?: BigIntFilter;
   /** Filter by the object’s `planMax` field. */
   planMax?: BigIntFilter;
   /** Filter by the object’s `purchasedCredits` field. */
   purchasedCredits?: BigIntFilter;
-  /** Filter by the object’s `periodCredits` field. */
-  periodCredits?: BigIntFilter;
   /** Filter by the object’s `reserved` field. */
   reserved?: BigIntFilter;
-  /** Filter by the object’s `organizationId` field. */
-  organizationId?: UUIDFilter;
+  /** Filter by the object’s `softMax` field. */
+  softMax?: BigIntFilter;
+  /** Filter by the object’s `windowDuration` field. */
+  windowDuration?: IntervalFilter;
+  /** Filter by the object’s `windowStart` field. */
+  windowStart?: DatetimeFilter;
+}
+/** An input for mutations affecting `OrgLimitAggregate` */
+export interface OrgLimitAggregateInput {
+  /** Entity (org) whose aggregate usage is being tracked */
+  entityId: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Maximum allowed aggregate usage; negative means unlimited */
+  max?: string;
+  /** Name identifier of the aggregate limit being tracked */
+  name?: string;
+  /** Current aggregate usage count for this entity and limit */
+  num?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
+  reserved?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+}
+/** Represents an update to a `OrgLimitAggregate`. Fields that are set will be updated. */
+export interface OrgLimitAggregatePatch {
+  /** Entity (org) whose aggregate usage is being tracked */
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Maximum allowed aggregate usage; negative means unlimited */
+  max?: string;
+  /** Name identifier of the aggregate limit being tracked */
+  name?: string;
+  /** Current aggregate usage count for this entity and limit */
+  num?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
+  reserved?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+}
+/** A filter to be used against `OrgLimitCap` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitCapFilter {
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitCapFilter[];
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: OrgLimitCapFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitCapFilter[];
+}
+/** An input for mutations affecting `OrgLimitCap` */
+export interface OrgLimitCapInput {
+  /** Entity this cap override applies to */
+  entityId: string;
+  id?: string;
+  /** Override cap value for this entity */
+  max?: string;
+  /** Name identifier of the cap being overridden */
+  name: string;
+}
+/** Represents an update to a `OrgLimitCap`. Fields that are set will be updated. */
+export interface OrgLimitCapPatch {
+  /** Entity this cap override applies to */
+  entityId?: string;
+  id?: string;
+  /** Override cap value for this entity */
+  max?: string;
+  /** Name identifier of the cap being overridden */
+  name?: string;
+}
+/** A filter to be used against `OrgLimitCapsDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitCapsDefaultFilter {
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitCapsDefaultFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: OrgLimitCapsDefaultFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitCapsDefaultFilter[];
+}
+/** An input for mutations affecting `OrgLimitCapsDefault` */
+export interface OrgLimitCapsDefaultInput {
+  id?: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name: string;
+}
+/** Represents an update to a `OrgLimitCapsDefault`. Fields that are set will be updated. */
+export interface OrgLimitCapsDefaultPatch {
+  id?: string;
+  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
+  max?: string;
+  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
+  name?: string;
+}
+/** A filter to be used against `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitCreditFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `amount` field. */
+  amount?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitCreditFilter[];
+  /** Filter by the object’s `creditType` field. */
+  creditType?: StringFilter;
+  /** Filter by the object’s `defaultLimit` relation. */
+  defaultLimit?: OrgLimitDefaultFilter;
+  /** Filter by the object’s `defaultLimitId` field. */
+  defaultLimitId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
   /** Filter by the object’s `entityType` field. */
   entityType?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitAggregateFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitAggregateFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Negates the expression. */
-  not?: OrgLimitAggregateFilter;
+  not?: OrgLimitCreditFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitCreditFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+}
+/** An input for mutations affecting `OrgLimitCredit` */
+export interface OrgLimitCreditInput {
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId: string;
+  /** Entity this credit applies to; NULL for actor-only credits */
+  entityId?: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  id?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+/** Represents an update to a `OrgLimitCredit`. Fields that are set will be updated. */
+export interface OrgLimitCreditPatch {
+  /** User this credit is for; NULL for aggregate entity-level credits */
+  actorId?: string;
+  /** Number of credits to grant (positive to add, negative to revoke) */
+  amount?: string;
+  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
+  creditType?: string;
+  /** FK to default_limits — which limit definition this credit applies to */
+  defaultLimitId?: string;
+  /** Entity this credit applies to; NULL for actor-only credits */
+  entityId?: string;
+  /** Membership prefix identifying the entity kind (org, team, app) */
+  entityType?: string;
+  id?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
+  reason?: string;
+}
+/** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitDefaultFilter {
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitDefaultFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `max` field. */
+  max?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: OrgLimitDefaultFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitDefaultFilter[];
+  /** Filter by the object’s `orgLimitCreditsByDefaultLimitId` relation. */
+  orgLimitCreditsByDefaultLimitId?: OrgLimitDefaultToManyOrgLimitCreditFilter;
+  /** `orgLimitCreditsByDefaultLimitId` exist. */
+  orgLimitCreditsByDefaultLimitIdExist?: boolean;
+  /** Filter by the object’s `softMax` field. */
+  softMax?: BigIntFilter;
+}
+/** An input for mutations affecting `OrgLimitDefault` */
+export interface OrgLimitDefaultInput {
+  id?: string;
+  /** Default maximum usage allowed for this limit */
+  max?: string;
+  /** Name identifier of the limit this default applies to */
+  name: string;
+  /** Default soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+}
+/** Represents an update to a `OrgLimitDefault`. Fields that are set will be updated. */
+export interface OrgLimitDefaultPatch {
+  id?: string;
+  /** Default maximum usage allowed for this limit */
+  max?: string;
+  /** Name identifier of the limit this default applies to */
+  name?: string;
+  /** Default soft limit threshold for warnings; NULL means no soft limit */
+  softMax?: string;
+}
+/** A filter to be used against many `OrgLimitCredit` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitDefaultToManyOrgLimitCreditFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: OrgLimitCreditFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgLimitCreditFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgLimitCreditFilter;
+}
+/** A filter to be used against `OrgLimitEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `delta` field. */
+  delta?: BigIntFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `eventType` field. */
+  eventType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `maxAtEvent` field. */
+  maxAtEvent?: BigIntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: OrgLimitEventFilter;
+  /** Filter by the object’s `numAfter` field. */
+  numAfter?: BigIntFilter;
+  /** Filter by the object’s `numBefore` field. */
+  numBefore?: BigIntFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitEventFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+}
+/** An input for mutations affecting `OrgLimitEvent` */
+export interface OrgLimitEventInput {
+  /** User who triggered this event; NULL for system/aggregate events */
+  actorId?: string;
+  createdAt?: string;
+  /** Change amount: positive for increment, negative for decrement */
+  delta?: string;
+  /** Entity this event applies to; NULL for app-level events */
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
+  eventType?: string;
+  /** Unique identifier for each limit event */
+  id?: string;
+  /** Max limit ceiling at the time of this event */
+  maxAtEvent?: string;
+  /** Limit name this event applies to */
+  name?: string;
+  /** Usage count after this event */
+  numAfter?: string;
+  /** Usage count before this event */
+  numBefore?: string;
+  /** Resolved billable organization via get_organization_id; NULL for app-level events */
+  organizationId?: string;
+  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
+  reason?: string;
+}
+/** Represents an update to a `OrgLimitEvent`. Fields that are set will be updated. */
+export interface OrgLimitEventPatch {
+  /** User who triggered this event; NULL for system/aggregate events */
+  actorId?: string;
+  createdAt?: string;
+  /** Change amount: positive for increment, negative for decrement */
+  delta?: string;
+  /** Entity this event applies to; NULL for app-level events */
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
+  eventType?: string;
+  /** Unique identifier for each limit event */
+  id?: string;
+  /** Max limit ceiling at the time of this event */
+  maxAtEvent?: string;
+  /** Limit name this event applies to */
+  name?: string;
+  /** Usage count after this event */
+  numAfter?: string;
+  /** Usage count before this event */
+  numBefore?: string;
+  /** Resolved billable organization via get_organization_id; NULL for app-level events */
+  organizationId?: string;
+  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
+  reason?: string;
 }
 /** A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgLimitFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  /** Filter by the object’s `num` field. */
-  num?: BigIntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitFilter[];
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `entityType` field. */
+  entityType?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
   /** Filter by the object’s `max` field. */
   max?: BigIntFilter;
-  /** Filter by the object’s `softMax` field. */
-  softMax?: BigIntFilter;
-  /** Filter by the object’s `windowStart` field. */
-  windowStart?: DatetimeFilter;
-  /** Filter by the object’s `windowDuration` field. */
-  windowDuration?: IntervalFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: OrgLimitFilter;
+  /** Filter by the object’s `num` field. */
+  num?: BigIntFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitFilter[];
+  /** Filter by the object’s `organizationId` field. */
+  organizationId?: UUIDFilter;
+  /** Filter by the object’s `periodCredits` field. */
+  periodCredits?: BigIntFilter;
   /** Filter by the object’s `planMax` field. */
   planMax?: BigIntFilter;
   /** Filter by the object’s `purchasedCredits` field. */
   purchasedCredits?: BigIntFilter;
-  /** Filter by the object’s `periodCredits` field. */
-  periodCredits?: BigIntFilter;
+  /** Filter by the object’s `softMax` field. */
+  softMax?: BigIntFilter;
+  /** Filter by the object’s `windowDuration` field. */
+  windowDuration?: IntervalFilter;
+  /** Filter by the object’s `windowStart` field. */
+  windowStart?: DatetimeFilter;
+}
+/** An input for mutations affecting `OrgLimit` */
+export interface OrgLimitInput {
+  /** User whose usage is being tracked against this limit */
+  actorId: string;
+  entityId: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+}
+/** Represents an update to a `OrgLimit`. Fields that are set will be updated. */
+export interface OrgLimitPatch {
+  /** User whose usage is being tracked against this limit */
+  actorId?: string;
+  entityId?: string;
+  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
+  entityType?: string;
+  id?: string;
+  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
+  max?: string;
+  /** Name identifier of the limit being tracked */
+  name?: string;
+  /** Current usage count for this actor and limit */
+  num?: string;
+  /** Resolved billable organization via get_organization_id */
+  organizationId?: string;
+  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
+  periodCredits?: string;
+  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
+  planMax?: string;
+  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
+  purchasedCredits?: string;
+  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
+  softMax?: string;
+  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
+  windowDuration?: IntervalInput;
+  /** Start of the current metering window; NULL means no time window */
+  windowStart?: string;
+}
+/** A filter to be used against `OrgLimitWarning` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitWarningFilter {
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitWarningFilter[];
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
-  /** Filter by the object’s `organizationId` field. */
-  organizationId?: UUIDFilter;
-  /** Filter by the object’s `entityType` field. */
-  entityType?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitFilter[];
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Negates the expression. */
-  not?: OrgLimitFilter;
+  not?: OrgLimitWarningFilter;
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitWarningFilter[];
+  /** Filter by the object’s `taskIdentifier` field. */
+  taskIdentifier?: StringFilter;
+  /** Filter by the object’s `thresholdValue` field. */
+  thresholdValue?: BigIntFilter;
+  /** Filter by the object’s `warningType` field. */
+  warningType?: StringFilter;
+}
+/** An input for mutations affecting `OrgLimitWarning` */
+export interface OrgLimitWarningInput {
+  /** Per-entity override (NULL = scope default for all entities) */
+  entityId?: string;
+  id?: string;
+  /** Limit name this warning applies to (must match a default_limits entry) */
+  name: string;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier: string;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue: string;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType: string;
+}
+/** Represents an update to a `OrgLimitWarning`. Fields that are set will be updated. */
+export interface OrgLimitWarningPatch {
+  /** Per-entity override (NULL = scope default for all entities) */
+  entityId?: string;
+  id?: string;
+  /** Limit name this warning applies to (must match a default_limits entry) */
+  name?: string;
+  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
+  taskIdentifier?: string;
+  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
+  thresholdValue?: string;
+  /** Threshold type: absolute (fixed count) or percentage (of max) */
+  warningType?: string;
+}
+export interface ProvisionBucketInput {
+  /** The logical bucket key (e.g., "public", "private") */
+  bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped bucket provisioning.
+   * Omit for app-level (database-wide) storage.
+   */
+  ownerId?: string;
 }
 export interface SeedAppLimitCapsDefaultsInput {
   clientMutationId?: string;
@@ -948,434 +1713,73 @@ export interface SeedOrgLimitDefaultsInput {
   clientMutationId?: string;
   defaults?: unknown;
 }
-export interface CreateAppLimitCapsDefaultInput {
-  clientMutationId?: string;
-  /** The `AppLimitCapsDefault` to be created by this mutation. */
-  appLimitCapsDefault: AppLimitCapsDefaultInput;
-}
-/** An input for mutations affecting `AppLimitCapsDefault` */
-export interface AppLimitCapsDefaultInput {
-  id?: string;
-  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
-  name: string;
-  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
-  max?: string;
-}
-export interface CreateOrgLimitCapsDefaultInput {
-  clientMutationId?: string;
-  /** The `OrgLimitCapsDefault` to be created by this mutation. */
-  orgLimitCapsDefault: OrgLimitCapsDefaultInput;
-}
-/** An input for mutations affecting `OrgLimitCapsDefault` */
-export interface OrgLimitCapsDefaultInput {
-  id?: string;
-  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
-  name: string;
-  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
-  max?: string;
-}
-export interface CreateAppLimitCapInput {
-  clientMutationId?: string;
-  /** The `AppLimitCap` to be created by this mutation. */
-  appLimitCap: AppLimitCapInput;
-}
-/** An input for mutations affecting `AppLimitCap` */
-export interface AppLimitCapInput {
-  id?: string;
-  /** Name identifier of the cap being overridden */
-  name: string;
-  /** Entity this cap override applies to */
-  entityId: string;
-  /** Override cap value for this entity */
-  max?: string;
-}
-export interface CreateOrgLimitCapInput {
-  clientMutationId?: string;
-  /** The `OrgLimitCap` to be created by this mutation. */
-  orgLimitCap: OrgLimitCapInput;
-}
-/** An input for mutations affecting `OrgLimitCap` */
-export interface OrgLimitCapInput {
-  id?: string;
-  /** Name identifier of the cap being overridden */
-  name: string;
-  /** Entity this cap override applies to */
-  entityId: string;
-  /** Override cap value for this entity */
-  max?: string;
-}
-export interface CreateAppLimitDefaultInput {
-  clientMutationId?: string;
-  /** The `AppLimitDefault` to be created by this mutation. */
-  appLimitDefault: AppLimitDefaultInput;
-}
-/** An input for mutations affecting `AppLimitDefault` */
-export interface AppLimitDefaultInput {
-  id?: string;
-  /** Name identifier of the limit this default applies to */
-  name: string;
-  /** Default maximum usage allowed for this limit */
-  max?: string;
-  /** Default soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-}
-export interface CreateOrgLimitDefaultInput {
-  clientMutationId?: string;
-  /** The `OrgLimitDefault` to be created by this mutation. */
-  orgLimitDefault: OrgLimitDefaultInput;
-}
-/** An input for mutations affecting `OrgLimitDefault` */
-export interface OrgLimitDefaultInput {
-  id?: string;
-  /** Name identifier of the limit this default applies to */
-  name: string;
-  /** Default maximum usage allowed for this limit */
-  max?: string;
-  /** Default soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-}
-export interface CreateAppLimitCreditRedemptionInput {
-  clientMutationId?: string;
-  /** The `AppLimitCreditRedemption` to be created by this mutation. */
-  appLimitCreditRedemption: AppLimitCreditRedemptionInput;
-}
-/** An input for mutations affecting `AppLimitCreditRedemption` */
-export interface AppLimitCreditRedemptionInput {
-  id?: string;
-  /** FK to credit_codes — which code is being redeemed */
-  creditCodeId: string;
-  /** Entity receiving the credits (personal org user_id or org entity_id) */
-  entityId: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Membership prefix identifying the entity kind (org, team, app) */
-  entityType?: string;
-}
-export interface CreateAppLimitCreditCodeItemInput {
-  clientMutationId?: string;
-  /** The `AppLimitCreditCodeItem` to be created by this mutation. */
-  appLimitCreditCodeItem: AppLimitCreditCodeItemInput;
-}
-/** An input for mutations affecting `AppLimitCreditCodeItem` */
-export interface AppLimitCreditCodeItemInput {
-  id?: string;
-  /** FK to credit_codes — which code this item belongs to */
-  creditCodeId: string;
-  /** FK to default_limits — which limit this item grants credits for */
-  defaultLimitId: string;
-  /** Number of credits this item grants per redemption */
-  amount: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-}
-export interface CreateAppLimitWarningInput {
-  clientMutationId?: string;
-  /** The `AppLimitWarning` to be created by this mutation. */
-  appLimitWarning: AppLimitWarningInput;
-}
-/** An input for mutations affecting `AppLimitWarning` */
-export interface AppLimitWarningInput {
-  id?: string;
-  /** Limit name this warning applies to (must match a default_limits entry) */
-  name: string;
-  /** Threshold type: absolute (fixed count) or percentage (of max) */
-  warningType: string;
-  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
-  thresholdValue: string;
-  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
-  taskIdentifier: string;
-}
-export interface CreateAppLimitCreditInput {
-  clientMutationId?: string;
-  /** The `AppLimitCredit` to be created by this mutation. */
-  appLimitCredit: AppLimitCreditInput;
-}
-/** An input for mutations affecting `AppLimitCredit` */
-export interface AppLimitCreditInput {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
-}
-export interface CreateOrgLimitWarningInput {
-  clientMutationId?: string;
-  /** The `OrgLimitWarning` to be created by this mutation. */
-  orgLimitWarning: OrgLimitWarningInput;
-}
-/** An input for mutations affecting `OrgLimitWarning` */
-export interface OrgLimitWarningInput {
-  id?: string;
-  /** Limit name this warning applies to (must match a default_limits entry) */
-  name: string;
-  /** Threshold type: absolute (fixed count) or percentage (of max) */
-  warningType: string;
-  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
-  thresholdValue: string;
-  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
-  taskIdentifier: string;
-  /** Per-entity override (NULL = scope default for all entities) */
-  entityId?: string;
-}
-export interface CreateOrgLimitCreditInput {
-  clientMutationId?: string;
-  /** The `OrgLimitCredit` to be created by this mutation. */
-  orgLimitCredit: OrgLimitCreditInput;
-}
-/** An input for mutations affecting `OrgLimitCredit` */
-export interface OrgLimitCreditInput {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Entity this credit applies to; NULL for actor-only credits */
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Membership prefix identifying the entity kind (org, team, app) */
-  entityType?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
-}
-export interface CreateAppLimitCreditCodeInput {
-  clientMutationId?: string;
-  /** The `AppLimitCreditCode` to be created by this mutation. */
-  appLimitCreditCode: AppLimitCreditCodeInput;
-}
-/** An input for mutations affecting `AppLimitCreditCode` */
-export interface AppLimitCreditCodeInput {
-  id?: string;
-  /** Human-readable credit code (case-insensitive, unique) */
-  code: string;
-  /** Maximum total redemptions allowed; NULL for unlimited */
-  maxRedemptions?: number;
-  /** Current number of redemptions (incremented by trigger on credit_redemptions) */
-  currentRedemptions?: number;
-  /** Expiration timestamp; NULL for no expiry */
-  expiresAt?: string;
-}
-export interface CreateAppLimitEventInput {
-  clientMutationId?: string;
-  /** The `AppLimitEvent` to be created by this mutation. */
-  appLimitEvent: AppLimitEventInput;
-}
-/** An input for mutations affecting `AppLimitEvent` */
-export interface AppLimitEventInput {
-  createdAt?: string;
-  /** Unique identifier for each limit event */
-  id?: string;
-  /** Limit name this event applies to */
-  name?: string;
-  /** User who triggered this event; NULL for system/aggregate events */
-  actorId?: string;
-  /** Entity this event applies to; NULL for app-level events */
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id; NULL for app-level events */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
-  eventType?: string;
-  /** Change amount: positive for increment, negative for decrement */
-  delta?: string;
-  /** Usage count before this event */
-  numBefore?: string;
-  /** Usage count after this event */
-  numAfter?: string;
-  /** Max limit ceiling at the time of this event */
-  maxAtEvent?: string;
-  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
-  reason?: string;
-}
-export interface CreateOrgLimitEventInput {
-  clientMutationId?: string;
-  /** The `OrgLimitEvent` to be created by this mutation. */
-  orgLimitEvent: OrgLimitEventInput;
-}
-/** An input for mutations affecting `OrgLimitEvent` */
-export interface OrgLimitEventInput {
-  createdAt?: string;
-  /** Unique identifier for each limit event */
-  id?: string;
-  /** Limit name this event applies to */
-  name?: string;
-  /** User who triggered this event; NULL for system/aggregate events */
-  actorId?: string;
-  /** Entity this event applies to; NULL for app-level events */
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id; NULL for app-level events */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
-  eventType?: string;
-  /** Change amount: positive for increment, negative for decrement */
-  delta?: string;
-  /** Usage count before this event */
-  numBefore?: string;
-  /** Usage count after this event */
-  numAfter?: string;
-  /** Max limit ceiling at the time of this event */
-  maxAtEvent?: string;
-  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
-  reason?: string;
-}
-export interface CreateAppLimitInput {
-  clientMutationId?: string;
-  /** The `AppLimit` to be created by this mutation. */
-  appLimit: AppLimitInput;
-}
-/** An input for mutations affecting `AppLimit` */
-export interface AppLimitInput {
-  id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
-  planMax?: string;
-  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
-  purchasedCredits?: string;
-  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
-  periodCredits?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-}
-export interface CreateOrgLimitAggregateInput {
-  clientMutationId?: string;
-  /** The `OrgLimitAggregate` to be created by this mutation. */
-  orgLimitAggregate: OrgLimitAggregateInput;
-}
-/** An input for mutations affecting `OrgLimitAggregate` */
-export interface OrgLimitAggregateInput {
-  id?: string;
-  /** Name identifier of the aggregate limit being tracked */
-  name?: string;
-  /** Entity (org) whose aggregate usage is being tracked */
-  entityId: string;
-  /** Current aggregate usage count for this entity and limit */
-  num?: string;
-  /** Maximum allowed aggregate usage; negative means unlimited */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
-  planMax?: string;
-  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
-  purchasedCredits?: string;
-  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
-  periodCredits?: string;
-  /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
-  reserved?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-}
-export interface CreateOrgLimitInput {
-  clientMutationId?: string;
-  /** The `OrgLimit` to be created by this mutation. */
-  orgLimit: OrgLimitInput;
-}
-/** An input for mutations affecting `OrgLimit` */
-export interface OrgLimitInput {
-  id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
-  planMax?: string;
-  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
-  purchasedCredits?: string;
-  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
-  periodCredits?: string;
-  entityId: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-}
-export interface UpdateAppLimitCapsDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimitCapsDefault` being updated. */
-  appLimitCapsDefaultPatch: AppLimitCapsDefaultPatch;
-}
-/** Represents an update to a `AppLimitCapsDefault`. Fields that are set will be updated. */
-export interface AppLimitCapsDefaultPatch {
-  id?: string;
-  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
-  name?: string;
-  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
-  max?: string;
-}
-export interface UpdateOrgLimitCapsDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgLimitCapsDefault` being updated. */
-  orgLimitCapsDefaultPatch: OrgLimitCapsDefaultPatch;
-}
-/** Represents an update to a `OrgLimitCapsDefault`. Fields that are set will be updated. */
-export interface OrgLimitCapsDefaultPatch {
-  id?: string;
-  /** Name identifier of the cap (e.g. max_file_upload_size, advanced_analytics) */
-  name?: string;
-  /** Default cap value. For feature flags: 0=disabled, 1=enabled. For size caps: the limit in bytes/units. */
-  max?: string;
-}
 export interface UpdateAppLimitCapInput {
-  clientMutationId?: string;
-  id: string;
   /** An object where the defined keys will be set on the `AppLimitCap` being updated. */
   appLimitCapPatch: AppLimitCapPatch;
+  clientMutationId?: string;
+  id: string;
 }
-/** Represents an update to a `AppLimitCap`. Fields that are set will be updated. */
-export interface AppLimitCapPatch {
-  id?: string;
-  /** Name identifier of the cap being overridden */
-  name?: string;
-  /** Entity this cap override applies to */
-  entityId?: string;
-  /** Override cap value for this entity */
-  max?: string;
+export interface UpdateAppLimitCapsDefaultInput {
+  /** An object where the defined keys will be set on the `AppLimitCapsDefault` being updated. */
+  appLimitCapsDefaultPatch: AppLimitCapsDefaultPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLimitCreditCodeInput {
+  /** An object where the defined keys will be set on the `AppLimitCreditCode` being updated. */
+  appLimitCreditCodePatch: AppLimitCreditCodePatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLimitCreditCodeItemInput {
+  /** An object where the defined keys will be set on the `AppLimitCreditCodeItem` being updated. */
+  appLimitCreditCodeItemPatch: AppLimitCreditCodeItemPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLimitCreditInput {
+  /** An object where the defined keys will be set on the `AppLimitCredit` being updated. */
+  appLimitCreditPatch: AppLimitCreditPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLimitCreditRedemptionInput {
+  /** An object where the defined keys will be set on the `AppLimitCreditRedemption` being updated. */
+  appLimitCreditRedemptionPatch: AppLimitCreditRedemptionPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLimitDefaultInput {
+  /** An object where the defined keys will be set on the `AppLimitDefault` being updated. */
+  appLimitDefaultPatch: AppLimitDefaultPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLimitEventInput {
+  /** An object where the defined keys will be set on the `AppLimitEvent` being updated. */
+  appLimitEventPatch: AppLimitEventPatch;
+  clientMutationId?: string;
+  createdAt: string;
+  /** Unique identifier for each limit event */
+  id: string;
+}
+export interface UpdateAppLimitInput {
+  /** An object where the defined keys will be set on the `AppLimit` being updated. */
+  appLimitPatch: AppLimitPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAppLimitWarningInput {
+  /** An object where the defined keys will be set on the `AppLimitWarning` being updated. */
+  appLimitWarningPatch: AppLimitWarningPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateOrgLimitAggregateInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgLimitAggregate` being updated. */
+  orgLimitAggregatePatch: OrgLimitAggregatePatch;
 }
 export interface UpdateOrgLimitCapInput {
   clientMutationId?: string;
@@ -1383,141 +1787,11 @@ export interface UpdateOrgLimitCapInput {
   /** An object where the defined keys will be set on the `OrgLimitCap` being updated. */
   orgLimitCapPatch: OrgLimitCapPatch;
 }
-/** Represents an update to a `OrgLimitCap`. Fields that are set will be updated. */
-export interface OrgLimitCapPatch {
-  id?: string;
-  /** Name identifier of the cap being overridden */
-  name?: string;
-  /** Entity this cap override applies to */
-  entityId?: string;
-  /** Override cap value for this entity */
-  max?: string;
-}
-export interface UpdateAppLimitDefaultInput {
+export interface UpdateOrgLimitCapsDefaultInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `AppLimitDefault` being updated. */
-  appLimitDefaultPatch: AppLimitDefaultPatch;
-}
-/** Represents an update to a `AppLimitDefault`. Fields that are set will be updated. */
-export interface AppLimitDefaultPatch {
-  id?: string;
-  /** Name identifier of the limit this default applies to */
-  name?: string;
-  /** Default maximum usage allowed for this limit */
-  max?: string;
-  /** Default soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-}
-export interface UpdateOrgLimitDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgLimitDefault` being updated. */
-  orgLimitDefaultPatch: OrgLimitDefaultPatch;
-}
-/** Represents an update to a `OrgLimitDefault`. Fields that are set will be updated. */
-export interface OrgLimitDefaultPatch {
-  id?: string;
-  /** Name identifier of the limit this default applies to */
-  name?: string;
-  /** Default maximum usage allowed for this limit */
-  max?: string;
-  /** Default soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-}
-export interface UpdateAppLimitCreditRedemptionInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimitCreditRedemption` being updated. */
-  appLimitCreditRedemptionPatch: AppLimitCreditRedemptionPatch;
-}
-/** Represents an update to a `AppLimitCreditRedemption`. Fields that are set will be updated. */
-export interface AppLimitCreditRedemptionPatch {
-  id?: string;
-  /** FK to credit_codes — which code is being redeemed */
-  creditCodeId?: string;
-  /** Entity receiving the credits (personal org user_id or org entity_id) */
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Membership prefix identifying the entity kind (org, team, app) */
-  entityType?: string;
-}
-export interface UpdateAppLimitCreditCodeItemInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimitCreditCodeItem` being updated. */
-  appLimitCreditCodeItemPatch: AppLimitCreditCodeItemPatch;
-}
-/** Represents an update to a `AppLimitCreditCodeItem`. Fields that are set will be updated. */
-export interface AppLimitCreditCodeItemPatch {
-  id?: string;
-  /** FK to credit_codes — which code this item belongs to */
-  creditCodeId?: string;
-  /** FK to default_limits — which limit this item grants credits for */
-  defaultLimitId?: string;
-  /** Number of credits this item grants per redemption */
-  amount?: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-}
-export interface UpdateAppLimitWarningInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimitWarning` being updated. */
-  appLimitWarningPatch: AppLimitWarningPatch;
-}
-/** Represents an update to a `AppLimitWarning`. Fields that are set will be updated. */
-export interface AppLimitWarningPatch {
-  id?: string;
-  /** Limit name this warning applies to (must match a default_limits entry) */
-  name?: string;
-  /** Threshold type: absolute (fixed count) or percentage (of max) */
-  warningType?: string;
-  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
-  thresholdValue?: string;
-  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
-  taskIdentifier?: string;
-}
-export interface UpdateAppLimitCreditInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimitCredit` being updated. */
-  appLimitCreditPatch: AppLimitCreditPatch;
-}
-/** Represents an update to a `AppLimitCredit`. Fields that are set will be updated. */
-export interface AppLimitCreditPatch {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId?: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount?: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
-}
-export interface UpdateOrgLimitWarningInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgLimitWarning` being updated. */
-  orgLimitWarningPatch: OrgLimitWarningPatch;
-}
-/** Represents an update to a `OrgLimitWarning`. Fields that are set will be updated. */
-export interface OrgLimitWarningPatch {
-  id?: string;
-  /** Limit name this warning applies to (must match a default_limits entry) */
-  name?: string;
-  /** Threshold type: absolute (fixed count) or percentage (of max) */
-  warningType?: string;
-  /** Threshold value — either an absolute count or a percentage (1-100) depending on warning_type */
-  thresholdValue?: string;
-  /** Job task name to enqueue when warning fires (e.g. email:limit_warning, notification:approaching_limit) */
-  taskIdentifier?: string;
-  /** Per-entity override (NULL = scope default for all entities) */
-  entityId?: string;
+  /** An object where the defined keys will be set on the `OrgLimitCapsDefault` being updated. */
+  orgLimitCapsDefaultPatch: OrgLimitCapsDefaultPatch;
 }
 export interface UpdateOrgLimitCreditInput {
   clientMutationId?: string;
@@ -1525,79 +1799,11 @@ export interface UpdateOrgLimitCreditInput {
   /** An object where the defined keys will be set on the `OrgLimitCredit` being updated. */
   orgLimitCreditPatch: OrgLimitCreditPatch;
 }
-/** Represents an update to a `OrgLimitCredit`. Fields that are set will be updated. */
-export interface OrgLimitCreditPatch {
-  id?: string;
-  /** FK to default_limits — which limit definition this credit applies to */
-  defaultLimitId?: string;
-  /** User this credit is for; NULL for aggregate entity-level credits */
-  actorId?: string;
-  /** Entity this credit applies to; NULL for actor-only credits */
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Membership prefix identifying the entity kind (org, team, app) */
-  entityType?: string;
-  /** Number of credits to grant (positive to add, negative to revoke) */
-  amount?: string;
-  /** Credit durability: permanent (survives window reset) or period (resets on window expiry) */
-  creditType?: string;
-  /** Optional reason for the credit grant (promo code, admin grant, etc.) */
-  reason?: string;
-}
-export interface UpdateAppLimitCreditCodeInput {
+export interface UpdateOrgLimitDefaultInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `AppLimitCreditCode` being updated. */
-  appLimitCreditCodePatch: AppLimitCreditCodePatch;
-}
-/** Represents an update to a `AppLimitCreditCode`. Fields that are set will be updated. */
-export interface AppLimitCreditCodePatch {
-  id?: string;
-  /** Human-readable credit code (case-insensitive, unique) */
-  code?: string;
-  /** Maximum total redemptions allowed; NULL for unlimited */
-  maxRedemptions?: number;
-  /** Current number of redemptions (incremented by trigger on credit_redemptions) */
-  currentRedemptions?: number;
-  /** Expiration timestamp; NULL for no expiry */
-  expiresAt?: string;
-}
-export interface UpdateAppLimitEventInput {
-  clientMutationId?: string;
-  createdAt: string;
-  /** Unique identifier for each limit event */
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimitEvent` being updated. */
-  appLimitEventPatch: AppLimitEventPatch;
-}
-/** Represents an update to a `AppLimitEvent`. Fields that are set will be updated. */
-export interface AppLimitEventPatch {
-  createdAt?: string;
-  /** Unique identifier for each limit event */
-  id?: string;
-  /** Limit name this event applies to */
-  name?: string;
-  /** User who triggered this event; NULL for system/aggregate events */
-  actorId?: string;
-  /** Entity this event applies to; NULL for app-level events */
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id; NULL for app-level events */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
-  eventType?: string;
-  /** Change amount: positive for increment, negative for decrement */
-  delta?: string;
-  /** Usage count before this event */
-  numBefore?: string;
-  /** Usage count after this event */
-  numAfter?: string;
-  /** Max limit ceiling at the time of this event */
-  maxAtEvent?: string;
-  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
-  reason?: string;
+  /** An object where the defined keys will be set on the `OrgLimitDefault` being updated. */
+  orgLimitDefaultPatch: OrgLimitDefaultPatch;
 }
 export interface UpdateOrgLimitEventInput {
   clientMutationId?: string;
@@ -1607,353 +1813,377 @@ export interface UpdateOrgLimitEventInput {
   /** An object where the defined keys will be set on the `OrgLimitEvent` being updated. */
   orgLimitEventPatch: OrgLimitEventPatch;
 }
-/** Represents an update to a `OrgLimitEvent`. Fields that are set will be updated. */
-export interface OrgLimitEventPatch {
-  createdAt?: string;
-  /** Unique identifier for each limit event */
-  id?: string;
-  /** Limit name this event applies to */
-  name?: string;
-  /** User who triggered this event; NULL for system/aggregate events */
-  actorId?: string;
-  /** Entity this event applies to; NULL for app-level events */
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id; NULL for app-level events */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-  /** Event type: inc, dec, check, modify, transfer, apply_plan, reset */
-  eventType?: string;
-  /** Change amount: positive for increment, negative for decrement */
-  delta?: string;
-  /** Usage count before this event */
-  numBefore?: string;
-  /** Usage count after this event */
-  numAfter?: string;
-  /** Max limit ceiling at the time of this event */
-  maxAtEvent?: string;
-  /** Optional reason or source: achievement, invite, plan_change, purchase, etc. */
-  reason?: string;
-}
-export interface UpdateAppLimitInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLimit` being updated. */
-  appLimitPatch: AppLimitPatch;
-}
-/** Represents an update to a `AppLimit`. Fields that are set will be updated. */
-export interface AppLimitPatch {
-  id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId?: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
-  planMax?: string;
-  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
-  purchasedCredits?: string;
-  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
-  periodCredits?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-}
-export interface UpdateOrgLimitAggregateInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgLimitAggregate` being updated. */
-  orgLimitAggregatePatch: OrgLimitAggregatePatch;
-}
-/** Represents an update to a `OrgLimitAggregate`. Fields that are set will be updated. */
-export interface OrgLimitAggregatePatch {
-  id?: string;
-  /** Name identifier of the aggregate limit being tracked */
-  name?: string;
-  /** Entity (org) whose aggregate usage is being tracked */
-  entityId?: string;
-  /** Current aggregate usage count for this entity and limit */
-  num?: string;
-  /** Maximum allowed aggregate usage; negative means unlimited */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
-  planMax?: string;
-  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
-  purchasedCredits?: string;
-  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
-  periodCredits?: string;
-  /** Capacity reserved by child entities in budgeted allocation mode. Available = max - num - reserved. */
-  reserved?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-}
 export interface UpdateOrgLimitInput {
   clientMutationId?: string;
   id: string;
   /** An object where the defined keys will be set on the `OrgLimit` being updated. */
   orgLimitPatch: OrgLimitPatch;
 }
-/** Represents an update to a `OrgLimit`. Fields that are set will be updated. */
-export interface OrgLimitPatch {
-  id?: string;
-  /** Name identifier of the limit being tracked */
-  name?: string;
-  /** User whose usage is being tracked against this limit */
-  actorId?: string;
-  /** Current usage count for this actor and limit */
-  num?: string;
-  /** Maximum allowed usage; negative means unlimited. Modified by plans, credits, and achievements. */
-  max?: string;
-  /** Soft limit threshold for warnings; NULL means no soft limit. When num >= soft_max, consumers should warn but still allow until max is reached. */
-  softMax?: string;
-  /** Start of the current metering window; NULL means no time window */
-  windowStart?: string;
-  /** Duration of the metering window (e.g. 1 day, 1 month); NULL means no time window */
-  windowDuration?: IntervalInput;
-  /** Ceiling set by the active plan via apply_plan(). Window reset does not change this value. */
-  planMax?: string;
-  /** Permanent credits from purchases, admin grants, or lifetime rewards. Survives window reset. */
-  purchasedCredits?: string;
-  /** Temporary credits for the current billing window. Resets to 0 on window expiry. */
-  periodCredits?: string;
-  entityId?: string;
-  /** Resolved billable organization via get_organization_id */
-  organizationId?: string;
-  /** Entity type prefix (org, team, app, etc.) for interpreting entity_id */
-  entityType?: string;
-}
-export interface DeleteAppLimitCapsDefaultInput {
+export interface UpdateOrgLimitWarningInput {
   clientMutationId?: string;
   id: string;
+  /** An object where the defined keys will be set on the `OrgLimitWarning` being updated. */
+  orgLimitWarningPatch: OrgLimitWarningPatch;
 }
-export interface DeleteOrgLimitCapsDefaultInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitCapInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitCapInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitDefaultInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitDefaultInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitCreditRedemptionInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitCreditCodeItemInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitWarningInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitCreditInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitWarningInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitCreditInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitCreditCodeInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLimitEventInput {
-  clientMutationId?: string;
-  createdAt: string;
-  /** Unique identifier for each limit event */
-  id: string;
-}
-export interface DeleteOrgLimitEventInput {
-  clientMutationId?: string;
-  createdAt: string;
-  /** Unique identifier for each limit event */
-  id: string;
-}
-export interface DeleteAppLimitInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitAggregateInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteOrgLimitInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface ProvisionBucketInput {
-  /** The logical bucket key (e.g., "public", "private") */
-  bucketKey: string;
-  /**
-   * Owner entity ID for entity-scoped bucket provisioning.
-   * Omit for app-level (database-wide) storage.
-   */
-  ownerId?: string;
-}
-/** A connection to a list of `AppLimitCapsDefault` values. */
-export interface AppLimitCapsDefaultConnection {
-  nodes: AppLimitCapsDefault[];
-  edges: AppLimitCapsDefaultEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgLimitCapsDefault` values. */
-export interface OrgLimitCapsDefaultConnection {
-  nodes: OrgLimitCapsDefault[];
-  edges: OrgLimitCapsDefaultEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+/** Root meta schema type */
+export interface MetaSchema {
+  tables: MetaTable[];
 }
 /** A connection to a list of `AppLimitCap` values. */
 export interface AppLimitCapConnection {
-  nodes: AppLimitCap[];
   edges: AppLimitCapEdge[];
+  nodes: AppLimitCap[];
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgLimitCap` values. */
-export interface OrgLimitCapConnection {
-  nodes: OrgLimitCap[];
-  edges: OrgLimitCapEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AppLimitDefault` values. */
-export interface AppLimitDefaultConnection {
-  nodes: AppLimitDefault[];
-  edges: AppLimitDefaultEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgLimitDefault` values. */
-export interface OrgLimitDefaultConnection {
-  nodes: OrgLimitDefault[];
-  edges: OrgLimitDefaultEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AppLimitCreditRedemption` values. */
-export interface AppLimitCreditRedemptionConnection {
-  nodes: AppLimitCreditRedemption[];
-  edges: AppLimitCreditRedemptionEdge[];
+/** A connection to a list of `AppLimitCapsDefault` values. */
+export interface AppLimitCapsDefaultConnection {
+  edges: AppLimitCapsDefaultEdge[];
+  nodes: AppLimitCapsDefault[];
   pageInfo: PageInfo;
   totalCount: number;
 }
 /** A connection to a list of `AppLimitCreditCodeItem` values. */
 export interface AppLimitCreditCodeItemConnection {
-  nodes: AppLimitCreditCodeItem[];
   edges: AppLimitCreditCodeItemEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AppLimitWarning` values. */
-export interface AppLimitWarningConnection {
-  nodes: AppLimitWarning[];
-  edges: AppLimitWarningEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AppLimitCredit` values. */
-export interface AppLimitCreditConnection {
-  nodes: AppLimitCredit[];
-  edges: AppLimitCreditEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgLimitWarning` values. */
-export interface OrgLimitWarningConnection {
-  nodes: OrgLimitWarning[];
-  edges: OrgLimitWarningEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `OrgLimitCredit` values. */
-export interface OrgLimitCreditConnection {
-  nodes: OrgLimitCredit[];
-  edges: OrgLimitCreditEdge[];
+  nodes: AppLimitCreditCodeItem[];
   pageInfo: PageInfo;
   totalCount: number;
 }
 /** A connection to a list of `AppLimitCreditCode` values. */
 export interface AppLimitCreditCodeConnection {
-  nodes: AppLimitCreditCode[];
   edges: AppLimitCreditCodeEdge[];
+  nodes: AppLimitCreditCode[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLimitCreditRedemption` values. */
+export interface AppLimitCreditRedemptionConnection {
+  edges: AppLimitCreditRedemptionEdge[];
+  nodes: AppLimitCreditRedemption[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLimitCredit` values. */
+export interface AppLimitCreditConnection {
+  edges: AppLimitCreditEdge[];
+  nodes: AppLimitCredit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLimitDefault` values. */
+export interface AppLimitDefaultConnection {
+  edges: AppLimitDefaultEdge[];
+  nodes: AppLimitDefault[];
   pageInfo: PageInfo;
   totalCount: number;
 }
 /** A connection to a list of `AppLimitEvent` values. */
 export interface AppLimitEventConnection {
-  nodes: AppLimitEvent[];
   edges: AppLimitEventEdge[];
+  nodes: AppLimitEvent[];
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgLimitEvent` values. */
-export interface OrgLimitEventConnection {
-  nodes: OrgLimitEvent[];
-  edges: OrgLimitEventEdge[];
+/** A connection to a list of `AppLimitWarning` values. */
+export interface AppLimitWarningConnection {
+  edges: AppLimitWarningEdge[];
+  nodes: AppLimitWarning[];
   pageInfo: PageInfo;
   totalCount: number;
 }
 /** A connection to a list of `AppLimit` values. */
 export interface AppLimitConnection {
-  nodes: AppLimit[];
   edges: AppLimitEdge[];
+  nodes: AppLimit[];
   pageInfo: PageInfo;
   totalCount: number;
 }
 /** A connection to a list of `OrgLimitAggregate` values. */
 export interface OrgLimitAggregateConnection {
-  nodes: OrgLimitAggregate[];
   edges: OrgLimitAggregateEdge[];
+  nodes: OrgLimitAggregate[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitCap` values. */
+export interface OrgLimitCapConnection {
+  edges: OrgLimitCapEdge[];
+  nodes: OrgLimitCap[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitCapsDefault` values. */
+export interface OrgLimitCapsDefaultConnection {
+  edges: OrgLimitCapsDefaultEdge[];
+  nodes: OrgLimitCapsDefault[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitCredit` values. */
+export interface OrgLimitCreditConnection {
+  edges: OrgLimitCreditEdge[];
+  nodes: OrgLimitCredit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitDefault` values. */
+export interface OrgLimitDefaultConnection {
+  edges: OrgLimitDefaultEdge[];
+  nodes: OrgLimitDefault[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitEvent` values. */
+export interface OrgLimitEventConnection {
+  edges: OrgLimitEventEdge[];
+  nodes: OrgLimitEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgLimitWarning` values. */
+export interface OrgLimitWarningConnection {
+  edges: OrgLimitWarningEdge[];
+  nodes: OrgLimitWarning[];
   pageInfo: PageInfo;
   totalCount: number;
 }
 /** A connection to a list of `OrgLimit` values. */
 export interface OrgLimitConnection {
-  nodes: OrgLimit[];
   edges: OrgLimitEdge[];
+  nodes: OrgLimit[];
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** Root meta schema type */
-export interface MetaSchema {
-  tables: MetaTable[];
+export interface CreateAppLimitPayload {
+  /** The `AppLimit` that was created by this mutation. */
+  appLimit?: AppLimit | null;
+  appLimitEdge?: AppLimitEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitCapPayload {
+  /** The `AppLimitCap` that was created by this mutation. */
+  appLimitCap?: AppLimitCap | null;
+  appLimitCapEdge?: AppLimitCapEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitCapsDefaultPayload {
+  /** The `AppLimitCapsDefault` that was created by this mutation. */
+  appLimitCapsDefault?: AppLimitCapsDefault | null;
+  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitCreditPayload {
+  /** The `AppLimitCredit` that was created by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitCreditCodePayload {
+  /** The `AppLimitCreditCode` that was created by this mutation. */
+  appLimitCreditCode?: AppLimitCreditCode | null;
+  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitCreditCodeItemPayload {
+  /** The `AppLimitCreditCodeItem` that was created by this mutation. */
+  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
+  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitCreditRedemptionPayload {
+  /** The `AppLimitCreditRedemption` that was created by this mutation. */
+  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
+  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitDefaultPayload {
+  /** The `AppLimitDefault` that was created by this mutation. */
+  appLimitDefault?: AppLimitDefault | null;
+  appLimitDefaultEdge?: AppLimitDefaultEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitEventPayload {
+  /** The `AppLimitEvent` that was created by this mutation. */
+  appLimitEvent?: AppLimitEvent | null;
+  appLimitEventEdge?: AppLimitEventEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAppLimitWarningPayload {
+  /** The `AppLimitWarning` that was created by this mutation. */
+  appLimitWarning?: AppLimitWarning | null;
+  appLimitWarningEdge?: AppLimitWarningEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateOrgLimitPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimit` that was created by this mutation. */
+  orgLimit?: OrgLimit | null;
+  orgLimitEdge?: OrgLimitEdge | null;
+}
+export interface CreateOrgLimitAggregatePayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitAggregate` that was created by this mutation. */
+  orgLimitAggregate?: OrgLimitAggregate | null;
+  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+}
+export interface CreateOrgLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCap` that was created by this mutation. */
+  orgLimitCap?: OrgLimitCap | null;
+  orgLimitCapEdge?: OrgLimitCapEdge | null;
+}
+export interface CreateOrgLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCapsDefault` that was created by this mutation. */
+  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
+  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
+}
+export interface CreateOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was created by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
+export interface CreateOrgLimitDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitDefault` that was created by this mutation. */
+  orgLimitDefault?: OrgLimitDefault | null;
+  orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
+}
+export interface CreateOrgLimitEventPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitEvent` that was created by this mutation. */
+  orgLimitEvent?: OrgLimitEvent | null;
+  orgLimitEventEdge?: OrgLimitEventEdge | null;
+}
+export interface CreateOrgLimitWarningPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitWarning` that was created by this mutation. */
+  orgLimitWarning?: OrgLimitWarning | null;
+  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
+}
+export interface DeleteAppLimitPayload {
+  /** The `AppLimit` that was deleted by this mutation. */
+  appLimit?: AppLimit | null;
+  appLimitEdge?: AppLimitEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitCapPayload {
+  /** The `AppLimitCap` that was deleted by this mutation. */
+  appLimitCap?: AppLimitCap | null;
+  appLimitCapEdge?: AppLimitCapEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitCapsDefaultPayload {
+  /** The `AppLimitCapsDefault` that was deleted by this mutation. */
+  appLimitCapsDefault?: AppLimitCapsDefault | null;
+  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitCreditPayload {
+  /** The `AppLimitCredit` that was deleted by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitCreditCodePayload {
+  /** The `AppLimitCreditCode` that was deleted by this mutation. */
+  appLimitCreditCode?: AppLimitCreditCode | null;
+  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitCreditCodeItemPayload {
+  /** The `AppLimitCreditCodeItem` that was deleted by this mutation. */
+  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
+  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitCreditRedemptionPayload {
+  /** The `AppLimitCreditRedemption` that was deleted by this mutation. */
+  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
+  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitDefaultPayload {
+  /** The `AppLimitDefault` that was deleted by this mutation. */
+  appLimitDefault?: AppLimitDefault | null;
+  appLimitDefaultEdge?: AppLimitDefaultEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitEventPayload {
+  /** The `AppLimitEvent` that was deleted by this mutation. */
+  appLimitEvent?: AppLimitEvent | null;
+  appLimitEventEdge?: AppLimitEventEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAppLimitWarningPayload {
+  /** The `AppLimitWarning` that was deleted by this mutation. */
+  appLimitWarning?: AppLimitWarning | null;
+  appLimitWarningEdge?: AppLimitWarningEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteOrgLimitPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimit` that was deleted by this mutation. */
+  orgLimit?: OrgLimit | null;
+  orgLimitEdge?: OrgLimitEdge | null;
+}
+export interface DeleteOrgLimitAggregatePayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitAggregate` that was deleted by this mutation. */
+  orgLimitAggregate?: OrgLimitAggregate | null;
+  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+}
+export interface DeleteOrgLimitCapPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCap` that was deleted by this mutation. */
+  orgLimitCap?: OrgLimitCap | null;
+  orgLimitCapEdge?: OrgLimitCapEdge | null;
+}
+export interface DeleteOrgLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCapsDefault` that was deleted by this mutation. */
+  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
+  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
+}
+export interface DeleteOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was deleted by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
+}
+export interface DeleteOrgLimitDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitDefault` that was deleted by this mutation. */
+  orgLimitDefault?: OrgLimitDefault | null;
+  orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
+}
+export interface DeleteOrgLimitEventPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitEvent` that was deleted by this mutation. */
+  orgLimitEvent?: OrgLimitEvent | null;
+  orgLimitEventEdge?: OrgLimitEventEdge | null;
+}
+export interface DeleteOrgLimitWarningPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitWarning` that was deleted by this mutation. */
+  orgLimitWarning?: OrgLimitWarning | null;
+  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
+}
+export interface ProvisionBucketPayload {
+  /** The access type applied */
+  accessType: string;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
+  /** The S3 endpoint (null for AWS S3 default) */
+  endpoint?: string | null;
+  /** Error message if provisioning failed */
+  error?: string | null;
+  /** The storage provider used */
+  provider: string;
+  /** Whether provisioning succeeded */
+  success: boolean;
 }
 export interface SeedAppLimitCapsDefaultsPayload {
   clientMutationId?: string | null;
@@ -1971,215 +2201,65 @@ export interface SeedOrgLimitDefaultsPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
-export interface CreateAppLimitCapsDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCapsDefault` that was created by this mutation. */
-  appLimitCapsDefault?: AppLimitCapsDefault | null;
-  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
-}
-export interface CreateOrgLimitCapsDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCapsDefault` that was created by this mutation. */
-  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
-  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
-}
-export interface CreateAppLimitCapPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCap` that was created by this mutation. */
-  appLimitCap?: AppLimitCap | null;
-  appLimitCapEdge?: AppLimitCapEdge | null;
-}
-export interface CreateOrgLimitCapPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCap` that was created by this mutation. */
-  orgLimitCap?: OrgLimitCap | null;
-  orgLimitCapEdge?: OrgLimitCapEdge | null;
-}
-export interface CreateAppLimitDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitDefault` that was created by this mutation. */
-  appLimitDefault?: AppLimitDefault | null;
-  appLimitDefaultEdge?: AppLimitDefaultEdge | null;
-}
-export interface CreateOrgLimitDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitDefault` that was created by this mutation. */
-  orgLimitDefault?: OrgLimitDefault | null;
-  orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
-}
-export interface CreateAppLimitCreditRedemptionPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditRedemption` that was created by this mutation. */
-  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
-  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
-}
-export interface CreateAppLimitCreditCodeItemPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditCodeItem` that was created by this mutation. */
-  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
-  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
-}
-export interface CreateAppLimitWarningPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitWarning` that was created by this mutation. */
-  appLimitWarning?: AppLimitWarning | null;
-  appLimitWarningEdge?: AppLimitWarningEdge | null;
-}
-export interface CreateAppLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCredit` that was created by this mutation. */
-  appLimitCredit?: AppLimitCredit | null;
-  appLimitCreditEdge?: AppLimitCreditEdge | null;
-}
-export interface CreateOrgLimitWarningPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitWarning` that was created by this mutation. */
-  orgLimitWarning?: OrgLimitWarning | null;
-  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
-}
-export interface CreateOrgLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCredit` that was created by this mutation. */
-  orgLimitCredit?: OrgLimitCredit | null;
-  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
-}
-export interface CreateAppLimitCreditCodePayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditCode` that was created by this mutation. */
-  appLimitCreditCode?: AppLimitCreditCode | null;
-  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
-}
-export interface CreateAppLimitEventPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitEvent` that was created by this mutation. */
-  appLimitEvent?: AppLimitEvent | null;
-  appLimitEventEdge?: AppLimitEventEdge | null;
-}
-export interface CreateOrgLimitEventPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitEvent` that was created by this mutation. */
-  orgLimitEvent?: OrgLimitEvent | null;
-  orgLimitEventEdge?: OrgLimitEventEdge | null;
-}
-export interface CreateAppLimitPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimit` that was created by this mutation. */
-  appLimit?: AppLimit | null;
-  appLimitEdge?: AppLimitEdge | null;
-}
-export interface CreateOrgLimitAggregatePayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitAggregate` that was created by this mutation. */
-  orgLimitAggregate?: OrgLimitAggregate | null;
-  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
-}
-export interface CreateOrgLimitPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimit` that was created by this mutation. */
-  orgLimit?: OrgLimit | null;
-  orgLimitEdge?: OrgLimitEdge | null;
-}
-export interface UpdateAppLimitCapsDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCapsDefault` that was updated by this mutation. */
-  appLimitCapsDefault?: AppLimitCapsDefault | null;
-  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
-}
-export interface UpdateOrgLimitCapsDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCapsDefault` that was updated by this mutation. */
-  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
-  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
-}
-export interface UpdateAppLimitCapPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCap` that was updated by this mutation. */
-  appLimitCap?: AppLimitCap | null;
-  appLimitCapEdge?: AppLimitCapEdge | null;
-}
-export interface UpdateOrgLimitCapPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCap` that was updated by this mutation. */
-  orgLimitCap?: OrgLimitCap | null;
-  orgLimitCapEdge?: OrgLimitCapEdge | null;
-}
-export interface UpdateAppLimitDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitDefault` that was updated by this mutation. */
-  appLimitDefault?: AppLimitDefault | null;
-  appLimitDefaultEdge?: AppLimitDefaultEdge | null;
-}
-export interface UpdateOrgLimitDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitDefault` that was updated by this mutation. */
-  orgLimitDefault?: OrgLimitDefault | null;
-  orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
-}
-export interface UpdateAppLimitCreditRedemptionPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditRedemption` that was updated by this mutation. */
-  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
-  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
-}
-export interface UpdateAppLimitCreditCodeItemPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditCodeItem` that was updated by this mutation. */
-  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
-  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
-}
-export interface UpdateAppLimitWarningPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitWarning` that was updated by this mutation. */
-  appLimitWarning?: AppLimitWarning | null;
-  appLimitWarningEdge?: AppLimitWarningEdge | null;
-}
-export interface UpdateAppLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCredit` that was updated by this mutation. */
-  appLimitCredit?: AppLimitCredit | null;
-  appLimitCreditEdge?: AppLimitCreditEdge | null;
-}
-export interface UpdateOrgLimitWarningPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitWarning` that was updated by this mutation. */
-  orgLimitWarning?: OrgLimitWarning | null;
-  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
-}
-export interface UpdateOrgLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCredit` that was updated by this mutation. */
-  orgLimitCredit?: OrgLimitCredit | null;
-  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
-}
-export interface UpdateAppLimitCreditCodePayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditCode` that was updated by this mutation. */
-  appLimitCreditCode?: AppLimitCreditCode | null;
-  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
-}
-export interface UpdateAppLimitEventPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitEvent` that was updated by this mutation. */
-  appLimitEvent?: AppLimitEvent | null;
-  appLimitEventEdge?: AppLimitEventEdge | null;
-}
-export interface UpdateOrgLimitEventPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitEvent` that was updated by this mutation. */
-  orgLimitEvent?: OrgLimitEvent | null;
-  orgLimitEventEdge?: OrgLimitEventEdge | null;
-}
 export interface UpdateAppLimitPayload {
-  clientMutationId?: string | null;
   /** The `AppLimit` that was updated by this mutation. */
   appLimit?: AppLimit | null;
   appLimitEdge?: AppLimitEdge | null;
-}
-export interface UpdateOrgLimitAggregatePayload {
   clientMutationId?: string | null;
-  /** The `OrgLimitAggregate` that was updated by this mutation. */
-  orgLimitAggregate?: OrgLimitAggregate | null;
-  orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
+}
+export interface UpdateAppLimitCapPayload {
+  /** The `AppLimitCap` that was updated by this mutation. */
+  appLimitCap?: AppLimitCap | null;
+  appLimitCapEdge?: AppLimitCapEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitCapsDefaultPayload {
+  /** The `AppLimitCapsDefault` that was updated by this mutation. */
+  appLimitCapsDefault?: AppLimitCapsDefault | null;
+  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitCreditPayload {
+  /** The `AppLimitCredit` that was updated by this mutation. */
+  appLimitCredit?: AppLimitCredit | null;
+  appLimitCreditEdge?: AppLimitCreditEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitCreditCodePayload {
+  /** The `AppLimitCreditCode` that was updated by this mutation. */
+  appLimitCreditCode?: AppLimitCreditCode | null;
+  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitCreditCodeItemPayload {
+  /** The `AppLimitCreditCodeItem` that was updated by this mutation. */
+  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
+  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitCreditRedemptionPayload {
+  /** The `AppLimitCreditRedemption` that was updated by this mutation. */
+  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
+  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitDefaultPayload {
+  /** The `AppLimitDefault` that was updated by this mutation. */
+  appLimitDefault?: AppLimitDefault | null;
+  appLimitDefaultEdge?: AppLimitDefaultEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitEventPayload {
+  /** The `AppLimitEvent` that was updated by this mutation. */
+  appLimitEvent?: AppLimitEvent | null;
+  appLimitEventEdge?: AppLimitEventEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAppLimitWarningPayload {
+  /** The `AppLimitWarning` that was updated by this mutation. */
+  appLimitWarning?: AppLimitWarning | null;
+  appLimitWarningEdge?: AppLimitWarningEdge | null;
+  clientMutationId?: string | null;
 }
 export interface UpdateOrgLimitPayload {
   clientMutationId?: string | null;
@@ -2187,150 +2267,69 @@ export interface UpdateOrgLimitPayload {
   orgLimit?: OrgLimit | null;
   orgLimitEdge?: OrgLimitEdge | null;
 }
-export interface DeleteAppLimitCapsDefaultPayload {
+export interface UpdateOrgLimitAggregatePayload {
   clientMutationId?: string | null;
-  /** The `AppLimitCapsDefault` that was deleted by this mutation. */
-  appLimitCapsDefault?: AppLimitCapsDefault | null;
-  appLimitCapsDefaultEdge?: AppLimitCapsDefaultEdge | null;
-}
-export interface DeleteOrgLimitCapsDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCapsDefault` that was deleted by this mutation. */
-  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
-  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
-}
-export interface DeleteAppLimitCapPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCap` that was deleted by this mutation. */
-  appLimitCap?: AppLimitCap | null;
-  appLimitCapEdge?: AppLimitCapEdge | null;
-}
-export interface DeleteOrgLimitCapPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCap` that was deleted by this mutation. */
-  orgLimitCap?: OrgLimitCap | null;
-  orgLimitCapEdge?: OrgLimitCapEdge | null;
-}
-export interface DeleteAppLimitDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitDefault` that was deleted by this mutation. */
-  appLimitDefault?: AppLimitDefault | null;
-  appLimitDefaultEdge?: AppLimitDefaultEdge | null;
-}
-export interface DeleteOrgLimitDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitDefault` that was deleted by this mutation. */
-  orgLimitDefault?: OrgLimitDefault | null;
-  orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
-}
-export interface DeleteAppLimitCreditRedemptionPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditRedemption` that was deleted by this mutation. */
-  appLimitCreditRedemption?: AppLimitCreditRedemption | null;
-  appLimitCreditRedemptionEdge?: AppLimitCreditRedemptionEdge | null;
-}
-export interface DeleteAppLimitCreditCodeItemPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditCodeItem` that was deleted by this mutation. */
-  appLimitCreditCodeItem?: AppLimitCreditCodeItem | null;
-  appLimitCreditCodeItemEdge?: AppLimitCreditCodeItemEdge | null;
-}
-export interface DeleteAppLimitWarningPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitWarning` that was deleted by this mutation. */
-  appLimitWarning?: AppLimitWarning | null;
-  appLimitWarningEdge?: AppLimitWarningEdge | null;
-}
-export interface DeleteAppLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCredit` that was deleted by this mutation. */
-  appLimitCredit?: AppLimitCredit | null;
-  appLimitCreditEdge?: AppLimitCreditEdge | null;
-}
-export interface DeleteOrgLimitWarningPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitWarning` that was deleted by this mutation. */
-  orgLimitWarning?: OrgLimitWarning | null;
-  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
-}
-export interface DeleteOrgLimitCreditPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitCredit` that was deleted by this mutation. */
-  orgLimitCredit?: OrgLimitCredit | null;
-  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
-}
-export interface DeleteAppLimitCreditCodePayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitCreditCode` that was deleted by this mutation. */
-  appLimitCreditCode?: AppLimitCreditCode | null;
-  appLimitCreditCodeEdge?: AppLimitCreditCodeEdge | null;
-}
-export interface DeleteAppLimitEventPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimitEvent` that was deleted by this mutation. */
-  appLimitEvent?: AppLimitEvent | null;
-  appLimitEventEdge?: AppLimitEventEdge | null;
-}
-export interface DeleteOrgLimitEventPayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitEvent` that was deleted by this mutation. */
-  orgLimitEvent?: OrgLimitEvent | null;
-  orgLimitEventEdge?: OrgLimitEventEdge | null;
-}
-export interface DeleteAppLimitPayload {
-  clientMutationId?: string | null;
-  /** The `AppLimit` that was deleted by this mutation. */
-  appLimit?: AppLimit | null;
-  appLimitEdge?: AppLimitEdge | null;
-}
-export interface DeleteOrgLimitAggregatePayload {
-  clientMutationId?: string | null;
-  /** The `OrgLimitAggregate` that was deleted by this mutation. */
+  /** The `OrgLimitAggregate` that was updated by this mutation. */
   orgLimitAggregate?: OrgLimitAggregate | null;
   orgLimitAggregateEdge?: OrgLimitAggregateEdge | null;
 }
-export interface DeleteOrgLimitPayload {
+export interface UpdateOrgLimitCapPayload {
   clientMutationId?: string | null;
-  /** The `OrgLimit` that was deleted by this mutation. */
-  orgLimit?: OrgLimit | null;
-  orgLimitEdge?: OrgLimitEdge | null;
+  /** The `OrgLimitCap` that was updated by this mutation. */
+  orgLimitCap?: OrgLimitCap | null;
+  orgLimitCapEdge?: OrgLimitCapEdge | null;
 }
-export interface ProvisionBucketPayload {
-  /** Whether provisioning succeeded */
-  success: boolean;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The access type applied */
-  accessType: string;
-  /** The storage provider used */
-  provider: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
+export interface UpdateOrgLimitCapsDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCapsDefault` that was updated by this mutation. */
+  orgLimitCapsDefault?: OrgLimitCapsDefault | null;
+  orgLimitCapsDefaultEdge?: OrgLimitCapsDefaultEdge | null;
 }
-/** A `AppLimitCapsDefault` edge in the connection. */
-export interface AppLimitCapsDefaultEdge {
-  cursor?: string | null;
-  /** The `AppLimitCapsDefault` at the end of the edge. */
-  node?: AppLimitCapsDefault | null;
+export interface UpdateOrgLimitCreditPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitCredit` that was updated by this mutation. */
+  orgLimitCredit?: OrgLimitCredit | null;
+  orgLimitCreditEdge?: OrgLimitCreditEdge | null;
 }
-/** Information about pagination in a connection. */
-export interface PageInfo {
-  /** When paginating forwards, are there more items? */
-  hasNextPage: boolean;
-  /** When paginating backwards, are there more items? */
-  hasPreviousPage: boolean;
-  /** When paginating backwards, the cursor to continue. */
-  startCursor?: string | null;
-  /** When paginating forwards, the cursor to continue. */
-  endCursor?: string | null;
+export interface UpdateOrgLimitDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitDefault` that was updated by this mutation. */
+  orgLimitDefault?: OrgLimitDefault | null;
+  orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
-/** A `OrgLimitCapsDefault` edge in the connection. */
-export interface OrgLimitCapsDefaultEdge {
-  cursor?: string | null;
-  /** The `OrgLimitCapsDefault` at the end of the edge. */
-  node?: OrgLimitCapsDefault | null;
+export interface UpdateOrgLimitEventPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitEvent` that was updated by this mutation. */
+  orgLimitEvent?: OrgLimitEvent | null;
+  orgLimitEventEdge?: OrgLimitEventEdge | null;
+}
+export interface UpdateOrgLimitWarningPayload {
+  clientMutationId?: string | null;
+  /** The `OrgLimitWarning` that was updated by this mutation. */
+  orgLimitWarning?: OrgLimitWarning | null;
+  orgLimitWarningEdge?: OrgLimitWarningEdge | null;
+}
+/** Information about a database table */
+export interface MetaTable {
+  constraints: MetaConstraints;
+  fields: MetaField[];
+  foreignKeyConstraints: MetaForeignKeyConstraint[];
+  /** i18n metadata (null if no @i18n tag) */
+  i18n?: MetaI18n | null;
+  indexes: MetaIndex[];
+  inflection: MetaInflection;
+  name: string;
+  primaryKeyConstraints: MetaPrimaryKeyConstraint[];
+  query: MetaQuery;
+  /** Realtime metadata (null if no @realtime tag) */
+  realtime?: MetaRealtime | null;
+  relations: MetaRelations;
+  schemaName: string;
+  /** Search metadata (null if no search configured) */
+  search?: MetaSearch | null;
+  /** Storage metadata (null if not a storage table) */
+  storage?: MetaStorage | null;
+  uniqueConstraints: MetaUniqueConstraint[];
 }
 /** A `AppLimitCap` edge in the connection. */
 export interface AppLimitCapEdge {
@@ -2338,29 +2337,22 @@ export interface AppLimitCapEdge {
   /** The `AppLimitCap` at the end of the edge. */
   node?: AppLimitCap | null;
 }
-/** A `OrgLimitCap` edge in the connection. */
-export interface OrgLimitCapEdge {
-  cursor?: string | null;
-  /** The `OrgLimitCap` at the end of the edge. */
-  node?: OrgLimitCap | null;
+/** Information about pagination in a connection. */
+export interface PageInfo {
+  /** When paginating forwards, the cursor to continue. */
+  endCursor?: string | null;
+  /** When paginating forwards, are there more items? */
+  hasNextPage: boolean;
+  /** When paginating backwards, are there more items? */
+  hasPreviousPage: boolean;
+  /** When paginating backwards, the cursor to continue. */
+  startCursor?: string | null;
 }
-/** A `AppLimitDefault` edge in the connection. */
-export interface AppLimitDefaultEdge {
+/** A `AppLimitCapsDefault` edge in the connection. */
+export interface AppLimitCapsDefaultEdge {
   cursor?: string | null;
-  /** The `AppLimitDefault` at the end of the edge. */
-  node?: AppLimitDefault | null;
-}
-/** A `OrgLimitDefault` edge in the connection. */
-export interface OrgLimitDefaultEdge {
-  cursor?: string | null;
-  /** The `OrgLimitDefault` at the end of the edge. */
-  node?: OrgLimitDefault | null;
-}
-/** A `AppLimitCreditRedemption` edge in the connection. */
-export interface AppLimitCreditRedemptionEdge {
-  cursor?: string | null;
-  /** The `AppLimitCreditRedemption` at the end of the edge. */
-  node?: AppLimitCreditRedemption | null;
+  /** The `AppLimitCapsDefault` at the end of the edge. */
+  node?: AppLimitCapsDefault | null;
 }
 /** A `AppLimitCreditCodeItem` edge in the connection. */
 export interface AppLimitCreditCodeItemEdge {
@@ -2368,11 +2360,17 @@ export interface AppLimitCreditCodeItemEdge {
   /** The `AppLimitCreditCodeItem` at the end of the edge. */
   node?: AppLimitCreditCodeItem | null;
 }
-/** A `AppLimitWarning` edge in the connection. */
-export interface AppLimitWarningEdge {
+/** A `AppLimitCreditCode` edge in the connection. */
+export interface AppLimitCreditCodeEdge {
   cursor?: string | null;
-  /** The `AppLimitWarning` at the end of the edge. */
-  node?: AppLimitWarning | null;
+  /** The `AppLimitCreditCode` at the end of the edge. */
+  node?: AppLimitCreditCode | null;
+}
+/** A `AppLimitCreditRedemption` edge in the connection. */
+export interface AppLimitCreditRedemptionEdge {
+  cursor?: string | null;
+  /** The `AppLimitCreditRedemption` at the end of the edge. */
+  node?: AppLimitCreditRedemption | null;
 }
 /** A `AppLimitCredit` edge in the connection. */
 export interface AppLimitCreditEdge {
@@ -2380,23 +2378,11 @@ export interface AppLimitCreditEdge {
   /** The `AppLimitCredit` at the end of the edge. */
   node?: AppLimitCredit | null;
 }
-/** A `OrgLimitWarning` edge in the connection. */
-export interface OrgLimitWarningEdge {
+/** A `AppLimitDefault` edge in the connection. */
+export interface AppLimitDefaultEdge {
   cursor?: string | null;
-  /** The `OrgLimitWarning` at the end of the edge. */
-  node?: OrgLimitWarning | null;
-}
-/** A `OrgLimitCredit` edge in the connection. */
-export interface OrgLimitCreditEdge {
-  cursor?: string | null;
-  /** The `OrgLimitCredit` at the end of the edge. */
-  node?: OrgLimitCredit | null;
-}
-/** A `AppLimitCreditCode` edge in the connection. */
-export interface AppLimitCreditCodeEdge {
-  cursor?: string | null;
-  /** The `AppLimitCreditCode` at the end of the edge. */
-  node?: AppLimitCreditCode | null;
+  /** The `AppLimitDefault` at the end of the edge. */
+  node?: AppLimitDefault | null;
 }
 /** A `AppLimitEvent` edge in the connection. */
 export interface AppLimitEventEdge {
@@ -2404,11 +2390,11 @@ export interface AppLimitEventEdge {
   /** The `AppLimitEvent` at the end of the edge. */
   node?: AppLimitEvent | null;
 }
-/** A `OrgLimitEvent` edge in the connection. */
-export interface OrgLimitEventEdge {
+/** A `AppLimitWarning` edge in the connection. */
+export interface AppLimitWarningEdge {
   cursor?: string | null;
-  /** The `OrgLimitEvent` at the end of the edge. */
-  node?: OrgLimitEvent | null;
+  /** The `AppLimitWarning` at the end of the edge. */
+  node?: AppLimitWarning | null;
 }
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
@@ -2422,116 +2408,130 @@ export interface OrgLimitAggregateEdge {
   /** The `OrgLimitAggregate` at the end of the edge. */
   node?: OrgLimitAggregate | null;
 }
+/** A `OrgLimitCap` edge in the connection. */
+export interface OrgLimitCapEdge {
+  cursor?: string | null;
+  /** The `OrgLimitCap` at the end of the edge. */
+  node?: OrgLimitCap | null;
+}
+/** A `OrgLimitCapsDefault` edge in the connection. */
+export interface OrgLimitCapsDefaultEdge {
+  cursor?: string | null;
+  /** The `OrgLimitCapsDefault` at the end of the edge. */
+  node?: OrgLimitCapsDefault | null;
+}
+/** A `OrgLimitCredit` edge in the connection. */
+export interface OrgLimitCreditEdge {
+  cursor?: string | null;
+  /** The `OrgLimitCredit` at the end of the edge. */
+  node?: OrgLimitCredit | null;
+}
+/** A `OrgLimitDefault` edge in the connection. */
+export interface OrgLimitDefaultEdge {
+  cursor?: string | null;
+  /** The `OrgLimitDefault` at the end of the edge. */
+  node?: OrgLimitDefault | null;
+}
+/** A `OrgLimitEvent` edge in the connection. */
+export interface OrgLimitEventEdge {
+  cursor?: string | null;
+  /** The `OrgLimitEvent` at the end of the edge. */
+  node?: OrgLimitEvent | null;
+}
+/** A `OrgLimitWarning` edge in the connection. */
+export interface OrgLimitWarningEdge {
+  cursor?: string | null;
+  /** The `OrgLimitWarning` at the end of the edge. */
+  node?: OrgLimitWarning | null;
+}
 /** A `OrgLimit` edge in the connection. */
 export interface OrgLimitEdge {
   cursor?: string | null;
   /** The `OrgLimit` at the end of the edge. */
   node?: OrgLimit | null;
 }
-/** Information about a database table */
-export interface MetaTable {
-  name: string;
-  schemaName: string;
-  fields: MetaField[];
-  indexes: MetaIndex[];
-  constraints: MetaConstraints;
-  foreignKeyConstraints: MetaForeignKeyConstraint[];
-  primaryKeyConstraints: MetaPrimaryKeyConstraint[];
-  uniqueConstraints: MetaUniqueConstraint[];
-  relations: MetaRelations;
-  inflection: MetaInflection;
-  query: MetaQuery;
-  /** Storage metadata (null if not a storage table) */
-  storage?: MetaStorage | null;
-  /** Search metadata (null if no search configured) */
-  search?: MetaSearch | null;
-  /** i18n metadata (null if no @i18n tag) */
-  i18n?: MetaI18n | null;
-  /** Realtime metadata (null if no @realtime tag) */
-  realtime?: MetaRealtime | null;
+/** Table constraints */
+export interface MetaConstraints {
+  foreignKey: MetaForeignKeyConstraint[];
+  primaryKey?: MetaPrimaryKeyConstraint | null;
+  unique: MetaUniqueConstraint[];
 }
 /** Information about a table field/column */
 export interface MetaField {
-  name: string;
-  type: MetaType;
-  isNotNull: boolean;
-  hasDefault: boolean;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
   description?: string | null;
   /** Enum metadata if this field has an enum type */
   enumValues?: MetaEnum | null;
-}
-/** Information about a database index */
-export interface MetaIndex {
+  hasDefault: boolean;
+  isForeignKey: boolean;
+  isNotNull: boolean;
+  isPrimaryKey: boolean;
   name: string;
-  isUnique: boolean;
-  isPrimary: boolean;
-  columns: string[];
-  fields?: MetaField[] | null;
-}
-/** Table constraints */
-export interface MetaConstraints {
-  primaryKey?: MetaPrimaryKeyConstraint | null;
-  unique: MetaUniqueConstraint[];
-  foreignKey: MetaForeignKeyConstraint[];
+  type: MetaType;
 }
 /** Information about a foreign key constraint */
 export interface MetaForeignKeyConstraint {
-  name: string;
   fields: MetaField[];
-  referencedTable: string;
-  referencedFields: string[];
+  name: string;
   refFields?: MetaField[] | null;
   refTable?: MetaRefTable | null;
+  referencedFields: string[];
+  referencedTable: string;
+}
+/** i18n metadata for a table with @i18n tag */
+export interface MetaI18n {
+  /** Fields that are translatable */
+  translatableFields: MetaI18nField[];
+  /** Name of the translation table */
+  translationTable: string;
+}
+/** Information about a database index */
+export interface MetaIndex {
+  columns: string[];
+  fields?: MetaField[] | null;
+  isPrimary: boolean;
+  isUnique: boolean;
+  name: string;
+}
+/** Table inflection names */
+export interface MetaInflection {
+  allRows: string;
+  conditionType: string;
+  connection: string;
+  createInputType: string;
+  createPayloadType: string;
+  deletePayloadType: string;
+  edge: string;
+  filterType?: string | null;
+  orderByType: string;
+  patchType?: string | null;
+  tableType: string;
+  updatePayloadType?: string | null;
 }
 /** Information about a primary key constraint */
 export interface MetaPrimaryKeyConstraint {
-  name: string;
   fields: MetaField[];
+  name: string;
 }
-/** Information about a unique constraint */
-export interface MetaUniqueConstraint {
-  name: string;
-  fields: MetaField[];
+/** Table query/mutation names */
+export interface MetaQuery {
+  all: string;
+  create?: string | null;
+  delete?: string | null;
+  one?: string | null;
+  update?: string | null;
+}
+/** Realtime metadata for a table with @realtime tag */
+export interface MetaRealtime {
+  /** The generated subscription field name (e.g. onPostChanged) */
+  subscriptionFieldName: string;
 }
 /** Table relations */
 export interface MetaRelations {
   belongsTo: MetaBelongsToRelation[];
   has: MetaHasRelation[];
-  hasOne: MetaHasRelation[];
   hasMany: MetaHasRelation[];
+  hasOne: MetaHasRelation[];
   manyToMany: MetaManyToManyRelation[];
-}
-/** Table inflection names */
-export interface MetaInflection {
-  tableType: string;
-  allRows: string;
-  connection: string;
-  edge: string;
-  filterType?: string | null;
-  orderByType: string;
-  conditionType: string;
-  patchType?: string | null;
-  createInputType: string;
-  createPayloadType: string;
-  updatePayloadType?: string | null;
-  deletePayloadType: string;
-}
-/** Table query/mutation names */
-export interface MetaQuery {
-  all: string;
-  one?: string | null;
-  create?: string | null;
-  update?: string | null;
-  delete?: string | null;
-}
-/** Storage metadata for a table */
-export interface MetaStorage {
-  /** Whether this table is a storage files table */
-  isFilesTable: boolean;
-  /** Whether this table is a storage buckets table */
-  isBucketsTable: boolean;
 }
 /** Search metadata for a table */
 export interface MetaSearch {
@@ -2539,31 +2539,22 @@ export interface MetaSearch {
   algorithms: string[];
   /** Searchable columns with their algorithm */
   columns: MetaSearchColumn[];
-  /** Whether unifiedSearch composite filter is available */
-  hasUnifiedSearch: boolean;
   /** Per-table search configuration */
   config?: MetaSearchConfig | null;
+  /** Whether unifiedSearch composite filter is available */
+  hasUnifiedSearch: boolean;
 }
-/** i18n metadata for a table with @i18n tag */
-export interface MetaI18n {
-  /** Name of the translation table */
-  translationTable: string;
-  /** Fields that are translatable */
-  translatableFields: MetaI18nField[];
+/** Storage metadata for a table */
+export interface MetaStorage {
+  /** Whether this table is a storage buckets table */
+  isBucketsTable: boolean;
+  /** Whether this table is a storage files table */
+  isFilesTable: boolean;
 }
-/** Realtime metadata for a table with @realtime tag */
-export interface MetaRealtime {
-  /** The generated subscription field name (e.g. onPostChanged) */
-  subscriptionFieldName: string;
-}
-/** Information about a PostgreSQL type */
-export interface MetaType {
-  pgType: string;
-  gqlType: string;
-  isArray: boolean;
-  isNotNull?: boolean | null;
-  hasDefault?: boolean | null;
-  subtype?: string | null;
+/** Information about a unique constraint */
+export interface MetaUniqueConstraint {
+  fields: MetaField[];
+  name: string;
 }
 /** Information about a PostgreSQL enum type */
 export interface MetaEnum {
@@ -2572,56 +2563,18 @@ export interface MetaEnum {
   /** Allowed values for this enum */
   values: string[];
 }
+/** Information about a PostgreSQL type */
+export interface MetaType {
+  gqlType: string;
+  hasDefault?: boolean | null;
+  isArray: boolean;
+  isNotNull?: boolean | null;
+  pgType: string;
+  subtype?: string | null;
+}
 /** Reference to a related table */
 export interface MetaRefTable {
   name: string;
-}
-/** A belongs-to (forward FK) relation */
-export interface MetaBelongsToRelation {
-  fieldName?: string | null;
-  isUnique: boolean;
-  type?: string | null;
-  keys: MetaField[];
-  references: MetaRefTable;
-}
-/** A has-one or has-many (reverse FK) relation */
-export interface MetaHasRelation {
-  fieldName?: string | null;
-  isUnique: boolean;
-  type?: string | null;
-  keys: MetaField[];
-  referencedBy: MetaRefTable;
-}
-/** A many-to-many relation via junction table */
-export interface MetaManyToManyRelation {
-  fieldName?: string | null;
-  type?: string | null;
-  junctionTable: MetaRefTable;
-  junctionLeftConstraint: MetaForeignKeyConstraint;
-  junctionLeftKeyAttributes: MetaField[];
-  junctionRightConstraint: MetaForeignKeyConstraint;
-  junctionRightKeyAttributes: MetaField[];
-  leftKeyAttributes: MetaField[];
-  rightKeyAttributes: MetaField[];
-  rightTable: MetaRefTable;
-}
-/** A searchable column with its algorithm */
-export interface MetaSearchColumn {
-  /** Column name (camelCase) */
-  name: string;
-  /** Search algorithm: tsvector, bm25, trgm, or vector */
-  algorithm: string;
-}
-/** Per-table search configuration from @searchConfig smart tag */
-export interface MetaSearchConfig {
-  /** JSON-encoded per-adapter score weights */
-  weights?: string | null;
-  /** Whether recency boosting is enabled */
-  boostRecent: boolean;
-  /** Field used for recency decay */
-  boostRecencyField?: string | null;
-  /** Exponential decay factor per day */
-  boostRecencyDecay?: number | null;
 }
 /** A translatable field */
 export interface MetaI18nField {
@@ -2629,4 +2582,51 @@ export interface MetaI18nField {
   name: string;
   /** PostgreSQL column type (text, citext) */
   type: string;
+}
+/** A belongs-to (forward FK) relation */
+export interface MetaBelongsToRelation {
+  fieldName?: string | null;
+  isUnique: boolean;
+  keys: MetaField[];
+  references: MetaRefTable;
+  type?: string | null;
+}
+/** A has-one or has-many (reverse FK) relation */
+export interface MetaHasRelation {
+  fieldName?: string | null;
+  isUnique: boolean;
+  keys: MetaField[];
+  referencedBy: MetaRefTable;
+  type?: string | null;
+}
+/** A many-to-many relation via junction table */
+export interface MetaManyToManyRelation {
+  fieldName?: string | null;
+  junctionLeftConstraint: MetaForeignKeyConstraint;
+  junctionLeftKeyAttributes: MetaField[];
+  junctionRightConstraint: MetaForeignKeyConstraint;
+  junctionRightKeyAttributes: MetaField[];
+  junctionTable: MetaRefTable;
+  leftKeyAttributes: MetaField[];
+  rightKeyAttributes: MetaField[];
+  rightTable: MetaRefTable;
+  type?: string | null;
+}
+/** A searchable column with its algorithm */
+export interface MetaSearchColumn {
+  /** Search algorithm: tsvector, bm25, trgm, or vector */
+  algorithm: string;
+  /** Column name (camelCase) */
+  name: string;
+}
+/** Per-table search configuration from @searchConfig smart tag */
+export interface MetaSearchConfig {
+  /** Exponential decay factor per day */
+  boostRecencyDecay?: number | null;
+  /** Field used for recency decay */
+  boostRecencyField?: string | null;
+  /** Whether recency boosting is enabled */
+  boostRecent: boolean;
+  /** JSON-encoded per-adapter score weights */
+  weights?: string | null;
 }

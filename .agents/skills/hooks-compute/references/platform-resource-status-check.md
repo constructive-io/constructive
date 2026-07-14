@@ -7,8 +7,8 @@ On-demand resource status checks — diagnostic snapshots from the runtime (K8s 
 ## Usage
 
 ```typescript
-usePlatformResourceStatusChecksQuery({ selection: { fields: { id: true, resourceId: true, requestedBy: true, requestedAt: true, completedAt: true, status: true, result: true } } })
-usePlatformResourceStatusCheckQuery({ id: '<UUID>', selection: { fields: { id: true, resourceId: true, requestedBy: true, requestedAt: true, completedAt: true, status: true, result: true } } })
+usePlatformResourceStatusChecksQuery({ selection: { fields: { completedAt: true, id: true, requestedAt: true, requestedBy: true, resourceId: true, result: true, status: true } } })
+usePlatformResourceStatusCheckQuery({ id: '<UUID>', selection: { fields: { completedAt: true, id: true, requestedAt: true, requestedBy: true, resourceId: true, result: true, status: true } } })
 useCreatePlatformResourceStatusCheckMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformResourceStatusCheckMutation({ selection: { fields: { id: true } } })
 useDeletePlatformResourceStatusCheckMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformResourceStatusCheckMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformResourceStatusChecksQuery({
-  selection: { fields: { id: true, resourceId: true, requestedBy: true, requestedAt: true, completedAt: true, status: true, result: true } },
+  selection: { fields: { completedAt: true, id: true, requestedAt: true, requestedBy: true, resourceId: true, result: true, status: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformResourceStatusChecksQuery({
 const { mutate } = useCreatePlatformResourceStatusCheckMutation({
   selection: { fields: { id: true } },
 });
-mutate({ resourceId: '<UUID>', requestedBy: '<UUID>', requestedAt: '<Datetime>', completedAt: '<Datetime>', status: '<String>', result: '<JSON>' });
+mutate({ completedAt: '<Datetime>', requestedAt: '<Datetime>', requestedBy: '<UUID>', resourceId: '<UUID>', result: '<JSON>', status: '<String>' });
 ```

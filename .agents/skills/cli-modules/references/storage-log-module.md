@@ -12,8 +12,8 @@ csdk storage-log-module list --where.<field>.<op> <value> --orderBy <values>
 csdk storage-log-module list --limit 10 --after <cursor>
 csdk storage-log-module find-first --where.<field>.<op> <value>
 csdk storage-log-module get --id <UUID>
-csdk storage-log-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--storageLogTableId <UUID>] [--storageLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
-csdk storage-log-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--storageLogTableId <UUID>] [--storageLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk storage-log-module create --databaseId <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--storageLogTableId <UUID>] [--storageLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>]
+csdk storage-log-module update --id <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--databaseId <UUID>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--storageLogTableId <UUID>] [--storageLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>]
 csdk storage-log-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk storage-log-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a storageLogModule
 
 ```bash
-csdk storage-log-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--publicSchemaName <String>] [--privateSchemaName <String>] [--storageLogTableId <UUID>] [--storageLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>] [--interval <String>] [--retention <String>] [--premake <Int>] [--scope <String>] [--actorFkTableId <UUID>] [--entityFkTableId <UUID>] [--prefix <String>] [--apiName <String>] [--privateApiName <String>]
+csdk storage-log-module create --databaseId <UUID> [--actorFkTableId <UUID>] [--apiName <String>] [--entityField <String>] [--entityFkTableId <UUID>] [--interval <String>] [--prefix <String>] [--premake <Int>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--privateSchemaName <String>] [--publicSchemaName <String>] [--retention <String>] [--schemaId <UUID>] [--scope <String>] [--storageLogTableId <UUID>] [--storageLogTableName <String>] [--usageDailyTableId <UUID>] [--usageDailyTableName <String>]
 ```
 
 ### Get a storageLogModule by id

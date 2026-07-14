@@ -7,8 +7,8 @@ DO INSTEAD rules for views (e.g., read-only enforcement)
 ## Usage
 
 ```typescript
-useViewRulesQuery({ selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } } })
-useViewRuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } } })
+useViewRulesQuery({ selection: { fields: { action: true, databaseId: true, event: true, id: true, name: true, viewId: true } } })
+useViewRuleQuery({ id: '<UUID>', selection: { fields: { action: true, databaseId: true, event: true, id: true, name: true, viewId: true } } })
 useCreateViewRuleMutation({ selection: { fields: { id: true } } })
 useUpdateViewRuleMutation({ selection: { fields: { id: true } } })
 useDeleteViewRuleMutation({})
@@ -20,7 +20,7 @@ useDeleteViewRuleMutation({})
 
 ```typescript
 const { data, isLoading } = useViewRulesQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } },
+  selection: { fields: { action: true, databaseId: true, event: true, id: true, name: true, viewId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useViewRulesQuery({
 const { mutate } = useCreateViewRuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', viewId: '<UUID>', name: '<String>', event: '<String>', action: '<String>' });
+mutate({ action: '<String>', databaseId: '<UUID>', event: '<String>', name: '<String>', viewId: '<UUID>' });
 ```

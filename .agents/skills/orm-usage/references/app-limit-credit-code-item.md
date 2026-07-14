@@ -9,8 +9,8 @@ Items within a credit code — each row grants credits for a specific limit defi
 ```typescript
 db.appLimitCreditCodeItem.findMany({ select: { id: true } }).execute()
 db.appLimitCreditCodeItem.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appLimitCreditCodeItem.create({ data: { creditCodeId: '<UUID>', defaultLimitId: '<UUID>', amount: '<BigInt>', creditType: '<String>' }, select: { id: true } }).execute()
-db.appLimitCreditCodeItem.update({ where: { id: '<UUID>' }, data: { creditCodeId: '<UUID>' }, select: { id: true } }).execute()
+db.appLimitCreditCodeItem.create({ data: { amount: '<BigInt>', creditCodeId: '<UUID>', creditType: '<String>', defaultLimitId: '<UUID>' }, select: { id: true } }).execute()
+db.appLimitCreditCodeItem.update({ where: { id: '<UUID>' }, data: { amount: '<BigInt>' }, select: { id: true } }).execute()
 db.appLimitCreditCodeItem.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.appLimitCreditCodeItem.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.appLimitCreditCodeItem.findMany({
-  select: { id: true, creditCodeId: true }
+  select: { id: true, amount: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.appLimitCreditCodeItem.findMany({
 
 ```typescript
 const item = await db.appLimitCreditCodeItem.create({
-  data: { creditCodeId: '<UUID>', defaultLimitId: '<UUID>', amount: '<BigInt>', creditType: '<String>' },
+  data: { amount: '<BigInt>', creditCodeId: '<UUID>', creditType: '<String>', defaultLimitId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

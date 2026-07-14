@@ -16,17 +16,17 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  createdAt: 'string',
-  updatedAt: 'string',
-  membershipId: 'uuid',
-  entityId: 'uuid',
   actorId: 'uuid',
+  bio: 'string',
+  createdAt: 'string',
   displayName: 'string',
   email: 'string',
-  title: 'string',
-  bio: 'string',
+  entityId: 'uuid',
+  id: 'uuid',
+  membershipId: 'uuid',
   profilePicture: 'string',
+  title: 'string',
+  updatedAt: 'string',
 };
 const usage =
   '\norg-member-profile <command>\n\nCommands:\n  list                  List orgMemberProfile records\n  find-first            Find first matching orgMemberProfile record\n  get                   Get a orgMemberProfile by ID\n  create                Create a new orgMemberProfile\n  update                Update an existing orgMemberProfile\n  delete                Delete a orgMemberProfile\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -79,17 +79,17 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      membershipId: true,
-      entityId: true,
       actorId: true,
+      bio: true,
+      createdAt: true,
       displayName: true,
       email: true,
-      title: true,
-      bio: true,
+      entityId: true,
+      id: true,
+      membershipId: true,
       profilePicture: true,
+      title: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy> & {
@@ -110,17 +110,17 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      membershipId: true,
-      entityId: true,
       actorId: true,
+      bio: true,
+      createdAt: true,
       displayName: true,
       email: true,
-      title: true,
-      bio: true,
+      entityId: true,
+      id: true,
+      membershipId: true,
       profilePicture: true,
+      title: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<OrgMemberProfileSelect, OrgMemberProfileFilter, OrgMemberProfileOrderBy> & {
@@ -153,17 +153,17 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          membershipId: true,
-          entityId: true,
           actorId: true,
+          bio: true,
+          createdAt: true,
           displayName: true,
           email: true,
-          title: true,
-          bio: true,
+          entityId: true,
+          id: true,
+          membershipId: true,
           profilePicture: true,
+          title: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -181,21 +181,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'membershipId',
-        message: 'membershipId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'entityId',
-        message: 'entityId',
-        required: true,
-      },
-      {
-        type: 'text',
         name: 'actorId',
         message: 'actorId',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'bio',
+        message: 'bio',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -213,22 +208,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'title',
-        message: 'title',
-        required: false,
-        skipPrompt: true,
+        name: 'entityId',
+        message: 'entityId',
+        required: true,
       },
       {
         type: 'text',
-        name: 'bio',
-        message: 'bio',
-        required: false,
-        skipPrompt: true,
+        name: 'membershipId',
+        message: 'membershipId',
+        required: true,
       },
       {
         type: 'text',
         name: 'profilePicture',
         message: 'profilePicture',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'title',
+        message: 'title',
         required: false,
         skipPrompt: true,
       },
@@ -242,27 +242,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.orgMemberProfile
       .create({
         data: {
-          membershipId: cleanedData.membershipId,
-          entityId: cleanedData.entityId,
           actorId: cleanedData.actorId,
+          bio: cleanedData.bio,
           displayName: cleanedData.displayName,
           email: cleanedData.email,
-          title: cleanedData.title,
-          bio: cleanedData.bio,
+          entityId: cleanedData.entityId,
+          membershipId: cleanedData.membershipId,
           profilePicture: cleanedData.profilePicture,
+          title: cleanedData.title,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          membershipId: true,
-          entityId: true,
           actorId: true,
+          bio: true,
+          createdAt: true,
           displayName: true,
           email: true,
-          title: true,
-          bio: true,
+          entityId: true,
+          id: true,
+          membershipId: true,
           profilePicture: true,
+          title: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -286,21 +286,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'membershipId',
-        message: 'membershipId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'entityId',
-        message: 'entityId',
-        required: false,
-      },
-      {
-        type: 'text',
         name: 'actorId',
         message: 'actorId',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'bio',
+        message: 'bio',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -318,22 +313,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'title',
-        message: 'title',
+        name: 'entityId',
+        message: 'entityId',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'bio',
-        message: 'bio',
+        name: 'membershipId',
+        message: 'membershipId',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'profilePicture',
         message: 'profilePicture',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'title',
+        message: 'title',
         required: false,
         skipPrompt: true,
       },
@@ -347,27 +347,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          membershipId: cleanedData.membershipId,
-          entityId: cleanedData.entityId,
           actorId: cleanedData.actorId,
+          bio: cleanedData.bio,
           displayName: cleanedData.displayName,
           email: cleanedData.email,
-          title: cleanedData.title,
-          bio: cleanedData.bio,
+          entityId: cleanedData.entityId,
+          membershipId: cleanedData.membershipId,
           profilePicture: cleanedData.profilePicture,
+          title: cleanedData.title,
         },
         select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          membershipId: true,
-          entityId: true,
           actorId: true,
+          bio: true,
+          createdAt: true,
           displayName: true,
           email: true,
-          title: true,
-          bio: true,
+          entityId: true,
+          id: true,
+          membershipId: true,
           profilePicture: true,
+          title: true,
+          updatedAt: true,
         },
       })
       .execute();

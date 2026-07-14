@@ -13,7 +13,7 @@ csdk infra-ref list --limit 10 --after <cursor>
 csdk infra-ref find-first --where.<field>.<op> <value>
 csdk infra-ref get --id <UUID>
 csdk infra-ref create --name <String> --scopeId <UUID> --storeId <UUID> [--commitId <UUID>]
-csdk infra-ref update --id <UUID> [--name <String>] [--scopeId <UUID>] [--storeId <UUID>] [--commitId <UUID>]
+csdk infra-ref update --id <UUID> [--commitId <UUID>] [--name <String>] [--scopeId <UUID>] [--storeId <UUID>]
 csdk infra-ref delete --id <UUID>
 ```
 

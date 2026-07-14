@@ -12,8 +12,8 @@ csdk org-admin-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk org-admin-grant list --limit 10 --after <cursor>
 csdk org-admin-grant find-first --where.<field>.<op> <value>
 csdk org-admin-grant get --id <UUID>
-csdk org-admin-grant create --entityId <UUID> [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
-csdk org-admin-grant update --id <UUID> [--isGrant <Boolean>] [--actorId <UUID>] [--entityId <UUID>] [--grantorId <UUID>]
+csdk org-admin-grant create --entityId <UUID> [--actorId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>]
+csdk org-admin-grant update --id <UUID> [--actorId <UUID>] [--entityId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>]
 csdk org-admin-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-admin-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgAdminGrant
 
 ```bash
-csdk org-admin-grant create --entityId <UUID> [--isGrant <Boolean>] [--actorId <UUID>] [--grantorId <UUID>]
+csdk org-admin-grant create --entityId <UUID> [--actorId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>]
 ```
 
 ### Get a orgAdminGrant by id

@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `OrgPermission`.
 ## Usage
 
 ```typescript
-useOrgPermissionsGetByMaskQuery({ mask: '<BitString>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
+useOrgPermissionsGetByMaskQuery({ after: '<Cursor>', first: '<Int>', mask: '<BitString>', offset: '<Int>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useOrgPermissionsGetByMaskQuery({ mask: '<BitString>', first: '<Int>', offset: '
 ### Use useOrgPermissionsGetByMaskQuery
 
 ```typescript
-const { data, isLoading } = useOrgPermissionsGetByMaskQuery({ mask: '<BitString>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
+const { data, isLoading } = useOrgPermissionsGetByMaskQuery({ after: '<Cursor>', first: '<Int>', mask: '<BitString>', offset: '<Int>' });
 ```

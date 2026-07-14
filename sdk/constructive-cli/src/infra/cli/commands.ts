@@ -6,19 +6,19 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
+import dbPresetCmd from './commands/db-preset';
+import infraCommitCmd from './commands/infra-commit';
 import infraGetAllRecordCmd from './commands/infra-get-all-record';
+import infraObjectCmd from './commands/infra-object';
 import infraRefCmd from './commands/infra-ref';
 import infraStoreCmd from './commands/infra-store';
-import infraObjectCmd from './commands/infra-object';
-import infraCommitCmd from './commands/infra-commit';
-import dbPresetCmd from './commands/db-preset';
-import platformNamespaceCmd from './commands/platform-namespace';
 import namespaceCmd from './commands/namespace';
-import platformNamespaceEventCmd from './commands/platform-namespace-event';
 import namespaceEventCmd from './commands/namespace-event';
+import platformNamespaceCmd from './commands/platform-namespace';
+import platformNamespaceEventCmd from './commands/platform-namespace-event';
 import infraInitEmptyRepoCmd from './commands/infra-init-empty-repo';
-import infraSetDataAtPathCmd from './commands/infra-set-data-at-path';
 import infraInsertNodeAtPathCmd from './commands/infra-insert-node-at-path';
+import infraSetDataAtPathCmd from './commands/infra-set-data-at-path';
 import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
@@ -30,23 +30,23 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
+  'db-preset': dbPresetCmd,
+  'infra-commit': infraCommitCmd,
   'infra-get-all-record': infraGetAllRecordCmd,
+  'infra-object': infraObjectCmd,
   'infra-ref': infraRefCmd,
   'infra-store': infraStoreCmd,
-  'infra-object': infraObjectCmd,
-  'infra-commit': infraCommitCmd,
-  'db-preset': dbPresetCmd,
-  'platform-namespace': platformNamespaceCmd,
   namespace: namespaceCmd,
-  'platform-namespace-event': platformNamespaceEventCmd,
   'namespace-event': namespaceEventCmd,
+  'platform-namespace': platformNamespaceCmd,
+  'platform-namespace-event': platformNamespaceEventCmd,
   'infra-init-empty-repo': infraInitEmptyRepoCmd,
-  'infra-set-data-at-path': infraSetDataAtPathCmd,
   'infra-insert-node-at-path': infraInsertNodeAtPathCmd,
+  'infra-set-data-at-path': infraSetDataAtPathCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  infra-get-all-record infraGetAllRecord CRUD operations\n  infra-ref            infraRef CRUD operations\n  infra-store          infraStore CRUD operations\n  infra-object         infraObject CRUD operations\n  infra-commit         infraCommit CRUD operations\n  db-preset            dbPreset CRUD operations\n  platform-namespace   platformNamespace CRUD operations\n  namespace            namespace CRUD operations\n  platform-namespace-event platformNamespaceEvent CRUD operations\n  namespace-event      namespaceEvent CRUD operations\n  infra-init-empty-repo infraInitEmptyRepo\n  infra-set-data-at-path infraSetDataAtPath\n  infra-insert-node-at-path infraInsertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  db-preset            dbPreset CRUD operations\n  infra-commit         infraCommit CRUD operations\n  infra-get-all-record infraGetAllRecord CRUD operations\n  infra-object         infraObject CRUD operations\n  infra-ref            infraRef CRUD operations\n  infra-store          infraStore CRUD operations\n  namespace            namespace CRUD operations\n  namespace-event      namespaceEvent CRUD operations\n  platform-namespace   platformNamespace CRUD operations\n  platform-namespace-event platformNamespaceEvent CRUD operations\n  infra-init-empty-repo infraInitEmptyRepo\n  infra-insert-node-at-path infraInsertNodeAtPath\n  infra-set-data-at-path infraSetDataAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

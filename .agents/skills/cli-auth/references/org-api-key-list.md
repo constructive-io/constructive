@@ -12,8 +12,8 @@ csdk org-api-key-list list --where.<field>.<op> <value> --orderBy <values>
 csdk org-api-key-list list --limit 10 --after <cursor>
 csdk org-api-key-list find-first --where.<field>.<op> <value>
 csdk org-api-key-list get --id <UUID>
-csdk org-api-key-list create [--keyId <String>] [--name <String>] [--principalId <UUID>] [--orgId <UUID>] [--expiresAt <Datetime>] [--revokedAt <Datetime>] [--lastUsedAt <Datetime>] [--mfaLevel <String>] [--accessLevel <String>]
-csdk org-api-key-list update --id <UUID> [--keyId <String>] [--name <String>] [--principalId <UUID>] [--orgId <UUID>] [--expiresAt <Datetime>] [--revokedAt <Datetime>] [--lastUsedAt <Datetime>] [--mfaLevel <String>] [--accessLevel <String>]
+csdk org-api-key-list create [--accessLevel <String>] [--expiresAt <Datetime>] [--keyId <String>] [--lastUsedAt <Datetime>] [--mfaLevel <String>] [--name <String>] [--orgId <UUID>] [--principalId <UUID>] [--revokedAt <Datetime>]
+csdk org-api-key-list update --id <UUID> [--accessLevel <String>] [--expiresAt <Datetime>] [--keyId <String>] [--lastUsedAt <Datetime>] [--mfaLevel <String>] [--name <String>] [--orgId <UUID>] [--principalId <UUID>] [--revokedAt <Datetime>]
 csdk org-api-key-list delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-api-key-list list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgApiKeyList
 
 ```bash
-csdk org-api-key-list create [--keyId <String>] [--name <String>] [--principalId <UUID>] [--orgId <UUID>] [--expiresAt <Datetime>] [--revokedAt <Datetime>] [--lastUsedAt <Datetime>] [--mfaLevel <String>] [--accessLevel <String>]
+csdk org-api-key-list create [--accessLevel <String>] [--expiresAt <Datetime>] [--keyId <String>] [--lastUsedAt <Datetime>] [--mfaLevel <String>] [--name <String>] [--orgId <UUID>] [--principalId <UUID>] [--revokedAt <Datetime>]
 ```
 
 ### Get a orgApiKeyList by id

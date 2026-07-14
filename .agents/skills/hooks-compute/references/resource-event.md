@@ -7,8 +7,8 @@ Resource lifecycle events — audit log of provisioning, updates, and failure ev
 ## Usage
 
 ```typescript
-useResourceEventsQuery({ selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } } })
-useResourceEventQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } } })
+useResourceEventsQuery({ selection: { fields: { actorId: true, createdAt: true, databaseId: true, eventType: true, id: true, message: true, metadata: true, resourceId: true } } })
+useResourceEventQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, databaseId: true, eventType: true, id: true, message: true, metadata: true, resourceId: true } } })
 useCreateResourceEventMutation({ selection: { fields: { id: true } } })
 useUpdateResourceEventMutation({ selection: { fields: { id: true } } })
 useDeleteResourceEventMutation({})
@@ -20,7 +20,7 @@ useDeleteResourceEventMutation({})
 
 ```typescript
 const { data, isLoading } = useResourceEventsQuery({
-  selection: { fields: { createdAt: true, id: true, resourceId: true, eventType: true, actorId: true, message: true, metadata: true, databaseId: true } },
+  selection: { fields: { actorId: true, createdAt: true, databaseId: true, eventType: true, id: true, message: true, metadata: true, resourceId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useResourceEventsQuery({
 const { mutate } = useCreateResourceEventMutation({
   selection: { fields: { id: true } },
 });
-mutate({ resourceId: '<UUID>', eventType: '<String>', actorId: '<UUID>', message: '<String>', metadata: '<JSON>', databaseId: '<UUID>' });
+mutate({ actorId: '<UUID>', databaseId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', resourceId: '<UUID>' });
 ```

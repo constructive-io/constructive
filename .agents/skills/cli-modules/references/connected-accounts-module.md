@@ -12,8 +12,8 @@ csdk connected-accounts-module list --where.<field>.<op> <value> --orderBy <valu
 csdk connected-accounts-module list --limit 10 --after <cursor>
 csdk connected-accounts-module find-first --where.<field>.<op> <value>
 csdk connected-accounts-module get --id <UUID>
-csdk connected-accounts-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
-csdk connected-accounts-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk connected-accounts-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
+csdk connected-accounts-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk connected-accounts-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk connected-accounts-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a connectedAccountsModule
 
 ```bash
-csdk connected-accounts-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--apiName <String>] [--privateApiName <String>]
+csdk connected-accounts-module create --databaseId <UUID> --tableName <String> [--apiName <String>] [--ownerTableId <UUID>] [--privateApiName <String>] [--privateSchemaId <UUID>] [--schemaId <UUID>] [--tableId <UUID>]
 ```
 
 ### Get a connectedAccountsModule by id

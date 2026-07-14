@@ -12,8 +12,8 @@ csdk table-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk table-grant list --limit 10 --after <cursor>
 csdk table-grant find-first --where.<field>.<op> <value>
 csdk table-grant get --id <UUID>
-csdk table-grant create --tableId <UUID> --privilege <String> --granteeName <String> [--databaseId <UUID>] [--fieldIds <UUID>] [--isGrant <Boolean>]
-csdk table-grant update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--privilege <String>] [--granteeName <String>] [--fieldIds <UUID>] [--isGrant <Boolean>]
+csdk table-grant create --granteeName <String> --privilege <String> --tableId <UUID> [--databaseId <UUID>] [--fieldIds <UUID>] [--isGrant <Boolean>]
+csdk table-grant update --id <UUID> [--databaseId <UUID>] [--fieldIds <UUID>] [--granteeName <String>] [--isGrant <Boolean>] [--privilege <String>] [--tableId <UUID>]
 csdk table-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk table-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a tableGrant
 
 ```bash
-csdk table-grant create --tableId <UUID> --privilege <String> --granteeName <String> [--databaseId <UUID>] [--fieldIds <UUID>] [--isGrant <Boolean>]
+csdk table-grant create --granteeName <String> --privilege <String> --tableId <UUID> [--databaseId <UUID>] [--fieldIds <UUID>] [--isGrant <Boolean>]
 ```
 
 ### Get a tableGrant by id

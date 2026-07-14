@@ -12,8 +12,8 @@ csdk site-metadatum list --where.<field>.<op> <value> --orderBy <values>
 csdk site-metadatum list --limit 10 --after <cursor>
 csdk site-metadatum find-first --where.<field>.<op> <value>
 csdk site-metadatum get --id <UUID>
-csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--title <String>] [--description <String>] [--ogImage <Image>]
-csdk site-metadatum update --id <UUID> [--databaseId <UUID>] [--siteId <UUID>] [--title <String>] [--description <String>] [--ogImage <Image>]
+csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--description <String>] [--ogImage <Image>] [--title <String>]
+csdk site-metadatum update --id <UUID> [--databaseId <UUID>] [--description <String>] [--ogImage <Image>] [--siteId <UUID>] [--title <String>]
 csdk site-metadatum delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk site-metadatum list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a siteMetadatum
 
 ```bash
-csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--title <String>] [--description <String>] [--ogImage <Image>]
+csdk site-metadatum create --databaseId <UUID> --siteId <UUID> [--description <String>] [--ogImage <Image>] [--title <String>]
 ```
 
 ### Get a siteMetadatum by id

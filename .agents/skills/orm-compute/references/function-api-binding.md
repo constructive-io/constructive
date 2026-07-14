@@ -9,8 +9,8 @@ Join table binding function definitions to API endpoints with per-binding alias 
 ```typescript
 db.functionApiBinding.findMany({ select: { id: true } }).execute()
 db.functionApiBinding.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionApiBinding.create({ data: { functionDefinitionId: '<UUID>', apiId: '<UUID>', alias: '<String>', config: '<JSON>' }, select: { id: true } }).execute()
-db.functionApiBinding.update({ where: { id: '<UUID>' }, data: { functionDefinitionId: '<UUID>' }, select: { id: true } }).execute()
+db.functionApiBinding.create({ data: { alias: '<String>', apiId: '<UUID>', config: '<JSON>', functionDefinitionId: '<UUID>' }, select: { id: true } }).execute()
+db.functionApiBinding.update({ where: { id: '<UUID>' }, data: { alias: '<String>' }, select: { id: true } }).execute()
 db.functionApiBinding.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.functionApiBinding.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.functionApiBinding.findMany({
-  select: { id: true, functionDefinitionId: true }
+  select: { id: true, alias: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.functionApiBinding.findMany({
 
 ```typescript
 const item = await db.functionApiBinding.create({
-  data: { functionDefinitionId: '<UUID>', apiId: '<UUID>', alias: '<String>', config: '<JSON>' },
+  data: { alias: '<String>', apiId: '<UUID>', config: '<JSON>', functionDefinitionId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

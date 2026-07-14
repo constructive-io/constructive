@@ -7,7 +7,7 @@ Execute the importDefinitions mutation
 ## Usage
 
 ```bash
-csdk import-definitions --input.clientMutationId <String> --input.graphId <UUID> --input.sourceScopeId <UUID> --input.sourceCommitId <UUID> --input.contexts <String>
+csdk import-definitions --input.clientMutationId <String> --input.contexts <String> --input.graphId <UUID> --input.sourceCommitId <UUID> --input.sourceScopeId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk import-definitions --input.clientMutationId <String> --input.graphId <UUID>
 ### Run importDefinitions
 
 ```bash
-csdk import-definitions --input.clientMutationId <String> --input.graphId <UUID> --input.sourceScopeId <UUID> --input.sourceCommitId <UUID> --input.contexts <String>
+csdk import-definitions --input.clientMutationId <String> --input.contexts <String> --input.graphId <UUID> --input.sourceCommitId <UUID> --input.sourceScopeId <UUID>
 ```

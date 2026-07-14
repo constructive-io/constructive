@@ -7,7 +7,7 @@ React Query mutation hook for platformSecretsRemoveArray
 ## Usage
 
 ```typescript
-const { mutate } = usePlatformSecretsRemoveArrayMutation(); mutate({ input: { secretNames: '<String>', namespaceId: '<UUID>' } });
+const { mutate } = usePlatformSecretsRemoveArrayMutation(); mutate({ input: { namespaceId: '<UUID>', secretNames: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = usePlatformSecretsRemoveArrayMutation(); mutate({ input: { se
 
 ```typescript
 const { mutate, isLoading } = usePlatformSecretsRemoveArrayMutation();
-mutate({ input: { secretNames: '<String>', namespaceId: '<UUID>' } });
+mutate({ input: { namespaceId: '<UUID>', secretNames: '<String>' } });
 ```

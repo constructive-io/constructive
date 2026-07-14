@@ -18,6 +18,23 @@
 // Entity Mutation Keys
 // ============================================================================
 
+export const dbPresetMutationKeys = {
+  /** All dbPreset mutation keys */ all: ['mutation', 'dbpreset'] as const,
+  /** Create dbPreset mutation key */ create: () => ['mutation', 'dbpreset', 'create'] as const,
+  /** Update dbPreset mutation key */ update: (id: string | number) =>
+    ['mutation', 'dbpreset', 'update', id] as const,
+  /** Delete dbPreset mutation key */ delete: (id: string | number) =>
+    ['mutation', 'dbpreset', 'delete', id] as const,
+} as const;
+export const infraCommitMutationKeys = {
+  /** All infraCommit mutation keys */ all: ['mutation', 'infracommit'] as const,
+  /** Create infraCommit mutation key */ create: () =>
+    ['mutation', 'infracommit', 'create'] as const,
+  /** Update infraCommit mutation key */ update: (id: string | number) =>
+    ['mutation', 'infracommit', 'update', id] as const,
+  /** Delete infraCommit mutation key */ delete: (id: string | number) =>
+    ['mutation', 'infracommit', 'delete', id] as const,
+} as const;
 export const infraGetAllRecordMutationKeys = {
   /** All infraGetAllRecord mutation keys */ all: ['mutation', 'infragetallrecord'] as const,
   /** Create infraGetAllRecord mutation key */ create: () =>
@@ -26,6 +43,15 @@ export const infraGetAllRecordMutationKeys = {
     ['mutation', 'infragetallrecord', 'update', id] as const,
   /** Delete infraGetAllRecord mutation key */ delete: (id: string | number) =>
     ['mutation', 'infragetallrecord', 'delete', id] as const,
+} as const;
+export const infraObjectMutationKeys = {
+  /** All infraObject mutation keys */ all: ['mutation', 'infraobject'] as const,
+  /** Create infraObject mutation key */ create: () =>
+    ['mutation', 'infraobject', 'create'] as const,
+  /** Update infraObject mutation key */ update: (id: string | number) =>
+    ['mutation', 'infraobject', 'update', id] as const,
+  /** Delete infraObject mutation key */ delete: (id: string | number) =>
+    ['mutation', 'infraobject', 'delete', id] as const,
 } as const;
 export const infraRefMutationKeys = {
   /** All infraRef mutation keys */ all: ['mutation', 'infraref'] as const,
@@ -43,31 +69,22 @@ export const infraStoreMutationKeys = {
   /** Delete infraStore mutation key */ delete: (id: string | number) =>
     ['mutation', 'infrastore', 'delete', id] as const,
 } as const;
-export const infraObjectMutationKeys = {
-  /** All infraObject mutation keys */ all: ['mutation', 'infraobject'] as const,
-  /** Create infraObject mutation key */ create: () =>
-    ['mutation', 'infraobject', 'create'] as const,
-  /** Update infraObject mutation key */ update: (id: string | number) =>
-    ['mutation', 'infraobject', 'update', id] as const,
-  /** Delete infraObject mutation key */ delete: (id: string | number) =>
-    ['mutation', 'infraobject', 'delete', id] as const,
+export const namespaceMutationKeys = {
+  /** All namespace mutation keys */ all: ['mutation', 'namespace'] as const,
+  /** Create namespace mutation key */ create: () => ['mutation', 'namespace', 'create'] as const,
+  /** Update namespace mutation key */ update: (id: string | number) =>
+    ['mutation', 'namespace', 'update', id] as const,
+  /** Delete namespace mutation key */ delete: (id: string | number) =>
+    ['mutation', 'namespace', 'delete', id] as const,
 } as const;
-export const infraCommitMutationKeys = {
-  /** All infraCommit mutation keys */ all: ['mutation', 'infracommit'] as const,
-  /** Create infraCommit mutation key */ create: () =>
-    ['mutation', 'infracommit', 'create'] as const,
-  /** Update infraCommit mutation key */ update: (id: string | number) =>
-    ['mutation', 'infracommit', 'update', id] as const,
-  /** Delete infraCommit mutation key */ delete: (id: string | number) =>
-    ['mutation', 'infracommit', 'delete', id] as const,
-} as const;
-export const dbPresetMutationKeys = {
-  /** All dbPreset mutation keys */ all: ['mutation', 'dbpreset'] as const,
-  /** Create dbPreset mutation key */ create: () => ['mutation', 'dbpreset', 'create'] as const,
-  /** Update dbPreset mutation key */ update: (id: string | number) =>
-    ['mutation', 'dbpreset', 'update', id] as const,
-  /** Delete dbPreset mutation key */ delete: (id: string | number) =>
-    ['mutation', 'dbpreset', 'delete', id] as const,
+export const namespaceEventMutationKeys = {
+  /** All namespaceEvent mutation keys */ all: ['mutation', 'namespaceevent'] as const,
+  /** Create namespaceEvent mutation key */ create: () =>
+    ['mutation', 'namespaceevent', 'create'] as const,
+  /** Update namespaceEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'namespaceevent', 'update', id] as const,
+  /** Delete namespaceEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'namespaceevent', 'delete', id] as const,
 } as const;
 export const platformNamespaceMutationKeys = {
   /** All platformNamespace mutation keys */ all: ['mutation', 'platformnamespace'] as const,
@@ -77,14 +94,6 @@ export const platformNamespaceMutationKeys = {
     ['mutation', 'platformnamespace', 'update', id] as const,
   /** Delete platformNamespace mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformnamespace', 'delete', id] as const,
-} as const;
-export const namespaceMutationKeys = {
-  /** All namespace mutation keys */ all: ['mutation', 'namespace'] as const,
-  /** Create namespace mutation key */ create: () => ['mutation', 'namespace', 'create'] as const,
-  /** Update namespace mutation key */ update: (id: string | number) =>
-    ['mutation', 'namespace', 'update', id] as const,
-  /** Delete namespace mutation key */ delete: (id: string | number) =>
-    ['mutation', 'namespace', 'delete', id] as const,
 } as const;
 export const platformNamespaceEventMutationKeys = {
   /** All platformNamespaceEvent mutation keys */ all: [
@@ -98,15 +107,6 @@ export const platformNamespaceEventMutationKeys = {
   /** Delete platformNamespaceEvent mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformnamespaceevent', 'delete', id] as const,
 } as const;
-export const namespaceEventMutationKeys = {
-  /** All namespaceEvent mutation keys */ all: ['mutation', 'namespaceevent'] as const,
-  /** Create namespaceEvent mutation key */ create: () =>
-    ['mutation', 'namespaceevent', 'create'] as const,
-  /** Update namespaceEvent mutation key */ update: (id: string | number) =>
-    ['mutation', 'namespaceevent', 'update', id] as const,
-  /** Delete namespaceEvent mutation key */ delete: (id: string | number) =>
-    ['mutation', 'namespaceevent', 'delete', id] as const,
-} as const;
 
 // ============================================================================
 // Custom Mutation Keys
@@ -117,14 +117,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'infraInitEmptyRepo', identifier] as const)
       : (['mutation', 'infraInitEmptyRepo'] as const),
-  /** Mutation key for infraSetDataAtPath */ infraSetDataAtPath: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'infraSetDataAtPath', identifier] as const)
-      : (['mutation', 'infraSetDataAtPath'] as const),
   /** Mutation key for infraInsertNodeAtPath */ infraInsertNodeAtPath: (identifier?: string) =>
     identifier
       ? (['mutation', 'infraInsertNodeAtPath', identifier] as const)
       : (['mutation', 'infraInsertNodeAtPath'] as const),
+  /** Mutation key for infraSetDataAtPath */ infraSetDataAtPath: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'infraSetDataAtPath', identifier] as const)
+      : (['mutation', 'infraSetDataAtPath'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
@@ -153,15 +153,15 @@ export const customMutationKeys = {
  * ```
  */
 export const mutationKeys = {
+  dbPreset: dbPresetMutationKeys,
+  infraCommit: infraCommitMutationKeys,
   infraGetAllRecord: infraGetAllRecordMutationKeys,
+  infraObject: infraObjectMutationKeys,
   infraRef: infraRefMutationKeys,
   infraStore: infraStoreMutationKeys,
-  infraObject: infraObjectMutationKeys,
-  infraCommit: infraCommitMutationKeys,
-  dbPreset: dbPresetMutationKeys,
-  platformNamespace: platformNamespaceMutationKeys,
   namespace: namespaceMutationKeys,
-  platformNamespaceEvent: platformNamespaceEventMutationKeys,
   namespaceEvent: namespaceEventMutationKeys,
+  platformNamespace: platformNamespaceMutationKeys,
+  platformNamespaceEvent: platformNamespaceEventMutationKeys,
   custom: customMutationKeys,
 } as const;

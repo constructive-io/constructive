@@ -46,13 +46,22 @@ export function createModuleLoader<T>(opts: CreateLoaderOptions<T>): ModuleLoade
       }
 
       log.debug(`Cache MISS databaseId=${key}, resolving`);
+      // "Not provisioned" is expressed by the loader returning undefined, or
+      // by the module's tables not existing at all (42P01 undefined_table).
+      // Any other resolution error (bad query, ambiguous config) propagates —
+      // never silently coerced into "module absent".
       try {
         const value = await opts.resolve(ctx);
         cache.set(key, value);
         return value;
       } catch (e: any) {
+        if (e.code === '42P01') {
+          log.debug(`Module tables absent for databaseId=${key}: ${e.message}`);
+          cache.set(key, undefined);
+          return undefined;
+        }
         log.warn(`Failed to resolve databaseId=${key}: ${e.message}`);
-        return undefined;
+        throw e;
       }
     },
 

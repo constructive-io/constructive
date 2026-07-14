@@ -12,8 +12,8 @@ csdk trigger list --where.<field>.<op> <value> --orderBy <values>
 csdk trigger list --limit 10 --after <cursor>
 csdk trigger find-first --where.<field>.<op> <value>
 csdk trigger get --id <UUID>
-csdk trigger create --tableId <UUID> --name <String> [--databaseId <UUID>] [--event <String>] [--functionName <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
-csdk trigger update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--name <String>] [--event <String>] [--functionName <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
+csdk trigger create --name <String> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--event <String>] [--functionName <String>] [--smartTags <JSON>] [--tags <String>]
+csdk trigger update --id <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--event <String>] [--functionName <String>] [--name <String>] [--smartTags <JSON>] [--tableId <UUID>] [--tags <String>]
 csdk trigger delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk trigger list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a trigger
 
 ```bash
-csdk trigger create --tableId <UUID> --name <String> [--databaseId <UUID>] [--event <String>] [--functionName <String>] [--smartTags <JSON>] [--category <ObjectCategory>] [--tags <String>]
+csdk trigger create --name <String> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--event <String>] [--functionName <String>] [--smartTags <JSON>] [--tags <String>]
 ```
 
 ### Get a trigger by id

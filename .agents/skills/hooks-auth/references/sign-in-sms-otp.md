@@ -7,7 +7,7 @@ React Query mutation hook for signInSmsOtp
 ## Usage
 
 ```typescript
-const { mutate } = useSignInSmsOtpMutation(); mutate({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } });
+const { mutate } = useSignInSmsOtpMutation(); mutate({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSignInSmsOtpMutation(); mutate({ input: { phone: '<String>
 
 ```typescript
 const { mutate, isLoading } = useSignInSmsOtpMutation();
-mutate({ input: { phone: '<String>', code: '<String>', credentialKind: '<String>', rememberMe: '<Boolean>', deviceToken: '<String>' } });
+mutate({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } });
 ```

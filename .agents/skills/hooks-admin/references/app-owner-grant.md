@@ -7,8 +7,8 @@ Records of ownership transfers and grants between members
 ## Usage
 
 ```typescript
-useAppOwnerGrantsQuery({ selection: { fields: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } } })
-useAppOwnerGrantQuery({ id: '<UUID>', selection: { fields: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } } })
+useAppOwnerGrantsQuery({ selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, updatedAt: true } } })
+useAppOwnerGrantQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, updatedAt: true } } })
 useCreateAppOwnerGrantMutation({ selection: { fields: { id: true } } })
 useUpdateAppOwnerGrantMutation({ selection: { fields: { id: true } } })
 useDeleteAppOwnerGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteAppOwnerGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useAppOwnerGrantsQuery({
-  selection: { fields: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { actorId: true, createdAt: true, grantorId: true, id: true, isGrant: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppOwnerGrantsQuery({
 const { mutate } = useCreateAppOwnerGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ isGrant: '<Boolean>', actorId: '<UUID>', grantorId: '<UUID>' });
+mutate({ actorId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>' });
 ```

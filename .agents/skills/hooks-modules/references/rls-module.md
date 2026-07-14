@@ -7,8 +7,8 @@ React Query hooks for RlsModule data operations
 ## Usage
 
 ```typescript
-useRlsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, apiName: true, privateApiName: true } } })
-useRlsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, apiName: true, privateApiName: true } } })
+useRlsModulesQuery({ selection: { fields: { apiName: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, databaseId: true, id: true, privateApiName: true, privateSchemaId: true, schemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true } } })
+useRlsModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, databaseId: true, id: true, privateApiName: true, privateSchemaId: true, schemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true } } })
 useCreateRlsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateRlsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteRlsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteRlsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useRlsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, apiName: true, privateApiName: true } },
+  selection: { fields: { apiName: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, databaseId: true, id: true, privateApiName: true, privateSchemaId: true, schemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useRlsModulesQuery({
 const { mutate } = useCreateRlsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>', apiName: '<String>', privateApiName: '<String>' });
+mutate({ apiName: '<String>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>', databaseId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>' });
 ```

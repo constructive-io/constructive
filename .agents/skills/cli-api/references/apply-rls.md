@@ -7,7 +7,7 @@ Execute the applyRls mutation
 ## Usage
 
 ```bash
-csdk apply-rls --input.clientMutationId <String> --input.tableId <UUID> --input.grants <JSON> --input.policyType <String> --input.vars <JSON> --input.fieldIds <UUID> --input.permissive <Boolean> --input.name <String>
+csdk apply-rls --input.clientMutationId <String> --input.fieldIds <UUID> --input.grants <JSON> --input.name <String> --input.permissive <Boolean> --input.policyType <String> --input.tableId <UUID> --input.vars <JSON>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk apply-rls --input.clientMutationId <String> --input.tableId <UUID> --input.
 ### Run applyRls
 
 ```bash
-csdk apply-rls --input.clientMutationId <String> --input.tableId <UUID> --input.grants <JSON> --input.policyType <String> --input.vars <JSON> --input.fieldIds <UUID> --input.permissive <Boolean> --input.name <String>
+csdk apply-rls --input.clientMutationId <String> --input.fieldIds <UUID> --input.grants <JSON> --input.name <String> --input.permissive <Boolean> --input.policyType <String> --input.tableId <UUID> --input.vars <JSON>
 ```

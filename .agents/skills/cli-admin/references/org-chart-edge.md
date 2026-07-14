@@ -12,8 +12,8 @@ csdk org-chart-edge list --where.<field>.<op> <value> --orderBy <values>
 csdk org-chart-edge list --limit 10 --after <cursor>
 csdk org-chart-edge find-first --where.<field>.<op> <value>
 csdk org-chart-edge get --id <UUID>
-csdk org-chart-edge create --entityId <UUID> --childId <UUID> [--parentId <UUID>] [--positionTitle <String>] [--positionLevel <Int>]
-csdk org-chart-edge update --id <UUID> [--entityId <UUID>] [--childId <UUID>] [--parentId <UUID>] [--positionTitle <String>] [--positionLevel <Int>]
+csdk org-chart-edge create --childId <UUID> --entityId <UUID> [--parentId <UUID>] [--positionLevel <Int>] [--positionTitle <String>]
+csdk org-chart-edge update --id <UUID> [--childId <UUID>] [--entityId <UUID>] [--parentId <UUID>] [--positionLevel <Int>] [--positionTitle <String>]
 csdk org-chart-edge delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-chart-edge list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgChartEdge
 
 ```bash
-csdk org-chart-edge create --entityId <UUID> --childId <UUID> [--parentId <UUID>] [--positionTitle <String>] [--positionLevel <Int>]
+csdk org-chart-edge create --childId <UUID> --entityId <UUID> [--parentId <UUID>] [--positionLevel <Int>] [--positionTitle <String>]
 ```
 
 ### Get a orgChartEdge by id

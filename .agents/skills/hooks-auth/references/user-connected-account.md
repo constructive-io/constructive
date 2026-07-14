@@ -7,8 +7,8 @@ React Query hooks for UserConnectedAccount data operations
 ## Usage
 
 ```typescript
-useUserConnectedAccountsQuery({ selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } } })
-useUserConnectedAccountQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } } })
+useUserConnectedAccountsQuery({ selection: { fields: { createdAt: true, details: true, id: true, identifier: true, isVerified: true, ownerId: true, service: true, updatedAt: true } } })
+useUserConnectedAccountQuery({ id: '<UUID>', selection: { fields: { createdAt: true, details: true, id: true, identifier: true, isVerified: true, ownerId: true, service: true, updatedAt: true } } })
 useCreateUserConnectedAccountMutation({ selection: { fields: { id: true } } })
 useUpdateUserConnectedAccountMutation({ selection: { fields: { id: true } } })
 useDeleteUserConnectedAccountMutation({})
@@ -20,7 +20,7 @@ useDeleteUserConnectedAccountMutation({})
 
 ```typescript
 const { data, isLoading } = useUserConnectedAccountsQuery({
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, details: true, id: true, identifier: true, isVerified: true, ownerId: true, service: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUserConnectedAccountsQuery({
 const { mutate } = useCreateUserConnectedAccountMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
+mutate({ details: '<JSON>', identifier: '<String>', isVerified: '<Boolean>', ownerId: '<UUID>', service: '<String>' });
 ```

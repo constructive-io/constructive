@@ -16,13 +16,13 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  data: 'json',
-  senderId: 'uuid',
-  receiverId: 'uuid',
   createdAt: 'string',
-  updatedAt: 'string',
+  data: 'json',
   entityId: 'uuid',
+  id: 'uuid',
+  receiverId: 'uuid',
+  senderId: 'uuid',
+  updatedAt: 'string',
 };
 const usage =
   '\norg-claimed-invite <command>\n\nCommands:\n  list                  List orgClaimedInvite records\n  find-first            Find first matching orgClaimedInvite record\n  get                   Get a orgClaimedInvite by ID\n  create                Create a new orgClaimedInvite\n  update                Update an existing orgClaimedInvite\n  delete                Delete a orgClaimedInvite\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -75,13 +75,13 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      data: true,
-      senderId: true,
-      receiverId: true,
       createdAt: true,
-      updatedAt: true,
+      data: true,
       entityId: true,
+      id: true,
+      receiverId: true,
+      senderId: true,
+      updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy> & {
@@ -102,13 +102,13 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      data: true,
-      senderId: true,
-      receiverId: true,
       createdAt: true,
-      updatedAt: true,
+      data: true,
       entityId: true,
+      id: true,
+      receiverId: true,
+      senderId: true,
+      updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<OrgClaimedInviteSelect, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy> & {
@@ -141,13 +141,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          data: true,
-          senderId: true,
-          receiverId: true,
           createdAt: true,
-          updatedAt: true,
+          data: true,
           entityId: true,
+          id: true,
+          receiverId: true,
+          senderId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -172,10 +172,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'senderId',
-        message: 'senderId',
-        required: false,
-        skipPrompt: true,
+        name: 'entityId',
+        message: 'entityId',
+        required: true,
       },
       {
         type: 'text',
@@ -186,9 +185,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
-        required: true,
+        name: 'senderId',
+        message: 'senderId',
+        required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -201,18 +201,18 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           data: cleanedData.data,
-          senderId: cleanedData.senderId,
-          receiverId: cleanedData.receiverId,
           entityId: cleanedData.entityId,
+          receiverId: cleanedData.receiverId,
+          senderId: cleanedData.senderId,
         },
         select: {
-          id: true,
-          data: true,
-          senderId: true,
-          receiverId: true,
           createdAt: true,
-          updatedAt: true,
+          data: true,
           entityId: true,
+          id: true,
+          receiverId: true,
+          senderId: true,
+          updatedAt: true,
         },
       })
       .execute();
@@ -243,10 +243,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'senderId',
-        message: 'senderId',
+        name: 'entityId',
+        message: 'entityId',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -257,9 +256,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'entityId',
-        message: 'entityId',
+        name: 'senderId',
+        message: 'senderId',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -272,18 +272,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           data: cleanedData.data,
-          senderId: cleanedData.senderId,
-          receiverId: cleanedData.receiverId,
           entityId: cleanedData.entityId,
+          receiverId: cleanedData.receiverId,
+          senderId: cleanedData.senderId,
         },
         select: {
-          id: true,
-          data: true,
-          senderId: true,
-          receiverId: true,
           createdAt: true,
-          updatedAt: true,
+          data: true,
           entityId: true,
+          id: true,
+          receiverId: true,
+          senderId: true,
+          updatedAt: true,
         },
       })
       .execute();

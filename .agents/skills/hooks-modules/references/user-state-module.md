@@ -7,8 +7,8 @@ React Query hooks for UserStateModule data operations
 ## Usage
 
 ```typescript
-useUserStateModulesQuery({ selection: { fields: { id: true, databaseId: true, entityField: true, schemaId: true, tableId: true, tableName: true } } })
-useUserStateModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, entityField: true, schemaId: true, tableId: true, tableName: true } } })
+useUserStateModulesQuery({ selection: { fields: { databaseId: true, entityField: true, id: true, schemaId: true, tableId: true, tableName: true } } })
+useUserStateModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, entityField: true, id: true, schemaId: true, tableId: true, tableName: true } } })
 useCreateUserStateModuleMutation({ selection: { fields: { id: true } } })
 useUpdateUserStateModuleMutation({ selection: { fields: { id: true } } })
 useDeleteUserStateModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteUserStateModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useUserStateModulesQuery({
-  selection: { fields: { id: true, databaseId: true, entityField: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { databaseId: true, entityField: true, id: true, schemaId: true, tableId: true, tableName: true } },
 });
 ```
 

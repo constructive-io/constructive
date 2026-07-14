@@ -7,8 +7,8 @@ Simplified view of active members in an entity, used for listing who belongs to 
 ## Usage
 
 ```typescript
-useOrgMembersQuery({ selection: { fields: { id: true, isAdmin: true, actorId: true, entityId: true } } })
-useOrgMemberQuery({ id: '<UUID>', selection: { fields: { id: true, isAdmin: true, actorId: true, entityId: true } } })
+useOrgMembersQuery({ selection: { fields: { actorId: true, entityId: true, id: true, isAdmin: true } } })
+useOrgMemberQuery({ id: '<UUID>', selection: { fields: { actorId: true, entityId: true, id: true, isAdmin: true } } })
 useCreateOrgMemberMutation({ selection: { fields: { id: true } } })
 useUpdateOrgMemberMutation({ selection: { fields: { id: true } } })
 useDeleteOrgMemberMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgMemberMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgMembersQuery({
-  selection: { fields: { id: true, isAdmin: true, actorId: true, entityId: true } },
+  selection: { fields: { actorId: true, entityId: true, id: true, isAdmin: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgMembersQuery({
 const { mutate } = useCreateOrgMemberMutation({
   selection: { fields: { id: true } },
 });
-mutate({ isAdmin: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>' });
+mutate({ actorId: '<UUID>', entityId: '<UUID>', isAdmin: '<Boolean>' });
 ```

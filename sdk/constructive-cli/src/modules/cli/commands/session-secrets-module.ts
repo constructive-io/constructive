@@ -16,12 +16,12 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
+  id: 'uuid',
   schemaId: 'uuid',
+  sessionsTableId: 'uuid',
   tableId: 'uuid',
   tableName: 'string',
-  sessionsTableId: 'uuid',
 };
 const usage =
   '\nsession-secrets-module <command>\n\nCommands:\n  list                  List sessionSecretsModule records\n  find-first            Find first matching sessionSecretsModule record\n  get                   Get a sessionSecretsModule by ID\n  create                Create a new sessionSecretsModule\n  update                Update an existing sessionSecretsModule\n  delete                Delete a sessionSecretsModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -74,12 +74,12 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       schemaId: true,
+      sessionsTableId: true,
       tableId: true,
       tableName: true,
-      sessionsTableId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -104,12 +104,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
+      id: true,
       schemaId: true,
+      sessionsTableId: true,
       tableId: true,
       tableName: true,
-      sessionsTableId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -146,12 +146,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           schemaId: true,
+          sessionsTableId: true,
           tableId: true,
           tableName: true,
-          sessionsTableId: true,
         },
       })
       .execute();
@@ -182,6 +182,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'sessionsTableId',
+        message: 'sessionsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'tableId',
         message: 'tableId',
         required: false,
@@ -191,13 +198,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'tableName',
         message: 'tableName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'sessionsTableId',
-        message: 'sessionsTableId',
         required: false,
         skipPrompt: true,
       },
@@ -213,17 +213,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           databaseId: cleanedData.databaseId,
           schemaId: cleanedData.schemaId,
+          sessionsTableId: cleanedData.sessionsTableId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
-          sessionsTableId: cleanedData.sessionsTableId,
         },
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           schemaId: true,
+          sessionsTableId: true,
           tableId: true,
           tableName: true,
-          sessionsTableId: true,
         },
       })
       .execute();
@@ -260,6 +260,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'sessionsTableId',
+        message: 'sessionsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'tableId',
         message: 'tableId',
         required: false,
@@ -269,13 +276,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'tableName',
         message: 'tableName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'sessionsTableId',
-        message: 'sessionsTableId',
         required: false,
         skipPrompt: true,
       },
@@ -291,17 +291,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           databaseId: cleanedData.databaseId,
           schemaId: cleanedData.schemaId,
+          sessionsTableId: cleanedData.sessionsTableId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
-          sessionsTableId: cleanedData.sessionsTableId,
         },
         select: {
-          id: true,
           databaseId: true,
+          id: true,
           schemaId: true,
+          sessionsTableId: true,
           tableId: true,
           tableName: true,
-          sessionsTableId: true,
         },
       })
       .execute();

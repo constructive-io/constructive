@@ -12,8 +12,8 @@ csdk crypto-auth-module list --where.<field>.<op> <value> --orderBy <values>
 csdk crypto-auth-module list --limit 10 --after <cursor>
 csdk crypto-auth-module find-first --where.<field>.<op> <value>
 csdk crypto-auth-module get --id <UUID>
-csdk crypto-auth-module create --databaseId <UUID> --userField <String> [--schemaId <UUID>] [--usersTableId <UUID>] [--secretsTableId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--addressesTableId <UUID>] [--cryptoNetwork <String>] [--signInRequestChallenge <String>] [--signInRecordFailure <String>] [--signUpWithKey <String>] [--signInWithChallenge <String>]
-csdk crypto-auth-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--usersTableId <UUID>] [--secretsTableId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--addressesTableId <UUID>] [--userField <String>] [--cryptoNetwork <String>] [--signInRequestChallenge <String>] [--signInRecordFailure <String>] [--signUpWithKey <String>] [--signInWithChallenge <String>]
+csdk crypto-auth-module create --databaseId <UUID> --userField <String> [--addressesTableId <UUID>] [--cryptoNetwork <String>] [--schemaId <UUID>] [--secretsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--signInRecordFailure <String>] [--signInRequestChallenge <String>] [--signInWithChallenge <String>] [--signUpWithKey <String>] [--usersTableId <UUID>]
+csdk crypto-auth-module update --id <UUID> [--addressesTableId <UUID>] [--cryptoNetwork <String>] [--databaseId <UUID>] [--schemaId <UUID>] [--secretsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--signInRecordFailure <String>] [--signInRequestChallenge <String>] [--signInWithChallenge <String>] [--signUpWithKey <String>] [--userField <String>] [--usersTableId <UUID>]
 csdk crypto-auth-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk crypto-auth-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a cryptoAuthModule
 
 ```bash
-csdk crypto-auth-module create --databaseId <UUID> --userField <String> [--schemaId <UUID>] [--usersTableId <UUID>] [--secretsTableId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--addressesTableId <UUID>] [--cryptoNetwork <String>] [--signInRequestChallenge <String>] [--signInRecordFailure <String>] [--signUpWithKey <String>] [--signInWithChallenge <String>]
+csdk crypto-auth-module create --databaseId <UUID> --userField <String> [--addressesTableId <UUID>] [--cryptoNetwork <String>] [--schemaId <UUID>] [--secretsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionsTableId <UUID>] [--signInRecordFailure <String>] [--signInRequestChallenge <String>] [--signInWithChallenge <String>] [--signUpWithKey <String>] [--usersTableId <UUID>]
 ```
 
 ### Get a cryptoAuthModule by id

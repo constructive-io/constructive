@@ -7,7 +7,7 @@ Execute the signInCrossOrigin mutation
 ## Usage
 
 ```typescript
-db.mutation.signInCrossOrigin({ input: { token: '<String>', credentialKind: '<String>' } }).execute()
+db.mutation.signInCrossOrigin({ input: { credentialKind: '<String>', token: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.signInCrossOrigin({ input: { token: '<String>', credentialKind: '<St
 ### Run signInCrossOrigin
 
 ```typescript
-const result = await db.mutation.signInCrossOrigin({ input: { token: '<String>', credentialKind: '<String>' } }).execute();
+const result = await db.mutation.signInCrossOrigin({ input: { credentialKind: '<String>', token: '<String>' } }).execute();
 ```

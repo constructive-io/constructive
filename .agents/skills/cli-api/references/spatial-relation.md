@@ -12,8 +12,8 @@ csdk spatial-relation list --where.<field>.<op> <value> --orderBy <values>
 csdk spatial-relation list --limit 10 --after <cursor>
 csdk spatial-relation find-first --where.<field>.<op> <value>
 csdk spatial-relation get --id <UUID>
-csdk spatial-relation create --tableId <UUID> --fieldId <UUID> --refTableId <UUID> --refFieldId <UUID> --name <String> --operator <String> [--databaseId <UUID>] [--paramName <String>] [--category <ObjectCategory>] [--tags <String>]
-csdk spatial-relation update --id <UUID> [--databaseId <UUID>] [--tableId <UUID>] [--fieldId <UUID>] [--refTableId <UUID>] [--refFieldId <UUID>] [--name <String>] [--operator <String>] [--paramName <String>] [--category <ObjectCategory>] [--tags <String>]
+csdk spatial-relation create --fieldId <UUID> --name <String> --operator <String> --refFieldId <UUID> --refTableId <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--paramName <String>] [--tags <String>]
+csdk spatial-relation update --id <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--fieldId <UUID>] [--name <String>] [--operator <String>] [--paramName <String>] [--refFieldId <UUID>] [--refTableId <UUID>] [--tableId <UUID>] [--tags <String>]
 csdk spatial-relation delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk spatial-relation list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a spatialRelation
 
 ```bash
-csdk spatial-relation create --tableId <UUID> --fieldId <UUID> --refTableId <UUID> --refFieldId <UUID> --name <String> --operator <String> [--databaseId <UUID>] [--paramName <String>] [--category <ObjectCategory>] [--tags <String>]
+csdk spatial-relation create --fieldId <UUID> --name <String> --operator <String> --refFieldId <UUID> --refTableId <UUID> --tableId <UUID> [--category <ObjectCategory>] [--databaseId <UUID>] [--paramName <String>] [--tags <String>]
 ```
 
 ### Get a spatialRelation by id

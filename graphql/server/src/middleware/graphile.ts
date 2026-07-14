@@ -1,11 +1,13 @@
 import crypto from 'node:crypto';
 import { getNodeEnv } from '@pgpmjs/env';
+import type { ComputeConfig } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
+import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
@@ -208,10 +210,33 @@ const buildPreset = (
   anonRole: string,
   roleName: string,
   databaseSettings?: DatabaseSettings,
+  apiId?: string,
+  compute?: ComputeConfig,
 ): GraphileConfig.Preset => {
   return {
   extends: [createConstructivePreset(databaseSettings)],
-  plugins: [AuthCookiePlugin],
+  plugins: [
+    AuthCookiePlugin,
+    // Only registered when the compute module is provisioned for this
+    // database — all schema/table names come from the constructive
+    // metaschema (express-context compute module loader); the plugin has
+    // no fallbacks or discovery of its own.
+    ...(apiId && compute?.modules.length
+      ? [
+        createFunctionBindingsPlugin({
+          apiId,
+          modules: compute.modules.map((m) => ({
+            computeSchema: m.schemaName,
+            bindingsTable: m.bindingsTableName,
+            definitionsTable: m.definitionsTableName,
+            invocationsSchema: m.invocationsSchemaName,
+            invocationsTable: m.invocationsTableName,
+            invocationsEntityField: m.invocationsEntityField,
+          })),
+        }),
+      ]
+      : []),
+  ],
   pgServices: [
     makePgService({
       pool,
@@ -235,6 +260,12 @@ const buildPreset = (
       if (req) {
         if (req.databaseId) {
           context['jwt.claims.database_id'] = req.databaseId;
+        }
+        // API provenance — which API surface this request arrived through.
+        // Derived server-side from hostname -> services_public.domains -> api_id;
+        // never taken from client-supplied headers, body, or token payload.
+        if (req.api?.apiId) {
+          context['jwt.claims.api_id'] = req.api.apiId;
         }
         if (req.clientIp) {
           context['jwt.claims.ip_address'] = req.clientIp;
@@ -380,7 +411,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings);
+      const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
+      const preset = buildPreset(pool, schema || [], anonRole, roleName, api.databaseSettings, api.apiId, compute);
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

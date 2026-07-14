@@ -9,8 +9,8 @@ User email addresses with verification and primary-email management
 ```typescript
 db.email.findMany({ select: { id: true } }).execute()
 db.email.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.email.create({ data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' }, select: { id: true } }).execute()
-db.email.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.email.create({ data: { email: '<Email>', isPrimary: '<Boolean>', isVerified: '<Boolean>', name: '<String>', ownerId: '<UUID>' }, select: { id: true } }).execute()
+db.email.update({ where: { id: '<UUID>' }, data: { email: '<Email>' }, select: { id: true } }).execute()
 db.email.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.email.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.email.findMany({
-  select: { id: true, ownerId: true }
+  select: { id: true, email: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.email.findMany({
 
 ```typescript
 const item = await db.email.create({
-  data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' },
+  data: { email: '<Email>', isPrimary: '<Boolean>', isVerified: '<Boolean>', name: '<String>', ownerId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

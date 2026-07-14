@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  databaseId: 'uuid',
-  name: 'string',
   code: 'string',
   createdAt: 'string',
+  databaseId: 'uuid',
+  id: 'uuid',
+  name: 'string',
   updatedAt: 'string',
 };
 const usage =
@@ -74,11 +74,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      name: true,
       code: true,
       createdAt: true,
+      databaseId: true,
+      id: true,
+      name: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -100,11 +100,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      databaseId: true,
-      name: true,
       code: true,
       createdAt: true,
+      databaseId: true,
+      id: true,
+      name: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -138,11 +138,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          databaseId: true,
-          name: true,
           code: true,
           createdAt: true,
+          databaseId: true,
+          id: true,
+          name: true,
           updatedAt: true,
         },
       })
@@ -161,6 +161,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'code',
+        message: 'code',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
@@ -170,13 +177,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'name',
         message: 'name',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'code',
-        message: 'code',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -188,16 +188,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.triggerFunction
       .create({
         data: {
+          code: cleanedData.code,
           databaseId: cleanedData.databaseId,
           name: cleanedData.name,
-          code: cleanedData.code,
         },
         select: {
-          id: true,
-          databaseId: true,
-          name: true,
           code: true,
           createdAt: true,
+          databaseId: true,
+          id: true,
+          name: true,
           updatedAt: true,
         },
       })
@@ -222,6 +222,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'code',
+        message: 'code',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -231,13 +238,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'name',
         message: 'name',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'code',
-        message: 'code',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -249,16 +249,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          code: cleanedData.code,
           databaseId: cleanedData.databaseId,
           name: cleanedData.name,
-          code: cleanedData.code,
         },
         select: {
-          id: true,
-          databaseId: true,
-          name: true,
           code: true,
           createdAt: true,
+          databaseId: true,
+          id: true,
+          name: true,
           updatedAt: true,
         },
       })

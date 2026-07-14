@@ -7,8 +7,8 @@ Named stores — one per version-controlled tree (e.g. one graph, one definition
 ## Usage
 
 ```typescript
-useInfraStoresQuery({ selection: { fields: { id: true, name: true, scopeId: true, hash: true, createdAt: true } } })
-useInfraStoreQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, scopeId: true, hash: true, createdAt: true } } })
+useInfraStoresQuery({ selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } } })
+useInfraStoreQuery({ id: '<UUID>', selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } } })
 useCreateInfraStoreMutation({ selection: { fields: { id: true } } })
 useUpdateInfraStoreMutation({ selection: { fields: { id: true } } })
 useDeleteInfraStoreMutation({})
@@ -20,7 +20,7 @@ useDeleteInfraStoreMutation({})
 
 ```typescript
 const { data, isLoading } = useInfraStoresQuery({
-  selection: { fields: { id: true, name: true, scopeId: true, hash: true, createdAt: true } },
+  selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useInfraStoresQuery({
 const { mutate } = useCreateInfraStoreMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', scopeId: '<UUID>', hash: '<UUID>' });
+mutate({ hash: '<UUID>', name: '<String>', scopeId: '<UUID>' });
 ```

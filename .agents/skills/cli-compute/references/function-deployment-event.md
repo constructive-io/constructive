@@ -12,8 +12,8 @@ csdk function-deployment-event list --where.<field>.<op> <value> --orderBy <valu
 csdk function-deployment-event list --limit 10 --after <cursor>
 csdk function-deployment-event find-first --where.<field>.<op> <value>
 csdk function-deployment-event get --id <UUID>
-csdk function-deployment-event create --deploymentId <UUID> --eventType <String> --databaseId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
-csdk function-deployment-event update --id <UUID> [--deploymentId <UUID>] [--eventType <String>] [--actorId <UUID>] [--message <String>] [--metadata <JSON>] [--databaseId <UUID>]
+csdk function-deployment-event create --databaseId <UUID> --deploymentId <UUID> --eventType <String> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
+csdk function-deployment-event update --id <UUID> [--actorId <UUID>] [--databaseId <UUID>] [--deploymentId <UUID>] [--eventType <String>] [--message <String>] [--metadata <JSON>]
 csdk function-deployment-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-deployment-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a functionDeploymentEvent
 
 ```bash
-csdk function-deployment-event create --deploymentId <UUID> --eventType <String> --databaseId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
+csdk function-deployment-event create --databaseId <UUID> --deploymentId <UUID> --eventType <String> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
 ```
 
 ### Get a functionDeploymentEvent by id

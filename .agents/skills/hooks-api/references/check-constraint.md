@@ -7,8 +7,8 @@ React Query hooks for CheckConstraint data operations
 ## Usage
 
 ```typescript
-useCheckConstraintsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } } })
-useCheckConstraintQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } } })
+useCheckConstraintsQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } } })
+useCheckConstraintQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } } })
 useCreateCheckConstraintMutation({ selection: { fields: { id: true } } })
 useUpdateCheckConstraintMutation({ selection: { fields: { id: true } } })
 useDeleteCheckConstraintMutation({})
@@ -20,7 +20,7 @@ useDeleteCheckConstraintMutation({})
 
 ```typescript
 const { data, isLoading } = useCheckConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, expr: true, fieldIds: true, id: true, name: true, smartTags: true, tableId: true, tags: true, type: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useCheckConstraintsQuery({
 const { mutate } = useCreateCheckConstraintMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', type: '<String>', fieldIds: '<UUID>', expr: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', expr: '<JSON>', fieldIds: '<UUID>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', type: '<String>' });
 ```

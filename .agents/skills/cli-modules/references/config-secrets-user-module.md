@@ -12,8 +12,8 @@ csdk config-secrets-user-module list --where.<field>.<op> <value> --orderBy <val
 csdk config-secrets-user-module list --limit 10 --after <cursor>
 csdk config-secrets-user-module find-first --where.<field>.<op> <value>
 csdk config-secrets-user-module get --id <UUID>
-csdk config-secrets-user-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
-csdk config-secrets-user-module update --id <UUID> [--databaseId <UUID>] [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk config-secrets-user-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--privateApiName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
+csdk config-secrets-user-module update --id <UUID> [--apiName <String>] [--databaseId <UUID>] [--entityField <String>] [--privateApiName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 csdk config-secrets-user-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk config-secrets-user-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a configSecretsUserModule
 
 ```bash
-csdk config-secrets-user-module create --databaseId <UUID> [--entityField <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>] [--apiName <String>] [--privateApiName <String>]
+csdk config-secrets-user-module create --databaseId <UUID> [--apiName <String>] [--entityField <String>] [--privateApiName <String>] [--schemaId <UUID>] [--tableId <UUID>] [--tableName <String>]
 ```
 
 ### Get a configSecretsUserModule by id

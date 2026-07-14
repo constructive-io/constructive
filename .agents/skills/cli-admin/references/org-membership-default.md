@@ -12,8 +12,8 @@ csdk org-membership-default list --where.<field>.<op> <value> --orderBy <values>
 csdk org-membership-default list --limit 10 --after <cursor>
 csdk org-membership-default find-first --where.<field>.<op> <value>
 csdk org-membership-default get --id <UUID>
-csdk org-membership-default create --entityId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>]
-csdk org-membership-default update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--entityId <UUID>]
+csdk org-membership-default create --entityId <UUID> [--createdBy <UUID>] [--isApproved <Boolean>] [--updatedBy <UUID>]
+csdk org-membership-default update --id <UUID> [--createdBy <UUID>] [--entityId <UUID>] [--isApproved <Boolean>] [--updatedBy <UUID>]
 csdk org-membership-default delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-membership-default list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgMembershipDefault
 
 ```bash
-csdk org-membership-default create --entityId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>]
+csdk org-membership-default create --entityId <UUID> [--createdBy <UUID>] [--isApproved <Boolean>] [--updatedBy <UUID>]
 ```
 
 ### Get a orgMembershipDefault by id

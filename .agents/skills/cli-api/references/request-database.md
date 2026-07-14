@@ -13,7 +13,7 @@ Example usage:
 ## Usage
 
 ```bash
-csdk request-database --input.clientMutationId <String> --input.databaseName <String> --input.domain <String> --input.presetSlug <String> --input.modules <JSON> --input.options <JSON> --input.subdomain <String>
+csdk request-database --input.clientMutationId <String> --input.databaseName <String> --input.domain <String> --input.modules <JSON> --input.options <JSON> --input.presetSlug <String> --input.subdomain <String>
 ```
 
 ## Examples
@@ -21,5 +21,5 @@ csdk request-database --input.clientMutationId <String> --input.databaseName <St
 ### Run requestDatabase
 
 ```bash
-csdk request-database --input.clientMutationId <String> --input.databaseName <String> --input.domain <String> --input.presetSlug <String> --input.modules <JSON> --input.options <JSON> --input.subdomain <String>
+csdk request-database --input.clientMutationId <String> --input.databaseName <String> --input.domain <String> --input.modules <JSON> --input.options <JSON> --input.presetSlug <String> --input.subdomain <String>
 ```

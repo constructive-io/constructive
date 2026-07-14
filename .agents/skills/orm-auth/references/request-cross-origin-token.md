@@ -7,7 +7,7 @@ Execute the requestCrossOriginToken mutation
 ## Usage
 
 ```typescript
-db.mutation.requestCrossOriginToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute()
+db.mutation.requestCrossOriginToken({ input: { email: '<String>', origin: '<Origin>', password: '<String>', rememberMe: '<Boolean>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.requestCrossOriginToken({ input: { email: '<String>', password: '<St
 ### Run requestCrossOriginToken
 
 ```typescript
-const result = await db.mutation.requestCrossOriginToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
+const result = await db.mutation.requestCrossOriginToken({ input: { email: '<String>', origin: '<Origin>', password: '<String>', rememberMe: '<Boolean>' } }).execute();
 ```

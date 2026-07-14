@@ -7,7 +7,7 @@ React Query hooks for PlatformResourcesResolvedRequirement data operations
 ## Usage
 
 ```typescript
-usePlatformResourcesResolvedRequirementsQuery({ selection: { fields: { resourceId: true, slug: true, namespaceId: true, requirementKind: true, name: true, required: true, atomId: true, present: true, secretsObjectName: true, configObjectName: true } } })
+usePlatformResourcesResolvedRequirementsQuery({ selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } } })
 useCreatePlatformResourcesResolvedRequirementMutation({ selection: { fields: { id: true } } })
 ```
 
@@ -17,7 +17,7 @@ useCreatePlatformResourcesResolvedRequirementMutation({ selection: { fields: { i
 
 ```typescript
 const { data, isLoading } = usePlatformResourcesResolvedRequirementsQuery({
-  selection: { fields: { resourceId: true, slug: true, namespaceId: true, requirementKind: true, name: true, required: true, atomId: true, present: true, secretsObjectName: true, configObjectName: true } },
+  selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } },
 });
 ```
 
@@ -27,5 +27,5 @@ const { data, isLoading } = usePlatformResourcesResolvedRequirementsQuery({
 const { mutate } = useCreatePlatformResourcesResolvedRequirementMutation({
   selection: { fields: { id: true } },
 });
-mutate({ resourceId: '<UUID>', slug: '<String>', namespaceId: '<UUID>', requirementKind: '<String>', name: '<String>', required: '<Boolean>', atomId: '<UUID>', present: '<Boolean>', secretsObjectName: '<String>', configObjectName: '<String>' });
+mutate({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' });
 ```

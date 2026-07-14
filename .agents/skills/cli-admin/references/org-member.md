@@ -13,7 +13,7 @@ csdk org-member list --limit 10 --after <cursor>
 csdk org-member find-first --where.<field>.<op> <value>
 csdk org-member get --id <UUID>
 csdk org-member create --actorId <UUID> --entityId <UUID> [--isAdmin <Boolean>]
-csdk org-member update --id <UUID> [--isAdmin <Boolean>] [--actorId <UUID>] [--entityId <UUID>]
+csdk org-member update --id <UUID> [--actorId <UUID>] [--entityId <UUID>] [--isAdmin <Boolean>]
 csdk org-member delete --id <UUID>
 ```
 

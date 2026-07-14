@@ -9,8 +9,8 @@ Function execution logs — structured console output per invocation
 ```typescript
 db.platformFunctionExecutionLog.findMany({ select: { id: true } }).execute()
 db.platformFunctionExecutionLog.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformFunctionExecutionLog.create({ data: { invocationId: '<UUID>', taskIdentifier: '<String>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', actorId: '<UUID>' }, select: { id: true } }).execute()
-db.platformFunctionExecutionLog.update({ where: { id: '<UUID>' }, data: { invocationId: '<UUID>' }, select: { id: true } }).execute()
+db.platformFunctionExecutionLog.create({ data: { actorId: '<UUID>', invocationId: '<UUID>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', taskIdentifier: '<String>' }, select: { id: true } }).execute()
+db.platformFunctionExecutionLog.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.platformFunctionExecutionLog.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.platformFunctionExecutionLog.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.platformFunctionExecutionLog.findMany({
-  select: { id: true, invocationId: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.platformFunctionExecutionLog.findMany({
 
 ```typescript
 const item = await db.platformFunctionExecutionLog.create({
-  data: { invocationId: '<UUID>', taskIdentifier: '<String>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', actorId: '<UUID>' },
+  data: { actorId: '<UUID>', invocationId: '<UUID>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', taskIdentifier: '<String>' },
   select: { id: true }
 }).execute();
 ```

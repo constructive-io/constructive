@@ -13,7 +13,7 @@ csdk trigger-function list --limit 10 --after <cursor>
 csdk trigger-function find-first --where.<field>.<op> <value>
 csdk trigger-function get --id <UUID>
 csdk trigger-function create --databaseId <UUID> --name <String> [--code <String>]
-csdk trigger-function update --id <UUID> [--databaseId <UUID>] [--name <String>] [--code <String>]
+csdk trigger-function update --id <UUID> [--code <String>] [--databaseId <UUID>] [--name <String>]
 csdk trigger-function delete --id <UUID>
 ```
 

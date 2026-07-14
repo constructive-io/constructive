@@ -9,8 +9,8 @@ Branch heads — mutable pointers into the commit chain
 ```typescript
 db.functionGraphRef.findMany({ select: { id: true } }).execute()
 db.functionGraphRef.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.functionGraphRef.create({ data: { name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' }, select: { id: true } }).execute()
-db.functionGraphRef.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.functionGraphRef.create({ data: { commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' }, select: { id: true } }).execute()
+db.functionGraphRef.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute()
 db.functionGraphRef.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.functionGraphRef.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.functionGraphRef.findMany({
-  select: { id: true, name: true }
+  select: { id: true, commitId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.functionGraphRef.findMany({
 
 ```typescript
 const item = await db.functionGraphRef.create({
-  data: { name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', commitId: '<UUID>' },
+  data: { commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

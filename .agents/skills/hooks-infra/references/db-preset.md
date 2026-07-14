@@ -7,8 +7,8 @@ Database provisioning preset catalog — merkle-versioned head over the infra st
 ## Usage
 
 ```typescript
-useDbPresetsQuery({ selection: { fields: { id: true, storeId: true, slug: true, definition: true, commitId: true, modulesHash: true, label: true, description: true, active: true, createdAt: true, updatedAt: true } } })
-useDbPresetQuery({ id: '<UUID>', selection: { fields: { id: true, storeId: true, slug: true, definition: true, commitId: true, modulesHash: true, label: true, description: true, active: true, createdAt: true, updatedAt: true } } })
+useDbPresetsQuery({ selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, modulesHash: true, slug: true, storeId: true, updatedAt: true } } })
+useDbPresetQuery({ id: '<UUID>', selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, modulesHash: true, slug: true, storeId: true, updatedAt: true } } })
 useCreateDbPresetMutation({ selection: { fields: { id: true } } })
 useUpdateDbPresetMutation({ selection: { fields: { id: true } } })
 useDeleteDbPresetMutation({})
@@ -20,7 +20,7 @@ useDeleteDbPresetMutation({})
 
 ```typescript
 const { data, isLoading } = useDbPresetsQuery({
-  selection: { fields: { id: true, storeId: true, slug: true, definition: true, commitId: true, modulesHash: true, label: true, description: true, active: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, label: true, modulesHash: true, slug: true, storeId: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDbPresetsQuery({
 const { mutate } = useCreateDbPresetMutation({
   selection: { fields: { id: true } },
 });
-mutate({ storeId: '<UUID>', slug: '<String>', definition: '<JSON>', commitId: '<UUID>', modulesHash: '<UUID>', label: '<String>', description: '<String>', active: '<Boolean>' });
+mutate({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', label: '<String>', modulesHash: '<UUID>', slug: '<String>', storeId: '<UUID>' });
 ```

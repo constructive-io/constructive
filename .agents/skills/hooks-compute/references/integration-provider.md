@@ -7,8 +7,8 @@ Branded catalog of external service integrations and their canonical secret/conf
 ## Usage
 
 ```typescript
-useIntegrationProvidersQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, slug: true, name: true, description: true, category: true, icon: true, logo: true, brand: true, requiredSecrets: true, requiredConfigs: true } } })
-useIntegrationProviderQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, slug: true, name: true, description: true, category: true, icon: true, logo: true, brand: true, requiredSecrets: true, requiredConfigs: true } } })
+useIntegrationProvidersQuery({ selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } } })
+useIntegrationProviderQuery({ id: '<UUID>', selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } } })
 useCreateIntegrationProviderMutation({ selection: { fields: { id: true } } })
 useUpdateIntegrationProviderMutation({ selection: { fields: { id: true } } })
 useDeleteIntegrationProviderMutation({})
@@ -20,7 +20,7 @@ useDeleteIntegrationProviderMutation({})
 
 ```typescript
 const { data, isLoading } = useIntegrationProvidersQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, slug: true, name: true, description: true, category: true, icon: true, logo: true, brand: true, requiredSecrets: true, requiredConfigs: true } },
+  selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useIntegrationProvidersQuery({
 const { mutate } = useCreateIntegrationProviderMutation({
   selection: { fields: { id: true } },
 });
-mutate({ slug: '<String>', name: '<String>', description: '<String>', category: '<String>', icon: '<String>', logo: '<Image>', brand: '<JSON>', requiredSecrets: '<ResourceRequirement>', requiredConfigs: '<ResourceRequirement>' });
+mutate({ brand: '<JSON>', category: '<String>', description: '<String>', icon: '<String>', logo: '<Image>', name: '<String>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>' });
 ```

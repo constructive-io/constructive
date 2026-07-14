@@ -12,8 +12,8 @@ csdk platform-function-api-binding list --where.<field>.<op> <value> --orderBy <
 csdk platform-function-api-binding list --limit 10 --after <cursor>
 csdk platform-function-api-binding find-first --where.<field>.<op> <value>
 csdk platform-function-api-binding get --id <UUID>
-csdk platform-function-api-binding create --functionDefinitionId <UUID> --apiId <UUID> [--alias <String>] [--config <JSON>]
-csdk platform-function-api-binding update --id <UUID> [--functionDefinitionId <UUID>] [--apiId <UUID>] [--alias <String>] [--config <JSON>]
+csdk platform-function-api-binding create --apiId <UUID> --functionDefinitionId <UUID> [--alias <String>] [--config <JSON>]
+csdk platform-function-api-binding update --id <UUID> [--alias <String>] [--apiId <UUID>] [--config <JSON>] [--functionDefinitionId <UUID>]
 csdk platform-function-api-binding delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-function-api-binding list --where.id.equalTo <value> --orderBy ID_
 ### Create a platformFunctionApiBinding
 
 ```bash
-csdk platform-function-api-binding create --functionDefinitionId <UUID> --apiId <UUID> [--alias <String>] [--config <JSON>]
+csdk platform-function-api-binding create --apiId <UUID> --functionDefinitionId <UUID> [--alias <String>] [--config <JSON>]
 ```
 
 ### Get a platformFunctionApiBinding by id

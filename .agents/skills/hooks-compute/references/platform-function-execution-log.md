@@ -7,8 +7,8 @@ Function execution logs — structured console output per invocation
 ## Usage
 
 ```typescript
-usePlatformFunctionExecutionLogsQuery({ selection: { fields: { createdAt: true, id: true, invocationId: true, taskIdentifier: true, logLevel: true, message: true, metadata: true, actorId: true } } })
-usePlatformFunctionExecutionLogQuery({ id: '<UUID>', selection: { fields: { createdAt: true, id: true, invocationId: true, taskIdentifier: true, logLevel: true, message: true, metadata: true, actorId: true } } })
+usePlatformFunctionExecutionLogsQuery({ selection: { fields: { actorId: true, createdAt: true, id: true, invocationId: true, logLevel: true, message: true, metadata: true, taskIdentifier: true } } })
+usePlatformFunctionExecutionLogQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, id: true, invocationId: true, logLevel: true, message: true, metadata: true, taskIdentifier: true } } })
 useCreatePlatformFunctionExecutionLogMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformFunctionExecutionLogMutation({ selection: { fields: { id: true } } })
 useDeletePlatformFunctionExecutionLogMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformFunctionExecutionLogMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformFunctionExecutionLogsQuery({
-  selection: { fields: { createdAt: true, id: true, invocationId: true, taskIdentifier: true, logLevel: true, message: true, metadata: true, actorId: true } },
+  selection: { fields: { actorId: true, createdAt: true, id: true, invocationId: true, logLevel: true, message: true, metadata: true, taskIdentifier: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformFunctionExecutionLogsQuery({
 const { mutate } = useCreatePlatformFunctionExecutionLogMutation({
   selection: { fields: { id: true } },
 });
-mutate({ invocationId: '<UUID>', taskIdentifier: '<String>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', actorId: '<UUID>' });
+mutate({ actorId: '<UUID>', invocationId: '<UUID>', logLevel: '<String>', message: '<String>', metadata: '<JSON>', taskIdentifier: '<String>' });
 ```

@@ -13,8 +13,8 @@ import { connectionFieldsMap } from '../input-types';
  */
 export interface ResolveBlueprintFieldVariables {
   databaseId?: string;
-  tableId?: string;
   fieldName?: string;
+  tableId?: string;
 }
 /**
  * Variables for resolveBlueprintTable
@@ -22,10 +22,10 @@ export interface ResolveBlueprintFieldVariables {
  */
 export interface ResolveBlueprintTableVariables {
   databaseId?: string;
-  tableName?: string;
+  defaultSchemaId?: string;
   schemaName?: string;
   tableMap?: unknown;
-  defaultSchemaId?: string;
+  tableName?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -54,12 +54,12 @@ export function createQueryOperations(client: OrmClient) {
               type: 'UUID',
             },
             {
-              name: 'tableId',
-              type: 'UUID',
-            },
-            {
               name: 'fieldName',
               type: 'String',
+            },
+            {
+              name: 'tableId',
+              type: 'UUID',
             },
           ],
           connectionFieldsMap,
@@ -91,8 +91,8 @@ export function createQueryOperations(client: OrmClient) {
               type: 'UUID',
             },
             {
-              name: 'tableName',
-              type: 'String',
+              name: 'defaultSchemaId',
+              type: 'UUID',
             },
             {
               name: 'schemaName',
@@ -103,8 +103,8 @@ export function createQueryOperations(client: OrmClient) {
               type: 'JSON',
             },
             {
-              name: 'defaultSchemaId',
-              type: 'UUID',
+              name: 'tableName',
+              type: 'String',
             },
           ],
           connectionFieldsMap,

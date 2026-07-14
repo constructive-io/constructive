@@ -12,8 +12,8 @@ csdk webauthn-setting list --where.<field>.<op> <value> --orderBy <values>
 csdk webauthn-setting list --limit 10 --after <cursor>
 csdk webauthn-setting find-first --where.<field>.<op> <value>
 csdk webauthn-setting get --id <UUID>
-csdk webauthn-setting create --databaseId <UUID> [--schemaId <UUID>] [--credentialsSchemaId <UUID>] [--sessionsSchemaId <UUID>] [--sessionSecretsSchemaId <UUID>] [--credentialsTableId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionSecretsTableId <UUID>] [--userFieldId <UUID>] [--rpId <String>] [--rpName <String>] [--originAllowlist <String>] [--attestationType <String>] [--requireUserVerification <Boolean>] [--residentKey <String>] [--challengeExpirySeconds <BigInt>]
-csdk webauthn-setting update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--credentialsSchemaId <UUID>] [--sessionsSchemaId <UUID>] [--sessionSecretsSchemaId <UUID>] [--credentialsTableId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionSecretsTableId <UUID>] [--userFieldId <UUID>] [--rpId <String>] [--rpName <String>] [--originAllowlist <String>] [--attestationType <String>] [--requireUserVerification <Boolean>] [--residentKey <String>] [--challengeExpirySeconds <BigInt>]
+csdk webauthn-setting create --databaseId <UUID> [--attestationType <String>] [--challengeExpirySeconds <BigInt>] [--credentialsSchemaId <UUID>] [--credentialsTableId <UUID>] [--originAllowlist <String>] [--requireUserVerification <Boolean>] [--residentKey <String>] [--rpId <String>] [--rpName <String>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionSecretsSchemaId <UUID>] [--sessionSecretsTableId <UUID>] [--sessionsSchemaId <UUID>] [--sessionsTableId <UUID>] [--userFieldId <UUID>]
+csdk webauthn-setting update --id <UUID> [--attestationType <String>] [--challengeExpirySeconds <BigInt>] [--credentialsSchemaId <UUID>] [--credentialsTableId <UUID>] [--databaseId <UUID>] [--originAllowlist <String>] [--requireUserVerification <Boolean>] [--residentKey <String>] [--rpId <String>] [--rpName <String>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionSecretsSchemaId <UUID>] [--sessionSecretsTableId <UUID>] [--sessionsSchemaId <UUID>] [--sessionsTableId <UUID>] [--userFieldId <UUID>]
 csdk webauthn-setting delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk webauthn-setting list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a webauthnSetting
 
 ```bash
-csdk webauthn-setting create --databaseId <UUID> [--schemaId <UUID>] [--credentialsSchemaId <UUID>] [--sessionsSchemaId <UUID>] [--sessionSecretsSchemaId <UUID>] [--credentialsTableId <UUID>] [--sessionsTableId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionSecretsTableId <UUID>] [--userFieldId <UUID>] [--rpId <String>] [--rpName <String>] [--originAllowlist <String>] [--attestationType <String>] [--requireUserVerification <Boolean>] [--residentKey <String>] [--challengeExpirySeconds <BigInt>]
+csdk webauthn-setting create --databaseId <UUID> [--attestationType <String>] [--challengeExpirySeconds <BigInt>] [--credentialsSchemaId <UUID>] [--credentialsTableId <UUID>] [--originAllowlist <String>] [--requireUserVerification <Boolean>] [--residentKey <String>] [--rpId <String>] [--rpName <String>] [--schemaId <UUID>] [--sessionCredentialsTableId <UUID>] [--sessionSecretsSchemaId <UUID>] [--sessionSecretsTableId <UUID>] [--sessionsSchemaId <UUID>] [--sessionsTableId <UUID>] [--userFieldId <UUID>]
 ```
 
 ### Get a webauthnSetting by id

@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "4.41.1",
+  "version": "4.42.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -45,6 +45,7 @@
     "@constructive-io/express-context": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/query-builder": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.2",
@@ -63,6 +64,7 @@
     "graphile-build-pg": "5.0.2",
     "graphile-cache": "workspace:^",
     "graphile-config": "1.0.1",
+    "graphile-function-bindings": "workspace:^",
     "graphile-settings": "workspace:^",
     "graphile-utils": "5.0.1",
     "graphql": "16.13.0",

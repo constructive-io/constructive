@@ -7,7 +7,7 @@ Execute the linkIdentity mutation
 ## Usage
 
 ```bash
-csdk link-identity --input.clientMutationId <String> --input.service <String> --input.identifier <String> --input.details <JSON>
+csdk link-identity --input.clientMutationId <String> --input.details <JSON> --input.identifier <String> --input.service <String>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk link-identity --input.clientMutationId <String> --input.service <String> --
 ### Run linkIdentity
 
 ```bash
-csdk link-identity --input.clientMutationId <String> --input.service <String> --input.identifier <String> --input.details <JSON>
+csdk link-identity --input.clientMutationId <String> --input.details <JSON> --input.identifier <String> --input.service <String>
 ```

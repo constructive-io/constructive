@@ -1,6 +1,7 @@
-import type { PgResource, PgResourceParameter } from '@dataplan/pg';
+import type { PgResource } from '@dataplan/pg';
 import type { GraphileBuild } from 'graphile-build';
 import type {} from 'graphile-build-pg';
+import { isComputedScalarAttributeResource } from 'graphile-plugin-utils';
 
 export function getComputedAttributeResources(
   build: GraphileBuild.Build,
@@ -8,24 +9,11 @@ export function getComputedAttributeResources(
 ) {
   const computedAttributeResources = Object.values(
     build.input.pgRegistry.pgResources
-  ).filter((s) => {
-    if (!s.parameters || s.parameters.length < 1) {
-      return false;
-    }
-    if (s.codec.attributes) {
-      return false;
-    }
-    if (!s.isUnique) {
-      return false;
-    }
-    if (s.codec.arrayOfCodec) {
-      return false;
-    }
-    const firstParameter = s.parameters[0] as PgResourceParameter;
-    if (firstParameter.codec !== resource.codec) {
-      return false;
-    }
-    return true;
-  });
+  ).filter(
+    (s) =>
+      isComputedScalarAttributeResource(s) &&
+      !s.codec.arrayOfCodec &&
+      s.parameters[0].codec === resource.codec
+  );
   return computedAttributeResources;
 }

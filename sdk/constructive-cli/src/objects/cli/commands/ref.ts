@@ -16,11 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  commitId: 'uuid',
+  databaseId: 'uuid',
   id: 'uuid',
   name: 'string',
-  databaseId: 'uuid',
   storeId: 'uuid',
-  commitId: 'uuid',
 };
 const usage =
   '\nref <command>\n\nCommands:\n  list                  List ref records\n  find-first            Find first matching ref record\n  get                   Get a ref by ID\n  create                Create a new ref\n  update                Update an existing ref\n  delete                Delete a ref\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -73,11 +73,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      commitId: true,
+      databaseId: true,
       id: true,
       name: true,
-      databaseId: true,
       storeId: true,
-      commitId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<RefSelect, RefFilter, RefOrderBy> & {
@@ -98,11 +98,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      commitId: true,
+      databaseId: true,
       id: true,
       name: true,
-      databaseId: true,
       storeId: true,
-      commitId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<RefSelect, RefFilter, RefOrderBy> & {
@@ -135,11 +135,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          commitId: true,
+          databaseId: true,
           id: true,
           name: true,
-          databaseId: true,
           storeId: true,
-          commitId: true,
         },
       })
       .execute();
@@ -157,9 +157,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
+        name: 'commitId',
+        message: 'commitId',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -169,16 +170,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'storeId',
-        message: 'storeId',
+        name: 'name',
+        message: 'name',
         required: true,
       },
       {
         type: 'text',
-        name: 'commitId',
-        message: 'commitId',
-        required: false,
-        skipPrompt: true,
+        name: 'storeId',
+        message: 'storeId',
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -187,17 +187,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.ref
       .create({
         data: {
-          name: cleanedData.name,
-          databaseId: cleanedData.databaseId,
-          storeId: cleanedData.storeId,
           commitId: cleanedData.commitId,
+          databaseId: cleanedData.databaseId,
+          name: cleanedData.name,
+          storeId: cleanedData.storeId,
         },
         select: {
+          commitId: true,
+          databaseId: true,
           id: true,
           name: true,
-          databaseId: true,
           storeId: true,
-          commitId: true,
         },
       })
       .execute();
@@ -227,6 +227,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'commitId',
+        message: 'commitId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'name',
         message: 'name',
         required: false,
@@ -236,13 +243,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'storeId',
         message: 'storeId',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'commitId',
-        message: 'commitId',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -255,16 +255,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: answers.databaseId as string,
         },
         data: {
+          commitId: cleanedData.commitId,
           name: cleanedData.name,
           storeId: cleanedData.storeId,
-          commitId: cleanedData.commitId,
         },
         select: {
+          commitId: true,
+          databaseId: true,
           id: true,
           name: true,
-          databaseId: true,
           storeId: true,
-          commitId: true,
         },
       })
       .execute();

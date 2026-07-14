@@ -9,8 +9,8 @@ Config row for the webauthn_credentials_module, which provisions the per-user We
 ```typescript
 db.webauthnCredentialsModule.findMany({ select: { id: true } }).execute()
 db.webauthnCredentialsModule.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.webauthnCredentialsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>' }, select: { id: true } }).execute()
-db.webauthnCredentialsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.webauthnCredentialsModule.create({ data: { apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' }, select: { id: true } }).execute()
+db.webauthnCredentialsModule.update({ where: { id: '<UUID>' }, data: { apiName: '<String>' }, select: { id: true } }).execute()
 db.webauthnCredentialsModule.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.webauthnCredentialsModule.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.webauthnCredentialsModule.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, apiName: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.webauthnCredentialsModule.findMany({
 
 ```typescript
 const item = await db.webauthnCredentialsModule.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', apiName: '<String>', privateApiName: '<String>' },
+  data: { apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' },
   select: { id: true }
 }).execute();
 ```

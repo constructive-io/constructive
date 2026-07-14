@@ -7,7 +7,7 @@ Creates a check constraint on a table from a $type + data blueprint definition. 
 ## Usage
 
 ```typescript
-const { mutate } = useProvisionCheckConstraintMutation(); mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+const { mutate } = useProvisionCheckConstraintMutation(); mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useProvisionCheckConstraintMutation(); mutate({ input: { data
 
 ```typescript
 const { mutate, isLoading } = useProvisionCheckConstraintMutation();
-mutate({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } });
+mutate({ input: { databaseId: '<UUID>', definition: '<JSON>', tableId: '<UUID>' } });
 ```

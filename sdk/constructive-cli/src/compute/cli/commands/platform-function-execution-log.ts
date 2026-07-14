@@ -16,14 +16,14 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  actorId: 'uuid',
   createdAt: 'string',
   id: 'uuid',
   invocationId: 'uuid',
-  taskIdentifier: 'string',
   logLevel: 'string',
   message: 'string',
   metadata: 'json',
-  actorId: 'uuid',
+  taskIdentifier: 'string',
 };
 const usage =
   '\nplatform-function-execution-log <command>\n\nCommands:\n  list                  List platformFunctionExecutionLog records\n  find-first            Find first matching platformFunctionExecutionLog record\n  get                   Get a platformFunctionExecutionLog by ID\n  create                Create a new platformFunctionExecutionLog\n  update                Update an existing platformFunctionExecutionLog\n  delete                Delete a platformFunctionExecutionLog\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -76,14 +76,14 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       createdAt: true,
       id: true,
       invocationId: true,
-      taskIdentifier: true,
       logLevel: true,
       message: true,
       metadata: true,
-      actorId: true,
+      taskIdentifier: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -108,14 +108,14 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       createdAt: true,
       id: true,
       invocationId: true,
-      taskIdentifier: true,
       logLevel: true,
       message: true,
       metadata: true,
-      actorId: true,
+      taskIdentifier: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -152,14 +152,14 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          actorId: true,
           createdAt: true,
           id: true,
           invocationId: true,
-          taskIdentifier: true,
           logLevel: true,
           message: true,
           metadata: true,
-          actorId: true,
+          taskIdentifier: true,
         },
       })
       .execute();
@@ -177,15 +177,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'invocationId',
-        message: 'invocationId',
+        name: 'actorId',
+        message: 'actorId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'taskIdentifier',
-        message: 'taskIdentifier',
+        name: 'invocationId',
+        message: 'invocationId',
         required: false,
         skipPrompt: true,
       },
@@ -211,8 +211,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'actorId',
-        message: 'actorId',
+        name: 'taskIdentifier',
+        message: 'taskIdentifier',
         required: false,
         skipPrompt: true,
       },
@@ -226,22 +226,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.platformFunctionExecutionLog
       .create({
         data: {
+          actorId: cleanedData.actorId,
           invocationId: cleanedData.invocationId,
-          taskIdentifier: cleanedData.taskIdentifier,
           logLevel: cleanedData.logLevel,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
-          actorId: cleanedData.actorId,
+          taskIdentifier: cleanedData.taskIdentifier,
         },
         select: {
+          actorId: true,
           createdAt: true,
           id: true,
           invocationId: true,
-          taskIdentifier: true,
           logLevel: true,
           message: true,
           metadata: true,
-          actorId: true,
+          taskIdentifier: true,
         },
       })
       .execute();
@@ -271,15 +271,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'invocationId',
-        message: 'invocationId',
+        name: 'actorId',
+        message: 'actorId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'taskIdentifier',
-        message: 'taskIdentifier',
+        name: 'invocationId',
+        message: 'invocationId',
         required: false,
         skipPrompt: true,
       },
@@ -305,8 +305,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'actorId',
-        message: 'actorId',
+        name: 'taskIdentifier',
+        message: 'taskIdentifier',
         required: false,
         skipPrompt: true,
       },
@@ -321,22 +321,22 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           createdAt: answers.createdAt as string,
         },
         data: {
+          actorId: cleanedData.actorId,
           invocationId: cleanedData.invocationId,
-          taskIdentifier: cleanedData.taskIdentifier,
           logLevel: cleanedData.logLevel,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
-          actorId: cleanedData.actorId,
+          taskIdentifier: cleanedData.taskIdentifier,
         },
         select: {
+          actorId: true,
           createdAt: true,
           id: true,
           invocationId: true,
-          taskIdentifier: true,
           logLevel: true,
           message: true,
           metadata: true,
-          actorId: true,
+          taskIdentifier: true,
         },
       })
       .execute();

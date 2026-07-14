@@ -7,8 +7,8 @@ Default cap values for static configuration limits (max file size, feature flags
 ## Usage
 
 ```typescript
-useAppLimitCapsDefaultsQuery({ selection: { fields: { id: true, name: true, max: true } } })
-useAppLimitCapsDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, max: true } } })
+useAppLimitCapsDefaultsQuery({ selection: { fields: { id: true, max: true, name: true } } })
+useAppLimitCapsDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, max: true, name: true } } })
 useCreateAppLimitCapsDefaultMutation({ selection: { fields: { id: true } } })
 useUpdateAppLimitCapsDefaultMutation({ selection: { fields: { id: true } } })
 useDeleteAppLimitCapsDefaultMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLimitCapsDefaultMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLimitCapsDefaultsQuery({
-  selection: { fields: { id: true, name: true, max: true } },
+  selection: { fields: { id: true, max: true, name: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLimitCapsDefaultsQuery({
 const { mutate } = useCreateAppLimitCapsDefaultMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', max: '<BigInt>' });
+mutate({ max: '<BigInt>', name: '<String>' });
 ```

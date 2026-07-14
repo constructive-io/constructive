@@ -12,8 +12,8 @@ csdk store list --where.<field>.<op> <value> --orderBy <values>
 csdk store list --limit 10 --after <cursor>
 csdk store find-first --where.<field>.<op> <value>
 csdk store get --id <UUID>
-csdk store create --name <String> --databaseId <UUID> [--hash <UUID>]
-csdk store update --id <UUID> [--name <String>] [--databaseId <UUID>] [--hash <UUID>]
+csdk store create --databaseId <UUID> --name <String> [--hash <UUID>]
+csdk store update --id <UUID> [--databaseId <UUID>] [--hash <UUID>] [--name <String>]
 csdk store delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk store list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a store
 
 ```bash
-csdk store create --name <String> --databaseId <UUID> [--hash <UUID>]
+csdk store create --databaseId <UUID> --name <String> [--hash <UUID>]
 ```
 
 ### Get a store by id

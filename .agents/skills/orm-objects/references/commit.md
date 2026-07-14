@@ -9,8 +9,8 @@ Commit history — each commit snapshots a tree root for a store
 ```typescript
 db.commit.findMany({ select: { id: true } }).execute()
 db.commit.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.commit.create({ data: { message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' }, select: { id: true } }).execute()
-db.commit.update({ where: { id: '<UUID>' }, data: { message: '<String>' }, select: { id: true } }).execute()
+db.commit.create({ data: { authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' }, select: { id: true } }).execute()
+db.commit.update({ where: { id: '<UUID>' }, data: { authorId: '<UUID>' }, select: { id: true } }).execute()
 db.commit.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.commit.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.commit.findMany({
-  select: { id: true, message: true }
+  select: { id: true, authorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.commit.findMany({
 
 ```typescript
 const item = await db.commit.create({
-  data: { message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' },
+  data: { authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

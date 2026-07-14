@@ -8,8 +8,8 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import { connectionFieldsMap } from '../input-types';
 export interface ApplyRegistryDefaultsVariables {
-  nodeType?: string;
   data?: unknown;
+  nodeType?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -34,12 +34,12 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'nodeType',
-              type: 'String',
-            },
-            {
               name: 'data',
               type: 'JSON',
+            },
+            {
+              name: 'nodeType',
+              type: 'String',
             },
           ],
           connectionFieldsMap,

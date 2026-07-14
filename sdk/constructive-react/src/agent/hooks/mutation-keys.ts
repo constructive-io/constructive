@@ -18,14 +18,6 @@
 // Entity Mutation Keys
 // ============================================================================
 
-export const agentPlanMutationKeys = {
-  /** All agentPlan mutation keys */ all: ['mutation', 'agentplan'] as const,
-  /** Create agentPlan mutation key */ create: () => ['mutation', 'agentplan', 'create'] as const,
-  /** Update agentPlan mutation key */ update: (id: string | number) =>
-    ['mutation', 'agentplan', 'update', id] as const,
-  /** Delete agentPlan mutation key */ delete: (id: string | number) =>
-    ['mutation', 'agentplan', 'delete', id] as const,
-} as const;
 export const agentMutationKeys = {
   /** All agent mutation keys */ all: ['mutation', 'agent'] as const,
   /** Create agent mutation key */ create: () => ['mutation', 'agent', 'create'] as const,
@@ -33,15 +25,6 @@ export const agentMutationKeys = {
     ['mutation', 'agent', 'update', id] as const,
   /** Delete agent mutation key */ delete: (id: string | number) =>
     ['mutation', 'agent', 'delete', id] as const,
-} as const;
-export const agentThreadMutationKeys = {
-  /** All agentThread mutation keys */ all: ['mutation', 'agentthread'] as const,
-  /** Create agentThread mutation key */ create: () =>
-    ['mutation', 'agentthread', 'create'] as const,
-  /** Update agentThread mutation key */ update: (id: string | number) =>
-    ['mutation', 'agentthread', 'update', id] as const,
-  /** Delete agentThread mutation key */ delete: (id: string | number) =>
-    ['mutation', 'agentthread', 'delete', id] as const,
 } as const;
 export const agentMessageMutationKeys = {
   /** All agentMessage mutation keys */ all: ['mutation', 'agentmessage'] as const,
@@ -52,13 +35,22 @@ export const agentMessageMutationKeys = {
   /** Delete agentMessage mutation key */ delete: (id: string | number) =>
     ['mutation', 'agentmessage', 'delete', id] as const,
 } as const;
-export const agentTaskMutationKeys = {
-  /** All agentTask mutation keys */ all: ['mutation', 'agenttask'] as const,
-  /** Create agentTask mutation key */ create: () => ['mutation', 'agenttask', 'create'] as const,
-  /** Update agentTask mutation key */ update: (id: string | number) =>
-    ['mutation', 'agenttask', 'update', id] as const,
-  /** Delete agentTask mutation key */ delete: (id: string | number) =>
-    ['mutation', 'agenttask', 'delete', id] as const,
+export const agentPersonaMutationKeys = {
+  /** All agentPersona mutation keys */ all: ['mutation', 'agentpersona'] as const,
+  /** Create agentPersona mutation key */ create: () =>
+    ['mutation', 'agentpersona', 'create'] as const,
+  /** Update agentPersona mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentpersona', 'update', id] as const,
+  /** Delete agentPersona mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentpersona', 'delete', id] as const,
+} as const;
+export const agentPlanMutationKeys = {
+  /** All agentPlan mutation keys */ all: ['mutation', 'agentplan'] as const,
+  /** Create agentPlan mutation key */ create: () => ['mutation', 'agentplan', 'create'] as const,
+  /** Update agentPlan mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentplan', 'update', id] as const,
+  /** Delete agentPlan mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentplan', 'delete', id] as const,
 } as const;
 export const agentPromptMutationKeys = {
   /** All agentPrompt mutation keys */ all: ['mutation', 'agentprompt'] as const,
@@ -78,15 +70,6 @@ export const agentResourceChunkMutationKeys = {
   /** Delete agentResourceChunk mutation key */ delete: (id: string | number) =>
     ['mutation', 'agentresourcechunk', 'delete', id] as const,
 } as const;
-export const agentPersonaMutationKeys = {
-  /** All agentPersona mutation keys */ all: ['mutation', 'agentpersona'] as const,
-  /** Create agentPersona mutation key */ create: () =>
-    ['mutation', 'agentpersona', 'create'] as const,
-  /** Update agentPersona mutation key */ update: (id: string | number) =>
-    ['mutation', 'agentpersona', 'update', id] as const,
-  /** Delete agentPersona mutation key */ delete: (id: string | number) =>
-    ['mutation', 'agentpersona', 'delete', id] as const,
-} as const;
 export const agentResourceMutationKeys = {
   /** All agentResource mutation keys */ all: ['mutation', 'agentresource'] as const,
   /** Create agentResource mutation key */ create: () =>
@@ -95,6 +78,23 @@ export const agentResourceMutationKeys = {
     ['mutation', 'agentresource', 'update', id] as const,
   /** Delete agentResource mutation key */ delete: (id: string | number) =>
     ['mutation', 'agentresource', 'delete', id] as const,
+} as const;
+export const agentTaskMutationKeys = {
+  /** All agentTask mutation keys */ all: ['mutation', 'agenttask'] as const,
+  /** Create agentTask mutation key */ create: () => ['mutation', 'agenttask', 'create'] as const,
+  /** Update agentTask mutation key */ update: (id: string | number) =>
+    ['mutation', 'agenttask', 'update', id] as const,
+  /** Delete agentTask mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agenttask', 'delete', id] as const,
+} as const;
+export const agentThreadMutationKeys = {
+  /** All agentThread mutation keys */ all: ['mutation', 'agentthread'] as const,
+  /** Create agentThread mutation key */ create: () =>
+    ['mutation', 'agentthread', 'create'] as const,
+  /** Update agentThread mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentthread', 'update', id] as const,
+  /** Delete agentThread mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentthread', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -130,14 +130,14 @@ export const customMutationKeys = {
  * ```
  */
 export const mutationKeys = {
-  agentPlan: agentPlanMutationKeys,
   agent: agentMutationKeys,
-  agentThread: agentThreadMutationKeys,
   agentMessage: agentMessageMutationKeys,
-  agentTask: agentTaskMutationKeys,
+  agentPersona: agentPersonaMutationKeys,
+  agentPlan: agentPlanMutationKeys,
   agentPrompt: agentPromptMutationKeys,
   agentResourceChunk: agentResourceChunkMutationKeys,
-  agentPersona: agentPersonaMutationKeys,
   agentResource: agentResourceMutationKeys,
+  agentTask: agentTaskMutationKeys,
+  agentThread: agentThreadMutationKeys,
   custom: customMutationKeys,
 } as const;

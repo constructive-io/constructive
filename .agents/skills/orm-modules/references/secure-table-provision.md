@@ -9,7 +9,7 @@ Provisions security, fields, grants, and policies onto a table. Each row can ind
 ```typescript
 db.secureTableProvision.findMany({ select: { id: true } }).execute()
 db.secureTableProvision.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.secureTableProvision.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodes: '<JSON>', useRls: '<Boolean>', fields: '<JSON>', grants: '<JSON>', policies: '<JSON>', outFields: '<UUID>' }, select: { id: true } }).execute()
+db.secureTableProvision.create({ data: { databaseId: '<UUID>', fields: '<JSON>', grants: '<JSON>', nodes: '<JSON>', outFields: '<UUID>', policies: '<JSON>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', useRls: '<Boolean>' }, select: { id: true } }).execute()
 db.secureTableProvision.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
 db.secureTableProvision.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.secureTableProvision.findMany({
 
 ```typescript
 const item = await db.secureTableProvision.create({
-  data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodes: '<JSON>', useRls: '<Boolean>', fields: '<JSON>', grants: '<JSON>', policies: '<JSON>', outFields: '<UUID>' },
+  data: { databaseId: '<UUID>', fields: '<JSON>', grants: '<JSON>', nodes: '<JSON>', outFields: '<UUID>', policies: '<JSON>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', useRls: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```

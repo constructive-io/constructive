@@ -7,7 +7,7 @@ Execute the infraSetDataAtPath mutation
 ## Usage
 
 ```bash
-csdk infra-set-data-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON>
+csdk infra-set-data-at-path --input.clientMutationId <String> --input.data <JSON> --input.path <String> --input.root <UUID> --input.sId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk infra-set-data-at-path --input.clientMutationId <String> --input.sId <UUID>
 ### Run infraSetDataAtPath
 
 ```bash
-csdk infra-set-data-at-path --input.clientMutationId <String> --input.sId <UUID> --input.root <UUID> --input.path <String> --input.data <JSON>
+csdk infra-set-data-at-path --input.clientMutationId <String> --input.data <JSON> --input.path <String> --input.root <UUID> --input.sId <UUID>
 ```

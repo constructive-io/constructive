@@ -19,32 +19,59 @@
 // Entity Query Keys
 // ============================================================================
 
-export const functionKeys = {
-  /** All function queries */ all: ['function'] as const,
-  /** List query keys */ lists: () => [...functionKeys.all, 'list'] as const,
+export const apiKeys = {
+  /** All api queries */ all: ['api'] as const,
+  /** List query keys */ lists: () => [...apiKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...functionKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...functionKeys.all, 'detail'] as const,
+    [...apiKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...apiKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...functionKeys.details(), id] as const,
+    [...apiKeys.details(), id] as const,
 } as const;
-export const schemaKeys = {
-  /** All schema queries */ all: ['schema'] as const,
-  /** List query keys */ lists: () => [...schemaKeys.all, 'list'] as const,
+export const apiModuleKeys = {
+  /** All apiModule queries */ all: ['apimodule'] as const,
+  /** List query keys */ lists: () => [...apiModuleKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...schemaKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...schemaKeys.all, 'detail'] as const,
+    [...apiModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...apiModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...schemaKeys.details(), id] as const,
+    [...apiModuleKeys.details(), id] as const,
 } as const;
-export const tableKeys = {
-  /** All table queries */ all: ['table'] as const,
-  /** List query keys */ lists: () => [...tableKeys.all, 'list'] as const,
+export const apiSchemaKeys = {
+  /** All apiSchema queries */ all: ['apischema'] as const,
+  /** List query keys */ lists: () => [...apiSchemaKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...tableKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...tableKeys.all, 'detail'] as const,
+    [...apiSchemaKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...apiSchemaKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...tableKeys.details(), id] as const,
+    [...apiSchemaKeys.details(), id] as const,
+} as const;
+export const apiSettingKeys = {
+  /** All apiSetting queries */ all: ['apisetting'] as const,
+  /** List query keys */ lists: () => [...apiSettingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...apiSettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...apiSettingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...apiSettingKeys.details(), id] as const,
+} as const;
+export const appKeys = {
+  /** All app queries */ all: ['app'] as const,
+  /** List query keys */ lists: () => [...appKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...appKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...appKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...appKeys.details(), id] as const,
+} as const;
+export const astMigrationKeys = {
+  /** All astMigration queries */ all: ['astmigration'] as const,
+  /** List query keys */ lists: () => [...astMigrationKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...astMigrationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...astMigrationKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...astMigrationKeys.details(), id] as const,
 } as const;
 export const checkConstraintKeys = {
   /** All checkConstraint queries */ all: ['checkconstraint'] as const,
@@ -55,6 +82,87 @@ export const checkConstraintKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...checkConstraintKeys.details(), id] as const,
 } as const;
+export const compositeTypeKeys = {
+  /** All compositeType queries */ all: ['compositetype'] as const,
+  /** List query keys */ lists: () => [...compositeTypeKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...compositeTypeKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...compositeTypeKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...compositeTypeKeys.details(), id] as const,
+} as const;
+export const corsSettingKeys = {
+  /** All corsSetting queries */ all: ['corssetting'] as const,
+  /** List query keys */ lists: () => [...corsSettingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...corsSettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...corsSettingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...corsSettingKeys.details(), id] as const,
+} as const;
+export const databaseKeys = {
+  /** All database queries */ all: ['database'] as const,
+  /** List query keys */ lists: () => [...databaseKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...databaseKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...databaseKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...databaseKeys.details(), id] as const,
+} as const;
+export const databaseSettingKeys = {
+  /** All databaseSetting queries */ all: ['databasesetting'] as const,
+  /** List query keys */ lists: () => [...databaseSettingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...databaseSettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...databaseSettingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...databaseSettingKeys.details(), id] as const,
+} as const;
+export const databaseTransferKeys = {
+  /** All databaseTransfer queries */ all: ['databasetransfer'] as const,
+  /** List query keys */ lists: () => [...databaseTransferKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...databaseTransferKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...databaseTransferKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...databaseTransferKeys.details(), id] as const,
+} as const;
+export const defaultPrivilegeKeys = {
+  /** All defaultPrivilege queries */ all: ['defaultprivilege'] as const,
+  /** List query keys */ lists: () => [...defaultPrivilegeKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...defaultPrivilegeKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...defaultPrivilegeKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...defaultPrivilegeKeys.details(), id] as const,
+} as const;
+export const domainKeys = {
+  /** All domain queries */ all: ['domain'] as const,
+  /** List query keys */ lists: () => [...domainKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...domainKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...domainKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...domainKeys.details(), id] as const,
+} as const;
+export const embeddingChunkKeys = {
+  /** All embeddingChunk queries */ all: ['embeddingchunk'] as const,
+  /** List query keys */ lists: () => [...embeddingChunkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...embeddingChunkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...embeddingChunkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...embeddingChunkKeys.details(), id] as const,
+} as const;
+export const enumKeys = {
+  /** All enum queries */ all: ['enum'] as const,
+  /** List query keys */ lists: () => [...enumKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...enumKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...enumKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...enumKeys.details(), id] as const,
+} as const;
 export const fieldKeys = {
   /** All field queries */ all: ['field'] as const,
   /** List query keys */ lists: () => [...fieldKeys.all, 'list'] as const,
@@ -63,15 +171,6 @@ export const fieldKeys = {
   /** Detail query keys */ details: () => [...fieldKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...fieldKeys.details(), id] as const,
-} as const;
-export const spatialRelationKeys = {
-  /** All spatialRelation queries */ all: ['spatialrelation'] as const,
-  /** List query keys */ lists: () => [...spatialRelationKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...spatialRelationKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...spatialRelationKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...spatialRelationKeys.details(), id] as const,
 } as const;
 export const foreignKeyConstraintKeys = {
   /** All foreignKeyConstraint queries */ all: ['foreignkeyconstraint'] as const,
@@ -91,6 +190,15 @@ export const fullTextSearchKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...fullTextSearchKeys.details(), id] as const,
 } as const;
+export const functionKeys = {
+  /** All function queries */ all: ['function'] as const,
+  /** List query keys */ lists: () => [...functionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...functionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...functionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...functionKeys.details(), id] as const,
+} as const;
 export const indexKeys = {
   /** All index queries */ all: ['index'] as const,
   /** List query keys */ lists: () => [...indexKeys.all, 'list'] as const,
@@ -99,6 +207,33 @@ export const indexKeys = {
   /** Detail query keys */ details: () => [...indexKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...indexKeys.details(), id] as const,
+} as const;
+export const migrateFileKeys = {
+  /** All migrateFile queries */ all: ['migratefile'] as const,
+  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...migrateFileKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...migrateFileKeys.details(), id] as const,
+} as const;
+export const nodeTypeRegistryKeys = {
+  /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
+  /** List query keys */ lists: () => [...nodeTypeRegistryKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...nodeTypeRegistryKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...nodeTypeRegistryKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...nodeTypeRegistryKeys.details(), id] as const,
+} as const;
+export const partitionKeys = {
+  /** All partition queries */ all: ['partition'] as const,
+  /** List query keys */ lists: () => [...partitionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...partitionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...partitionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...partitionKeys.details(), id] as const,
 } as const;
 export const policyKeys = {
   /** All policy queries */ all: ['policy'] as const,
@@ -118,77 +253,32 @@ export const primaryKeyConstraintKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...primaryKeyConstraintKeys.details(), id] as const,
 } as const;
-export const tableGrantKeys = {
-  /** All tableGrant queries */ all: ['tablegrant'] as const,
-  /** List query keys */ lists: () => [...tableGrantKeys.all, 'list'] as const,
+export const pubkeySettingKeys = {
+  /** All pubkeySetting queries */ all: ['pubkeysetting'] as const,
+  /** List query keys */ lists: () => [...pubkeySettingKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...tableGrantKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...tableGrantKeys.all, 'detail'] as const,
+    [...pubkeySettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...pubkeySettingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...tableGrantKeys.details(), id] as const,
+    [...pubkeySettingKeys.details(), id] as const,
 } as const;
-export const triggerKeys = {
-  /** All trigger queries */ all: ['trigger'] as const,
-  /** List query keys */ lists: () => [...triggerKeys.all, 'list'] as const,
+export const rlsSettingKeys = {
+  /** All rlsSetting queries */ all: ['rlssetting'] as const,
+  /** List query keys */ lists: () => [...rlsSettingKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...triggerKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...triggerKeys.all, 'detail'] as const,
+    [...rlsSettingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...rlsSettingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...triggerKeys.details(), id] as const,
+    [...rlsSettingKeys.details(), id] as const,
 } as const;
-export const uniqueConstraintKeys = {
-  /** All uniqueConstraint queries */ all: ['uniqueconstraint'] as const,
-  /** List query keys */ lists: () => [...uniqueConstraintKeys.all, 'list'] as const,
+export const schemaKeys = {
+  /** All schema queries */ all: ['schema'] as const,
+  /** List query keys */ lists: () => [...schemaKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...uniqueConstraintKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...uniqueConstraintKeys.all, 'detail'] as const,
+    [...schemaKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...schemaKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...uniqueConstraintKeys.details(), id] as const,
-} as const;
-export const viewKeys = {
-  /** All view queries */ all: ['view'] as const,
-  /** List query keys */ lists: () => [...viewKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...viewKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...viewKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...viewKeys.details(), id] as const,
-} as const;
-export const viewTableKeys = {
-  /** All viewTable queries */ all: ['viewtable'] as const,
-  /** List query keys */ lists: () => [...viewTableKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...viewTableKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...viewTableKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...viewTableKeys.details(), id] as const,
-} as const;
-export const viewGrantKeys = {
-  /** All viewGrant queries */ all: ['viewgrant'] as const,
-  /** List query keys */ lists: () => [...viewGrantKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...viewGrantKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...viewGrantKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...viewGrantKeys.details(), id] as const,
-} as const;
-export const viewRuleKeys = {
-  /** All viewRule queries */ all: ['viewrule'] as const,
-  /** List query keys */ lists: () => [...viewRuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...viewRuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...viewRuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...viewRuleKeys.details(), id] as const,
-} as const;
-export const embeddingChunkKeys = {
-  /** All embeddingChunk queries */ all: ['embeddingchunk'] as const,
-  /** List query keys */ lists: () => [...embeddingChunkKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...embeddingChunkKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...embeddingChunkKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...embeddingChunkKeys.details(), id] as const,
+    [...schemaKeys.details(), id] as const,
 } as const;
 export const schemaGrantKeys = {
   /** All schemaGrant queries */ all: ['schemagrant'] as const,
@@ -199,59 +289,14 @@ export const schemaGrantKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...schemaGrantKeys.details(), id] as const,
 } as const;
-export const defaultPrivilegeKeys = {
-  /** All defaultPrivilege queries */ all: ['defaultprivilege'] as const,
-  /** List query keys */ lists: () => [...defaultPrivilegeKeys.all, 'list'] as const,
+export const siteKeys = {
+  /** All site queries */ all: ['site'] as const,
+  /** List query keys */ lists: () => [...siteKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...defaultPrivilegeKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...defaultPrivilegeKeys.all, 'detail'] as const,
+    [...siteKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...siteKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...defaultPrivilegeKeys.details(), id] as const,
-} as const;
-export const enumKeys = {
-  /** All enum queries */ all: ['enum'] as const,
-  /** List query keys */ lists: () => [...enumKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...enumKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...enumKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...enumKeys.details(), id] as const,
-} as const;
-export const compositeTypeKeys = {
-  /** All compositeType queries */ all: ['compositetype'] as const,
-  /** List query keys */ lists: () => [...compositeTypeKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...compositeTypeKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...compositeTypeKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...compositeTypeKeys.details(), id] as const,
-} as const;
-export const apiSchemaKeys = {
-  /** All apiSchema queries */ all: ['apischema'] as const,
-  /** List query keys */ lists: () => [...apiSchemaKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...apiSchemaKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apiSchemaKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apiSchemaKeys.details(), id] as const,
-} as const;
-export const apiModuleKeys = {
-  /** All apiModule queries */ all: ['apimodule'] as const,
-  /** List query keys */ lists: () => [...apiModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...apiModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apiModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apiModuleKeys.details(), id] as const,
-} as const;
-export const domainKeys = {
-  /** All domain queries */ all: ['domain'] as const,
-  /** List query keys */ lists: () => [...domainKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...domainKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...domainKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...domainKeys.details(), id] as const,
+    [...siteKeys.details(), id] as const,
 } as const;
 export const siteMetadatumKeys = {
   /** All siteMetadatum queries */ all: ['sitemetadatum'] as const,
@@ -280,122 +325,14 @@ export const siteThemeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...siteThemeKeys.details(), id] as const,
 } as const;
-export const corsSettingKeys = {
-  /** All corsSetting queries */ all: ['corssetting'] as const,
-  /** List query keys */ lists: () => [...corsSettingKeys.all, 'list'] as const,
+export const spatialRelationKeys = {
+  /** All spatialRelation queries */ all: ['spatialrelation'] as const,
+  /** List query keys */ lists: () => [...spatialRelationKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...corsSettingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...corsSettingKeys.all, 'detail'] as const,
+    [...spatialRelationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...spatialRelationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...corsSettingKeys.details(), id] as const,
-} as const;
-export const triggerFunctionKeys = {
-  /** All triggerFunction queries */ all: ['triggerfunction'] as const,
-  /** List query keys */ lists: () => [...triggerFunctionKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...triggerFunctionKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...triggerFunctionKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...triggerFunctionKeys.details(), id] as const,
-} as const;
-export const partitionKeys = {
-  /** All partition queries */ all: ['partition'] as const,
-  /** List query keys */ lists: () => [...partitionKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...partitionKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...partitionKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...partitionKeys.details(), id] as const,
-} as const;
-export const databaseTransferKeys = {
-  /** All databaseTransfer queries */ all: ['databasetransfer'] as const,
-  /** List query keys */ lists: () => [...databaseTransferKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...databaseTransferKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...databaseTransferKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...databaseTransferKeys.details(), id] as const,
-} as const;
-export const apiKeys = {
-  /** All api queries */ all: ['api'] as const,
-  /** List query keys */ lists: () => [...apiKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...apiKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apiKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apiKeys.details(), id] as const,
-} as const;
-export const siteKeys = {
-  /** All site queries */ all: ['site'] as const,
-  /** List query keys */ lists: () => [...siteKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...siteKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...siteKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...siteKeys.details(), id] as const,
-} as const;
-export const appKeys = {
-  /** All app queries */ all: ['app'] as const,
-  /** List query keys */ lists: () => [...appKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appKeys.details(), id] as const,
-} as const;
-export const apiSettingKeys = {
-  /** All apiSetting queries */ all: ['apisetting'] as const,
-  /** List query keys */ lists: () => [...apiSettingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...apiSettingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...apiSettingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...apiSettingKeys.details(), id] as const,
-} as const;
-export const migrateFileKeys = {
-  /** All migrateFile queries */ all: ['migratefile'] as const,
-  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...migrateFileKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...migrateFileKeys.details(), id] as const,
-} as const;
-export const nodeTypeRegistryKeys = {
-  /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
-  /** List query keys */ lists: () => [...nodeTypeRegistryKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...nodeTypeRegistryKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...nodeTypeRegistryKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...nodeTypeRegistryKeys.details(), id] as const,
-} as const;
-export const pubkeySettingKeys = {
-  /** All pubkeySetting queries */ all: ['pubkeysetting'] as const,
-  /** List query keys */ lists: () => [...pubkeySettingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...pubkeySettingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...pubkeySettingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...pubkeySettingKeys.details(), id] as const,
-} as const;
-export const databaseKeys = {
-  /** All database queries */ all: ['database'] as const,
-  /** List query keys */ lists: () => [...databaseKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...databaseKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...databaseKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...databaseKeys.details(), id] as const,
-} as const;
-export const rlsSettingKeys = {
-  /** All rlsSetting queries */ all: ['rlssetting'] as const,
-  /** List query keys */ lists: () => [...rlsSettingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...rlsSettingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...rlsSettingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...rlsSettingKeys.details(), id] as const,
+    [...spatialRelationKeys.details(), id] as const,
 } as const;
 export const sqlActionKeys = {
   /** All sqlAction queries */ all: ['sqlaction'] as const,
@@ -406,23 +343,86 @@ export const sqlActionKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...sqlActionKeys.details(), id] as const,
 } as const;
-export const databaseSettingKeys = {
-  /** All databaseSetting queries */ all: ['databasesetting'] as const,
-  /** List query keys */ lists: () => [...databaseSettingKeys.all, 'list'] as const,
+export const tableKeys = {
+  /** All table queries */ all: ['table'] as const,
+  /** List query keys */ lists: () => [...tableKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...databaseSettingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...databaseSettingKeys.all, 'detail'] as const,
+    [...tableKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...tableKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...databaseSettingKeys.details(), id] as const,
+    [...tableKeys.details(), id] as const,
 } as const;
-export const astMigrationKeys = {
-  /** All astMigration queries */ all: ['astmigration'] as const,
-  /** List query keys */ lists: () => [...astMigrationKeys.all, 'list'] as const,
+export const tableGrantKeys = {
+  /** All tableGrant queries */ all: ['tablegrant'] as const,
+  /** List query keys */ lists: () => [...tableGrantKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...astMigrationKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...astMigrationKeys.all, 'detail'] as const,
+    [...tableGrantKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...tableGrantKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...astMigrationKeys.details(), id] as const,
+    [...tableGrantKeys.details(), id] as const,
+} as const;
+export const triggerKeys = {
+  /** All trigger queries */ all: ['trigger'] as const,
+  /** List query keys */ lists: () => [...triggerKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...triggerKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...triggerKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...triggerKeys.details(), id] as const,
+} as const;
+export const triggerFunctionKeys = {
+  /** All triggerFunction queries */ all: ['triggerfunction'] as const,
+  /** List query keys */ lists: () => [...triggerFunctionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...triggerFunctionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...triggerFunctionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...triggerFunctionKeys.details(), id] as const,
+} as const;
+export const uniqueConstraintKeys = {
+  /** All uniqueConstraint queries */ all: ['uniqueconstraint'] as const,
+  /** List query keys */ lists: () => [...uniqueConstraintKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...uniqueConstraintKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...uniqueConstraintKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...uniqueConstraintKeys.details(), id] as const,
+} as const;
+export const viewKeys = {
+  /** All view queries */ all: ['view'] as const,
+  /** List query keys */ lists: () => [...viewKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...viewKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...viewKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...viewKeys.details(), id] as const,
+} as const;
+export const viewGrantKeys = {
+  /** All viewGrant queries */ all: ['viewgrant'] as const,
+  /** List query keys */ lists: () => [...viewGrantKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...viewGrantKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...viewGrantKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...viewGrantKeys.details(), id] as const,
+} as const;
+export const viewRuleKeys = {
+  /** All viewRule queries */ all: ['viewrule'] as const,
+  /** List query keys */ lists: () => [...viewRuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...viewRuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...viewRuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...viewRuleKeys.details(), id] as const,
+} as const;
+export const viewTableKeys = {
+  /** All viewTable queries */ all: ['viewtable'] as const,
+  /** List query keys */ lists: () => [...viewTableKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...viewTableKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...viewTableKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...viewTableKeys.details(), id] as const,
 } as const;
 export const webauthnSettingKeys = {
   /** All webauthnSetting queries */ all: ['webauthnsetting'] as const,
@@ -465,51 +465,51 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
-  function: functionKeys,
-  schema: schemaKeys,
-  table: tableKeys,
+  api: apiKeys,
+  apiModule: apiModuleKeys,
+  apiSchema: apiSchemaKeys,
+  apiSetting: apiSettingKeys,
+  app: appKeys,
+  astMigration: astMigrationKeys,
   checkConstraint: checkConstraintKeys,
+  compositeType: compositeTypeKeys,
+  corsSetting: corsSettingKeys,
+  database: databaseKeys,
+  databaseSetting: databaseSettingKeys,
+  databaseTransfer: databaseTransferKeys,
+  defaultPrivilege: defaultPrivilegeKeys,
+  domain: domainKeys,
+  embeddingChunk: embeddingChunkKeys,
+  enum: enumKeys,
   field: fieldKeys,
-  spatialRelation: spatialRelationKeys,
   foreignKeyConstraint: foreignKeyConstraintKeys,
   fullTextSearch: fullTextSearchKeys,
+  function: functionKeys,
   index: indexKeys,
+  migrateFile: migrateFileKeys,
+  nodeTypeRegistry: nodeTypeRegistryKeys,
+  partition: partitionKeys,
   policy: policyKeys,
   primaryKeyConstraint: primaryKeyConstraintKeys,
-  tableGrant: tableGrantKeys,
-  trigger: triggerKeys,
-  uniqueConstraint: uniqueConstraintKeys,
-  view: viewKeys,
-  viewTable: viewTableKeys,
-  viewGrant: viewGrantKeys,
-  viewRule: viewRuleKeys,
-  embeddingChunk: embeddingChunkKeys,
+  pubkeySetting: pubkeySettingKeys,
+  rlsSetting: rlsSettingKeys,
+  schema: schemaKeys,
   schemaGrant: schemaGrantKeys,
-  defaultPrivilege: defaultPrivilegeKeys,
-  enum: enumKeys,
-  compositeType: compositeTypeKeys,
-  apiSchema: apiSchemaKeys,
-  apiModule: apiModuleKeys,
-  domain: domainKeys,
+  site: siteKeys,
   siteMetadatum: siteMetadatumKeys,
   siteModule: siteModuleKeys,
   siteTheme: siteThemeKeys,
-  corsSetting: corsSettingKeys,
-  triggerFunction: triggerFunctionKeys,
-  partition: partitionKeys,
-  databaseTransfer: databaseTransferKeys,
-  api: apiKeys,
-  site: siteKeys,
-  app: appKeys,
-  apiSetting: apiSettingKeys,
-  migrateFile: migrateFileKeys,
-  nodeTypeRegistry: nodeTypeRegistryKeys,
-  pubkeySetting: pubkeySettingKeys,
-  database: databaseKeys,
-  rlsSetting: rlsSettingKeys,
+  spatialRelation: spatialRelationKeys,
   sqlAction: sqlActionKeys,
-  databaseSetting: databaseSettingKeys,
-  astMigration: astMigrationKeys,
+  table: tableKeys,
+  tableGrant: tableGrantKeys,
+  trigger: triggerKeys,
+  triggerFunction: triggerFunctionKeys,
+  uniqueConstraint: uniqueConstraintKeys,
+  view: viewKeys,
+  viewGrant: viewGrantKeys,
+  viewRule: viewRuleKeys,
+  viewTable: viewTableKeys,
   webauthnSetting: webauthnSettingKeys,
   custom: customQueryKeys,
 } as const;

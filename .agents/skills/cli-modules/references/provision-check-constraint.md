@@ -7,7 +7,7 @@ Creates a check constraint on a table from a $type + data blueprint definition. 
 ## Usage
 
 ```bash
-csdk provision-check-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-check-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-check-constraint --input.clientMutationId <String> --input.databa
 ### Run provisionCheckConstraint
 
 ```bash
-csdk provision-check-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.tableId <UUID> --input.definition <JSON>
+csdk provision-check-constraint --input.clientMutationId <String> --input.databaseId <UUID> --input.definition <JSON> --input.tableId <UUID>
 ```

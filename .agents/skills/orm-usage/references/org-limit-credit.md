@@ -9,8 +9,8 @@ Append-only ledger of credit grants that automatically update limit ceilings
 ```typescript
 db.orgLimitCredit.findMany({ select: { id: true } }).execute()
 db.orgLimitCredit.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgLimitCredit.create({ data: { defaultLimitId: '<UUID>', actorId: '<UUID>', entityId: '<UUID>', organizationId: '<UUID>', entityType: '<String>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' }, select: { id: true } }).execute()
-db.orgLimitCredit.update({ where: { id: '<UUID>' }, data: { defaultLimitId: '<UUID>' }, select: { id: true } }).execute()
+db.orgLimitCredit.create({ data: { actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', defaultLimitId: '<UUID>', entityId: '<UUID>', entityType: '<String>', organizationId: '<UUID>', reason: '<String>' }, select: { id: true } }).execute()
+db.orgLimitCredit.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.orgLimitCredit.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.orgLimitCredit.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.orgLimitCredit.findMany({
-  select: { id: true, defaultLimitId: true }
+  select: { id: true, actorId: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.orgLimitCredit.findMany({
 
 ```typescript
 const item = await db.orgLimitCredit.create({
-  data: { defaultLimitId: '<UUID>', actorId: '<UUID>', entityId: '<UUID>', organizationId: '<UUID>', entityType: '<String>', amount: '<BigInt>', creditType: '<String>', reason: '<String>' },
+  data: { actorId: '<UUID>', amount: '<BigInt>', creditType: '<String>', defaultLimitId: '<UUID>', entityId: '<UUID>', entityType: '<String>', organizationId: '<UUID>', reason: '<String>' },
   select: { id: true }
 }).execute();
 ```

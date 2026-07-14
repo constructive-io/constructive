@@ -16,10 +16,10 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
   databaseId: 'uuid',
-  schemaId: 'uuid',
+  id: 'uuid',
   name: 'string',
+  schemaId: 'uuid',
 };
 const usage =
   '\nfunction <command>\n\nCommands:\n  list                  List function records\n  find-first            Find first matching function record\n  get                   Get a function by ID\n  create                Create a new function\n  update                Update an existing function\n  delete                Delete a function\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -72,10 +72,10 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      schemaId: true,
+      id: true,
       name: true,
+      schemaId: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<FunctionSelect, FunctionFilter, FunctionOrderBy> & {
@@ -96,10 +96,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
       databaseId: true,
-      schemaId: true,
+      id: true,
       name: true,
+      schemaId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<FunctionSelect, FunctionFilter, FunctionOrderBy> & {
@@ -132,10 +132,10 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
+          id: true,
           name: true,
+          schemaId: true,
         },
       })
       .execute();
@@ -159,14 +159,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'name',
+        message: 'name',
         required: true,
       },
       {
         type: 'text',
-        name: 'name',
-        message: 'name',
+        name: 'schemaId',
+        message: 'schemaId',
         required: true,
       },
     ]);
@@ -177,14 +177,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
           name: cleanedData.name,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
+          id: true,
           name: true,
+          schemaId: true,
         },
       })
       .execute();
@@ -214,14 +214,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'schemaId',
-        message: 'schemaId',
+        name: 'name',
+        message: 'name',
         required: false,
       },
       {
         type: 'text',
-        name: 'name',
-        message: 'name',
+        name: 'schemaId',
+        message: 'schemaId',
         required: false,
       },
     ]);
@@ -235,14 +235,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          schemaId: cleanedData.schemaId,
           name: cleanedData.name,
+          schemaId: cleanedData.schemaId,
         },
         select: {
-          id: true,
           databaseId: true,
-          schemaId: true,
+          id: true,
           name: true,
+          schemaId: true,
         },
       })
       .execute();

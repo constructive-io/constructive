@@ -23,8 +23,8 @@ export default async (
     const answers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'mask',
-        message: 'mask',
+        name: 'after',
+        message: 'Read all values in the set after (below) this cursor.',
       },
       {
         type: 'text',
@@ -33,14 +33,14 @@ export default async (
       },
       {
         type: 'text',
-        name: 'offset',
-        message:
-          'Skip the first `n` values from our `after` cursor, an alternative to cursor\nbased pagination. May not be used with `last`.',
+        name: 'mask',
+        message: 'mask',
       },
       {
         type: 'text',
-        name: 'after',
-        message: 'Read all values in the set after (below) this cursor.',
+        name: 'offset',
+        message:
+          'Skip the first `n` values from our `after` cursor, an alternative to cursor\nbased pagination. May not be used with `last`.',
       },
     ]);
     const client = getClient();

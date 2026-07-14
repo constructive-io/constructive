@@ -12,8 +12,8 @@ csdk pubkey-setting list --where.<field>.<op> <value> --orderBy <values>
 csdk pubkey-setting list --limit 10 --after <cursor>
 csdk pubkey-setting find-first --where.<field>.<op> <value>
 csdk pubkey-setting get --id <UUID>
-csdk pubkey-setting create --databaseId <UUID> [--schemaId <UUID>] [--cryptoNetwork <String>] [--userField <String>] [--signUpWithKeyFunctionId <UUID>] [--signInRequestChallengeFunctionId <UUID>] [--signInRecordFailureFunctionId <UUID>] [--signInWithChallengeFunctionId <UUID>]
-csdk pubkey-setting update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--cryptoNetwork <String>] [--userField <String>] [--signUpWithKeyFunctionId <UUID>] [--signInRequestChallengeFunctionId <UUID>] [--signInRecordFailureFunctionId <UUID>] [--signInWithChallengeFunctionId <UUID>]
+csdk pubkey-setting create --databaseId <UUID> [--cryptoNetwork <String>] [--schemaId <UUID>] [--signInRecordFailureFunctionId <UUID>] [--signInRequestChallengeFunctionId <UUID>] [--signInWithChallengeFunctionId <UUID>] [--signUpWithKeyFunctionId <UUID>] [--userField <String>]
+csdk pubkey-setting update --id <UUID> [--cryptoNetwork <String>] [--databaseId <UUID>] [--schemaId <UUID>] [--signInRecordFailureFunctionId <UUID>] [--signInRequestChallengeFunctionId <UUID>] [--signInWithChallengeFunctionId <UUID>] [--signUpWithKeyFunctionId <UUID>] [--userField <String>]
 csdk pubkey-setting delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk pubkey-setting list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a pubkeySetting
 
 ```bash
-csdk pubkey-setting create --databaseId <UUID> [--schemaId <UUID>] [--cryptoNetwork <String>] [--userField <String>] [--signUpWithKeyFunctionId <UUID>] [--signInRequestChallengeFunctionId <UUID>] [--signInRecordFailureFunctionId <UUID>] [--signInWithChallengeFunctionId <UUID>]
+csdk pubkey-setting create --databaseId <UUID> [--cryptoNetwork <String>] [--schemaId <UUID>] [--signInRecordFailureFunctionId <UUID>] [--signInRequestChallengeFunctionId <UUID>] [--signInWithChallengeFunctionId <UUID>] [--signUpWithKeyFunctionId <UUID>] [--userField <String>]
 ```
 
 ### Get a pubkeySetting by id

@@ -7,8 +7,8 @@ Join table binding function definitions to API endpoints with per-binding alias 
 ## Usage
 
 ```typescript
-usePlatformFunctionApiBindingsQuery({ selection: { fields: { id: true, functionDefinitionId: true, apiId: true, alias: true, config: true } } })
-usePlatformFunctionApiBindingQuery({ id: '<UUID>', selection: { fields: { id: true, functionDefinitionId: true, apiId: true, alias: true, config: true } } })
+usePlatformFunctionApiBindingsQuery({ selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } } })
+usePlatformFunctionApiBindingQuery({ id: '<UUID>', selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } } })
 useCreatePlatformFunctionApiBindingMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformFunctionApiBindingMutation({ selection: { fields: { id: true } } })
 useDeletePlatformFunctionApiBindingMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformFunctionApiBindingMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformFunctionApiBindingsQuery({
-  selection: { fields: { id: true, functionDefinitionId: true, apiId: true, alias: true, config: true } },
+  selection: { fields: { alias: true, apiId: true, config: true, functionDefinitionId: true, id: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformFunctionApiBindingsQuery({
 const { mutate } = useCreatePlatformFunctionApiBindingMutation({
   selection: { fields: { id: true } },
 });
-mutate({ functionDefinitionId: '<UUID>', apiId: '<UUID>', alias: '<String>', config: '<JSON>' });
+mutate({ alias: '<String>', apiId: '<UUID>', config: '<JSON>', functionDefinitionId: '<UUID>' });
 ```

@@ -16,17 +16,17 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  id: 'uuid',
-  namespaceId: 'uuid',
-  name: 'string',
-  provider: 'string',
-  value: 'string',
-  labels: 'json',
   annotations: 'json',
-  description: 'string',
   createdAt: 'string',
-  updatedAt: 'string',
+  description: 'string',
   expiresAt: 'string',
+  id: 'uuid',
+  labels: 'json',
+  name: 'string',
+  namespaceId: 'uuid',
+  provider: 'string',
+  updatedAt: 'string',
+  value: 'string',
 };
 const usage =
   '\nplatform-config <command>\n\nCommands:\n  list                  List platformConfig records\n  find-first            Find first matching platformConfig record\n  get                   Get a platformConfig by ID\n  create                Create a new platformConfig\n  update                Update an existing platformConfig\n  delete                Delete a platformConfig\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -79,17 +79,17 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      namespaceId: true,
-      name: true,
-      provider: true,
-      value: true,
-      labels: true,
       annotations: true,
-      description: true,
       createdAt: true,
-      updatedAt: true,
+      description: true,
       expiresAt: true,
+      id: true,
+      labels: true,
+      name: true,
+      namespaceId: true,
+      provider: true,
+      updatedAt: true,
+      value: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PlatformConfigSelect, PlatformConfigFilter, PlatformConfigOrderBy> & {
@@ -110,17 +110,17 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      id: true,
-      namespaceId: true,
-      name: true,
-      provider: true,
-      value: true,
-      labels: true,
       annotations: true,
-      description: true,
       createdAt: true,
-      updatedAt: true,
+      description: true,
       expiresAt: true,
+      id: true,
+      labels: true,
+      name: true,
+      namespaceId: true,
+      provider: true,
+      updatedAt: true,
+      value: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PlatformConfigSelect, PlatformConfigFilter, PlatformConfigOrderBy> & {
@@ -153,17 +153,17 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          id: true,
-          namespaceId: true,
-          name: true,
-          provider: true,
-          value: true,
-          labels: true,
           annotations: true,
-          description: true,
           createdAt: true,
-          updatedAt: true,
+          description: true,
           expiresAt: true,
+          id: true,
+          labels: true,
+          name: true,
+          namespaceId: true,
+          provider: true,
+          updatedAt: true,
+          value: true,
         },
       })
       .execute();
@@ -179,39 +179,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'provider',
-        message: 'provider',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'value',
-        message: 'value',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'json',
-        name: 'labels',
-        message: 'labels',
-        required: false,
-        skipPrompt: true,
-      },
       {
         type: 'json',
         name: 'annotations',
@@ -233,6 +200,39 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'namespaceId',
+        message: 'namespaceId',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'provider',
+        message: 'provider',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'value',
+        message: 'value',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -243,27 +243,27 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.platformConfig
       .create({
         data: {
-          namespaceId: cleanedData.namespaceId,
-          name: cleanedData.name,
-          provider: cleanedData.provider,
-          value: cleanedData.value,
-          labels: cleanedData.labels,
           annotations: cleanedData.annotations,
           description: cleanedData.description,
           expiresAt: cleanedData.expiresAt,
+          labels: cleanedData.labels,
+          name: cleanedData.name,
+          namespaceId: cleanedData.namespaceId,
+          provider: cleanedData.provider,
+          value: cleanedData.value,
         },
         select: {
-          id: true,
-          namespaceId: true,
-          name: true,
-          provider: true,
-          value: true,
-          labels: true,
           annotations: true,
-          description: true,
           createdAt: true,
-          updatedAt: true,
+          description: true,
           expiresAt: true,
+          id: true,
+          labels: true,
+          name: true,
+          namespaceId: true,
+          provider: true,
+          updatedAt: true,
+          value: true,
         },
       })
       .execute();
@@ -286,39 +286,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'provider',
-        message: 'provider',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'value',
-        message: 'value',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'json',
-        name: 'labels',
-        message: 'labels',
-        required: false,
-        skipPrompt: true,
-      },
-      {
         type: 'json',
         name: 'annotations',
         message: 'annotations',
@@ -339,6 +306,39 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'json',
+        name: 'labels',
+        message: 'labels',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'namespaceId',
+        message: 'namespaceId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'provider',
+        message: 'provider',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'value',
+        message: 'value',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformConfigPatch;
@@ -349,27 +349,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          namespaceId: cleanedData.namespaceId,
-          name: cleanedData.name,
-          provider: cleanedData.provider,
-          value: cleanedData.value,
-          labels: cleanedData.labels,
           annotations: cleanedData.annotations,
           description: cleanedData.description,
           expiresAt: cleanedData.expiresAt,
+          labels: cleanedData.labels,
+          name: cleanedData.name,
+          namespaceId: cleanedData.namespaceId,
+          provider: cleanedData.provider,
+          value: cleanedData.value,
         },
         select: {
-          id: true,
-          namespaceId: true,
-          name: true,
-          provider: true,
-          value: true,
-          labels: true,
           annotations: true,
-          description: true,
           createdAt: true,
-          updatedAt: true,
+          description: true,
           expiresAt: true,
+          id: true,
+          labels: true,
+          name: true,
+          namespaceId: true,
+          provider: true,
+          updatedAt: true,
+          value: true,
         },
       })
       .execute();

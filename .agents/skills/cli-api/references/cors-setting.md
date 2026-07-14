@@ -12,8 +12,8 @@ csdk cors-setting list --where.<field>.<op> <value> --orderBy <values>
 csdk cors-setting list --limit 10 --after <cursor>
 csdk cors-setting find-first --where.<field>.<op> <value>
 csdk cors-setting get --id <UUID>
-csdk cors-setting create --databaseId <UUID> [--apiId <UUID>] [--allowedOrigins <String>]
-csdk cors-setting update --id <UUID> [--databaseId <UUID>] [--apiId <UUID>] [--allowedOrigins <String>]
+csdk cors-setting create --databaseId <UUID> [--allowedOrigins <String>] [--apiId <UUID>]
+csdk cors-setting update --id <UUID> [--allowedOrigins <String>] [--apiId <UUID>] [--databaseId <UUID>]
 csdk cors-setting delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk cors-setting list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a corsSetting
 
 ```bash
-csdk cors-setting create --databaseId <UUID> [--apiId <UUID>] [--allowedOrigins <String>]
+csdk cors-setting create --databaseId <UUID> [--allowedOrigins <String>] [--apiId <UUID>]
 ```
 
 ### Get a corsSetting by id

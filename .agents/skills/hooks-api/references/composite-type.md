@@ -7,8 +7,8 @@ React Query hooks for CompositeType data operations
 ## Usage
 
 ```typescript
-useCompositeTypesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, tags: true } } })
-useCompositeTypeQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, tags: true } } })
+useCompositeTypesQuery({ selection: { fields: { attributes: true, category: true, databaseId: true, description: true, id: true, label: true, name: true, schemaId: true, smartTags: true, tags: true } } })
+useCompositeTypeQuery({ id: '<UUID>', selection: { fields: { attributes: true, category: true, databaseId: true, description: true, id: true, label: true, name: true, schemaId: true, smartTags: true, tags: true } } })
 useCreateCompositeTypeMutation({ selection: { fields: { id: true } } })
 useUpdateCompositeTypeMutation({ selection: { fields: { id: true } } })
 useDeleteCompositeTypeMutation({})
@@ -20,7 +20,7 @@ useDeleteCompositeTypeMutation({})
 
 ```typescript
 const { data, isLoading } = useCompositeTypesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, attributes: true, smartTags: true, category: true, tags: true } },
+  selection: { fields: { attributes: true, category: true, databaseId: true, description: true, id: true, label: true, name: true, schemaId: true, smartTags: true, tags: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useCompositeTypesQuery({
 const { mutate } = useCreateCompositeTypeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', schemaId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', attributes: '<JSON>', smartTags: '<JSON>', category: '<ObjectCategory>', tags: '<String>' });
+mutate({ attributes: '<JSON>', category: '<ObjectCategory>', databaseId: '<UUID>', description: '<String>', label: '<String>', name: '<String>', schemaId: '<UUID>', smartTags: '<JSON>', tags: '<String>' });
 ```

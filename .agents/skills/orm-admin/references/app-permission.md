@@ -9,8 +9,8 @@ Defines available permissions as named bits within a bitmask, used by the RBAC s
 ```typescript
 db.appPermission.findMany({ select: { id: true } }).execute()
 db.appPermission.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.appPermission.create({ data: { name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' }, select: { id: true } }).execute()
-db.appPermission.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.appPermission.create({ data: { bitnum: '<Int>', bitstr: '<BitString>', description: '<String>', name: '<String>' }, select: { id: true } }).execute()
+db.appPermission.update({ where: { id: '<UUID>' }, data: { bitnum: '<Int>' }, select: { id: true } }).execute()
 db.appPermission.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.appPermission.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.appPermission.findMany({
-  select: { id: true, name: true }
+  select: { id: true, bitnum: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.appPermission.findMany({
 
 ```typescript
 const item = await db.appPermission.create({
-  data: { name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' },
+  data: { bitnum: '<Int>', bitstr: '<BitString>', description: '<String>', name: '<String>' },
   select: { id: true }
 }).execute();
 ```

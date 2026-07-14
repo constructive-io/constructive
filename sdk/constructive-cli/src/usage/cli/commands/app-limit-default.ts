@@ -17,8 +17,8 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
-  name: 'string',
   max: 'int',
+  name: 'string',
   softMax: 'int',
 };
 const usage =
@@ -73,8 +73,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       id: true,
-      name: true,
       max: true,
+      name: true,
       softMax: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -97,8 +97,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       id: true,
-      name: true,
       max: true,
+      name: true,
       softMax: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -133,8 +133,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           id: true,
-          name: true,
           max: true,
+          name: true,
           softMax: true,
         },
       })
@@ -153,16 +153,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
         name: 'max',
         message: 'max',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: true,
       },
       {
         type: 'text',
@@ -181,14 +181,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.appLimitDefault
       .create({
         data: {
-          name: cleanedData.name,
           max: cleanedData.max,
+          name: cleanedData.name,
           softMax: cleanedData.softMax,
         },
         select: {
           id: true,
-          name: true,
           max: true,
+          name: true,
           softMax: true,
         },
       })
@@ -213,16 +213,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'name',
-        message: 'name',
-        required: false,
-      },
-      {
-        type: 'text',
         name: 'max',
         message: 'max',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
       },
       {
         type: 'text',
@@ -241,14 +241,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          name: cleanedData.name,
           max: cleanedData.max,
+          name: cleanedData.name,
           softMax: cleanedData.softMax,
         },
         select: {
           id: true,
-          name: true,
           max: true,
+          name: true,
           softMax: true,
         },
       })
