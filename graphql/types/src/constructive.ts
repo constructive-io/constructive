@@ -19,6 +19,7 @@ import {
   apiDefaults
 } from './graphile';
 import { LlmOptions } from './llm';
+import { SmsOptions, smsDefaults } from './sms';
 
 /**
  * GraphQL-specific options for Constructive
@@ -30,6 +31,8 @@ export interface ConstructiveGraphQLOptions {
   features?: GraphileFeatureOptions;
   /** API configuration options */
   api?: ApiOptions;
+  /** SMS provider configuration */
+  sms?: SmsOptions;
 }
 
 /**
@@ -59,6 +62,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   jobs?: JobsConfig;
   /** LLM provider configuration (embeddings, chat, RAG) */
   llm?: LlmOptions;
+  /** SMS provider configuration */
+  sms?: SmsOptions;
 }
 
 /**
@@ -67,7 +72,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
 export const constructiveGraphqlDefaults: ConstructiveGraphQLOptions = {
   graphile: graphileDefaults,
   features: graphileFeatureDefaults,
-  api: apiDefaults
+  api: apiDefaults,
+  sms: smsDefaults
 };
 
 /**

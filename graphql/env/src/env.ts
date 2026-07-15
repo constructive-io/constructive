@@ -1,4 +1,4 @@
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
+import type { ConstructiveOptions, SmsProviderName } from '@constructive-io/graphql-types';
 
 /**
  * Parse GraphQL-related environment variables.
@@ -7,6 +7,27 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
 const parseEnvBoolean = (val?: string): boolean | undefined => {
   if (val === undefined) return undefined;
   return ['true', '1', 'yes'].includes(val.toLowerCase());
+};
+
+const parseEnvInteger = (name: string, val?: string): number | undefined => {
+  if (val === undefined) return undefined;
+  const trimmed = val.trim();
+  if (!/^\d+$/.test(trimmed)) {
+    throw new Error(`${name} must be an integer`);
+  }
+  const parsed = Number.parseInt(trimmed, 10);
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+    throw new Error(`${name} must be a positive safe integer`);
+  }
+  return parsed;
+};
+
+const parseSmsProvider = (val?: string): SmsProviderName | undefined => {
+  if (val === undefined) return undefined;
+  if (val === 'devsms' || val === 'twilio' || val === 'sns') {
+    return val;
+  }
+  throw new Error('SMS_PROVIDER must be one of: devsms, twilio, sns');
 };
 
 /**
@@ -34,6 +55,12 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     CHAT_PROVIDER,
     CHAT_MODEL,
     CHAT_BASE_URL,
+
+    SMS_PROVIDER,
+    SMS_SENDER_ID,
+    SMS_REQUEST_TIMEOUT_MS,
+    SEND_SMS_DRY_RUN,
+    DEVSMS_BASE_URL,
   } = env;
 
   return {
@@ -73,6 +100,21 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
             ...(CHAT_MODEL && { model: CHAT_MODEL }),
             ...(CHAT_BASE_URL && { baseUrl: CHAT_BASE_URL }),
           },
+        }),
+      },
+    }),
+    ...((SMS_PROVIDER || SMS_SENDER_ID || SMS_REQUEST_TIMEOUT_MS || SEND_SMS_DRY_RUN || DEVSMS_BASE_URL) && {
+      sms: {
+        ...(SMS_PROVIDER && { provider: parseSmsProvider(SMS_PROVIDER) }),
+        ...(SMS_SENDER_ID && { senderId: SMS_SENDER_ID }),
+        ...(SMS_REQUEST_TIMEOUT_MS && {
+          requestTimeoutMs: parseEnvInteger('SMS_REQUEST_TIMEOUT_MS', SMS_REQUEST_TIMEOUT_MS)
+        }),
+        ...(SEND_SMS_DRY_RUN && { dryRun: parseEnvBoolean(SEND_SMS_DRY_RUN) }),
+        ...(DEVSMS_BASE_URL && {
+          devsms: {
+            baseUrl: DEVSMS_BASE_URL
+          }
         }),
       },
     }),
