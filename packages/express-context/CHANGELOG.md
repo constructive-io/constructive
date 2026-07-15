@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.11.0...@constructive-io/express-context@0.11.1) (2026-07-15)
+
+### Bug Fixes
+
+- **express-context:** read auth_settings_table_name directly ([560530d](https://github.com/constructive-io/constructive/commit/560530d688a3b2fa3bf6dc9854be51867d2ed5a7)), closes [constructive-db#2194](https://github.com/constructive-db/issues/2194)
+
 # [0.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.10.0...@constructive-io/express-context@0.11.0) (2026-07-14)
 
 ### Bug Fixes
