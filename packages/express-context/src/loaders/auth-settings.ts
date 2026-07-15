@@ -16,15 +16,8 @@ import { createModuleLoader } from './create-loader';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
-// The column was renamed auth_settings_table -> auth_settings_table_name
-// (Graphile inflection collision with auth_settings_table_id); read whichever
-// exists so the server works against both old and new metaschema versions.
 const AUTH_SETTINGS_DISCOVERY_SQL = `
-  SELECT s.schema_name,
-         coalesce(
-           to_jsonb(sm) ->> 'auth_settings_table_name',
-           to_jsonb(sm) ->> 'auth_settings_table'
-         ) AS table_name
+  SELECT s.schema_name, sm.auth_settings_table_name AS table_name
   FROM metaschema_modules_public.sessions_module sm
   JOIN metaschema_public.schema s ON s.id = sm.schema_id
   LIMIT 1
