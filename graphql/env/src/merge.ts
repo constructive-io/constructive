@@ -30,7 +30,7 @@ export const getEnvOptions = (
   const graphqlEnvOptions = getGraphQLEnvVars(env);
   
   // Load config again to get any GraphQL-specific config
-  // Config files can contain Constructive options (graphile, features, api)
+  // Config files can contain Constructive options (graphile, features, api, sms)
   // even though loadConfigSync returns PgpmOptions type
   const configOptions = loadConfigSync(cwd) as Partial<ConstructiveOptions>;
   
@@ -43,6 +43,7 @@ export const getEnvOptions = (
       ...(configOptions.graphile && { graphile: configOptions.graphile }),
       ...(configOptions.features && { features: configOptions.features }),
       ...(configOptions.api && { api: configOptions.api }),
+      ...(configOptions.sms && { sms: configOptions.sms }),
     },
     graphqlEnvOptions,
     overrides

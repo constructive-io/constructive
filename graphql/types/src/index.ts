@@ -29,3 +29,11 @@ export {
   LlmEmbedderOptions,
   LlmChatOptions
 } from './llm';
+
+// Export SMS types
+export {
+  SmsProviderName,
+  SmsOptions,
+  DevSmsOptions,
+  smsDefaults
+} from './sms';

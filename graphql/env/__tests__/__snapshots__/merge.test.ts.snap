@@ -24,7 +24,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "bucketName": "test-bucket",
     "endpoint": "http://localhost:9000",
     "provider": "minio",
-    "publicUrlPrefix": "http://localhost:9000",
+    "publicUrlPrefix": "http://localhost:9000/test-bucket",
   },
   "db": {
     "connections": {
@@ -100,6 +100,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "useTx": false,
     },
   },
+  "oauth": {},
   "pg": {
     "database": "config-db",
     "host": "override-host",
@@ -112,6 +113,15 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "port": 5000,
     "strictAuth": false,
     "trustProxy": false,
+  },
+  "sms": {
+    "devsms": {
+      "baseUrl": "http://env-devsms:4000",
+    },
+    "dryRun": true,
+    "provider": "devsms",
+    "requestTimeoutMs": 9000,
+    "senderId": "OverrideSender",
   },
   "smtp": {
     "debug": false,
