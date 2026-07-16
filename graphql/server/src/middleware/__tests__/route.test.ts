@@ -23,17 +23,12 @@ afterAll(() => {
 
 const routeRow = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
   route_id: 'route-1',
+  database_id: 'db-1',
   domain_id: 'domain-1',
   matched_path: '/graphql',
   method: null,
   target_kind: 'api',
-  channel: null,
-  api_id: 'api-1',
-  site_id: null,
-  service_id: null,
-  function_definition_id: null,
-  bucket_id: null,
-  route_scope: 'database',
+  target_id: 'api-1',
   ...overrides
 });
 
@@ -104,7 +99,7 @@ describe('getHttpRouteMode', () => {
 describe('resolveHttpRoute', () => {
   it('maps a row into a typed match', async () => {
     const match = await resolveHttpRoute(poolReturning([routeRow()]), 'acme.test', '/graphql', 'POST');
-    expect(match).toMatchObject({ targetKind: 'api', apiId: 'api-1', routeScope: 'database' });
+    expect(match).toMatchObject({ targetKind: 'api', targetId: 'api-1', databaseId: 'db-1' });
   });
 
   it('returns null when nothing matches', async () => {
@@ -145,7 +140,7 @@ describe('createRouteMiddleware', () => {
     const next = jest.fn() as NextFunction;
     await createRouteMiddleware(opts)(req, res as Response, next);
     expect(next).toHaveBeenCalled();
-    expect(req.httpRoute).toMatchObject({ targetKind: 'api', apiId: 'api-1' });
+    expect(req.httpRoute).toMatchObject({ targetKind: 'api', targetId: 'api-1' });
     expect(req.routeApiId).toBeUndefined();
     expect(res.status).not.toHaveBeenCalled();
   });
@@ -163,7 +158,7 @@ describe('createRouteMiddleware', () => {
   it('on mode / site target: serves a typed placeholder', async () => {
     process.env.HTTP_ROUTE_RESOLVER_MODE = 'on';
     mockGetPgPool.mockReturnValue(
-      poolReturning([routeRow({ target_kind: 'site', api_id: null, site_id: 'site-9' })])
+      poolReturning([routeRow({ target_kind: 'site', target_id: 'site-9' })])
     );
     const req = createRequest('acme.test', '/', 'GET');
     const res = createResponse();
@@ -180,9 +175,7 @@ describe('createRouteMiddleware', () => {
       poolReturning([
         routeRow({
           target_kind: 'function',
-          api_id: null,
-          function_definition_id: 'fn-1',
-          channel: 'sync'
+          target_id: 'fn-1'
         })
       ])
     );
@@ -192,7 +185,7 @@ describe('createRouteMiddleware', () => {
     await createRouteMiddleware(opts)(req, res as Response, next);
     expect(next).not.toHaveBeenCalled();
     expect(res.statusCode).toBe(501);
-    expect(res.body).toMatchObject({ targetKind: 'function', channel: 'sync', functionDefinitionId: 'fn-1' });
+    expect(res.body).toMatchObject({ targetKind: 'function', targetId: 'fn-1' });
   });
 
   it('on mode / no match: falls through to legacy resolution', async () => {

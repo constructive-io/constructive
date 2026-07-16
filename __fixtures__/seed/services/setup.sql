@@ -244,10 +244,11 @@ CREATE TABLE IF NOT EXISTS services_public.api_modules (
 -- HTTP ROUTES (Stage B) + resolver
 -- =====================================================
 --
--- Mirrors the constructive-db route storage + resolver contract
--- (services_public.resolve_http_route). Two scopes exist in production
--- (platform_http_routes / http_routes); the resolver unions both. Routes are
--- unseeded by default — tests insert their own.
+-- Mirrors the constructive-db single-table route storage + resolver contract
+-- (services_public.resolve_http_route). A single http_routes table fans a host
+-- out to typed targets via (target_kind, target_id); platform is just a
+-- database, so there is no separate route tier. Routes are unseeded by
+-- default — tests insert their own.
 
 CREATE TABLE IF NOT EXISTS services_public.http_routes (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -255,13 +256,8 @@ CREATE TABLE IF NOT EXISTS services_public.http_routes (
   domain_id uuid NOT NULL,
   path text NOT NULL DEFAULT '/',
   method text,
-  target_kind text NOT NULL CHECK (target_kind IN ('api', 'site', 'service', 'function', 'bucket')),
-  channel text,
-  api_id uuid,
-  site_id uuid,
-  service_id uuid,
-  function_definition_id uuid,
-  bucket_id uuid,
+  target_kind text NOT NULL CHECK (target_kind IN ('api', 'site', 'function', 'bucket', 'service')),
+  target_id uuid NOT NULL,
   priority int NOT NULL DEFAULT 0,
   is_active boolean NOT NULL DEFAULT true,
   CONSTRAINT hr_db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
@@ -269,92 +265,33 @@ CREATE TABLE IF NOT EXISTS services_public.http_routes (
 );
 CREATE INDEX IF NOT EXISTS http_routes_domain_id_idx ON services_public.http_routes (domain_id);
 
-CREATE TABLE IF NOT EXISTS services_public.platform_http_routes (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  domain_id uuid NOT NULL,
-  path text NOT NULL DEFAULT '/',
-  method text,
-  target_kind text NOT NULL CHECK (target_kind IN ('api', 'site', 'service', 'function', 'bucket')),
-  channel text,
-  api_id uuid,
-  site_id uuid,
-  service_id uuid,
-  function_definition_id uuid,
-  bucket_id uuid,
-  priority int NOT NULL DEFAULT 0,
-  is_active boolean NOT NULL DEFAULT true,
-  CONSTRAINT phr_domain_fkey FOREIGN KEY (domain_id) REFERENCES services_public.domains (id) ON DELETE CASCADE
-);
-CREATE INDEX IF NOT EXISTS platform_http_routes_domain_id_idx ON services_public.platform_http_routes (domain_id);
-
 CREATE OR REPLACE FUNCTION services_public.resolve_http_route(
   p_host text,
   p_path text,
   p_method text,
   OUT route_id uuid,
+  OUT database_id uuid,
   OUT domain_id uuid,
   OUT matched_path text,
   OUT method text,
   OUT target_kind text,
-  OUT channel text,
-  OUT api_id uuid,
-  OUT site_id uuid,
-  OUT service_id uuid,
-  OUT function_definition_id uuid,
-  OUT bucket_id uuid,
-  OUT route_scope text
+  OUT target_id uuid
 ) RETURNS record AS $_PGFN_$
 SELECT
-  route_id, domain_id, matched_path, method, target_kind, channel,
-  api_id, site_id, service_id, function_definition_id, bucket_id, route_scope
-FROM (
-  SELECT
-    r.id AS route_id,
-    r.domain_id AS domain_id,
-    r.path AS matched_path,
-    r.method AS method,
-    r.target_kind::text AS target_kind,
-    CASE r.target_kind WHEN 'function' THEN r.channel ELSE NULL END::text AS channel,
-    CASE r.target_kind WHEN 'api' THEN r.api_id ELSE NULL END AS api_id,
-    CASE r.target_kind WHEN 'site' THEN r.site_id ELSE NULL END AS site_id,
-    CASE r.target_kind WHEN 'service' THEN r.service_id ELSE NULL END AS service_id,
-    CASE r.target_kind WHEN 'function' THEN r.function_definition_id ELSE NULL END AS function_definition_id,
-    CASE r.target_kind WHEN 'bucket' THEN r.bucket_id ELSE NULL END AS bucket_id,
-    'platform' AS route_scope,
-    length(r.path) AS path_length,
-    r.method IS NOT NULL AS method_specific,
-    r.priority AS priority
-  FROM services_public.platform_http_routes AS r
-  INNER JOIN services_public.domains AS d ON d.id = r.domain_id
-  WHERE lower(concat_ws('.', d.subdomain, d.domain)) = split_part(lower(p_host), ':', 1)
-    AND ((r.path = '/' OR (concat('/', ltrim(COALESCE(p_path, '/'), '/')) = r.path
-      OR "left"(concat('/', ltrim(COALESCE(p_path, '/'), '/')), length(r.path) + 1) = (r.path || '/')))
-      AND ((r.method IS NULL OR upper(r.method) = upper(p_method)) AND r.is_active))
-  UNION ALL
-  SELECT
-    r.id AS route_id,
-    r.domain_id AS domain_id,
-    r.path AS matched_path,
-    r.method AS method,
-    r.target_kind::text AS target_kind,
-    CASE r.target_kind WHEN 'function' THEN r.channel ELSE NULL END::text AS channel,
-    CASE r.target_kind WHEN 'api' THEN r.api_id ELSE NULL END AS api_id,
-    CASE r.target_kind WHEN 'site' THEN r.site_id ELSE NULL END AS site_id,
-    CASE r.target_kind WHEN 'service' THEN r.service_id ELSE NULL END AS service_id,
-    CASE r.target_kind WHEN 'function' THEN r.function_definition_id ELSE NULL END AS function_definition_id,
-    CASE r.target_kind WHEN 'bucket' THEN r.bucket_id ELSE NULL END AS bucket_id,
-    'database' AS route_scope,
-    length(r.path) AS path_length,
-    r.method IS NOT NULL AS method_specific,
-    r.priority AS priority
-  FROM services_public.http_routes AS r
-  INNER JOIN services_public.domains AS d ON d.id = r.domain_id
-  WHERE lower(concat_ws('.', d.subdomain, d.domain)) = split_part(lower(p_host), ':', 1)
-    AND ((r.path = '/' OR (concat('/', ltrim(COALESCE(p_path, '/'), '/')) = r.path
-      OR "left"(concat('/', ltrim(COALESCE(p_path, '/'), '/')), length(r.path) + 1) = (r.path || '/')))
-      AND ((r.method IS NULL OR upper(r.method) = upper(p_method)) AND r.is_active))
-) AS candidates
-ORDER BY path_length DESC, method_specific DESC, priority DESC, route_id ASC
+  r.id AS route_id,
+  r.database_id AS database_id,
+  r.domain_id AS domain_id,
+  r.path AS matched_path,
+  r.method AS method,
+  r.target_kind AS target_kind,
+  r.target_id AS target_id
+FROM services_public.http_routes AS r
+INNER JOIN services_public.domains AS d ON d.id = r.domain_id
+WHERE lower(concat_ws('.', d.subdomain, d.domain)) = split_part(lower(p_host), ':', 1)
+  AND ((r.path = '/' OR (concat('/', ltrim(COALESCE(p_path, '/'), '/')) = r.path
+    OR "left"(concat('/', ltrim(COALESCE(p_path, '/'), '/')), length(r.path) + 1) = (r.path || '/')))
+    AND ((r.method IS NULL OR upper(r.method) = upper(p_method)) AND r.is_active))
+ORDER BY length(r.path) DESC, (r.method IS NOT NULL) DESC, r.priority DESC, r.id ASC
 LIMIT 1
 $_PGFN_$ LANGUAGE sql STABLE SECURITY DEFINER;
 
@@ -455,5 +392,4 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON services_public.database_settings TO adm
 GRANT SELECT, INSERT, UPDATE, DELETE ON services_public.api_settings TO administrator, authenticated, anonymous;
 GRANT SELECT, INSERT, UPDATE, DELETE ON metaschema_modules_public.rls_module TO administrator, authenticated, anonymous;
 GRANT SELECT, INSERT, UPDATE, DELETE ON services_public.http_routes TO administrator, authenticated, anonymous;
-GRANT SELECT, INSERT, UPDATE, DELETE ON services_public.platform_http_routes TO administrator, authenticated, anonymous;
 GRANT EXECUTE ON FUNCTION services_public.resolve_http_route(text, text, text) TO administrator, authenticated, anonymous;
