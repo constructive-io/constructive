@@ -40,6 +40,7 @@ const seedFiles = [
 
 const API_HOST = 'app.test.constructive.io';
 const SITE_ID = '90000000-0000-4000-8000-000000000001';
+const FUNCTION_ID = '90000000-0000-4000-8000-000000000002';
 
 let request: supertest.Agent;
 let teardown: () => Promise<void>;
@@ -114,7 +115,7 @@ describe('on mode (authoritative)', () => {
 
     expect(res.status).toBe(501);
     expect(res.body.targetKind).toBe('function');
-    expect(res.body.channel).toBe('webhook');
+    expect(res.body.targetId).toBe(FUNCTION_ID);
   });
 
   it('unrouted /graphql falls through to legacy host->api (GraphQL still serves)', async () => {

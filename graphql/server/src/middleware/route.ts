@@ -4,7 +4,7 @@
  * Consumes the database-side `services_public.resolve_http_route(host, path,
  * method)` contract and turns a request into a typed target:
  *
- *   host + path + method  ->  { target_kind, channel, api_id, site_id, ... }
+ *   host + path + method  ->  { target_kind, target_id }
  *
  * This is the request-plane counterpart to the routing table that lives in
  * constructive-db (PR #2214). The resolver decides *which typed thing* serves a
@@ -17,8 +17,8 @@
  *                 cost unless a host is deliberately shared.
  *   - site     -> served by the site handler (Track 2 SSR lands the full
  *                 contract; this returns a typed placeholder for now).
- *   - function -> recognized (with channel); full sync/page/webhook dispatch is
- *                 tracked separately. Returns a typed 501 for now.
+ *   - function -> recognized; full sync/page/webhook dispatch is tracked
+ *                 separately. Returns a typed 501 for now.
  *   - bucket   -> recognized; object serving is a follow-up. Typed 501.
  *   - service  -> recognized; the only target that may point at a customer-owned
  *                 workload in its own namespace. Typed 501.
@@ -56,38 +56,27 @@ export type HttpRouteTargetKind =
 
 export interface HttpRouteMatch {
   routeId: string;
+  databaseId: string;
   domainId: string;
   matchedPath: string;
   method: string | null;
   targetKind: HttpRouteTargetKind;
-  channel: string | null;
-  apiId: string | null;
-  siteId: string | null;
-  serviceId: string | null;
-  functionDefinitionId: string | null;
-  bucketId: string | null;
-  routeScope: string;
+  targetId: string;
 }
 
 interface ResolveHttpRouteRow {
   route_id: string | null;
+  database_id: string | null;
   domain_id: string | null;
   matched_path: string | null;
   method: string | null;
   target_kind: HttpRouteTargetKind | null;
-  channel: string | null;
-  api_id: string | null;
-  site_id: string | null;
-  service_id: string | null;
-  function_definition_id: string | null;
-  bucket_id: string | null;
-  route_scope: string | null;
+  target_id: string | null;
 }
 
 const RESOLVE_ROUTE_SQL = `
   SELECT
-    route_id, domain_id, matched_path, method, target_kind, channel,
-    api_id, site_id, service_id, function_definition_id, bucket_id, route_scope
+    route_id, database_id, domain_id, matched_path, method, target_kind, target_id
   FROM services_public.resolve_http_route($1, $2, $3)
 `;
 
@@ -110,20 +99,15 @@ export const getHttpRouteMode = (): HttpRouteMode => {
 };
 
 const toMatch = (row: ResolveHttpRouteRow): HttpRouteMatch | null => {
-  if (!row || !row.route_id || !row.target_kind) return null;
+  if (!row || !row.route_id || !row.target_kind || !row.target_id) return null;
   return {
     routeId: row.route_id,
+    databaseId: row.database_id ?? '',
     domainId: row.domain_id ?? '',
     matchedPath: row.matched_path ?? '',
     method: row.method,
     targetKind: row.target_kind,
-    channel: row.channel,
-    apiId: row.api_id,
-    siteId: row.site_id,
-    serviceId: row.service_id,
-    functionDefinitionId: row.function_definition_id,
-    bucketId: row.bucket_id,
-    routeScope: row.route_scope ?? ''
+    targetId: row.target_id
   };
 };
 
@@ -164,11 +148,7 @@ const sendNotImplemented = (
   res.status(501).json({
     error: 'Route target not yet served',
     targetKind: match.targetKind,
-    channel: match.channel,
-    routeScope: match.routeScope,
-    ...(match.functionDefinitionId ? { functionDefinitionId: match.functionDefinitionId } : {}),
-    ...(match.bucketId ? { bucketId: match.bucketId } : {}),
-    ...(match.serviceId ? { serviceId: match.serviceId } : {})
+    targetId: match.targetId
   });
 };
 
@@ -179,10 +159,10 @@ const sendSitePlaceholder = (res: Response, match: HttpRouteMatch): void => {
   res
     .status(200)
     .set('Content-Type', 'text/html; charset=utf-8')
-    .set('X-Constructive-Route', `site:${match.siteId ?? ''}`)
+    .set('X-Constructive-Route', `site:${match.targetId}`)
     .send(
       `<!doctype html><html><head><meta charset="utf-8"><title>site</title></head>` +
-        `<body data-site-id="${match.siteId ?? ''}" data-route-scope="${match.routeScope}">` +
+        `<body data-site-id="${match.targetId}">` +
         `<!-- resolved via services_public.resolve_http_route --></body></html>`
     );
 };
@@ -207,8 +187,7 @@ export const createRouteMiddleware = (opts: ApiOptions) => {
 
     if (mode === 'shadow') {
       log.debug(
-        `[shadow] ${req.method} ${host}${req.path} -> ${match.targetKind}` +
-          `${match.channel ? `:${match.channel}` : ''} (scope=${match.routeScope})`
+        `[shadow] ${req.method} ${host}${req.path} -> ${match.targetKind}:${match.targetId}`
       );
       return next();
     }
@@ -216,9 +195,7 @@ export const createRouteMiddleware = (opts: ApiOptions) => {
     // mode === 'on'
     switch (match.targetKind) {
     case 'api':
-      if (match.apiId) {
-        req.routeApiId = match.apiId;
-      }
+      req.routeApiId = match.targetId;
       return next();
     case 'site':
       return sendSitePlaceholder(res, match);

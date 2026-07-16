@@ -11,7 +11,7 @@ SET session_replication_role TO replica;
 
 -- site target at a specific prefix (NOT '/', so it never shadows /graphql)
 INSERT INTO services_public.http_routes
-  (id, database_id, domain_id, path, method, target_kind, site_id, priority)
+  (id, database_id, domain_id, path, method, target_kind, target_id, priority)
 VALUES (
   'a0000000-0000-4000-8000-000000000001',
   '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
@@ -23,9 +23,9 @@ VALUES (
   0
 ) ON CONFLICT (id) DO NOTHING;
 
--- function target (webhook channel) for a specific POST path
+-- function target for a specific POST path
 INSERT INTO services_public.http_routes
-  (id, database_id, domain_id, path, method, target_kind, channel, function_definition_id, priority)
+  (id, database_id, domain_id, path, method, target_kind, target_id, priority)
 VALUES (
   'a0000000-0000-4000-8000-000000000002',
   '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
@@ -33,7 +33,6 @@ VALUES (
   '/hooks/stripe',
   'POST',
   'function',
-  'webhook',
   '90000000-0000-4000-8000-000000000002',
   0
 ) ON CONFLICT (id) DO NOTHING;
