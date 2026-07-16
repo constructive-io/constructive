@@ -1,4 +1,4 @@
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
+import { ConstructiveOptions, HttpRouteMode, RoutingEnv } from '@constructive-io/graphql-types';
 
 /**
  * Parse GraphQL-related environment variables.
@@ -7,6 +7,25 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
 const parseEnvBoolean = (val?: string): boolean | undefined => {
   if (val === undefined) return undefined;
   return ['true', '1', 'yes'].includes(val.toLowerCase());
+};
+
+const VALID_ROUTE_MODES: readonly HttpRouteMode[] = ['off', 'shadow', 'on'];
+const VALID_ROUTING_ENVS: readonly RoutingEnv[] = ['local', 'production'];
+
+const parseRouteMode = (val?: string): HttpRouteMode | undefined => {
+  if (val === undefined) return undefined;
+  const lower = val.toLowerCase();
+  return (VALID_ROUTE_MODES as readonly string[]).includes(lower)
+    ? (lower as HttpRouteMode)
+    : undefined;
+};
+
+const parseRoutingEnv = (val?: string): RoutingEnv | undefined => {
+  if (val === undefined) return undefined;
+  const lower = val.toLowerCase();
+  return (VALID_ROUTING_ENVS as readonly string[]).includes(lower)
+    ? (lower as RoutingEnv)
+    : undefined;
 };
 
 /**
@@ -34,9 +53,26 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     CHAT_PROVIDER,
     CHAT_MODEL,
     CHAT_BASE_URL,
+
+    HTTP_ROUTE_RESOLVER_MODE,
+    ROUTING_ENV,
+    ROUTING_LOCAL_HOST_SUFFIXES,
   } = env;
 
+  const routeMode = parseRouteMode(HTTP_ROUTE_RESOLVER_MODE);
+  const routingEnv = parseRoutingEnv(ROUTING_ENV);
+  const localHostSuffixes = ROUTING_LOCAL_HOST_SUFFIXES
+    ? ROUTING_LOCAL_HOST_SUFFIXES.split(',').map(s => s.trim()).filter(Boolean)
+    : undefined;
+
   return {
+    ...((routeMode || routingEnv || localHostSuffixes) && {
+      routing: {
+        ...(routeMode && { mode: routeMode }),
+        ...(routingEnv && { env: routingEnv }),
+        ...(localHostSuffixes && { localHostSuffixes }),
+      },
+    }),
     graphile: {
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')

@@ -107,6 +107,15 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "port": 5432,
     "user": "env-user",
   },
+  "routing": {
+    "localHostSuffixes": [
+      "localhost",
+      "127.0.0.1",
+      "::1",
+      ".local",
+      ".test",
+    ],
+  },
   "server": {
     "host": "localhost",
     "port": 5000,

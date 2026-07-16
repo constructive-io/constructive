@@ -10,15 +10,24 @@ import type { ApiOptions } from '../../types';
 import {
   createRouteMiddleware,
   getHttpRouteMode,
-  resolveHttpRoute
+  isLocalHost,
+  isSecureRequest,
+  normalizeHost,
+  resolveHttpRoute,
+  resolveRouteMode,
+  resolveRoutingEnv
 } from '../route';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
 
-const OLD_ENV = process.env.HTTP_ROUTE_RESOLVER_MODE;
+const OLD_MODE = process.env.HTTP_ROUTE_RESOLVER_MODE;
+const OLD_ROUTING_ENV = process.env.ROUTING_ENV;
+const OLD_NODE_ENV = process.env.NODE_ENV;
 
 afterAll(() => {
-  process.env.HTTP_ROUTE_RESOLVER_MODE = OLD_ENV;
+  process.env.HTTP_ROUTE_RESOLVER_MODE = OLD_MODE;
+  process.env.ROUTING_ENV = OLD_ROUTING_ENV;
+  process.env.NODE_ENV = OLD_NODE_ENV;
 });
 
 const routeRow = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
@@ -49,11 +58,23 @@ const poolThrowing = (code: string): Pool => ({
   })
 } as unknown as Pool);
 
-const createRequest = (host: string, path: string, method: string): Request =>
+const createRequest = (
+  host: string,
+  path: string,
+  method: string,
+  extraHeaders: Record<string, string> = {},
+  protocol = 'http'
+): Request =>
   ({
     method,
     path,
-    get: (name: string) => (name.toLowerCase() === 'host' ? host : undefined)
+    protocol,
+    secure: protocol === 'https',
+    get: (name: string) => {
+      const key = name.toLowerCase();
+      if (key === 'host') return host;
+      return extraHeaders[key];
+    }
   } as unknown as Request);
 
 const createResponse = () => {
@@ -98,6 +119,83 @@ describe('getHttpRouteMode', () => {
     expect(getHttpRouteMode()).toBe('on');
     process.env.HTTP_ROUTE_RESOLVER_MODE = 'off';
     expect(getHttpRouteMode()).toBe('off');
+  });
+});
+
+describe('normalizeHost', () => {
+  it('lowercases and strips the port', () => {
+    expect(normalizeHost('App.Localhost:5678')).toBe('app.localhost');
+    expect(normalizeHost('acme.test.constructive.io:443')).toBe('acme.test.constructive.io');
+  });
+  it('leaves a bare host unchanged', () => {
+    expect(normalizeHost('acme.test')).toBe('acme.test');
+  });
+  it('keeps an IPv6 literal (drops only the port)', () => {
+    expect(normalizeHost('[::1]:3000')).toBe('[::1]');
+  });
+  it('returns empty string for empty input', () => {
+    expect(normalizeHost('')).toBe('');
+  });
+});
+
+describe('isLocalHost', () => {
+  const suffixes = ['localhost', '127.0.0.1', '::1', '.local', '.test'];
+  it('matches localhost and its subdomains', () => {
+    expect(isLocalHost('localhost', suffixes)).toBe(true);
+    expect(isLocalHost('app.localhost', suffixes)).toBe(true);
+  });
+  it('matches dotted dev suffixes', () => {
+    expect(isLocalHost('acme.test', suffixes)).toBe(true);
+    expect(isLocalHost('foo.local', suffixes)).toBe(true);
+  });
+  it('matches loopback literals', () => {
+    expect(isLocalHost('127.0.0.1', suffixes)).toBe(true);
+    expect(isLocalHost('[::1]', suffixes)).toBe(true);
+  });
+  it('does not match a public host', () => {
+    expect(isLocalHost('acme.constructive.io', suffixes)).toBe(false);
+  });
+});
+
+describe('resolveRouteMode / resolveRoutingEnv precedence', () => {
+  it('env var HTTP_ROUTE_RESOLVER_MODE wins over typed config', () => {
+    process.env.HTTP_ROUTE_RESOLVER_MODE = 'on';
+    expect(resolveRouteMode({ routing: { mode: 'off' } } as unknown as ApiOptions)).toBe('on');
+  });
+  it('falls back to typed config when env var unset', () => {
+    delete process.env.HTTP_ROUTE_RESOLVER_MODE;
+    expect(resolveRouteMode({ routing: { mode: 'on' } } as unknown as ApiOptions)).toBe('on');
+  });
+  it('ROUTING_ENV wins, then config, then NODE_ENV', () => {
+    process.env.ROUTING_ENV = 'production';
+    expect(resolveRoutingEnv({ routing: { env: 'local' } } as unknown as ApiOptions)).toBe('production');
+    delete process.env.ROUTING_ENV;
+    expect(resolveRoutingEnv({ routing: { env: 'local' } } as unknown as ApiOptions)).toBe('local');
+    delete (process.env as Record<string, string | undefined>).ROUTING_ENV;
+    process.env.NODE_ENV = 'production';
+    expect(resolveRoutingEnv({} as unknown as ApiOptions)).toBe('production');
+    process.env.NODE_ENV = 'test';
+    expect(resolveRoutingEnv({} as unknown as ApiOptions)).toBe('local');
+  });
+});
+
+describe('isSecureRequest (local vs production)', () => {
+  const suffixes = ['localhost', '127.0.0.1', '::1', '.local', '.test'];
+  it('local env: a public host over plain http is treated as secure (TLS simulated)', () => {
+    const req = createRequest('acme.constructive.io', '/', 'GET', {}, 'http');
+    expect(isSecureRequest(req, 'local', 'acme.constructive.io', suffixes)).toBe(true);
+  });
+  it('production env: same public host over plain http is NOT secure', () => {
+    const req = createRequest('acme.constructive.io', '/', 'GET', {}, 'http');
+    expect(isSecureRequest(req, 'production', 'acme.constructive.io', suffixes)).toBe(false);
+  });
+  it('production env: X-Forwarded-Proto=https is secure', () => {
+    const req = createRequest('acme.constructive.io', '/', 'GET', { 'x-forwarded-proto': 'https' }, 'http');
+    expect(isSecureRequest(req, 'production', 'acme.constructive.io', suffixes)).toBe(true);
+  });
+  it('production env: a local dev host is always secure', () => {
+    const req = createRequest('app.localhost', '/', 'GET', {}, 'http');
+    expect(isSecureRequest(req, 'production', 'app.localhost', suffixes)).toBe(true);
   });
 });
 
@@ -203,5 +301,40 @@ describe('createRouteMiddleware', () => {
     await createRouteMiddleware(opts)(req, createResponse() as Response, next);
     expect(next).toHaveBeenCalled();
     expect(req.routeApiId).toBeUndefined();
+  });
+
+  it('normalizes the host (drops the port) before resolving', async () => {
+    process.env.HTTP_ROUTE_RESOLVER_MODE = 'on';
+    const pool = poolReturning([routeRow()]);
+    mockGetPgPool.mockReturnValue(pool);
+    const req = createRequest('acme.test:5678', '/graphql', 'POST');
+    await createRouteMiddleware(opts)(req, createResponse() as Response, jest.fn() as NextFunction);
+    expect(pool.query).toHaveBeenCalledWith(expect.any(String), ['acme.test', '/graphql', 'POST']);
+  });
+
+  it('annotates env + secure headers; local treats http public host as secure', async () => {
+    delete process.env.ROUTING_ENV;
+    process.env.NODE_ENV = 'test';
+    process.env.HTTP_ROUTE_RESOLVER_MODE = 'shadow';
+    mockGetPgPool.mockReturnValue(poolReturning([]));
+    const req = createRequest('acme.constructive.io', '/graphql', 'POST', {}, 'http');
+    const res = createResponse();
+    await createRouteMiddleware(opts)(req, res as Response, jest.fn() as NextFunction);
+    expect(req.routeEnv).toBe('local');
+    expect(req.routeSecure).toBe(true);
+    expect(res.headers['X-Constructive-Route-Env']).toBe('local');
+    expect(res.headers['X-Constructive-Route-Secure']).toBe('true');
+  });
+
+  it('production: same http public host is flagged insecure', async () => {
+    process.env.HTTP_ROUTE_RESOLVER_MODE = 'shadow';
+    mockGetPgPool.mockReturnValue(poolReturning([]));
+    const prodOpts = { ...opts, routing: { env: 'production' } } as unknown as ApiOptions;
+    const req = createRequest('acme.constructive.io', '/graphql', 'POST', {}, 'http');
+    const res = createResponse();
+    await createRouteMiddleware(prodOpts)(req, res as Response, jest.fn() as NextFunction);
+    expect(req.routeEnv).toBe('production');
+    expect(req.routeSecure).toBe(false);
+    expect(res.headers['X-Constructive-Route-Secure']).toBe('false');
   });
 });

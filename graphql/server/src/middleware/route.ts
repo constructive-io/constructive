@@ -27,15 +27,25 @@
  * matching route this middleware is a no-op and the request falls through to the
  * existing domain -> api resolution. Behavior is unchanged until routes exist.
  *
- * Mode (HTTP_ROUTE_RESOLVER_MODE, default "shadow"):
+ * Mode (routing.mode, or HTTP_ROUTE_RESOLVER_MODE, default "shadow"):
  *   - off    : middleware does nothing.
  *   - shadow : resolve + attach req.httpRoute + log, but never change behavior
  *              (used to verify parity against the legacy host-router before flip).
  *   - on     : dispatch on the resolved target.
+ *
+ * Deployment environment (routing.env, or ROUTING_ENV, derived from NODE_ENV):
+ *   - local      : developer machine. Ingress concerns that cannot work on
+ *                  localhost (public DNS domain verification, ACME/HTTPS certs)
+ *                  are simulated as satisfied, so a laptop serving plain HTTP is
+ *                  never blocked. The request is always treated as secure.
+ *   - production : secure context is derived from the request (X-Forwarded-Proto
+ *                  / req.protocol), not assumed. Known local dev hosts are still
+ *                  treated as secure so mixed setups don't break.
  */
 
 import './types';
 
+import type { HttpRouteMode, RoutingEnv } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
@@ -45,7 +55,8 @@ import { ApiOptions } from '../types';
 
 const log = new Logger('route');
 
-export type HttpRouteMode = 'off' | 'shadow' | 'on';
+// Re-export routing types so existing importers of this module keep working.
+export type { HttpRouteMode, RoutingEnv };
 
 export type HttpRouteTargetKind =
   | 'api'
@@ -96,17 +107,99 @@ const RESOLVE_ROUTE_SQL = `
 const RESOLVER_ABSENT_CODES = new Set(['42883', '42P01', '3F000', '42P04']);
 
 const VALID_MODES: readonly HttpRouteMode[] = ['off', 'shadow', 'on'];
+const VALID_ENVS: readonly RoutingEnv[] = ['local', 'production'];
+
+const DEFAULT_LOCAL_HOST_SUFFIXES = [
+  'localhost',
+  '127.0.0.1',
+  '::1',
+  '.local',
+  '.test'
+];
 
 /**
- * Prototype feature flag. Read once from the environment in a single place;
- * this graduates into the typed env-options system when Stage B is promoted
- * out of prototype.
+ * Resolve the dispatch mode. Precedence: explicit HTTP_ROUTE_RESOLVER_MODE env
+ * var (runtime override) > typed `routing.mode` config > default `shadow`.
+ * The env var keeps highest precedence so operators (and tests) can flip mode
+ * at runtime without rebuilding config.
  */
-export const getHttpRouteMode = (): HttpRouteMode => {
-  const raw = (process.env.HTTP_ROUTE_RESOLVER_MODE ?? 'shadow').toLowerCase();
-  return (VALID_MODES as readonly string[]).includes(raw)
-    ? (raw as HttpRouteMode)
-    : 'shadow';
+export const resolveRouteMode = (opts?: ApiOptions): HttpRouteMode => {
+  const raw = (process.env.HTTP_ROUTE_RESOLVER_MODE ?? '').toLowerCase();
+  if ((VALID_MODES as readonly string[]).includes(raw)) return raw as HttpRouteMode;
+  const configured = opts?.routing?.mode;
+  if (configured && (VALID_MODES as readonly string[]).includes(configured)) {
+    return configured;
+  }
+  return 'shadow';
+};
+
+/** Back-compat alias (no-arg): reads env var / default only. */
+export const getHttpRouteMode = (): HttpRouteMode => resolveRouteMode();
+
+/**
+ * Resolve the deployment environment. Precedence: ROUTING_ENV env var > typed
+ * `routing.env` config > derived from NODE_ENV (production when
+ * NODE_ENV==='production', otherwise local).
+ */
+export const resolveRoutingEnv = (opts?: ApiOptions): RoutingEnv => {
+  const raw = (process.env.ROUTING_ENV ?? '').toLowerCase();
+  if ((VALID_ENVS as readonly string[]).includes(raw)) return raw as RoutingEnv;
+  const configured = opts?.routing?.env;
+  if (configured && (VALID_ENVS as readonly string[]).includes(configured)) {
+    return configured;
+  }
+  return process.env.NODE_ENV === 'production' ? 'production' : 'local';
+};
+
+const resolveLocalHostSuffixes = (opts?: ApiOptions): string[] => {
+  const configured = opts?.routing?.localHostSuffixes;
+  return configured && configured.length ? configured : DEFAULT_LOCAL_HOST_SUFFIXES;
+};
+
+/**
+ * Normalize an incoming Host header for domain matching: lowercase and drop the
+ * port. Without this a local request to `app.localhost:5678` would never match
+ * a `app.localhost` domain row — the single biggest blocker to exercising
+ * host-based routing on a developer machine.
+ */
+export const normalizeHost = (host: string): string => {
+  const trimmed = (host ?? '').trim().toLowerCase();
+  if (!trimmed) return '';
+  // IPv6 literal, e.g. "[::1]:3000" -> "[::1]"
+  if (trimmed.startsWith('[')) {
+    const close = trimmed.indexOf(']');
+    return close === -1 ? trimmed : trimmed.slice(0, close + 1);
+  }
+  const colon = trimmed.indexOf(':');
+  return colon === -1 ? trimmed : trimmed.slice(0, colon);
+};
+
+/** Whether a normalized host is a known local development host. */
+export const isLocalHost = (host: string, suffixes: string[]): boolean => {
+  const bare = host.replace(/^\[|\]$/g, '');
+  return suffixes.some((suffix) => {
+    const s = suffix.toLowerCase();
+    if (s.startsWith('.')) return host.endsWith(s);
+    return host === s || bare === s || host.endsWith(`.${s}`);
+  });
+};
+
+/**
+ * Whether the request should be treated as a secure (TLS) context. In `local`
+ * env TLS is simulated as satisfied; known local hosts are always secure; in
+ * `production` the scheme is derived from X-Forwarded-Proto / req.protocol.
+ */
+export const isSecureRequest = (
+  req: Request,
+  env: RoutingEnv,
+  host: string,
+  suffixes: string[]
+): boolean => {
+  if (isLocalHost(host, suffixes)) return true;
+  if (env === 'local') return true;
+  const forwarded = (req.get('x-forwarded-proto') ?? '').split(',')[0].trim().toLowerCase();
+  if (forwarded) return forwarded === 'https';
+  return req.protocol === 'https' || req.secure === true;
 };
 
 const toMatch = (row: ResolveHttpRouteRow): HttpRouteMatch | null => {
@@ -192,13 +285,21 @@ const sendSitePlaceholder = (res: Response, match: HttpRouteMatch): void => {
  * middleware so an `api` target can hand the resolved api id downstream.
  */
 export const createRouteMiddleware = (opts: ApiOptions) => {
+  const suffixes = resolveLocalHostSuffixes(opts);
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const mode = getHttpRouteMode();
+    const mode = resolveRouteMode(opts);
     if (mode === 'off' || opts.api?.enableServicesApi === false) {
       return next();
     }
 
-    const host = req.get('host') ?? '';
+    const host = normalizeHost(req.get('host') ?? '');
+    const env = resolveRoutingEnv(opts);
+    const secure = isSecureRequest(req, env, host, suffixes);
+    req.routeEnv = env;
+    req.routeSecure = secure;
+    res.set('X-Constructive-Route-Env', env);
+    res.set('X-Constructive-Route-Secure', String(secure));
+
     const match = await resolveHttpRoute(getPgPool(opts.pg), host, req.path, req.method);
 
     req.httpRoute = match ?? undefined;
@@ -208,7 +309,7 @@ export const createRouteMiddleware = (opts: ApiOptions) => {
     if (mode === 'shadow') {
       log.debug(
         `[shadow] ${req.method} ${host}${req.path} -> ${match.targetKind}` +
-          `${match.channel ? `:${match.channel}` : ''} (scope=${match.routeScope})`
+          `${match.channel ? `:${match.channel}` : ''} (scope=${match.routeScope}, env=${env}, secure=${secure})`
       );
       return next();
     }

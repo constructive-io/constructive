@@ -8,6 +8,14 @@ export {
   apiDefaults
 } from './graphile';
 
+// Export routing types
+export {
+  HttpRouteMode,
+  RoutingEnv,
+  RoutingOptions,
+  routingDefaults
+} from './routing';
+
 // Export Constructive combined types
 export {
   ConstructiveGraphQLOptions,
