@@ -31,6 +31,7 @@ import { createFnRouter } from './middleware/fn';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
+import { createRouteMiddleware } from './middleware/route';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
@@ -163,6 +164,10 @@ class Server {
     app.use(requestIp.mw());
     app.use(requestIdMiddleware());
     app.use(requestLogger);
+    // Stage B: resolve host+path+method to a typed target via
+    // services_public.resolve_http_route. An `api` target sets req.routeApiId
+    // (consumed by `api` below); with no match it falls through unchanged.
+    app.use(createRouteMiddleware(effectiveOpts));
     app.use(api);
     app.use(authenticate);
     app.use(createContextMiddleware({ pg: effectiveOpts.pg, loaders: createDefaultRegistry() }));

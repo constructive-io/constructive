@@ -67,6 +67,23 @@ const API_NAME_LOOKUP_SQL = `
   LIMIT 1
 `;
 
+const API_BY_ID_LOOKUP_SQL = `
+  SELECT 
+    a.id as api_id,
+    a.database_id,
+    a.dbname,
+    a.role_name,
+    a.anon_role,
+    a.is_public,
+    COALESCE(array_agg(s.schema_name) FILTER (WHERE s.schema_name IS NOT NULL), '{}') as schemas
+  FROM services_public.apis a
+  LEFT JOIN services_public.api_schemas aps ON a.id = aps.api_id
+  LEFT JOIN metaschema_public.schema s ON aps.schema_id = s.id
+  WHERE a.id = $1
+  GROUP BY a.id, a.database_id, a.dbname, a.role_name, a.anon_role, a.is_public
+  LIMIT 1
+`;
+
 const API_LIST_SQL = `
   SELECT 
     a.id,
@@ -120,11 +137,13 @@ interface ResolveContext {
   domain: string;
   subdomain: string | null;
   cacheKey: string;
+  routeApiId?: string | null;
   headers: RoutingHeaders;
 }
 
 type ResolutionMode = 
   | 'services-disabled'
+  | 'route-api'
   | 'schemata-header'
   | 'api-name-header'
   | 'meta-schema-header'
@@ -325,6 +344,14 @@ const queryByApiName = async (
   return result.rows[0] ?? null;
 };
 
+const queryByApiId = async (
+  pool: Pool,
+  apiId: string,
+): Promise<ApiRow | null> => {
+  const result = await pool.query<ApiRow>(API_BY_ID_LOOKUP_SQL, [apiId]);
+  return result.rows[0] ?? null;
+};
+
 const queryApiList = async (pool: Pool, isPublic: boolean): Promise<ApiListRow[]> => {
   const result = await pool.query<ApiListRow>(API_LIST_SQL, [isPublic]);
   return result.rows;
@@ -338,6 +365,9 @@ const determineMode = (ctx: ResolveContext): ResolutionMode => {
   const { opts, headers } = ctx;
   
   if (opts.api?.enableServicesApi === false) return 'services-disabled';
+  // An `api` route target (Stage B) resolves the api directly by id, ahead of
+  // host/header heuristics.
+  if (ctx.routeApiId) return 'route-api';
   if (opts.api?.isPublic === false) {
     return getPrivateHeaderMode(headers) ?? 'domain-lookup';
   }
@@ -397,6 +427,22 @@ const resolveMetaSchemaHeader = (
   validatedSchemas: string[]
 ): ApiStructure => {
   return createAdminStructure(ctx.opts, validatedSchemas, ctx.headers.databaseId);
+};
+
+const resolveByRouteApi = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
+  const { opts, pool, routeApiId } = ctx;
+  if (!routeApiId) return null;
+
+  const row = await queryByApiId(pool, routeApiId);
+  if (!row) {
+    log.debug(`[route-api] No API found for api_id=${routeApiId}`);
+    return null;
+  }
+
+  const loaderCtx = buildLoaderContext(pool, opts, row);
+  const settings = await resolveModuleSettings(defaultRegistry, loaderCtx);
+  log.debug(`[route-api] resolved api_id=${routeApiId} schemas: [${row.schemas?.join(', ')}]`);
+  return toApiStructure(row, opts, settings);
 };
 
 const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
@@ -479,7 +525,10 @@ export const getApiConfig = async (
   const pool = getPgPool(opts.pg);
   const { domain, subdomains } = getUrlDomains(req);
   const subdomain = getSubdomain(subdomains);
-  const cacheKey = getSvcKey(opts, req);
+  // An `api` route target (Stage B) selects the api by id; cache it under a
+  // dedicated key so it never collides with host/header-based resolution.
+  const routeApiId = req.routeApiId ?? null;
+  const cacheKey = routeApiId ? `route-api:${routeApiId}` : getSvcKey(opts, req);
 
   req.svc_key = cacheKey;
 
@@ -497,6 +546,7 @@ export const getApiConfig = async (
     domain,
     subdomain,
     cacheKey,
+    routeApiId,
     headers: getRoutingHeaders(req),
   };
 
@@ -537,6 +587,10 @@ export const getApiConfig = async (
 
     case 'meta-schema-header':
       result = resolveMetaSchemaHeader(ctx, validatedSchemas);
+      break;
+
+    case 'route-api':
+      result = await resolveByRouteApi(ctx);
       break;
 
     case 'domain-lookup':
