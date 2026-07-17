@@ -6,6 +6,8 @@ on:
       - main
       - v1
       - release/*
+    paths-ignore:
+      - '**.md'
   workflow_dispatch: {}
 
 concurrency:

@@ -385,6 +385,7 @@ Consult these reference files for detailed documentation on specific topics:
 ## Cross-References
 
 Related skills:
+- `constructive-starter-kits` — Project scaffolding router (`pgpm init` templates, Next.js boilerplate, template authoring); surfaces the Project Scaffolding references above under starter-kit/boilerplate trigger phrases
 - `constructive-testing` — PostgreSQL testing patterns (RLS, seeding, snapshots, JWT context)
 - `constructive-setup` — Monorepo setup and local development environment
 - `constructive-cli` — Generated CLI commands and scaffolding

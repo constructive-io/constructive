@@ -5,6 +5,7 @@ on:
     paths:
       - 'examples/**'
       - 'graphql/codegen/**'
+      - '!**/*.md'
   workflow_dispatch:
 
 jobs:
