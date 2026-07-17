@@ -54,6 +54,28 @@ export const isDevelopment = (
 ): boolean => getNodeEnv(environment) === 'development';
 
 /**
+ * Rollout valve for enforcing newly-reclassified env vars (class 2/3).
+ *
+ * When a var is promoted from "always has a baked default" to "must be provided
+ * in production", a big-bang hard-throw can break every deploy that silently
+ * relied on the old default. `STRICT_ENV` lets that enforcement roll out safely:
+ *
+ *   - `STRICT_ENV=throw`            -> hard-fail (throw) on a missing/unsafe value
+ *   - anything else, INCLUDING UNSET -> `warn` (log loudly, keep booting)
+ *
+ * Defaulting to `warn` means enforcement surfaces in logs for a release before
+ * it is turned into a hard failure. NOTE: this only governs opt-in enforcement
+ * helpers (e.g. `assertProductionEnvOptions`); the `env()`/`cleanEnv` validators
+ * always throw, so existing `required()`/`devDefault()` guarantees are unchanged.
+ */
+export type StrictEnvMode = 'warn' | 'throw';
+
+export const getStrictEnvMode = (
+  environment: Record<string, string | undefined> = process.env
+): StrictEnvMode =>
+  environment.STRICT_ENV?.toLowerCase() === 'throw' ? 'throw' : 'warn';
+
+/**
  * Return a copy of `environment` with `NODE_ENV` populated per house semantics
  * when it is missing/blank, so envalid's `devDefault`/`testDefault` resolve
  * correctly (unset => development, not production).

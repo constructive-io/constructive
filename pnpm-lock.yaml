@@ -2973,6 +2973,9 @@ importers:
 
   pgpm/env:
     dependencies:
+      12factor-env:
+        specifier: workspace:^
+        version: link:../../packages/12factor-env/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist

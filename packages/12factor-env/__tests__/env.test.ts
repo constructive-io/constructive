@@ -8,6 +8,7 @@ import {
   devDefault,
   env,
   getNodeEnv,
+  getStrictEnvMode,
   host,
   isDevelopment,
   isProduction,
@@ -387,6 +388,23 @@ describe('env', () => {
       const input: Record<string, string | undefined> = { JOBS_SCHEMA: 'app_jobs' };
       env(input, {}, { JOBS_SCHEMA: withDefault(str, 'app_jobs') });
       expect('NODE_ENV' in input).toBe(false);
+    });
+  });
+
+  describe('getStrictEnvMode', () => {
+    it('defaults to warn when STRICT_ENV is unset', () => {
+      expect(getStrictEnvMode({})).toBe('warn');
+    });
+
+    it('is warn for any value other than throw', () => {
+      expect(getStrictEnvMode({ STRICT_ENV: 'warn' })).toBe('warn');
+      expect(getStrictEnvMode({ STRICT_ENV: 'anything' })).toBe('warn');
+      expect(getStrictEnvMode({ STRICT_ENV: '' })).toBe('warn');
+    });
+
+    it('is throw only for STRICT_ENV=throw (case-insensitive)', () => {
+      expect(getStrictEnvMode({ STRICT_ENV: 'throw' })).toBe('throw');
+      expect(getStrictEnvMode({ STRICT_ENV: 'THROW' })).toBe('throw');
     });
   });
 });
