@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.16.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.15.0...12factor-env@1.16.0) (2026-07-17)
+
+### Features
+
+- **12factor-env:** add fallback-class wrappers and house NODE_ENV semantics ([4bee222](https://github.com/constructive-io/constructive/commit/4bee222d11fb216959b8ffb8038e3d080d6972b8))
+
 # [1.15.0](https://github.com/constructive-io/constructive/compare/12factor-env@1.14.1...12factor-env@1.15.0) (2026-07-12)
 
 **Note:** Version bump only for package 12factor-env
