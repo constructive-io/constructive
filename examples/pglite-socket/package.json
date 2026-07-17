@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/examples-pglite-socket",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Example: the pgpm migrate engine deploying into PGlite (WASM Postgres) over the pg-gateway socket shim — no Postgres service required.",
   "homepage": "https://github.com/constructive-io/constructive",

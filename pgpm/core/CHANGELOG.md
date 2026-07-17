@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.30.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.29.2...@pgpmjs/core@6.30.0) (2026-07-17)
+
+### Features
+
+- **export:** install app-scope + function-resolution in exported databases ([84fa76f](https://github.com/constructive-io/constructive/commit/84fa76f75144b1a654d6811ff284988d1942730b))
+
 ## [6.29.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.29.1...@pgpmjs/core@6.29.2) (2026-07-13)
 
 **Note:** Version bump only for package @pgpmjs/core
