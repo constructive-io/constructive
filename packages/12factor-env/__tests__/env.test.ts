@@ -1,8 +1,24 @@
-import { writeFileSync, unlinkSync, mkdirSync, rmSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync, rmSync,unlinkSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
+import { join } from 'path';
 
-import { env, str, port, bool, host } from '../src';
+import {
+  bool,
+  boolish,
+  devDefault,
+  env,
+  getNodeEnv,
+  host,
+  isDevelopment,
+  isProduction,
+  isTest,
+  parseEnvBoolean,
+  parseEnvNumber,
+  port,
+  required,
+  str,
+  url,
+  withDefault} from '../src';
 
 describe('env', () => {
   const ORIGINAL_ENV = { ...process.env };
@@ -215,6 +231,162 @@ describe('env', () => {
           {}
         );
       }).toThrow(/DB_PORT/);
+    });
+  });
+
+  describe('getNodeEnv (house semantics)', () => {
+    it('unset NODE_ENV → development', () => {
+      expect(getNodeEnv({})).toBe('development');
+      expect(getNodeEnv({ NODE_ENV: '' })).toBe('development');
+    });
+
+    it('explicit production → production', () => {
+      expect(getNodeEnv({ NODE_ENV: 'production' })).toBe('production');
+      expect(getNodeEnv({ NODE_ENV: 'PRODUCTION' })).toBe('production');
+    });
+
+    it('explicit test/testing → test', () => {
+      expect(getNodeEnv({ NODE_ENV: 'test' })).toBe('test');
+      expect(getNodeEnv({ NODE_ENV: 'testing' })).toBe('test');
+    });
+
+    it('GitHub Actions → test', () => {
+      expect(getNodeEnv({ GITHUB_ACTIONS: 'true' })).toBe('test');
+    });
+
+    it('predicates agree with getNodeEnv', () => {
+      expect(isProduction({ NODE_ENV: 'production' })).toBe(true);
+      expect(isProduction({})).toBe(false);
+      expect(isTest({ NODE_ENV: 'test' })).toBe(true);
+      expect(isDevelopment({})).toBe(true);
+    });
+  });
+
+  describe('fallback classes', () => {
+    it('withDefault: uses fallback when unset, in every environment', () => {
+      const dev = env({}, {}, { JOBS_SCHEMA: withDefault(str, 'app_jobs') });
+      expect(dev.JOBS_SCHEMA).toBe('app_jobs');
+
+      const prod = env(
+        { NODE_ENV: 'production' },
+        {},
+        { JOBS_SCHEMA: withDefault(str, 'app_jobs') }
+      );
+      expect(prod.JOBS_SCHEMA).toBe('app_jobs');
+    });
+
+    it('withDefault: env value overrides the fallback', () => {
+      const result = env(
+        { JOBS_SCHEMA: 'custom_jobs' },
+        {},
+        { JOBS_SCHEMA: withDefault(str, 'app_jobs') }
+      );
+      expect(result.JOBS_SCHEMA).toBe('custom_jobs');
+    });
+
+    it('devDefault: uses fallback in development (NODE_ENV unset)', () => {
+      const result = env(
+        {},
+        {},
+        { SYNC_GATEWAY_BASE_DOMAIN: devDefault(str, 'sync.localhost') }
+      );
+      expect(result.SYNC_GATEWAY_BASE_DOMAIN).toBe('sync.localhost');
+    });
+
+    it('devDefault: uses fallback in test', () => {
+      const result = env(
+        { NODE_ENV: 'test' },
+        {},
+        { SYNC_GATEWAY_BASE_DOMAIN: devDefault(str, 'sync.localhost') }
+      );
+      expect(result.SYNC_GATEWAY_BASE_DOMAIN).toBe('sync.localhost');
+    });
+
+    it('devDefault: THROWS in production when absent', () => {
+      expect(() => {
+        env(
+          { NODE_ENV: 'production' },
+          {},
+          { SYNC_GATEWAY_BASE_DOMAIN: devDefault(str, 'sync.localhost') }
+        );
+      }).toThrow(/SYNC_GATEWAY_BASE_DOMAIN/);
+    });
+
+    it('devDefault: env value satisfies the requirement in production', () => {
+      const result = env(
+        { NODE_ENV: 'production', SYNC_GATEWAY_BASE_DOMAIN: 'sync.example.com' },
+        {},
+        { SYNC_GATEWAY_BASE_DOMAIN: devDefault(str, 'sync.localhost') }
+      );
+      expect(result.SYNC_GATEWAY_BASE_DOMAIN).toBe('sync.example.com');
+    });
+
+    it('required: throws when absent in development', () => {
+      expect(() => {
+        env({}, {}, { K8S_API_URL: required(url) });
+      }).toThrow(/K8S_API_URL/);
+    });
+
+    it('required: throws when absent in production', () => {
+      expect(() => {
+        env({ NODE_ENV: 'production' }, {}, { K8S_API_URL: required(url) });
+      }).toThrow(/K8S_API_URL/);
+    });
+
+    it('required(url): rejects empty string, accepts a real url', () => {
+      expect(() => {
+        env({ K8S_API_URL: '' }, {}, { K8S_API_URL: required(url) });
+      }).toThrow(/K8S_API_URL/);
+
+      const result = env(
+        { K8S_API_URL: 'https://k8s.example.com' },
+        {},
+        { K8S_API_URL: required(url) }
+      );
+      expect(result.K8S_API_URL).toBe('https://k8s.example.com');
+    });
+  });
+
+  describe('lenient coercion', () => {
+    it('parseEnvBoolean accepts true/1/yes case-insensitively', () => {
+      expect(parseEnvBoolean('true')).toBe(true);
+      expect(parseEnvBoolean('TRUE')).toBe(true);
+      expect(parseEnvBoolean('1')).toBe(true);
+      expect(parseEnvBoolean('Yes')).toBe(true);
+      expect(parseEnvBoolean('false')).toBe(false);
+      expect(parseEnvBoolean('no')).toBe(false);
+      expect(parseEnvBoolean(undefined)).toBeUndefined();
+      expect(parseEnvBoolean('')).toBeUndefined();
+    });
+
+    it('parseEnvNumber parses finite numbers only', () => {
+      expect(parseEnvNumber('42')).toBe(42);
+      expect(parseEnvNumber('3.14')).toBe(3.14);
+      expect(parseEnvNumber('nan')).toBeUndefined();
+      expect(parseEnvNumber('')).toBeUndefined();
+      expect(parseEnvNumber(undefined)).toBeUndefined();
+    });
+
+    it('boolish validator accepts TRUE/yes that envalid bool rejects', () => {
+      const result = env(
+        { FEATURE_ENABLED: 'TRUE' },
+        {},
+        { FEATURE_ENABLED: boolish() }
+      );
+      expect(result.FEATURE_ENABLED).toBe(true);
+    });
+
+    it('boolish composes with withDefault (validator runs on typed default)', () => {
+      const result = env({}, {}, { FEATURE_ENABLED: withDefault(boolish, false) });
+      expect(result.FEATURE_ENABLED).toBe(false);
+    });
+  });
+
+  describe('no mutation of caller env', () => {
+    it('does not add NODE_ENV to the passed-in object', () => {
+      const input: Record<string, string | undefined> = { JOBS_SCHEMA: 'app_jobs' };
+      env(input, {}, { JOBS_SCHEMA: withDefault(str, 'app_jobs') });
+      expect('NODE_ENV' in input).toBe(false);
     });
   });
 });
