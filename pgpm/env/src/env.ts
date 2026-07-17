@@ -1,14 +1,7 @@
+import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 import { PgpmOptions, BucketProvider } from '@pgpmjs/types';
 
-export const parseEnvNumber = (val?: string): number | undefined => {
-  const num = Number(val);
-  return !isNaN(num) ? num : undefined;
-};
-
-export const parseEnvBoolean = (val?: string): boolean | undefined => {
-  if (val === undefined) return undefined;
-  return ['true', '1', 'yes'].includes(val.toLowerCase());
-};
+export { parseEnvBoolean, parseEnvNumber };
 
 const parseEnvStringArray = (val?: string): string[] | undefined => {
   if (!val) return undefined;
