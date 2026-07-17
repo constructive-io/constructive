@@ -36,6 +36,8 @@ export const DB_REQUIRED_EXTENSIONS = [
   'pgpm-utils',
   'pgpm-database-jobs',
   'pgpm-jwt-claims',
+  'pgpm-app-scope',
+  'pgpm-function-resolution',
   'pgpm-stamps',
   'pgpm-base32',
   'pgpm-totp',
