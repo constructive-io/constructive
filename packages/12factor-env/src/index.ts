@@ -1,22 +1,69 @@
+import type { CleanedEnv, CleanOptions, Spec,ValidatorSpec } from 'envalid';
 import {
+  bool,
   cleanEnv as envalidCleanEnv,
-  makeValidator,
+  email,
   EnvError,
   EnvMissingError,
-  testOnly,
-  bool,
-  num,
-  str,
-  json,
   host,
+  json,
+  makeValidator,
+  num,
   port,
-  url,
-  email
-} from 'envalid';
-import type { ValidatorSpec, CleanedEnv, CleanOptions } from 'envalid';
-
+  str,
+  testOnly,
+  url} from 'envalid';
 import { readFileSync } from 'fs';
-import { resolve, join } from 'path';
+import { join,resolve } from 'path';
+
+/**
+ * NODE_ENV resolved with "house" semantics.
+ *
+ * envalid natively treats an UNSET `NODE_ENV` as production, which means a
+ * `devDefault` (fallback in dev, required in prod) throws in ordinary local
+ * development where nobody sets `NODE_ENV`. That is the opposite of what we
+ * want. `getNodeEnv` mirrors `@pgpmjs/env`'s `getNodeEnv`:
+ *
+ *   - explicit `production`                       -> `production`
+ *   - explicit `test`/`testing`, or GitHub Actions -> `test`
+ *   - anything else, INCLUDING UNSET              -> `development`
+ */
+export type NodeEnv = 'development' | 'production' | 'test';
+
+export const getNodeEnv = (
+  environment: Record<string, string | undefined> = process.env
+): NodeEnv => {
+  const raw = environment.NODE_ENV?.toLowerCase();
+  if (raw === 'production') return 'production';
+  if (raw === 'test' || raw === 'testing' || environment.GITHUB_ACTIONS === 'true') {
+    return 'test';
+  }
+  return 'development';
+};
+
+export const isProduction = (
+  environment: Record<string, string | undefined> = process.env
+): boolean => getNodeEnv(environment) === 'production';
+
+export const isTest = (
+  environment: Record<string, string | undefined> = process.env
+): boolean => getNodeEnv(environment) === 'test';
+
+export const isDevelopment = (
+  environment: Record<string, string | undefined> = process.env
+): boolean => getNodeEnv(environment) === 'development';
+
+/**
+ * Return a copy of `environment` with `NODE_ENV` populated per house semantics
+ * when it is missing/blank, so envalid's `devDefault`/`testDefault` resolve
+ * correctly (unset => development, not production).
+ */
+const withResolvedNodeEnv = (
+  environment: Record<string, string | undefined>
+): Record<string, string | undefined> => {
+  if (environment.NODE_ENV && environment.NODE_ENV.trim() !== '') return environment;
+  return { ...environment, NODE_ENV: getNodeEnv(environment) };
+};
 
 /**
  * Custom reporter that throws an error instead of calling process.exit
@@ -39,7 +86,7 @@ const cleanEnv = <S extends Record<string, ValidatorSpec<unknown>>>(
   specs: S,
   options?: CleanOptions<S>
 ): CleanedEnv<S> => {
-  return envalidCleanEnv(environment, specs, {
+  return envalidCleanEnv(withResolvedNodeEnv(environment), specs, {
     reporter: throwingReporter,
     ...options
   });
@@ -106,6 +153,73 @@ const secretEnv = <T extends Record<string, ValidatorSpec<unknown>>>(
 const secret = (envFile?: string): ValidatorSpec<string> =>
   str({ default: getSecret(envFile) });
 
+// ── Fallback classes ─────────────────────────────────────────────────────────
+//
+// A var's real distinction is not "optional vs required" but "is there an honest
+// fallback?". These thin wrappers over any envalid validator make that intent
+// legible at the declaration site:
+//
+//   withDefault(str, 'app_jobs')          class 1: honest fallback everywhere
+//   devDefault(str, 'sync.localhost')     class 2: fallback in dev/test, THROW in prod
+//   required(url)                          class 3: no honest fallback, THROW if absent
+//   secret('DB_PASSWORD')                  class 3 secret: required + secret-file support
+//
+// `devDefault` relies on the NODE_ENV normalization above, so it is enforced in
+// production even when NODE_ENV is only implicitly set.
+
+type ValidatorFactory<T> = (spec?: Spec<T>) => ValidatorSpec<T>;
+
+/** Class 1 — always resolves to `defaultValue` when the var is unset. */
+const withDefault = <T>(
+  validator: ValidatorFactory<T>,
+  defaultValue: NonNullable<T>,
+  spec: Spec<T> = {}
+): ValidatorSpec<T> => validator({ ...spec, default: defaultValue });
+
+/** Class 2 — uses `defaultValue` in dev/test, but is required (throws) in production. */
+const devDefault = <T>(
+  validator: ValidatorFactory<T>,
+  defaultValue: NonNullable<T>,
+  spec: Spec<T> = {}
+): ValidatorSpec<T> => validator({ ...spec, devDefault: defaultValue });
+
+/** Class 3 — no fallback; throws in every environment when the var is absent. */
+const required = <T>(
+  validator: ValidatorFactory<T>,
+  spec: Spec<T> = {}
+): ValidatorSpec<T> => validator({ ...spec });
+
+// ── Lenient coercion helpers ─────────────────────────────────────────────────
+
+/**
+ * Parse a boolean env value leniently: `true`/`1`/`yes` (case-insensitive) are
+ * true, everything else (including unset/blank => undefined) is false. Matches
+ * `@pgpmjs/env`'s `parseEnvBoolean`.
+ */
+const parseEnvBoolean = (val?: string): boolean | undefined => {
+  if (val === undefined || val === '') return undefined;
+  return ['true', '1', 'yes'].includes(val.trim().toLowerCase());
+};
+
+/** Parse a numeric env value; unset/blank/non-finite => undefined. */
+const parseEnvNumber = (val?: string): number | undefined => {
+  if (val === undefined || val === '') return undefined;
+  const n = Number(val);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+/**
+ * Lenient boolean validator. Unlike envalid's built-in `bool` (which rejects
+ * e.g. `TRUE`/`yes`), this accepts `true`/`1`/`yes` case-insensitively. Safe to
+ * combine with a boolean `default`/`devDefault` (envalid also runs the validator
+ * against the typed default).
+ */
+const boolish = makeValidator<boolean>((value: string) => {
+  const raw = value as unknown;
+  if (typeof raw === 'boolean') return raw;
+  return parseEnvBoolean(String(raw)) ?? false;
+});
+
 // Type for specs object
 type Specs = Record<string, ValidatorSpec<unknown>>;
 
@@ -151,26 +265,33 @@ const env = <S extends Specs, V extends Specs>(
 };
 
 export {
-  env,
-  secretEnv,
-  secret,
-  getSecret,
-  secretPath,
-  getSecretsPath,
+  bool,
+  boolish,
   // Re-export from envalid
   cleanEnv,
-  makeValidator,
+  devDefault,
+  email,
+  env,
   EnvError,
   EnvMissingError,
-  testOnly,
-  bool,
-  num,
-  str,
-  json,
+  getSecret,
+  getSecretsPath,
   host,
+  json,
+  makeValidator,
+  num,
+  // Lenient coercion
+  parseEnvBoolean,
+  parseEnvNumber,
   port,
+  required,
+  secret,
+  secretEnv,
+  secretPath,
+  str,
+  testOnly,
   url,
-  email
-};
+  // Fallback-class wrappers
+  withDefault};
 
-export type { ValidatorSpec, CleanedEnv };
+export type { CleanedEnv, Spec,ValidatorSpec };

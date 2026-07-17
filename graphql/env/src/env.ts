@@ -1,13 +1,5 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
-
-/**
- * Parse GraphQL-related environment variables.
- * These are the env vars that Constructive packages need but pgpm doesn't.
- */
-const parseEnvBoolean = (val?: string): boolean | undefined => {
-  if (val === undefined) return undefined;
-  return ['true', '1', 'yes'].includes(val.toLowerCase());
-};
+import { parseEnvBoolean } from '12factor-env';
 
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
