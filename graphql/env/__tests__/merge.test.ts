@@ -1,4 +1,5 @@
 import { getEnvOptions } from '../src/merge';
+import { getGraphQLEnvVars } from '../src/env';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -37,6 +38,15 @@ describe('getEnvOptions', () => {
         enableServicesApi: false,
         isPublic: false,
         metaSchemas: ['config_meta']
+      },
+      sms: {
+        provider: 'devsms',
+        senderId: 'ConfigSender',
+        requestTimeoutMs: 3000,
+        dryRun: false,
+        devsms: {
+          baseUrl: 'http://config-devsms:4000'
+        }
       }
     });
 
@@ -52,7 +62,12 @@ describe('getEnvOptions', () => {
       API_META_SCHEMAS: 'env_meta1,env_meta2',
       API_ANON_ROLE: 'env_anon',
       API_ROLE_NAME: 'env_role',
-      API_DEFAULT_DATABASE_ID: 'env_db'
+      API_DEFAULT_DATABASE_ID: 'env_db',
+      SMS_PROVIDER: 'devsms',
+      SMS_SENDER_ID: 'EnvSender',
+      SMS_REQUEST_TIMEOUT_MS: '4000',
+      SEND_SMS_DRY_RUN: 'true',
+      DEVSMS_BASE_URL: 'http://env-devsms:4000'
     };
 
     const result = getEnvOptions(
@@ -75,6 +90,10 @@ describe('getEnvOptions', () => {
         api: {
           enableServicesApi: false,
           defaultDatabaseId: 'override_db'
+        },
+        sms: {
+          senderId: 'OverrideSender',
+          requestTimeoutMs: 9000
         }
       },
       tempDir,
@@ -120,5 +139,98 @@ describe('getEnvOptions', () => {
     expect(result.graphile?.schema).toEqual(['override_schema', 'shared_schema']);
     expect(result.api?.exposedSchemas).toEqual(['public', 'override_schema']);
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
+  });
+
+  it('parses SMS environment variables into typed options', () => {
+    const result = getGraphQLEnvVars({
+      SMS_PROVIDER: 'devsms',
+      SMS_SENDER_ID: 'LocalSender',
+      SMS_REQUEST_TIMEOUT_MS: '2500',
+      SEND_SMS_DRY_RUN: 'true',
+      DEVSMS_BASE_URL: 'http://localhost:4000'
+    });
+
+    expect(result.sms).toEqual({
+      provider: 'devsms',
+      senderId: 'LocalSender',
+      requestTimeoutMs: 2500,
+      dryRun: true,
+      devsms: {
+        baseUrl: 'http://localhost:4000'
+      }
+    });
+  });
+
+  it('honors defaults, config, env, and runtime override priority for SMS', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-sms-'));
+    writeConfig(tempDir, {
+      sms: {
+        provider: 'devsms',
+        senderId: 'ConfigSender',
+        requestTimeoutMs: 3000,
+        dryRun: false,
+        devsms: {
+          baseUrl: 'http://config-devsms:4000'
+        }
+      }
+    });
+
+    const result = getEnvOptions(
+      {
+        sms: {
+          requestTimeoutMs: 9000
+        }
+      },
+      tempDir,
+      {
+        SMS_SENDER_ID: 'EnvSender',
+        SEND_SMS_DRY_RUN: 'true',
+        DEVSMS_BASE_URL: 'http://env-devsms:4000'
+      }
+    );
+
+    expect(result.sms).toEqual({
+      provider: 'devsms',
+      senderId: 'EnvSender',
+      requestTimeoutMs: 9000,
+      dryRun: true,
+      devsms: {
+        baseUrl: 'http://env-devsms:4000'
+      }
+    });
+  });
+
+  it('uses the injected env object instead of global process.env for SMS', () => {
+    const previousSmsProvider = process.env.SMS_PROVIDER;
+    process.env.SMS_PROVIDER = 'twilio';
+
+    try {
+      const result = getEnvOptions({}, process.cwd(), {
+        SMS_PROVIDER: 'devsms'
+      });
+
+      expect(result.sms?.provider).toBe('devsms');
+    } finally {
+      if (previousSmsProvider === undefined) {
+        delete process.env.SMS_PROVIDER;
+      } else {
+        process.env.SMS_PROVIDER = previousSmsProvider;
+      }
+    }
+  });
+
+  it('keeps SMS provider and DevSms base URL optional while applying defaults', () => {
+    const result = getEnvOptions({}, process.cwd(), {});
+
+    expect(result.sms).toEqual({
+      requestTimeoutMs: 5000,
+      dryRun: false
+    });
+  });
+
+  it('throws on invalid SMS_REQUEST_TIMEOUT_MS values', () => {
+    expect(() => getGraphQLEnvVars({
+      SMS_REQUEST_TIMEOUT_MS: '5s'
+    })).toThrow('SMS_REQUEST_TIMEOUT_MS must be an integer');
   });
 });
