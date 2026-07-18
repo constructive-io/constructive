@@ -22,7 +22,7 @@ const API_ID = '6c9997a4-591b-4cb3-9313-4ef45d6f134e';
 const sharedSeedRoot = join(__dirname, '..', '..', '..', '..', '__fixtures__', 'seed');
 const shared = (...segments: string[]) => join(sharedSeedRoot, ...segments);
 
-const pgpmWorkspace = join(sharedSeedRoot, '..', 'pgpm', 'workspace');
+const pgpmWorkspace = join(sharedSeedRoot, '..', '..');
 
 const seedAdapters = [
   seed.pgpm(pgpmWorkspace),

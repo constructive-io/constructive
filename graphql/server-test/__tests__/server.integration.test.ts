@@ -15,7 +15,7 @@ jest.setTimeout(30000);
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
 const shared = (...segments: string[]) =>
   path.join(sharedSeedRoot, ...segments);
-const pgpmWorkspace = path.join(sharedSeedRoot, '..', 'pgpm', 'workspace');
+const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const servicesDatabaseId = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const metaSchemas = [

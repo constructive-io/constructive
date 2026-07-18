@@ -41,7 +41,7 @@ const sql = (seedDir: string, file: string) =>
   path.join(localSeedRoot, seedDir, file);
 const shared = (...segments: string[]) =>
   path.join(sharedSeedRoot, ...segments);
-const pgpmWorkspace = path.join(sharedSeedRoot, '..', 'pgpm', 'workspace');
+const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 
 // =========================================================================
 // Tenant constants

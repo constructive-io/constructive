@@ -7,7 +7,7 @@ Composable SQL seed layers for integration testing. Each layer builds on the pre
 | Layer | Files | What it provides |
 |-------|-------|-----------------|
 | **base** | `base/setup.sql` | `uuid-ossp` extension, `stamps` schema + `timestamps()` trigger |
-| **services (real modules)** | `seed.pgpm(...)` from `../pgpm/workspace` | Real `@pgpm/metaschema-modules` (+ deps: `@pgpm/services`, `@pgpm/metaschema-schema`, ...) deployed from the ephemeral pgpm workspace — see `../pgpm/README.md`; run `pnpm fixtures:install` first |
+| **services (real modules)** | `seed.pgpm(repoRoot)` | Real `@pgpm/metaschema-modules` (+ deps: `@pgpm/services`, `@pgpm/metaschema-schema`, ...) installed into the gitignored root `extensions/` — see `.agents/skills/ephemeral-pgpm-fixtures/SKILL.md`; run `pnpm fixtures:install` first |
 | **services grants** | `services/grants.sql` | Widens grants on the installed metaschema/services schemas to the test roles |
 | **services data** | `services/test-data.sql` | Example database (`simple-pets`), 3 schemas, 5 APIs, 2 domains, API→schema linkage, animals metaschema entries |
 | **app-schemas** | `app-schemas/simple-pets/schema.sql` | `simple-pets-*` schemas, animals table with constraints/indexes/triggers |
@@ -30,14 +30,14 @@ seed.sqlfile([
 
 ### Services-enabled tests (metaschema + domain resolution)
 
-Real module DDL comes from the ephemeral pgpm workspace (`__fixtures__/pgpm/workspace`,
-populated by `pnpm fixtures:install`):
+Real module DDL comes from the pinned `@pgpm/*` modules installed at the repo
+root (`pgpm.json` dependencies, populated by `pnpm fixtures:install`):
 
 ```typescript
-const PGPM_WORKSPACE = path.resolve(__dirname, '../../../__fixtures__/pgpm/workspace');
+const REPO_ROOT = path.resolve(__dirname, '../../..');
 
 [
-  seed.pgpm(PGPM_WORKSPACE),                          // all installed @pgpm/* modules
+  seed.pgpm(REPO_ROOT),                               // all installed @pgpm/* modules
   seed.sqlfile([
     `${SEED}/services/grants.sql`,                    // test-role grants
     `${SEED}/app-schemas/simple-pets/schema.sql`,     // app tables

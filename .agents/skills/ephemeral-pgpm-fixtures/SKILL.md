@@ -1,6 +1,6 @@
 ---
 name: ephemeral-pgpm-fixtures
-description: "Ephemeral pgpm fixtures workspace — install real published @pgpm/* modules into a gitignored extensions/ directory and deploy them into test databases with seed.pgpm, instead of hand-maintaining copies of production DDL. Use when running or writing integration tests that need metaschema/services/module schemas, when tests fail with 'no pgpm module found', or when bumping fixture module versions."
+description: "Ephemeral pgpm fixture modules — install real published @pgpm/* modules into the gitignored root extensions/ directory and deploy them into test databases with seed.pgpm, instead of hand-maintaining copies of production DDL. Use when running or writing integration tests that need metaschema/services/module schemas, when tests fail with 'no pgpm module or workspace found', or when bumping fixture module versions."
 compatibility: pgpm, pgsql-test, graphile-test, graphql-server-test, Jest, PostgreSQL
 metadata:
   author: constructive-io
@@ -11,14 +11,14 @@ metadata:
 
 Integration tests that need production-shaped Constructive schemas (metaschema,
 services, module registration tables) deploy the **real published `@pgpm/*`
-modules** rather than hand-written SQL approximations. The modules live in a
-gitignored ephemeral workspace at `__fixtures__/pgpm/workspace/extensions/`,
-pinned by version in `__fixtures__/pgpm/workspace/pgpm.json`.
+modules** rather than hand-written SQL approximations. The repo root is itself
+a pgpm workspace (`pgpm.json`): modules are pinned in its `dependencies` field
+and installed into the gitignored root `extensions/` directory.
 
 ## When to Apply
 
 - Running integration tests in `graphql/server-test`, `graphile/graphile-function-bindings`, or anything that seeds with `seed.pgpm(...)`
-- A test fails with `seed.pgpm: no pgpm module found at ...`
+- A test fails with `seed.pgpm: no pgpm module or workspace found at ...`
 - Bumping the fixture modules to a newer published version
 - Adding a new test that needs metaschema/services/module DDL
 
@@ -27,7 +27,7 @@ pinned by version in `__fixtures__/pgpm/workspace/pgpm.json`.
 ```bash
 pnpm install
 pnpm build                    # builds the pgpm CLI used by fixtures:install
-pnpm fixtures:install         # installs pinned @pgpm/* modules into the gitignored extensions/
+pnpm fixtures:install         # pgpm install at the repo root -> gitignored extensions/
 ```
 
 `fixtures:install` is idempotent — it skips modules already present. Use
@@ -38,10 +38,10 @@ pnpm fixtures:install         # installs pinned @pgpm/* modules into the gitigno
 ```typescript
 import { getConnections, seed } from 'pgsql-test'; // or graphile-test / server-test
 
-const pgpmWorkspace = path.resolve(__dirname, '../../../__fixtures__/pgpm/workspace');
+const repoRoot = path.resolve(__dirname, '../../..'); // the repo root is the pgpm workspace
 
 await getConnections(options, [
-  seed.pgpm(pgpmWorkspace),           // deploys ALL installed modules in dependency order
+  seed.pgpm(repoRoot),                // deploys ALL installed modules in dependency order
   seed.sqlfile([
     shared('services', 'grants.sql'), // widens grants to test roles
     /* app schemas, test data ... */
@@ -50,7 +50,7 @@ await getConnections(options, [
 ```
 
 Key facts:
-- `seed.pgpm(dir)` deploys a pgpm module (and its dependencies) into the isolated test database; pass a workspace root to deploy every installed module once, in dependency order. Don't chain multiple `seed.pgpm(module)` calls that share dependencies — fast deploys are not idempotent across calls.
+- `seed.pgpm(dir)` deploys a pgpm module (and its dependencies) into the isolated test database; pass a workspace root (e.g. the repo root) to deploy every installed module once, in dependency order. Workspace-wide deploys require an explicit `cwd` — `seed.pgpm()` with no args stays module-only. Don't chain multiple `seed.pgpm(module)` calls that share dependencies — fast deploys are not idempotent across calls.
 - The real modules only grant to production roles — include `__fixtures__/seed/services/grants.sql` so `administrator`/`authenticated`/`anonymous` test roles can read/write.
 - Per-app *generated* tables (compute `function_definitions`, storage tables) are NOT published modules — they stay as hand-written fixtures (`__fixtures__/seed/compute/setup.sql`, `simple-seed-storage/`).
 - The deterministic pgpm engine fixtures under `__fixtures__/sqitch/` are intentionally frozen — never replace them with installed modules.
@@ -58,11 +58,11 @@ Key facts:
 ## Upgrading module versions
 
 ```bash
-node pgpm/cli/dist/index.js install @pgpm/metaschema-modules@latest --cwd __fixtures__/pgpm/workspace
+node pgpm/cli/dist/index.js install @pgpm/metaschema-modules@latest
 ```
 
-This installs the latest published version and records it in
-`__fixtures__/pgpm/workspace/pgpm.json` — commit the 1-line version bump.
+This installs the latest published version and records it in the root
+`pgpm.json` — commit the 1-line version bump.
 
 ## Workspace-level `pgpm install`
 

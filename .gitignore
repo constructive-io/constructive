@@ -14,5 +14,5 @@ postgres/pgsql-test/output/
 graphql/server/logs/
 graphql/server/*.heapsnapshot
 
-# Ephemeral pgpm fixtures workspace (populated by `pnpm fixtures:install`)
-__fixtures__/pgpm/workspace/extensions/
+# Ephemeral pgpm modules installed by `pnpm fixtures:install` (pgpm install)
+/extensions/
