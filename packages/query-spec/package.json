@@ -1,6 +1,6 @@
 {
   "name": "query-spec",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "The Constructive query language specification — shared filter, ordering, and pagination types",
   "main": "index.js",
