@@ -16,9 +16,9 @@
   </a>
 </p>
 
-> Environment variable validation with secret file support for 12-factor apps
+> Environment variable validation for 12-factor apps
 
-A TypeScript library for validating environment variables with built-in support for Docker/Kubernetes secret files. Built on top of [envalid](https://github.com/af/envalid) with additional features for reading secrets from files.
+A TypeScript library for validating environment variables. Built on top of [envalid](https://github.com/af/envalid).
 
 ## Installation
 
@@ -115,49 +115,6 @@ parseEnvBoolean('YES'); // true
 parseEnvNumber('42');   // 42
 ```
 
-## Secret File Support
-
-This library supports reading secrets from files, which is useful for Docker secrets and Kubernetes secrets that are mounted as files.
-
-### Direct Secret Files
-
-Secrets can be read from `/run/secrets/` (or a custom path via `ENV_SECRETS_PATH`):
-
-```ts
-import { env, str } from '12factor-env';
-
-// If /run/secrets/DATABASE_PASSWORD exists, it will be read automatically
-const config = env(process.env, {
-  DATABASE_PASSWORD: str()
-});
-```
-
-### _FILE Suffix Pattern
-
-You can also use the `_FILE` suffix pattern commonly used with Docker:
-
-```bash
-# Set the path to the secret file
-export DATABASE_PASSWORD_FILE=/run/secrets/db-password
-```
-
-```ts
-import { env, str } from '12factor-env';
-
-// Will read from the file specified in DATABASE_PASSWORD_FILE
-const config = env(process.env, {
-  DATABASE_PASSWORD: str()
-});
-```
-
-### Custom Secrets Path
-
-Set `ENV_SECRETS_PATH` to change the default secrets directory:
-
-```bash
-export ENV_SECRETS_PATH=/custom/secrets/path
-```
-
 ## Validators
 
 All validators from [envalid](https://github.com/af/envalid) are re-exported:
@@ -195,39 +152,6 @@ Main function to validate environment variables.
 - `inputEnv` - The environment object (usually `process.env`)
 - `secrets` - Required environment variables
 - `vars` - Optional environment variables
-
-### `secret(envFile)`
-
-Create a validator for a secret file:
-
-```ts
-import { env, secret } from '12factor-env';
-
-const config = env(process.env, {
-  DB_PASSWORD: secret('DATABASE_PASSWORD')
-});
-```
-
-### `getSecret(name)`
-
-Read a secret from a file:
-
-```ts
-import { getSecret } from '12factor-env';
-
-const password = getSecret('DATABASE_PASSWORD');
-```
-
-### `secretPath(name)`
-
-Resolve the full path to a secret file:
-
-```ts
-import { secretPath } from '12factor-env';
-
-const path = secretPath('DATABASE_PASSWORD');
-// Returns: /run/secrets/DATABASE_PASSWORD
-```
 
 ## Re-exports from envalid
 
