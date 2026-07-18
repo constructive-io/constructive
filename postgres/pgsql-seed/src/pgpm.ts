@@ -35,7 +35,8 @@ export async function deployPgpm(
   cache: boolean = false
 ): Promise<void> {
   const proj = new PgpmPackage(cwd ?? process.cwd());
-  if (!proj.isInModule()) return;
+  const inModule = proj.isInModule();
+  if (!inModule && !proj.isInWorkspace()) return;
 
   await proj.deploy(
     getEnvOptions({ 
@@ -46,7 +47,8 @@ export async function deployPgpm(
         cache
       }
     }), 
-    proj.getModuleName()
+    // At a workspace root, deploy all modules in the workspace
+    inModule ? proj.getModuleName() : undefined
   );
 }
 

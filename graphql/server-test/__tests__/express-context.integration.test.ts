@@ -24,6 +24,7 @@ jest.setTimeout(30000);
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
 const shared = (...segments: string[]) =>
   path.join(sharedSeedRoot, ...segments);
+const pgpmWorkspace = path.join(sharedSeedRoot, '..', 'pgpm', 'workspace');
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const metaSchemas = [
   'services_public',
@@ -31,11 +32,14 @@ const metaSchemas = [
   'metaschema_modules_public',
 ];
 
-const seedFiles = [
-  shared('services', 'setup.sql'),
-  shared('app-schemas', 'simple-pets', 'schema.sql'),
-  shared('services', 'test-data.sql'),
-  shared('app-schemas', 'simple-pets', 'test-data.sql'),
+const seedAdapters = [
+  seed.pgpm(pgpmWorkspace),
+  seed.sqlfile([
+    shared('services', 'grants.sql'),
+    shared('app-schemas', 'simple-pets', 'schema.sql'),
+    shared('services', 'test-data.sql'),
+    shared('app-schemas', 'simple-pets', 'test-data.sql'),
+  ]),
 ];
 
 let server: ServerInfo;
@@ -55,7 +59,7 @@ beforeAll(async () => {
         },
       },
     },
-    [seed.sqlfile(seedFiles)]
+    seedAdapters
   ));
 });
 

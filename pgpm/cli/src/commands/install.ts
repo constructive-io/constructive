@@ -9,10 +9,15 @@ Install Command:
 
   pgpm install [package]...
 
-  Install pgpm modules into current module.
+  Install pgpm modules into the workspace extensions/ directory.
 
-  When called without arguments, installs any missing modules that are
-  listed in the module's .control file but not yet installed in the workspace.
+  Inside a module, installing without arguments installs any missing modules
+  listed in the module's .control file, and explicit installs are recorded in
+  the module's package.json and .control file.
+
+  At the workspace root, installing without arguments installs the modules
+  pinned in the workspace pgpm.json \`dependencies\` field, and explicit
+  installs are recorded there.
 
 Arguments:
   package                 One or more package names to install (optional)
@@ -20,10 +25,13 @@ Arguments:
 Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
+  --force                 Reinstall modules even if already installed
 
 Examples:
-  pgpm install                                 Install missing modules from .control file
+  pgpm install                                 Install missing modules (.control or workspace pgpm.json)
+  pgpm install --force                         Reinstall all declared modules
   pgpm install @pgpm/base32                    Install single package
+  pgpm install @pgpm/base32@latest             Install the latest published version
   pgpm install @pgpm/base32 @pgpm/utils        Install multiple packages
 `;
 
@@ -40,9 +48,30 @@ export default async (
   const { cwd = process.cwd() } = argv;
 
   const project = new PgpmPackage(cwd);
+  const force = Boolean(argv.force);
 
+  if (!project.isInModule() && !project.isInWorkspace()) {
+    throw new Error('You must run this command inside a PGPM module or workspace.');
+  }
+
+  // Workspace root: install pinned dependencies from pgpm.json
   if (!project.isInModule()) {
-    throw new Error('You must run this command inside a PGPM module.');
+    const installSpinner = createSpinner('Installing workspace dependencies...');
+    installSpinner.start();
+
+    if (argv._.length > 0) {
+      await project.installModules(...argv._);
+      installSpinner.succeed(`Installed ${argv._.length} module(s) successfully.`);
+      return;
+    }
+
+    const installed = await project.installWorkspaceDependencies({ force });
+    if (installed.length === 0) {
+      installSpinner.succeed('All workspace dependencies are already installed.');
+    } else {
+      installSpinner.succeed(`Installed ${installed.length} module(s): ${installed.join(', ')}`);
+    }
+    return;
   }
 
   // If no packages specified, install missing modules from .control file
@@ -51,7 +80,7 @@ export default async (
     checkSpinner.start();
     
     const requiredExtensions = project.getRequiredModules();
-    const installedModules = project.getWorkspaceInstalledModules();
+    const installedModules = force ? [] : project.getWorkspaceInstalledModules();
     const missingModules = getMissingInstallableModules(requiredExtensions, installedModules);
 
     if (missingModules.length === 0) {

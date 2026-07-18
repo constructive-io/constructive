@@ -22,11 +22,16 @@ const API_ID = '6c9997a4-591b-4cb3-9313-4ef45d6f134e';
 const sharedSeedRoot = join(__dirname, '..', '..', '..', '..', '__fixtures__', 'seed');
 const shared = (...segments: string[]) => join(sharedSeedRoot, ...segments);
 
-const seedFiles = [
-  shared('services', 'setup.sql'),
-  shared('compute', 'setup.sql'),
-  shared('services', 'test-data.sql'),
-  shared('compute', 'test-data.sql')
+const pgpmWorkspace = join(sharedSeedRoot, '..', 'pgpm', 'workspace');
+
+const seedAdapters = [
+  seed.pgpm(pgpmWorkspace),
+  seed.sqlfile([
+    shared('services', 'grants.sql'),
+    shared('compute', 'setup.sql'),
+    shared('services', 'test-data.sql'),
+    shared('compute', 'test-data.sql')
+  ])
 ];
 
 type QueryFn = <TResult = unknown>(
@@ -87,7 +92,7 @@ describe('function bindings plugin', () => {
         useRoot: true,
         authRole: 'postgres'
       },
-      [seed.sqlfile(seedFiles)]
+      seedAdapters
     );
 
     pg = connections.pg;

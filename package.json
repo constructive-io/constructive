@@ -20,7 +20,9 @@
     "build:dev": "pnpm -r run build:dev",
     "lint": "pnpm -r run lint",
     "internal:deps": "makage update-workspace",
-    "deps": "pnpm up -r -i -L"
+    "deps": "pnpm up -r -i -L",
+    "fixtures:install": "node pgpm/cli/dist/index.js install --cwd __fixtures__/pgpm/workspace",
+    "fixtures:install:force": "node pgpm/cli/dist/index.js install --force --cwd __fixtures__/pgpm/workspace"
   },
   "devDependencies": {
     "@jest/test-sequencer": "^30.4.1",

@@ -241,6 +241,9 @@ jobs:
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
 
+      - name: Install pgpm fixture modules
+        run: pnpm fixtures:install
+
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test
         env: ${{ matrix.env }}
@@ -353,6 +356,9 @@ jobs:
         run: |
           pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
+
+      - name: Install pgpm fixture modules
+        run: pnpm fixtures:install
 
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test
