@@ -2407,29 +2407,27 @@ describe('MetaSchemaPlugin', () => {
   });
 
   describe('scope metadata', () => {
-    it('returns null scope for tables without @scope tag or a scope key column', () => {
+    it('returns null scope for tables without an @scope tag (no column inference)', () => {
+      const codec = createMockCodec('widget', {
+        id: createMockAttribute('uuid'),
+        // a database_id column must NOT be enough to infer a scope
+        database_id: createMockAttribute('uuid')
+      });
       const build = createMockBuild({
-        widget: {
-          codec: createMockCodec('widget', {
-            id: createMockAttribute('uuid'),
-            name: createMockAttribute('text')
-          }),
-          uniques: [],
-          relations: {}
-        }
+        widget: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].scope).toBeNull();
     });
 
-    it('reads a database @scope smart tag', () => {
+    it('reads a database @scope smart tag verbatim', () => {
       const codec = createMockCodec('app_setting', {
         id: createMockAttribute('uuid'),
         database_id: createMockAttribute('uuid')
       });
       (codec as any).extensions = {
         ...codec.extensions,
-        tags: { scope: 'database' }
+        tags: { scope: 'database', scopeTier: 'database', scopeKey: 'database_id' }
       };
       const build = createMockBuild({
         app_setting: { codec, uniques: [], relations: {} }
@@ -2444,14 +2442,14 @@ describe('MetaSchemaPlugin', () => {
       });
     });
 
-    it('reads a global (platform/app) @scope smart tag with no key column', () => {
+    it('reads a global @scope smart tag with no key column', () => {
       const codec = createMockCodec('feature_flag', {
         id: createMockAttribute('uuid'),
         key: createMockAttribute('text')
       });
       (codec as any).extensions = {
         ...codec.extensions,
-        tags: { scope: 'platform' }
+        tags: { scope: 'platform', scopeTier: 'global' }
       };
       const build = createMockBuild({
         feature_flag: { codec, uniques: [], relations: {} }
@@ -2466,14 +2464,20 @@ describe('MetaSchemaPlugin', () => {
       });
     });
 
-    it('reads an entity @scope smart tag with entity table and scope-named key', () => {
+    it('reads an entity @scope smart tag with the exact key column and entity table', () => {
       const codec = createMockCodec('project', {
         id: createMockAttribute('uuid'),
-        org_id: createMockAttribute('uuid')
+        tenant_ref: createMockAttribute('uuid')
       });
       (codec as any).extensions = {
         ...codec.extensions,
-        tags: { scope: 'org', scopeEntityTable: 'organizations' }
+        // key column named freely by the generator — must be taken verbatim
+        tags: {
+          scope: 'org',
+          scopeTier: 'entity',
+          scopeKey: 'tenant_ref',
+          scopeEntityTable: 'organizations'
+        }
       };
       const build = createMockBuild({
         project: { codec, uniques: [], relations: {} }
@@ -2482,63 +2486,24 @@ describe('MetaSchemaPlugin', () => {
       expect(tables[0].scope).toEqual({
         scope: 'org',
         tier: 'entity',
-        keyColumn: 'orgId',
+        keyColumn: 'tenantRef',
         entityTable: 'organizations',
         source: 'smartTag'
       });
     });
 
-    it('honors an explicit scopeKey smart tag over inference', () => {
-      const codec = createMockCodec('membership', {
-        id: createMockAttribute('uuid'),
-        owner_id: createMockAttribute('uuid')
+    it('throws when @scope is present but scopeTier is missing or invalid', () => {
+      const codec = createMockCodec('broken', {
+        id: createMockAttribute('uuid')
       });
       (codec as any).extensions = {
         ...codec.extensions,
-        tags: { scope: 'team', scopeKey: 'owner_id' }
+        tags: { scope: 'org' }
       };
       const build = createMockBuild({
-        membership: { codec, uniques: [], relations: {} }
+        broken: { codec, uniques: [], relations: {} }
       });
-      const tables = callInitHook(build);
-      expect(tables[0].scope).toEqual({
-        scope: 'team',
-        tier: 'entity',
-        keyColumn: 'ownerId',
-        entityTable: null,
-        source: 'smartTag'
-      });
-    });
-
-    it('infers a database scope from a database_id column when untagged', () => {
-      const codec = createMockCodec('audit_log', {
-        id: createMockAttribute('uuid'),
-        database_id: createMockAttribute('uuid'),
-        message: createMockAttribute('text')
-      });
-      const build = createMockBuild({
-        audit_log: { codec, uniques: [], relations: {} }
-      });
-      const tables = callInitHook(build);
-      expect(tables[0].scope).toEqual({
-        scope: 'database',
-        tier: 'database',
-        keyColumn: 'databaseId',
-        entityTable: null,
-        source: 'inferred'
-      });
-    });
-
-    it('does not infer entity/global scope from arbitrary columns', () => {
-      const codec = createMockCodec('note', {
-        id: createMockAttribute('uuid'),
-        author_id: createMockAttribute('uuid')
-      });
-      const build = createMockBuild({
-        note: { codec, uniques: [], relations: {} }
-      });
-      const tables = callInitHook(build);
-      expect(tables[0].scope).toBeNull();
+      expect(() => callInitHook(build)).toThrow(/scopeTier/);
     });
   });
 

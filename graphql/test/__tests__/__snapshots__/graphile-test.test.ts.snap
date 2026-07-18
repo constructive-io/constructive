@@ -1486,7 +1486,7 @@ based pagination. May not be used with \`last\`.",
             {
               "args": [],
               "deprecationReason": null,
-              "description": "Provisioning scope metadata (null if no @scope tag and not inferrable)",
+              "description": "Provisioning scope metadata (null if no @scope tag)",
               "isDeprecated": false,
               "name": "scope",
               "type": {
@@ -3409,7 +3409,7 @@ based pagination. May not be used with \`last\`.",
             {
               "args": [],
               "deprecationReason": null,
-              "description": "How scope was determined: 'smartTag' (@scope) or 'inferred' (columns)",
+              "description": "Provenance of the scope metadata (always 'smartTag')",
               "isDeprecated": false,
               "name": "source",
               "type": {

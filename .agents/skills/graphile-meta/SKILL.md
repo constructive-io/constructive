@@ -124,26 +124,28 @@ map it onto a `Meta*` GraphQL type.**
 Worked pattern (this is exactly how the `scope` block was added — mirror the
 `storage`/`search` precedent):
 
-1. **(DB, if the data isn't already a physical column)** Emit a smart tag from the
-   generator so it lands on the codec, e.g.
-   `metaschema.append_table_smart_tags(v_table_id, jsonb_build_object('scope', v_scope))`
-   at the single scope decision point (`apply_scope_fields.sql`), then
-   `pgpm package` + `pnpm run generate:constructive`.
+1. **(DB)** Emit a smart tag carrying **all** the metadata from the generator so it
+   lands on the codec — never make the plugin guess. For scope, emit every field
+   (`scope`, `scopeTier`, `scopeKey`, `scopeEntityTable`) at the single decision
+   point (`apply_scope_fields.sql`):
+   `metaschema.append_table_smart_tags(v_table_id, jsonb_build_object('scope', v_scope, 'scopeTier', v_tier, 'scopeKey', v_key_col, 'scopeEntityTable', v_entity_table))`,
+   then `pgpm package` + `pnpm run generate:constructive`.
 2. **`types.ts`** — add the interface (e.g. `ScopeMeta`) and a nullable field on
    `TableMeta` (`scope: ScopeMeta | null`).
 3. **A builder** — add `buildScopeMeta(codec, inflectAttr): ScopeMeta | null`
    in a builder file (`scope` lives in `scope-meta-builders.ts`). Read
-   `codec.extensions.tags`, return `null` when the feature is absent (the
-   convention across all builders). Optionally infer from physical columns as a
-   fallback (e.g. `database_id` present → database scope) and record provenance.
+   `codec.extensions.tags` and return the values **verbatim**; return `null` when
+   the tag is absent (the convention across all builders). Do NOT infer key
+   columns from physical column names — generators name key columns freely, so
+   column-name heuristics are brittle. The DB is the source of truth.
 4. **`table-meta-builder.ts`** — call the builder inside `buildTableMeta` next to
    `buildStorageMeta`/`buildSearchMeta` and add it to the returned object.
 5. **`graphql-meta-field.ts`** — declare a `MetaScope` `GraphQLObjectType` and add
    the `scope` field to `MetaTableType` (nullable, with a description).
 6. **Tests** — extend `__tests__/meta-schema.test.ts` and its snapshot
    (`__snapshots__/meta-schema.test.ts.snap`). Metadata is tested in-process with
-   mocked PostGraphile build resources (no live DB). Add both a tagged fixture and,
-   if you added inference, an untagged fixture.
+   mocked PostGraphile build resources (no live DB). Add a tagged fixture and an
+   untagged fixture (asserting `null`).
    Run: `pnpm --filter graphile-settings exec jest --runInBand`
 
 ### Builder conventions (follow these)
@@ -188,7 +190,7 @@ file, or direct introspection). Beyond raw structure it gives codegen the
 |---|---|---|
 | `_meta` field missing | `MetaSchemaPreset`/`Plugin` not loaded | Add the preset (or use `ConstructivePreset`) |
 | Table missing from `_meta.tables` | Its schema isn't in the configured `pgSchemas`, or resource isn't a real table | Ensure the schema is in `makePgService({ schemas })`; virtual/function resources are skipped |
-| `storage`/`search`/`i18n`/`realtime`/`scope` is `null` | No corresponding smart tag / column detected | Emit the smart tag in SQL (`append_table_smart_tags`) and re-introspect; verify `codec.extensions.tags` |
+| `storage`/`search`/`i18n`/`realtime`/`scope` is `null` | No corresponding smart tag emitted | Emit the smart tag in SQL (`append_table_smart_tags`) and re-introspect; verify `codec.extensions.tags` |
 | Stale metadata after schema change | `_meta` is cached at build time | Rebuild the schema (server uses LISTEN/NOTIFY cache invalidation) |
 | New field not appearing | Added to `types.ts`/builder but not to `graphql-meta-field.ts` | The GraphQL types are hand-declared — add the field to `MetaTableType` and its object type |
 

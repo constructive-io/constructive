@@ -286,7 +286,7 @@ function createMetaSchemaType(): GraphQLObjectType {
       tier: { type: nn(GraphQLString), description: "Coarse bucket: 'global', 'database', or 'entity'" },
       keyColumn: { type: GraphQLString, description: 'Inflected scope key column (e.g. databaseId, orgId), null for global tiers' },
       entityTable: { type: GraphQLString, description: 'SQL name of the entity table for entity scopes, else null' },
-      source: { type: nn(GraphQLString), description: "How scope was determined: 'smartTag' (@scope) or 'inferred' (columns)" }
+      source: { type: nn(GraphQLString), description: "Provenance of the scope metadata (always 'smartTag')" }
     })
   });
 
@@ -309,7 +309,7 @@ function createMetaSchemaType(): GraphQLObjectType {
       search: { type: MetaSearchType, description: 'Search metadata (null if no search configured)' },
       i18n: { type: MetaI18nType, description: 'i18n metadata (null if no @i18n tag)' },
       realtime: { type: MetaRealtimeType, description: 'Realtime metadata (null if no @realtime tag)' },
-      scope: { type: MetaScopeType, description: 'Provisioning scope metadata (null if no @scope tag and not inferrable)' }
+      scope: { type: MetaScopeType, description: 'Provisioning scope metadata (null if no @scope tag)' }
     })
   });
 

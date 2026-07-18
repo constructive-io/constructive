@@ -29,8 +29,8 @@ export interface ScopeMeta {
   keyColumn: string | null;
   /** SQL name of the entity table for entity scopes, else null */
   entityTable: string | null;
-  /** Where the scope was determined: 'smartTag' (@scope) or 'inferred' (columns) */
-  source: 'smartTag' | 'inferred';
+  /** Provenance of the scope metadata. Always the @scope smart tag. */
+  source: 'smartTag';
 }
 
 export interface StorageMeta {

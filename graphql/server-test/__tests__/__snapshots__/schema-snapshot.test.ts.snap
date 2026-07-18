@@ -850,7 +850,7 @@ type MetaScope {
   """
   scope: String!
 
-  """How scope was determined: 'smartTag' (@scope) or 'inferred' (columns)"""
+  """Provenance of the scope metadata (always 'smartTag')"""
   source: String!
 
   """Coarse bucket: 'global', 'database', or 'entity'"""
@@ -924,7 +924,7 @@ type MetaTable {
   relations: MetaRelations!
   schemaName: String!
 
-  """Provisioning scope metadata (null if no @scope tag and not inferrable)"""
+  """Provisioning scope metadata (null if no @scope tag)"""
   scope: MetaScope
 
   """Search metadata (null if no search configured)"""
