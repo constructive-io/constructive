@@ -284,7 +284,18 @@ export class PgpmPackage {
   listModules(): ModuleMap {
     if (!this.workspacePath) return {};
 
-    const moduleFiles = glob.sync(`${this.workspacePath}/**/*.control`).filter(
+    // Workspace membership is first-class: modules are discovered from the
+    // workspace's declared `packages` globs plus the installed extensions/
+    // directory — never from an unscoped workspace-wide scan. This keeps
+    // nested workspaces (e.g. test fixtures) out of the module map.
+    const packageDirs = [
+      ...this.allowedDirs,
+      ...glob.sync(path.join(this.workspacePath, EXTENSIONS_DIR, '{*,@*/*}'))
+    ];
+
+    const moduleFiles = [...new Set(
+      packageDirs.flatMap(dir => glob.sync(`${dir}/**/*.control`))
+    )].filter(
       (file: string) => !/node_modules/.test(file)
     ).sort((a, b) => a.localeCompare(b));
 
@@ -968,28 +979,38 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   }
 
   /**
-    * Installs an extension npm package into the local skitch extensions directory,
-    * and automatically adds it to the current module’s package.json dependencies.
+    * Installs an extension npm package into the workspace extensions directory.
+    *
+    * When run inside a module, the installed version is recorded in the
+    * module's package.json dependencies and its .control requires list.
+    * When run at the workspace root, the installed version is recorded in
+    * the workspace pgpm.json `dependencies` field instead — no .control
+    * file is needed.
     */
-
-
   async installModules(...pkgstrs: string[]): Promise<void> {
     this.ensureWorkspace();
-    this.ensureModule();
-  
+
+    const inModule = this.isInModule();
     const originalDir = process.cwd();
     const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
-    const pkgJsonPath = path.join(this.modulePath!, 'package.json');
-  
-    if (!fs.existsSync(pkgJsonPath)) {
-      throw new Error(`No package.json found at module path: ${this.modulePath}`);
+
+    let pkgJsonPath: string | undefined;
+    let pkgData: Record<string, any> | undefined;
+
+    if (inModule) {
+      pkgJsonPath = path.join(this.modulePath!, 'package.json');
+
+      if (!fs.existsSync(pkgJsonPath)) {
+        throw new Error(`No package.json found at module path: ${this.modulePath}`);
+      }
+
+      pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+      pkgData.dependencies = pkgData.dependencies || {};
     }
-  
-    const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
-    pkgData.dependencies = pkgData.dependencies || {};
-  
+
     const newlyAdded: string[] = [];
-  
+    const installedVersions: Record<string, string> = {};
+
     for (const pkgstr of pkgstrs) {
       const { name } = parse(pkgstr);
       const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-install-'));
@@ -1029,7 +1050,10 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           }
   
           const { version } = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf-8'));
-          pkgData.dependencies[name] = `${version}`;
+          installedVersions[name] = `${version}`;
+          if (pkgData) {
+            pkgData.dependencies[name] = `${version}`;
+          }
   
           const extensionName = getExtensionName(dst);
           newlyAdded.push(extensionName);
@@ -1041,23 +1065,94 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       }
     }
   
-    const { dependencies, devDependencies, ...rest } = pkgData;
-    const finalPkgData: Record<string, any> = { ...rest };
+    if (inModule && pkgData && pkgJsonPath) {
+      const { dependencies, devDependencies, ...rest } = pkgData;
+      const finalPkgData: Record<string, any> = { ...rest };
   
-    if (dependencies) {
-      finalPkgData.dependencies = sortObjectByKey(dependencies);
+      if (dependencies) {
+        finalPkgData.dependencies = sortObjectByKey(dependencies);
+      }
+      if (devDependencies) {
+        finalPkgData.devDependencies = sortObjectByKey(devDependencies);
+      }
+  
+      fs.writeFileSync(pkgJsonPath, JSON.stringify(finalPkgData, null, 2));
+      logger.success(`📦 Updated package.json with: ${pkgstrs.join(', ')}`);
+  
+      // ─── Update .control file with actual extension names ──────────────
+      const currentDeps = this.getRequiredModules();
+      const updatedDeps = Array.from(new Set([...currentDeps, ...newlyAdded])).sort();
+      writeExtensions(this.modulePath!, updatedDeps);
+    } else {
+      this.recordWorkspaceDependencies(installedVersions);
     }
-    if (devDependencies) {
-      finalPkgData.devDependencies = sortObjectByKey(devDependencies);
+  }
+
+  /**
+   * Returns the workspace-level pgpm module dependencies recorded in
+   * the workspace pgpm.json `dependencies` field.
+   */
+  getWorkspaceDependencies(): Record<string, string> {
+    this.ensureWorkspace();
+
+    const configPath = path.join(this.workspacePath!, 'pgpm.json');
+    if (!fs.existsSync(configPath)) {
+      return {};
     }
-  
-    fs.writeFileSync(pkgJsonPath, JSON.stringify(finalPkgData, null, 2));
-    logger.success(`📦 Updated package.json with: ${pkgstrs.join(', ')}`);
-  
-    // ─── Update .control file with actual extension names ──────────────
-    const currentDeps = this.getRequiredModules();
-    const updatedDeps = Array.from(new Set([...currentDeps, ...newlyAdded])).sort();
-    writeExtensions(this.modulePath!, updatedDeps);
+
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    return config.dependencies || {};
+  }
+
+  /**
+   * Records installed module versions into the workspace pgpm.json
+   * `dependencies` field. No-op when the workspace uses pgpm.config.js.
+   */
+  recordWorkspaceDependencies(versions: Record<string, string>): void {
+    this.ensureWorkspace();
+
+    if (Object.keys(versions).length === 0) return;
+
+    const configPath = path.join(this.workspacePath!, 'pgpm.json');
+    if (!fs.existsSync(configPath)) {
+      logger.warn('No pgpm.json found at workspace root — skipping dependency recording.');
+      return;
+    }
+
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    config.dependencies = sortObjectByKey({
+      ...(config.dependencies || {}),
+      ...versions
+    });
+
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
+    logger.success(`📦 Updated pgpm.json dependencies with: ${Object.keys(versions).join(', ')}`);
+  }
+
+  /**
+   * Installs the workspace-level dependencies declared in pgpm.json into
+   * the workspace extensions/ directory. Skips modules already present
+   * unless `force` is set.
+   *
+   * @returns The list of installed package specs (name@version)
+   */
+  async installWorkspaceDependencies(options?: { force?: boolean }): Promise<string[]> {
+    this.ensureWorkspace();
+
+    const { force = false } = options || {};
+    const dependencies = this.getWorkspaceDependencies();
+    const installedModules = this.getWorkspaceInstalledModules();
+
+    const toInstall = Object.entries(dependencies)
+      .filter(([name]) => force || !installedModules.includes(name))
+      .map(([name, version]) => `${name}@${version}`);
+
+    if (toInstall.length === 0) {
+      return [];
+    }
+
+    await this.installModules(...toInstall);
+    return toInstall;
   }
 
   /**

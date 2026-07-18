@@ -211,6 +211,12 @@ export interface PgpmWorkspaceConfig {
   /** Deployment configuration for the workspace */
   deployment?: Omit<DeploymentOptions, 'toChange'>;
   /**
+   * Workspace-level pgpm module dependencies (npm package name -> exact version).
+   * Recorded by `pgpm install` when run at the workspace root; `pgpm install`
+   * with no arguments at the workspace root installs these into extensions/.
+   */
+  dependencies?: Record<string, string>;
+  /**
    * Template source recorded at scaffold time when the workspace is created
    * from a non-default boilerplate repo (e.g. via `pgpm init workspace --pglite`
    * or `--repo`). `pgpm init` reads this so modules created inside the workspace

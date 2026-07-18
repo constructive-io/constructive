@@ -92,7 +92,7 @@ export class PgTestClient extends PgClient {
     // await this.ctxQuery(); // no point to call ctxQuery() here
     // because deployPgpm() has it's own way of getting the client...
     // so for now, we'll expose this but it's limited
-    await deployPgpm(this.config, cwd, cache);
+    await deployPgpm(this.config, cwd, cache, { workspace: Boolean(cwd) });
   }
 
 }

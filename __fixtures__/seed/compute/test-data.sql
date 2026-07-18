@@ -27,12 +27,13 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Module registrations (what the compute loader resolves)
-INSERT INTO metaschema_modules_public.function_module (id, database_id, schema_id, definitions_table_name, scope)
+INSERT INTO metaschema_modules_public.function_module (id, database_id, schema_id, definitions_table_name, bindings_table_name, scope)
 VALUES (
   '9dba0002-0000-4000-8000-000000000002',
   '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
   '9dba0001-0000-4000-8000-000000000001',
   'function_definitions',
+  'function_api_bindings',
   'app'
 ) ON CONFLICT (id) DO NOTHING;
 

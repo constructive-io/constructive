@@ -115,6 +115,11 @@ pgpm install @pgpm/base32 @pgpm/types @pgpm/uuid
 
 # Install all missing modules declared in .control requires
 pgpm install
+
+# Workspace root (no module): install/pin modules in pgpm.json `dependencies`
+pgpm install -W
+pgpm install -W @pgpm/base32@latest
+pgpm install -W --force
 ```
 
 `pgpm install` downloads the module from npm and places it in the workspace's `extensions/` directory (e.g., `extensions/@pgpm/base32/`).

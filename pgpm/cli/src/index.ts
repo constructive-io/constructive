@@ -40,7 +40,10 @@ export const options: Partial<CLIOptions> = {
       t: 'template',
       // -w for --create-workspace flag
       w: 'createWorkspace',
-      'create-workspace': 'createWorkspace'
+      'create-workspace': 'createWorkspace',
+      // -W for --workspace-root (pgpm install -W)
+      W: 'workspaceRoot',
+      'workspace-root': 'workspaceRoot'
     }
   }
 };
