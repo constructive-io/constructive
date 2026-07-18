@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.16.0](https://github.com/constructive-io/constructive/compare/graphile-settings@5.15.1...graphile-settings@5.16.0) (2026-07-18)
+
+### Features
+
+- **meta:** add scope block to \_meta introspection plugin ([08c8f06](https://github.com/constructive-io/constructive/commit/08c8f06de86722583b02261f2dbdef035a949cbc))
+
 ## [5.15.1](https://github.com/constructive-io/constructive/compare/graphile-settings@5.15.0...graphile-settings@5.15.1) (2026-07-18)
 
 **Note:** Version bump only for package graphile-settings
