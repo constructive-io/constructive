@@ -15,6 +15,9 @@ import { getStrictEnvMode, isProduction } from '12factor-env';
  * (i.e. neither config file, env var, nor override replaced it) AND we are in
  * production. Enforcement is gated by `STRICT_ENV` (see `12factor-env`): `warn`
  * by default (log loudly, keep booting) and `throw` once the fleet is clean.
+ *
+ * `getEnvOptions` calls this on every invocation, so warnings are de-duplicated
+ * per-process (by message) to avoid log spam; `throw` always throws.
  */
 
 type Severity = 'secret' | 'host';
@@ -70,6 +73,8 @@ export const findUnsafeProductionDefaults = (opts: PgpmOptions): string[] => {
   return issues;
 };
 
+const warnedMessages = new Set<string>();
+
 /**
  * Assert that the merged PGPM options are safe for production. No-op outside
  * production (per `12factor-env`'s house `NODE_ENV` semantics, so tests and CI
@@ -91,6 +96,9 @@ export const assertProductionEnvOptions = (
   if (getStrictEnvMode(env) === 'throw') {
     throw new Error(message);
   }
+
+  if (warnedMessages.has(message)) return;
+  warnedMessages.add(message);
   // eslint-disable-next-line no-console
   console.warn(`[pgpm-env] ${message}\n(set STRICT_ENV=throw to make this fatal)`);
 };
