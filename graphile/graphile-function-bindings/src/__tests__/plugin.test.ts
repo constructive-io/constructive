@@ -27,7 +27,6 @@ const pgpmWorkspace = join(sharedSeedRoot, '..', '..');
 const seedAdapters = [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
-    shared('services', 'grants.sql'),
     shared('compute', 'setup.sql'),
     shared('services', 'test-data.sql'),
     shared('compute', 'test-data.sql')

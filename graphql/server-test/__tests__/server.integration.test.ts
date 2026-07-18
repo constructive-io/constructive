@@ -106,7 +106,6 @@ const seedAdaptersFor = (seedDir: Scenario['seedDir']) => {
     return [
       seed.pgpm(pgpmWorkspace),
       seed.sqlfile([
-        shared('services', 'grants.sql'),
         shared('app-schemas', 'simple-pets', 'schema.sql'),
         shared('services', 'test-data.sql'),
         shared('app-schemas', 'simple-pets', 'test-data.sql'),
