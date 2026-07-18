@@ -12,8 +12,8 @@ csdk function-graph-execution-node-state list --where.<field>.<op> <value> --ord
 csdk function-graph-execution-node-state list --limit 10 --after <cursor>
 csdk function-graph-execution-node-state find-first --where.<field>.<op> <value>
 csdk function-graph-execution-node-state get --id <UUID>
-csdk function-graph-execution-node-state create --executionId <UUID> --nodeName <String> --scopeId <UUID> [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--nodePath <String>] [--outputId <UUID>] [--startedAt <Datetime>] [--status <String>]
-csdk function-graph-execution-node-state update --id <UUID> [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--executionId <UUID>] [--nodeName <String>] [--nodePath <String>] [--outputId <UUID>] [--scopeId <UUID>] [--startedAt <Datetime>] [--status <String>]
+csdk function-graph-execution-node-state create --executionId <UUID> --nodeName <String> --scopeId <UUID> [--callbackInputs <JSON>] [--callbackMeta <JSON>] [--callbackTokenHash <String>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--nodePath <String>] [--outputId <UUID>] [--startedAt <Datetime>] [--status <String>]
+csdk function-graph-execution-node-state update --id <UUID> [--callbackInputs <JSON>] [--callbackMeta <JSON>] [--callbackTokenHash <String>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--executionId <UUID>] [--nodeName <String>] [--nodePath <String>] [--outputId <UUID>] [--scopeId <UUID>] [--startedAt <Datetime>] [--status <String>]
 csdk function-graph-execution-node-state delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk function-graph-execution-node-state list --where.id.equalTo <value> --order
 ### Create a functionGraphExecutionNodeState
 
 ```bash
-csdk function-graph-execution-node-state create --executionId <UUID> --nodeName <String> --scopeId <UUID> [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--nodePath <String>] [--outputId <UUID>] [--startedAt <Datetime>] [--status <String>]
+csdk function-graph-execution-node-state create --executionId <UUID> --nodeName <String> --scopeId <UUID> [--callbackInputs <JSON>] [--callbackMeta <JSON>] [--callbackTokenHash <String>] [--completedAt <Datetime>] [--errorCode <String>] [--errorMessage <String>] [--nodePath <String>] [--outputId <UUID>] [--startedAt <Datetime>] [--status <String>]
 ```
 
 ### Get a functionGraphExecutionNodeState by id

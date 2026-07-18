@@ -37,8 +37,8 @@ function App() {
 | `useCreateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useUpdateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useDeleteCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
-| `useGetAllQuery` | Query | List all getAll |
-| `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
+| `useGetAllTreeNodesQuery` | Query | List all getAllTreeNodes |
+| `useCreateGetAllTreeNodesRecordMutation` | Mutation | Create a getAllTreeNodesRecord |
 | `useObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useCreateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
@@ -85,16 +85,16 @@ const { mutate: create } = useCreateCommitMutation({
 create({ authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
 ```
 
-### GetAllRecord
+### GetAllTreeNodesRecord
 
 ```typescript
-// List all getAll
-const { data, isLoading } = useGetAllQuery({
+// List all getAllTreeNodes
+const { data, isLoading } = useGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
 
-// Create a getAllRecord
-const { mutate: create } = useCreateGetAllRecordMutation({
+// Create a getAllTreeNodesRecord
+const { mutate: create } = useCreateGetAllTreeNodesRecordMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', path: '<String>' });

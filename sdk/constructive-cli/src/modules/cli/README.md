@@ -54,6 +54,7 @@ csdk auth set-token <your-token>
 | `graph-execution-module` | graphExecutionModule CRUD operations |
 | `graph-module` | graphModule CRUD operations |
 | `hierarchy-module` | hierarchyModule CRUD operations |
+| `http-route-module` | httpRouteModule CRUD operations |
 | `i-18-n-module` | i18NModule CRUD operations |
 | `identity-providers-module` | identityProvidersModule CRUD operations |
 | `inference-log-module` | inferenceLogModule CRUD operations |
@@ -92,6 +93,7 @@ csdk auth set-token <your-token>
 | `users-module` | usersModule CRUD operations |
 | `webauthn-auth-module` | webauthnAuthModule CRUD operations |
 | `webauthn-credentials-module` | webauthnCredentialsModule CRUD operations |
+| `webhook-module` | webhookModule CRUD operations |
 | `resolve-blueprint-field` | Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this. |
 | `resolve-blueprint-table` | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
@@ -438,11 +440,11 @@ CRUD operations for ComputeLogModule records.
 | `retention` | String |
 | `schemaId` | UUID |
 | `scope` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `computeLogTableId`, `computeLogTableName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `usageDailyTableId`, `usageDailyTableName`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `computeLogTableId`, `computeLogTableName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `usageSummaryTableId`, `usageSummaryTableName`
 
 ### `config-secrets-user-module`
 
@@ -742,22 +744,22 @@ CRUD operations for DbUsageModule records.
 | `privateSchemaId` | UUID |
 | `privateSchemaName` | String |
 | `publicSchemaName` | String |
-| `queryStatsDailyTableId` | UUID |
-| `queryStatsDailyTableName` | String |
 | `queryStatsLogTableId` | UUID |
 | `queryStatsLogTableName` | String |
+| `queryStatsSummaryTableId` | UUID |
+| `queryStatsSummaryTableName` | String |
 | `retention` | String |
-| `rollupDbQueryStatsDailyFunction` | String |
-| `rollupDbTableStatsDailyFunction` | String |
+| `rollupDbQueryStatsUsageSummaryFunction` | String |
+| `rollupDbTableStatsUsageSummaryFunction` | String |
 | `schemaId` | UUID |
 | `scope` | String |
-| `tableStatsDailyTableId` | UUID |
-| `tableStatsDailyTableName` | String |
 | `tableStatsLogTableId` | UUID |
 | `tableStatsLogTableName` | String |
+| `tableStatsSummaryTableId` | UUID |
+| `tableStatsSummaryTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `apiName`, `collectDbQueryStatsFunction`, `collectDbTableStatsFunction`, `defaultPermissions`, `entityField`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `queryStatsDailyTableId`, `queryStatsDailyTableName`, `queryStatsLogTableId`, `queryStatsLogTableName`, `retention`, `rollupDbQueryStatsDailyFunction`, `rollupDbTableStatsDailyFunction`, `schemaId`, `scope`, `tableStatsDailyTableId`, `tableStatsDailyTableName`, `tableStatsLogTableId`, `tableStatsLogTableName`
+**Optional create fields (backend defaults):** `apiName`, `collectDbQueryStatsFunction`, `collectDbTableStatsFunction`, `defaultPermissions`, `entityField`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `queryStatsLogTableId`, `queryStatsLogTableName`, `queryStatsSummaryTableId`, `queryStatsSummaryTableName`, `retention`, `rollupDbQueryStatsUsageSummaryFunction`, `rollupDbTableStatsUsageSummaryFunction`, `schemaId`, `scope`, `tableStatsLogTableId`, `tableStatsLogTableName`, `tableStatsSummaryTableId`, `tableStatsSummaryTableName`
 
 ### `default-ids-module`
 
@@ -832,15 +834,15 @@ CRUD operations for DevicesModule records.
 | Field | Type |
 |-------|------|
 | `databaseId` | UUID |
-| `deviceSettingsTable` | String |
 | `deviceSettingsTableId` | UUID |
+| `deviceSettingsTableName` | String |
 | `id` | UUID |
 | `schemaId` | UUID |
-| `userDevicesTable` | String |
 | `userDevicesTableId` | UUID |
+| `userDevicesTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `deviceSettingsTable`, `deviceSettingsTableId`, `schemaId`, `userDevicesTable`, `userDevicesTableId`
+**Optional create fields (backend defaults):** `deviceSettingsTableId`, `deviceSettingsTableName`, `schemaId`, `userDevicesTableId`, `userDevicesTableName`
 
 ### `emails-module`
 
@@ -1105,6 +1107,7 @@ CRUD operations for FunctionModule records.
 | `definitionsTableName` | String |
 | `entityField` | String |
 | `entityTableId` | UUID |
+| `hasCron` | Boolean |
 | `id` | UUID |
 | `policies` | JSON |
 | `prefix` | String |
@@ -1113,11 +1116,12 @@ CRUD operations for FunctionModule records.
 | `privateSchemaName` | String |
 | `provisions` | JSON |
 | `publicSchemaName` | String |
+| `schedulesTableId` | UUID |
 | `schemaId` | UUID |
 | `scope` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `apiName`, `bindingsTableId`, `bindingsTableName`, `defaultPermissions`, `definitionsTableId`, `definitionsTableName`, `entityField`, `entityTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`
+**Optional create fields (backend defaults):** `apiName`, `bindingsTableId`, `bindingsTableName`, `defaultPermissions`, `definitionsTableId`, `definitionsTableName`, `entityField`, `entityTableId`, `hasCron`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schedulesTableId`, `schemaId`, `scope`
 
 ### `graph-execution-module`
 
@@ -1246,6 +1250,48 @@ CRUD operations for HierarchyModule records.
 **Required create fields:** `databaseId`, `entityTableId`, `usersTableId`
 **Optional create fields (backend defaults):** `chartEdgeGrantsTableId`, `chartEdgeGrantsTableName`, `chartEdgesTableId`, `chartEdgesTableName`, `defaultPermissions`, `entityField`, `getManagersFunction`, `getSubordinatesFunction`, `hierarchySprtTableId`, `hierarchySprtTableName`, `isManagerOfFunction`, `prefix`, `privateSchemaId`, `privateSchemaName`, `rebuildHierarchyFunction`, `schemaId`, `scope`, `sprtTableName`
 
+### `http-route-module`
+
+CRUD operations for HttpRouteModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all httpRouteModule records |
+| `find-first` | Find first matching httpRouteModule record |
+| `get` | Get a httpRouteModule by id |
+| `create` | Create a new httpRouteModule |
+| `update` | Update an existing httpRouteModule |
+| `delete` | Delete a httpRouteModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `functionModuleId` | UUID |
+| `httpRoutesTableId` | UUID |
+| `httpRoutesTableName` | String |
+| `id` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `resolverFunctionName` | String |
+| `resourceModuleId` | UUID |
+| `schemaId` | UUID |
+| `scope` | String |
+| `storageModuleId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `functionModuleId`, `httpRoutesTableId`, `httpRoutesTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `resolverFunctionName`, `resourceModuleId`, `schemaId`, `scope`, `storageModuleId`
+
 ### `i-18-n-module`
 
 CRUD operations for I18NModule records.
@@ -1344,11 +1390,11 @@ CRUD operations for InferenceLogModule records.
 | `retention` | String |
 | `schemaId` | UUID |
 | `scope` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `inferenceLogTableId`, `inferenceLogTableName`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `usageDailyTableId`, `usageDailyTableName`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `inferenceLogTableId`, `inferenceLogTableName`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `usageSummaryTableId`, `usageSummaryTableName`
 
 ### `infra-config-module`
 
@@ -2064,16 +2110,16 @@ CRUD operations for RateLimitsModule records.
 |-------|------|
 | `databaseId` | UUID |
 | `id` | UUID |
-| `ipRateLimitsTable` | String |
 | `ipRateLimitsTableId` | UUID |
-| `rateLimitSettingsTable` | String |
+| `ipRateLimitsTableName` | String |
 | `rateLimitSettingsTableId` | UUID |
-| `rateLimitsTable` | String |
+| `rateLimitSettingsTableName` | String |
 | `rateLimitsTableId` | UUID |
+| `rateLimitsTableName` | String |
 | `schemaId` | UUID |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `ipRateLimitsTable`, `ipRateLimitsTableId`, `rateLimitSettingsTable`, `rateLimitSettingsTableId`, `rateLimitsTable`, `rateLimitsTableId`, `schemaId`
+**Optional create fields (backend defaults):** `ipRateLimitsTableId`, `ipRateLimitsTableName`, `rateLimitSettingsTableId`, `rateLimitSettingsTableName`, `rateLimitsTableId`, `rateLimitsTableName`, `schemaId`
 
 ### `realtime-module`
 
@@ -2178,6 +2224,8 @@ CRUD operations for ResourceModule records.
 | `entityField` | String |
 | `entityTableId` | UUID |
 | `id` | UUID |
+| `installationStoreName` | String |
+| `merkleStoreModuleId` | UUID |
 | `namespaceModuleId` | UUID |
 | `policies` | JSON |
 | `prefix` | String |
@@ -2188,19 +2236,27 @@ CRUD operations for ResourceModule records.
 | `publicSchemaName` | String |
 | `requirementsStateViewName` | String |
 | `resolvedRequirementsViewName` | String |
+| `resourceBillingRollupFunction` | String |
 | `resourceDefinitionsTableId` | UUID |
 | `resourceDefinitionsTableName` | String |
 | `resourceEventsTableId` | UUID |
 | `resourceEventsTableName` | String |
+| `resourceInstallationsTableId` | UUID |
+| `resourceInstallationsTableName` | String |
 | `resourceStatusChecksTableId` | UUID |
 | `resourceStatusChecksTableName` | String |
+| `resourceUsageLogTableId` | UUID |
+| `resourceUsageLogTableName` | String |
+| `resourceUsageSummaryTableId` | UUID |
+| `resourceUsageSummaryTableName` | String |
 | `resourcesTableId` | UUID |
 | `resourcesTableName` | String |
+| `rollupResourceUsageSummaryFunction` | String |
 | `schemaId` | UUID |
 | `scope` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `requirementsStateViewName`, `resolvedRequirementsViewName`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceEventsTableId`, `resourceEventsTableName`, `resourceStatusChecksTableId`, `resourceStatusChecksTableName`, `resourcesTableId`, `resourcesTableName`, `schemaId`, `scope`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `installationStoreName`, `merkleStoreModuleId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `requirementsStateViewName`, `resolvedRequirementsViewName`, `resourceBillingRollupFunction`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceEventsTableId`, `resourceEventsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourceStatusChecksTableId`, `resourceStatusChecksTableName`, `resourceUsageLogTableId`, `resourceUsageLogTableName`, `resourceUsageSummaryTableId`, `resourceUsageSummaryTableName`, `resourcesTableId`, `resourcesTableName`, `rollupResourceUsageSummaryFunction`, `schemaId`, `scope`
 
 ### `rls-module`
 
@@ -2312,20 +2368,20 @@ CRUD operations for SessionsModule records.
 
 | Field | Type |
 |-------|------|
-| `authSettingsTable` | String |
 | `authSettingsTableId` | UUID |
+| `authSettingsTableName` | String |
 | `databaseId` | UUID |
 | `id` | UUID |
 | `schemaId` | UUID |
-| `sessionCredentialsTable` | String |
 | `sessionCredentialsTableId` | UUID |
+| `sessionCredentialsTableName` | String |
 | `sessionsDefaultExpiration` | Interval |
-| `sessionsTable` | String |
 | `sessionsTableId` | UUID |
+| `sessionsTableName` | String |
 | `usersTableId` | UUID |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `authSettingsTable`, `authSettingsTableId`, `schemaId`, `sessionCredentialsTable`, `sessionCredentialsTableId`, `sessionsDefaultExpiration`, `sessionsTable`, `sessionsTableId`, `usersTableId`
+**Optional create fields (backend defaults):** `authSettingsTableId`, `authSettingsTableName`, `schemaId`, `sessionCredentialsTableId`, `sessionCredentialsTableName`, `sessionsDefaultExpiration`, `sessionsTableId`, `sessionsTableName`, `usersTableId`
 
 ### `storage-log-module`
 
@@ -2362,11 +2418,11 @@ CRUD operations for StorageLogModule records.
 | `scope` | String |
 | `storageLogTableId` | UUID |
 | `storageLogTableName` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `storageLogTableId`, `storageLogTableName`, `usageDailyTableId`, `usageDailyTableName`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `storageLogTableId`, `storageLogTableName`, `usageSummaryTableId`, `usageSummaryTableName`
 
 ### `storage-module`
 
@@ -2464,11 +2520,11 @@ CRUD operations for TransferLogModule records.
 | `scope` | String |
 | `transferLogTableId` | UUID |
 | `transferLogTableName` | String |
-| `usageDailyTableId` | UUID |
-| `usageDailyTableName` | String |
+| `usageSummaryTableId` | UUID |
+| `usageSummaryTableName` | String |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `transferLogTableId`, `transferLogTableName`, `usageDailyTableId`, `usageDailyTableName`
+**Optional create fields (backend defaults):** `actorFkTableId`, `apiName`, `entityField`, `entityFkTableId`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `schemaId`, `scope`, `transferLogTableId`, `transferLogTableName`, `usageSummaryTableId`, `usageSummaryTableName`
 
 ### `user-auth-module`
 
@@ -2698,6 +2754,50 @@ CRUD operations for WebauthnCredentialsModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `apiName`, `ownerTableId`, `privateApiName`, `privateSchemaId`, `schemaId`, `tableId`, `tableName`
+
+### `webhook-module`
+
+CRUD operations for WebhookModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all webhookModule records |
+| `find-first` | Find first matching webhookModule record |
+| `get` | Get a webhookModule by id |
+| `create` | Create a new webhookModule |
+| `update` | Update an existing webhookModule |
+| `delete` | Delete a webhookModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `apiName` | String |
+| `databaseId` | UUID |
+| `defaultPermissions` | String |
+| `entityField` | String |
+| `entityTableId` | UUID |
+| `functionInvocationModuleId` | UUID |
+| `functionModuleId` | UUID |
+| `id` | UUID |
+| `infraSecretsModuleId` | UUID |
+| `namespaceModuleId` | UUID |
+| `policies` | JSON |
+| `prefix` | String |
+| `privateApiName` | String |
+| `privateSchemaId` | UUID |
+| `privateSchemaName` | String |
+| `provisions` | JSON |
+| `publicSchemaName` | String |
+| `schemaId` | UUID |
+| `scope` | String |
+| `webhookEndpointsTableId` | UUID |
+| `webhookEndpointsTableName` | String |
+| `webhookEventsTableId` | UUID |
+| `webhookEventsTableName` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiName`, `defaultPermissions`, `entityField`, `entityTableId`, `functionInvocationModuleId`, `functionModuleId`, `infraSecretsModuleId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`, `scope`, `webhookEndpointsTableId`, `webhookEndpointsTableName`, `webhookEventsTableId`, `webhookEventsTableName`
 
 ## Custom Operations
 

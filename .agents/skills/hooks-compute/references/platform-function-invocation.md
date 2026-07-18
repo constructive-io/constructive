@@ -7,8 +7,8 @@ Function invocation log — INSERT to call a function (business-layer, metered).
 ## Usage
 
 ```typescript
-usePlatformFunctionInvocationsQuery({ selection: { fields: { actorId: true, apiBindingId: true, completedAt: true, createdAt: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, result: true, startedAt: true, status: true, taskIdentifier: true } } })
-usePlatformFunctionInvocationQuery({ id: '<UUID>', selection: { fields: { actorId: true, apiBindingId: true, completedAt: true, createdAt: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, result: true, startedAt: true, status: true, taskIdentifier: true } } })
+usePlatformFunctionInvocationsQuery({ selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } } })
+usePlatformFunctionInvocationQuery({ id: '<UUID>', selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } } })
 useCreatePlatformFunctionInvocationMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformFunctionInvocationMutation({ selection: { fields: { id: true } } })
 useDeletePlatformFunctionInvocationMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformFunctionInvocationMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformFunctionInvocationsQuery({
-  selection: { fields: { actorId: true, apiBindingId: true, completedAt: true, createdAt: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
+  selection: { fields: { actorId: true, apiBindingId: true, channel: true, completedAt: true, createdAt: true, definitionScope: true, durationMs: true, error: true, functionDefinitionId: true, graphExecutionId: true, id: true, jobId: true, parentInvocationId: true, payload: true, provenance: true, result: true, startedAt: true, status: true, taskIdentifier: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformFunctionInvocationsQuery({
 const { mutate } = useCreatePlatformFunctionInvocationMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', apiBindingId: '<UUID>', completedAt: '<Datetime>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' });
+mutate({ actorId: '<UUID>', apiBindingId: '<UUID>', channel: '<String>', completedAt: '<Datetime>', definitionScope: '<String>', durationMs: '<Int>', error: '<String>', functionDefinitionId: '<UUID>', graphExecutionId: '<UUID>', jobId: '<BigInt>', parentInvocationId: '<UUID>', payload: '<JSON>', provenance: '<JSON>', result: '<JSON>', startedAt: '<Datetime>', status: '<String>', taskIdentifier: '<String>' });
 ```

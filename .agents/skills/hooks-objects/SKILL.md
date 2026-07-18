@@ -39,7 +39,7 @@ const { data, isLoading } = useCommitsQuery({
 See the `references/` directory for detailed per-entity API documentation:
 
 - [commit](references/commit.md)
-- [get-all-record](references/get-all-record.md)
+- [get-all-tree-nodes-record](references/get-all-tree-nodes-record.md)
 - [object](references/object.md)
 - [ref](references/ref.md)
 - [store](references/store.md)

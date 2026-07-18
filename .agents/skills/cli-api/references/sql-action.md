@@ -12,8 +12,8 @@ csdk sql-action list --where.<field>.<op> <value> --orderBy <values>
 csdk sql-action list --limit 10 --after <cursor>
 csdk sql-action find-first --where.<field>.<op> <value>
 csdk sql-action get --id <Int>
-csdk sql-action create [--action <String>] [--actionId <UUID>] [--actorId <UUID>] [--content <String>] [--databaseId <UUID>] [--deploy <String>] [--deps <String>] [--name <String>] [--payload <JSON>] [--revert <String>] [--verify <String>]
-csdk sql-action update --id <Int> [--action <String>] [--actionId <UUID>] [--actorId <UUID>] [--content <String>] [--databaseId <UUID>] [--deploy <String>] [--deps <String>] [--name <String>] [--payload <JSON>] [--revert <String>] [--verify <String>]
+csdk sql-action create --actionId <UUID> --actionName <String> --actorId <UUID> --content <String> --databaseId <UUID> --deploy <String> --deps <String> --name <String> --payload <JSON> --revert <String> --verify <String>
+csdk sql-action update --id <Int> [--actionId <UUID>] [--actionName <String>] [--actorId <UUID>] [--content <String>] [--databaseId <UUID>] [--deploy <String>] [--deps <String>] [--name <String>] [--payload <JSON>] [--revert <String>] [--verify <String>]
 csdk sql-action delete --id <Int>
 ```
 
@@ -58,7 +58,7 @@ csdk sql-action list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a sqlAction
 
 ```bash
-csdk sql-action create [--action <String>] [--actionId <UUID>] [--actorId <UUID>] [--content <String>] [--databaseId <UUID>] [--deploy <String>] [--deps <String>] [--name <String>] [--payload <JSON>] [--revert <String>] [--verify <String>]
+csdk sql-action create --actionId <UUID> --actionName <String> --actorId <UUID> --content <String> --databaseId <UUID> --deploy <String> --deps <String> --name <String> --payload <JSON> --revert <String> --verify <String>
 ```
 
 ### Get a sqlAction by id

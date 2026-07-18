@@ -17,19 +17,12 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   actorId: 'uuid',
-  cpuMillicores: 'int',
   createdAt: 'string',
   eventType: 'string',
   id: 'uuid',
-  memoryBytes: 'int',
   message: 'string',
   metadata: 'json',
-  metrics: 'json',
   namespaceId: 'uuid',
-  networkEgressBytes: 'int',
-  networkIngressBytes: 'int',
-  podCount: 'int',
-  storageBytes: 'int',
 };
 const usage =
   '\nplatform-namespace-event <command>\n\nCommands:\n  list                  List platformNamespaceEvent records\n  find-first            Find first matching platformNamespaceEvent record\n  get                   Get a platformNamespaceEvent by ID\n  create                Create a new platformNamespaceEvent\n  update                Update an existing platformNamespaceEvent\n  delete                Delete a platformNamespaceEvent\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -83,19 +76,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       actorId: true,
-      cpuMillicores: true,
       createdAt: true,
       eventType: true,
       id: true,
-      memoryBytes: true,
       message: true,
       metadata: true,
-      metrics: true,
       namespaceId: true,
-      networkEgressBytes: true,
-      networkIngressBytes: true,
-      podCount: true,
-      storageBytes: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -121,19 +107,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       actorId: true,
-      cpuMillicores: true,
       createdAt: true,
       eventType: true,
       id: true,
-      memoryBytes: true,
       message: true,
       metadata: true,
-      metrics: true,
       namespaceId: true,
-      networkEgressBytes: true,
-      networkIngressBytes: true,
-      podCount: true,
-      storageBytes: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -171,19 +150,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           actorId: true,
-          cpuMillicores: true,
           createdAt: true,
           eventType: true,
           id: true,
-          memoryBytes: true,
           message: true,
           metadata: true,
-          metrics: true,
           namespaceId: true,
-          networkEgressBytes: true,
-          networkIngressBytes: true,
-          podCount: true,
-          storageBytes: true,
         },
       })
       .execute();
@@ -208,23 +180,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'cpuMillicores',
-        message: 'cpuMillicores',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'eventType',
         message: 'eventType',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'memoryBytes',
-        message: 'memoryBytes',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -241,45 +199,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
-        name: 'metrics',
-        message: 'metrics',
-        required: false,
-        skipPrompt: true,
-      },
-      {
         type: 'text',
         name: 'namespaceId',
         message: 'namespaceId',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'networkEgressBytes',
-        message: 'networkEgressBytes',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'networkIngressBytes',
-        message: 'networkIngressBytes',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'podCount',
-        message: 'podCount',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'storageBytes',
-        message: 'storageBytes',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -292,33 +215,19 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           actorId: cleanedData.actorId,
-          cpuMillicores: cleanedData.cpuMillicores,
           eventType: cleanedData.eventType,
-          memoryBytes: cleanedData.memoryBytes,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
-          metrics: cleanedData.metrics,
           namespaceId: cleanedData.namespaceId,
-          networkEgressBytes: cleanedData.networkEgressBytes,
-          networkIngressBytes: cleanedData.networkIngressBytes,
-          podCount: cleanedData.podCount,
-          storageBytes: cleanedData.storageBytes,
         },
         select: {
           actorId: true,
-          cpuMillicores: true,
           createdAt: true,
           eventType: true,
           id: true,
-          memoryBytes: true,
           message: true,
           metadata: true,
-          metrics: true,
           namespaceId: true,
-          networkEgressBytes: true,
-          networkIngressBytes: true,
-          podCount: true,
-          storageBytes: true,
         },
       })
       .execute();
@@ -355,23 +264,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'cpuMillicores',
-        message: 'cpuMillicores',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'eventType',
         message: 'eventType',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'memoryBytes',
-        message: 'memoryBytes',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -388,45 +283,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
-        name: 'metrics',
-        message: 'metrics',
-        required: false,
-        skipPrompt: true,
-      },
-      {
         type: 'text',
         name: 'namespaceId',
         message: 'namespaceId',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'networkEgressBytes',
-        message: 'networkEgressBytes',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'networkIngressBytes',
-        message: 'networkIngressBytes',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'podCount',
-        message: 'podCount',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'storageBytes',
-        message: 'storageBytes',
-        required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -440,33 +300,19 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           actorId: cleanedData.actorId,
-          cpuMillicores: cleanedData.cpuMillicores,
           eventType: cleanedData.eventType,
-          memoryBytes: cleanedData.memoryBytes,
           message: cleanedData.message,
           metadata: cleanedData.metadata,
-          metrics: cleanedData.metrics,
           namespaceId: cleanedData.namespaceId,
-          networkEgressBytes: cleanedData.networkEgressBytes,
-          networkIngressBytes: cleanedData.networkIngressBytes,
-          podCount: cleanedData.podCount,
-          storageBytes: cleanedData.storageBytes,
         },
         select: {
           actorId: true,
-          cpuMillicores: true,
           createdAt: true,
           eventType: true,
           id: true,
-          memoryBytes: true,
           message: true,
           metadata: true,
-          metrics: true,
           namespaceId: true,
-          networkEgressBytes: true,
-          networkIngressBytes: true,
-          podCount: true,
-          storageBytes: true,
         },
       })
       .execute();

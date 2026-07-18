@@ -1012,6 +1012,35 @@ input AgentPlanToManyAgentTaskFilter {
 
 """Shared system prompt templates for agent conversations"""
 type AgentPrompt {
+  """Reads and enables pagination through a set of `AgentThread`."""
+  agentThreadsByPromptTemplateId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AgentThread`."""
+    orderBy: [AgentThreadOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AgentThreadFilter
+  ): AgentThreadConnection!
+
   """The system prompt template content"""
   content: String!
   createdAt: Datetime
@@ -1066,6 +1095,12 @@ type AgentPromptEdge {
 A filter to be used against `AgentPrompt` object types. All fields are combined with a logical ‘and.’
 """
 input AgentPromptFilter {
+  """Filter by the object’s `agentThreadsByPromptTemplateId` relation."""
+  agentThreadsByPromptTemplateId: AgentPromptToManyAgentThreadFilter
+
+  """`agentThreadsByPromptTemplateId` exist."""
+  agentThreadsByPromptTemplateIdExist: Boolean
+
   """Checks for all expressions in this list."""
   and: [AgentPromptFilter!]
 
@@ -1190,6 +1225,20 @@ input AgentPromptPatch {
   name: String
   updatedAt: Datetime
   updatedBy: UUID
+}
+
+"""
+A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’
+"""
+input AgentPromptToManyAgentThreadFilter {
+  """Filters to entities where every related entity matches."""
+  every: AgentThreadFilter
+
+  """Filters to entities where no related entity matches."""
+  none: AgentThreadFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: AgentThreadFilter
 }
 
 """

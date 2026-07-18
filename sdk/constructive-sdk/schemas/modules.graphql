@@ -2077,8 +2077,8 @@ type ComputeLogModule {
   retention: String!
   schemaId: UUID!
   scope: String!
-  usageDailyTableId: UUID!
-  usageDailyTableName: String!
+  usageSummaryTableId: UUID!
+  usageSummaryTableName: String!
 }
 
 """A connection to a list of `ComputeLogModule` values."""
@@ -2176,11 +2176,11 @@ input ComputeLogModuleFilter {
   """Filter by the object’s `scope` field."""
   scope: StringFilter
 
-  """Filter by the object’s `usageDailyTableId` field."""
-  usageDailyTableId: UUIDFilter
+  """Filter by the object’s `usageSummaryTableId` field."""
+  usageSummaryTableId: UUIDFilter
 
-  """Filter by the object’s `usageDailyTableName` field."""
-  usageDailyTableName: StringFilter
+  """Filter by the object’s `usageSummaryTableName` field."""
+  usageSummaryTableName: StringFilter
 }
 
 """An input for mutations affecting `ComputeLogModule`"""
@@ -2203,8 +2203,8 @@ input ComputeLogModuleInput {
   retention: String
   schemaId: UUID
   scope: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 """Methods to use when ordering `ComputeLogModule`."""
@@ -2248,10 +2248,10 @@ enum ComputeLogModuleOrderBy {
   SCHEMA_ID_DESC
   SCOPE_ASC
   SCOPE_DESC
-  USAGE_DAILY_TABLE_ID_ASC
-  USAGE_DAILY_TABLE_ID_DESC
-  USAGE_DAILY_TABLE_NAME_ASC
-  USAGE_DAILY_TABLE_NAME_DESC
+  USAGE_SUMMARY_TABLE_ID_ASC
+  USAGE_SUMMARY_TABLE_ID_DESC
+  USAGE_SUMMARY_TABLE_NAME_ASC
+  USAGE_SUMMARY_TABLE_NAME_DESC
 }
 
 """
@@ -2276,8 +2276,8 @@ input ComputeLogModulePatch {
   retention: String
   schemaId: UUID
   scope: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 type ConfigSecretsUserModule {
@@ -3569,6 +3569,41 @@ type CreateHierarchyModulePayload {
     """The method to use when ordering `HierarchyModule`."""
     orderBy: [HierarchyModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): HierarchyModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `HttpRouteModule` mutation."""
+input CreateHttpRouteModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `HttpRouteModule` to be created by this mutation."""
+  httpRouteModule: HttpRouteModuleInput!
+}
+
+"""The output of our create `HttpRouteModule` mutation."""
+type CreateHttpRouteModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `HttpRouteModule` that was created by this mutation."""
+  httpRouteModule: HttpRouteModule
+
+  """An edge for our `HttpRouteModule`. May be used by Relay 1."""
+  httpRouteModuleEdge(
+    """The method to use when ordering `HttpRouteModule`."""
+    orderBy: [HttpRouteModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): HttpRouteModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4906,6 +4941,41 @@ type CreateWebauthnCredentialsModulePayload {
   ): WebauthnCredentialsModuleEdge
 }
 
+"""All input for the create `WebhookModule` mutation."""
+input CreateWebhookModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `WebhookModule` to be created by this mutation."""
+  webhookModule: WebhookModuleInput!
+}
+
+"""The output of our create `WebhookModule` mutation."""
+type CreateWebhookModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `WebhookModule` that was created by this mutation."""
+  webhookModule: WebhookModule
+
+  """An edge for our `WebhookModule`. May be used by Relay 1."""
+  webhookModuleEdge(
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): WebhookModuleEdge
+}
+
 type CryptoAddressesModule {
   apiName: String
   cryptoNetwork: String!
@@ -6233,19 +6303,19 @@ type DbUsageModule {
   privateSchemaId: UUID!
   privateSchemaName: String
   publicSchemaName: String
-  queryStatsDailyTableId: UUID!
-  queryStatsDailyTableName: String!
   queryStatsLogTableId: UUID!
   queryStatsLogTableName: String!
+  queryStatsSummaryTableId: UUID!
+  queryStatsSummaryTableName: String!
   retention: String!
-  rollupDbQueryStatsDailyFunction: String!
-  rollupDbTableStatsDailyFunction: String!
+  rollupDbQueryStatsUsageSummaryFunction: String!
+  rollupDbTableStatsUsageSummaryFunction: String!
   schemaId: UUID!
   scope: String!
-  tableStatsDailyTableId: UUID!
-  tableStatsDailyTableName: String!
   tableStatsLogTableId: UUID!
   tableStatsLogTableName: String!
+  tableStatsSummaryTableId: UUID!
+  tableStatsSummaryTableName: String!
 }
 
 """A connection to a list of `DbUsageModule` values."""
@@ -6329,26 +6399,26 @@ input DbUsageModuleFilter {
   """Filter by the object’s `publicSchemaName` field."""
   publicSchemaName: StringFilter
 
-  """Filter by the object’s `queryStatsDailyTableId` field."""
-  queryStatsDailyTableId: UUIDFilter
-
-  """Filter by the object’s `queryStatsDailyTableName` field."""
-  queryStatsDailyTableName: StringFilter
-
   """Filter by the object’s `queryStatsLogTableId` field."""
   queryStatsLogTableId: UUIDFilter
 
   """Filter by the object’s `queryStatsLogTableName` field."""
   queryStatsLogTableName: StringFilter
 
+  """Filter by the object’s `queryStatsSummaryTableId` field."""
+  queryStatsSummaryTableId: UUIDFilter
+
+  """Filter by the object’s `queryStatsSummaryTableName` field."""
+  queryStatsSummaryTableName: StringFilter
+
   """Filter by the object’s `retention` field."""
   retention: StringFilter
 
-  """Filter by the object’s `rollupDbQueryStatsDailyFunction` field."""
-  rollupDbQueryStatsDailyFunction: StringFilter
+  """Filter by the object’s `rollupDbQueryStatsUsageSummaryFunction` field."""
+  rollupDbQueryStatsUsageSummaryFunction: StringFilter
 
-  """Filter by the object’s `rollupDbTableStatsDailyFunction` field."""
-  rollupDbTableStatsDailyFunction: StringFilter
+  """Filter by the object’s `rollupDbTableStatsUsageSummaryFunction` field."""
+  rollupDbTableStatsUsageSummaryFunction: StringFilter
 
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
@@ -6356,17 +6426,17 @@ input DbUsageModuleFilter {
   """Filter by the object’s `scope` field."""
   scope: StringFilter
 
-  """Filter by the object’s `tableStatsDailyTableId` field."""
-  tableStatsDailyTableId: UUIDFilter
-
-  """Filter by the object’s `tableStatsDailyTableName` field."""
-  tableStatsDailyTableName: StringFilter
-
   """Filter by the object’s `tableStatsLogTableId` field."""
   tableStatsLogTableId: UUIDFilter
 
   """Filter by the object’s `tableStatsLogTableName` field."""
   tableStatsLogTableName: StringFilter
+
+  """Filter by the object’s `tableStatsSummaryTableId` field."""
+  tableStatsSummaryTableId: UUIDFilter
+
+  """Filter by the object’s `tableStatsSummaryTableName` field."""
+  tableStatsSummaryTableName: StringFilter
 }
 
 """An input for mutations affecting `DbUsageModule`"""
@@ -6385,19 +6455,19 @@ input DbUsageModuleInput {
   privateSchemaId: UUID
   privateSchemaName: String
   publicSchemaName: String
-  queryStatsDailyTableId: UUID
-  queryStatsDailyTableName: String
   queryStatsLogTableId: UUID
   queryStatsLogTableName: String
+  queryStatsSummaryTableId: UUID
+  queryStatsSummaryTableName: String
   retention: String
-  rollupDbQueryStatsDailyFunction: String
-  rollupDbTableStatsDailyFunction: String
+  rollupDbQueryStatsUsageSummaryFunction: String
+  rollupDbTableStatsUsageSummaryFunction: String
   schemaId: UUID
   scope: String
-  tableStatsDailyTableId: UUID
-  tableStatsDailyTableName: String
   tableStatsLogTableId: UUID
   tableStatsLogTableName: String
+  tableStatsSummaryTableId: UUID
+  tableStatsSummaryTableName: String
 }
 
 """Methods to use when ordering `DbUsageModule`."""
@@ -6433,32 +6503,32 @@ enum DbUsageModuleOrderBy {
   PRIVATE_SCHEMA_NAME_DESC
   PUBLIC_SCHEMA_NAME_ASC
   PUBLIC_SCHEMA_NAME_DESC
-  QUERY_STATS_DAILY_TABLE_ID_ASC
-  QUERY_STATS_DAILY_TABLE_ID_DESC
-  QUERY_STATS_DAILY_TABLE_NAME_ASC
-  QUERY_STATS_DAILY_TABLE_NAME_DESC
   QUERY_STATS_LOG_TABLE_ID_ASC
   QUERY_STATS_LOG_TABLE_ID_DESC
   QUERY_STATS_LOG_TABLE_NAME_ASC
   QUERY_STATS_LOG_TABLE_NAME_DESC
+  QUERY_STATS_SUMMARY_TABLE_ID_ASC
+  QUERY_STATS_SUMMARY_TABLE_ID_DESC
+  QUERY_STATS_SUMMARY_TABLE_NAME_ASC
+  QUERY_STATS_SUMMARY_TABLE_NAME_DESC
   RETENTION_ASC
   RETENTION_DESC
-  ROLLUP_DB_QUERY_STATS_DAILY_FUNCTION_ASC
-  ROLLUP_DB_QUERY_STATS_DAILY_FUNCTION_DESC
-  ROLLUP_DB_TABLE_STATS_DAILY_FUNCTION_ASC
-  ROLLUP_DB_TABLE_STATS_DAILY_FUNCTION_DESC
+  ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_ASC
+  ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_DESC
+  ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_ASC
+  ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
   SCOPE_ASC
   SCOPE_DESC
-  TABLE_STATS_DAILY_TABLE_ID_ASC
-  TABLE_STATS_DAILY_TABLE_ID_DESC
-  TABLE_STATS_DAILY_TABLE_NAME_ASC
-  TABLE_STATS_DAILY_TABLE_NAME_DESC
   TABLE_STATS_LOG_TABLE_ID_ASC
   TABLE_STATS_LOG_TABLE_ID_DESC
   TABLE_STATS_LOG_TABLE_NAME_ASC
   TABLE_STATS_LOG_TABLE_NAME_DESC
+  TABLE_STATS_SUMMARY_TABLE_ID_ASC
+  TABLE_STATS_SUMMARY_TABLE_ID_DESC
+  TABLE_STATS_SUMMARY_TABLE_NAME_ASC
+  TABLE_STATS_SUMMARY_TABLE_NAME_DESC
 }
 
 """
@@ -6479,19 +6549,19 @@ input DbUsageModulePatch {
   privateSchemaId: UUID
   privateSchemaName: String
   publicSchemaName: String
-  queryStatsDailyTableId: UUID
-  queryStatsDailyTableName: String
   queryStatsLogTableId: UUID
   queryStatsLogTableName: String
+  queryStatsSummaryTableId: UUID
+  queryStatsSummaryTableName: String
   retention: String
-  rollupDbQueryStatsDailyFunction: String
-  rollupDbTableStatsDailyFunction: String
+  rollupDbQueryStatsUsageSummaryFunction: String
+  rollupDbTableStatsUsageSummaryFunction: String
   schemaId: UUID
   scope: String
-  tableStatsDailyTableId: UUID
-  tableStatsDailyTableName: String
   tableStatsLogTableId: UUID
   tableStatsLogTableName: String
+  tableStatsSummaryTableId: UUID
+  tableStatsSummaryTableName: String
 }
 
 type DefaultIdsModule {
@@ -7497,6 +7567,39 @@ type DeleteHierarchyModulePayload {
     """The method to use when ordering `HierarchyModule`."""
     orderBy: [HierarchyModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): HierarchyModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteHttpRouteModule` mutation."""
+input DeleteHttpRouteModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `HttpRouteModule` mutation."""
+type DeleteHttpRouteModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `HttpRouteModule` that was deleted by this mutation."""
+  httpRouteModule: HttpRouteModule
+
+  """An edge for our `HttpRouteModule`. May be used by Relay 1."""
+  httpRouteModuleEdge(
+    """The method to use when ordering `HttpRouteModule`."""
+    orderBy: [HttpRouteModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): HttpRouteModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8762,6 +8865,39 @@ type DeleteWebauthnCredentialsModulePayload {
   ): WebauthnCredentialsModuleEdge
 }
 
+"""All input for the `deleteWebhookModule` mutation."""
+input DeleteWebhookModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `WebhookModule` mutation."""
+type DeleteWebhookModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `WebhookModule` that was deleted by this mutation."""
+  webhookModule: WebhookModule
+
+  """An edge for our `WebhookModule`. May be used by Relay 1."""
+  webhookModuleEdge(
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): WebhookModuleEdge
+}
+
 type DenormalizedTableField {
   databaseId: UUID!
   fieldId: UUID!
@@ -8922,12 +9058,12 @@ input DenormalizedTableFieldPatch {
 
 type DevicesModule {
   databaseId: UUID!
-  deviceSettingsTable: String!
   deviceSettingsTableId: UUID!
+  deviceSettingsTableName: String!
   id: UUID!
   schemaId: UUID!
-  userDevicesTable: String!
   userDevicesTableId: UUID!
+  userDevicesTableName: String!
 }
 
 """A connection to a list of `DevicesModule` values."""
@@ -8966,11 +9102,11 @@ input DevicesModuleFilter {
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
-  """Filter by the object’s `deviceSettingsTable` field."""
-  deviceSettingsTable: StringFilter
-
   """Filter by the object’s `deviceSettingsTableId` field."""
   deviceSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `deviceSettingsTableName` field."""
+  deviceSettingsTableName: StringFilter
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -8984,32 +9120,32 @@ input DevicesModuleFilter {
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
 
-  """Filter by the object’s `userDevicesTable` field."""
-  userDevicesTable: StringFilter
-
   """Filter by the object’s `userDevicesTableId` field."""
   userDevicesTableId: UUIDFilter
+
+  """Filter by the object’s `userDevicesTableName` field."""
+  userDevicesTableName: StringFilter
 }
 
 """An input for mutations affecting `DevicesModule`"""
 input DevicesModuleInput {
   databaseId: UUID!
-  deviceSettingsTable: String
   deviceSettingsTableId: UUID
+  deviceSettingsTableName: String
   id: UUID
   schemaId: UUID
-  userDevicesTable: String
   userDevicesTableId: UUID
+  userDevicesTableName: String
 }
 
 """Methods to use when ordering `DevicesModule`."""
 enum DevicesModuleOrderBy {
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-  DEVICE_SETTINGS_TABLE_ASC
-  DEVICE_SETTINGS_TABLE_DESC
   DEVICE_SETTINGS_TABLE_ID_ASC
   DEVICE_SETTINGS_TABLE_ID_DESC
+  DEVICE_SETTINGS_TABLE_NAME_ASC
+  DEVICE_SETTINGS_TABLE_NAME_DESC
   ID_ASC
   ID_DESC
   NATURAL
@@ -9017,10 +9153,10 @@ enum DevicesModuleOrderBy {
   PRIMARY_KEY_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
-  USER_DEVICES_TABLE_ASC
-  USER_DEVICES_TABLE_DESC
   USER_DEVICES_TABLE_ID_ASC
   USER_DEVICES_TABLE_ID_DESC
+  USER_DEVICES_TABLE_NAME_ASC
+  USER_DEVICES_TABLE_NAME_DESC
 }
 
 """
@@ -9028,12 +9164,12 @@ Represents an update to a `DevicesModule`. Fields that are set will be updated.
 """
 input DevicesModulePatch {
   databaseId: UUID
-  deviceSettingsTable: String
   deviceSettingsTableId: UUID
+  deviceSettingsTableName: String
   id: UUID
   schemaId: UUID
-  userDevicesTable: String
   userDevicesTableId: UUID
+  userDevicesTableName: String
 }
 
 type EmailsModule {
@@ -11190,6 +11326,7 @@ type FunctionModule {
   definitionsTableName: String!
   entityField: String
   entityTableId: UUID
+  hasCron: Boolean!
   id: UUID!
   policies: JSON
   prefix: String!
@@ -11198,6 +11335,7 @@ type FunctionModule {
   privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
+  schedulesTableId: UUID
   schemaId: UUID!
   scope: String!
 }
@@ -11262,6 +11400,9 @@ input FunctionModuleFilter {
   """Filter by the object’s `entityTableId` field."""
   entityTableId: UUIDFilter
 
+  """Filter by the object’s `hasCron` field."""
+  hasCron: BooleanFilter
+
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -11292,6 +11433,9 @@ input FunctionModuleFilter {
   """Filter by the object’s `publicSchemaName` field."""
   publicSchemaName: StringFilter
 
+  """Filter by the object’s `schedulesTableId` field."""
+  schedulesTableId: UUIDFilter
+
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
 
@@ -11310,6 +11454,7 @@ input FunctionModuleInput {
   definitionsTableName: String
   entityField: String
   entityTableId: UUID
+  hasCron: Boolean
   id: UUID
   policies: JSON
   prefix: String
@@ -11318,6 +11463,7 @@ input FunctionModuleInput {
   privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
+  schedulesTableId: UUID
   schemaId: UUID
   scope: String
 }
@@ -11342,6 +11488,8 @@ enum FunctionModuleOrderBy {
   ENTITY_FIELD_DESC
   ENTITY_TABLE_ID_ASC
   ENTITY_TABLE_ID_DESC
+  HAS_CRON_ASC
+  HAS_CRON_DESC
   ID_ASC
   ID_DESC
   NATURAL
@@ -11361,6 +11509,8 @@ enum FunctionModuleOrderBy {
   PROVISIONS_DESC
   PUBLIC_SCHEMA_NAME_ASC
   PUBLIC_SCHEMA_NAME_DESC
+  SCHEDULES_TABLE_ID_ASC
+  SCHEDULES_TABLE_ID_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
   SCOPE_ASC
@@ -11380,6 +11530,7 @@ input FunctionModulePatch {
   definitionsTableName: String
   entityField: String
   entityTableId: UUID
+  hasCron: Boolean
   id: UUID
   policies: JSON
   prefix: String
@@ -11388,6 +11539,7 @@ input FunctionModulePatch {
   privateSchemaName: String
   provisions: JSON
   publicSchemaName: String
+  schedulesTableId: UUID
   schemaId: UUID
   scope: String
 }
@@ -12104,6 +12256,269 @@ input HierarchyModulePatch {
   usersTableId: UUID
 }
 
+type HttpRouteModule {
+  apiName: String
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+
+  """
+  Reads a single `FunctionModule` that is related to this `HttpRouteModule`.
+  """
+  functionModule: FunctionModule
+  functionModuleId: UUID
+  httpRoutesTableId: UUID!
+  httpRoutesTableName: String!
+  id: UUID!
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  privateSchemaId: UUID!
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  resolverFunctionName: String
+
+  """
+  Reads a single `ResourceModule` that is related to this `HttpRouteModule`.
+  """
+  resourceModule: ResourceModule
+  resourceModuleId: UUID
+  schemaId: UUID!
+  scope: String!
+
+  """
+  Reads a single `StorageModule` that is related to this `HttpRouteModule`.
+  """
+  storageModule: StorageModule
+  storageModuleId: UUID
+}
+
+"""A connection to a list of `HttpRouteModule` values."""
+type HttpRouteModuleConnection {
+  """
+  A list of edges which contains the `HttpRouteModule` and cursor to aid in pagination.
+  """
+  edges: [HttpRouteModuleEdge]!
+
+  """A list of `HttpRouteModule` objects."""
+  nodes: [HttpRouteModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `HttpRouteModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `HttpRouteModule` edge in the connection."""
+type HttpRouteModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `HttpRouteModule` at the end of the edge."""
+  node: HttpRouteModule
+}
+
+"""
+A filter to be used against `HttpRouteModule` object types. All fields are combined with a logical ‘and.’
+"""
+input HttpRouteModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [HttpRouteModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `functionModule` relation."""
+  functionModule: FunctionModuleFilter
+
+  """A related `functionModule` exists."""
+  functionModuleExists: Boolean
+
+  """Filter by the object’s `functionModuleId` field."""
+  functionModuleId: UUIDFilter
+
+  """Filter by the object’s `httpRoutesTableId` field."""
+  httpRoutesTableId: UUIDFilter
+
+  """Filter by the object’s `httpRoutesTableName` field."""
+  httpRoutesTableName: StringFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Negates the expression."""
+  not: HttpRouteModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [HttpRouteModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `resolverFunctionName` field."""
+  resolverFunctionName: StringFilter
+
+  """Filter by the object’s `resourceModule` relation."""
+  resourceModule: ResourceModuleFilter
+
+  """A related `resourceModule` exists."""
+  resourceModuleExists: Boolean
+
+  """Filter by the object’s `resourceModuleId` field."""
+  resourceModuleId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `storageModule` relation."""
+  storageModule: StorageModuleFilter
+
+  """A related `storageModule` exists."""
+  storageModuleExists: Boolean
+
+  """Filter by the object’s `storageModuleId` field."""
+  storageModuleId: UUIDFilter
+}
+
+"""An input for mutations affecting `HttpRouteModule`"""
+input HttpRouteModuleInput {
+  apiName: String
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  functionModuleId: UUID
+  httpRoutesTableId: UUID
+  httpRoutesTableName: String
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  resolverFunctionName: String
+  resourceModuleId: UUID
+  schemaId: UUID
+  scope: String
+  storageModuleId: UUID
+}
+
+"""Methods to use when ordering `HttpRouteModule`."""
+enum HttpRouteModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  FUNCTION_MODULE_ID_ASC
+  FUNCTION_MODULE_ID_DESC
+  HTTP_ROUTES_TABLE_ID_ASC
+  HTTP_ROUTES_TABLE_ID_DESC
+  HTTP_ROUTES_TABLE_NAME_ASC
+  HTTP_ROUTES_TABLE_NAME_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  RESOLVER_FUNCTION_NAME_ASC
+  RESOLVER_FUNCTION_NAME_DESC
+  RESOURCE_MODULE_ID_ASC
+  RESOURCE_MODULE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  STORAGE_MODULE_ID_ASC
+  STORAGE_MODULE_ID_DESC
+}
+
+"""
+Represents an update to a `HttpRouteModule`. Fields that are set will be updated.
+"""
+input HttpRouteModulePatch {
+  apiName: String
+  databaseId: UUID
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  functionModuleId: UUID
+  httpRoutesTableId: UUID
+  httpRoutesTableName: String
+  id: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  resolverFunctionName: String
+  resourceModuleId: UUID
+  schemaId: UUID
+  scope: String
+  storageModuleId: UUID
+}
+
 type I18NModule {
   apiName: String
   databaseId: UUID!
@@ -12436,8 +12851,8 @@ type InferenceLogModule {
   retention: String!
   schemaId: UUID!
   scope: String!
-  usageDailyTableId: UUID!
-  usageDailyTableName: String!
+  usageSummaryTableId: UUID!
+  usageSummaryTableName: String!
 }
 
 """A connection to a list of `InferenceLogModule` values."""
@@ -12535,11 +12950,11 @@ input InferenceLogModuleFilter {
   """Filter by the object’s `scope` field."""
   scope: StringFilter
 
-  """Filter by the object’s `usageDailyTableId` field."""
-  usageDailyTableId: UUIDFilter
+  """Filter by the object’s `usageSummaryTableId` field."""
+  usageSummaryTableId: UUIDFilter
 
-  """Filter by the object’s `usageDailyTableName` field."""
-  usageDailyTableName: StringFilter
+  """Filter by the object’s `usageSummaryTableName` field."""
+  usageSummaryTableName: StringFilter
 }
 
 """An input for mutations affecting `InferenceLogModule`"""
@@ -12562,8 +12977,8 @@ input InferenceLogModuleInput {
   retention: String
   schemaId: UUID
   scope: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 """Methods to use when ordering `InferenceLogModule`."""
@@ -12607,10 +13022,10 @@ enum InferenceLogModuleOrderBy {
   SCHEMA_ID_DESC
   SCOPE_ASC
   SCOPE_DESC
-  USAGE_DAILY_TABLE_ID_ASC
-  USAGE_DAILY_TABLE_ID_DESC
-  USAGE_DAILY_TABLE_NAME_ASC
-  USAGE_DAILY_TABLE_NAME_DESC
+  USAGE_SUMMARY_TABLE_ID_ASC
+  USAGE_SUMMARY_TABLE_ID_DESC
+  USAGE_SUMMARY_TABLE_NAME_ASC
+  USAGE_SUMMARY_TABLE_NAME_DESC
 }
 
 """
@@ -12635,8 +13050,8 @@ input InferenceLogModulePatch {
   retention: String
   schemaId: UUID
   scope: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 """
@@ -15528,6 +15943,14 @@ type Mutation {
     input: CreateHierarchyModuleInput!
   ): CreateHierarchyModulePayload
 
+  """Creates a single `HttpRouteModule`."""
+  createHttpRouteModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateHttpRouteModuleInput!
+  ): CreateHttpRouteModulePayload
+
   """Creates a single `I18NModule`."""
   createI18NModule(
     """
@@ -15832,6 +16255,14 @@ type Mutation {
     input: CreateWebauthnCredentialsModuleInput!
   ): CreateWebauthnCredentialsModulePayload
 
+  """Creates a single `WebhookModule`."""
+  createWebhookModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateWebhookModuleInput!
+  ): CreateWebhookModulePayload
+
   """Deletes a single `AgentModule` using a unique key."""
   deleteAgentModule(
     """
@@ -16055,6 +16486,14 @@ type Mutation {
     """
     input: DeleteHierarchyModuleInput!
   ): DeleteHierarchyModulePayload
+
+  """Deletes a single `HttpRouteModule` using a unique key."""
+  deleteHttpRouteModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteHttpRouteModuleInput!
+  ): DeleteHttpRouteModulePayload
 
   """Deletes a single `I18NModule` using a unique key."""
   deleteI18NModule(
@@ -16359,6 +16798,14 @@ type Mutation {
     """
     input: DeleteWebauthnCredentialsModuleInput!
   ): DeleteWebauthnCredentialsModulePayload
+
+  """Deletes a single `WebhookModule` using a unique key."""
+  deleteWebhookModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteWebhookModuleInput!
+  ): DeleteWebhookModulePayload
 
   """
   Provision an S3 bucket for a logical bucket in the database.
@@ -16687,6 +17134,14 @@ type Mutation {
     input: UpdateHierarchyModuleInput!
   ): UpdateHierarchyModulePayload
 
+  """Updates a single `HttpRouteModule` using a unique key and a patch."""
+  updateHttpRouteModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateHttpRouteModuleInput!
+  ): UpdateHttpRouteModulePayload
+
   """Updates a single `I18NModule` using a unique key and a patch."""
   updateI18NModule(
     """
@@ -17008,6 +17463,14 @@ type Mutation {
     """
     input: UpdateWebauthnCredentialsModuleInput!
   ): UpdateWebauthnCredentialsModulePayload
+
+  """Updates a single `WebhookModule` using a unique key and a patch."""
+  updateWebhookModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateWebhookModuleInput!
+  ): UpdateWebhookModulePayload
 }
 
 type NamespaceModule {
@@ -19655,6 +20118,35 @@ type Query {
     where: HierarchyModuleFilter
   ): HierarchyModuleConnection
 
+  """Reads and enables pagination through a set of `HttpRouteModule`."""
+  httpRouteModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `HttpRouteModule`."""
+    orderBy: [HttpRouteModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: HttpRouteModuleFilter
+  ): HttpRouteModuleConnection
+
   """Reads and enables pagination through a set of `I18NModule`."""
   i18nModules(
     """Read all values in the set after (below) this cursor."""
@@ -20772,6 +21264,35 @@ type Query {
     """
     where: WebauthnCredentialsModuleFilter
   ): WebauthnCredentialsModuleConnection
+
+  """Reads and enables pagination through a set of `WebhookModule`."""
+  webhookModules(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebhookModuleFilter
+  ): WebhookModuleConnection
 }
 
 type RateLimitMetersModule {
@@ -20975,12 +21496,12 @@ input RateLimitMetersModulePatch {
 type RateLimitsModule {
   databaseId: UUID!
   id: UUID!
-  ipRateLimitsTable: String!
   ipRateLimitsTableId: UUID!
-  rateLimitSettingsTable: String!
+  ipRateLimitsTableName: String!
   rateLimitSettingsTableId: UUID!
-  rateLimitsTable: String!
+  rateLimitSettingsTableName: String!
   rateLimitsTableId: UUID!
+  rateLimitsTableName: String!
   schemaId: UUID!
 }
 
@@ -21025,11 +21546,11 @@ input RateLimitsModuleFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
-  """Filter by the object’s `ipRateLimitsTable` field."""
-  ipRateLimitsTable: StringFilter
-
   """Filter by the object’s `ipRateLimitsTableId` field."""
   ipRateLimitsTableId: UUIDFilter
+
+  """Filter by the object’s `ipRateLimitsTableName` field."""
+  ipRateLimitsTableName: StringFilter
 
   """Negates the expression."""
   not: RateLimitsModuleFilter
@@ -21037,17 +21558,17 @@ input RateLimitsModuleFilter {
   """Checks for any expressions in this list."""
   or: [RateLimitsModuleFilter!]
 
-  """Filter by the object’s `rateLimitSettingsTable` field."""
-  rateLimitSettingsTable: StringFilter
-
   """Filter by the object’s `rateLimitSettingsTableId` field."""
   rateLimitSettingsTableId: UUIDFilter
 
-  """Filter by the object’s `rateLimitsTable` field."""
-  rateLimitsTable: StringFilter
+  """Filter by the object’s `rateLimitSettingsTableName` field."""
+  rateLimitSettingsTableName: StringFilter
 
   """Filter by the object’s `rateLimitsTableId` field."""
   rateLimitsTableId: UUIDFilter
+
+  """Filter by the object’s `rateLimitsTableName` field."""
+  rateLimitsTableName: StringFilter
 
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
@@ -21057,12 +21578,12 @@ input RateLimitsModuleFilter {
 input RateLimitsModuleInput {
   databaseId: UUID!
   id: UUID
-  ipRateLimitsTable: String
   ipRateLimitsTableId: UUID
-  rateLimitSettingsTable: String
+  ipRateLimitsTableName: String
   rateLimitSettingsTableId: UUID
-  rateLimitsTable: String
+  rateLimitSettingsTableName: String
   rateLimitsTableId: UUID
+  rateLimitsTableName: String
   schemaId: UUID
 }
 
@@ -21072,21 +21593,21 @@ enum RateLimitsModuleOrderBy {
   DATABASE_ID_DESC
   ID_ASC
   ID_DESC
-  IP_RATE_LIMITS_TABLE_ASC
-  IP_RATE_LIMITS_TABLE_DESC
   IP_RATE_LIMITS_TABLE_ID_ASC
   IP_RATE_LIMITS_TABLE_ID_DESC
+  IP_RATE_LIMITS_TABLE_NAME_ASC
+  IP_RATE_LIMITS_TABLE_NAME_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  RATE_LIMITS_TABLE_ASC
-  RATE_LIMITS_TABLE_DESC
   RATE_LIMITS_TABLE_ID_ASC
   RATE_LIMITS_TABLE_ID_DESC
-  RATE_LIMIT_SETTINGS_TABLE_ASC
-  RATE_LIMIT_SETTINGS_TABLE_DESC
+  RATE_LIMITS_TABLE_NAME_ASC
+  RATE_LIMITS_TABLE_NAME_DESC
   RATE_LIMIT_SETTINGS_TABLE_ID_ASC
   RATE_LIMIT_SETTINGS_TABLE_ID_DESC
+  RATE_LIMIT_SETTINGS_TABLE_NAME_ASC
+  RATE_LIMIT_SETTINGS_TABLE_NAME_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
 }
@@ -21097,12 +21618,12 @@ Represents an update to a `RateLimitsModule`. Fields that are set will be update
 input RateLimitsModulePatch {
   databaseId: UUID
   id: UUID
-  ipRateLimitsTable: String
   ipRateLimitsTableId: UUID
-  rateLimitSettingsTable: String
+  ipRateLimitsTableName: String
   rateLimitSettingsTableId: UUID
-  rateLimitsTable: String
+  rateLimitSettingsTableName: String
   rateLimitsTableId: UUID
+  rateLimitsTableName: String
   schemaId: UUID
 }
 
@@ -21975,6 +22496,13 @@ type ResourceModule {
   entityField: String
   entityTableId: UUID
   id: UUID!
+  installationStoreName: String!
+
+  """
+  Reads a single `MerkleStoreModule` that is related to this `ResourceModule`.
+  """
+  merkleStoreModule: MerkleStoreModule
+  merkleStoreModuleId: UUID
 
   """
   Reads a single `NamespaceModule` that is related to this `ResourceModule`.
@@ -21990,14 +22518,22 @@ type ResourceModule {
   publicSchemaName: String
   requirementsStateViewName: String
   resolvedRequirementsViewName: String
+  resourceBillingRollupFunction: String!
   resourceDefinitionsTableId: UUID!
   resourceDefinitionsTableName: String!
   resourceEventsTableId: UUID!
   resourceEventsTableName: String!
+  resourceInstallationsTableId: UUID!
+  resourceInstallationsTableName: String!
   resourceStatusChecksTableId: UUID!
   resourceStatusChecksTableName: String!
+  resourceUsageLogTableId: UUID!
+  resourceUsageLogTableName: String!
+  resourceUsageSummaryTableId: UUID!
+  resourceUsageSummaryTableName: String!
   resourcesTableId: UUID!
   resourcesTableName: String!
+  rollupResourceUsageSummaryFunction: String!
   schemaId: UUID!
   scope: String!
 }
@@ -22053,6 +22589,18 @@ input ResourceModuleFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
+  """Filter by the object’s `installationStoreName` field."""
+  installationStoreName: StringFilter
+
+  """Filter by the object’s `merkleStoreModule` relation."""
+  merkleStoreModule: MerkleStoreModuleFilter
+
+  """A related `merkleStoreModule` exists."""
+  merkleStoreModuleExists: Boolean
+
+  """Filter by the object’s `merkleStoreModuleId` field."""
+  merkleStoreModuleId: UUIDFilter
+
   """Filter by the object’s `namespaceModule` relation."""
   namespaceModule: NamespaceModuleFilter
 
@@ -22095,6 +22643,9 @@ input ResourceModuleFilter {
   """Filter by the object’s `resolvedRequirementsViewName` field."""
   resolvedRequirementsViewName: StringFilter
 
+  """Filter by the object’s `resourceBillingRollupFunction` field."""
+  resourceBillingRollupFunction: StringFilter
+
   """Filter by the object’s `resourceDefinitionsTableId` field."""
   resourceDefinitionsTableId: UUIDFilter
 
@@ -22107,17 +22658,38 @@ input ResourceModuleFilter {
   """Filter by the object’s `resourceEventsTableName` field."""
   resourceEventsTableName: StringFilter
 
+  """Filter by the object’s `resourceInstallationsTableId` field."""
+  resourceInstallationsTableId: UUIDFilter
+
+  """Filter by the object’s `resourceInstallationsTableName` field."""
+  resourceInstallationsTableName: StringFilter
+
   """Filter by the object’s `resourceStatusChecksTableId` field."""
   resourceStatusChecksTableId: UUIDFilter
 
   """Filter by the object’s `resourceStatusChecksTableName` field."""
   resourceStatusChecksTableName: StringFilter
 
+  """Filter by the object’s `resourceUsageLogTableId` field."""
+  resourceUsageLogTableId: UUIDFilter
+
+  """Filter by the object’s `resourceUsageLogTableName` field."""
+  resourceUsageLogTableName: StringFilter
+
+  """Filter by the object’s `resourceUsageSummaryTableId` field."""
+  resourceUsageSummaryTableId: UUIDFilter
+
+  """Filter by the object’s `resourceUsageSummaryTableName` field."""
+  resourceUsageSummaryTableName: StringFilter
+
   """Filter by the object’s `resourcesTableId` field."""
   resourcesTableId: UUIDFilter
 
   """Filter by the object’s `resourcesTableName` field."""
   resourcesTableName: StringFilter
+
+  """Filter by the object’s `rollupResourceUsageSummaryFunction` field."""
+  rollupResourceUsageSummaryFunction: StringFilter
 
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
@@ -22134,6 +22706,8 @@ input ResourceModuleInput {
   entityField: String
   entityTableId: UUID
   id: UUID
+  installationStoreName: String
+  merkleStoreModuleId: UUID
   namespaceModuleId: UUID
   policies: JSON
   prefix: String
@@ -22144,14 +22718,22 @@ input ResourceModuleInput {
   publicSchemaName: String
   requirementsStateViewName: String
   resolvedRequirementsViewName: String
+  resourceBillingRollupFunction: String
   resourceDefinitionsTableId: UUID
   resourceDefinitionsTableName: String
   resourceEventsTableId: UUID
   resourceEventsTableName: String
+  resourceInstallationsTableId: UUID
+  resourceInstallationsTableName: String
   resourceStatusChecksTableId: UUID
   resourceStatusChecksTableName: String
+  resourceUsageLogTableId: UUID
+  resourceUsageLogTableName: String
+  resourceUsageSummaryTableId: UUID
+  resourceUsageSummaryTableName: String
   resourcesTableId: UUID
   resourcesTableName: String
+  rollupResourceUsageSummaryFunction: String
   schemaId: UUID
   scope: String
 }
@@ -22170,6 +22752,10 @@ enum ResourceModuleOrderBy {
   ENTITY_TABLE_ID_DESC
   ID_ASC
   ID_DESC
+  INSTALLATION_STORE_NAME_ASC
+  INSTALLATION_STORE_NAME_DESC
+  MERKLE_STORE_MODULE_ID_ASC
+  MERKLE_STORE_MODULE_ID_DESC
   NAMESPACE_MODULE_ID_ASC
   NAMESPACE_MODULE_ID_DESC
   NATURAL
@@ -22197,6 +22783,8 @@ enum ResourceModuleOrderBy {
   RESOURCES_TABLE_ID_DESC
   RESOURCES_TABLE_NAME_ASC
   RESOURCES_TABLE_NAME_DESC
+  RESOURCE_BILLING_ROLLUP_FUNCTION_ASC
+  RESOURCE_BILLING_ROLLUP_FUNCTION_DESC
   RESOURCE_DEFINITIONS_TABLE_ID_ASC
   RESOURCE_DEFINITIONS_TABLE_ID_DESC
   RESOURCE_DEFINITIONS_TABLE_NAME_ASC
@@ -22205,10 +22793,24 @@ enum ResourceModuleOrderBy {
   RESOURCE_EVENTS_TABLE_ID_DESC
   RESOURCE_EVENTS_TABLE_NAME_ASC
   RESOURCE_EVENTS_TABLE_NAME_DESC
+  RESOURCE_INSTALLATIONS_TABLE_ID_ASC
+  RESOURCE_INSTALLATIONS_TABLE_ID_DESC
+  RESOURCE_INSTALLATIONS_TABLE_NAME_ASC
+  RESOURCE_INSTALLATIONS_TABLE_NAME_DESC
   RESOURCE_STATUS_CHECKS_TABLE_ID_ASC
   RESOURCE_STATUS_CHECKS_TABLE_ID_DESC
   RESOURCE_STATUS_CHECKS_TABLE_NAME_ASC
   RESOURCE_STATUS_CHECKS_TABLE_NAME_DESC
+  RESOURCE_USAGE_LOG_TABLE_ID_ASC
+  RESOURCE_USAGE_LOG_TABLE_ID_DESC
+  RESOURCE_USAGE_LOG_TABLE_NAME_ASC
+  RESOURCE_USAGE_LOG_TABLE_NAME_DESC
+  RESOURCE_USAGE_SUMMARY_TABLE_ID_ASC
+  RESOURCE_USAGE_SUMMARY_TABLE_ID_DESC
+  RESOURCE_USAGE_SUMMARY_TABLE_NAME_ASC
+  RESOURCE_USAGE_SUMMARY_TABLE_NAME_DESC
+  ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_ASC
+  ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_DESC
   SCHEMA_ID_ASC
   SCHEMA_ID_DESC
   SCOPE_ASC
@@ -22225,6 +22827,8 @@ input ResourceModulePatch {
   entityField: String
   entityTableId: UUID
   id: UUID
+  installationStoreName: String
+  merkleStoreModuleId: UUID
   namespaceModuleId: UUID
   policies: JSON
   prefix: String
@@ -22235,14 +22839,22 @@ input ResourceModulePatch {
   publicSchemaName: String
   requirementsStateViewName: String
   resolvedRequirementsViewName: String
+  resourceBillingRollupFunction: String
   resourceDefinitionsTableId: UUID
   resourceDefinitionsTableName: String
   resourceEventsTableId: UUID
   resourceEventsTableName: String
+  resourceInstallationsTableId: UUID
+  resourceInstallationsTableName: String
   resourceStatusChecksTableId: UUID
   resourceStatusChecksTableName: String
+  resourceUsageLogTableId: UUID
+  resourceUsageLogTableName: String
+  resourceUsageSummaryTableId: UUID
+  resourceUsageSummaryTableName: String
   resourcesTableId: UUID
   resourcesTableName: String
+  rollupResourceUsageSummaryFunction: String
   schemaId: UUID
   scope: String
 }
@@ -22690,7 +23302,7 @@ type SessionSecretsModule {
   schemaId: UUID!
 
   """
-  Resolved reference to sessions_module.sessions_table, used to FK session_secrets.session_id with ON DELETE CASCADE.
+  Resolved reference to sessions_module.sessions_table_name, used to FK session_secrets.session_id with ON DELETE CASCADE.
   """
   sessionsTableId: UUID!
   tableId: UUID!
@@ -22764,7 +23376,7 @@ input SessionSecretsModuleInput {
   schemaId: UUID
 
   """
-  Resolved reference to sessions_module.sessions_table, used to FK session_secrets.session_id with ON DELETE CASCADE.
+  Resolved reference to sessions_module.sessions_table_name, used to FK session_secrets.session_id with ON DELETE CASCADE.
   """
   sessionsTableId: UUID
   tableId: UUID
@@ -22799,7 +23411,7 @@ input SessionSecretsModulePatch {
   schemaId: UUID
 
   """
-  Resolved reference to sessions_module.sessions_table, used to FK session_secrets.session_id with ON DELETE CASCADE.
+  Resolved reference to sessions_module.sessions_table_name, used to FK session_secrets.session_id with ON DELETE CASCADE.
   """
   sessionsTableId: UUID
   tableId: UUID
@@ -22807,16 +23419,16 @@ input SessionSecretsModulePatch {
 }
 
 type SessionsModule {
-  authSettingsTable: String!
   authSettingsTableId: UUID!
+  authSettingsTableName: String!
   databaseId: UUID!
   id: UUID!
   schemaId: UUID!
-  sessionCredentialsTable: String!
   sessionCredentialsTableId: UUID!
+  sessionCredentialsTableName: String!
   sessionsDefaultExpiration: Interval!
-  sessionsTable: String!
   sessionsTableId: UUID!
+  sessionsTableName: String!
   usersTableId: UUID!
 }
 
@@ -22853,11 +23465,11 @@ input SessionsModuleFilter {
   """Checks for all expressions in this list."""
   and: [SessionsModuleFilter!]
 
-  """Filter by the object’s `authSettingsTable` field."""
-  authSettingsTable: StringFilter
-
   """Filter by the object’s `authSettingsTableId` field."""
   authSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `authSettingsTableName` field."""
+  authSettingsTableName: StringFilter
 
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
@@ -22874,20 +23486,20 @@ input SessionsModuleFilter {
   """Filter by the object’s `schemaId` field."""
   schemaId: UUIDFilter
 
-  """Filter by the object’s `sessionCredentialsTable` field."""
-  sessionCredentialsTable: StringFilter
-
   """Filter by the object’s `sessionCredentialsTableId` field."""
   sessionCredentialsTableId: UUIDFilter
+
+  """Filter by the object’s `sessionCredentialsTableName` field."""
+  sessionCredentialsTableName: StringFilter
 
   """Filter by the object’s `sessionsDefaultExpiration` field."""
   sessionsDefaultExpiration: IntervalFilter
 
-  """Filter by the object’s `sessionsTable` field."""
-  sessionsTable: StringFilter
-
   """Filter by the object’s `sessionsTableId` field."""
   sessionsTableId: UUIDFilter
+
+  """Filter by the object’s `sessionsTableName` field."""
+  sessionsTableName: StringFilter
 
   """Filter by the object’s `usersTableId` field."""
   usersTableId: UUIDFilter
@@ -22895,25 +23507,25 @@ input SessionsModuleFilter {
 
 """An input for mutations affecting `SessionsModule`"""
 input SessionsModuleInput {
-  authSettingsTable: String
   authSettingsTableId: UUID
+  authSettingsTableName: String
   databaseId: UUID!
   id: UUID
   schemaId: UUID
-  sessionCredentialsTable: String
   sessionCredentialsTableId: UUID
+  sessionCredentialsTableName: String
   sessionsDefaultExpiration: IntervalInput
-  sessionsTable: String
   sessionsTableId: UUID
+  sessionsTableName: String
   usersTableId: UUID
 }
 
 """Methods to use when ordering `SessionsModule`."""
 enum SessionsModuleOrderBy {
-  AUTH_SETTINGS_TABLE_ASC
-  AUTH_SETTINGS_TABLE_DESC
   AUTH_SETTINGS_TABLE_ID_ASC
   AUTH_SETTINGS_TABLE_ID_DESC
+  AUTH_SETTINGS_TABLE_NAME_ASC
+  AUTH_SETTINGS_TABLE_NAME_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
   ID_ASC
@@ -22925,14 +23537,14 @@ enum SessionsModuleOrderBy {
   SCHEMA_ID_DESC
   SESSIONS_DEFAULT_EXPIRATION_ASC
   SESSIONS_DEFAULT_EXPIRATION_DESC
-  SESSIONS_TABLE_ASC
-  SESSIONS_TABLE_DESC
   SESSIONS_TABLE_ID_ASC
   SESSIONS_TABLE_ID_DESC
-  SESSION_CREDENTIALS_TABLE_ASC
-  SESSION_CREDENTIALS_TABLE_DESC
+  SESSIONS_TABLE_NAME_ASC
+  SESSIONS_TABLE_NAME_DESC
   SESSION_CREDENTIALS_TABLE_ID_ASC
   SESSION_CREDENTIALS_TABLE_ID_DESC
+  SESSION_CREDENTIALS_TABLE_NAME_ASC
+  SESSION_CREDENTIALS_TABLE_NAME_DESC
   USERS_TABLE_ID_ASC
   USERS_TABLE_ID_DESC
 }
@@ -22941,16 +23553,16 @@ enum SessionsModuleOrderBy {
 Represents an update to a `SessionsModule`. Fields that are set will be updated.
 """
 input SessionsModulePatch {
-  authSettingsTable: String
   authSettingsTableId: UUID
+  authSettingsTableName: String
   databaseId: UUID
   id: UUID
   schemaId: UUID
-  sessionCredentialsTable: String
   sessionCredentialsTableId: UUID
+  sessionCredentialsTableName: String
   sessionsDefaultExpiration: IntervalInput
-  sessionsTable: String
   sessionsTableId: UUID
+  sessionsTableName: String
   usersTableId: UUID
 }
 
@@ -22973,8 +23585,8 @@ type StorageLogModule {
   scope: String!
   storageLogTableId: UUID!
   storageLogTableName: String!
-  usageDailyTableId: UUID!
-  usageDailyTableName: String!
+  usageSummaryTableId: UUID!
+  usageSummaryTableName: String!
 }
 
 """A connection to a list of `StorageLogModule` values."""
@@ -23072,11 +23684,11 @@ input StorageLogModuleFilter {
   """Filter by the object’s `storageLogTableName` field."""
   storageLogTableName: StringFilter
 
-  """Filter by the object’s `usageDailyTableId` field."""
-  usageDailyTableId: UUIDFilter
+  """Filter by the object’s `usageSummaryTableId` field."""
+  usageSummaryTableId: UUIDFilter
 
-  """Filter by the object’s `usageDailyTableName` field."""
-  usageDailyTableName: StringFilter
+  """Filter by the object’s `usageSummaryTableName` field."""
+  usageSummaryTableName: StringFilter
 }
 
 """An input for mutations affecting `StorageLogModule`"""
@@ -23099,8 +23711,8 @@ input StorageLogModuleInput {
   scope: String
   storageLogTableId: UUID
   storageLogTableName: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 """Methods to use when ordering `StorageLogModule`."""
@@ -23144,10 +23756,10 @@ enum StorageLogModuleOrderBy {
   STORAGE_LOG_TABLE_ID_DESC
   STORAGE_LOG_TABLE_NAME_ASC
   STORAGE_LOG_TABLE_NAME_DESC
-  USAGE_DAILY_TABLE_ID_ASC
-  USAGE_DAILY_TABLE_ID_DESC
-  USAGE_DAILY_TABLE_NAME_ASC
-  USAGE_DAILY_TABLE_NAME_DESC
+  USAGE_SUMMARY_TABLE_ID_ASC
+  USAGE_SUMMARY_TABLE_ID_DESC
+  USAGE_SUMMARY_TABLE_NAME_ASC
+  USAGE_SUMMARY_TABLE_NAME_DESC
 }
 
 """
@@ -23172,8 +23784,8 @@ input StorageLogModulePatch {
   scope: String
   storageLogTableId: UUID
   storageLogTableName: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 type StorageModule {
@@ -23770,8 +24382,8 @@ type TransferLogModule {
   scope: String!
   transferLogTableId: UUID!
   transferLogTableName: String!
-  usageDailyTableId: UUID!
-  usageDailyTableName: String!
+  usageSummaryTableId: UUID!
+  usageSummaryTableName: String!
 }
 
 """A connection to a list of `TransferLogModule` values."""
@@ -23869,11 +24481,11 @@ input TransferLogModuleFilter {
   """Filter by the object’s `transferLogTableName` field."""
   transferLogTableName: StringFilter
 
-  """Filter by the object’s `usageDailyTableId` field."""
-  usageDailyTableId: UUIDFilter
+  """Filter by the object’s `usageSummaryTableId` field."""
+  usageSummaryTableId: UUIDFilter
 
-  """Filter by the object’s `usageDailyTableName` field."""
-  usageDailyTableName: StringFilter
+  """Filter by the object’s `usageSummaryTableName` field."""
+  usageSummaryTableName: StringFilter
 }
 
 """An input for mutations affecting `TransferLogModule`"""
@@ -23896,8 +24508,8 @@ input TransferLogModuleInput {
   scope: String
   transferLogTableId: UUID
   transferLogTableName: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 """Methods to use when ordering `TransferLogModule`."""
@@ -23941,10 +24553,10 @@ enum TransferLogModuleOrderBy {
   TRANSFER_LOG_TABLE_ID_DESC
   TRANSFER_LOG_TABLE_NAME_ASC
   TRANSFER_LOG_TABLE_NAME_DESC
-  USAGE_DAILY_TABLE_ID_ASC
-  USAGE_DAILY_TABLE_ID_DESC
-  USAGE_DAILY_TABLE_NAME_ASC
-  USAGE_DAILY_TABLE_NAME_DESC
+  USAGE_SUMMARY_TABLE_ID_ASC
+  USAGE_SUMMARY_TABLE_ID_DESC
+  USAGE_SUMMARY_TABLE_NAME_ASC
+  USAGE_SUMMARY_TABLE_NAME_DESC
 }
 
 """
@@ -23969,8 +24581,8 @@ input TransferLogModulePatch {
   scope: String
   transferLogTableId: UUID
   transferLogTableName: String
-  usageDailyTableId: UUID
-  usageDailyTableName: String
+  usageSummaryTableId: UUID
+  usageSummaryTableName: String
 }
 
 """
@@ -25148,6 +25760,44 @@ type UpdateHierarchyModulePayload {
     """The method to use when ordering `HierarchyModule`."""
     orderBy: [HierarchyModuleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): HierarchyModuleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateHttpRouteModule` mutation."""
+input UpdateHttpRouteModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `HttpRouteModule` being updated.
+  """
+  httpRouteModulePatch: HttpRouteModulePatch!
+  id: UUID!
+}
+
+"""The output of our update `HttpRouteModule` mutation."""
+type UpdateHttpRouteModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `HttpRouteModule` that was updated by this mutation."""
+  httpRouteModule: HttpRouteModule
+
+  """An edge for our `HttpRouteModule`. May be used by Relay 1."""
+  httpRouteModuleEdge(
+    """The method to use when ordering `HttpRouteModule`."""
+    orderBy: [HttpRouteModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): HttpRouteModuleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -26603,6 +27253,44 @@ type UpdateWebauthnCredentialsModulePayload {
   ): WebauthnCredentialsModuleEdge
 }
 
+"""All input for the `updateWebhookModule` mutation."""
+input UpdateWebhookModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `WebhookModule` being updated.
+  """
+  webhookModulePatch: WebhookModulePatch!
+}
+
+"""The output of our update `WebhookModule` mutation."""
+type UpdateWebhookModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `WebhookModule` that was updated by this mutation."""
+  webhookModule: WebhookModule
+
+  """An edge for our `WebhookModule`. May be used by Relay 1."""
+  webhookModuleEdge(
+    """The method to use when ordering `WebhookModule`."""
+    orderBy: [WebhookModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): WebhookModuleEdge
+}
+
 type UserAuthModule {
   apiName: String
   auditsTableId: UUID!
@@ -27707,4 +28395,292 @@ input WebauthnCredentialsModulePatch {
   schemaId: UUID
   tableId: UUID
   tableName: String
+}
+
+type WebhookModule {
+  apiName: String
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+
+  """
+  Reads a single `FunctionInvocationModule` that is related to this `WebhookModule`.
+  """
+  functionInvocationModule: FunctionInvocationModule
+  functionInvocationModuleId: UUID
+
+  """
+  Reads a single `FunctionModule` that is related to this `WebhookModule`.
+  """
+  functionModule: FunctionModule
+  functionModuleId: UUID
+  id: UUID!
+
+  """
+  Reads a single `InfraSecretsModule` that is related to this `WebhookModule`.
+  """
+  infraSecretsModule: InfraSecretsModule
+  infraSecretsModuleId: UUID
+
+  """
+  Reads a single `NamespaceModule` that is related to this `WebhookModule`.
+  """
+  namespaceModule: NamespaceModule
+  namespaceModuleId: UUID
+  policies: JSON
+  prefix: String!
+  privateApiName: String
+  privateSchemaId: UUID!
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID!
+  scope: String!
+  webhookEndpointsTableId: UUID!
+  webhookEndpointsTableName: String!
+  webhookEventsTableId: UUID!
+  webhookEventsTableName: String!
+}
+
+"""A connection to a list of `WebhookModule` values."""
+type WebhookModuleConnection {
+  """
+  A list of edges which contains the `WebhookModule` and cursor to aid in pagination.
+  """
+  edges: [WebhookModuleEdge]!
+
+  """A list of `WebhookModule` objects."""
+  nodes: [WebhookModule]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `WebhookModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `WebhookModule` edge in the connection."""
+type WebhookModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `WebhookModule` at the end of the edge."""
+  node: WebhookModule
+}
+
+"""
+A filter to be used against `WebhookModule` object types. All fields are combined with a logical ‘and.’
+"""
+input WebhookModuleFilter {
+  """Checks for all expressions in this list."""
+  and: [WebhookModuleFilter!]
+
+  """Filter by the object’s `apiName` field."""
+  apiName: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `defaultPermissions` field."""
+  defaultPermissions: StringListFilter
+
+  """Filter by the object’s `entityField` field."""
+  entityField: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `functionInvocationModule` relation."""
+  functionInvocationModule: FunctionInvocationModuleFilter
+
+  """A related `functionInvocationModule` exists."""
+  functionInvocationModuleExists: Boolean
+
+  """Filter by the object’s `functionInvocationModuleId` field."""
+  functionInvocationModuleId: UUIDFilter
+
+  """Filter by the object’s `functionModule` relation."""
+  functionModule: FunctionModuleFilter
+
+  """A related `functionModule` exists."""
+  functionModuleExists: Boolean
+
+  """Filter by the object’s `functionModuleId` field."""
+  functionModuleId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `infraSecretsModule` relation."""
+  infraSecretsModule: InfraSecretsModuleFilter
+
+  """A related `infraSecretsModule` exists."""
+  infraSecretsModuleExists: Boolean
+
+  """Filter by the object’s `infraSecretsModuleId` field."""
+  infraSecretsModuleId: UUIDFilter
+
+  """Filter by the object’s `namespaceModule` relation."""
+  namespaceModule: NamespaceModuleFilter
+
+  """A related `namespaceModule` exists."""
+  namespaceModuleExists: Boolean
+
+  """Filter by the object’s `namespaceModuleId` field."""
+  namespaceModuleId: UUIDFilter
+
+  """Negates the expression."""
+  not: WebhookModuleFilter
+
+  """Checks for any expressions in this list."""
+  or: [WebhookModuleFilter!]
+
+  """Filter by the object’s `policies` field."""
+  policies: JSONFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `privateApiName` field."""
+  privateApiName: StringFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaName` field."""
+  privateSchemaName: StringFilter
+
+  """Filter by the object’s `provisions` field."""
+  provisions: JSONFilter
+
+  """Filter by the object’s `publicSchemaName` field."""
+  publicSchemaName: StringFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `scope` field."""
+  scope: StringFilter
+
+  """Filter by the object’s `webhookEndpointsTableId` field."""
+  webhookEndpointsTableId: UUIDFilter
+
+  """Filter by the object’s `webhookEndpointsTableName` field."""
+  webhookEndpointsTableName: StringFilter
+
+  """Filter by the object’s `webhookEventsTableId` field."""
+  webhookEventsTableId: UUIDFilter
+
+  """Filter by the object’s `webhookEventsTableName` field."""
+  webhookEventsTableName: StringFilter
+}
+
+"""An input for mutations affecting `WebhookModule`"""
+input WebhookModuleInput {
+  apiName: String
+  databaseId: UUID!
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  functionInvocationModuleId: UUID
+  functionModuleId: UUID
+  id: UUID
+  infraSecretsModuleId: UUID
+  namespaceModuleId: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+  webhookEndpointsTableId: UUID
+  webhookEndpointsTableName: String
+  webhookEventsTableId: UUID
+  webhookEventsTableName: String
+}
+
+"""Methods to use when ordering `WebhookModule`."""
+enum WebhookModuleOrderBy {
+  API_NAME_ASC
+  API_NAME_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEFAULT_PERMISSIONS_ASC
+  DEFAULT_PERMISSIONS_DESC
+  ENTITY_FIELD_ASC
+  ENTITY_FIELD_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  FUNCTION_INVOCATION_MODULE_ID_ASC
+  FUNCTION_INVOCATION_MODULE_ID_DESC
+  FUNCTION_MODULE_ID_ASC
+  FUNCTION_MODULE_ID_DESC
+  ID_ASC
+  ID_DESC
+  INFRA_SECRETS_MODULE_ID_ASC
+  INFRA_SECRETS_MODULE_ID_DESC
+  NAMESPACE_MODULE_ID_ASC
+  NAMESPACE_MODULE_ID_DESC
+  NATURAL
+  POLICIES_ASC
+  POLICIES_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRIVATE_API_NAME_ASC
+  PRIVATE_API_NAME_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_NAME_ASC
+  PRIVATE_SCHEMA_NAME_DESC
+  PROVISIONS_ASC
+  PROVISIONS_DESC
+  PUBLIC_SCHEMA_NAME_ASC
+  PUBLIC_SCHEMA_NAME_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  SCOPE_ASC
+  SCOPE_DESC
+  WEBHOOK_ENDPOINTS_TABLE_ID_ASC
+  WEBHOOK_ENDPOINTS_TABLE_ID_DESC
+  WEBHOOK_ENDPOINTS_TABLE_NAME_ASC
+  WEBHOOK_ENDPOINTS_TABLE_NAME_DESC
+  WEBHOOK_EVENTS_TABLE_ID_ASC
+  WEBHOOK_EVENTS_TABLE_ID_DESC
+  WEBHOOK_EVENTS_TABLE_NAME_ASC
+  WEBHOOK_EVENTS_TABLE_NAME_DESC
+}
+
+"""
+Represents an update to a `WebhookModule`. Fields that are set will be updated.
+"""
+input WebhookModulePatch {
+  apiName: String
+  databaseId: UUID
+  defaultPermissions: [String]
+  entityField: String
+  entityTableId: UUID
+  functionInvocationModuleId: UUID
+  functionModuleId: UUID
+  id: UUID
+  infraSecretsModuleId: UUID
+  namespaceModuleId: UUID
+  policies: JSON
+  prefix: String
+  privateApiName: String
+  privateSchemaId: UUID
+  privateSchemaName: String
+  provisions: JSON
+  publicSchemaName: String
+  schemaId: UUID
+  scope: String
+  webhookEndpointsTableId: UUID
+  webhookEndpointsTableName: String
+  webhookEventsTableId: UUID
+  webhookEventsTableName: String
 }

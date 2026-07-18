@@ -17,12 +17,12 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   databaseId: 'uuid',
-  deviceSettingsTable: 'string',
   deviceSettingsTableId: 'uuid',
+  deviceSettingsTableName: 'string',
   id: 'uuid',
   schemaId: 'uuid',
-  userDevicesTable: 'string',
   userDevicesTableId: 'uuid',
+  userDevicesTableName: 'string',
 };
 const usage =
   '\ndevices-module <command>\n\nCommands:\n  list                  List devicesModule records\n  find-first            Find first matching devicesModule record\n  get                   Get a devicesModule by ID\n  create                Create a new devicesModule\n  update                Update an existing devicesModule\n  delete                Delete a devicesModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -76,12 +76,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       databaseId: true,
-      deviceSettingsTable: true,
       deviceSettingsTableId: true,
+      deviceSettingsTableName: true,
       id: true,
       schemaId: true,
-      userDevicesTable: true,
       userDevicesTableId: true,
+      userDevicesTableName: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy> & {
@@ -103,12 +103,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       databaseId: true,
-      deviceSettingsTable: true,
       deviceSettingsTableId: true,
+      deviceSettingsTableName: true,
       id: true,
       schemaId: true,
-      userDevicesTable: true,
       userDevicesTableId: true,
+      userDevicesTableName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<DevicesModuleSelect, DevicesModuleFilter, DevicesModuleOrderBy> & {
@@ -142,12 +142,12 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           databaseId: true,
-          deviceSettingsTable: true,
           deviceSettingsTableId: true,
+          deviceSettingsTableName: true,
           id: true,
           schemaId: true,
-          userDevicesTable: true,
           userDevicesTableId: true,
+          userDevicesTableName: true,
         },
       })
       .execute();
@@ -171,15 +171,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'deviceSettingsTable',
-        message: 'deviceSettingsTable',
+        name: 'deviceSettingsTableId',
+        message: 'deviceSettingsTableId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'deviceSettingsTableId',
-        message: 'deviceSettingsTableId',
+        name: 'deviceSettingsTableName',
+        message: 'deviceSettingsTableName',
         required: false,
         skipPrompt: true,
       },
@@ -192,15 +192,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'userDevicesTable',
-        message: 'userDevicesTable',
+        name: 'userDevicesTableId',
+        message: 'userDevicesTableId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'userDevicesTableId',
-        message: 'userDevicesTableId',
+        name: 'userDevicesTableName',
+        message: 'userDevicesTableName',
         required: false,
         skipPrompt: true,
       },
@@ -215,20 +215,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          deviceSettingsTable: cleanedData.deviceSettingsTable,
           deviceSettingsTableId: cleanedData.deviceSettingsTableId,
+          deviceSettingsTableName: cleanedData.deviceSettingsTableName,
           schemaId: cleanedData.schemaId,
-          userDevicesTable: cleanedData.userDevicesTable,
           userDevicesTableId: cleanedData.userDevicesTableId,
+          userDevicesTableName: cleanedData.userDevicesTableName,
         },
         select: {
           databaseId: true,
-          deviceSettingsTable: true,
           deviceSettingsTableId: true,
+          deviceSettingsTableName: true,
           id: true,
           schemaId: true,
-          userDevicesTable: true,
           userDevicesTableId: true,
+          userDevicesTableName: true,
         },
       })
       .execute();
@@ -258,15 +258,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'deviceSettingsTable',
-        message: 'deviceSettingsTable',
+        name: 'deviceSettingsTableId',
+        message: 'deviceSettingsTableId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'deviceSettingsTableId',
-        message: 'deviceSettingsTableId',
+        name: 'deviceSettingsTableName',
+        message: 'deviceSettingsTableName',
         required: false,
         skipPrompt: true,
       },
@@ -279,15 +279,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'userDevicesTable',
-        message: 'userDevicesTable',
+        name: 'userDevicesTableId',
+        message: 'userDevicesTableId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'userDevicesTableId',
-        message: 'userDevicesTableId',
+        name: 'userDevicesTableName',
+        message: 'userDevicesTableName',
         required: false,
         skipPrompt: true,
       },
@@ -302,20 +302,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          deviceSettingsTable: cleanedData.deviceSettingsTable,
           deviceSettingsTableId: cleanedData.deviceSettingsTableId,
+          deviceSettingsTableName: cleanedData.deviceSettingsTableName,
           schemaId: cleanedData.schemaId,
-          userDevicesTable: cleanedData.userDevicesTable,
           userDevicesTableId: cleanedData.userDevicesTableId,
+          userDevicesTableName: cleanedData.userDevicesTableName,
         },
         select: {
           databaseId: true,
-          deviceSettingsTable: true,
           deviceSettingsTableId: true,
+          deviceSettingsTableName: true,
           id: true,
           schemaId: true,
-          userDevicesTable: true,
           userDevicesTableId: true,
+          userDevicesTableName: true,
         },
       })
       .execute();

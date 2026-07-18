@@ -872,35 +872,6 @@ type CreateEmailPayload {
   query: Query
 }
 
-"""All input for the create `IdentityProvider` mutation."""
-input CreateIdentityProviderInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `IdentityProvider` to be created by this mutation."""
-  identityProvider: IdentityProviderInput!
-}
-
-"""The output of our create `IdentityProvider` mutation."""
-type CreateIdentityProviderPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `IdentityProvider` that was created by this mutation."""
-  identityProvider: IdentityProvider
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the `createOrgApiKey` mutation."""
 input CreateOrgApiKeyInput {
   accessLevel: String
@@ -915,35 +886,6 @@ input CreateOrgApiKeyInput {
   mfaLevel: String
   orgId: UUID
   principalId: UUID
-}
-
-"""All input for the create `OrgApiKeyList` mutation."""
-input CreateOrgApiKeyListInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgApiKeyList` to be created by this mutation."""
-  orgApiKeyList: OrgApiKeyListInput!
-}
-
-"""The output of our create `OrgApiKeyList` mutation."""
-type CreateOrgApiKeyListPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgApiKeyList` that was created by this mutation."""
-  orgApiKeyList: OrgApiKeyList
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 }
 
 """The output of our `createOrgApiKey` mutation."""
@@ -1130,35 +1072,6 @@ type CreateRoleTypePayload {
     """The method to use when ordering `RoleType`."""
     orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RoleTypeEdge
-}
-
-"""All input for the create `UserConnectedAccount` mutation."""
-input CreateUserConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `UserConnectedAccount` to be created by this mutation."""
-  userConnectedAccount: UserConnectedAccountInput!
-}
-
-"""The output of our create `UserConnectedAccount` mutation."""
-type CreateUserConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `UserConnectedAccount` that was created by this mutation."""
-  userConnectedAccount: UserConnectedAccount
 }
 
 """All input for the create `User` mutation."""
@@ -2104,14 +2017,6 @@ input IdentityProviderFilter {
   slug: StringFilter
 }
 
-"""An input for mutations affecting `IdentityProvider`"""
-input IdentityProviderInput {
-  displayName: String
-  enabled: Boolean
-  kind: String
-  slug: String
-}
-
 """Methods to use when ordering `IdentityProvider`."""
 enum IdentityProviderOrderBy {
   DISPLAY_NAME_ASC
@@ -2635,28 +2540,12 @@ type Mutation {
     """
     input: CreateEmailInput!
   ): CreateEmailPayload
-
-  """Creates a single `IdentityProvider`."""
-  createIdentityProvider(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateIdentityProviderInput!
-  ): CreateIdentityProviderPayload
   createOrgApiKey(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: CreateOrgApiKeyInput!
   ): CreateOrgApiKeyPayload
-
-  """Creates a single `OrgApiKeyList`."""
-  createOrgApiKeyList(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgApiKeyListInput!
-  ): CreateOrgApiKeyListPayload
   createOrgPrincipal(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2701,14 +2590,6 @@ type Mutation {
     """
     input: CreateUserInput!
   ): CreateUserPayload
-
-  """Creates a single `UserConnectedAccount`."""
-  createUserConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateUserConnectedAccountInput!
-  ): CreateUserConnectedAccountPayload
 
   """Creates a single `WebauthnCredential`."""
   createWebauthnCredential(
@@ -3093,22 +2974,6 @@ input OrgApiKeyListFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `OrgApiKeyList`"""
-input OrgApiKeyListInput {
-  accessLevel: String
-  createdAt: Datetime
-  expiresAt: Datetime
-  id: UUID
-  keyId: String
-  lastUsedAt: Datetime
-  mfaLevel: String
-  name: String
-  orgId: UUID
-  principalId: UUID
-  revokedAt: Datetime
-  updatedAt: Datetime
 }
 
 """Methods to use when ordering `OrgApiKeyList`."""
@@ -4425,6 +4290,35 @@ type RevokeSessionPayload {
 type RoleType {
   id: Int!
   name: String!
+
+  """Reads and enables pagination through a set of `User`."""
+  usersByType(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `User`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UserFilter
+  ): UserConnection!
 }
 
 """A connection to a list of `RoleType` values."""
@@ -4471,6 +4365,12 @@ input RoleTypeFilter {
 
   """Checks for any expressions in this list."""
   or: [RoleTypeFilter!]
+
+  """Filter by the object’s `usersByType` relation."""
+  usersByType: RoleTypeToManyUserFilter
+
+  """`usersByType` exist."""
+  usersByTypeExist: Boolean
 }
 
 """An input for mutations affecting `RoleType`"""
@@ -4496,6 +4396,20 @@ Represents an update to a `RoleType`. Fields that are set will be updated.
 input RoleTypePatch {
   id: Int
   name: String
+}
+
+"""
+A filter to be used against many `User` object types. All fields are combined with a logical ‘and.’
+"""
+input RoleTypeToManyUserFilter {
+  """Filters to entities where every related entity matches."""
+  every: UserFilter
+
+  """Filters to entities where no related entity matches."""
+  none: UserFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: UserFilter
 }
 
 """All input for the `sendAccountDeletionEmail` mutation."""
@@ -5615,6 +5529,35 @@ type User {
     where: PhoneNumberFilter
   ): PhoneNumberConnection!
 
+  """Reads and enables pagination through a set of `PrincipalEntity`."""
+  ownedPrincipalEntities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PrincipalEntity`."""
+    orderBy: [PrincipalEntityOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PrincipalEntityFilter
+  ): PrincipalEntityConnection!
+
   """Reads and enables pagination through a set of `Principal`."""
   ownedPrincipals(
     """Read all values in the set after (below) this cursor."""
@@ -5827,18 +5770,6 @@ input UserConnectedAccountFilter {
   updatedAt: DatetimeFilter
 }
 
-"""An input for mutations affecting `UserConnectedAccount`"""
-input UserConnectedAccountInput {
-  createdAt: Datetime
-  details: JSON
-  id: UUID
-  identifier: String
-  isVerified: Boolean
-  ownerId: UUID
-  service: String
-  updatedAt: Datetime
-}
-
 """Methods to use when ordering `UserConnectedAccount`."""
 enum UserConnectedAccountOrderBy {
   CREATED_AT_ASC
@@ -5931,6 +5862,12 @@ input UserFilter {
 
   """`ownedPhoneNumbers` exist."""
   ownedPhoneNumbersExist: Boolean
+
+  """Filter by the object’s `ownedPrincipalEntities` relation."""
+  ownedPrincipalEntities: UserToManyPrincipalEntityFilter
+
+  """`ownedPrincipalEntities` exist."""
+  ownedPrincipalEntitiesExist: Boolean
 
   """Filter by the object’s `ownedPrincipals` relation."""
   ownedPrincipals: UserToManyPrincipalFilter

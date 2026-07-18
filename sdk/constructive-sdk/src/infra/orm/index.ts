@@ -6,13 +6,13 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { DbPresetModel } from './models/dbPreset';
-import { InfraCommitModel } from './models/infraCommit';
-import { InfraGetAllRecordModel } from './models/infraGetAllRecord';
-import { InfraObjectModel } from './models/infraObject';
-import { InfraRefModel } from './models/infraRef';
-import { InfraStoreModel } from './models/infraStore';
 import { NamespaceModel } from './models/namespace';
 import { NamespaceEventModel } from './models/namespaceEvent';
+import { PlatformInfraCommitModel } from './models/platformInfraCommit';
+import { PlatformInfraGetAllTreeNodesRecordModel } from './models/platformInfraGetAllTreeNodesRecord';
+import { PlatformInfraObjectModel } from './models/platformInfraObject';
+import { PlatformInfraRefModel } from './models/platformInfraRef';
+import { PlatformInfraStoreModel } from './models/platformInfraStore';
 import { PlatformNamespaceModel } from './models/platformNamespace';
 import { PlatformNamespaceEventModel } from './models/platformNamespaceEvent';
 import { createMutationOperations } from './mutation';
@@ -49,13 +49,13 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     dbPreset: new DbPresetModel(client),
-    infraCommit: new InfraCommitModel(client),
-    infraGetAllRecord: new InfraGetAllRecordModel(client),
-    infraObject: new InfraObjectModel(client),
-    infraRef: new InfraRefModel(client),
-    infraStore: new InfraStoreModel(client),
     namespace: new NamespaceModel(client),
     namespaceEvent: new NamespaceEventModel(client),
+    platformInfraCommit: new PlatformInfraCommitModel(client),
+    platformInfraGetAllTreeNodesRecord: new PlatformInfraGetAllTreeNodesRecordModel(client),
+    platformInfraObject: new PlatformInfraObjectModel(client),
+    platformInfraRef: new PlatformInfraRefModel(client),
+    platformInfraStore: new PlatformInfraStoreModel(client),
     platformNamespace: new PlatformNamespaceModel(client),
     platformNamespaceEvent: new PlatformNamespaceEventModel(client),
     mutation: createMutationOperations(client),

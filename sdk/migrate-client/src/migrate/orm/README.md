@@ -21,40 +21,50 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
-| `migrateFile` | findMany, findOne, create, update, delete |
+| `astMigration` | findMany, findOne, create, update, delete |
 | `sqlAction` | findMany, findOne, create, update, delete |
 
 ## Table Operations
 
-### `db.migrateFile`
+### `db.astMigration`
 
-CRUD operations for MigrateFile records.
+CRUD operations for AstMigration records.
 
 **Fields:**
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `actionId` | UUID | Yes |
+| `actionName` | String | Yes |
+| `actorId` | UUID | Yes |
+| `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `id` | UUID | No |
-| `upload` | ConstructiveInternalTypeUpload | Yes |
+| `deploy` | JSON | Yes |
+| `deploys` | String | Yes |
+| `id` | Int | No |
+| `name` | String | Yes |
+| `payload` | JSON | Yes |
+| `requires` | String | Yes |
+| `revert` | JSON | Yes |
+| `verify` | JSON | Yes |
 
 **Operations:**
 
 ```typescript
-// List all migrateFile records
-const items = await db.migrateFile.findMany({ select: { databaseId: true, id: true, upload: true } }).execute();
+// List all astMigration records
+const items = await db.astMigration.findMany({ select: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } }).execute();
 
 // Get one by id
-const item = await db.migrateFile.findOne({ id: '<UUID>', select: { databaseId: true, id: true, upload: true } }).execute();
+const item = await db.astMigration.findOne({ id: '<Int>', select: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } }).execute();
 
 // Create
-const created = await db.migrateFile.create({ data: { databaseId: '<UUID>', upload: '<Upload>' }, select: { id: true } }).execute();
+const created = await db.astMigration.create({ data: { actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.migrateFile.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.astMigration.update({ where: { id: '<Int>' }, data: { actionId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.migrateFile.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.astMigration.delete({ where: { id: '<Int>' } }).execute();
 ```
 
 ### `db.sqlAction`
@@ -65,10 +75,9 @@ CRUD operations for SqlAction records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `action` | String | Yes |
 | `actionId` | UUID | Yes |
+| `actionName` | String | Yes |
 | `actorId` | UUID | Yes |
-| `category` | String | Yes |
 | `content` | String | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
@@ -84,37 +93,22 @@ CRUD operations for SqlAction records.
 
 ```typescript
 // List all sqlAction records
-const items = await db.sqlAction.findMany({ select: { action: true, actionId: true, actorId: true, category: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
+const items = await db.sqlAction.findMany({ select: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
 
 // Get one by id
-const item = await db.sqlAction.findOne({ id: '<Int>', select: { action: true, actionId: true, actorId: true, category: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
+const item = await db.sqlAction.findOne({ id: '<Int>', select: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
 
 // Create
-const created = await db.sqlAction.create({ data: { action: '<String>', actionId: '<UUID>', actorId: '<UUID>', category: '<String>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' }, select: { id: true } }).execute();
+const created = await db.sqlAction.create({ data: { actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { action: '<String>' }, select: { id: true } }).execute();
+const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { actionId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.sqlAction.delete({ where: { id: '<Int>' } }).execute();
 ```
 
 ## Custom Operations
-
-### `db.mutation.executeSql`
-
-executeSql
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ExecuteSqlInput (required) |
-
-```typescript
-const result = await db.mutation.executeSql({ input: { stmt: '<String>' } }).execute();
-```
 
 ### `db.mutation.provisionBucket`
 
@@ -132,21 +126,6 @@ and lifecycle settings.
 
 ```typescript
 const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.runMigration`
-
-runMigration
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RunMigrationInput (required) |
-
-```typescript
-const result = await db.mutation.runMigration({ input: { databaseId: '<UUID>', kind: '<String>', migration: '<Int>' } }).execute();
 ```
 
 ---

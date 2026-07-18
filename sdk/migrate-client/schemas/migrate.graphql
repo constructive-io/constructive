@@ -1,130 +1,127 @@
-scalar ConstructiveInternalTypeUpload
+type AstMigration {
+  actionId: UUID
+  actionName: String
+  actorId: UUID
+  createdAt: Datetime
+  databaseId: UUID
+  deploy: JSON
+  deploys: String
+  id: Int
+  name: String
+  payload: JSON
+  requires: [String]
+  revert: JSON
+  verify: JSON
+}
+
+"""A connection to a list of `AstMigration` values."""
+type AstMigrationConnection {
+  """
+  A list of edges which contains the `AstMigration` and cursor to aid in pagination.
+  """
+  edges: [AstMigrationEdge]!
+
+  """A list of `AstMigration` objects."""
+  nodes: [AstMigration]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AstMigration` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `AstMigration` edge in the connection."""
+type AstMigrationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AstMigration` at the end of the edge."""
+  node: AstMigration
+}
 
 """
-A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’
+A filter to be used against `AstMigration` object types. All fields are combined with a logical ‘and.’
 """
-input ConstructiveInternalTypeUploadFilter {
-  """Contained by the specified JSON."""
-  containedBy: ConstructiveInternalTypeUpload
+input AstMigrationFilter {
+  """Filter by the object’s `actionId` field."""
+  actionId: UUIDFilter
 
-  """Contains the specified JSON."""
-  contains: ConstructiveInternalTypeUpload
+  """Filter by the object’s `actionName` field."""
+  actionName: StringFilter
 
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
 
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
+  """Checks for all expressions in this list."""
+  and: [AstMigrationFilter!]
 
-  """Contains the specified key."""
-  containsKey: String
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
 
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: ConstructiveInternalTypeUpload
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
 
-  """Equal to the specified value."""
-  equalTo: ConstructiveInternalTypeUpload
+  """Filter by the object’s `deploy` field."""
+  deploy: JSONFilter
 
-  """Greater than the specified value."""
-  greaterThan: ConstructiveInternalTypeUpload
+  """Filter by the object’s `deploys` field."""
+  deploys: StringFilter
 
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: ConstructiveInternalTypeUpload
+  """Filter by the object’s `id` field."""
+  id: IntFilter
 
-  """Included in the specified list."""
-  in: [ConstructiveInternalTypeUpload!]
+  """Filter by the object’s `name` field."""
+  name: StringFilter
 
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
+  """Negates the expression."""
+  not: AstMigrationFilter
 
-  """Less than the specified value."""
-  lessThan: ConstructiveInternalTypeUpload
+  """Checks for any expressions in this list."""
+  or: [AstMigrationFilter!]
 
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: ConstructiveInternalTypeUpload
+  """Filter by the object’s `payload` field."""
+  payload: JSONFilter
 
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: ConstructiveInternalTypeUpload
+  """Filter by the object’s `requires` field."""
+  requires: StringListFilter
 
-  """Not equal to the specified value."""
-  notEqualTo: ConstructiveInternalTypeUpload
+  """Filter by the object’s `revert` field."""
+  revert: JSONFilter
 
-  """Not included in the specified list."""
-  notIn: [ConstructiveInternalTypeUpload!]
+  """Filter by the object’s `verify` field."""
+  verify: JSONFilter
 }
 
-"""All input for the create `MigrateFile` mutation."""
-input CreateMigrateFileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` to be created by this mutation."""
-  migrateFile: MigrateFileInput!
-}
-
-"""The output of our create `MigrateFile` mutation."""
-type CreateMigrateFilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` that was created by this mutation."""
-  migrateFile: MigrateFile
-
-  """An edge for our `MigrateFile`. May be used by Relay 1."""
-  migrateFileEdge(
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MigrateFileEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `SqlAction` mutation."""
-input CreateSqlActionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `SqlAction` to be created by this mutation."""
-  sqlAction: SqlActionInput!
-}
-
-"""The output of our create `SqlAction` mutation."""
-type CreateSqlActionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `SqlAction` that was created by this mutation."""
-  sqlAction: SqlAction
-
-  """An edge for our `SqlAction`. May be used by Relay 1."""
-  sqlActionEdge(
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SqlActionEdge
+"""Methods to use when ordering `AstMigration`."""
+enum AstMigrationOrderBy {
+  ACTION_ID_ASC
+  ACTION_ID_DESC
+  ACTION_NAME_ASC
+  ACTION_NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEPLOYS_ASC
+  DEPLOYS_DESC
+  DEPLOY_ASC
+  DEPLOY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PAYLOAD_ASC
+  PAYLOAD_DESC
+  REQUIRES_ASC
+  REQUIRES_DESC
+  REVERT_ASC
+  REVERT_DESC
+  VERIFY_ASC
+  VERIFY_DESC
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -181,96 +178,6 @@ input DatetimeFilter {
   notIn: [Datetime!]
 }
 
-"""All input for the `deleteMigrateFile` mutation."""
-input DeleteMigrateFileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `MigrateFile` mutation."""
-type DeleteMigrateFilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` that was deleted by this mutation."""
-  migrateFile: MigrateFile
-
-  """An edge for our `MigrateFile`. May be used by Relay 1."""
-  migrateFileEdge(
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MigrateFileEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deleteSqlAction` mutation."""
-input DeleteSqlActionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
-"""The output of our delete `SqlAction` mutation."""
-type DeleteSqlActionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `SqlAction` that was deleted by this mutation."""
-  sqlAction: SqlAction
-
-  """An edge for our `SqlAction`. May be used by Relay 1."""
-  sqlActionEdge(
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SqlActionEdge
-}
-
-"""All input for the `executeSql` mutation."""
-input ExecuteSqlInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  stmt: String
-}
-
-"""The output of our `executeSql` mutation."""
-type ExecuteSqlPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """
 A filter to be used against Int fields. All fields are combined with a logical ‘and.’
 """
@@ -317,6 +224,63 @@ input IntFilter {
 Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """Contained by the specified JSON."""
+  containedBy: JSON
+
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
+}
 
 """A belongs-to (forward FK) relation"""
 type MetaBelongsToRelation {
@@ -564,135 +528,10 @@ type MetaUniqueConstraint {
   name: String!
 }
 
-type MigrateFile {
-  databaseId: UUID
-  id: UUID!
-  upload: ConstructiveInternalTypeUpload
-}
-
-"""A connection to a list of `MigrateFile` values."""
-type MigrateFileConnection {
-  """
-  A list of edges which contains the `MigrateFile` and cursor to aid in pagination.
-  """
-  edges: [MigrateFileEdge]!
-
-  """A list of `MigrateFile` objects."""
-  nodes: [MigrateFile]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `MigrateFile` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `MigrateFile` edge in the connection."""
-type MigrateFileEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `MigrateFile` at the end of the edge."""
-  node: MigrateFile
-}
-
-"""
-A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’
-"""
-input MigrateFileFilter {
-  """Checks for all expressions in this list."""
-  and: [MigrateFileFilter!]
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Negates the expression."""
-  not: MigrateFileFilter
-
-  """Checks for any expressions in this list."""
-  or: [MigrateFileFilter!]
-
-  """Filter by the object’s `upload` field."""
-  upload: ConstructiveInternalTypeUploadFilter
-}
-
-"""An input for mutations affecting `MigrateFile`"""
-input MigrateFileInput {
-  databaseId: UUID
-  id: UUID
-  upload: ConstructiveInternalTypeUpload
-}
-
-"""Methods to use when ordering `MigrateFile`."""
-enum MigrateFileOrderBy {
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  ID_ASC
-  ID_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  UPLOAD_ASC
-  UPLOAD_DESC
-}
-
-"""
-Represents an update to a `MigrateFile`. Fields that are set will be updated.
-"""
-input MigrateFilePatch {
-  databaseId: UUID
-  id: UUID
-  upload: ConstructiveInternalTypeUpload
-
-  """File upload for the `upload` field."""
-  uploadUpload: Upload
-}
-
 """
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
-  """Creates a single `MigrateFile`."""
-  createMigrateFile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMigrateFileInput!
-  ): CreateMigrateFilePayload
-
-  """Creates a single `SqlAction`."""
-  createSqlAction(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateSqlActionInput!
-  ): CreateSqlActionPayload
-
-  """Deletes a single `MigrateFile` using a unique key."""
-  deleteMigrateFile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMigrateFileInput!
-  ): DeleteMigrateFilePayload
-
-  """Deletes a single `SqlAction` using a unique key."""
-  deleteSqlAction(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteSqlActionInput!
-  ): DeleteSqlActionPayload
-  executeSql(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ExecuteSqlInput!
-  ): ExecuteSqlPayload
-
   """
   Provision an S3 bucket for a logical bucket in the database.
   Reads the bucket config via RLS, then creates and configures
@@ -705,28 +544,6 @@ type Mutation {
     """
     input: ProvisionBucketInput!
   ): ProvisionBucketPayload
-  runMigration(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: RunMigrationInput!
-  ): RunMigrationPayload
-
-  """Updates a single `MigrateFile` using a unique key and a patch."""
-  updateMigrateFile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMigrateFileInput!
-  ): UpdateMigrateFilePayload
-
-  """Updates a single `SqlAction` using a unique key and a patch."""
-  updateSqlAction(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateSqlActionInput!
-  ): UpdateSqlActionPayload
 }
 
 """Information about pagination in a connection."""
@@ -782,8 +599,8 @@ type Query {
   """
   _meta: MetaSchema
 
-  """Reads and enables pagination through a set of `MigrateFile`."""
-  migrateFiles(
+  """Reads and enables pagination through a set of `AstMigration`."""
+  astMigrations(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -802,14 +619,14 @@ type Query {
     """
     offset: Int
 
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `AstMigration`."""
+    orderBy: [AstMigrationOrderBy!] = [NATURAL]
 
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: MigrateFileFilter
-  ): MigrateFileConnection
+    where: AstMigrationFilter
+  ): AstMigrationConnection
 
   """Reads and enables pagination through a set of `SqlAction`."""
   sqlActions(
@@ -832,7 +649,7 @@ type Query {
     offset: Int
 
     """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [SqlActionOrderBy!] = [NATURAL]
 
     """
     A filter to be used in determining which values should be returned by the collection.
@@ -841,43 +658,16 @@ type Query {
   ): SqlActionConnection
 }
 
-"""All input for the `runMigration` mutation."""
-input RunMigrationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  databaseId: UUID
-  kind: String
-  migration: Int
-}
-
-"""The output of our `runMigration` mutation."""
-type RunMigrationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 type SqlAction {
-  action: String
   actionId: UUID
+  actionName: String
   actorId: UUID
-  category: String
   content: String
   createdAt: Datetime
   databaseId: UUID
   deploy: String
   deps: [String]
-  id: Int!
+  id: Int
   name: String
   payload: JSON
   revert: String
@@ -914,20 +704,17 @@ type SqlActionEdge {
 A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’
 """
 input SqlActionFilter {
-  """Filter by the object’s `action` field."""
-  action: StringFilter
-
   """Filter by the object’s `actionId` field."""
   actionId: UUIDFilter
+
+  """Filter by the object’s `actionName` field."""
+  actionName: StringFilter
 
   """Filter by the object’s `actorId` field."""
   actorId: UUIDFilter
 
   """Checks for all expressions in this list."""
   and: [SqlActionFilter!]
-
-  """Filter by the object’s `category` field."""
-  category: StringFilter
 
   """Filter by the object’s `content` field."""
   content: StringFilter
@@ -963,34 +750,14 @@ input SqlActionFilter {
   verify: StringFilter
 }
 
-"""An input for mutations affecting `SqlAction`"""
-input SqlActionInput {
-  action: String
-  actionId: UUID
-  actorId: UUID
-  category: String
-  content: String
-  createdAt: Datetime
-  databaseId: UUID
-  deploy: String
-  deps: [String]
-  id: Int
-  name: String
-  payload: JSON
-  revert: String
-  verify: String
-}
-
 """Methods to use when ordering `SqlAction`."""
 enum SqlActionOrderBy {
-  ACTION_ASC
-  ACTION_DESC
   ACTION_ID_ASC
   ACTION_ID_DESC
+  ACTION_NAME_ASC
+  ACTION_NAME_DESC
   ACTOR_ID_ASC
   ACTOR_ID_DESC
-  CATEGORY_ASC
-  CATEGORY_DESC
   CONTENT_ASC
   CONTENT_DESC
   CREATED_AT_ASC
@@ -1008,32 +775,10 @@ enum SqlActionOrderBy {
   NATURAL
   PAYLOAD_ASC
   PAYLOAD_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
   REVERT_ASC
   REVERT_DESC
   VERIFY_ASC
   VERIFY_DESC
-}
-
-"""
-Represents an update to a `SqlAction`. Fields that are set will be updated.
-"""
-input SqlActionPatch {
-  action: String
-  actionId: UUID
-  actorId: UUID
-  category: String
-  content: String
-  createdAt: Datetime
-  databaseId: UUID
-  deploy: String
-  deps: [String]
-  id: Int
-  name: String
-  payload: JSON
-  revert: String
-  verify: String
 }
 
 """
@@ -1277,82 +1022,3 @@ input UUIDFilter {
   """Not included in the specified list."""
   notIn: [UUID!]
 }
-
-"""All input for the `updateMigrateFile` mutation."""
-input UpdateMigrateFileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `MigrateFile` being updated.
-  """
-  migrateFilePatch: MigrateFilePatch!
-}
-
-"""The output of our update `MigrateFile` mutation."""
-type UpdateMigrateFilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` that was updated by this mutation."""
-  migrateFile: MigrateFile
-
-  """An edge for our `MigrateFile`. May be used by Relay 1."""
-  migrateFileEdge(
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MigrateFileEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateSqlAction` mutation."""
-input UpdateSqlActionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `SqlAction` being updated.
-  """
-  sqlActionPatch: SqlActionPatch!
-}
-
-"""The output of our update `SqlAction` mutation."""
-type UpdateSqlActionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `SqlAction` that was updated by this mutation."""
-  sqlAction: SqlAction
-
-  """An edge for our `SqlAction`. May be used by Relay 1."""
-  sqlActionEdge(
-    """The method to use when ordering `SqlAction`."""
-    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SqlActionEdge
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload

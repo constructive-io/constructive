@@ -7,8 +7,8 @@ Namespace lifecycle events — audit log of creation, activation, deactivation, 
 ## Usage
 
 ```typescript
-usePlatformNamespaceEventsQuery({ selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } } })
-usePlatformNamespaceEventQuery({ id: '<UUID>', selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } } })
+usePlatformNamespaceEventsQuery({ selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } } })
+usePlatformNamespaceEventQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } } })
 useCreatePlatformNamespaceEventMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformNamespaceEventMutation({ selection: { fields: { id: true } } })
 useDeletePlatformNamespaceEventMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformNamespaceEventMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformNamespaceEventsQuery({
-  selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } },
+  selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformNamespaceEventsQuery({
 const { mutate } = useCreatePlatformNamespaceEventMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', cpuMillicores: '<Int>', eventType: '<String>', memoryBytes: '<BigInt>', message: '<String>', metadata: '<JSON>', metrics: '<JSON>', namespaceId: '<UUID>', networkEgressBytes: '<BigInt>', networkIngressBytes: '<BigInt>', podCount: '<Int>', storageBytes: '<BigInt>' });
+mutate({ actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' });
 ```

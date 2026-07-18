@@ -12,7 +12,7 @@ csdk platform-secret list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-secret list --limit 10 --after <cursor>
 csdk platform-secret find-first --where.<field>.<op> <value>
 csdk platform-secret get --id <UUID>
-csdk platform-secret create [--annotations <JSON>] [--description <String>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--provider <String>] [--retiredAt <Datetime>] [--rotatedAt <Datetime>]
+csdk platform-secret create --annotations <JSON> --description <String> --labels <JSON> --name <String> --namespaceId <UUID> --provider <String> --retiredAt <Datetime> --rotatedAt <Datetime>
 csdk platform-secret update --id <UUID> [--annotations <JSON>] [--description <String>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--provider <String>] [--retiredAt <Datetime>] [--rotatedAt <Datetime>]
 csdk platform-secret delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk platform-secret list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformSecret
 
 ```bash
-csdk platform-secret create [--annotations <JSON>] [--description <String>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--provider <String>] [--retiredAt <Datetime>] [--rotatedAt <Datetime>]
+csdk platform-secret create --annotations <JSON> --description <String> --labels <JSON> --name <String> --namespaceId <UUID> --provider <String> --retiredAt <Datetime> --rotatedAt <Datetime>
 ```
 
 ### Get a platformSecret by id

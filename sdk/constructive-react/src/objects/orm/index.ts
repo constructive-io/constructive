@@ -6,7 +6,7 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { CommitModel } from './models/commit';
-import { GetAllRecordModel } from './models/getAllRecord';
+import { GetAllTreeNodesRecordModel } from './models/getAllTreeNodesRecord';
 import { ObjectModel } from './models/object';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
@@ -44,7 +44,7 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     commit: new CommitModel(client),
-    getAllRecord: new GetAllRecordModel(client),
+    getAllTreeNodesRecord: new GetAllTreeNodesRecordModel(client),
     object: new ObjectModel(client),
     ref: new RefModel(client),
     store: new StoreModel(client),

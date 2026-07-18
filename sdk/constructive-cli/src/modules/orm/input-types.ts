@@ -436,8 +436,8 @@ export interface ComputeLogModule {
   retention?: string | null;
   schemaId?: string | null;
   scope?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 export interface ConfigSecretsUserModule {
   apiName?: string | null;
@@ -598,19 +598,19 @@ export interface DbUsageModule {
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
   publicSchemaName?: string | null;
-  queryStatsDailyTableId?: string | null;
-  queryStatsDailyTableName?: string | null;
   queryStatsLogTableId?: string | null;
   queryStatsLogTableName?: string | null;
+  queryStatsSummaryTableId?: string | null;
+  queryStatsSummaryTableName?: string | null;
   retention?: string | null;
-  rollupDbQueryStatsDailyFunction?: string | null;
-  rollupDbTableStatsDailyFunction?: string | null;
+  rollupDbQueryStatsUsageSummaryFunction?: string | null;
+  rollupDbTableStatsUsageSummaryFunction?: string | null;
   schemaId?: string | null;
   scope?: string | null;
-  tableStatsDailyTableId?: string | null;
-  tableStatsDailyTableName?: string | null;
   tableStatsLogTableId?: string | null;
   tableStatsLogTableName?: string | null;
+  tableStatsSummaryTableId?: string | null;
+  tableStatsSummaryTableName?: string | null;
 }
 export interface DefaultIdsModule {
   databaseId?: string | null;
@@ -632,12 +632,12 @@ export interface DenormalizedTableField {
 }
 export interface DevicesModule {
   databaseId?: string | null;
-  deviceSettingsTable?: string | null;
   deviceSettingsTableId?: string | null;
+  deviceSettingsTableName?: string | null;
   id: string;
   schemaId?: string | null;
-  userDevicesTable?: string | null;
   userDevicesTableId?: string | null;
+  userDevicesTableName?: string | null;
 }
 export interface EmailsModule {
   apiName?: string | null;
@@ -1011,6 +1011,7 @@ export interface FunctionModule {
   definitionsTableName?: string | null;
   entityField?: string | null;
   entityTableId?: string | null;
+  hasCron?: boolean | null;
   id: string;
   policies?: Record<string, unknown> | null;
   prefix?: string | null;
@@ -1019,6 +1020,7 @@ export interface FunctionModule {
   privateSchemaName?: string | null;
   provisions?: Record<string, unknown> | null;
   publicSchemaName?: string | null;
+  schedulesTableId?: string | null;
   schemaId?: string | null;
   scope?: string | null;
 }
@@ -1092,6 +1094,29 @@ export interface HierarchyModule {
   sprtTableName?: string | null;
   usersTableId?: string | null;
 }
+export interface HttpRouteModule {
+  apiName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  functionModuleId?: string | null;
+  httpRoutesTableId?: string | null;
+  httpRoutesTableName?: string | null;
+  id: string;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  resolverFunctionName?: string | null;
+  resourceModuleId?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  storageModuleId?: string | null;
+}
 export interface I18NModule {
   apiName?: string | null;
   databaseId?: string | null;
@@ -1148,8 +1173,8 @@ export interface InferenceLogModule {
   retention?: string | null;
   schemaId?: string | null;
   scope?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 /** Namespace-backed plaintext key-value config module. Requires namespace_module and emits namespace:sync_config job triggers for K8s ConfigMap synchronization. */
 export interface InfraConfigModule {
@@ -1537,12 +1562,12 @@ export interface RateLimitMetersModule {
 export interface RateLimitsModule {
   databaseId?: string | null;
   id: string;
-  ipRateLimitsTable?: string | null;
   ipRateLimitsTableId?: string | null;
-  rateLimitSettingsTable?: string | null;
+  ipRateLimitsTableName?: string | null;
   rateLimitSettingsTableId?: string | null;
-  rateLimitsTable?: string | null;
+  rateLimitSettingsTableName?: string | null;
   rateLimitsTableId?: string | null;
+  rateLimitsTableName?: string | null;
   schemaId?: string | null;
 }
 export interface RealtimeModule {
@@ -1701,6 +1726,8 @@ export interface ResourceModule {
   entityField?: string | null;
   entityTableId?: string | null;
   id: string;
+  installationStoreName?: string | null;
+  merkleStoreModuleId?: string | null;
   namespaceModuleId?: string | null;
   policies?: Record<string, unknown> | null;
   prefix?: string | null;
@@ -1711,14 +1738,22 @@ export interface ResourceModule {
   publicSchemaName?: string | null;
   requirementsStateViewName?: string | null;
   resolvedRequirementsViewName?: string | null;
+  resourceBillingRollupFunction?: string | null;
   resourceDefinitionsTableId?: string | null;
   resourceDefinitionsTableName?: string | null;
   resourceEventsTableId?: string | null;
   resourceEventsTableName?: string | null;
+  resourceInstallationsTableId?: string | null;
+  resourceInstallationsTableName?: string | null;
   resourceStatusChecksTableId?: string | null;
   resourceStatusChecksTableName?: string | null;
+  resourceUsageLogTableId?: string | null;
+  resourceUsageLogTableName?: string | null;
+  resourceUsageSummaryTableId?: string | null;
+  resourceUsageSummaryTableName?: string | null;
   resourcesTableId?: string | null;
   resourcesTableName?: string | null;
+  rollupResourceUsageSummaryFunction?: string | null;
   schemaId?: string | null;
   scope?: string | null;
 }
@@ -1767,22 +1802,22 @@ export interface SessionSecretsModule {
   databaseId?: string | null;
   id: string;
   schemaId?: string | null;
-  /** Resolved reference to sessions_module.sessions_table, used to FK session_secrets.session_id with ON DELETE CASCADE. */
+  /** Resolved reference to sessions_module.sessions_table_name, used to FK session_secrets.session_id with ON DELETE CASCADE. */
   sessionsTableId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
 }
 export interface SessionsModule {
-  authSettingsTable?: string | null;
   authSettingsTableId?: string | null;
+  authSettingsTableName?: string | null;
   databaseId?: string | null;
   id: string;
   schemaId?: string | null;
-  sessionCredentialsTable?: string | null;
   sessionCredentialsTableId?: string | null;
+  sessionCredentialsTableName?: string | null;
   sessionsDefaultExpiration?: string | null;
-  sessionsTable?: string | null;
   sessionsTableId?: string | null;
+  sessionsTableName?: string | null;
   usersTableId?: string | null;
 }
 export interface StorageLogModule {
@@ -1804,8 +1839,8 @@ export interface StorageLogModule {
   scope?: string | null;
   storageLogTableId?: string | null;
   storageLogTableName?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 export interface StorageModule {
   allowedOrigins?: string[] | null;
@@ -1868,8 +1903,8 @@ export interface TransferLogModule {
   scope?: string | null;
   transferLogTableId?: string | null;
   transferLogTableName?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 export interface UserAuthModule {
   apiName?: string | null;
@@ -1974,6 +2009,31 @@ export interface WebauthnCredentialsModule {
   tableId?: string | null;
   tableName?: string | null;
 }
+export interface WebhookModule {
+  apiName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  functionInvocationModuleId?: string | null;
+  functionModuleId?: string | null;
+  id: string;
+  infraSecretsModuleId?: string | null;
+  namespaceModuleId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  webhookEndpointsTableId?: string | null;
+  webhookEndpointsTableName?: string | null;
+  webhookEventsTableId?: string | null;
+  webhookEventsTableName?: string | null;
+}
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
   nodes: T[];
@@ -2033,6 +2093,11 @@ export interface GraphModuleRelations {
   merkleStoreModule?: MerkleStoreModule | null;
 }
 export interface HierarchyModuleRelations {}
+export interface HttpRouteModuleRelations {
+  functionModule?: FunctionModule | null;
+  resourceModule?: ResourceModule | null;
+  storageModule?: StorageModule | null;
+}
 export interface I18NModuleRelations {}
 export interface IdentityProvidersModuleRelations {}
 export interface InferenceLogModuleRelations {}
@@ -2060,6 +2125,7 @@ export interface RateLimitsModuleRelations {}
 export interface RealtimeModuleRelations {}
 export interface RelationProvisionRelations {}
 export interface ResourceModuleRelations {
+  merkleStoreModule?: MerkleStoreModule | null;
   namespaceModule?: NamespaceModule | null;
 }
 export interface RlsModuleRelations {}
@@ -2076,6 +2142,12 @@ export interface UserStateModuleRelations {}
 export interface UsersModuleRelations {}
 export interface WebauthnAuthModuleRelations {}
 export interface WebauthnCredentialsModuleRelations {}
+export interface WebhookModuleRelations {
+  functionInvocationModule?: FunctionInvocationModule | null;
+  functionModule?: FunctionModule | null;
+  infraSecretsModule?: InfraSecretsModule | null;
+  namespaceModule?: NamespaceModule | null;
+}
 // ============ Entity Types With Relations ============
 export type AgentModuleWithRelations = AgentModule & AgentModuleRelations;
 export type BillingModuleWithRelations = BillingModule & BillingModuleRelations;
@@ -2115,6 +2187,7 @@ export type GraphExecutionModuleWithRelations = GraphExecutionModule &
   GraphExecutionModuleRelations;
 export type GraphModuleWithRelations = GraphModule & GraphModuleRelations;
 export type HierarchyModuleWithRelations = HierarchyModule & HierarchyModuleRelations;
+export type HttpRouteModuleWithRelations = HttpRouteModule & HttpRouteModuleRelations;
 export type I18NModuleWithRelations = I18NModule & I18NModuleRelations;
 export type IdentityProvidersModuleWithRelations = IdentityProvidersModule &
   IdentityProvidersModuleRelations;
@@ -2162,6 +2235,7 @@ export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
 export type WebauthnAuthModuleWithRelations = WebauthnAuthModule & WebauthnAuthModuleRelations;
 export type WebauthnCredentialsModuleWithRelations = WebauthnCredentialsModule &
   WebauthnCredentialsModuleRelations;
+export type WebhookModuleWithRelations = WebhookModule & WebhookModuleRelations;
 // ============ Entity Select Types ============
 export type AgentModuleSelect = {
   agentTableId?: boolean;
@@ -2349,8 +2423,8 @@ export type ComputeLogModuleSelect = {
   retention?: boolean;
   schemaId?: boolean;
   scope?: boolean;
-  usageDailyTableId?: boolean;
-  usageDailyTableName?: boolean;
+  usageSummaryTableId?: boolean;
+  usageSummaryTableName?: boolean;
 };
 export type ConfigSecretsUserModuleSelect = {
   apiName?: boolean;
@@ -2485,19 +2559,19 @@ export type DbUsageModuleSelect = {
   privateSchemaId?: boolean;
   privateSchemaName?: boolean;
   publicSchemaName?: boolean;
-  queryStatsDailyTableId?: boolean;
-  queryStatsDailyTableName?: boolean;
   queryStatsLogTableId?: boolean;
   queryStatsLogTableName?: boolean;
+  queryStatsSummaryTableId?: boolean;
+  queryStatsSummaryTableName?: boolean;
   retention?: boolean;
-  rollupDbQueryStatsDailyFunction?: boolean;
-  rollupDbTableStatsDailyFunction?: boolean;
+  rollupDbQueryStatsUsageSummaryFunction?: boolean;
+  rollupDbTableStatsUsageSummaryFunction?: boolean;
   schemaId?: boolean;
   scope?: boolean;
-  tableStatsDailyTableId?: boolean;
-  tableStatsDailyTableName?: boolean;
   tableStatsLogTableId?: boolean;
   tableStatsLogTableName?: boolean;
+  tableStatsSummaryTableId?: boolean;
+  tableStatsSummaryTableName?: boolean;
 };
 export type DefaultIdsModuleSelect = {
   databaseId?: boolean;
@@ -2519,12 +2593,12 @@ export type DenormalizedTableFieldSelect = {
 };
 export type DevicesModuleSelect = {
   databaseId?: boolean;
-  deviceSettingsTable?: boolean;
   deviceSettingsTableId?: boolean;
+  deviceSettingsTableName?: boolean;
   id?: boolean;
   schemaId?: boolean;
-  userDevicesTable?: boolean;
   userDevicesTableId?: boolean;
+  userDevicesTableName?: boolean;
 };
 export type EmailsModuleSelect = {
   apiName?: boolean;
@@ -2684,6 +2758,7 @@ export type FunctionModuleSelect = {
   definitionsTableName?: boolean;
   entityField?: boolean;
   entityTableId?: boolean;
+  hasCron?: boolean;
   id?: boolean;
   policies?: boolean;
   prefix?: boolean;
@@ -2692,6 +2767,7 @@ export type FunctionModuleSelect = {
   privateSchemaName?: boolean;
   provisions?: boolean;
   publicSchemaName?: boolean;
+  schedulesTableId?: boolean;
   schemaId?: boolean;
   scope?: boolean;
 };
@@ -2771,6 +2847,38 @@ export type HierarchyModuleSelect = {
   sprtTableName?: boolean;
   usersTableId?: boolean;
 };
+export type HttpRouteModuleSelect = {
+  apiName?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  functionModuleId?: boolean;
+  httpRoutesTableId?: boolean;
+  httpRoutesTableName?: boolean;
+  id?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  resolverFunctionName?: boolean;
+  resourceModuleId?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  storageModuleId?: boolean;
+  functionModule?: {
+    select: FunctionModuleSelect;
+  };
+  resourceModule?: {
+    select: ResourceModuleSelect;
+  };
+  storageModule?: {
+    select: StorageModuleSelect;
+  };
+};
 export type I18NModuleSelect = {
   apiName?: boolean;
   databaseId?: boolean;
@@ -2815,8 +2923,8 @@ export type InferenceLogModuleSelect = {
   retention?: boolean;
   schemaId?: boolean;
   scope?: boolean;
-  usageDailyTableId?: boolean;
-  usageDailyTableName?: boolean;
+  usageSummaryTableId?: boolean;
+  usageSummaryTableName?: boolean;
 };
 export type InfraConfigModuleSelect = {
   apiName?: boolean;
@@ -3205,12 +3313,12 @@ export type RateLimitMetersModuleSelect = {
 export type RateLimitsModuleSelect = {
   databaseId?: boolean;
   id?: boolean;
-  ipRateLimitsTable?: boolean;
   ipRateLimitsTableId?: boolean;
-  rateLimitSettingsTable?: boolean;
+  ipRateLimitsTableName?: boolean;
   rateLimitSettingsTableId?: boolean;
-  rateLimitsTable?: boolean;
+  rateLimitSettingsTableName?: boolean;
   rateLimitsTableId?: boolean;
+  rateLimitsTableName?: boolean;
   schemaId?: boolean;
 };
 export type RealtimeModuleSelect = {
@@ -3262,6 +3370,8 @@ export type ResourceModuleSelect = {
   entityField?: boolean;
   entityTableId?: boolean;
   id?: boolean;
+  installationStoreName?: boolean;
+  merkleStoreModuleId?: boolean;
   namespaceModuleId?: boolean;
   policies?: boolean;
   prefix?: boolean;
@@ -3272,16 +3382,27 @@ export type ResourceModuleSelect = {
   publicSchemaName?: boolean;
   requirementsStateViewName?: boolean;
   resolvedRequirementsViewName?: boolean;
+  resourceBillingRollupFunction?: boolean;
   resourceDefinitionsTableId?: boolean;
   resourceDefinitionsTableName?: boolean;
   resourceEventsTableId?: boolean;
   resourceEventsTableName?: boolean;
+  resourceInstallationsTableId?: boolean;
+  resourceInstallationsTableName?: boolean;
   resourceStatusChecksTableId?: boolean;
   resourceStatusChecksTableName?: boolean;
+  resourceUsageLogTableId?: boolean;
+  resourceUsageLogTableName?: boolean;
+  resourceUsageSummaryTableId?: boolean;
+  resourceUsageSummaryTableName?: boolean;
   resourcesTableId?: boolean;
   resourcesTableName?: boolean;
+  rollupResourceUsageSummaryFunction?: boolean;
   schemaId?: boolean;
   scope?: boolean;
+  merkleStoreModule?: {
+    select: MerkleStoreModuleSelect;
+  };
   namespaceModule?: {
     select: NamespaceModuleSelect;
   };
@@ -3323,16 +3444,16 @@ export type SessionSecretsModuleSelect = {
   tableName?: boolean;
 };
 export type SessionsModuleSelect = {
-  authSettingsTable?: boolean;
   authSettingsTableId?: boolean;
+  authSettingsTableName?: boolean;
   databaseId?: boolean;
   id?: boolean;
   schemaId?: boolean;
-  sessionCredentialsTable?: boolean;
   sessionCredentialsTableId?: boolean;
+  sessionCredentialsTableName?: boolean;
   sessionsDefaultExpiration?: boolean;
-  sessionsTable?: boolean;
   sessionsTableId?: boolean;
+  sessionsTableName?: boolean;
   usersTableId?: boolean;
 };
 export type StorageLogModuleSelect = {
@@ -3354,8 +3475,8 @@ export type StorageLogModuleSelect = {
   scope?: boolean;
   storageLogTableId?: boolean;
   storageLogTableName?: boolean;
-  usageDailyTableId?: boolean;
-  usageDailyTableName?: boolean;
+  usageSummaryTableId?: boolean;
+  usageSummaryTableName?: boolean;
 };
 export type StorageModuleSelect = {
   allowedOrigins?: boolean;
@@ -3418,8 +3539,8 @@ export type TransferLogModuleSelect = {
   scope?: boolean;
   transferLogTableId?: boolean;
   transferLogTableName?: boolean;
-  usageDailyTableId?: boolean;
-  usageDailyTableName?: boolean;
+  usageSummaryTableId?: boolean;
+  usageSummaryTableName?: boolean;
 };
 export type UserAuthModuleSelect = {
   apiName?: boolean;
@@ -3516,6 +3637,43 @@ export type WebauthnCredentialsModuleSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
+};
+export type WebhookModuleSelect = {
+  apiName?: boolean;
+  databaseId?: boolean;
+  defaultPermissions?: boolean;
+  entityField?: boolean;
+  entityTableId?: boolean;
+  functionInvocationModuleId?: boolean;
+  functionModuleId?: boolean;
+  id?: boolean;
+  infraSecretsModuleId?: boolean;
+  namespaceModuleId?: boolean;
+  policies?: boolean;
+  prefix?: boolean;
+  privateApiName?: boolean;
+  privateSchemaId?: boolean;
+  privateSchemaName?: boolean;
+  provisions?: boolean;
+  publicSchemaName?: boolean;
+  schemaId?: boolean;
+  scope?: boolean;
+  webhookEndpointsTableId?: boolean;
+  webhookEndpointsTableName?: boolean;
+  webhookEventsTableId?: boolean;
+  webhookEventsTableName?: boolean;
+  functionInvocationModule?: {
+    select: FunctionInvocationModuleSelect;
+  };
+  functionModule?: {
+    select: FunctionModuleSelect;
+  };
+  infraSecretsModule?: {
+    select: InfraSecretsModuleSelect;
+  };
+  namespaceModule?: {
+    select: NamespaceModuleSelect;
+  };
 };
 // ============ Table Filter Types ============
 export interface AgentModuleFilter {
@@ -3887,10 +4045,10 @@ export interface ComputeLogModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 export interface ConfigSecretsUserModuleFilter {
   /** Checks for all expressions in this list. */
@@ -4191,32 +4349,32 @@ export interface DbUsageModuleFilter {
   privateSchemaName?: StringFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
-  /** Filter by the object’s `queryStatsDailyTableId` field. */
-  queryStatsDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `queryStatsDailyTableName` field. */
-  queryStatsDailyTableName?: StringFilter;
   /** Filter by the object’s `queryStatsLogTableId` field. */
   queryStatsLogTableId?: UUIDFilter;
   /** Filter by the object’s `queryStatsLogTableName` field. */
   queryStatsLogTableName?: StringFilter;
+  /** Filter by the object’s `queryStatsSummaryTableId` field. */
+  queryStatsSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `queryStatsSummaryTableName` field. */
+  queryStatsSummaryTableName?: StringFilter;
   /** Filter by the object’s `retention` field. */
   retention?: StringFilter;
-  /** Filter by the object’s `rollupDbQueryStatsDailyFunction` field. */
-  rollupDbQueryStatsDailyFunction?: StringFilter;
-  /** Filter by the object’s `rollupDbTableStatsDailyFunction` field. */
-  rollupDbTableStatsDailyFunction?: StringFilter;
+  /** Filter by the object’s `rollupDbQueryStatsUsageSummaryFunction` field. */
+  rollupDbQueryStatsUsageSummaryFunction?: StringFilter;
+  /** Filter by the object’s `rollupDbTableStatsUsageSummaryFunction` field. */
+  rollupDbTableStatsUsageSummaryFunction?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
-  /** Filter by the object’s `tableStatsDailyTableId` field. */
-  tableStatsDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `tableStatsDailyTableName` field. */
-  tableStatsDailyTableName?: StringFilter;
   /** Filter by the object’s `tableStatsLogTableId` field. */
   tableStatsLogTableId?: UUIDFilter;
   /** Filter by the object’s `tableStatsLogTableName` field. */
   tableStatsLogTableName?: StringFilter;
+  /** Filter by the object’s `tableStatsSummaryTableId` field. */
+  tableStatsSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `tableStatsSummaryTableName` field. */
+  tableStatsSummaryTableName?: StringFilter;
 }
 export interface DefaultIdsModuleFilter {
   /** Checks for all expressions in this list. */
@@ -4267,10 +4425,10 @@ export interface DevicesModuleFilter {
   and?: DevicesModuleFilter[];
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `deviceSettingsTable` field. */
-  deviceSettingsTable?: StringFilter;
   /** Filter by the object’s `deviceSettingsTableId` field. */
   deviceSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `deviceSettingsTableName` field. */
+  deviceSettingsTableName?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -4279,10 +4437,10 @@ export interface DevicesModuleFilter {
   or?: DevicesModuleFilter[];
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
-  /** Filter by the object’s `userDevicesTable` field. */
-  userDevicesTable?: StringFilter;
   /** Filter by the object’s `userDevicesTableId` field. */
   userDevicesTableId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTableName` field. */
+  userDevicesTableName?: StringFilter;
 }
 export interface EmailsModuleFilter {
   /** Checks for all expressions in this list. */
@@ -4617,6 +4775,8 @@ export interface FunctionModuleFilter {
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `hasCron` field. */
+  hasCron?: BooleanFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -4637,6 +4797,8 @@ export interface FunctionModuleFilter {
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schedulesTableId` field. */
+  schedulesTableId?: UUIDFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
@@ -4798,6 +4960,68 @@ export interface HierarchyModuleFilter {
   /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
 }
+export interface HttpRouteModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: HttpRouteModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionModule` relation. */
+  functionModule?: FunctionModuleFilter;
+  /** A related `functionModule` exists. */
+  functionModuleExists?: boolean;
+  /** Filter by the object’s `functionModuleId` field. */
+  functionModuleId?: UUIDFilter;
+  /** Filter by the object’s `httpRoutesTableId` field. */
+  httpRoutesTableId?: UUIDFilter;
+  /** Filter by the object’s `httpRoutesTableName` field. */
+  httpRoutesTableName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: HttpRouteModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: HttpRouteModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `resolverFunctionName` field. */
+  resolverFunctionName?: StringFilter;
+  /** Filter by the object’s `resourceModule` relation. */
+  resourceModule?: ResourceModuleFilter;
+  /** A related `resourceModule` exists. */
+  resourceModuleExists?: boolean;
+  /** Filter by the object’s `resourceModuleId` field. */
+  resourceModuleId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `storageModule` relation. */
+  storageModule?: StorageModuleFilter;
+  /** A related `storageModule` exists. */
+  storageModuleExists?: boolean;
+  /** Filter by the object’s `storageModuleId` field. */
+  storageModuleId?: UUIDFilter;
+}
 export interface I18NModuleFilter {
   /** Checks for all expressions in this list. */
   and?: I18NModuleFilter[];
@@ -4899,10 +5123,10 @@ export interface InferenceLogModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 export interface InfraConfigModuleFilter {
   /** Checks for all expressions in this list. */
@@ -5731,22 +5955,22 @@ export interface RateLimitsModuleFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `ipRateLimitsTable` field. */
-  ipRateLimitsTable?: StringFilter;
   /** Filter by the object’s `ipRateLimitsTableId` field. */
   ipRateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `ipRateLimitsTableName` field. */
+  ipRateLimitsTableName?: StringFilter;
   /** Negates the expression. */
   not?: RateLimitsModuleFilter;
   /** Checks for any expressions in this list. */
   or?: RateLimitsModuleFilter[];
-  /** Filter by the object’s `rateLimitSettingsTable` field. */
-  rateLimitSettingsTable?: StringFilter;
   /** Filter by the object’s `rateLimitSettingsTableId` field. */
   rateLimitSettingsTableId?: UUIDFilter;
-  /** Filter by the object’s `rateLimitsTable` field. */
-  rateLimitsTable?: StringFilter;
+  /** Filter by the object’s `rateLimitSettingsTableName` field. */
+  rateLimitSettingsTableName?: StringFilter;
   /** Filter by the object’s `rateLimitsTableId` field. */
   rateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitsTableName` field. */
+  rateLimitsTableName?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
 }
@@ -5857,6 +6081,14 @@ export interface ResourceModuleFilter {
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `installationStoreName` field. */
+  installationStoreName?: StringFilter;
+  /** Filter by the object’s `merkleStoreModule` relation. */
+  merkleStoreModule?: MerkleStoreModuleFilter;
+  /** A related `merkleStoreModule` exists. */
+  merkleStoreModuleExists?: boolean;
+  /** Filter by the object’s `merkleStoreModuleId` field. */
+  merkleStoreModuleId?: UUIDFilter;
   /** Filter by the object’s `namespaceModule` relation. */
   namespaceModule?: NamespaceModuleFilter;
   /** A related `namespaceModule` exists. */
@@ -5885,6 +6117,8 @@ export interface ResourceModuleFilter {
   requirementsStateViewName?: StringFilter;
   /** Filter by the object’s `resolvedRequirementsViewName` field. */
   resolvedRequirementsViewName?: StringFilter;
+  /** Filter by the object’s `resourceBillingRollupFunction` field. */
+  resourceBillingRollupFunction?: StringFilter;
   /** Filter by the object’s `resourceDefinitionsTableId` field. */
   resourceDefinitionsTableId?: UUIDFilter;
   /** Filter by the object’s `resourceDefinitionsTableName` field. */
@@ -5893,14 +6127,28 @@ export interface ResourceModuleFilter {
   resourceEventsTableId?: UUIDFilter;
   /** Filter by the object’s `resourceEventsTableName` field. */
   resourceEventsTableName?: StringFilter;
+  /** Filter by the object’s `resourceInstallationsTableId` field. */
+  resourceInstallationsTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceInstallationsTableName` field. */
+  resourceInstallationsTableName?: StringFilter;
   /** Filter by the object’s `resourceStatusChecksTableId` field. */
   resourceStatusChecksTableId?: UUIDFilter;
   /** Filter by the object’s `resourceStatusChecksTableName` field. */
   resourceStatusChecksTableName?: StringFilter;
+  /** Filter by the object’s `resourceUsageLogTableId` field. */
+  resourceUsageLogTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceUsageLogTableName` field. */
+  resourceUsageLogTableName?: StringFilter;
+  /** Filter by the object’s `resourceUsageSummaryTableId` field. */
+  resourceUsageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceUsageSummaryTableName` field. */
+  resourceUsageSummaryTableName?: StringFilter;
   /** Filter by the object’s `resourcesTableId` field. */
   resourcesTableId?: UUIDFilter;
   /** Filter by the object’s `resourcesTableName` field. */
   resourcesTableName?: StringFilter;
+  /** Filter by the object’s `rollupResourceUsageSummaryFunction` field. */
+  rollupResourceUsageSummaryFunction?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
@@ -5993,10 +6241,10 @@ export interface SessionSecretsModuleFilter {
 export interface SessionsModuleFilter {
   /** Checks for all expressions in this list. */
   and?: SessionsModuleFilter[];
-  /** Filter by the object’s `authSettingsTable` field. */
-  authSettingsTable?: StringFilter;
   /** Filter by the object’s `authSettingsTableId` field. */
   authSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `authSettingsTableName` field. */
+  authSettingsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -6007,16 +6255,16 @@ export interface SessionsModuleFilter {
   or?: SessionsModuleFilter[];
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
-  /** Filter by the object’s `sessionCredentialsTable` field. */
-  sessionCredentialsTable?: StringFilter;
   /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableName` field. */
+  sessionCredentialsTableName?: StringFilter;
   /** Filter by the object’s `sessionsDefaultExpiration` field. */
   sessionsDefaultExpiration?: IntervalFilter;
-  /** Filter by the object’s `sessionsTable` field. */
-  sessionsTable?: StringFilter;
   /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableName` field. */
+  sessionsTableName?: StringFilter;
   /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
 }
@@ -6063,10 +6311,10 @@ export interface StorageLogModuleFilter {
   storageLogTableId?: UUIDFilter;
   /** Filter by the object’s `storageLogTableName` field. */
   storageLogTableName?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 export interface StorageModuleFilter {
   /** Filter by the object’s `allowedOrigins` field. */
@@ -6199,10 +6447,10 @@ export interface TransferLogModuleFilter {
   transferLogTableId?: UUIDFilter;
   /** Filter by the object’s `transferLogTableName` field. */
   transferLogTableName?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 export interface UserAuthModuleFilter {
   /** Checks for all expressions in this list. */
@@ -6423,6 +6671,76 @@ export interface WebauthnCredentialsModuleFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+}
+export interface WebhookModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: WebhookModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionInvocationModule` relation. */
+  functionInvocationModule?: FunctionInvocationModuleFilter;
+  /** A related `functionInvocationModule` exists. */
+  functionInvocationModuleExists?: boolean;
+  /** Filter by the object’s `functionInvocationModuleId` field. */
+  functionInvocationModuleId?: UUIDFilter;
+  /** Filter by the object’s `functionModule` relation. */
+  functionModule?: FunctionModuleFilter;
+  /** A related `functionModule` exists. */
+  functionModuleExists?: boolean;
+  /** Filter by the object’s `functionModuleId` field. */
+  functionModuleId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `infraSecretsModule` relation. */
+  infraSecretsModule?: InfraSecretsModuleFilter;
+  /** A related `infraSecretsModule` exists. */
+  infraSecretsModuleExists?: boolean;
+  /** Filter by the object’s `infraSecretsModuleId` field. */
+  infraSecretsModuleId?: UUIDFilter;
+  /** Filter by the object’s `namespaceModule` relation. */
+  namespaceModule?: NamespaceModuleFilter;
+  /** A related `namespaceModule` exists. */
+  namespaceModuleExists?: boolean;
+  /** Filter by the object’s `namespaceModuleId` field. */
+  namespaceModuleId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: WebhookModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: WebhookModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `webhookEndpointsTableId` field. */
+  webhookEndpointsTableId?: UUIDFilter;
+  /** Filter by the object’s `webhookEndpointsTableName` field. */
+  webhookEndpointsTableName?: StringFilter;
+  /** Filter by the object’s `webhookEventsTableId` field. */
+  webhookEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `webhookEventsTableName` field. */
+  webhookEventsTableName?: StringFilter;
 }
 // ============ OrderBy Types ============
 export type AgentModuleOrderBy =
@@ -6745,10 +7063,10 @@ export type ComputeLogModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 export type ConfigSecretsUserModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -7011,32 +7329,32 @@ export type DbUsageModuleOrderBy =
   | 'PRIVATE_SCHEMA_NAME_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'QUERY_STATS_DAILY_TABLE_ID_ASC'
-  | 'QUERY_STATS_DAILY_TABLE_ID_DESC'
-  | 'QUERY_STATS_DAILY_TABLE_NAME_ASC'
-  | 'QUERY_STATS_DAILY_TABLE_NAME_DESC'
   | 'QUERY_STATS_LOG_TABLE_ID_ASC'
   | 'QUERY_STATS_LOG_TABLE_ID_DESC'
   | 'QUERY_STATS_LOG_TABLE_NAME_ASC'
   | 'QUERY_STATS_LOG_TABLE_NAME_DESC'
+  | 'QUERY_STATS_SUMMARY_TABLE_ID_ASC'
+  | 'QUERY_STATS_SUMMARY_TABLE_ID_DESC'
+  | 'QUERY_STATS_SUMMARY_TABLE_NAME_ASC'
+  | 'QUERY_STATS_SUMMARY_TABLE_NAME_DESC'
   | 'RETENTION_ASC'
   | 'RETENTION_DESC'
-  | 'ROLLUP_DB_QUERY_STATS_DAILY_FUNCTION_ASC'
-  | 'ROLLUP_DB_QUERY_STATS_DAILY_FUNCTION_DESC'
-  | 'ROLLUP_DB_TABLE_STATS_DAILY_FUNCTION_ASC'
-  | 'ROLLUP_DB_TABLE_STATS_DAILY_FUNCTION_DESC'
+  | 'ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_ASC'
+  | 'ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_DESC'
+  | 'ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_ASC'
+  | 'ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
-  | 'TABLE_STATS_DAILY_TABLE_ID_ASC'
-  | 'TABLE_STATS_DAILY_TABLE_ID_DESC'
-  | 'TABLE_STATS_DAILY_TABLE_NAME_ASC'
-  | 'TABLE_STATS_DAILY_TABLE_NAME_DESC'
   | 'TABLE_STATS_LOG_TABLE_ID_ASC'
   | 'TABLE_STATS_LOG_TABLE_ID_DESC'
   | 'TABLE_STATS_LOG_TABLE_NAME_ASC'
-  | 'TABLE_STATS_LOG_TABLE_NAME_DESC';
+  | 'TABLE_STATS_LOG_TABLE_NAME_DESC'
+  | 'TABLE_STATS_SUMMARY_TABLE_ID_ASC'
+  | 'TABLE_STATS_SUMMARY_TABLE_ID_DESC'
+  | 'TABLE_STATS_SUMMARY_TABLE_NAME_ASC'
+  | 'TABLE_STATS_SUMMARY_TABLE_NAME_DESC';
 export type DefaultIdsModuleOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
@@ -7076,10 +7394,10 @@ export type DenormalizedTableFieldOrderBy =
 export type DevicesModuleOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEVICE_SETTINGS_TABLE_ASC'
-  | 'DEVICE_SETTINGS_TABLE_DESC'
   | 'DEVICE_SETTINGS_TABLE_ID_ASC'
   | 'DEVICE_SETTINGS_TABLE_ID_DESC'
+  | 'DEVICE_SETTINGS_TABLE_NAME_ASC'
+  | 'DEVICE_SETTINGS_TABLE_NAME_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -7087,10 +7405,10 @@ export type DevicesModuleOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
-  | 'USER_DEVICES_TABLE_ASC'
-  | 'USER_DEVICES_TABLE_DESC'
   | 'USER_DEVICES_TABLE_ID_ASC'
-  | 'USER_DEVICES_TABLE_ID_DESC';
+  | 'USER_DEVICES_TABLE_ID_DESC'
+  | 'USER_DEVICES_TABLE_NAME_ASC'
+  | 'USER_DEVICES_TABLE_NAME_DESC';
 export type EmailsModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -7394,6 +7712,8 @@ export type FunctionModuleOrderBy =
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
   | 'ENTITY_TABLE_ID_DESC'
+  | 'HAS_CRON_ASC'
+  | 'HAS_CRON_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -7413,6 +7733,8 @@ export type FunctionModuleOrderBy =
   | 'PROVISIONS_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCHEDULES_TABLE_ID_ASC'
+  | 'SCHEDULES_TABLE_ID_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
@@ -7557,6 +7879,52 @@ export type HierarchyModuleOrderBy =
   | 'SPRT_TABLE_NAME_DESC'
   | 'USERS_TABLE_ID_ASC'
   | 'USERS_TABLE_ID_DESC';
+export type HttpRouteModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'ENTITY_FIELD_ASC'
+  | 'ENTITY_FIELD_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'FUNCTION_MODULE_ID_ASC'
+  | 'FUNCTION_MODULE_ID_DESC'
+  | 'HTTP_ROUTES_TABLE_ID_ASC'
+  | 'HTTP_ROUTES_TABLE_ID_DESC'
+  | 'HTTP_ROUTES_TABLE_NAME_ASC'
+  | 'HTTP_ROUTES_TABLE_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'RESOLVER_FUNCTION_NAME_ASC'
+  | 'RESOLVER_FUNCTION_NAME_DESC'
+  | 'RESOURCE_MODULE_ID_ASC'
+  | 'RESOURCE_MODULE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'STORAGE_MODULE_ID_ASC'
+  | 'STORAGE_MODULE_ID_DESC';
 export type I18NModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -7647,10 +8015,10 @@ export type InferenceLogModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 export type InfraConfigModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -8400,21 +8768,21 @@ export type RateLimitsModuleOrderBy =
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IP_RATE_LIMITS_TABLE_ASC'
-  | 'IP_RATE_LIMITS_TABLE_DESC'
   | 'IP_RATE_LIMITS_TABLE_ID_ASC'
   | 'IP_RATE_LIMITS_TABLE_ID_DESC'
+  | 'IP_RATE_LIMITS_TABLE_NAME_ASC'
+  | 'IP_RATE_LIMITS_TABLE_NAME_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'RATE_LIMITS_TABLE_ASC'
-  | 'RATE_LIMITS_TABLE_DESC'
   | 'RATE_LIMITS_TABLE_ID_ASC'
   | 'RATE_LIMITS_TABLE_ID_DESC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_ASC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_DESC'
+  | 'RATE_LIMITS_TABLE_NAME_ASC'
+  | 'RATE_LIMITS_TABLE_NAME_DESC'
   | 'RATE_LIMIT_SETTINGS_TABLE_ID_ASC'
   | 'RATE_LIMIT_SETTINGS_TABLE_ID_DESC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_NAME_ASC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_NAME_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC';
 export type RealtimeModuleOrderBy =
@@ -8514,6 +8882,10 @@ export type ResourceModuleOrderBy =
   | 'ENTITY_TABLE_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'INSTALLATION_STORE_NAME_ASC'
+  | 'INSTALLATION_STORE_NAME_DESC'
+  | 'MERKLE_STORE_MODULE_ID_ASC'
+  | 'MERKLE_STORE_MODULE_ID_DESC'
   | 'NAMESPACE_MODULE_ID_ASC'
   | 'NAMESPACE_MODULE_ID_DESC'
   | 'NATURAL'
@@ -8541,6 +8913,8 @@ export type ResourceModuleOrderBy =
   | 'RESOURCES_TABLE_ID_DESC'
   | 'RESOURCES_TABLE_NAME_ASC'
   | 'RESOURCES_TABLE_NAME_DESC'
+  | 'RESOURCE_BILLING_ROLLUP_FUNCTION_ASC'
+  | 'RESOURCE_BILLING_ROLLUP_FUNCTION_DESC'
   | 'RESOURCE_DEFINITIONS_TABLE_ID_ASC'
   | 'RESOURCE_DEFINITIONS_TABLE_ID_DESC'
   | 'RESOURCE_DEFINITIONS_TABLE_NAME_ASC'
@@ -8549,10 +8923,24 @@ export type ResourceModuleOrderBy =
   | 'RESOURCE_EVENTS_TABLE_ID_DESC'
   | 'RESOURCE_EVENTS_TABLE_NAME_ASC'
   | 'RESOURCE_EVENTS_TABLE_NAME_DESC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_ID_ASC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_ID_DESC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_NAME_ASC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_NAME_DESC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_ID_ASC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_ID_DESC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_NAME_ASC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_NAME_DESC'
+  | 'RESOURCE_USAGE_LOG_TABLE_ID_ASC'
+  | 'RESOURCE_USAGE_LOG_TABLE_ID_DESC'
+  | 'RESOURCE_USAGE_LOG_TABLE_NAME_ASC'
+  | 'RESOURCE_USAGE_LOG_TABLE_NAME_DESC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_NAME_DESC'
+  | 'ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_ASC'
+  | 'ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
@@ -8630,10 +9018,10 @@ export type SessionSecretsModuleOrderBy =
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC';
 export type SessionsModuleOrderBy =
-  | 'AUTH_SETTINGS_TABLE_ASC'
-  | 'AUTH_SETTINGS_TABLE_DESC'
   | 'AUTH_SETTINGS_TABLE_ID_ASC'
   | 'AUTH_SETTINGS_TABLE_ID_DESC'
+  | 'AUTH_SETTINGS_TABLE_NAME_ASC'
+  | 'AUTH_SETTINGS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
@@ -8645,14 +9033,14 @@ export type SessionsModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SESSIONS_DEFAULT_EXPIRATION_ASC'
   | 'SESSIONS_DEFAULT_EXPIRATION_DESC'
-  | 'SESSIONS_TABLE_ASC'
-  | 'SESSIONS_TABLE_DESC'
   | 'SESSIONS_TABLE_ID_ASC'
   | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_DESC'
+  | 'SESSIONS_TABLE_NAME_ASC'
+  | 'SESSIONS_TABLE_NAME_DESC'
   | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
   | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
+  | 'SESSION_CREDENTIALS_TABLE_NAME_ASC'
+  | 'SESSION_CREDENTIALS_TABLE_NAME_DESC'
   | 'USERS_TABLE_ID_ASC'
   | 'USERS_TABLE_ID_DESC';
 export type StorageLogModuleOrderBy =
@@ -8695,10 +9083,10 @@ export type StorageLogModuleOrderBy =
   | 'STORAGE_LOG_TABLE_ID_DESC'
   | 'STORAGE_LOG_TABLE_NAME_ASC'
   | 'STORAGE_LOG_TABLE_NAME_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 export type StorageModuleOrderBy =
   | 'ALLOWED_ORIGINS_ASC'
   | 'ALLOWED_ORIGINS_DESC'
@@ -8823,10 +9211,10 @@ export type TransferLogModuleOrderBy =
   | 'TRANSFER_LOG_TABLE_ID_DESC'
   | 'TRANSFER_LOG_TABLE_NAME_ASC'
   | 'TRANSFER_LOG_TABLE_NAME_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 export type UserAuthModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -9019,6 +9407,56 @@ export type WebauthnCredentialsModuleOrderBy =
   | 'TABLE_ID_DESC'
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC';
+export type WebhookModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'ENTITY_FIELD_ASC'
+  | 'ENTITY_FIELD_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'FUNCTION_INVOCATION_MODULE_ID_ASC'
+  | 'FUNCTION_INVOCATION_MODULE_ID_DESC'
+  | 'FUNCTION_MODULE_ID_ASC'
+  | 'FUNCTION_MODULE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INFRA_SECRETS_MODULE_ID_ASC'
+  | 'INFRA_SECRETS_MODULE_ID_DESC'
+  | 'NAMESPACE_MODULE_ID_ASC'
+  | 'NAMESPACE_MODULE_ID_DESC'
+  | 'NATURAL'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_ID_ASC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_ID_DESC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_NAME_ASC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_NAME_DESC'
+  | 'WEBHOOK_EVENTS_TABLE_ID_ASC'
+  | 'WEBHOOK_EVENTS_TABLE_ID_DESC'
+  | 'WEBHOOK_EVENTS_TABLE_NAME_ASC'
+  | 'WEBHOOK_EVENTS_TABLE_NAME_DESC';
 // ============ CRUD Input Types ============
 export interface CreateAgentModuleInput {
   clientMutationId?: string;
@@ -9368,8 +9806,8 @@ export interface CreateComputeLogModuleInput {
     retention?: string;
     schemaId?: string;
     scope?: string;
-    usageDailyTableId?: string;
-    usageDailyTableName?: string;
+    usageSummaryTableId?: string;
+    usageSummaryTableName?: string;
   };
 }
 export interface ComputeLogModulePatch {
@@ -9390,8 +9828,8 @@ export interface ComputeLogModulePatch {
   retention?: string | null;
   schemaId?: string | null;
   scope?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 export interface UpdateComputeLogModuleInput {
   clientMutationId?: string;
@@ -9714,19 +10152,19 @@ export interface CreateDbUsageModuleInput {
     privateSchemaId?: string;
     privateSchemaName?: string;
     publicSchemaName?: string;
-    queryStatsDailyTableId?: string;
-    queryStatsDailyTableName?: string;
     queryStatsLogTableId?: string;
     queryStatsLogTableName?: string;
+    queryStatsSummaryTableId?: string;
+    queryStatsSummaryTableName?: string;
     retention?: string;
-    rollupDbQueryStatsDailyFunction?: string;
-    rollupDbTableStatsDailyFunction?: string;
+    rollupDbQueryStatsUsageSummaryFunction?: string;
+    rollupDbTableStatsUsageSummaryFunction?: string;
     schemaId?: string;
     scope?: string;
-    tableStatsDailyTableId?: string;
-    tableStatsDailyTableName?: string;
     tableStatsLogTableId?: string;
     tableStatsLogTableName?: string;
+    tableStatsSummaryTableId?: string;
+    tableStatsSummaryTableName?: string;
   };
 }
 export interface DbUsageModulePatch {
@@ -9743,19 +10181,19 @@ export interface DbUsageModulePatch {
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
   publicSchemaName?: string | null;
-  queryStatsDailyTableId?: string | null;
-  queryStatsDailyTableName?: string | null;
   queryStatsLogTableId?: string | null;
   queryStatsLogTableName?: string | null;
+  queryStatsSummaryTableId?: string | null;
+  queryStatsSummaryTableName?: string | null;
   retention?: string | null;
-  rollupDbQueryStatsDailyFunction?: string | null;
-  rollupDbTableStatsDailyFunction?: string | null;
+  rollupDbQueryStatsUsageSummaryFunction?: string | null;
+  rollupDbTableStatsUsageSummaryFunction?: string | null;
   schemaId?: string | null;
   scope?: string | null;
-  tableStatsDailyTableId?: string | null;
-  tableStatsDailyTableName?: string | null;
   tableStatsLogTableId?: string | null;
   tableStatsLogTableName?: string | null;
+  tableStatsSummaryTableId?: string | null;
+  tableStatsSummaryTableName?: string | null;
 }
 export interface UpdateDbUsageModuleInput {
   clientMutationId?: string;
@@ -9826,20 +10264,20 @@ export interface CreateDevicesModuleInput {
   clientMutationId?: string;
   devicesModule: {
     databaseId: string;
-    deviceSettingsTable?: string;
     deviceSettingsTableId?: string;
+    deviceSettingsTableName?: string;
     schemaId?: string;
-    userDevicesTable?: string;
     userDevicesTableId?: string;
+    userDevicesTableName?: string;
   };
 }
 export interface DevicesModulePatch {
   databaseId?: string | null;
-  deviceSettingsTable?: string | null;
   deviceSettingsTableId?: string | null;
+  deviceSettingsTableName?: string | null;
   schemaId?: string | null;
-  userDevicesTable?: string | null;
   userDevicesTableId?: string | null;
+  userDevicesTableName?: string | null;
 }
 export interface UpdateDevicesModuleInput {
   clientMutationId?: string;
@@ -10196,6 +10634,7 @@ export interface CreateFunctionModuleInput {
     definitionsTableName?: string;
     entityField?: string;
     entityTableId?: string;
+    hasCron?: boolean;
     policies?: Record<string, unknown>;
     prefix?: string;
     privateApiName?: string;
@@ -10203,6 +10642,7 @@ export interface CreateFunctionModuleInput {
     privateSchemaName?: string;
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
+    schedulesTableId?: string;
     schemaId?: string;
     scope?: string;
   };
@@ -10217,6 +10657,7 @@ export interface FunctionModulePatch {
   definitionsTableName?: string | null;
   entityField?: string | null;
   entityTableId?: string | null;
+  hasCron?: boolean | null;
   policies?: Record<string, unknown> | null;
   prefix?: string | null;
   privateApiName?: string | null;
@@ -10224,6 +10665,7 @@ export interface FunctionModulePatch {
   privateSchemaName?: string | null;
   provisions?: Record<string, unknown> | null;
   publicSchemaName?: string | null;
+  schedulesTableId?: string | null;
   schemaId?: string | null;
   scope?: string | null;
 }
@@ -10400,6 +10842,62 @@ export interface DeleteHierarchyModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateHttpRouteModuleInput {
+  clientMutationId?: string;
+  httpRouteModule: {
+    apiName?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    entityField?: string;
+    entityTableId?: string;
+    functionModuleId?: string;
+    httpRoutesTableId?: string;
+    httpRoutesTableName?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    resolverFunctionName?: string;
+    resourceModuleId?: string;
+    schemaId?: string;
+    scope?: string;
+    storageModuleId?: string;
+  };
+}
+export interface HttpRouteModulePatch {
+  apiName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  functionModuleId?: string | null;
+  httpRoutesTableId?: string | null;
+  httpRoutesTableName?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  resolverFunctionName?: string | null;
+  resourceModuleId?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  storageModuleId?: string | null;
+}
+export interface UpdateHttpRouteModuleInput {
+  clientMutationId?: string;
+  id: string;
+  httpRouteModulePatch: HttpRouteModulePatch;
+}
+export interface DeleteHttpRouteModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateI18NModuleInput {
   clientMutationId?: string;
   i18NModule: {
@@ -10490,8 +10988,8 @@ export interface CreateInferenceLogModuleInput {
     retention?: string;
     schemaId?: string;
     scope?: string;
-    usageDailyTableId?: string;
-    usageDailyTableName?: string;
+    usageSummaryTableId?: string;
+    usageSummaryTableName?: string;
   };
 }
 export interface InferenceLogModulePatch {
@@ -10512,8 +11010,8 @@ export interface InferenceLogModulePatch {
   retention?: string | null;
   schemaId?: string | null;
   scope?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 export interface UpdateInferenceLogModuleInput {
   clientMutationId?: string;
@@ -11440,23 +11938,23 @@ export interface CreateRateLimitsModuleInput {
   clientMutationId?: string;
   rateLimitsModule: {
     databaseId: string;
-    ipRateLimitsTable?: string;
     ipRateLimitsTableId?: string;
-    rateLimitSettingsTable?: string;
+    ipRateLimitsTableName?: string;
     rateLimitSettingsTableId?: string;
-    rateLimitsTable?: string;
+    rateLimitSettingsTableName?: string;
     rateLimitsTableId?: string;
+    rateLimitsTableName?: string;
     schemaId?: string;
   };
 }
 export interface RateLimitsModulePatch {
   databaseId?: string | null;
-  ipRateLimitsTable?: string | null;
   ipRateLimitsTableId?: string | null;
-  rateLimitSettingsTable?: string | null;
+  ipRateLimitsTableName?: string | null;
   rateLimitSettingsTableId?: string | null;
-  rateLimitsTable?: string | null;
+  rateLimitSettingsTableName?: string | null;
   rateLimitsTableId?: string | null;
+  rateLimitsTableName?: string | null;
   schemaId?: string | null;
 }
 export interface UpdateRateLimitsModuleInput {
@@ -11580,6 +12078,8 @@ export interface CreateResourceModuleInput {
     defaultPermissions?: string[];
     entityField?: string;
     entityTableId?: string;
+    installationStoreName?: string;
+    merkleStoreModuleId?: string;
     namespaceModuleId?: string;
     policies?: Record<string, unknown>;
     prefix?: string;
@@ -11590,14 +12090,22 @@ export interface CreateResourceModuleInput {
     publicSchemaName?: string;
     requirementsStateViewName?: string;
     resolvedRequirementsViewName?: string;
+    resourceBillingRollupFunction?: string;
     resourceDefinitionsTableId?: string;
     resourceDefinitionsTableName?: string;
     resourceEventsTableId?: string;
     resourceEventsTableName?: string;
+    resourceInstallationsTableId?: string;
+    resourceInstallationsTableName?: string;
     resourceStatusChecksTableId?: string;
     resourceStatusChecksTableName?: string;
+    resourceUsageLogTableId?: string;
+    resourceUsageLogTableName?: string;
+    resourceUsageSummaryTableId?: string;
+    resourceUsageSummaryTableName?: string;
     resourcesTableId?: string;
     resourcesTableName?: string;
+    rollupResourceUsageSummaryFunction?: string;
     schemaId?: string;
     scope?: string;
   };
@@ -11608,6 +12116,8 @@ export interface ResourceModulePatch {
   defaultPermissions?: string[] | null;
   entityField?: string | null;
   entityTableId?: string | null;
+  installationStoreName?: string | null;
+  merkleStoreModuleId?: string | null;
   namespaceModuleId?: string | null;
   policies?: Record<string, unknown> | null;
   prefix?: string | null;
@@ -11618,14 +12128,22 @@ export interface ResourceModulePatch {
   publicSchemaName?: string | null;
   requirementsStateViewName?: string | null;
   resolvedRequirementsViewName?: string | null;
+  resourceBillingRollupFunction?: string | null;
   resourceDefinitionsTableId?: string | null;
   resourceDefinitionsTableName?: string | null;
   resourceEventsTableId?: string | null;
   resourceEventsTableName?: string | null;
+  resourceInstallationsTableId?: string | null;
+  resourceInstallationsTableName?: string | null;
   resourceStatusChecksTableId?: string | null;
   resourceStatusChecksTableName?: string | null;
+  resourceUsageLogTableId?: string | null;
+  resourceUsageLogTableName?: string | null;
+  resourceUsageSummaryTableId?: string | null;
+  resourceUsageSummaryTableName?: string | null;
   resourcesTableId?: string | null;
   resourcesTableName?: string | null;
+  rollupResourceUsageSummaryFunction?: string | null;
   schemaId?: string | null;
   scope?: string | null;
 }
@@ -11743,28 +12261,28 @@ export interface DeleteSessionSecretsModuleInput {
 export interface CreateSessionsModuleInput {
   clientMutationId?: string;
   sessionsModule: {
-    authSettingsTable?: string;
     authSettingsTableId?: string;
+    authSettingsTableName?: string;
     databaseId: string;
     schemaId?: string;
-    sessionCredentialsTable?: string;
     sessionCredentialsTableId?: string;
+    sessionCredentialsTableName?: string;
     sessionsDefaultExpiration?: IntervalInput;
-    sessionsTable?: string;
     sessionsTableId?: string;
+    sessionsTableName?: string;
     usersTableId?: string;
   };
 }
 export interface SessionsModulePatch {
-  authSettingsTable?: string | null;
   authSettingsTableId?: string | null;
+  authSettingsTableName?: string | null;
   databaseId?: string | null;
   schemaId?: string | null;
-  sessionCredentialsTable?: string | null;
   sessionCredentialsTableId?: string | null;
+  sessionCredentialsTableName?: string | null;
   sessionsDefaultExpiration?: IntervalInput | null;
-  sessionsTable?: string | null;
   sessionsTableId?: string | null;
+  sessionsTableName?: string | null;
   usersTableId?: string | null;
 }
 export interface UpdateSessionsModuleInput {
@@ -11796,8 +12314,8 @@ export interface CreateStorageLogModuleInput {
     scope?: string;
     storageLogTableId?: string;
     storageLogTableName?: string;
-    usageDailyTableId?: string;
-    usageDailyTableName?: string;
+    usageSummaryTableId?: string;
+    usageSummaryTableName?: string;
   };
 }
 export interface StorageLogModulePatch {
@@ -11818,8 +12336,8 @@ export interface StorageLogModulePatch {
   scope?: string | null;
   storageLogTableId?: string | null;
   storageLogTableName?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 export interface UpdateStorageLogModuleInput {
   clientMutationId?: string;
@@ -11944,8 +12462,8 @@ export interface CreateTransferLogModuleInput {
     scope?: string;
     transferLogTableId?: string;
     transferLogTableName?: string;
-    usageDailyTableId?: string;
-    usageDailyTableName?: string;
+    usageSummaryTableId?: string;
+    usageSummaryTableName?: string;
   };
 }
 export interface TransferLogModulePatch {
@@ -11966,8 +12484,8 @@ export interface TransferLogModulePatch {
   scope?: string | null;
   transferLogTableId?: string | null;
   transferLogTableName?: string | null;
-  usageDailyTableId?: string | null;
-  usageDailyTableName?: string | null;
+  usageSummaryTableId?: string | null;
+  usageSummaryTableName?: string | null;
 }
 export interface UpdateTransferLogModuleInput {
   clientMutationId?: string;
@@ -12237,6 +12755,66 @@ export interface UpdateWebauthnCredentialsModuleInput {
   webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
 }
 export interface DeleteWebauthnCredentialsModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateWebhookModuleInput {
+  clientMutationId?: string;
+  webhookModule: {
+    apiName?: string;
+    databaseId: string;
+    defaultPermissions?: string[];
+    entityField?: string;
+    entityTableId?: string;
+    functionInvocationModuleId?: string;
+    functionModuleId?: string;
+    infraSecretsModuleId?: string;
+    namespaceModuleId?: string;
+    policies?: Record<string, unknown>;
+    prefix?: string;
+    privateApiName?: string;
+    privateSchemaId?: string;
+    privateSchemaName?: string;
+    provisions?: Record<string, unknown>;
+    publicSchemaName?: string;
+    schemaId?: string;
+    scope?: string;
+    webhookEndpointsTableId?: string;
+    webhookEndpointsTableName?: string;
+    webhookEventsTableId?: string;
+    webhookEventsTableName?: string;
+  };
+}
+export interface WebhookModulePatch {
+  apiName?: string | null;
+  databaseId?: string | null;
+  defaultPermissions?: string[] | null;
+  entityField?: string | null;
+  entityTableId?: string | null;
+  functionInvocationModuleId?: string | null;
+  functionModuleId?: string | null;
+  infraSecretsModuleId?: string | null;
+  namespaceModuleId?: string | null;
+  policies?: Record<string, unknown> | null;
+  prefix?: string | null;
+  privateApiName?: string | null;
+  privateSchemaId?: string | null;
+  privateSchemaName?: string | null;
+  provisions?: Record<string, unknown> | null;
+  publicSchemaName?: string | null;
+  schemaId?: string | null;
+  scope?: string | null;
+  webhookEndpointsTableId?: string | null;
+  webhookEndpointsTableName?: string | null;
+  webhookEventsTableId?: string | null;
+  webhookEventsTableName?: string | null;
+}
+export interface UpdateWebhookModuleInput {
+  clientMutationId?: string;
+  id: string;
+  webhookModulePatch: WebhookModulePatch;
+}
+export interface DeleteWebhookModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12668,8 +13246,8 @@ export interface ComputeLogModuleInput {
   retention?: string;
   schemaId?: string;
   scope?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** An input for mutations affecting `ConfigSecretsUserModule` */
 export interface ConfigSecretsUserModuleInput {
@@ -12855,19 +13433,19 @@ export interface DbUsageModuleInput {
   privateSchemaId?: string;
   privateSchemaName?: string;
   publicSchemaName?: string;
-  queryStatsDailyTableId?: string;
-  queryStatsDailyTableName?: string;
   queryStatsLogTableId?: string;
   queryStatsLogTableName?: string;
+  queryStatsSummaryTableId?: string;
+  queryStatsSummaryTableName?: string;
   retention?: string;
-  rollupDbQueryStatsDailyFunction?: string;
-  rollupDbTableStatsDailyFunction?: string;
+  rollupDbQueryStatsUsageSummaryFunction?: string;
+  rollupDbTableStatsUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
-  tableStatsDailyTableId?: string;
-  tableStatsDailyTableName?: string;
   tableStatsLogTableId?: string;
   tableStatsLogTableName?: string;
+  tableStatsSummaryTableId?: string;
+  tableStatsSummaryTableName?: string;
 }
 /** An input for mutations affecting `DefaultIdsModule` */
 export interface DefaultIdsModuleInput {
@@ -12892,12 +13470,12 @@ export interface DenormalizedTableFieldInput {
 /** An input for mutations affecting `DevicesModule` */
 export interface DevicesModuleInput {
   databaseId: string;
-  deviceSettingsTable?: string;
   deviceSettingsTableId?: string;
+  deviceSettingsTableName?: string;
   id?: string;
   schemaId?: string;
-  userDevicesTable?: string;
   userDevicesTableId?: string;
+  userDevicesTableName?: string;
 }
 /** An input for mutations affecting `EmailsModule` */
 export interface EmailsModuleInput {
@@ -13267,6 +13845,7 @@ export interface FunctionModuleInput {
   definitionsTableName?: string;
   entityField?: string;
   entityTableId?: string;
+  hasCron?: boolean;
   id?: string;
   policies?: Record<string, unknown>;
   prefix?: string;
@@ -13275,6 +13854,7 @@ export interface FunctionModuleInput {
   privateSchemaName?: string;
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
+  schedulesTableId?: string;
   schemaId?: string;
   scope?: string;
 }
@@ -13351,6 +13931,30 @@ export interface HierarchyModuleInput {
   sprtTableName?: string;
   usersTableId: string;
 }
+/** An input for mutations affecting `HttpRouteModule` */
+export interface HttpRouteModuleInput {
+  apiName?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  functionModuleId?: string;
+  httpRoutesTableId?: string;
+  httpRoutesTableName?: string;
+  id?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  resolverFunctionName?: string;
+  resourceModuleId?: string;
+  schemaId?: string;
+  scope?: string;
+  storageModuleId?: string;
+}
 /** An input for mutations affecting `I18NModule` */
 export interface I18NModuleInput {
   apiName?: string;
@@ -13399,8 +14003,8 @@ export interface InferenceLogModuleInput {
   retention?: string;
   schemaId?: string;
   scope?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** An input for mutations affecting `InfraConfigModule` */
 export interface InfraConfigModuleInput {
@@ -13795,12 +14399,12 @@ export interface RateLimitMetersModuleInput {
 export interface RateLimitsModuleInput {
   databaseId: string;
   id?: string;
-  ipRateLimitsTable?: string;
   ipRateLimitsTableId?: string;
-  rateLimitSettingsTable?: string;
+  ipRateLimitsTableName?: string;
   rateLimitSettingsTableId?: string;
-  rateLimitsTable?: string;
+  rateLimitSettingsTableName?: string;
   rateLimitsTableId?: string;
+  rateLimitsTableName?: string;
   schemaId?: string;
 }
 /** An input for mutations affecting `RealtimeModule` */
@@ -13952,6 +14556,8 @@ export interface ResourceModuleInput {
   entityField?: string;
   entityTableId?: string;
   id?: string;
+  installationStoreName?: string;
+  merkleStoreModuleId?: string;
   namespaceModuleId?: string;
   policies?: Record<string, unknown>;
   prefix?: string;
@@ -13962,14 +14568,22 @@ export interface ResourceModuleInput {
   publicSchemaName?: string;
   requirementsStateViewName?: string;
   resolvedRequirementsViewName?: string;
+  resourceBillingRollupFunction?: string;
   resourceDefinitionsTableId?: string;
   resourceDefinitionsTableName?: string;
   resourceEventsTableId?: string;
   resourceEventsTableName?: string;
+  resourceInstallationsTableId?: string;
+  resourceInstallationsTableName?: string;
   resourceStatusChecksTableId?: string;
   resourceStatusChecksTableName?: string;
+  resourceUsageLogTableId?: string;
+  resourceUsageLogTableName?: string;
+  resourceUsageSummaryTableId?: string;
+  resourceUsageSummaryTableName?: string;
   resourcesTableId?: string;
   resourcesTableName?: string;
+  rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
 }
@@ -14019,23 +14633,23 @@ export interface SessionSecretsModuleInput {
   databaseId: string;
   id?: string;
   schemaId?: string;
-  /** Resolved reference to sessions_module.sessions_table, used to FK session_secrets.session_id with ON DELETE CASCADE. */
+  /** Resolved reference to sessions_module.sessions_table_name, used to FK session_secrets.session_id with ON DELETE CASCADE. */
   sessionsTableId?: string;
   tableId?: string;
   tableName?: string;
 }
 /** An input for mutations affecting `SessionsModule` */
 export interface SessionsModuleInput {
-  authSettingsTable?: string;
   authSettingsTableId?: string;
+  authSettingsTableName?: string;
   databaseId: string;
   id?: string;
   schemaId?: string;
-  sessionCredentialsTable?: string;
   sessionCredentialsTableId?: string;
+  sessionCredentialsTableName?: string;
   sessionsDefaultExpiration?: IntervalInput;
-  sessionsTable?: string;
   sessionsTableId?: string;
+  sessionsTableName?: string;
   usersTableId?: string;
 }
 /** An input for mutations affecting `StorageLogModule` */
@@ -14058,8 +14672,8 @@ export interface StorageLogModuleInput {
   scope?: string;
   storageLogTableId?: string;
   storageLogTableName?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** An input for mutations affecting `StorageModule` */
 export interface StorageModuleInput {
@@ -14124,8 +14738,8 @@ export interface TransferLogModuleInput {
   scope?: string;
   transferLogTableId?: string;
   transferLogTableName?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** An input for mutations affecting `UserAuthModule` */
 export interface UserAuthModuleInput {
@@ -14230,6 +14844,32 @@ export interface WebauthnCredentialsModuleInput {
   schemaId?: string;
   tableId?: string;
   tableName?: string;
+}
+/** An input for mutations affecting `WebhookModule` */
+export interface WebhookModuleInput {
+  apiName?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  functionInvocationModuleId?: string;
+  functionModuleId?: string;
+  id?: string;
+  infraSecretsModuleId?: string;
+  namespaceModuleId?: string;
+  policies?: Record<string, unknown>;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: Record<string, unknown>;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope?: string;
+  webhookEndpointsTableId?: string;
+  webhookEndpointsTableName?: string;
+  webhookEventsTableId?: string;
+  webhookEventsTableName?: string;
 }
 /** A filter to be used against `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
 export interface BlueprintConstructionFilter {
@@ -16092,6 +16732,51 @@ export type DeleteHierarchyModulePayloadSelect = {
     select: HierarchyModuleEdgeSelect;
   };
 };
+export interface CreateHttpRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRouteModule` that was created by this mutation. */
+  httpRouteModule?: HttpRouteModule | null;
+  httpRouteModuleEdge?: HttpRouteModuleEdge | null;
+}
+export type CreateHttpRouteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  httpRouteModule?: {
+    select: HttpRouteModuleSelect;
+  };
+  httpRouteModuleEdge?: {
+    select: HttpRouteModuleEdgeSelect;
+  };
+};
+export interface UpdateHttpRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRouteModule` that was updated by this mutation. */
+  httpRouteModule?: HttpRouteModule | null;
+  httpRouteModuleEdge?: HttpRouteModuleEdge | null;
+}
+export type UpdateHttpRouteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  httpRouteModule?: {
+    select: HttpRouteModuleSelect;
+  };
+  httpRouteModuleEdge?: {
+    select: HttpRouteModuleEdgeSelect;
+  };
+};
+export interface DeleteHttpRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRouteModule` that was deleted by this mutation. */
+  httpRouteModule?: HttpRouteModule | null;
+  httpRouteModuleEdge?: HttpRouteModuleEdge | null;
+}
+export type DeleteHttpRouteModulePayloadSelect = {
+  clientMutationId?: boolean;
+  httpRouteModule?: {
+    select: HttpRouteModuleSelect;
+  };
+  httpRouteModuleEdge?: {
+    select: HttpRouteModuleEdgeSelect;
+  };
+};
 export interface CreateI18NModulePayload {
   clientMutationId?: string | null;
   /** The `I18NModule` that was created by this mutation. */
@@ -17802,6 +18487,51 @@ export type DeleteWebauthnCredentialsModulePayloadSelect = {
     select: WebauthnCredentialsModuleEdgeSelect;
   };
 };
+export interface CreateWebhookModulePayload {
+  clientMutationId?: string | null;
+  /** The `WebhookModule` that was created by this mutation. */
+  webhookModule?: WebhookModule | null;
+  webhookModuleEdge?: WebhookModuleEdge | null;
+}
+export type CreateWebhookModulePayloadSelect = {
+  clientMutationId?: boolean;
+  webhookModule?: {
+    select: WebhookModuleSelect;
+  };
+  webhookModuleEdge?: {
+    select: WebhookModuleEdgeSelect;
+  };
+};
+export interface UpdateWebhookModulePayload {
+  clientMutationId?: string | null;
+  /** The `WebhookModule` that was updated by this mutation. */
+  webhookModule?: WebhookModule | null;
+  webhookModuleEdge?: WebhookModuleEdge | null;
+}
+export type UpdateWebhookModulePayloadSelect = {
+  clientMutationId?: boolean;
+  webhookModule?: {
+    select: WebhookModuleSelect;
+  };
+  webhookModuleEdge?: {
+    select: WebhookModuleEdgeSelect;
+  };
+};
+export interface DeleteWebhookModulePayload {
+  clientMutationId?: string | null;
+  /** The `WebhookModule` that was deleted by this mutation. */
+  webhookModule?: WebhookModule | null;
+  webhookModuleEdge?: WebhookModuleEdge | null;
+}
+export type DeleteWebhookModulePayloadSelect = {
+  clientMutationId?: boolean;
+  webhookModule?: {
+    select: WebhookModuleSelect;
+  };
+  webhookModuleEdge?: {
+    select: WebhookModuleEdgeSelect;
+  };
+};
 export interface ProvisionRelationRecord {
   outFieldId?: string | null;
   outJunctionTableId?: string | null;
@@ -18156,6 +18886,18 @@ export type HierarchyModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: HierarchyModuleSelect;
+  };
+};
+/** A `HttpRouteModule` edge in the connection. */
+export interface HttpRouteModuleEdge {
+  cursor?: string | null;
+  /** The `HttpRouteModule` at the end of the edge. */
+  node?: HttpRouteModule | null;
+}
+export type HttpRouteModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: HttpRouteModuleSelect;
   };
 };
 /** A `I18NModule` edge in the connection. */
@@ -18612,5 +19354,17 @@ export type WebauthnCredentialsModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: WebauthnCredentialsModuleSelect;
+  };
+};
+/** A `WebhookModule` edge in the connection. */
+export interface WebhookModuleEdge {
+  cursor?: string | null;
+  /** The `WebhookModule` at the end of the edge. */
+  node?: WebhookModule | null;
+}
+export type WebhookModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: WebhookModuleSelect;
   };
 };

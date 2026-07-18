@@ -7,7 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
 import commitCmd from './commands/commit';
-import getAllRecordCmd from './commands/get-all-record';
+import getAllTreeNodesRecordCmd from './commands/get-all-tree-nodes-record';
 import objectCmd from './commands/object';
 import refCmd from './commands/ref';
 import storeCmd from './commands/store';
@@ -26,7 +26,7 @@ const createCommandMap: () => Record<
   context: contextCmd,
   auth: authCmd,
   commit: commitCmd,
-  'get-all-record': getAllRecordCmd,
+  'get-all-tree-nodes-record': getAllTreeNodesRecordCmd,
   object: objectCmd,
   ref: refCmd,
   store: storeCmd,
@@ -36,7 +36,7 @@ const createCommandMap: () => Record<
   'set-data-at-path': setDataAtPathCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  commit               commit CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  set-data-at-path     setDataAtPath\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  commit               commit CRUD operations\n  get-all-tree-nodes-record getAllTreeNodesRecord CRUD operations\n  object               object CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  set-data-at-path     setDataAtPath\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

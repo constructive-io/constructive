@@ -12,8 +12,8 @@ csdk platform-resource list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-resource list --limit 10 --after <cursor>
 csdk platform-resource find-first --where.<field>.<op> <value>
 csdk platform-resource get --id <UUID>
-csdk platform-resource create --kind <String> --name <String> --namespaceId <UUID> --slug <String> [--annotations <JSON>] [--createdBy <UUID>] [--errorCount <Int>] [--integrations <String>] [--labels <JSON>] [--lastError <String>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--resourceDefinitionId <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--updatedBy <UUID>]
-csdk platform-resource update --id <UUID> [--annotations <JSON>] [--createdBy <UUID>] [--errorCount <Int>] [--integrations <String>] [--kind <String>] [--labels <JSON>] [--lastError <String>] [--name <String>] [--namespaceId <UUID>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--resourceDefinitionId <UUID>] [--slug <String>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--updatedBy <UUID>]
+csdk platform-resource create --kind <String> --name <String> --namespaceId <UUID> --slug <String> [--annotations <JSON>] [--createdBy <UUID>] [--errorCount <Int>] [--installationId <UUID>] [--integrations <String>] [--labels <JSON>] [--lastError <String>] [--lastHeartbeatAt <Datetime>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--resourceDefinitionId <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--updatedBy <UUID>]
+csdk platform-resource update --id <UUID> [--annotations <JSON>] [--createdBy <UUID>] [--errorCount <Int>] [--installationId <UUID>] [--integrations <String>] [--kind <String>] [--labels <JSON>] [--lastError <String>] [--lastHeartbeatAt <Datetime>] [--name <String>] [--namespaceId <UUID>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--resourceDefinitionId <UUID>] [--slug <String>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--updatedBy <UUID>]
 csdk platform-resource delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-resource list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformResource
 
 ```bash
-csdk platform-resource create --kind <String> --name <String> --namespaceId <UUID> --slug <String> [--annotations <JSON>] [--createdBy <UUID>] [--errorCount <Int>] [--integrations <String>] [--labels <JSON>] [--lastError <String>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--resourceDefinitionId <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--updatedBy <UUID>]
+csdk platform-resource create --kind <String> --name <String> --namespaceId <UUID> --slug <String> [--annotations <JSON>] [--createdBy <UUID>] [--errorCount <Int>] [--installationId <UUID>] [--integrations <String>] [--labels <JSON>] [--lastError <String>] [--lastHeartbeatAt <Datetime>] [--requiredConfigs <ResourceRequirement>] [--requiredSecrets <ResourceRequirement>] [--resourceDefinitionId <UUID>] [--spec <JSON>] [--status <String>] [--statusObserved <JSON>] [--updatedBy <UUID>]
 ```
 
 ### Get a platformResource by id

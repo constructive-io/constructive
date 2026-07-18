@@ -6,10 +6,16 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
+import type { ResolveHttpRouteRecord, ResolveHttpRouteRecordSelect } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface ApplyRegistryDefaultsVariables {
   data?: unknown;
   nodeType?: string;
+}
+export interface ResolveHttpRouteVariables {
+  pHost?: string;
+  pMethod?: string;
+  pPath?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
@@ -44,6 +50,43 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           undefined
+        ),
+      }),
+    resolveHttpRoute: <S extends ResolveHttpRouteRecordSelect>(
+      args: ResolveHttpRouteVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ResolveHttpRouteRecordSelect>
+    ) =>
+      new QueryBuilder<{
+        resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ResolveHttpRoute',
+        fieldName: 'resolveHttpRoute',
+        ...buildCustomDocument(
+          'query',
+          'ResolveHttpRoute',
+          'resolveHttpRoute',
+          options.select,
+          args,
+          [
+            {
+              name: 'pHost',
+              type: 'String',
+            },
+            {
+              name: 'pMethod',
+              type: 'String',
+            },
+            {
+              name: 'pPath',
+              type: 'String',
+            },
+          ],
+          connectionFieldsMap,
+          'ResolveHttpRouteRecord'
         ),
       }),
   };

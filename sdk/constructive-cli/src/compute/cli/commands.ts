@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
 import dbPresetCmd from './commands/db-preset';
+import declaredCapacityCmd from './commands/declared-capacity';
 import functionApiBindingCmd from './commands/function-api-binding';
 import functionDefinitionCmd from './commands/function-definition';
 import functionDeploymentCmd from './commands/function-deployment';
@@ -21,35 +22,55 @@ import functionGraphObjectCmd from './commands/function-graph-object';
 import functionGraphRefCmd from './commands/function-graph-ref';
 import functionGraphStoreCmd from './commands/function-graph-store';
 import functionInvocationCmd from './commands/function-invocation';
-import getAllRecordCmd from './commands/get-all-record';
+import getAllTreeNodesRecordCmd from './commands/get-all-tree-nodes-record';
 import infraCommitCmd from './commands/infra-commit';
-import infraGetAllRecordCmd from './commands/infra-get-all-record';
+import infraGetAllTreeNodesRecordCmd from './commands/infra-get-all-tree-nodes-record';
 import infraObjectCmd from './commands/infra-object';
 import infraRefCmd from './commands/infra-ref';
 import infraStoreCmd from './commands/infra-store';
 import integrationProviderCmd from './commands/integration-provider';
 import namespaceCmd from './commands/namespace';
 import namespaceEventCmd from './commands/namespace-event';
+import platformDeclaredCapacityCmd from './commands/platform-declared-capacity';
 import platformFunctionApiBindingCmd from './commands/platform-function-api-binding';
 import platformFunctionDefinitionCmd from './commands/platform-function-definition';
 import platformFunctionDeploymentCmd from './commands/platform-function-deployment';
 import platformFunctionDeploymentEventCmd from './commands/platform-function-deployment-event';
 import platformFunctionExecutionLogCmd from './commands/platform-function-execution-log';
 import platformFunctionInvocationCmd from './commands/platform-function-invocation';
+import platformInfraCommitCmd from './commands/platform-infra-commit';
+import platformInfraGetAllTreeNodesRecordCmd from './commands/platform-infra-get-all-tree-nodes-record';
+import platformInfraObjectCmd from './commands/platform-infra-object';
+import platformInfraRefCmd from './commands/platform-infra-ref';
+import platformInfraStoreCmd from './commands/platform-infra-store';
 import platformNamespaceCmd from './commands/platform-namespace';
 import platformNamespaceEventCmd from './commands/platform-namespace-event';
 import platformResourceCmd from './commands/platform-resource';
 import platformResourceDefinitionCmd from './commands/platform-resource-definition';
 import platformResourceEventCmd from './commands/platform-resource-event';
+import platformResourceInstallationCmd from './commands/platform-resource-installation';
 import platformResourceStatusCheckCmd from './commands/platform-resource-status-check';
+import platformResourceUsageLogCmd from './commands/platform-resource-usage-log';
+import platformResourceUsageSummaryCmd from './commands/platform-resource-usage-summary';
+import platformResourceUtilizationDailyCmd from './commands/platform-resource-utilization-daily';
+import platformResourcesHealthCmd from './commands/platform-resources-health';
 import platformResourcesRequirementsStateCmd from './commands/platform-resources-requirements-state';
 import platformResourcesResolvedRequirementCmd from './commands/platform-resources-resolved-requirement';
+import platformWebhookEndpointCmd from './commands/platform-webhook-endpoint';
+import platformWebhookEventCmd from './commands/platform-webhook-event';
 import resourceCmd from './commands/resource';
 import resourceDefinitionCmd from './commands/resource-definition';
 import resourceEventCmd from './commands/resource-event';
+import resourceInstallationCmd from './commands/resource-installation';
 import resourceStatusCheckCmd from './commands/resource-status-check';
+import resourceUsageLogCmd from './commands/resource-usage-log';
+import resourceUsageSummaryCmd from './commands/resource-usage-summary';
+import resourceUtilizationDailyCmd from './commands/resource-utilization-daily';
+import resourcesHealthCmd from './commands/resources-health';
 import resourcesRequirementsStateCmd from './commands/resources-requirements-state';
 import resourcesResolvedRequirementCmd from './commands/resources-resolved-requirement';
+import webhookEndpointCmd from './commands/webhook-endpoint';
+import webhookEventCmd from './commands/webhook-event';
 import readFunctionGraphCmd from './commands/read-function-graph';
 import addEdgeCmd from './commands/add-edge';
 import addEdgeAndSaveCmd from './commands/add-edge-and-save';
@@ -63,7 +84,18 @@ import infraInsertNodeAtPathCmd from './commands/infra-insert-node-at-path';
 import infraSetDataAtPathCmd from './commands/infra-set-data-at-path';
 import initEmptyRepoCmd from './commands/init-empty-repo';
 import insertNodeAtPathCmd from './commands/insert-node-at-path';
+import platformInfraInitEmptyRepoCmd from './commands/platform-infra-init-empty-repo';
+import platformInfraInsertNodeAtPathCmd from './commands/platform-infra-insert-node-at-path';
+import platformInfraSetDataAtPathCmd from './commands/platform-infra-set-data-at-path';
+import platformResourceInstallationsInstallCmd from './commands/platform-resource-installations-install';
+import platformResourceInstallationsRollbackCmd from './commands/platform-resource-installations-rollback';
+import platformResourceInstallationsUninstallCmd from './commands/platform-resource-installations-uninstall';
+import platformResourceInstallationsUpgradeCmd from './commands/platform-resource-installations-upgrade';
 import provisionBucketCmd from './commands/provision-bucket';
+import resourceInstallationsInstallCmd from './commands/resource-installations-install';
+import resourceInstallationsRollbackCmd from './commands/resource-installations-rollback';
+import resourceInstallationsUninstallCmd from './commands/resource-installations-uninstall';
+import resourceInstallationsUpgradeCmd from './commands/resource-installations-upgrade';
 import saveGraphCmd from './commands/save-graph';
 import setDataAtPathCmd from './commands/set-data-at-path';
 import startExecutionCmd from './commands/start-execution';
@@ -79,6 +111,7 @@ const createCommandMap: () => Record<
   context: contextCmd,
   auth: authCmd,
   'db-preset': dbPresetCmd,
+  'declared-capacity': declaredCapacityCmd,
   'function-api-binding': functionApiBindingCmd,
   'function-definition': functionDefinitionCmd,
   'function-deployment': functionDeploymentCmd,
@@ -93,35 +126,55 @@ const createCommandMap: () => Record<
   'function-graph-ref': functionGraphRefCmd,
   'function-graph-store': functionGraphStoreCmd,
   'function-invocation': functionInvocationCmd,
-  'get-all-record': getAllRecordCmd,
+  'get-all-tree-nodes-record': getAllTreeNodesRecordCmd,
   'infra-commit': infraCommitCmd,
-  'infra-get-all-record': infraGetAllRecordCmd,
+  'infra-get-all-tree-nodes-record': infraGetAllTreeNodesRecordCmd,
   'infra-object': infraObjectCmd,
   'infra-ref': infraRefCmd,
   'infra-store': infraStoreCmd,
   'integration-provider': integrationProviderCmd,
   namespace: namespaceCmd,
   'namespace-event': namespaceEventCmd,
+  'platform-declared-capacity': platformDeclaredCapacityCmd,
   'platform-function-api-binding': platformFunctionApiBindingCmd,
   'platform-function-definition': platformFunctionDefinitionCmd,
   'platform-function-deployment': platformFunctionDeploymentCmd,
   'platform-function-deployment-event': platformFunctionDeploymentEventCmd,
   'platform-function-execution-log': platformFunctionExecutionLogCmd,
   'platform-function-invocation': platformFunctionInvocationCmd,
+  'platform-infra-commit': platformInfraCommitCmd,
+  'platform-infra-get-all-tree-nodes-record': platformInfraGetAllTreeNodesRecordCmd,
+  'platform-infra-object': platformInfraObjectCmd,
+  'platform-infra-ref': platformInfraRefCmd,
+  'platform-infra-store': platformInfraStoreCmd,
   'platform-namespace': platformNamespaceCmd,
   'platform-namespace-event': platformNamespaceEventCmd,
   'platform-resource': platformResourceCmd,
   'platform-resource-definition': platformResourceDefinitionCmd,
   'platform-resource-event': platformResourceEventCmd,
+  'platform-resource-installation': platformResourceInstallationCmd,
   'platform-resource-status-check': platformResourceStatusCheckCmd,
+  'platform-resource-usage-log': platformResourceUsageLogCmd,
+  'platform-resource-usage-summary': platformResourceUsageSummaryCmd,
+  'platform-resource-utilization-daily': platformResourceUtilizationDailyCmd,
+  'platform-resources-health': platformResourcesHealthCmd,
   'platform-resources-requirements-state': platformResourcesRequirementsStateCmd,
   'platform-resources-resolved-requirement': platformResourcesResolvedRequirementCmd,
+  'platform-webhook-endpoint': platformWebhookEndpointCmd,
+  'platform-webhook-event': platformWebhookEventCmd,
   resource: resourceCmd,
   'resource-definition': resourceDefinitionCmd,
   'resource-event': resourceEventCmd,
+  'resource-installation': resourceInstallationCmd,
   'resource-status-check': resourceStatusCheckCmd,
+  'resource-usage-log': resourceUsageLogCmd,
+  'resource-usage-summary': resourceUsageSummaryCmd,
+  'resource-utilization-daily': resourceUtilizationDailyCmd,
+  'resources-health': resourcesHealthCmd,
   'resources-requirements-state': resourcesRequirementsStateCmd,
   'resources-resolved-requirement': resourcesResolvedRequirementCmd,
+  'webhook-endpoint': webhookEndpointCmd,
+  'webhook-event': webhookEventCmd,
   'read-function-graph': readFunctionGraphCmd,
   'add-edge': addEdgeCmd,
   'add-edge-and-save': addEdgeAndSaveCmd,
@@ -135,14 +188,25 @@ const createCommandMap: () => Record<
   'infra-set-data-at-path': infraSetDataAtPathCmd,
   'init-empty-repo': initEmptyRepoCmd,
   'insert-node-at-path': insertNodeAtPathCmd,
+  'platform-infra-init-empty-repo': platformInfraInitEmptyRepoCmd,
+  'platform-infra-insert-node-at-path': platformInfraInsertNodeAtPathCmd,
+  'platform-infra-set-data-at-path': platformInfraSetDataAtPathCmd,
+  'platform-resource-installations-install': platformResourceInstallationsInstallCmd,
+  'platform-resource-installations-rollback': platformResourceInstallationsRollbackCmd,
+  'platform-resource-installations-uninstall': platformResourceInstallationsUninstallCmd,
+  'platform-resource-installations-upgrade': platformResourceInstallationsUpgradeCmd,
   'provision-bucket': provisionBucketCmd,
+  'resource-installations-install': resourceInstallationsInstallCmd,
+  'resource-installations-rollback': resourceInstallationsRollbackCmd,
+  'resource-installations-uninstall': resourceInstallationsUninstallCmd,
+  'resource-installations-upgrade': resourceInstallationsUpgradeCmd,
   'save-graph': saveGraphCmd,
   'set-data-at-path': setDataAtPathCmd,
   'start-execution': startExecutionCmd,
   'validate-function-graph': validateFunctionGraphCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  db-preset            dbPreset CRUD operations\n  function-api-binding functionApiBinding CRUD operations\n  function-definition  functionDefinition CRUD operations\n  function-deployment  functionDeployment CRUD operations\n  function-deployment-event functionDeploymentEvent CRUD operations\n  function-execution-log functionExecutionLog CRUD operations\n  function-graph-commit functionGraphCommit CRUD operations\n  function-graph       functionGraph CRUD operations\n  function-graph-execution functionGraphExecution CRUD operations\n  function-graph-execution-node-state functionGraphExecutionNodeState CRUD operations\n  function-graph-execution-output functionGraphExecutionOutput CRUD operations\n  function-graph-object functionGraphObject CRUD operations\n  function-graph-ref   functionGraphRef CRUD operations\n  function-graph-store functionGraphStore CRUD operations\n  function-invocation  functionInvocation CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  infra-commit         infraCommit CRUD operations\n  infra-get-all-record infraGetAllRecord CRUD operations\n  infra-object         infraObject CRUD operations\n  infra-ref            infraRef CRUD operations\n  infra-store          infraStore CRUD operations\n  integration-provider integrationProvider CRUD operations\n  namespace            namespace CRUD operations\n  namespace-event      namespaceEvent CRUD operations\n  platform-function-api-binding platformFunctionApiBinding CRUD operations\n  platform-function-definition platformFunctionDefinition CRUD operations\n  platform-function-deployment platformFunctionDeployment CRUD operations\n  platform-function-deployment-event platformFunctionDeploymentEvent CRUD operations\n  platform-function-execution-log platformFunctionExecutionLog CRUD operations\n  platform-function-invocation platformFunctionInvocation CRUD operations\n  platform-namespace   platformNamespace CRUD operations\n  platform-namespace-event platformNamespaceEvent CRUD operations\n  platform-resource    platformResource CRUD operations\n  platform-resource-definition platformResourceDefinition CRUD operations\n  platform-resource-event platformResourceEvent CRUD operations\n  platform-resource-status-check platformResourceStatusCheck CRUD operations\n  platform-resources-requirements-state platformResourcesRequirementsState CRUD operations\n  platform-resources-resolved-requirement platformResourcesResolvedRequirement CRUD operations\n  resource             resource CRUD operations\n  resource-definition  resourceDefinition CRUD operations\n  resource-event       resourceEvent CRUD operations\n  resource-status-check resourceStatusCheck CRUD operations\n  resources-requirements-state resourcesRequirementsState CRUD operations\n  resources-resolved-requirement resourcesResolvedRequirement CRUD operations\n  read-function-graph  readFunctionGraph\n  add-edge             addEdge\n  add-edge-and-save    addEdgeAndSave\n  add-node             addNode\n  add-node-and-save    addNodeAndSave\n  copy-graph           copyGraph\n  import-definitions   importDefinitions\n  import-graph-json    importGraphJson\n  infra-init-empty-repo infraInitEmptyRepo\n  infra-insert-node-at-path infraInsertNodeAtPath\n  infra-set-data-at-path infraSetDataAtPath\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  save-graph           saveGraph\n  set-data-at-path     setDataAtPath\n  start-execution      startExecution\n  validate-function-graph validateFunctionGraph\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  db-preset            dbPreset CRUD operations\n  declared-capacity    declaredCapacity CRUD operations\n  function-api-binding functionApiBinding CRUD operations\n  function-definition  functionDefinition CRUD operations\n  function-deployment  functionDeployment CRUD operations\n  function-deployment-event functionDeploymentEvent CRUD operations\n  function-execution-log functionExecutionLog CRUD operations\n  function-graph-commit functionGraphCommit CRUD operations\n  function-graph       functionGraph CRUD operations\n  function-graph-execution functionGraphExecution CRUD operations\n  function-graph-execution-node-state functionGraphExecutionNodeState CRUD operations\n  function-graph-execution-output functionGraphExecutionOutput CRUD operations\n  function-graph-object functionGraphObject CRUD operations\n  function-graph-ref   functionGraphRef CRUD operations\n  function-graph-store functionGraphStore CRUD operations\n  function-invocation  functionInvocation CRUD operations\n  get-all-tree-nodes-record getAllTreeNodesRecord CRUD operations\n  infra-commit         infraCommit CRUD operations\n  infra-get-all-tree-nodes-record infraGetAllTreeNodesRecord CRUD operations\n  infra-object         infraObject CRUD operations\n  infra-ref            infraRef CRUD operations\n  infra-store          infraStore CRUD operations\n  integration-provider integrationProvider CRUD operations\n  namespace            namespace CRUD operations\n  namespace-event      namespaceEvent CRUD operations\n  platform-declared-capacity platformDeclaredCapacity CRUD operations\n  platform-function-api-binding platformFunctionApiBinding CRUD operations\n  platform-function-definition platformFunctionDefinition CRUD operations\n  platform-function-deployment platformFunctionDeployment CRUD operations\n  platform-function-deployment-event platformFunctionDeploymentEvent CRUD operations\n  platform-function-execution-log platformFunctionExecutionLog CRUD operations\n  platform-function-invocation platformFunctionInvocation CRUD operations\n  platform-infra-commit platformInfraCommit CRUD operations\n  platform-infra-get-all-tree-nodes-record platformInfraGetAllTreeNodesRecord CRUD operations\n  platform-infra-object platformInfraObject CRUD operations\n  platform-infra-ref   platformInfraRef CRUD operations\n  platform-infra-store platformInfraStore CRUD operations\n  platform-namespace   platformNamespace CRUD operations\n  platform-namespace-event platformNamespaceEvent CRUD operations\n  platform-resource    platformResource CRUD operations\n  platform-resource-definition platformResourceDefinition CRUD operations\n  platform-resource-event platformResourceEvent CRUD operations\n  platform-resource-installation platformResourceInstallation CRUD operations\n  platform-resource-status-check platformResourceStatusCheck CRUD operations\n  platform-resource-usage-log platformResourceUsageLog CRUD operations\n  platform-resource-usage-summary platformResourceUsageSummary CRUD operations\n  platform-resource-utilization-daily platformResourceUtilizationDaily CRUD operations\n  platform-resources-health platformResourcesHealth CRUD operations\n  platform-resources-requirements-state platformResourcesRequirementsState CRUD operations\n  platform-resources-resolved-requirement platformResourcesResolvedRequirement CRUD operations\n  platform-webhook-endpoint platformWebhookEndpoint CRUD operations\n  platform-webhook-event platformWebhookEvent CRUD operations\n  resource             resource CRUD operations\n  resource-definition  resourceDefinition CRUD operations\n  resource-event       resourceEvent CRUD operations\n  resource-installation resourceInstallation CRUD operations\n  resource-status-check resourceStatusCheck CRUD operations\n  resource-usage-log   resourceUsageLog CRUD operations\n  resource-usage-summary resourceUsageSummary CRUD operations\n  resource-utilization-daily resourceUtilizationDaily CRUD operations\n  resources-health     resourcesHealth CRUD operations\n  resources-requirements-state resourcesRequirementsState CRUD operations\n  resources-resolved-requirement resourcesResolvedRequirement CRUD operations\n  webhook-endpoint     webhookEndpoint CRUD operations\n  webhook-event        webhookEvent CRUD operations\n  read-function-graph  readFunctionGraph\n  add-edge             addEdge\n  add-edge-and-save    addEdgeAndSave\n  add-node             addNode\n  add-node-and-save    addNodeAndSave\n  copy-graph           copyGraph\n  import-definitions   importDefinitions\n  import-graph-json    importGraphJson\n  infra-init-empty-repo infraInitEmptyRepo\n  infra-insert-node-at-path infraInsertNodeAtPath\n  infra-set-data-at-path infraSetDataAtPath\n  init-empty-repo      initEmptyRepo\n  insert-node-at-path  insertNodeAtPath\n  platform-infra-init-empty-repo platformInfraInitEmptyRepo\n  platform-infra-insert-node-at-path platformInfraInsertNodeAtPath\n  platform-infra-set-data-at-path platformInfraSetDataAtPath\n  platform-resource-installations-install platformResourceInstallationsInstall\n  platform-resource-installations-rollback platformResourceInstallationsRollback\n  platform-resource-installations-uninstall platformResourceInstallationsUninstall\n  platform-resource-installations-upgrade platformResourceInstallationsUpgrade\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  resource-installations-install resourceInstallationsInstall\n  resource-installations-rollback resourceInstallationsRollback\n  resource-installations-uninstall resourceInstallationsUninstall\n  resource-installations-upgrade resourceInstallationsUpgrade\n  save-graph           saveGraph\n  set-data-at-path     setDataAtPath\n  start-execution      startExecution\n  validate-function-graph validateFunctionGraph\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

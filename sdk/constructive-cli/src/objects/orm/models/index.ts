@@ -4,7 +4,7 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { CommitModel } from './commit';
-export { GetAllRecordModel } from './getAllRecord';
+export { GetAllTreeNodesRecordModel } from './getAllTreeNodesRecord';
 export { ObjectModel } from './object';
 export { RefModel } from './ref';
 export { StoreModel } from './store';

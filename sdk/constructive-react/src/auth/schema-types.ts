@@ -618,11 +618,6 @@ export interface CreateEmailInput {
   /** The `Email` to be created by this mutation. */
   email: EmailInput;
 }
-export interface CreateIdentityProviderInput {
-  clientMutationId?: string;
-  /** The `IdentityProvider` to be created by this mutation. */
-  identityProvider: IdentityProviderInput;
-}
 export interface CreateOrgApiKeyInput {
   accessLevel?: string;
   clientMutationId?: string;
@@ -631,11 +626,6 @@ export interface CreateOrgApiKeyInput {
   mfaLevel?: string;
   orgId?: string;
   principalId?: string;
-}
-export interface CreateOrgApiKeyListInput {
-  clientMutationId?: string;
-  /** The `OrgApiKeyList` to be created by this mutation. */
-  orgApiKeyList: OrgApiKeyListInput;
 }
 export interface CreateOrgPrincipalInput {
   bypassStepUp?: boolean;
@@ -667,11 +657,6 @@ export interface CreateRoleTypeInput {
   clientMutationId?: string;
   /** The `RoleType` to be created by this mutation. */
   roleType: RoleTypeInput;
-}
-export interface CreateUserConnectedAccountInput {
-  clientMutationId?: string;
-  /** The `UserConnectedAccount` to be created by this mutation. */
-  userConnectedAccount: UserConnectedAccountInput;
 }
 export interface CreateUserInput {
   clientMutationId?: string;
@@ -868,13 +853,6 @@ export interface IdentityProviderFilter {
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
 }
-/** An input for mutations affecting `IdentityProvider` */
-export interface IdentityProviderInput {
-  displayName?: string;
-  enabled?: boolean;
-  kind?: string;
-  slug?: string;
-}
 /** An interval of time that has passed where the smallest distinct unit is a second. */
 export interface IntervalInput {
   /** A quantity of days. */
@@ -932,21 +910,6 @@ export interface OrgApiKeyListFilter {
   revokedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `OrgApiKeyList` */
-export interface OrgApiKeyListInput {
-  accessLevel?: string;
-  createdAt?: string;
-  expiresAt?: string;
-  id?: string;
-  keyId?: string;
-  lastUsedAt?: string;
-  mfaLevel?: string;
-  name?: string;
-  orgId?: string;
-  principalId?: string;
-  revokedAt?: string;
-  updatedAt?: string;
 }
 /** A filter to be used against `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
 export interface PhoneNumberFilter {
@@ -1200,6 +1163,10 @@ export interface RoleTypeFilter {
   not?: RoleTypeFilter;
   /** Checks for any expressions in this list. */
   or?: RoleTypeFilter[];
+  /** Filter by the object’s `usersByType` relation. */
+  usersByType?: RoleTypeToManyUserFilter;
+  /** `usersByType` exist. */
+  usersByTypeExist?: boolean;
 }
 /** An input for mutations affecting `RoleType` */
 export interface RoleTypeInput {
@@ -1210,6 +1177,15 @@ export interface RoleTypeInput {
 export interface RoleTypePatch {
   id?: number;
   name?: string;
+}
+/** A filter to be used against many `User` object types. All fields are combined with a logical ‘and.’ */
+export interface RoleTypeToManyUserFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: UserFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UserFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: UserFilter;
 }
 export interface SendAccountDeletionEmailInput {
   clientMutationId?: string;
@@ -1428,17 +1404,6 @@ export interface UserConnectedAccountFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
-/** An input for mutations affecting `UserConnectedAccount` */
-export interface UserConnectedAccountInput {
-  createdAt?: string;
-  details?: unknown;
-  id?: string;
-  identifier?: string;
-  isVerified?: boolean;
-  ownerId?: string;
-  service?: string;
-  updatedAt?: string;
-}
 /** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
 export interface UserFilter {
   /** Checks for all expressions in this list. */
@@ -1469,6 +1434,10 @@ export interface UserFilter {
   ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
   /** `ownedPhoneNumbers` exist. */
   ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedPrincipalEntities` relation. */
+  ownedPrincipalEntities?: UserToManyPrincipalEntityFilter;
+  /** `ownedPrincipalEntities` exist. */
+  ownedPrincipalEntitiesExist?: boolean;
   /** Filter by the object’s `ownedPrincipals` relation. */
   ownedPrincipals?: UserToManyPrincipalFilter;
   /** `ownedPrincipals` exist. */
@@ -1825,19 +1794,9 @@ export interface CreateEmailPayload {
   email?: Email | null;
   emailEdge?: EmailEdge | null;
 }
-export interface CreateIdentityProviderPayload {
-  clientMutationId?: string | null;
-  /** The `IdentityProvider` that was created by this mutation. */
-  identityProvider?: IdentityProvider | null;
-}
 export interface CreateOrgApiKeyPayload {
   clientMutationId?: string | null;
   result?: CreateOrgApiKeyRecord | null;
-}
-export interface CreateOrgApiKeyListPayload {
-  clientMutationId?: string | null;
-  /** The `OrgApiKeyList` that was created by this mutation. */
-  orgApiKeyList?: OrgApiKeyList | null;
 }
 export interface CreateOrgPrincipalPayload {
   clientMutationId?: string | null;
@@ -1870,11 +1829,6 @@ export interface CreateUserPayload {
   /** The `User` that was created by this mutation. */
   user?: User | null;
   userEdge?: UserEdge | null;
-}
-export interface CreateUserConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `UserConnectedAccount` that was created by this mutation. */
-  userConnectedAccount?: UserConnectedAccount | null;
 }
 export interface CreateWebauthnCredentialPayload {
   clientMutationId?: string | null;

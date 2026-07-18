@@ -7,8 +7,8 @@ React Query hooks for RateLimitsModule data operations
 ## Usage
 
 ```typescript
-useRateLimitsModulesQuery({ selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } } })
-useRateLimitsModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } } })
+useRateLimitsModulesQuery({ selection: { fields: { databaseId: true, id: true, ipRateLimitsTableId: true, ipRateLimitsTableName: true, rateLimitSettingsTableId: true, rateLimitSettingsTableName: true, rateLimitsTableId: true, rateLimitsTableName: true, schemaId: true } } })
+useRateLimitsModuleQuery({ id: '<UUID>', selection: { fields: { databaseId: true, id: true, ipRateLimitsTableId: true, ipRateLimitsTableName: true, rateLimitSettingsTableId: true, rateLimitSettingsTableName: true, rateLimitsTableId: true, rateLimitsTableName: true, schemaId: true } } })
 useCreateRateLimitsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateRateLimitsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteRateLimitsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteRateLimitsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useRateLimitsModulesQuery({
-  selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } },
+  selection: { fields: { databaseId: true, id: true, ipRateLimitsTableId: true, ipRateLimitsTableName: true, rateLimitSettingsTableId: true, rateLimitSettingsTableName: true, rateLimitsTableId: true, rateLimitsTableName: true, schemaId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useRateLimitsModulesQuery({
 const { mutate } = useCreateRateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', ipRateLimitsTable: '<String>', ipRateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', rateLimitSettingsTableId: '<UUID>', rateLimitsTable: '<String>', rateLimitsTableId: '<UUID>', schemaId: '<UUID>' });
+mutate({ databaseId: '<UUID>', ipRateLimitsTableId: '<UUID>', ipRateLimitsTableName: '<String>', rateLimitSettingsTableId: '<UUID>', rateLimitSettingsTableName: '<String>', rateLimitsTableId: '<UUID>', rateLimitsTableName: '<String>', schemaId: '<UUID>' });
 ```

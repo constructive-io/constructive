@@ -228,7 +228,7 @@ CRUD operations for IdentityProvider records.
 | `kind` | String |
 | `slug` | String |
 
-**Optional create fields (backend defaults):** `displayName`, `enabled`, `kind`, `slug`
+**Required create fields:** `displayName`, `enabled`, `kind`, `slug`
 
 ### `org-api-key-list`
 
@@ -260,7 +260,7 @@ CRUD operations for OrgApiKeyList records.
 | `revokedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `accessLevel`, `expiresAt`, `keyId`, `lastUsedAt`, `mfaLevel`, `name`, `orgId`, `principalId`, `revokedAt`
+**Required create fields:** `accessLevel`, `expiresAt`, `keyId`, `lastUsedAt`, `mfaLevel`, `name`, `orgId`, `principalId`, `revokedAt`
 
 ### `phone-number`
 
@@ -424,7 +424,7 @@ CRUD operations for UserConnectedAccount records.
 | `service` | String |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `details`, `identifier`, `isVerified`, `ownerId`, `service`
+**Required create fields:** `details`, `identifier`, `isVerified`, `ownerId`, `service`
 
 ### `user`
 

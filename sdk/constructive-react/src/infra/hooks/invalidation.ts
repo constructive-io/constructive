@@ -16,13 +16,13 @@
 import type { QueryClient } from '@tanstack/react-query';
 import {
   dbPresetKeys,
-  infraCommitKeys,
-  infraGetAllRecordKeys,
-  infraObjectKeys,
-  infraRefKeys,
-  infraStoreKeys,
   namespaceKeys,
   namespaceEventKeys,
+  platformInfraCommitKeys,
+  platformInfraGetAllTreeNodesRecordKeys,
+  platformInfraObjectKeys,
+  platformInfraRefKeys,
+  platformInfraStoreKeys,
   platformNamespaceKeys,
   platformNamespaceEventKeys,
 } from './query-keys';
@@ -60,88 +60,6 @@ export const invalidate = {
         queryKey: dbPresetKeys.detail(id),
       }),
   },
-  /** Invalidate infraCommit queries */ infraCommit: {
-    /** Invalidate all infraCommit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraCommitKeys.all,
-      }),
-    /** Invalidate infraCommit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraCommitKeys.lists(),
-      }),
-    /** Invalidate a specific infraCommit */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: infraCommitKeys.detail(id),
-      }),
-  },
-  /** Invalidate infraGetAllRecord queries */ infraGetAllRecord: {
-    /** Invalidate all infraGetAllRecord queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraGetAllRecordKeys.all,
-      }),
-    /** Invalidate infraGetAllRecord list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraGetAllRecordKeys.lists(),
-      }),
-    /** Invalidate a specific infraGetAllRecord */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: infraGetAllRecordKeys.detail(id),
-      }),
-  },
-  /** Invalidate infraObject queries */ infraObject: {
-    /** Invalidate all infraObject queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.all,
-      }),
-    /** Invalidate infraObject list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.lists(),
-      }),
-    /** Invalidate a specific infraObject */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: infraObjectKeys.detail(id),
-      }),
-  },
-  /** Invalidate infraRef queries */ infraRef: {
-    /** Invalidate all infraRef queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraRefKeys.all,
-      }),
-    /** Invalidate infraRef list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraRefKeys.lists(),
-      }),
-    /** Invalidate a specific infraRef */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: infraRefKeys.detail(id),
-      }),
-  },
-  /** Invalidate infraStore queries */ infraStore: {
-    /** Invalidate all infraStore queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraStoreKeys.all,
-      }),
-    /** Invalidate infraStore list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: infraStoreKeys.lists(),
-      }),
-    /** Invalidate a specific infraStore */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: infraStoreKeys.detail(id),
-      }),
-  },
   /** Invalidate namespace queries */ namespace: {
     /** Invalidate all namespace queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -174,6 +92,95 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: namespaceEventKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformInfraCommit queries */ platformInfraCommit: {
+    /** Invalidate all platformInfraCommit queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraCommitKeys.all,
+      }),
+    /** Invalidate platformInfraCommit list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraCommitKeys.lists(),
+      }),
+    /** Invalidate a specific platformInfraCommit */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraCommitKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformInfraGetAllTreeNodesRecord queries */ platformInfraGetAllTreeNodesRecord: {
+    /** Invalidate all platformInfraGetAllTreeNodesRecord queries */ all: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraGetAllTreeNodesRecordKeys.all,
+      }),
+    /** Invalidate platformInfraGetAllTreeNodesRecord list queries */ lists: (
+      queryClient: QueryClient
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraGetAllTreeNodesRecordKeys.lists(),
+      }),
+    /** Invalidate a specific platformInfraGetAllTreeNodesRecord */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraGetAllTreeNodesRecordKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformInfraObject queries */ platformInfraObject: {
+    /** Invalidate all platformInfraObject queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraObjectKeys.all,
+      }),
+    /** Invalidate platformInfraObject list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraObjectKeys.lists(),
+      }),
+    /** Invalidate a specific platformInfraObject */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraObjectKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformInfraRef queries */ platformInfraRef: {
+    /** Invalidate all platformInfraRef queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraRefKeys.all,
+      }),
+    /** Invalidate platformInfraRef list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraRefKeys.lists(),
+      }),
+    /** Invalidate a specific platformInfraRef */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraRefKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformInfraStore queries */ platformInfraStore: {
+    /** Invalidate all platformInfraStore queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraStoreKeys.all,
+      }),
+    /** Invalidate platformInfraStore list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraStoreKeys.lists(),
+      }),
+    /** Invalidate a specific platformInfraStore */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInfraStoreKeys.detail(id),
       }),
   },
   /** Invalidate platformNamespace queries */ platformNamespace: {
@@ -228,43 +235,6 @@ export const remove = {
       queryKey: dbPresetKeys.detail(id),
     });
   },
-  /** Remove infraCommit from cache */ infraCommit: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: infraCommitKeys.detail(id),
-    });
-  },
-  /** Remove infraGetAllRecord from cache */ infraGetAllRecord: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: infraGetAllRecordKeys.detail(id),
-    });
-  },
-  /** Remove infraObject from cache */ infraObject: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: infraObjectKeys.detail(id),
-    });
-  },
-  /** Remove infraRef from cache */ infraRef: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: infraRefKeys.detail(id),
-    });
-  },
-  /** Remove infraStore from cache */ infraStore: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: infraStoreKeys.detail(id),
-    });
-  },
   /** Remove namespace from cache */ namespace: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: namespaceKeys.detail(id),
@@ -276,6 +246,46 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: namespaceEventKeys.detail(id),
+    });
+  },
+  /** Remove platformInfraCommit from cache */ platformInfraCommit: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformInfraCommitKeys.detail(id),
+    });
+  },
+  /** Remove platformInfraGetAllTreeNodesRecord from cache */ platformInfraGetAllTreeNodesRecord: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformInfraGetAllTreeNodesRecordKeys.detail(id),
+    });
+  },
+  /** Remove platformInfraObject from cache */ platformInfraObject: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformInfraObjectKeys.detail(id),
+    });
+  },
+  /** Remove platformInfraRef from cache */ platformInfraRef: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformInfraRefKeys.detail(id),
+    });
+  },
+  /** Remove platformInfraStore from cache */ platformInfraStore: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformInfraStoreKeys.detail(id),
     });
   },
   /** Remove platformNamespace from cache */ platformNamespace: (

@@ -49,7 +49,7 @@ export function useUpdateInfraCommitMutation<S extends InfraCommitSelect>(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
         infraCommitPatch: InfraCommitPatch;
       }
     >,
@@ -64,7 +64,7 @@ export function useUpdateInfraCommitMutation<S extends InfraCommitSelect>(
   Error,
   {
     id: string;
-    scopeId: string;
+    databaseId: string;
     infraCommitPatch: InfraCommitPatch;
   }
 >;
@@ -77,7 +77,7 @@ export function useUpdateInfraCommitMutation(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
         infraCommitPatch: InfraCommitPatch;
       }
     >,
@@ -92,18 +92,18 @@ export function useUpdateInfraCommitMutation(
     mutationKey: infraCommitMutationKeys.all,
     mutationFn: ({
       id,
-      scopeId,
+      databaseId,
       infraCommitPatch,
     }: {
       id: string;
-      scopeId: string;
+      databaseId: string;
       infraCommitPatch: InfraCommitPatch;
     }) =>
       getClient()
         .infraCommit.update({
           where: {
             id,
-            scopeId,
+            databaseId,
           },
           data: infraCommitPatch,
           select: args.select,

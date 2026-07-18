@@ -26,14 +26,17 @@ export const commitMutationKeys = {
   /** Delete commit mutation key */ delete: (id: string | number) =>
     ['mutation', 'commit', 'delete', id] as const,
 } as const;
-export const getAllRecordMutationKeys = {
-  /** All getAllRecord mutation keys */ all: ['mutation', 'getallrecord'] as const,
-  /** Create getAllRecord mutation key */ create: () =>
-    ['mutation', 'getallrecord', 'create'] as const,
-  /** Update getAllRecord mutation key */ update: (id: string | number) =>
-    ['mutation', 'getallrecord', 'update', id] as const,
-  /** Delete getAllRecord mutation key */ delete: (id: string | number) =>
-    ['mutation', 'getallrecord', 'delete', id] as const,
+export const getAllTreeNodesRecordMutationKeys = {
+  /** All getAllTreeNodesRecord mutation keys */ all: [
+    'mutation',
+    'getalltreenodesrecord',
+  ] as const,
+  /** Create getAllTreeNodesRecord mutation key */ create: () =>
+    ['mutation', 'getalltreenodesrecord', 'create'] as const,
+  /** Update getAllTreeNodesRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'getalltreenodesrecord', 'update', id] as const,
+  /** Delete getAllTreeNodesRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'getalltreenodesrecord', 'delete', id] as const,
 } as const;
 export const objectMutationKeys = {
   /** All object mutation keys */ all: ['mutation', 'object'] as const,
@@ -106,7 +109,7 @@ export const customMutationKeys = {
  */
 export const mutationKeys = {
   commit: commitMutationKeys,
-  getAllRecord: getAllRecordMutationKeys,
+  getAllTreeNodesRecord: getAllTreeNodesRecordMutationKeys,
   object: objectMutationKeys,
   ref: refMutationKeys,
   store: storeMutationKeys,

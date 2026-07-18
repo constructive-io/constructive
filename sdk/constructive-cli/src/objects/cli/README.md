@@ -27,7 +27,7 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `commit` | commit CRUD operations |
-| `get-all-record` | getAllRecord CRUD operations |
+| `get-all-tree-nodes-record` | getAllTreeNodesRecord CRUD operations |
 | `object` | object CRUD operations |
 | `ref` | ref CRUD operations |
 | `store` | store CRUD operations |
@@ -110,18 +110,18 @@ CRUD operations for Commit records.
 **Required create fields:** `databaseId`, `storeId`
 **Optional create fields (backend defaults):** `authorId`, `committerId`, `date`, `message`, `parentIds`, `treeId`
 
-### `get-all-record`
+### `get-all-tree-nodes-record`
 
-CRUD operations for GetAllRecord records.
+CRUD operations for GetAllTreeNodesRecord records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all getAllRecord records |
-| `find-first` | Find first matching getAllRecord record |
-| `get` | Get a getAllRecord by id |
-| `create` | Create a new getAllRecord |
-| `update` | Update an existing getAllRecord |
-| `delete` | Delete a getAllRecord |
+| `list` | List all getAllTreeNodesRecord records |
+| `find-first` | Find first matching getAllTreeNodesRecord record |
+| `get` | Get a getAllTreeNodesRecord by id |
+| `create` | Create a new getAllTreeNodesRecord |
+| `update` | Update an existing getAllTreeNodesRecord |
+| `delete` | Delete a getAllTreeNodesRecord |
 
 **Fields:**
 

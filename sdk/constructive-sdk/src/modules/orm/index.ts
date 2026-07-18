@@ -33,6 +33,7 @@ import { FunctionModuleModel } from './models/functionModule';
 import { GraphExecutionModuleModel } from './models/graphExecutionModule';
 import { GraphModuleModel } from './models/graphModule';
 import { HierarchyModuleModel } from './models/hierarchyModule';
+import { HttpRouteModuleModel } from './models/httpRouteModule';
 import { I18NModuleModel } from './models/i18NModule';
 import { IdentityProvidersModuleModel } from './models/identityProvidersModule';
 import { InferenceLogModuleModel } from './models/inferenceLogModule';
@@ -71,6 +72,7 @@ import { UserStateModuleModel } from './models/userStateModule';
 import { UsersModuleModel } from './models/usersModule';
 import { WebauthnAuthModuleModel } from './models/webauthnAuthModule';
 import { WebauthnCredentialsModuleModel } from './models/webauthnCredentialsModule';
+import { WebhookModuleModel } from './models/webhookModule';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -134,6 +136,7 @@ export function createClient(config: OrmClientConfig) {
     graphExecutionModule: new GraphExecutionModuleModel(client),
     graphModule: new GraphModuleModel(client),
     hierarchyModule: new HierarchyModuleModel(client),
+    httpRouteModule: new HttpRouteModuleModel(client),
     i18NModule: new I18NModuleModel(client),
     identityProvidersModule: new IdentityProvidersModuleModel(client),
     inferenceLogModule: new InferenceLogModuleModel(client),
@@ -172,6 +175,7 @@ export function createClient(config: OrmClientConfig) {
     usersModule: new UsersModuleModel(client),
     webauthnAuthModule: new WebauthnAuthModuleModel(client),
     webauthnCredentialsModule: new WebauthnCredentialsModuleModel(client),
+    webhookModule: new WebhookModuleModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

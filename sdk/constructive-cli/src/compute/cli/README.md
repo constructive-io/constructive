@@ -27,6 +27,7 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `db-preset` | dbPreset CRUD operations |
+| `declared-capacity` | declaredCapacity CRUD operations |
 | `function-api-binding` | functionApiBinding CRUD operations |
 | `function-definition` | functionDefinition CRUD operations |
 | `function-deployment` | functionDeployment CRUD operations |
@@ -41,35 +42,55 @@ csdk auth set-token <your-token>
 | `function-graph-ref` | functionGraphRef CRUD operations |
 | `function-graph-store` | functionGraphStore CRUD operations |
 | `function-invocation` | functionInvocation CRUD operations |
-| `get-all-record` | getAllRecord CRUD operations |
+| `get-all-tree-nodes-record` | getAllTreeNodesRecord CRUD operations |
 | `infra-commit` | infraCommit CRUD operations |
-| `infra-get-all-record` | infraGetAllRecord CRUD operations |
+| `infra-get-all-tree-nodes-record` | infraGetAllTreeNodesRecord CRUD operations |
 | `infra-object` | infraObject CRUD operations |
 | `infra-ref` | infraRef CRUD operations |
 | `infra-store` | infraStore CRUD operations |
 | `integration-provider` | integrationProvider CRUD operations |
 | `namespace` | namespace CRUD operations |
 | `namespace-event` | namespaceEvent CRUD operations |
+| `platform-declared-capacity` | platformDeclaredCapacity CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
 | `platform-function-deployment` | platformFunctionDeployment CRUD operations |
 | `platform-function-deployment-event` | platformFunctionDeploymentEvent CRUD operations |
 | `platform-function-execution-log` | platformFunctionExecutionLog CRUD operations |
 | `platform-function-invocation` | platformFunctionInvocation CRUD operations |
+| `platform-infra-commit` | platformInfraCommit CRUD operations |
+| `platform-infra-get-all-tree-nodes-record` | platformInfraGetAllTreeNodesRecord CRUD operations |
+| `platform-infra-object` | platformInfraObject CRUD operations |
+| `platform-infra-ref` | platformInfraRef CRUD operations |
+| `platform-infra-store` | platformInfraStore CRUD operations |
 | `platform-namespace` | platformNamespace CRUD operations |
 | `platform-namespace-event` | platformNamespaceEvent CRUD operations |
 | `platform-resource` | platformResource CRUD operations |
 | `platform-resource-definition` | platformResourceDefinition CRUD operations |
 | `platform-resource-event` | platformResourceEvent CRUD operations |
+| `platform-resource-installation` | platformResourceInstallation CRUD operations |
 | `platform-resource-status-check` | platformResourceStatusCheck CRUD operations |
+| `platform-resource-usage-log` | platformResourceUsageLog CRUD operations |
+| `platform-resource-usage-summary` | platformResourceUsageSummary CRUD operations |
+| `platform-resource-utilization-daily` | platformResourceUtilizationDaily CRUD operations |
+| `platform-resources-health` | platformResourcesHealth CRUD operations |
 | `platform-resources-requirements-state` | platformResourcesRequirementsState CRUD operations |
 | `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
+| `platform-webhook-endpoint` | platformWebhookEndpoint CRUD operations |
+| `platform-webhook-event` | platformWebhookEvent CRUD operations |
 | `resource` | resource CRUD operations |
 | `resource-definition` | resourceDefinition CRUD operations |
 | `resource-event` | resourceEvent CRUD operations |
+| `resource-installation` | resourceInstallation CRUD operations |
 | `resource-status-check` | resourceStatusCheck CRUD operations |
+| `resource-usage-log` | resourceUsageLog CRUD operations |
+| `resource-usage-summary` | resourceUsageSummary CRUD operations |
+| `resource-utilization-daily` | resourceUtilizationDaily CRUD operations |
+| `resources-health` | resourcesHealth CRUD operations |
 | `resources-requirements-state` | resourcesRequirementsState CRUD operations |
 | `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
+| `webhook-endpoint` | webhookEndpoint CRUD operations |
+| `webhook-event` | webhookEvent CRUD operations |
 | `read-function-graph` | readFunctionGraph |
 | `add-edge` | addEdge |
 | `add-edge-and-save` | addEdgeAndSave |
@@ -83,10 +104,21 @@ csdk auth set-token <your-token>
 | `infra-set-data-at-path` | infraSetDataAtPath |
 | `init-empty-repo` | initEmptyRepo |
 | `insert-node-at-path` | insertNodeAtPath |
+| `platform-infra-init-empty-repo` | platformInfraInitEmptyRepo |
+| `platform-infra-insert-node-at-path` | platformInfraInsertNodeAtPath |
+| `platform-infra-set-data-at-path` | platformInfraSetDataAtPath |
+| `platform-resource-installations-install` | platformResourceInstallationsInstall |
+| `platform-resource-installations-rollback` | platformResourceInstallationsRollback |
+| `platform-resource-installations-uninstall` | platformResourceInstallationsUninstall |
+| `platform-resource-installations-upgrade` | platformResourceInstallationsUpgrade |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `resource-installations-install` | resourceInstallationsInstall |
+| `resource-installations-rollback` | resourceInstallationsRollback |
+| `resource-installations-uninstall` | resourceInstallationsUninstall |
+| `resource-installations-upgrade` | resourceInstallationsUpgrade |
 | `save-graph` | saveGraph |
 | `set-data-at-path` | setDataAtPath |
 | `start-execution` | startExecution |
@@ -165,6 +197,39 @@ CRUD operations for DbPreset records.
 **Required create fields:** `definition`, `slug`
 **Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `modulesHash`, `storeId`
 
+### `declared-capacity`
+
+CRUD operations for DeclaredCapacity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all declaredCapacity records |
+| `find-first` | Find first matching declaredCapacity record |
+| `get` | Get a declaredCapacity by id |
+| `create` | Create a new declaredCapacity |
+| `update` | Update an existing declaredCapacity |
+| `delete` | Delete a declaredCapacity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `installationId` | UUID |
+| `isTransient` | Boolean |
+| `kind` | String |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
+| `namespaceId` | UUID |
+| `podCountMax` | Int |
+| `podCountMin` | Int |
+| `source` | String |
+| `sourceId` | UUID |
+| `storageSizeBytes` | BigInt |
+
+**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
+
 ### `function-api-binding`
 
 CRUD operations for FunctionApiBinding records.
@@ -211,11 +276,14 @@ CRUD operations for FunctionDefinition records.
 | `accessChannels` | String |
 | `category` | String |
 | `concurrency` | Int |
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `description` | String |
 | `fnCategory` | String |
 | `functionColumns` | JSON |
+| `graphId` | UUID |
 | `icon` | String |
 | `id` | UUID |
 | `image` | String |
@@ -223,12 +291,15 @@ CRUD operations for FunctionDefinition records.
 | `integrations` | String |
 | `isPublished` | Boolean |
 | `maxAttempts` | Int |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
 | `moduleTable` | String |
 | `name` | String |
 | `outputs` | JSON |
 | `payloadArgs` | JSON |
 | `priority` | Int |
 | `props` | JSON |
+| `protected` | Boolean |
 | `publishedAt` | Datetime |
 | `queueName` | String |
 | `requiredBuckets` | String |
@@ -247,7 +318,7 @@ CRUD operations for FunctionDefinition records.
 | `volatile` | Boolean |
 
 **Required create fields:** `category`, `databaseId`, `name`, `taskIdentifier`
-**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
+**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
 
 ### `function-deployment`
 
@@ -430,25 +501,33 @@ CRUD operations for FunctionGraphExecution records.
 
 | Field | Type |
 |-------|------|
+| `actorId` | UUID |
 | `completedAt` | Datetime |
 | `currentWave` | Int |
 | `definitionsCommitId` | UUID |
+| `entityId` | UUID |
+| `entityType` | String |
 | `errorCode` | String |
 | `errorMessage` | String |
 | `executionPlan` | JSON |
 | `graphId` | UUID |
 | `id` | UUID |
 | `inputPayload` | JSON |
+| `invocationCreatedAt` | Datetime |
 | `invocationId` | UUID |
 | `lastProgressAt` | Datetime |
 | `maxPendingJobs` | Int |
 | `maxTicks` | Int |
 | `nodeOutputs` | JSON |
+| `organizationId` | UUID |
+| `outputNames` | String |
 | `outputNode` | String |
 | `outputPayload` | JSON |
 | `outputPort` | String |
 | `parentExecutionId` | UUID |
+| `parentInvocationId` | UUID |
 | `parentNodeName` | String |
+| `principalId` | UUID |
 | `scopeId` | UUID |
 | `startedAt` | Datetime |
 | `status` | String |
@@ -456,7 +535,7 @@ CRUD operations for FunctionGraphExecution records.
 | `timeoutAt` | Datetime |
 
 **Required create fields:** `graphId`, `scopeId`
-**Optional create fields (backend defaults):** `completedAt`, `currentWave`, `definitionsCommitId`, `errorCode`, `errorMessage`, `executionPlan`, `inputPayload`, `invocationId`, `lastProgressAt`, `maxPendingJobs`, `maxTicks`, `nodeOutputs`, `outputNode`, `outputPayload`, `outputPort`, `parentExecutionId`, `parentNodeName`, `startedAt`, `status`, `tickCount`, `timeoutAt`
+**Optional create fields (backend defaults):** `actorId`, `completedAt`, `currentWave`, `definitionsCommitId`, `entityId`, `entityType`, `errorCode`, `errorMessage`, `executionPlan`, `inputPayload`, `invocationCreatedAt`, `invocationId`, `lastProgressAt`, `maxPendingJobs`, `maxTicks`, `nodeOutputs`, `organizationId`, `outputNames`, `outputNode`, `outputPayload`, `outputPort`, `parentExecutionId`, `parentInvocationId`, `parentNodeName`, `principalId`, `startedAt`, `status`, `tickCount`, `timeoutAt`
 
 ### `function-graph-execution-node-state`
 
@@ -475,6 +554,9 @@ CRUD operations for FunctionGraphExecutionNodeState records.
 
 | Field | Type |
 |-------|------|
+| `callbackInputs` | JSON |
+| `callbackMeta` | JSON |
+| `callbackTokenHash` | String |
 | `completedAt` | Datetime |
 | `createdAt` | Datetime |
 | `errorCode` | String |
@@ -489,7 +571,7 @@ CRUD operations for FunctionGraphExecutionNodeState records.
 | `status` | String |
 
 **Required create fields:** `executionId`, `nodeName`, `scopeId`
-**Optional create fields (backend defaults):** `completedAt`, `errorCode`, `errorMessage`, `nodePath`, `outputId`, `startedAt`, `status`
+**Optional create fields (backend defaults):** `callbackInputs`, `callbackMeta`, `callbackTokenHash`, `completedAt`, `errorCode`, `errorMessage`, `nodePath`, `outputId`, `startedAt`, `status`
 
 ### `function-graph-execution-output`
 
@@ -614,9 +696,11 @@ CRUD operations for FunctionInvocation records.
 |-------|------|
 | `actorId` | UUID |
 | `apiBindingId` | UUID |
+| `channel` | String |
 | `completedAt` | Datetime |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
+| `definitionScope` | String |
 | `durationMs` | Int |
 | `error` | String |
 | `functionDefinitionId` | UUID |
@@ -625,26 +709,27 @@ CRUD operations for FunctionInvocation records.
 | `jobId` | BigInt |
 | `parentInvocationId` | UUID |
 | `payload` | JSON |
+| `provenance` | JSON |
 | `result` | JSON |
 | `startedAt` | Datetime |
 | `status` | String |
 | `taskIdentifier` | String |
 
 **Required create fields:** `databaseId`, `taskIdentifier`
-**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `completedAt`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `result`, `startedAt`, `status`
+**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `channel`, `completedAt`, `definitionScope`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `provenance`, `result`, `startedAt`, `status`
 
-### `get-all-record`
+### `get-all-tree-nodes-record`
 
-CRUD operations for GetAllRecord records.
+CRUD operations for GetAllTreeNodesRecord records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all getAllRecord records |
-| `find-first` | Find first matching getAllRecord record |
-| `get` | Get a getAllRecord by id |
-| `create` | Create a new getAllRecord |
-| `update` | Update an existing getAllRecord |
-| `delete` | Delete a getAllRecord |
+| `list` | List all getAllTreeNodesRecord records |
+| `find-first` | Find first matching getAllTreeNodesRecord record |
+| `get` | Get a getAllTreeNodesRecord by id |
+| `create` | Create a new getAllTreeNodesRecord |
+| `update` | Update an existing getAllTreeNodesRecord |
+| `delete` | Delete a getAllTreeNodesRecord |
 
 **Fields:**
 
@@ -674,29 +759,29 @@ CRUD operations for InfraCommit records.
 |-------|------|
 | `authorId` | UUID |
 | `committerId` | UUID |
+| `databaseId` | UUID |
 | `date` | Datetime |
 | `id` | UUID |
 | `message` | String |
 | `parentIds` | UUID |
-| `scopeId` | UUID |
 | `storeId` | UUID |
 | `treeId` | UUID |
 
-**Required create fields:** `scopeId`, `storeId`
+**Required create fields:** `databaseId`, `storeId`
 **Optional create fields (backend defaults):** `authorId`, `committerId`, `date`, `message`, `parentIds`, `treeId`
 
-### `infra-get-all-record`
+### `infra-get-all-tree-nodes-record`
 
-CRUD operations for InfraGetAllRecord records.
+CRUD operations for InfraGetAllTreeNodesRecord records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all infraGetAllRecord records |
-| `find-first` | Find first matching infraGetAllRecord record |
-| `get` | Get a infraGetAllRecord by id |
-| `create` | Create a new infraGetAllRecord |
-| `update` | Update an existing infraGetAllRecord |
-| `delete` | Delete a infraGetAllRecord |
+| `list` | List all infraGetAllTreeNodesRecord records |
+| `find-first` | Find first matching infraGetAllTreeNodesRecord record |
+| `get` | Get a infraGetAllTreeNodesRecord by id |
+| `create` | Create a new infraGetAllTreeNodesRecord |
+| `update` | Update an existing infraGetAllTreeNodesRecord |
+| `delete` | Delete a infraGetAllTreeNodesRecord |
 
 **Fields:**
 
@@ -726,12 +811,12 @@ CRUD operations for InfraObject records.
 |-------|------|
 | `createdAt` | Datetime |
 | `data` | JSON |
+| `databaseId` | UUID |
 | `id` | UUID |
 | `kids` | UUID |
 | `ktree` | String |
-| `scopeId` | UUID |
 
-**Required create fields:** `scopeId`
+**Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `data`, `kids`, `ktree`
 
 ### `infra-ref`
@@ -752,12 +837,12 @@ CRUD operations for InfraRef records.
 | Field | Type |
 |-------|------|
 | `commitId` | UUID |
+| `databaseId` | UUID |
 | `id` | UUID |
 | `name` | String |
-| `scopeId` | UUID |
 | `storeId` | UUID |
 
-**Required create fields:** `name`, `scopeId`, `storeId`
+**Required create fields:** `databaseId`, `name`, `storeId`
 **Optional create fields (backend defaults):** `commitId`
 
 ### `infra-store`
@@ -778,12 +863,12 @@ CRUD operations for InfraStore records.
 | Field | Type |
 |-------|------|
 | `createdAt` | Datetime |
+| `databaseId` | UUID |
 | `hash` | UUID |
 | `id` | UUID |
 | `name` | String |
-| `scopeId` | UUID |
 
-**Required create fields:** `name`, `scopeId`
+**Required create fields:** `databaseId`, `name`
 **Optional create fields (backend defaults):** `hash`
 
 ### `integration-provider`
@@ -871,23 +956,49 @@ CRUD operations for NamespaceEvent records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
-| `cpuMillicores` | Int |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `eventType` | String |
 | `id` | UUID |
-| `memoryBytes` | BigInt |
 | `message` | String |
 | `metadata` | JSON |
-| `metrics` | JSON |
 | `namespaceId` | UUID |
-| `networkEgressBytes` | BigInt |
-| `networkIngressBytes` | BigInt |
-| `podCount` | Int |
-| `storageBytes` | BigInt |
 
 **Required create fields:** `databaseId`, `eventType`, `namespaceId`
-**Optional create fields (backend defaults):** `actorId`, `cpuMillicores`, `memoryBytes`, `message`, `metadata`, `metrics`, `networkEgressBytes`, `networkIngressBytes`, `podCount`, `storageBytes`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
+
+### `platform-declared-capacity`
+
+CRUD operations for PlatformDeclaredCapacity records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformDeclaredCapacity records |
+| `find-first` | Find first matching platformDeclaredCapacity record |
+| `get` | Get a platformDeclaredCapacity by id |
+| `create` | Create a new platformDeclaredCapacity |
+| `update` | Update an existing platformDeclaredCapacity |
+| `delete` | Delete a platformDeclaredCapacity |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `installationId` | UUID |
+| `isTransient` | Boolean |
+| `kind` | String |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
+| `namespaceId` | UUID |
+| `podCountMax` | Int |
+| `podCountMin` | Int |
+| `source` | String |
+| `sourceId` | UUID |
+| `storageSizeBytes` | BigInt |
+
+**Required create fields:** `cpuLimitMillicores`, `cpuRequestMillicores`, `installationId`, `isTransient`, `kind`, `memoryLimitBytes`, `memoryRequestBytes`, `namespaceId`, `podCountMax`, `podCountMin`, `source`, `sourceId`, `storageSizeBytes`
 
 ### `platform-function-api-binding`
 
@@ -935,10 +1046,13 @@ CRUD operations for PlatformFunctionDefinition records.
 | `accessChannels` | String |
 | `category` | String |
 | `concurrency` | Int |
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `description` | String |
 | `fnCategory` | String |
 | `functionColumns` | JSON |
+| `graphId` | UUID |
 | `icon` | String |
 | `id` | UUID |
 | `image` | String |
@@ -946,12 +1060,15 @@ CRUD operations for PlatformFunctionDefinition records.
 | `integrations` | String |
 | `isPublished` | Boolean |
 | `maxAttempts` | Int |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
 | `moduleTable` | String |
 | `name` | String |
 | `outputs` | JSON |
 | `payloadArgs` | JSON |
 | `priority` | Int |
 | `props` | JSON |
+| `protected` | Boolean |
 | `publishedAt` | Datetime |
 | `queueName` | String |
 | `requiredBuckets` | String |
@@ -970,7 +1087,7 @@ CRUD operations for PlatformFunctionDefinition records.
 | `volatile` | Boolean |
 
 **Required create fields:** `category`, `name`, `taskIdentifier`
-**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
+**Optional create fields (backend defaults):** `accessChannels`, `concurrency`, `description`, `fnCategory`, `functionColumns`, `graphId`, `icon`, `image`, `inputs`, `integrations`, `isPublished`, `maxAttempts`, `moduleTable`, `outputs`, `payloadArgs`, `priority`, `props`, `protected`, `publishedAt`, `queueName`, `requiredBuckets`, `requiredConfigs`, `requiredModels`, `requiredSecrets`, `resources`, `runtime`, `scaleMax`, `scaleMin`, `targetFunction`, `targetSchema`, `timeoutSeconds`, `volatile`
 
 ### `platform-function-deployment`
 
@@ -1090,8 +1207,10 @@ CRUD operations for PlatformFunctionInvocation records.
 |-------|------|
 | `actorId` | UUID |
 | `apiBindingId` | UUID |
+| `channel` | String |
 | `completedAt` | Datetime |
 | `createdAt` | Datetime |
+| `definitionScope` | String |
 | `durationMs` | Int |
 | `error` | String |
 | `functionDefinitionId` | UUID |
@@ -1100,13 +1219,145 @@ CRUD operations for PlatformFunctionInvocation records.
 | `jobId` | BigInt |
 | `parentInvocationId` | UUID |
 | `payload` | JSON |
+| `provenance` | JSON |
 | `result` | JSON |
 | `startedAt` | Datetime |
 | `status` | String |
 | `taskIdentifier` | String |
 
 **Required create fields:** `taskIdentifier`
-**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `completedAt`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `result`, `startedAt`, `status`
+**Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `channel`, `completedAt`, `definitionScope`, `durationMs`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `parentInvocationId`, `payload`, `provenance`, `result`, `startedAt`, `status`
+
+### `platform-infra-commit`
+
+CRUD operations for PlatformInfraCommit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraCommit records |
+| `find-first` | Find first matching platformInfraCommit record |
+| `get` | Get a platformInfraCommit by id |
+| `create` | Create a new platformInfraCommit |
+| `update` | Update an existing platformInfraCommit |
+| `delete` | Delete a platformInfraCommit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `authorId` | UUID |
+| `committerId` | UUID |
+| `date` | Datetime |
+| `id` | UUID |
+| `message` | String |
+| `parentIds` | UUID |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+| `treeId` | UUID |
+
+**Required create fields:** `scopeId`, `storeId`
+**Optional create fields (backend defaults):** `authorId`, `committerId`, `date`, `message`, `parentIds`, `treeId`
+
+### `platform-infra-get-all-tree-nodes-record`
+
+CRUD operations for PlatformInfraGetAllTreeNodesRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraGetAllTreeNodesRecord records |
+| `find-first` | Find first matching platformInfraGetAllTreeNodesRecord record |
+| `get` | Get a platformInfraGetAllTreeNodesRecord by id |
+| `create` | Create a new platformInfraGetAllTreeNodesRecord |
+| `update` | Update an existing platformInfraGetAllTreeNodesRecord |
+| `delete` | Delete a platformInfraGetAllTreeNodesRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `data` | JSON |
+| `path` | String |
+
+**Required create fields:** `data`, `path`
+
+### `platform-infra-object`
+
+CRUD operations for PlatformInfraObject records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraObject records |
+| `find-first` | Find first matching platformInfraObject record |
+| `get` | Get a platformInfraObject by id |
+| `create` | Create a new platformInfraObject |
+| `update` | Update an existing platformInfraObject |
+| `delete` | Delete a platformInfraObject |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `data` | JSON |
+| `id` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+| `scopeId` | UUID |
+
+**Required create fields:** `scopeId`
+**Optional create fields (backend defaults):** `data`, `kids`, `ktree`
+
+### `platform-infra-ref`
+
+CRUD operations for PlatformInfraRef records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraRef records |
+| `find-first` | Find first matching platformInfraRef record |
+| `get` | Get a platformInfraRef by id |
+| `create` | Create a new platformInfraRef |
+| `update` | Update an existing platformInfraRef |
+| `delete` | Delete a platformInfraRef |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+
+**Required create fields:** `name`, `scopeId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`
+
+### `platform-infra-store`
+
+CRUD operations for PlatformInfraStore records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraStore records |
+| `find-first` | Find first matching platformInfraStore record |
+| `get` | Get a platformInfraStore by id |
+| `create` | Create a new platformInfraStore |
+| `update` | Update an existing platformInfraStore |
+| `delete` | Delete a platformInfraStore |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `hash` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+
+**Required create fields:** `name`, `scopeId`
+**Optional create fields (backend defaults):** `hash`
 
 ### `platform-namespace`
 
@@ -1159,22 +1410,15 @@ CRUD operations for PlatformNamespaceEvent records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
-| `cpuMillicores` | Int |
 | `createdAt` | Datetime |
 | `eventType` | String |
 | `id` | UUID |
-| `memoryBytes` | BigInt |
 | `message` | String |
 | `metadata` | JSON |
-| `metrics` | JSON |
 | `namespaceId` | UUID |
-| `networkEgressBytes` | BigInt |
-| `networkIngressBytes` | BigInt |
-| `podCount` | Int |
-| `storageBytes` | BigInt |
 
 **Required create fields:** `eventType`, `namespaceId`
-**Optional create fields (backend defaults):** `actorId`, `cpuMillicores`, `memoryBytes`, `message`, `metadata`, `metrics`, `networkEgressBytes`, `networkIngressBytes`, `podCount`, `storageBytes`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
 
 ### `platform-resource`
 
@@ -1194,16 +1438,23 @@ CRUD operations for PlatformResource records.
 | Field | Type |
 |-------|------|
 | `annotations` | JSON |
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
 | `errorCount` | Int |
 | `id` | UUID |
+| `installationId` | UUID |
 | `integrations` | String |
 | `kind` | String |
 | `labels` | JSON |
 | `lastError` | String |
+| `lastHeartbeatAt` | Datetime |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
 | `name` | String |
 | `namespaceId` | UUID |
+| `replicas` | Int |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
 | `resourceDefinitionId` | UUID |
@@ -1211,11 +1462,13 @@ CRUD operations for PlatformResource records.
 | `spec` | JSON |
 | `status` | String |
 | `statusObserved` | JSON |
+| `storageClass` | String |
+| `storageSizeBytes` | BigInt |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
 
 **Required create fields:** `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `integrations`, `labels`, `lastError`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
 
 ### `platform-resource-definition`
 
@@ -1283,6 +1536,40 @@ CRUD operations for PlatformResourceEvent records.
 **Required create fields:** `eventType`, `resourceId`
 **Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
 
+### `platform-resource-installation`
+
+CRUD operations for PlatformResourceInstallation records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceInstallation records |
+| `find-first` | Find first matching platformResourceInstallation record |
+| `get` | Get a platformResourceInstallation by id |
+| `create` | Create a new platformResourceInstallation |
+| `update` | Update an existing platformResourceInstallation |
+| `delete` | Delete a platformResourceInstallation |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `namespaceId` | UUID |
+| `params` | JSON |
+| `revision` | Int |
+| `slug` | String |
+| `status` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+
+**Required create fields:** `name`, `namespaceId`, `slug`
+**Optional create fields (backend defaults):** `commitId`, `createdBy`, `params`, `revision`, `status`, `storeId`, `updatedBy`
+
 ### `platform-resource-status-check`
 
 CRUD operations for PlatformResourceStatusCheck records.
@@ -1310,6 +1597,155 @@ CRUD operations for PlatformResourceStatusCheck records.
 
 **Required create fields:** `resourceId`
 **Optional create fields (backend defaults):** `completedAt`, `requestedAt`, `requestedBy`, `result`, `status`
+
+### `platform-resource-usage-log`
+
+CRUD operations for PlatformResourceUsageLog records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceUsageLog records |
+| `find-first` | Find first matching platformResourceUsageLog record |
+| `get` | Get a platformResourceUsageLog by id |
+| `create` | Create a new platformResourceUsageLog |
+| `update` | Update an existing platformResourceUsageLog |
+| `delete` | Delete a platformResourceUsageLog |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cpuMillicores` | BigInt |
+| `id` | UUID |
+| `intervalSeconds` | Int |
+| `memoryBytes` | BigInt |
+| `metrics` | JSON |
+| `namespaceId` | UUID |
+| `resourceId` | UUID |
+| `sampledAt` | Datetime |
+| `source` | String |
+
+**Required create fields:** `intervalSeconds`, `namespaceId`, `source`
+**Optional create fields (backend defaults):** `cpuMillicores`, `memoryBytes`, `metrics`, `resourceId`, `sampledAt`
+
+### `platform-resource-usage-summary`
+
+CRUD operations for PlatformResourceUsageSummary records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceUsageSummary records |
+| `find-first` | Find first matching platformResourceUsageSummary record |
+| `get` | Get a platformResourceUsageSummary by id |
+| `create` | Create a new platformResourceUsageSummary |
+| `update` | Update an existing platformResourceUsageSummary |
+| `delete` | Delete a platformResourceUsageSummary |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `date` | Date |
+| `gbSeconds` | BigFloat |
+| `id` | UUID |
+| `maxCpuMillicores` | BigInt |
+| `maxMemoryBytes` | BigInt |
+| `namespaceId` | UUID |
+| `resourceId` | UUID |
+| `runtimeSeconds` | BigInt |
+| `sampleCount` | Int |
+
+**Required create fields:** `date`, `namespaceId`
+**Optional create fields (backend defaults):** `gbSeconds`, `maxCpuMillicores`, `maxMemoryBytes`, `resourceId`, `runtimeSeconds`, `sampleCount`
+
+### `platform-resource-utilization-daily`
+
+CRUD operations for PlatformResourceUtilizationDaily records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourceUtilizationDaily records |
+| `find-first` | Find first matching platformResourceUtilizationDaily record |
+| `get` | Get a platformResourceUtilizationDaily by id |
+| `create` | Create a new platformResourceUtilizationDaily |
+| `update` | Update an existing platformResourceUtilizationDaily |
+| `delete` | Delete a platformResourceUtilizationDaily |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `avgMemoryBytes` | BigInt |
+| `cpuLimitMillicores` | BigInt |
+| `cpuPeakUtilization` | BigFloat |
+| `cpuRequestHeadroomMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `date` | Date |
+| `gbSeconds` | BigFloat |
+| `kind` | String |
+| `maxCpuMillicores` | BigInt |
+| `maxMemoryBytes` | BigInt |
+| `memoryLimitBytes` | BigInt |
+| `memoryPeakUtilization` | BigFloat |
+| `memoryRequestBytes` | BigInt |
+| `memoryRequestHeadroomBytes` | BigInt |
+| `namespaceId` | UUID |
+| `replicas` | Int |
+| `resourceId` | UUID |
+| `runtimeSeconds` | BigInt |
+| `sampleCount` | Int |
+
+**Required create fields:** `avgMemoryBytes`, `cpuLimitMillicores`, `cpuPeakUtilization`, `cpuRequestHeadroomMillicores`, `cpuRequestMillicores`, `date`, `gbSeconds`, `kind`, `maxCpuMillicores`, `maxMemoryBytes`, `memoryLimitBytes`, `memoryPeakUtilization`, `memoryRequestBytes`, `memoryRequestHeadroomBytes`, `namespaceId`, `replicas`, `resourceId`, `runtimeSeconds`, `sampleCount`
+
+### `platform-resources-health`
+
+CRUD operations for PlatformResourcesHealth records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformResourcesHealth records |
+| `find-first` | Find first matching platformResourcesHealth record |
+| `get` | Get a platformResourcesHealth by id |
+| `create` | Create a new platformResourcesHealth |
+| `update` | Update an existing platformResourcesHealth |
+| `delete` | Delete a platformResourcesHealth |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `annotations` | JSON |
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `errorCount` | Int |
+| `id` | UUID |
+| `installationId` | UUID |
+| `integrations` | String |
+| `kind` | String |
+| `labels` | JSON |
+| `lastError` | String |
+| `lastHeartbeatAt` | Datetime |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
+| `name` | String |
+| `namespaceId` | UUID |
+| `replicas` | Int |
+| `requiredConfigs` | ResourceRequirement |
+| `requiredSecrets` | ResourceRequirement |
+| `resourceDefinitionId` | UUID |
+| `slug` | String |
+| `spec` | JSON |
+| `status` | String |
+| `statusDetail` | String |
+| `statusObserved` | JSON |
+| `storageClass` | String |
+| `storageSizeBytes` | BigInt |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+
+**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
 
 ### `platform-resources-requirements-state`
 
@@ -1368,6 +1804,73 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
 
+### `platform-webhook-endpoint`
+
+CRUD operations for PlatformWebhookEndpoint records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformWebhookEndpoint records |
+| `find-first` | Find first matching platformWebhookEndpoint record |
+| `get` | Get a platformWebhookEndpoint by id |
+| `create` | Create a new platformWebhookEndpoint |
+| `update` | Update an existing platformWebhookEndpoint |
+| `delete` | Delete a platformWebhookEndpoint |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `active` | Boolean |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `functionDefinitionId` | UUID |
+| `host` | String |
+| `id` | UUID |
+| `namespaceId` | UUID |
+| `path` | String |
+| `provider` | String |
+| `replayWindowSeconds` | Int |
+| `signingSecretName` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+
+**Required create fields:** `functionDefinitionId`, `host`, `namespaceId`, `path`, `signingSecretName`
+**Optional create fields (backend defaults):** `active`, `createdBy`, `provider`, `replayWindowSeconds`, `updatedBy`
+
+### `platform-webhook-event`
+
+CRUD operations for PlatformWebhookEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformWebhookEvent records |
+| `find-first` | Find first matching platformWebhookEvent record |
+| `get` | Get a platformWebhookEvent by id |
+| `create` | Create a new platformWebhookEvent |
+| `update` | Update an existing platformWebhookEvent |
+| `delete` | Delete a platformWebhookEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `endpointId` | UUID |
+| `error` | String |
+| `externalEventId` | String |
+| `id` | UUID |
+| `invocationCreatedAt` | Datetime |
+| `invocationId` | UUID |
+| `payload` | JSON |
+| `provider` | String |
+| `providerTimestamp` | Datetime |
+| `status` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `endpointId`, `externalEventId`, `provider`
+**Optional create fields (backend defaults):** `error`, `invocationCreatedAt`, `invocationId`, `payload`, `providerTimestamp`, `status`
+
 ### `resource`
 
 CRUD operations for Resource records.
@@ -1386,17 +1889,24 @@ CRUD operations for Resource records.
 | Field | Type |
 |-------|------|
 | `annotations` | JSON |
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
 | `databaseId` | UUID |
 | `errorCount` | Int |
 | `id` | UUID |
+| `installationId` | UUID |
 | `integrations` | String |
 | `kind` | String |
 | `labels` | JSON |
 | `lastError` | String |
+| `lastHeartbeatAt` | Datetime |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
 | `name` | String |
 | `namespaceId` | UUID |
+| `replicas` | Int |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
 | `resourceDefinitionId` | UUID |
@@ -1404,11 +1914,13 @@ CRUD operations for Resource records.
 | `spec` | JSON |
 | `status` | String |
 | `statusObserved` | JSON |
+| `storageClass` | String |
+| `storageSizeBytes` | BigInt |
 | `updatedAt` | Datetime |
 | `updatedBy` | UUID |
 
 **Required create fields:** `databaseId`, `kind`, `name`, `namespaceId`, `slug`
-**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `integrations`, `labels`, `lastError`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
+**Optional create fields (backend defaults):** `annotations`, `createdBy`, `errorCount`, `installationId`, `integrations`, `labels`, `lastError`, `lastHeartbeatAt`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `spec`, `status`, `statusObserved`, `updatedBy`
 
 ### `resource-definition`
 
@@ -1478,6 +1990,41 @@ CRUD operations for ResourceEvent records.
 **Required create fields:** `databaseId`, `eventType`, `resourceId`
 **Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
 
+### `resource-installation`
+
+CRUD operations for ResourceInstallation records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceInstallation records |
+| `find-first` | Find first matching resourceInstallation record |
+| `get` | Get a resourceInstallation by id |
+| `create` | Create a new resourceInstallation |
+| `update` | Update an existing resourceInstallation |
+| `delete` | Delete a resourceInstallation |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `namespaceId` | UUID |
+| `params` | JSON |
+| `revision` | Int |
+| `slug` | String |
+| `status` | String |
+| `storeId` | UUID |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+
+**Required create fields:** `databaseId`, `name`, `namespaceId`, `slug`
+**Optional create fields (backend defaults):** `commitId`, `createdBy`, `params`, `revision`, `status`, `storeId`, `updatedBy`
+
 ### `resource-status-check`
 
 CRUD operations for ResourceStatusCheck records.
@@ -1506,6 +2053,158 @@ CRUD operations for ResourceStatusCheck records.
 
 **Required create fields:** `databaseId`, `resourceId`
 **Optional create fields (backend defaults):** `completedAt`, `requestedAt`, `requestedBy`, `result`, `status`
+
+### `resource-usage-log`
+
+CRUD operations for ResourceUsageLog records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceUsageLog records |
+| `find-first` | Find first matching resourceUsageLog record |
+| `get` | Get a resourceUsageLog by id |
+| `create` | Create a new resourceUsageLog |
+| `update` | Update an existing resourceUsageLog |
+| `delete` | Delete a resourceUsageLog |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `cpuMillicores` | BigInt |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `intervalSeconds` | Int |
+| `memoryBytes` | BigInt |
+| `metrics` | JSON |
+| `namespaceId` | UUID |
+| `resourceId` | UUID |
+| `sampledAt` | Datetime |
+| `source` | String |
+
+**Required create fields:** `databaseId`, `intervalSeconds`, `namespaceId`, `source`
+**Optional create fields (backend defaults):** `cpuMillicores`, `memoryBytes`, `metrics`, `resourceId`, `sampledAt`
+
+### `resource-usage-summary`
+
+CRUD operations for ResourceUsageSummary records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceUsageSummary records |
+| `find-first` | Find first matching resourceUsageSummary record |
+| `get` | Get a resourceUsageSummary by id |
+| `create` | Create a new resourceUsageSummary |
+| `update` | Update an existing resourceUsageSummary |
+| `delete` | Delete a resourceUsageSummary |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `databaseId` | UUID |
+| `date` | Date |
+| `gbSeconds` | BigFloat |
+| `id` | UUID |
+| `maxCpuMillicores` | BigInt |
+| `maxMemoryBytes` | BigInt |
+| `namespaceId` | UUID |
+| `resourceId` | UUID |
+| `runtimeSeconds` | BigInt |
+| `sampleCount` | Int |
+
+**Required create fields:** `databaseId`, `date`, `namespaceId`
+**Optional create fields (backend defaults):** `gbSeconds`, `maxCpuMillicores`, `maxMemoryBytes`, `resourceId`, `runtimeSeconds`, `sampleCount`
+
+### `resource-utilization-daily`
+
+CRUD operations for ResourceUtilizationDaily records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourceUtilizationDaily records |
+| `find-first` | Find first matching resourceUtilizationDaily record |
+| `get` | Get a resourceUtilizationDaily by id |
+| `create` | Create a new resourceUtilizationDaily |
+| `update` | Update an existing resourceUtilizationDaily |
+| `delete` | Delete a resourceUtilizationDaily |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `avgMemoryBytes` | BigInt |
+| `cpuLimitMillicores` | BigInt |
+| `cpuPeakUtilization` | BigFloat |
+| `cpuRequestHeadroomMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `date` | Date |
+| `gbSeconds` | BigFloat |
+| `kind` | String |
+| `maxCpuMillicores` | BigInt |
+| `maxMemoryBytes` | BigInt |
+| `memoryLimitBytes` | BigInt |
+| `memoryPeakUtilization` | BigFloat |
+| `memoryRequestBytes` | BigInt |
+| `memoryRequestHeadroomBytes` | BigInt |
+| `namespaceId` | UUID |
+| `replicas` | Int |
+| `resourceId` | UUID |
+| `runtimeSeconds` | BigInt |
+| `sampleCount` | Int |
+
+**Required create fields:** `avgMemoryBytes`, `cpuLimitMillicores`, `cpuPeakUtilization`, `cpuRequestHeadroomMillicores`, `cpuRequestMillicores`, `date`, `gbSeconds`, `kind`, `maxCpuMillicores`, `maxMemoryBytes`, `memoryLimitBytes`, `memoryPeakUtilization`, `memoryRequestBytes`, `memoryRequestHeadroomBytes`, `namespaceId`, `replicas`, `resourceId`, `runtimeSeconds`, `sampleCount`
+
+### `resources-health`
+
+CRUD operations for ResourcesHealth records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all resourcesHealth records |
+| `find-first` | Find first matching resourcesHealth record |
+| `get` | Get a resourcesHealth by id |
+| `create` | Create a new resourcesHealth |
+| `update` | Update an existing resourcesHealth |
+| `delete` | Delete a resourcesHealth |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `annotations` | JSON |
+| `cpuLimitMillicores` | BigInt |
+| `cpuRequestMillicores` | BigInt |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
+| `errorCount` | Int |
+| `id` | UUID |
+| `installationId` | UUID |
+| `integrations` | String |
+| `kind` | String |
+| `labels` | JSON |
+| `lastError` | String |
+| `lastHeartbeatAt` | Datetime |
+| `memoryLimitBytes` | BigInt |
+| `memoryRequestBytes` | BigInt |
+| `name` | String |
+| `namespaceId` | UUID |
+| `replicas` | Int |
+| `requiredConfigs` | ResourceRequirement |
+| `requiredSecrets` | ResourceRequirement |
+| `resourceDefinitionId` | UUID |
+| `slug` | String |
+| `spec` | JSON |
+| `status` | String |
+| `statusDetail` | String |
+| `statusObserved` | JSON |
+| `storageClass` | String |
+| `storageSizeBytes` | BigInt |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+
+**Required create fields:** `annotations`, `cpuLimitMillicores`, `cpuRequestMillicores`, `createdBy`, `databaseId`, `errorCount`, `installationId`, `integrations`, `kind`, `labels`, `lastError`, `lastHeartbeatAt`, `memoryLimitBytes`, `memoryRequestBytes`, `name`, `namespaceId`, `replicas`, `requiredConfigs`, `requiredSecrets`, `resourceDefinitionId`, `slug`, `spec`, `status`, `statusDetail`, `statusObserved`, `storageClass`, `storageSizeBytes`, `updatedBy`
 
 ### `resources-requirements-state`
 
@@ -1563,6 +2262,75 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `webhook-endpoint`
+
+CRUD operations for WebhookEndpoint records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all webhookEndpoint records |
+| `find-first` | Find first matching webhookEndpoint record |
+| `get` | Get a webhookEndpoint by id |
+| `create` | Create a new webhookEndpoint |
+| `update` | Update an existing webhookEndpoint |
+| `delete` | Delete a webhookEndpoint |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `active` | Boolean |
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
+| `functionDefinitionId` | UUID |
+| `host` | String |
+| `id` | UUID |
+| `namespaceId` | UUID |
+| `path` | String |
+| `provider` | String |
+| `replayWindowSeconds` | Int |
+| `signingSecretName` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+
+**Required create fields:** `databaseId`, `functionDefinitionId`, `host`, `namespaceId`, `path`, `signingSecretName`
+**Optional create fields (backend defaults):** `active`, `createdBy`, `provider`, `replayWindowSeconds`, `updatedBy`
+
+### `webhook-event`
+
+CRUD operations for WebhookEvent records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all webhookEvent records |
+| `find-first` | Find first matching webhookEvent record |
+| `get` | Get a webhookEvent by id |
+| `create` | Create a new webhookEvent |
+| `update` | Update an existing webhookEvent |
+| `delete` | Delete a webhookEvent |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `endpointId` | UUID |
+| `error` | String |
+| `externalEventId` | String |
+| `id` | UUID |
+| `invocationCreatedAt` | Datetime |
+| `invocationId` | UUID |
+| `payload` | JSON |
+| `provider` | String |
+| `providerTimestamp` | Datetime |
+| `status` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `endpointId`, `externalEventId`, `provider`
+**Optional create fields (backend defaults):** `error`, `invocationCreatedAt`, `invocationId`, `payload`, `providerTimestamp`, `status`
 
 ## Custom Operations
 
@@ -1771,6 +2539,104 @@ insertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `platform-infra-init-empty-repo`
+
+platformInfraInitEmptyRepo
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
+
+### `platform-infra-insert-node-at-path`
+
+platformInfraInsertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `platform-infra-set-data-at-path`
+
+platformInfraSetDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.path` | String |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
+### `platform-resource-installations-install`
+
+platformResourceInstallationsInstall
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pName` | String |
+  | `--input.pNamespaceId` | UUID |
+  | `--input.pParams` | JSON |
+  | `--input.pSlug` | String |
+
+### `platform-resource-installations-rollback`
+
+platformResourceInstallationsRollback
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pCommitId` | UUID |
+  | `--input.pInstallationId` | UUID |
+
+### `platform-resource-installations-uninstall`
+
+platformResourceInstallationsUninstall
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pInstallationId` | UUID |
+
+### `platform-resource-installations-upgrade`
+
+platformResourceInstallationsUpgrade
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pInstallationId` | UUID |
+  | `--input.pParams` | JSON |
+
 ### `provision-bucket`
 
 Provision an S3 bucket for a logical bucket in the database.
@@ -1785,6 +2651,59 @@ and lifecycle settings.
   |----------|------|
   | `--input.bucketKey` | String (required) |
   | `--input.ownerId` | UUID |
+
+### `resource-installations-install`
+
+resourceInstallationsInstall
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pName` | String |
+  | `--input.pNamespaceId` | UUID |
+  | `--input.pParams` | JSON |
+  | `--input.pSlug` | String |
+
+### `resource-installations-rollback`
+
+resourceInstallationsRollback
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pCommitId` | UUID |
+  | `--input.pInstallationId` | UUID |
+
+### `resource-installations-uninstall`
+
+resourceInstallationsUninstall
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pInstallationId` | UUID |
+
+### `resource-installations-upgrade`
+
+resourceInstallationsUpgrade
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.pInstallationId` | UUID |
+  | `--input.pParams` | JSON |
 
 ### `save-graph`
 
@@ -1829,6 +2748,7 @@ startExecution
   | `--input.inputPayload` | JSON |
   | `--input.maxPendingJobs` | Int |
   | `--input.maxTicks` | Int |
+  | `--input.outputNames` | String |
   | `--input.outputNode` | String |
   | `--input.outputPort` | String |
   | `--input.parentExecutionId` | UUID |

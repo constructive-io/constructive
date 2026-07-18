@@ -12,8 +12,8 @@ csdk infra-store list --where.<field>.<op> <value> --orderBy <values>
 csdk infra-store list --limit 10 --after <cursor>
 csdk infra-store find-first --where.<field>.<op> <value>
 csdk infra-store get --id <UUID>
-csdk infra-store create --name <String> --scopeId <UUID> [--hash <UUID>]
-csdk infra-store update --id <UUID> [--hash <UUID>] [--name <String>] [--scopeId <UUID>]
+csdk infra-store create --databaseId <UUID> --name <String> [--hash <UUID>]
+csdk infra-store update --id <UUID> [--databaseId <UUID>] [--hash <UUID>] [--name <String>]
 csdk infra-store delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk infra-store list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a infraStore
 
 ```bash
-csdk infra-store create --name <String> --scopeId <UUID> [--hash <UUID>]
+csdk infra-store create --databaseId <UUID> --name <String> [--hash <UUID>]
 ```
 
 ### Get a infraStore by id

@@ -19,7 +19,18 @@ import type {
   InfraSetDataAtPathInput,
   InitEmptyRepoInput,
   InsertNodeAtPathInput,
+  PlatformInfraInitEmptyRepoInput,
+  PlatformInfraInsertNodeAtPathInput,
+  PlatformInfraSetDataAtPathInput,
+  PlatformResourceInstallationsInstallInput,
+  PlatformResourceInstallationsRollbackInput,
+  PlatformResourceInstallationsUninstallInput,
+  PlatformResourceInstallationsUpgradeInput,
   ProvisionBucketInput,
+  ResourceInstallationsInstallInput,
+  ResourceInstallationsRollbackInput,
+  ResourceInstallationsUninstallInput,
+  ResourceInstallationsUpgradeInput,
   SaveGraphInput,
   SetDataAtPathInput,
   StartExecutionInput,
@@ -36,7 +47,18 @@ import type {
   InfraSetDataAtPathPayload,
   InitEmptyRepoPayload,
   InsertNodeAtPathPayload,
+  PlatformInfraInitEmptyRepoPayload,
+  PlatformInfraInsertNodeAtPathPayload,
+  PlatformInfraSetDataAtPathPayload,
+  PlatformResourceInstallationsInstallPayload,
+  PlatformResourceInstallationsRollbackPayload,
+  PlatformResourceInstallationsUninstallPayload,
+  PlatformResourceInstallationsUpgradePayload,
   ProvisionBucketPayload,
+  ResourceInstallationsInstallPayload,
+  ResourceInstallationsRollbackPayload,
+  ResourceInstallationsUninstallPayload,
+  ResourceInstallationsUpgradePayload,
   SaveGraphPayload,
   SetDataAtPathPayload,
   StartExecutionPayload,
@@ -53,7 +75,18 @@ import type {
   InfraSetDataAtPathPayloadSelect,
   InitEmptyRepoPayloadSelect,
   InsertNodeAtPathPayloadSelect,
+  PlatformInfraInitEmptyRepoPayloadSelect,
+  PlatformInfraInsertNodeAtPathPayloadSelect,
+  PlatformInfraSetDataAtPathPayloadSelect,
+  PlatformResourceInstallationsInstallPayloadSelect,
+  PlatformResourceInstallationsRollbackPayloadSelect,
+  PlatformResourceInstallationsUninstallPayloadSelect,
+  PlatformResourceInstallationsUpgradePayloadSelect,
   ProvisionBucketPayloadSelect,
+  ResourceInstallationsInstallPayloadSelect,
+  ResourceInstallationsRollbackPayloadSelect,
+  ResourceInstallationsUninstallPayloadSelect,
+  ResourceInstallationsUpgradePayloadSelect,
   SaveGraphPayloadSelect,
   SetDataAtPathPayloadSelect,
   StartExecutionPayloadSelect,
@@ -96,6 +129,27 @@ export interface InitEmptyRepoVariables {
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
 }
+export interface PlatformInfraInitEmptyRepoVariables {
+  input: PlatformInfraInitEmptyRepoInput;
+}
+export interface PlatformInfraInsertNodeAtPathVariables {
+  input: PlatformInfraInsertNodeAtPathInput;
+}
+export interface PlatformInfraSetDataAtPathVariables {
+  input: PlatformInfraSetDataAtPathInput;
+}
+export interface PlatformResourceInstallationsInstallVariables {
+  input: PlatformResourceInstallationsInstallInput;
+}
+export interface PlatformResourceInstallationsRollbackVariables {
+  input: PlatformResourceInstallationsRollbackInput;
+}
+export interface PlatformResourceInstallationsUninstallVariables {
+  input: PlatformResourceInstallationsUninstallInput;
+}
+export interface PlatformResourceInstallationsUpgradeVariables {
+  input: PlatformResourceInstallationsUpgradeInput;
+}
 /**
  * Variables for provisionBucket
  * Provision an S3 bucket for a logical bucket in the database.
@@ -105,6 +159,18 @@ and lifecycle settings.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
+}
+export interface ResourceInstallationsInstallVariables {
+  input: ResourceInstallationsInstallInput;
+}
+export interface ResourceInstallationsRollbackVariables {
+  input: ResourceInstallationsRollbackInput;
+}
+export interface ResourceInstallationsUninstallVariables {
+  input: ResourceInstallationsUninstallInput;
+}
+export interface ResourceInstallationsUpgradeVariables {
+  input: ResourceInstallationsUpgradeInput;
 }
 export interface SaveGraphVariables {
   input: SaveGraphInput;
@@ -468,6 +534,232 @@ export function createMutationOperations(client: OrmClient) {
           'InsertNodeAtPathPayload'
         ),
       }),
+    platformInfraInitEmptyRepo: <S extends PlatformInfraInitEmptyRepoPayloadSelect>(
+      args: PlatformInfraInitEmptyRepoVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraInitEmptyRepoPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraInitEmptyRepo: InferSelectResult<PlatformInfraInitEmptyRepoPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraInitEmptyRepo',
+        fieldName: 'platformInfraInitEmptyRepo',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraInitEmptyRepo',
+          'platformInfraInitEmptyRepo',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraInitEmptyRepoInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraInitEmptyRepoPayload'
+        ),
+      }),
+    platformInfraInsertNodeAtPath: <S extends PlatformInfraInsertNodeAtPathPayloadSelect>(
+      args: PlatformInfraInsertNodeAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraInsertNodeAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraInsertNodeAtPath: InferSelectResult<
+          PlatformInfraInsertNodeAtPathPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraInsertNodeAtPath',
+        fieldName: 'platformInfraInsertNodeAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraInsertNodeAtPath',
+          'platformInfraInsertNodeAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraInsertNodeAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraInsertNodeAtPathPayload'
+        ),
+      }),
+    platformInfraSetDataAtPath: <S extends PlatformInfraSetDataAtPathPayloadSelect>(
+      args: PlatformInfraSetDataAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraSetDataAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraSetDataAtPath: InferSelectResult<PlatformInfraSetDataAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraSetDataAtPath',
+        fieldName: 'platformInfraSetDataAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraSetDataAtPath',
+          'platformInfraSetDataAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraSetDataAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraSetDataAtPathPayload'
+        ),
+      }),
+    platformResourceInstallationsInstall: <
+      S extends PlatformResourceInstallationsInstallPayloadSelect,
+    >(
+      args: PlatformResourceInstallationsInstallVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformResourceInstallationsInstallPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformResourceInstallationsInstall: InferSelectResult<
+          PlatformResourceInstallationsInstallPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformResourceInstallationsInstall',
+        fieldName: 'platformResourceInstallationsInstall',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformResourceInstallationsInstall',
+          'platformResourceInstallationsInstall',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformResourceInstallationsInstallInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformResourceInstallationsInstallPayload'
+        ),
+      }),
+    platformResourceInstallationsRollback: <
+      S extends PlatformResourceInstallationsRollbackPayloadSelect,
+    >(
+      args: PlatformResourceInstallationsRollbackVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformResourceInstallationsRollbackPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformResourceInstallationsRollback: InferSelectResult<
+          PlatformResourceInstallationsRollbackPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformResourceInstallationsRollback',
+        fieldName: 'platformResourceInstallationsRollback',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformResourceInstallationsRollback',
+          'platformResourceInstallationsRollback',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformResourceInstallationsRollbackInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformResourceInstallationsRollbackPayload'
+        ),
+      }),
+    platformResourceInstallationsUninstall: <
+      S extends PlatformResourceInstallationsUninstallPayloadSelect,
+    >(
+      args: PlatformResourceInstallationsUninstallVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformResourceInstallationsUninstallPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformResourceInstallationsUninstall: InferSelectResult<
+          PlatformResourceInstallationsUninstallPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformResourceInstallationsUninstall',
+        fieldName: 'platformResourceInstallationsUninstall',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformResourceInstallationsUninstall',
+          'platformResourceInstallationsUninstall',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformResourceInstallationsUninstallInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformResourceInstallationsUninstallPayload'
+        ),
+      }),
+    platformResourceInstallationsUpgrade: <
+      S extends PlatformResourceInstallationsUpgradePayloadSelect,
+    >(
+      args: PlatformResourceInstallationsUpgradeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformResourceInstallationsUpgradePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformResourceInstallationsUpgrade: InferSelectResult<
+          PlatformResourceInstallationsUpgradePayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformResourceInstallationsUpgrade',
+        fieldName: 'platformResourceInstallationsUpgrade',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformResourceInstallationsUpgrade',
+          'platformResourceInstallationsUpgrade',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformResourceInstallationsUpgradeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformResourceInstallationsUpgradePayload'
+        ),
+      }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
       args: ProvisionBucketVariables,
       options: {
@@ -495,6 +787,134 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
+        ),
+      }),
+    resourceInstallationsInstall: <S extends ResourceInstallationsInstallPayloadSelect>(
+      args: ResourceInstallationsInstallVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ResourceInstallationsInstallPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        resourceInstallationsInstall: InferSelectResult<
+          ResourceInstallationsInstallPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ResourceInstallationsInstall',
+        fieldName: 'resourceInstallationsInstall',
+        ...buildCustomDocument(
+          'mutation',
+          'ResourceInstallationsInstall',
+          'resourceInstallationsInstall',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ResourceInstallationsInstallInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ResourceInstallationsInstallPayload'
+        ),
+      }),
+    resourceInstallationsRollback: <S extends ResourceInstallationsRollbackPayloadSelect>(
+      args: ResourceInstallationsRollbackVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ResourceInstallationsRollbackPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        resourceInstallationsRollback: InferSelectResult<
+          ResourceInstallationsRollbackPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ResourceInstallationsRollback',
+        fieldName: 'resourceInstallationsRollback',
+        ...buildCustomDocument(
+          'mutation',
+          'ResourceInstallationsRollback',
+          'resourceInstallationsRollback',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ResourceInstallationsRollbackInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ResourceInstallationsRollbackPayload'
+        ),
+      }),
+    resourceInstallationsUninstall: <S extends ResourceInstallationsUninstallPayloadSelect>(
+      args: ResourceInstallationsUninstallVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ResourceInstallationsUninstallPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        resourceInstallationsUninstall: InferSelectResult<
+          ResourceInstallationsUninstallPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ResourceInstallationsUninstall',
+        fieldName: 'resourceInstallationsUninstall',
+        ...buildCustomDocument(
+          'mutation',
+          'ResourceInstallationsUninstall',
+          'resourceInstallationsUninstall',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ResourceInstallationsUninstallInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ResourceInstallationsUninstallPayload'
+        ),
+      }),
+    resourceInstallationsUpgrade: <S extends ResourceInstallationsUpgradePayloadSelect>(
+      args: ResourceInstallationsUpgradeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ResourceInstallationsUpgradePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        resourceInstallationsUpgrade: InferSelectResult<
+          ResourceInstallationsUpgradePayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ResourceInstallationsUpgrade',
+        fieldName: 'resourceInstallationsUpgrade',
+        ...buildCustomDocument(
+          'mutation',
+          'ResourceInstallationsUpgrade',
+          'resourceInstallationsUpgrade',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ResourceInstallationsUpgradeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ResourceInstallationsUpgradePayload'
         ),
       }),
     saveGraph: <S extends SaveGraphPayloadSelect>(

@@ -9,7 +9,7 @@ Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children
 ```typescript
 db.infraObject.findMany({ select: { id: true } }).execute()
 db.infraObject.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.infraObject.create({ data: { data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' }, select: { id: true } }).execute()
+db.infraObject.create({ data: { data: '<JSON>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>' }, select: { id: true } }).execute()
 db.infraObject.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute()
 db.infraObject.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.infraObject.findMany({
 
 ```typescript
 const item = await db.infraObject.create({
-  data: { data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' },
+  data: { data: '<JSON>', databaseId: '<UUID>', kids: '<UUID>', ktree: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -25,8 +25,9 @@ import type {
   ForeignKeyConstraint,
   FullTextSearch,
   Function,
+  HttpRoute,
   Index,
-  MigrateFile,
+  ManagedDomain,
   NodeTypeRegistry,
   Partition,
   Policy,
@@ -72,7 +73,6 @@ import type {
 export type ConstructiveInternalTypeAttachment = unknown;
 export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
-export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 export type ApiExposureLevel = 'EXPOSABLE' | 'INTERNAL_ONLY' | 'NEVER_EXPOSE';
 /** Methods to use when ordering `ApiModule`. */
@@ -188,10 +188,10 @@ export type AppOrderBy =
   | 'SITE_ID_DESC';
 /** Methods to use when ordering `AstMigration`. */
 export type AstMigrationOrderBy =
-  | 'ACTION_ASC'
-  | 'ACTION_DESC'
   | 'ACTION_ID_ASC'
   | 'ACTION_ID_DESC'
+  | 'ACTION_NAME_ASC'
+  | 'ACTION_NAME_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -617,6 +617,37 @@ export type FunctionOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC';
+/** Methods to use when ordering `HttpRoute`. */
+export type HttpRouteOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DOMAIN_ID_ASC'
+  | 'DOMAIN_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'METHOD_ASC'
+  | 'METHOD_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIORITY_ASC'
+  | 'PRIORITY_DESC'
+  | 'TARGET_ID_ASC'
+  | 'TARGET_ID_DESC'
+  | 'TARGET_KIND_ASC'
+  | 'TARGET_KIND_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
 /** Methods to use when ordering `Index`. */
 export type IndexOrderBy =
   | 'ACCESS_METHOD_ASC'
@@ -656,15 +687,29 @@ export type IndexOrderBy =
   | 'UPDATED_AT_DESC'
   | 'WHERE_CLAUSE_ASC'
   | 'WHERE_CLAUSE_DESC';
-/** Methods to use when ordering `MigrateFile`. */
-export type MigrateFileOrderBy =
+/** Methods to use when ordering `ManagedDomain`. */
+export type ManagedDomainOrderBy =
+  | 'ANNOTATIONS_ASC'
+  | 'ANNOTATIONS_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DOMAIN_ASC'
+  | 'DOMAIN_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IS_WILDCARD_ASC'
+  | 'IS_WILDCARD_DESC'
   | 'NATURAL'
-  | 'UPLOAD_ASC'
-  | 'UPLOAD_DESC';
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'TLS_READY_AT_ASC'
+  | 'TLS_READY_AT_DESC'
+  | 'TLS_STATUS_ASC'
+  | 'TLS_STATUS_DESC'
+  | 'VERIFICATION_STATUS_ASC'
+  | 'VERIFICATION_STATUS_DESC'
+  | 'VERIFIED_AT_ASC'
+  | 'VERIFIED_AT_DESC';
 /** Methods to use when ordering `NodeTypeRegistry`. */
 export type NodeTypeRegistryOrderBy =
   | 'CATEGORY_ASC'
@@ -981,10 +1026,10 @@ export type SpatialRelationOrderBy =
   | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `SqlAction`. */
 export type SqlActionOrderBy =
-  | 'ACTION_ASC'
-  | 'ACTION_DESC'
   | 'ACTION_ID_ASC'
   | 'ACTION_ID_DESC'
+  | 'ACTION_NAME_ASC'
+  | 'ACTION_NAME_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'CONTENT_ASC'
@@ -1728,10 +1773,10 @@ export interface ApplyRlsInput {
 }
 /** A filter to be used against `AstMigration` object types. All fields are combined with a logical ‘and.’ */
 export interface AstMigrationFilter {
-  /** Filter by the object’s `action` field. */
-  action?: StringFilter;
   /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actionName` field. */
+  actionName?: StringFilter;
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
@@ -1760,22 +1805,6 @@ export interface AstMigrationFilter {
   revert?: JSONFilter;
   /** Filter by the object’s `verify` field. */
   verify?: JSONFilter;
-}
-/** An input for mutations affecting `AstMigration` */
-export interface AstMigrationInput {
-  action?: string;
-  actionId?: string;
-  actorId?: string;
-  createdAt?: string;
-  databaseId?: string;
-  deploy?: unknown;
-  deploys?: string;
-  id?: number;
-  name?: string;
-  payload?: unknown;
-  requires?: string[];
-  revert?: unknown;
-  verify?: unknown;
 }
 export interface CancelDatabaseTransferInput {
   clientMutationId?: string;
@@ -2096,41 +2125,6 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Not included in the specified list. */
   notIn?: ConstructiveInternalTypeImage[];
 }
-/** A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’ */
-export interface ConstructiveInternalTypeUploadFilter {
-  /** Contained by the specified JSON. */
-  containedBy?: ConstructiveInternalTypeUpload;
-  /** Contains the specified JSON. */
-  contains?: ConstructiveInternalTypeUpload;
-  /** Contains all of the specified keys. */
-  containsAllKeys?: string[];
-  /** Contains any of the specified keys. */
-  containsAnyKeys?: string[];
-  /** Contains the specified key. */
-  containsKey?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: ConstructiveInternalTypeUpload;
-  /** Equal to the specified value. */
-  equalTo?: ConstructiveInternalTypeUpload;
-  /** Greater than the specified value. */
-  greaterThan?: ConstructiveInternalTypeUpload;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: ConstructiveInternalTypeUpload;
-  /** Included in the specified list. */
-  in?: ConstructiveInternalTypeUpload[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: ConstructiveInternalTypeUpload;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: ConstructiveInternalTypeUpload;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: ConstructiveInternalTypeUpload;
-  /** Not equal to the specified value. */
-  notEqualTo?: ConstructiveInternalTypeUpload;
-  /** Not included in the specified list. */
-  notIn?: ConstructiveInternalTypeUpload[];
-}
 /** A filter to be used against ConstructiveInternalTypeUrl fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeUrlFilter {
   /** Not equal to the specified value, treating null like an ordinary value. */
@@ -2278,11 +2272,6 @@ export interface CreateAppInput {
   app: AppInput;
   clientMutationId?: string;
 }
-export interface CreateAstMigrationInput {
-  /** The `AstMigration` to be created by this mutation. */
-  astMigration: AstMigrationInput;
-  clientMutationId?: string;
-}
 export interface CreateCheckConstraintInput {
   /** The `CheckConstraint` to be created by this mutation. */
   checkConstraint: CheckConstraintInput;
@@ -2353,15 +2342,20 @@ export interface CreateFunctionInput {
   /** The `Function` to be created by this mutation. */
   function: FunctionInput;
 }
+export interface CreateHttpRouteInput {
+  clientMutationId?: string;
+  /** The `HttpRoute` to be created by this mutation. */
+  httpRoute: HttpRouteInput;
+}
 export interface CreateIndexInput {
   clientMutationId?: string;
   /** The `Index` to be created by this mutation. */
   index: IndexInput;
 }
-export interface CreateMigrateFileInput {
+export interface CreateManagedDomainInput {
   clientMutationId?: string;
-  /** The `MigrateFile` to be created by this mutation. */
-  migrateFile: MigrateFileInput;
+  /** The `ManagedDomain` to be created by this mutation. */
+  managedDomain: ManagedDomainInput;
 }
 export interface CreateNodeTypeRegistryInput {
   clientMutationId?: string;
@@ -2427,11 +2421,6 @@ export interface CreateSpatialRelationInput {
   clientMutationId?: string;
   /** The `SpatialRelation` to be created by this mutation. */
   spatialRelation: SpatialRelationInput;
-}
-export interface CreateSqlActionInput {
-  clientMutationId?: string;
-  /** The `SqlAction` to be created by this mutation. */
-  sqlAction: SqlActionInput;
 }
 export interface CreateTableGrantInput {
   clientMutationId?: string;
@@ -2571,6 +2560,10 @@ export interface DatabaseFilter {
   indicesExist?: boolean;
   /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `managedDomains` relation. */
+  managedDomains?: DatabaseToManyManagedDomainFilter;
+  /** `managedDomains` exist. */
+  managedDomainsExist?: boolean;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
   /** Negates the expression. */
@@ -2979,6 +2972,15 @@ export interface DatabaseToManyIndexFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: IndexFilter;
 }
+/** A filter to be used against many `ManagedDomain` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyManagedDomainFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ManagedDomainFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ManagedDomainFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ManagedDomainFilter;
+}
 /** A filter to be used against many `Partition` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyPartitionFilter {
   /** Filters to entities where every related entity matches. */
@@ -3354,8 +3356,17 @@ export interface DeleteFunctionInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteHttpRouteInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteIndexInput {
   clientMutationId?: string;
+  id: string;
+}
+export interface DeleteManagedDomainInput {
+  clientMutationId?: string;
+  /** Unique identifier for this managed domain record */
   id: string;
 }
 export interface DeleteNodeTypeRegistryInput {
@@ -3475,6 +3486,10 @@ export interface DomainFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `domain` field. */
   domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `httpRoutes` relation. */
+  httpRoutes?: DomainToManyHttpRouteFilter;
+  /** `httpRoutes` exist. */
+  httpRoutesExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `labels` field. */
@@ -3535,6 +3550,15 @@ export interface DomainPatch {
   siteId?: string;
   /** Subdomain portion of the hostname */
   subdomain?: ConstructiveInternalTypeHostname;
+}
+/** A filter to be used against many `HttpRoute` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainToManyHttpRouteFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: HttpRouteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: HttpRouteFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: HttpRouteFilter;
 }
 /** A filter to be used against `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface EmbeddingChunkFilter {
@@ -4017,6 +4041,91 @@ export interface FunctionPatch {
   name?: string;
   schemaId?: string;
 }
+/** A filter to be used against `HttpRoute` object types. All fields are combined with a logical ‘and.’ */
+export interface HttpRouteFilter {
+  /** Checks for all expressions in this list. */
+  and?: HttpRouteFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` relation. */
+  domain?: DomainFilter;
+  /** Filter by the object’s `domainId` field. */
+  domainId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `method` field. */
+  method?: StringFilter;
+  /** Negates the expression. */
+  not?: HttpRouteFilter;
+  /** Checks for any expressions in this list. */
+  or?: HttpRouteFilter[];
+  /** Filter by the object’s `path` field. */
+  path?: StringFilter;
+  /** Filter by the object’s `priority` field. */
+  priority?: IntFilter;
+  /** Filter by the object’s `targetId` field. */
+  targetId?: UUIDFilter;
+  /** Filter by the object’s `targetKind` field. */
+  targetKind?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+}
+/** An input for mutations affecting `HttpRoute` */
+export interface HttpRouteInput {
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  /** Registered host in services_public.domains */
+  domainId: string;
+  id?: string;
+  /** Whether the resolver may select this route */
+  isActive?: boolean;
+  /** Optional uppercase HTTP method; NULL matches every method */
+  method?: string;
+  /** Normalized request path prefix; longest matching prefix wins */
+  path?: string;
+  /** Tie-break precedence after path length and method specificity */
+  priority?: number;
+  /** Target row of the type named by target_kind; existence enforced by trigger */
+  targetId: string;
+  /** Discriminator selecting the type of target_id */
+  targetKind: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+/** Represents an update to a `HttpRoute`. Fields that are set will be updated. */
+export interface HttpRoutePatch {
+  createdAt?: string;
+  createdBy?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Registered host in services_public.domains */
+  domainId?: string;
+  id?: string;
+  /** Whether the resolver may select this route */
+  isActive?: boolean;
+  /** Optional uppercase HTTP method; NULL matches every method */
+  method?: string;
+  /** Normalized request path prefix; longest matching prefix wins */
+  path?: string;
+  /** Tie-break precedence after path length and method specificity */
+  priority?: number;
+  /** Target row of the type named by target_kind; existence enforced by trigger */
+  targetId?: string;
+  /** Discriminator selecting the type of target_id */
+  targetKind?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
 /** A filter to be used against `Index` object types. All fields are combined with a logical ‘and.’ */
 export interface IndexFilter {
   /** Filter by the object’s `accessMethod` field. */
@@ -4104,26 +4213,76 @@ export interface IndexPatch {
   updatedAt?: string;
   whereClause?: unknown;
 }
-/** A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’ */
-export interface MigrateFileFilter {
+/** A filter to be used against `ManagedDomain` object types. All fields are combined with a logical ‘and.’ */
+export interface ManagedDomainFilter {
   /** Checks for all expressions in this list. */
-  and?: MigrateFileFilter[];
+  and?: ManagedDomainFilter[];
+  /** Filter by the object’s `annotations` field. */
+  annotations?: JSONFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: ConstructiveInternalTypeHostnameFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isWildcard` field. */
+  isWildcard?: BooleanFilter;
   /** Negates the expression. */
-  not?: MigrateFileFilter;
+  not?: ManagedDomainFilter;
   /** Checks for any expressions in this list. */
-  or?: MigrateFileFilter[];
-  /** Filter by the object’s `upload` field. */
-  upload?: ConstructiveInternalTypeUploadFilter;
+  or?: ManagedDomainFilter[];
+  /** Filter by the object’s `tlsReadyAt` field. */
+  tlsReadyAt?: DatetimeFilter;
+  /** Filter by the object’s `tlsStatus` field. */
+  tlsStatus?: StringFilter;
+  /** Filter by the object’s `verificationStatus` field. */
+  verificationStatus?: StringFilter;
+  /** Filter by the object’s `verifiedAt` field. */
+  verifiedAt?: DatetimeFilter;
 }
-/** An input for mutations affecting `MigrateFile` */
-export interface MigrateFileInput {
-  databaseId?: string;
+/** An input for mutations affecting `ManagedDomain` */
+export interface ManagedDomainInput {
+  /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
+  annotations?: unknown;
+  /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
+  databaseId: string;
+  /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
+  domain: ConstructiveInternalTypeHostname;
+  /** Unique identifier for this managed domain record */
   id?: string;
-  upload?: ConstructiveInternalTypeUpload;
+  /** Whether the cert covers the wildcard *.domain (one wildcard cert covers every subdomain row sharing this root) */
+  isWildcard?: boolean;
+  /** When tls_status last became active */
+  tlsReadyAt?: string;
+  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  tlsStatus?: string;
+  /** Domain ownership verification state: pending | verified | failed */
+  verificationStatus?: string;
+  /** When verification_status last became verified */
+  verifiedAt?: string;
+}
+/** Represents an update to a `ManagedDomain`. Fields that are set will be updated. */
+export interface ManagedDomainPatch {
+  /** Freeform cert-manager detail (secret name, challenge, last error) and tooling metadata */
+  annotations?: unknown;
+  /** Database that owns this cert-bearing host; platform wildcards are owned by the platform database */
+  databaseId?: string;
+  /** Root hostname this row governs certs/verification for (e.g. launchql.dev, shop.acme.com) */
+  domain?: ConstructiveInternalTypeHostname;
+  /** Unique identifier for this managed domain record */
+  id?: string;
+  /** Whether the cert covers the wildcard *.domain (one wildcard cert covers every subdomain row sharing this root) */
+  isWildcard?: boolean;
+  /** When tls_status last became active */
+  tlsReadyAt?: string;
+  /** TLS/SSL provisioning state: none | provisioning | active | failed */
+  tlsStatus?: string;
+  /** Domain ownership verification state: pending | verified | failed */
+  verificationStatus?: string;
+  /** When verification_status last became verified */
+  verifiedAt?: string;
 }
 /** A filter to be used against `NodeTypeRegistry` object types. All fields are combined with a logical ‘and.’ */
 export interface NodeTypeRegistryFilter {
@@ -5229,10 +5388,10 @@ export interface SpatialRelationPatch {
 }
 /** A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’ */
 export interface SqlActionFilter {
-  /** Filter by the object’s `action` field. */
-  action?: StringFilter;
   /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actionName` field. */
+  actionName?: StringFilter;
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
@@ -5259,22 +5418,6 @@ export interface SqlActionFilter {
   revert?: StringFilter;
   /** Filter by the object’s `verify` field. */
   verify?: StringFilter;
-}
-/** An input for mutations affecting `SqlAction` */
-export interface SqlActionInput {
-  action?: string;
-  actionId?: string;
-  actorId?: string;
-  content?: string;
-  createdAt?: string;
-  databaseId?: string;
-  deploy?: string;
-  deps?: string[];
-  id?: number;
-  name?: string;
-  payload?: unknown;
-  revert?: string;
-  verify?: string;
 }
 /** A filter to be used against `Table` object types. All fields are combined with a logical ‘and.’ */
 export interface TableFilter {
@@ -5931,11 +6074,24 @@ export interface UpdateFunctionInput {
   functionPatch: FunctionPatch;
   id: string;
 }
+export interface UpdateHttpRouteInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `HttpRoute` being updated. */
+  httpRoutePatch: HttpRoutePatch;
+  id: string;
+}
 export interface UpdateIndexInput {
   clientMutationId?: string;
   id: string;
   /** An object where the defined keys will be set on the `Index` being updated. */
   indexPatch: IndexPatch;
+}
+export interface UpdateManagedDomainInput {
+  clientMutationId?: string;
+  /** Unique identifier for this managed domain record */
+  id: string;
+  /** An object where the defined keys will be set on the `ManagedDomain` being updated. */
+  managedDomainPatch: ManagedDomainPatch;
 }
 export interface UpdateNodeTypeRegistryInput {
   clientMutationId?: string;
@@ -6640,6 +6796,13 @@ export interface FunctionConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `HttpRoute` values. */
+export interface HttpRouteConnection {
+  edges: HttpRouteEdge[];
+  nodes: HttpRoute[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `Index` values. */
 export interface IndexConnection {
   edges: IndexEdge[];
@@ -6647,10 +6810,10 @@ export interface IndexConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `MigrateFile` values. */
-export interface MigrateFileConnection {
-  edges: MigrateFileEdge[];
-  nodes: MigrateFile[];
+/** A connection to a list of `ManagedDomain` values. */
+export interface ManagedDomainConnection {
+  edges: ManagedDomainEdge[];
+  nodes: ManagedDomain[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -6688,6 +6851,15 @@ export interface PubkeySettingConnection {
   nodes: PubkeySetting[];
   pageInfo: PageInfo;
   totalCount: number;
+}
+export interface ResolveHttpRouteRecord {
+  databaseId?: string | null;
+  domainId?: string | null;
+  matchedPath?: string | null;
+  method?: string | null;
+  routeId?: string | null;
+  targetId?: string | null;
+  targetKind?: string | null;
 }
 /** A connection to a list of `RlsSetting` values. */
 export interface RlsSettingConnection {
@@ -6863,11 +7035,6 @@ export interface CreateAppPayload {
   appEdge?: AppEdge | null;
   clientMutationId?: string | null;
 }
-export interface CreateAstMigrationPayload {
-  /** The `AstMigration` that was created by this mutation. */
-  astMigration?: AstMigration | null;
-  clientMutationId?: string | null;
-}
 export interface CreateCheckConstraintPayload {
   /** The `CheckConstraint` that was created by this mutation. */
   checkConstraint?: CheckConstraint | null;
@@ -6952,16 +7119,23 @@ export interface CreateFunctionPayload {
   function?: Function | null;
   functionEdge?: FunctionEdge | null;
 }
+export interface CreateHttpRoutePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRoute` that was created by this mutation. */
+  httpRoute?: HttpRoute | null;
+  httpRouteEdge?: HttpRouteEdge | null;
+}
 export interface CreateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was created by this mutation. */
   index?: Index | null;
   indexEdge?: IndexEdge | null;
 }
-export interface CreateMigrateFilePayload {
+export interface CreateManagedDomainPayload {
   clientMutationId?: string | null;
-  /** The `MigrateFile` that was created by this mutation. */
-  migrateFile?: MigrateFile | null;
+  /** The `ManagedDomain` that was created by this mutation. */
+  managedDomain?: ManagedDomain | null;
+  managedDomainEdge?: ManagedDomainEdge | null;
 }
 export interface CreateNodeTypeRegistryPayload {
   clientMutationId?: string | null;
@@ -7040,11 +7214,6 @@ export interface CreateSpatialRelationPayload {
   /** The `SpatialRelation` that was created by this mutation. */
   spatialRelation?: SpatialRelation | null;
   spatialRelationEdge?: SpatialRelationEdge | null;
-}
-export interface CreateSqlActionPayload {
-  clientMutationId?: string | null;
-  /** The `SqlAction` that was created by this mutation. */
-  sqlAction?: SqlAction | null;
 }
 export interface CreateTablePayload {
   clientMutationId?: string | null;
@@ -7220,11 +7389,23 @@ export interface DeleteFunctionPayload {
   function?: Function | null;
   functionEdge?: FunctionEdge | null;
 }
+export interface DeleteHttpRoutePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRoute` that was deleted by this mutation. */
+  httpRoute?: HttpRoute | null;
+  httpRouteEdge?: HttpRouteEdge | null;
+}
 export interface DeleteIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was deleted by this mutation. */
   index?: Index | null;
   indexEdge?: IndexEdge | null;
+}
+export interface DeleteManagedDomainPayload {
+  clientMutationId?: string | null;
+  /** The `ManagedDomain` that was deleted by this mutation. */
+  managedDomain?: ManagedDomain | null;
+  managedDomainEdge?: ManagedDomainEdge | null;
 }
 export interface DeleteNodeTypeRegistryPayload {
   clientMutationId?: string | null;
@@ -7503,11 +7684,23 @@ export interface UpdateFunctionPayload {
   function?: Function | null;
   functionEdge?: FunctionEdge | null;
 }
+export interface UpdateHttpRoutePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRoute` that was updated by this mutation. */
+  httpRoute?: HttpRoute | null;
+  httpRouteEdge?: HttpRouteEdge | null;
+}
 export interface UpdateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was updated by this mutation. */
   index?: Index | null;
   indexEdge?: IndexEdge | null;
+}
+export interface UpdateManagedDomainPayload {
+  clientMutationId?: string | null;
+  /** The `ManagedDomain` that was updated by this mutation. */
+  managedDomain?: ManagedDomain | null;
+  managedDomainEdge?: ManagedDomainEdge | null;
 }
 export interface UpdateNodeTypeRegistryPayload {
   clientMutationId?: string | null;
@@ -7800,17 +7993,23 @@ export interface FunctionEdge {
   /** The `Function` at the end of the edge. */
   node?: Function | null;
 }
+/** A `HttpRoute` edge in the connection. */
+export interface HttpRouteEdge {
+  cursor?: string | null;
+  /** The `HttpRoute` at the end of the edge. */
+  node?: HttpRoute | null;
+}
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
   cursor?: string | null;
   /** The `Index` at the end of the edge. */
   node?: Index | null;
 }
-/** A `MigrateFile` edge in the connection. */
-export interface MigrateFileEdge {
+/** A `ManagedDomain` edge in the connection. */
+export interface ManagedDomainEdge {
   cursor?: string | null;
-  /** The `MigrateFile` at the end of the edge. */
-  node?: MigrateFile | null;
+  /** The `ManagedDomain` at the end of the edge. */
+  node?: ManagedDomain | null;
 }
 /** A `NodeTypeRegistry` edge in the connection. */
 export interface NodeTypeRegistryEdge {

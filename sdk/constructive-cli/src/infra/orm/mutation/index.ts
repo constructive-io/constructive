@@ -7,28 +7,28 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  InfraInitEmptyRepoInput,
-  InfraInsertNodeAtPathInput,
-  InfraSetDataAtPathInput,
+  PlatformInfraInitEmptyRepoInput,
+  PlatformInfraInsertNodeAtPathInput,
+  PlatformInfraSetDataAtPathInput,
   ProvisionBucketInput,
-  InfraInitEmptyRepoPayload,
-  InfraInsertNodeAtPathPayload,
-  InfraSetDataAtPathPayload,
+  PlatformInfraInitEmptyRepoPayload,
+  PlatformInfraInsertNodeAtPathPayload,
+  PlatformInfraSetDataAtPathPayload,
   ProvisionBucketPayload,
-  InfraInitEmptyRepoPayloadSelect,
-  InfraInsertNodeAtPathPayloadSelect,
-  InfraSetDataAtPathPayloadSelect,
+  PlatformInfraInitEmptyRepoPayloadSelect,
+  PlatformInfraInsertNodeAtPathPayloadSelect,
+  PlatformInfraSetDataAtPathPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface InfraInitEmptyRepoVariables {
-  input: InfraInitEmptyRepoInput;
+export interface PlatformInfraInitEmptyRepoVariables {
+  input: PlatformInfraInitEmptyRepoInput;
 }
-export interface InfraInsertNodeAtPathVariables {
-  input: InfraInsertNodeAtPathInput;
+export interface PlatformInfraInsertNodeAtPathVariables {
+  input: PlatformInfraInsertNodeAtPathInput;
 }
-export interface InfraSetDataAtPathVariables {
-  input: InfraSetDataAtPathInput;
+export interface PlatformInfraSetDataAtPathVariables {
+  input: PlatformInfraSetDataAtPathInput;
 }
 /**
  * Variables for provisionBucket
@@ -42,91 +42,94 @@ export interface ProvisionBucketVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
-    infraInitEmptyRepo: <S extends InfraInitEmptyRepoPayloadSelect>(
-      args: InfraInitEmptyRepoVariables,
+    platformInfraInitEmptyRepo: <S extends PlatformInfraInitEmptyRepoPayloadSelect>(
+      args: PlatformInfraInitEmptyRepoVariables,
       options: {
         select: S;
-      } & StrictSelect<S, InfraInitEmptyRepoPayloadSelect>
+      } & StrictSelect<S, PlatformInfraInitEmptyRepoPayloadSelect>
     ) =>
       new QueryBuilder<{
-        infraInitEmptyRepo: InferSelectResult<InfraInitEmptyRepoPayload, S> | null;
+        platformInfraInitEmptyRepo: InferSelectResult<PlatformInfraInitEmptyRepoPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'InfraInitEmptyRepo',
-        fieldName: 'infraInitEmptyRepo',
+        operationName: 'PlatformInfraInitEmptyRepo',
+        fieldName: 'platformInfraInitEmptyRepo',
         ...buildCustomDocument(
           'mutation',
-          'InfraInitEmptyRepo',
-          'infraInitEmptyRepo',
+          'PlatformInfraInitEmptyRepo',
+          'platformInfraInitEmptyRepo',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'InfraInitEmptyRepoInput!',
+              type: 'PlatformInfraInitEmptyRepoInput!',
             },
           ],
           connectionFieldsMap,
-          'InfraInitEmptyRepoPayload'
+          'PlatformInfraInitEmptyRepoPayload'
         ),
       }),
-    infraInsertNodeAtPath: <S extends InfraInsertNodeAtPathPayloadSelect>(
-      args: InfraInsertNodeAtPathVariables,
+    platformInfraInsertNodeAtPath: <S extends PlatformInfraInsertNodeAtPathPayloadSelect>(
+      args: PlatformInfraInsertNodeAtPathVariables,
       options: {
         select: S;
-      } & StrictSelect<S, InfraInsertNodeAtPathPayloadSelect>
+      } & StrictSelect<S, PlatformInfraInsertNodeAtPathPayloadSelect>
     ) =>
       new QueryBuilder<{
-        infraInsertNodeAtPath: InferSelectResult<InfraInsertNodeAtPathPayload, S> | null;
+        platformInfraInsertNodeAtPath: InferSelectResult<
+          PlatformInfraInsertNodeAtPathPayload,
+          S
+        > | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'InfraInsertNodeAtPath',
-        fieldName: 'infraInsertNodeAtPath',
+        operationName: 'PlatformInfraInsertNodeAtPath',
+        fieldName: 'platformInfraInsertNodeAtPath',
         ...buildCustomDocument(
           'mutation',
-          'InfraInsertNodeAtPath',
-          'infraInsertNodeAtPath',
+          'PlatformInfraInsertNodeAtPath',
+          'platformInfraInsertNodeAtPath',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'InfraInsertNodeAtPathInput!',
+              type: 'PlatformInfraInsertNodeAtPathInput!',
             },
           ],
           connectionFieldsMap,
-          'InfraInsertNodeAtPathPayload'
+          'PlatformInfraInsertNodeAtPathPayload'
         ),
       }),
-    infraSetDataAtPath: <S extends InfraSetDataAtPathPayloadSelect>(
-      args: InfraSetDataAtPathVariables,
+    platformInfraSetDataAtPath: <S extends PlatformInfraSetDataAtPathPayloadSelect>(
+      args: PlatformInfraSetDataAtPathVariables,
       options: {
         select: S;
-      } & StrictSelect<S, InfraSetDataAtPathPayloadSelect>
+      } & StrictSelect<S, PlatformInfraSetDataAtPathPayloadSelect>
     ) =>
       new QueryBuilder<{
-        infraSetDataAtPath: InferSelectResult<InfraSetDataAtPathPayload, S> | null;
+        platformInfraSetDataAtPath: InferSelectResult<PlatformInfraSetDataAtPathPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'InfraSetDataAtPath',
-        fieldName: 'infraSetDataAtPath',
+        operationName: 'PlatformInfraSetDataAtPath',
+        fieldName: 'platformInfraSetDataAtPath',
         ...buildCustomDocument(
           'mutation',
-          'InfraSetDataAtPath',
-          'infraSetDataAtPath',
+          'PlatformInfraSetDataAtPath',
+          'platformInfraSetDataAtPath',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'InfraSetDataAtPathInput!',
+              type: 'PlatformInfraSetDataAtPathInput!',
             },
           ],
           connectionFieldsMap,
-          'InfraSetDataAtPathPayload'
+          'PlatformInfraSetDataAtPathPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

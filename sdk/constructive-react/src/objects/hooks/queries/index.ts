@@ -5,7 +5,7 @@
  */
 export * from './useCommitsQuery';
 export * from './useCommitQuery';
-export * from './useGetAllQuery';
+export * from './useGetAllTreeNodesQuery';
 export * from './useObjectsQuery';
 export * from './useObjectQuery';
 export * from './useRefsQuery';

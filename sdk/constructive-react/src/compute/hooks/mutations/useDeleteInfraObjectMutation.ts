@@ -41,7 +41,7 @@ export function useDeleteInfraObjectMutation<S extends InfraObjectSelect>(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -55,7 +55,7 @@ export function useDeleteInfraObjectMutation<S extends InfraObjectSelect>(
   Error,
   {
     id: string;
-    scopeId: string;
+    databaseId: string;
   }
 >;
 export function useDeleteInfraObjectMutation(
@@ -67,7 +67,7 @@ export function useDeleteInfraObjectMutation(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -79,12 +79,12 @@ export function useDeleteInfraObjectMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: infraObjectMutationKeys.all,
-    mutationFn: ({ id, scopeId }: { id: string; scopeId: string }) =>
+    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
       getClient()
         .infraObject.delete({
           where: {
             id,
-            scopeId,
+            databaseId,
           },
           select: args.select,
         })

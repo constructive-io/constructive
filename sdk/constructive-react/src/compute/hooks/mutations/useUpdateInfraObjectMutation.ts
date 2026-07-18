@@ -49,7 +49,7 @@ export function useUpdateInfraObjectMutation<S extends InfraObjectSelect>(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
         infraObjectPatch: InfraObjectPatch;
       }
     >,
@@ -64,7 +64,7 @@ export function useUpdateInfraObjectMutation<S extends InfraObjectSelect>(
   Error,
   {
     id: string;
-    scopeId: string;
+    databaseId: string;
     infraObjectPatch: InfraObjectPatch;
   }
 >;
@@ -77,7 +77,7 @@ export function useUpdateInfraObjectMutation(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
         infraObjectPatch: InfraObjectPatch;
       }
     >,
@@ -92,18 +92,18 @@ export function useUpdateInfraObjectMutation(
     mutationKey: infraObjectMutationKeys.all,
     mutationFn: ({
       id,
-      scopeId,
+      databaseId,
       infraObjectPatch,
     }: {
       id: string;
-      scopeId: string;
+      databaseId: string;
       infraObjectPatch: InfraObjectPatch;
     }) =>
       getClient()
         .infraObject.update({
           where: {
             id,
-            scopeId,
+            databaseId,
           },
           data: infraObjectPatch,
           select: args.select,

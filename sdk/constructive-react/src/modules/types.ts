@@ -162,8 +162,8 @@ export interface ComputeLogModule {
   retention: string | null;
   schemaId: string | null;
   scope: string | null;
-  usageDailyTableId: string | null;
-  usageDailyTableName: string | null;
+  usageSummaryTableId: string | null;
+  usageSummaryTableName: string | null;
 }
 export interface ConfigSecretsUserModule {
   apiName: string | null;
@@ -295,19 +295,19 @@ export interface DbUsageModule {
   privateSchemaId: string | null;
   privateSchemaName: string | null;
   publicSchemaName: string | null;
-  queryStatsDailyTableId: string | null;
-  queryStatsDailyTableName: string | null;
   queryStatsLogTableId: string | null;
   queryStatsLogTableName: string | null;
+  queryStatsSummaryTableId: string | null;
+  queryStatsSummaryTableName: string | null;
   retention: string | null;
-  rollupDbQueryStatsDailyFunction: string | null;
-  rollupDbTableStatsDailyFunction: string | null;
+  rollupDbQueryStatsUsageSummaryFunction: string | null;
+  rollupDbTableStatsUsageSummaryFunction: string | null;
   schemaId: string | null;
   scope: string | null;
-  tableStatsDailyTableId: string | null;
-  tableStatsDailyTableName: string | null;
   tableStatsLogTableId: string | null;
   tableStatsLogTableName: string | null;
+  tableStatsSummaryTableId: string | null;
+  tableStatsSummaryTableName: string | null;
 }
 export interface DefaultIdsModule {
   databaseId: string | null;
@@ -329,12 +329,12 @@ export interface DenormalizedTableField {
 }
 export interface DevicesModule {
   databaseId: string | null;
-  deviceSettingsTable: string | null;
   deviceSettingsTableId: string | null;
+  deviceSettingsTableName: string | null;
   id: string | null;
   schemaId: string | null;
-  userDevicesTable: string | null;
   userDevicesTableId: string | null;
+  userDevicesTableName: string | null;
 }
 export interface EmailsModule {
   apiName: string | null;
@@ -488,6 +488,7 @@ export interface FunctionModule {
   definitionsTableName: string | null;
   entityField: string | null;
   entityTableId: string | null;
+  hasCron: boolean | null;
   id: string | null;
   policies: unknown | null;
   prefix: string | null;
@@ -496,6 +497,7 @@ export interface FunctionModule {
   privateSchemaName: string | null;
   provisions: unknown | null;
   publicSchemaName: string | null;
+  schedulesTableId: string | null;
   schemaId: string | null;
   scope: string | null;
 }
@@ -569,6 +571,29 @@ export interface HierarchyModule {
   sprtTableName: string | null;
   usersTableId: string | null;
 }
+export interface HttpRouteModule {
+  apiName: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  functionModuleId: string | null;
+  httpRoutesTableId: string | null;
+  httpRoutesTableName: string | null;
+  id: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  resolverFunctionName: string | null;
+  resourceModuleId: string | null;
+  schemaId: string | null;
+  scope: string | null;
+  storageModuleId: string | null;
+}
 export interface I18NModule {
   apiName: string | null;
   databaseId: string | null;
@@ -613,8 +638,8 @@ export interface InferenceLogModule {
   retention: string | null;
   schemaId: string | null;
   scope: string | null;
-  usageDailyTableId: string | null;
-  usageDailyTableName: string | null;
+  usageSummaryTableId: string | null;
+  usageSummaryTableName: string | null;
 }
 export interface InfraConfigModule {
   apiName: string | null;
@@ -991,12 +1016,12 @@ export interface RateLimitMetersModule {
 export interface RateLimitsModule {
   databaseId: string | null;
   id: string | null;
-  ipRateLimitsTable: string | null;
   ipRateLimitsTableId: string | null;
-  rateLimitSettingsTable: string | null;
+  ipRateLimitsTableName: string | null;
   rateLimitSettingsTableId: string | null;
-  rateLimitsTable: string | null;
+  rateLimitSettingsTableName: string | null;
   rateLimitsTableId: string | null;
+  rateLimitsTableName: string | null;
   schemaId: string | null;
 }
 export interface RealtimeModule {
@@ -1048,6 +1073,8 @@ export interface ResourceModule {
   entityField: string | null;
   entityTableId: string | null;
   id: string | null;
+  installationStoreName: string | null;
+  merkleStoreModuleId: string | null;
   namespaceModuleId: string | null;
   policies: unknown | null;
   prefix: string | null;
@@ -1058,14 +1085,22 @@ export interface ResourceModule {
   publicSchemaName: string | null;
   requirementsStateViewName: string | null;
   resolvedRequirementsViewName: string | null;
+  resourceBillingRollupFunction: string | null;
   resourceDefinitionsTableId: string | null;
   resourceDefinitionsTableName: string | null;
   resourceEventsTableId: string | null;
   resourceEventsTableName: string | null;
+  resourceInstallationsTableId: string | null;
+  resourceInstallationsTableName: string | null;
   resourceStatusChecksTableId: string | null;
   resourceStatusChecksTableName: string | null;
+  resourceUsageLogTableId: string | null;
+  resourceUsageLogTableName: string | null;
+  resourceUsageSummaryTableId: string | null;
+  resourceUsageSummaryTableName: string | null;
   resourcesTableId: string | null;
   resourcesTableName: string | null;
+  rollupResourceUsageSummaryFunction: string | null;
   schemaId: string | null;
   scope: string | null;
 }
@@ -1106,16 +1141,16 @@ export interface SessionSecretsModule {
   tableName: string | null;
 }
 export interface SessionsModule {
-  authSettingsTable: string | null;
   authSettingsTableId: string | null;
+  authSettingsTableName: string | null;
   databaseId: string | null;
   id: string | null;
   schemaId: string | null;
-  sessionCredentialsTable: string | null;
   sessionCredentialsTableId: string | null;
+  sessionCredentialsTableName: string | null;
   sessionsDefaultExpiration: string | null;
-  sessionsTable: string | null;
   sessionsTableId: string | null;
+  sessionsTableName: string | null;
   usersTableId: string | null;
 }
 export interface StorageLogModule {
@@ -1137,8 +1172,8 @@ export interface StorageLogModule {
   scope: string | null;
   storageLogTableId: string | null;
   storageLogTableName: string | null;
-  usageDailyTableId: string | null;
-  usageDailyTableName: string | null;
+  usageSummaryTableId: string | null;
+  usageSummaryTableName: string | null;
 }
 export interface StorageModule {
   allowedOrigins: string[] | null;
@@ -1201,8 +1236,8 @@ export interface TransferLogModule {
   scope: string | null;
   transferLogTableId: string | null;
   transferLogTableName: string | null;
-  usageDailyTableId: string | null;
-  usageDailyTableName: string | null;
+  usageSummaryTableId: string | null;
+  usageSummaryTableName: string | null;
 }
 export interface UserAuthModule {
   apiName: string | null;
@@ -1299,6 +1334,31 @@ export interface WebauthnCredentialsModule {
   schemaId: string | null;
   tableId: string | null;
   tableName: string | null;
+}
+export interface WebhookModule {
+  apiName: string | null;
+  databaseId: string | null;
+  defaultPermissions: string[] | null;
+  entityField: string | null;
+  entityTableId: string | null;
+  functionInvocationModuleId: string | null;
+  functionModuleId: string | null;
+  id: string | null;
+  infraSecretsModuleId: string | null;
+  namespaceModuleId: string | null;
+  policies: unknown | null;
+  prefix: string | null;
+  privateApiName: string | null;
+  privateSchemaId: string | null;
+  privateSchemaName: string | null;
+  provisions: unknown | null;
+  publicSchemaName: string | null;
+  schemaId: string | null;
+  scope: string | null;
+  webhookEndpointsTableId: string | null;
+  webhookEndpointsTableName: string | null;
+  webhookEventsTableId: string | null;
+  webhookEventsTableName: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

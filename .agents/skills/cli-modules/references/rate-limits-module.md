@@ -12,8 +12,8 @@ csdk rate-limits-module list --where.<field>.<op> <value> --orderBy <values>
 csdk rate-limits-module list --limit 10 --after <cursor>
 csdk rate-limits-module find-first --where.<field>.<op> <value>
 csdk rate-limits-module get --id <UUID>
-csdk rate-limits-module create --databaseId <UUID> [--ipRateLimitsTable <String>] [--ipRateLimitsTableId <UUID>] [--rateLimitSettingsTable <String>] [--rateLimitSettingsTableId <UUID>] [--rateLimitsTable <String>] [--rateLimitsTableId <UUID>] [--schemaId <UUID>]
-csdk rate-limits-module update --id <UUID> [--databaseId <UUID>] [--ipRateLimitsTable <String>] [--ipRateLimitsTableId <UUID>] [--rateLimitSettingsTable <String>] [--rateLimitSettingsTableId <UUID>] [--rateLimitsTable <String>] [--rateLimitsTableId <UUID>] [--schemaId <UUID>]
+csdk rate-limits-module create --databaseId <UUID> [--ipRateLimitsTableId <UUID>] [--ipRateLimitsTableName <String>] [--rateLimitSettingsTableId <UUID>] [--rateLimitSettingsTableName <String>] [--rateLimitsTableId <UUID>] [--rateLimitsTableName <String>] [--schemaId <UUID>]
+csdk rate-limits-module update --id <UUID> [--databaseId <UUID>] [--ipRateLimitsTableId <UUID>] [--ipRateLimitsTableName <String>] [--rateLimitSettingsTableId <UUID>] [--rateLimitSettingsTableName <String>] [--rateLimitsTableId <UUID>] [--rateLimitsTableName <String>] [--schemaId <UUID>]
 csdk rate-limits-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk rate-limits-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a rateLimitsModule
 
 ```bash
-csdk rate-limits-module create --databaseId <UUID> [--ipRateLimitsTable <String>] [--ipRateLimitsTableId <UUID>] [--rateLimitSettingsTable <String>] [--rateLimitSettingsTableId <UUID>] [--rateLimitsTable <String>] [--rateLimitsTableId <UUID>] [--schemaId <UUID>]
+csdk rate-limits-module create --databaseId <UUID> [--ipRateLimitsTableId <UUID>] [--ipRateLimitsTableName <String>] [--rateLimitSettingsTableId <UUID>] [--rateLimitSettingsTableName <String>] [--rateLimitsTableId <UUID>] [--rateLimitsTableName <String>] [--schemaId <UUID>]
 ```
 
 ### Get a rateLimitsModule by id

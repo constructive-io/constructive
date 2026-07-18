@@ -43,6 +43,7 @@ import {
   graphExecutionModuleKeys,
   graphModuleKeys,
   hierarchyModuleKeys,
+  httpRouteModuleKeys,
   i18NModuleKeys,
   identityProvidersModuleKeys,
   inferenceLogModuleKeys,
@@ -81,6 +82,7 @@ import {
   usersModuleKeys,
   webauthnAuthModuleKeys,
   webauthnCredentialsModuleKeys,
+  webhookModuleKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -573,6 +575,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: hierarchyModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate httpRouteModule queries */ httpRouteModule: {
+    /** Invalidate all httpRouteModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: httpRouteModuleKeys.all,
+      }),
+    /** Invalidate httpRouteModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: httpRouteModuleKeys.lists(),
+      }),
+    /** Invalidate a specific httpRouteModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: httpRouteModuleKeys.detail(id),
       }),
   },
   /** Invalidate i18NModule queries */ i18NModule: {
@@ -1221,6 +1240,23 @@ export const invalidate = {
         queryKey: webauthnCredentialsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate webhookModule queries */ webhookModule: {
+    /** Invalidate all webhookModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webhookModuleKeys.all,
+      }),
+    /** Invalidate webhookModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webhookModuleKeys.lists(),
+      }),
+    /** Invalidate a specific webhookModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webhookModuleKeys.detail(id),
+      }),
+  },
 } as const;
 /**
 
@@ -1450,6 +1486,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: hierarchyModuleKeys.detail(id),
+    });
+  },
+  /** Remove httpRouteModule from cache */ httpRouteModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: httpRouteModuleKeys.detail(id),
     });
   },
   /** Remove i18NModule from cache */ i18NModule: (
@@ -1751,6 +1795,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: webauthnCredentialsModuleKeys.detail(id),
+    });
+  },
+  /** Remove webhookModule from cache */ webhookModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webhookModuleKeys.detail(id),
     });
   },
 } as const;

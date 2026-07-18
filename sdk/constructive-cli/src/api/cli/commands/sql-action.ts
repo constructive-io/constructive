@@ -16,8 +16,8 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  action: 'string',
   actionId: 'uuid',
+  actionName: 'string',
   actorId: 'uuid',
   content: 'string',
   createdAt: 'string',
@@ -75,8 +75,8 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      action: true,
       actionId: true,
+      actionName: true,
       actorId: true,
       content: true,
       createdAt: true,
@@ -108,8 +108,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      action: true,
       actionId: true,
+      actionName: true,
       actorId: true,
       content: true,
       createdAt: true,
@@ -143,80 +143,69 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'action',
-        message: 'action',
-        required: false,
-        skipPrompt: true,
+        name: 'actionId',
+        message: 'actionId',
+        required: true,
       },
       {
         type: 'text',
-        name: 'actionId',
-        message: 'actionId',
-        required: false,
-        skipPrompt: true,
+        name: 'actionName',
+        message: 'actionName',
+        required: true,
       },
       {
         type: 'text',
         name: 'actorId',
         message: 'actorId',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'content',
         message: 'content',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'databaseId',
         message: 'databaseId',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'deploy',
         message: 'deploy',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'deps',
         message: 'deps',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'name',
         message: 'name',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'json',
         name: 'payload',
         message: 'payload',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'revert',
         message: 'revert',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'verify',
         message: 'verify',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -225,8 +214,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.sqlAction
       .create({
         data: {
-          action: cleanedData.action,
           actionId: cleanedData.actionId,
+          actionName: cleanedData.actionName,
           actorId: cleanedData.actorId,
           content: cleanedData.content,
           databaseId: cleanedData.databaseId,
@@ -238,8 +227,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           verify: cleanedData.verify,
         },
         select: {
-          action: true,
           actionId: true,
+          actionName: true,
           actorId: true,
           content: true,
           createdAt: true,

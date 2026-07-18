@@ -19,6 +19,21 @@ export interface DbPreset {
   storeId: string | null;
   updatedAt: string | null;
 }
+export interface DeclaredCapacity {
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  installationId: string | null;
+  isTransient: boolean | null;
+  kind: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
+  namespaceId: string | null;
+  podCountMax: number | null;
+  podCountMin: number | null;
+  source: string | null;
+  sourceId: string | null;
+  storageSizeBytes: string | null;
+}
 export interface FunctionApiBinding {
   alias: string | null;
   apiId: string | null;
@@ -30,11 +45,14 @@ export interface FunctionDefinition {
   accessChannels: string[] | null;
   category: string | null;
   concurrency: number | null;
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
   createdAt: string | null;
   databaseId: string | null;
   description: string | null;
   fnCategory: string | null;
   functionColumns: unknown | null;
+  graphId: string | null;
   icon: string | null;
   id: string | null;
   image: string | null;
@@ -42,12 +60,15 @@ export interface FunctionDefinition {
   integrations: string[] | null;
   isPublished: boolean | null;
   maxAttempts: number | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
   moduleTable: string | null;
   name: string | null;
   outputs: unknown | null;
   payloadArgs: unknown | null;
   priority: number | null;
   props: unknown | null;
+  protected: boolean | null;
   publishedAt: string | null;
   queueName: string | null;
   requiredBuckets: string[] | null;
@@ -136,25 +157,33 @@ export interface FunctionGraph {
   validationErrors: unknown | null;
 }
 export interface FunctionGraphExecution {
+  actorId: string | null;
   completedAt: string | null;
   currentWave: number | null;
   definitionsCommitId: string | null;
+  entityId: string | null;
+  entityType: string | null;
   errorCode: string | null;
   errorMessage: string | null;
   executionPlan: unknown | null;
   graphId: string | null;
   id: string | null;
   inputPayload: unknown | null;
+  invocationCreatedAt: string | null;
   invocationId: string | null;
   lastProgressAt: string | null;
   maxPendingJobs: number | null;
   maxTicks: number | null;
   nodeOutputs: unknown | null;
+  organizationId: string | null;
+  outputNames: string[] | null;
   outputNode: string | null;
   outputPayload: unknown | null;
   outputPort: string | null;
   parentExecutionId: string | null;
+  parentInvocationId: string | null;
   parentNodeName: string | null;
+  principalId: string | null;
   scopeId: string | null;
   startedAt: string | null;
   status: string | null;
@@ -162,6 +191,9 @@ export interface FunctionGraphExecution {
   timeoutAt: string | null;
 }
 export interface FunctionGraphExecutionNodeState {
+  callbackInputs: unknown | null;
+  callbackMeta: unknown | null;
+  callbackTokenHash: string | null;
   completedAt: string | null;
   createdAt: string | null;
   errorCode: string | null;
@@ -207,9 +239,11 @@ export interface FunctionGraphStore {
 export interface FunctionInvocation {
   actorId: string | null;
   apiBindingId: string | null;
+  channel: string | null;
   completedAt: string | null;
   createdAt: string | null;
   databaseId: string | null;
+  definitionScope: string | null;
   durationMs: number | null;
   error: string | null;
   functionDefinitionId: string | null;
@@ -218,51 +252,52 @@ export interface FunctionInvocation {
   jobId: string | null;
   parentInvocationId: string | null;
   payload: unknown | null;
+  provenance: unknown | null;
   result: unknown | null;
   startedAt: string | null;
   status: string | null;
   taskIdentifier: string | null;
 }
-export interface GetAllRecord {
+export interface GetAllTreeNodesRecord {
   data: unknown | null;
   path: string[] | null;
 }
 export interface InfraCommit {
   authorId: string | null;
   committerId: string | null;
+  databaseId: string | null;
   date: string | null;
   id: string | null;
   message: string | null;
   parentIds: string[] | null;
-  scopeId: string | null;
   storeId: string | null;
   treeId: string | null;
 }
-export interface InfraGetAllRecord {
+export interface InfraGetAllTreeNodesRecord {
   data: unknown | null;
   path: string[] | null;
 }
 export interface InfraObject {
   createdAt: string | null;
   data: unknown | null;
+  databaseId: string | null;
   id: string | null;
   kids: string[] | null;
   ktree: string[] | null;
-  scopeId: string | null;
 }
 export interface InfraRef {
   commitId: string | null;
+  databaseId: string | null;
   id: string | null;
   name: string | null;
-  scopeId: string | null;
   storeId: string | null;
 }
 export interface InfraStore {
   createdAt: string | null;
+  databaseId: string | null;
   hash: string | null;
   id: string | null;
   name: string | null;
-  scopeId: string | null;
 }
 export interface IntegrationProvider {
   brand: unknown | null;
@@ -295,20 +330,28 @@ export interface Namespace {
 }
 export interface NamespaceEvent {
   actorId: string | null;
-  cpuMillicores: number | null;
   createdAt: string | null;
   databaseId: string | null;
   eventType: string | null;
   id: string | null;
-  memoryBytes: string | null;
   message: string | null;
   metadata: unknown | null;
-  metrics: unknown | null;
   namespaceId: string | null;
-  networkEgressBytes: string | null;
-  networkIngressBytes: string | null;
-  podCount: number | null;
-  storageBytes: string | null;
+}
+export interface PlatformDeclaredCapacity {
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  installationId: string | null;
+  isTransient: boolean | null;
+  kind: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
+  namespaceId: string | null;
+  podCountMax: number | null;
+  podCountMin: number | null;
+  source: string | null;
+  sourceId: string | null;
+  storageSizeBytes: string | null;
 }
 export interface PlatformFunctionApiBinding {
   alias: string | null;
@@ -321,10 +364,13 @@ export interface PlatformFunctionDefinition {
   accessChannels: string[] | null;
   category: string | null;
   concurrency: number | null;
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
   createdAt: string | null;
   description: string | null;
   fnCategory: string | null;
   functionColumns: unknown | null;
+  graphId: string | null;
   icon: string | null;
   id: string | null;
   image: string | null;
@@ -332,12 +378,15 @@ export interface PlatformFunctionDefinition {
   integrations: string[] | null;
   isPublished: boolean | null;
   maxAttempts: number | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
   moduleTable: string | null;
   name: string | null;
   outputs: unknown | null;
   payloadArgs: unknown | null;
   priority: number | null;
   props: unknown | null;
+  protected: boolean | null;
   publishedAt: string | null;
   queueName: string | null;
   requiredBuckets: string[] | null;
@@ -400,8 +449,10 @@ export interface PlatformFunctionExecutionLog {
 export interface PlatformFunctionInvocation {
   actorId: string | null;
   apiBindingId: string | null;
+  channel: string | null;
   completedAt: string | null;
   createdAt: string | null;
+  definitionScope: string | null;
   durationMs: number | null;
   error: string | null;
   functionDefinitionId: string | null;
@@ -410,10 +461,48 @@ export interface PlatformFunctionInvocation {
   jobId: string | null;
   parentInvocationId: string | null;
   payload: unknown | null;
+  provenance: unknown | null;
   result: unknown | null;
   startedAt: string | null;
   status: string | null;
   taskIdentifier: string | null;
+}
+export interface PlatformInfraCommit {
+  authorId: string | null;
+  committerId: string | null;
+  date: string | null;
+  id: string | null;
+  message: string | null;
+  parentIds: string[] | null;
+  scopeId: string | null;
+  storeId: string | null;
+  treeId: string | null;
+}
+export interface PlatformInfraGetAllTreeNodesRecord {
+  data: unknown | null;
+  path: string[] | null;
+}
+export interface PlatformInfraObject {
+  createdAt: string | null;
+  data: unknown | null;
+  id: string | null;
+  kids: string[] | null;
+  ktree: string[] | null;
+  scopeId: string | null;
+}
+export interface PlatformInfraRef {
+  commitId: string | null;
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
+  storeId: string | null;
+}
+export interface PlatformInfraStore {
+  createdAt: string | null;
+  hash: string | null;
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
 }
 export interface PlatformNamespace {
   annotations: unknown | null;
@@ -431,32 +520,32 @@ export interface PlatformNamespace {
 }
 export interface PlatformNamespaceEvent {
   actorId: string | null;
-  cpuMillicores: number | null;
   createdAt: string | null;
   eventType: string | null;
   id: string | null;
-  memoryBytes: string | null;
   message: string | null;
   metadata: unknown | null;
-  metrics: unknown | null;
   namespaceId: string | null;
-  networkEgressBytes: string | null;
-  networkIngressBytes: string | null;
-  podCount: number | null;
-  storageBytes: string | null;
 }
 export interface PlatformResource {
   annotations: unknown | null;
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
   createdAt: string | null;
   createdBy: string | null;
   errorCount: number | null;
   id: string | null;
+  installationId: string | null;
   integrations: string[] | null;
   kind: string | null;
   labels: unknown | null;
   lastError: string | null;
+  lastHeartbeatAt: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
   name: string | null;
   namespaceId: string | null;
+  replicas: number | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   resourceDefinitionId: string | null;
@@ -464,6 +553,8 @@ export interface PlatformResource {
   spec: unknown | null;
   status: string | null;
   statusObserved: unknown | null;
+  storageClass: string | null;
+  storageSizeBytes: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
 }
@@ -495,6 +586,21 @@ export interface PlatformResourceEvent {
   metadata: unknown | null;
   resourceId: string | null;
 }
+export interface PlatformResourceInstallation {
+  commitId: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  id: string | null;
+  name: string | null;
+  namespaceId: string | null;
+  params: unknown | null;
+  revision: number | null;
+  slug: string | null;
+  status: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
 export interface PlatformResourceStatusCheck {
   completedAt: string | null;
   id: string | null;
@@ -503,6 +609,81 @@ export interface PlatformResourceStatusCheck {
   resourceId: string | null;
   result: unknown | null;
   status: string | null;
+}
+export interface PlatformResourceUsageLog {
+  cpuMillicores: string | null;
+  id: string | null;
+  intervalSeconds: number | null;
+  memoryBytes: string | null;
+  metrics: unknown | null;
+  namespaceId: string | null;
+  resourceId: string | null;
+  sampledAt: string | null;
+  source: string | null;
+}
+export interface PlatformResourceUsageSummary {
+  date: string | null;
+  gbSeconds: string | null;
+  id: string | null;
+  maxCpuMillicores: string | null;
+  maxMemoryBytes: string | null;
+  namespaceId: string | null;
+  resourceId: string | null;
+  runtimeSeconds: string | null;
+  sampleCount: number | null;
+}
+export interface PlatformResourceUtilizationDaily {
+  avgMemoryBytes: string | null;
+  cpuLimitMillicores: string | null;
+  cpuPeakUtilization: string | null;
+  cpuRequestHeadroomMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  date: string | null;
+  gbSeconds: string | null;
+  kind: string | null;
+  maxCpuMillicores: string | null;
+  maxMemoryBytes: string | null;
+  memoryLimitBytes: string | null;
+  memoryPeakUtilization: string | null;
+  memoryRequestBytes: string | null;
+  memoryRequestHeadroomBytes: string | null;
+  namespaceId: string | null;
+  replicas: number | null;
+  resourceId: string | null;
+  runtimeSeconds: string | null;
+  sampleCount: number | null;
+}
+export interface PlatformResourcesHealth {
+  annotations: unknown | null;
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  errorCount: number | null;
+  id: string | null;
+  installationId: string | null;
+  integrations: string[] | null;
+  kind: string | null;
+  labels: unknown | null;
+  lastError: string | null;
+  lastHeartbeatAt: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
+  name: string | null;
+  namespaceId: string | null;
+  replicas: number | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  resourceDefinitionId: string | null;
+  slug: string | null;
+  spec: unknown | null;
+  status: string | null;
+  statusDetail: string | null;
+  statusObserved: unknown | null;
+  storageClass: string | null;
+  storageSizeBytes: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
 }
 export interface PlatformResourcesRequirementsState {
   configHash: string | null;
@@ -525,19 +706,55 @@ export interface PlatformResourcesResolvedRequirement {
   secretsObjectName: string | null;
   slug: string | null;
 }
+export interface PlatformWebhookEndpoint {
+  active: boolean | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  functionDefinitionId: string | null;
+  host: string | null;
+  id: string | null;
+  namespaceId: string | null;
+  path: string | null;
+  provider: string | null;
+  replayWindowSeconds: number | null;
+  signingSecretName: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+export interface PlatformWebhookEvent {
+  createdAt: string | null;
+  endpointId: string | null;
+  error: string | null;
+  externalEventId: string | null;
+  id: string | null;
+  invocationCreatedAt: string | null;
+  invocationId: string | null;
+  payload: unknown | null;
+  provider: string | null;
+  providerTimestamp: string | null;
+  status: string | null;
+  updatedAt: string | null;
+}
 export interface Resource {
   annotations: unknown | null;
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
   createdAt: string | null;
   createdBy: string | null;
   databaseId: string | null;
   errorCount: number | null;
   id: string | null;
+  installationId: string | null;
   integrations: string[] | null;
   kind: string | null;
   labels: unknown | null;
   lastError: string | null;
+  lastHeartbeatAt: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
   name: string | null;
   namespaceId: string | null;
+  replicas: number | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
   resourceDefinitionId: string | null;
@@ -545,6 +762,8 @@ export interface Resource {
   spec: unknown | null;
   status: string | null;
   statusObserved: unknown | null;
+  storageClass: string | null;
+  storageSizeBytes: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
 }
@@ -578,6 +797,22 @@ export interface ResourceEvent {
   metadata: unknown | null;
   resourceId: string | null;
 }
+export interface ResourceInstallation {
+  commitId: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  namespaceId: string | null;
+  params: unknown | null;
+  revision: number | null;
+  slug: string | null;
+  status: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
 export interface ResourceStatusCheck {
   completedAt: string | null;
   databaseId: string | null;
@@ -587,6 +822,84 @@ export interface ResourceStatusCheck {
   resourceId: string | null;
   result: unknown | null;
   status: string | null;
+}
+export interface ResourceUsageLog {
+  cpuMillicores: string | null;
+  databaseId: string | null;
+  id: string | null;
+  intervalSeconds: number | null;
+  memoryBytes: string | null;
+  metrics: unknown | null;
+  namespaceId: string | null;
+  resourceId: string | null;
+  sampledAt: string | null;
+  source: string | null;
+}
+export interface ResourceUsageSummary {
+  databaseId: string | null;
+  date: string | null;
+  gbSeconds: string | null;
+  id: string | null;
+  maxCpuMillicores: string | null;
+  maxMemoryBytes: string | null;
+  namespaceId: string | null;
+  resourceId: string | null;
+  runtimeSeconds: string | null;
+  sampleCount: number | null;
+}
+export interface ResourceUtilizationDaily {
+  avgMemoryBytes: string | null;
+  cpuLimitMillicores: string | null;
+  cpuPeakUtilization: string | null;
+  cpuRequestHeadroomMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  date: string | null;
+  gbSeconds: string | null;
+  kind: string | null;
+  maxCpuMillicores: string | null;
+  maxMemoryBytes: string | null;
+  memoryLimitBytes: string | null;
+  memoryPeakUtilization: string | null;
+  memoryRequestBytes: string | null;
+  memoryRequestHeadroomBytes: string | null;
+  namespaceId: string | null;
+  replicas: number | null;
+  resourceId: string | null;
+  runtimeSeconds: string | null;
+  sampleCount: number | null;
+}
+export interface ResourcesHealth {
+  annotations: unknown | null;
+  cpuLimitMillicores: string | null;
+  cpuRequestMillicores: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  databaseId: string | null;
+  errorCount: number | null;
+  id: string | null;
+  installationId: string | null;
+  integrations: string[] | null;
+  kind: string | null;
+  labels: unknown | null;
+  lastError: string | null;
+  lastHeartbeatAt: string | null;
+  memoryLimitBytes: string | null;
+  memoryRequestBytes: string | null;
+  name: string | null;
+  namespaceId: string | null;
+  replicas: number | null;
+  requiredConfigs: ResourceRequirement[] | null;
+  requiredSecrets: ResourceRequirement[] | null;
+  resourceDefinitionId: string | null;
+  slug: string | null;
+  spec: unknown | null;
+  status: string | null;
+  statusDetail: string | null;
+  statusObserved: unknown | null;
+  storageClass: string | null;
+  storageSizeBytes: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
 }
 export interface ResourcesRequirementsState {
   configHash: string | null;
@@ -608,6 +921,37 @@ export interface ResourcesResolvedRequirement {
   resourceId: string | null;
   secretsObjectName: string | null;
   slug: string | null;
+}
+export interface WebhookEndpoint {
+  active: boolean | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  databaseId: string | null;
+  functionDefinitionId: string | null;
+  host: string | null;
+  id: string | null;
+  namespaceId: string | null;
+  path: string | null;
+  provider: string | null;
+  replayWindowSeconds: number | null;
+  signingSecretName: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+export interface WebhookEvent {
+  createdAt: string | null;
+  databaseId: string | null;
+  endpointId: string | null;
+  error: string | null;
+  externalEventId: string | null;
+  id: string | null;
+  invocationCreatedAt: string | null;
+  invocationId: string | null;
+  payload: unknown | null;
+  provider: string | null;
+  providerTimestamp: string | null;
+  status: string | null;
+  updatedAt: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

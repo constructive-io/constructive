@@ -16,43 +16,6 @@ export interface DbPreset {
   storeId: string | null;
   updatedAt: string | null;
 }
-export interface InfraCommit {
-  authorId: string | null;
-  committerId: string | null;
-  date: string | null;
-  id: string | null;
-  message: string | null;
-  parentIds: string[] | null;
-  scopeId: string | null;
-  storeId: string | null;
-  treeId: string | null;
-}
-export interface InfraGetAllRecord {
-  data: unknown | null;
-  path: string[] | null;
-}
-export interface InfraObject {
-  createdAt: string | null;
-  data: unknown | null;
-  id: string | null;
-  kids: string[] | null;
-  ktree: string[] | null;
-  scopeId: string | null;
-}
-export interface InfraRef {
-  commitId: string | null;
-  id: string | null;
-  name: string | null;
-  scopeId: string | null;
-  storeId: string | null;
-}
-export interface InfraStore {
-  createdAt: string | null;
-  hash: string | null;
-  id: string | null;
-  name: string | null;
-  scopeId: string | null;
-}
 export interface Namespace {
   annotations: unknown | null;
   createdAt: string | null;
@@ -70,20 +33,50 @@ export interface Namespace {
 }
 export interface NamespaceEvent {
   actorId: string | null;
-  cpuMillicores: number | null;
   createdAt: string | null;
   databaseId: string | null;
   eventType: string | null;
   id: string | null;
-  memoryBytes: string | null;
   message: string | null;
   metadata: unknown | null;
-  metrics: unknown | null;
   namespaceId: string | null;
-  networkEgressBytes: string | null;
-  networkIngressBytes: string | null;
-  podCount: number | null;
-  storageBytes: string | null;
+}
+export interface PlatformInfraCommit {
+  authorId: string | null;
+  committerId: string | null;
+  date: string | null;
+  id: string | null;
+  message: string | null;
+  parentIds: string[] | null;
+  scopeId: string | null;
+  storeId: string | null;
+  treeId: string | null;
+}
+export interface PlatformInfraGetAllTreeNodesRecord {
+  data: unknown | null;
+  path: string[] | null;
+}
+export interface PlatformInfraObject {
+  createdAt: string | null;
+  data: unknown | null;
+  id: string | null;
+  kids: string[] | null;
+  ktree: string[] | null;
+  scopeId: string | null;
+}
+export interface PlatformInfraRef {
+  commitId: string | null;
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
+  storeId: string | null;
+}
+export interface PlatformInfraStore {
+  createdAt: string | null;
+  hash: string | null;
+  id: string | null;
+  name: string | null;
+  scopeId: string | null;
 }
 export interface PlatformNamespace {
   annotations: unknown | null;
@@ -101,19 +94,12 @@ export interface PlatformNamespace {
 }
 export interface PlatformNamespaceEvent {
   actorId: string | null;
-  cpuMillicores: number | null;
   createdAt: string | null;
   eventType: string | null;
   id: string | null;
-  memoryBytes: string | null;
   message: string | null;
   metadata: unknown | null;
-  metrics: unknown | null;
   namespaceId: string | null;
-  networkEgressBytes: string | null;
-  networkIngressBytes: string | null;
-  podCount: number | null;
-  storageBytes: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

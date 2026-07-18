@@ -118,29 +118,25 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'displayName',
         message: 'displayName',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'boolean',
         name: 'enabled',
         message: 'enabled',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'kind',
         message: 'kind',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'slug',
         message: 'slug',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

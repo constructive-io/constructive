@@ -677,6 +677,10 @@ export interface AgentPlanToManyAgentTaskFilter {
 }
 /** A filter to be used against `AgentPrompt` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPromptFilter {
+  /** Filter by the object’s `agentThreadsByPromptTemplateId` relation. */
+  agentThreadsByPromptTemplateId?: AgentPromptToManyAgentThreadFilter;
+  /** `agentThreadsByPromptTemplateId` exist. */
+  agentThreadsByPromptTemplateIdExist?: boolean;
   /** Checks for all expressions in this list. */
   and?: AgentPromptFilter[];
   /** Filter by the object’s `content` field. */
@@ -745,6 +749,15 @@ export interface AgentPromptPatch {
   name?: string;
   updatedAt?: string;
   updatedBy?: string;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPromptToManyAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
 }
 /** A filter to be used against `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentResourceChunkFilter {

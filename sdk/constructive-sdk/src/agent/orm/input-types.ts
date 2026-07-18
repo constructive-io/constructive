@@ -493,7 +493,9 @@ export interface AgentPlanRelations {
   thread?: AgentThread | null;
   agentTasksByPlanId?: ConnectionResult<AgentTask>;
 }
-export interface AgentPromptRelations {}
+export interface AgentPromptRelations {
+  agentThreadsByPromptTemplateId?: ConnectionResult<AgentThread>;
+}
 export interface AgentResourceChunkRelations {
   agentResource?: AgentResource | null;
 }
@@ -631,6 +633,12 @@ export type AgentPromptSelect = {
   name?: boolean;
   updatedAt?: boolean;
   updatedBy?: boolean;
+  agentThreadsByPromptTemplateId?: {
+    select: AgentThreadSelect;
+    first?: number;
+    filter?: AgentThreadFilter;
+    orderBy?: AgentThreadOrderBy[];
+  };
 };
 export type AgentResourceChunkSelect = {
   agentResourceId?: boolean;
@@ -905,6 +913,10 @@ export interface AgentPlanFilter {
   updatedAt?: DatetimeFilter;
 }
 export interface AgentPromptFilter {
+  /** Filter by the object’s `agentThreadsByPromptTemplateId` relation. */
+  agentThreadsByPromptTemplateId?: AgentPromptToManyAgentThreadFilter;
+  /** `agentThreadsByPromptTemplateId` exist. */
+  agentThreadsByPromptTemplateIdExist?: boolean;
   /** Checks for all expressions in this list. */
   and?: AgentPromptFilter[];
   /** Filter by the object’s `content` field. */
@@ -1755,6 +1767,9 @@ export const connectionFieldsMap = {
   AgentPlan: {
     agentTasksByPlanId: 'AgentTask',
   },
+  AgentPrompt: {
+    agentThreadsByPromptTemplateId: 'AgentThread',
+  },
   AgentResource: {
     agentResourceChunks: 'AgentResourceChunk',
   },
@@ -1818,6 +1833,15 @@ export interface AgentPlanToManyAgentTaskFilter {
   none?: AgentTaskFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: AgentTaskFilter;
+}
+/** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentPromptToManyAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentThreadFilter;
 }
 /** Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold. */
 export interface VectorNearbyInput {
@@ -2622,6 +2646,10 @@ export interface BooleanFilter {
 }
 /** A filter to be used against `AgentPrompt` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPromptFilter {
+  /** Filter by the object’s `agentThreadsByPromptTemplateId` relation. */
+  agentThreadsByPromptTemplateId?: AgentPromptToManyAgentThreadFilter;
+  /** `agentThreadsByPromptTemplateId` exist. */
+  agentThreadsByPromptTemplateIdExist?: boolean;
   /** Checks for all expressions in this list. */
   and?: AgentPromptFilter[];
   /** Filter by the object’s `content` field. */

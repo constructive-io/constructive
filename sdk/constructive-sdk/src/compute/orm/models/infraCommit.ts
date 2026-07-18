@@ -176,7 +176,7 @@ export class InfraCommitModel {
       S,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       },
       InfraCommitPatch
     > & {
@@ -199,7 +199,7 @@ export class InfraCommitModel {
       'infraCommitPatch',
       connectionFieldsMap,
       {
-        scopeId: args.where.scopeId,
+        databaseId: args.where.databaseId,
       }
     );
     return new QueryBuilder({
@@ -215,7 +215,7 @@ export class InfraCommitModel {
     args: DeleteArgs<
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       },
       S
     > & {
@@ -232,7 +232,7 @@ export class InfraCommitModel {
       'infraCommit',
       {
         id: args.where.id,
-        scopeId: args.where.scopeId,
+        databaseId: args.where.databaseId,
       },
       'DeleteInfraCommitInput',
       args.select,

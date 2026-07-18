@@ -34,8 +34,8 @@ const fieldSchema: FieldSchema = {
   scope: 'string',
   storageLogTableId: 'uuid',
   storageLogTableName: 'string',
-  usageDailyTableId: 'uuid',
-  usageDailyTableName: 'string',
+  usageSummaryTableId: 'uuid',
+  usageSummaryTableName: 'string',
 };
 const usage =
   '\nstorage-log-module <command>\n\nCommands:\n  list                  List storageLogModule records\n  find-first            Find first matching storageLogModule record\n  get                   Get a storageLogModule by ID\n  create                Create a new storageLogModule\n  update                Update an existing storageLogModule\n  delete                Delete a storageLogModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -106,8 +106,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       scope: true,
       storageLogTableId: true,
       storageLogTableName: true,
-      usageDailyTableId: true,
-      usageDailyTableName: true,
+      usageSummaryTableId: true,
+      usageSummaryTableName: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<StorageLogModuleSelect, StorageLogModuleFilter, StorageLogModuleOrderBy> & {
@@ -146,8 +146,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       scope: true,
       storageLogTableId: true,
       storageLogTableName: true,
-      usageDailyTableId: true,
-      usageDailyTableName: true,
+      usageSummaryTableId: true,
+      usageSummaryTableName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<StorageLogModuleSelect, StorageLogModuleFilter, StorageLogModuleOrderBy> & {
@@ -198,8 +198,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           scope: true,
           storageLogTableId: true,
           storageLogTableName: true,
-          usageDailyTableId: true,
-          usageDailyTableName: true,
+          usageSummaryTableId: true,
+          usageSummaryTableName: true,
         },
       })
       .execute();
@@ -335,15 +335,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'usageDailyTableId',
-        message: 'usageDailyTableId',
+        name: 'usageSummaryTableId',
+        message: 'usageSummaryTableId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'usageDailyTableName',
-        message: 'usageDailyTableName',
+        name: 'usageSummaryTableName',
+        message: 'usageSummaryTableName',
         required: false,
         skipPrompt: true,
       },
@@ -374,8 +374,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: cleanedData.scope,
           storageLogTableId: cleanedData.storageLogTableId,
           storageLogTableName: cleanedData.storageLogTableName,
-          usageDailyTableId: cleanedData.usageDailyTableId,
-          usageDailyTableName: cleanedData.usageDailyTableName,
+          usageSummaryTableId: cleanedData.usageSummaryTableId,
+          usageSummaryTableName: cleanedData.usageSummaryTableName,
         },
         select: {
           actorFkTableId: true,
@@ -396,8 +396,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: true,
           storageLogTableId: true,
           storageLogTableName: true,
-          usageDailyTableId: true,
-          usageDailyTableName: true,
+          usageSummaryTableId: true,
+          usageSummaryTableName: true,
         },
       })
       .execute();
@@ -539,15 +539,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'usageDailyTableId',
-        message: 'usageDailyTableId',
+        name: 'usageSummaryTableId',
+        message: 'usageSummaryTableId',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'usageDailyTableName',
-        message: 'usageDailyTableName',
+        name: 'usageSummaryTableName',
+        message: 'usageSummaryTableName',
         required: false,
         skipPrompt: true,
       },
@@ -578,8 +578,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: cleanedData.scope,
           storageLogTableId: cleanedData.storageLogTableId,
           storageLogTableName: cleanedData.storageLogTableName,
-          usageDailyTableId: cleanedData.usageDailyTableId,
-          usageDailyTableName: cleanedData.usageDailyTableName,
+          usageSummaryTableId: cleanedData.usageSummaryTableId,
+          usageSummaryTableName: cleanedData.usageSummaryTableName,
         },
         select: {
           actorFkTableId: true,
@@ -600,8 +600,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           scope: true,
           storageLogTableId: true,
           storageLogTableName: true,
-          usageDailyTableId: true,
-          usageDailyTableName: true,
+          usageSummaryTableId: true,
+          usageSummaryTableName: true,
         },
       })
       .execute();

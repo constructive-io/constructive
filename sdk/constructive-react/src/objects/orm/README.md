@@ -22,7 +22,7 @@ const db = createClient({
 | Model | Operations |
 |-------|------------|
 | `commit` | findMany, findOne, create, update, delete |
-| `getAllRecord` | findMany, findOne, create, update, delete |
+| `getAllTreeNodesRecord` | findMany, findOne, create, update, delete |
 | `object` | findMany, findOne, create, update, delete |
 | `ref` | findMany, findOne, create, update, delete |
 | `store` | findMany, findOne, create, update, delete |
@@ -66,9 +66,9 @@ const updated = await db.commit.update({ where: { id: '<UUID>' }, data: { author
 const deleted = await db.commit.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.getAllRecord`
+### `db.getAllTreeNodesRecord`
 
-CRUD operations for GetAllRecord records.
+CRUD operations for GetAllTreeNodesRecord records.
 
 **Fields:**
 
@@ -80,20 +80,20 @@ CRUD operations for GetAllRecord records.
 **Operations:**
 
 ```typescript
-// List all getAllRecord records
-const items = await db.getAllRecord.findMany({ select: { data: true, path: true } }).execute();
+// List all getAllTreeNodesRecord records
+const items = await db.getAllTreeNodesRecord.findMany({ select: { data: true, path: true } }).execute();
 
 // Get one by id
-const item = await db.getAllRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
+const item = await db.getAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
 
 // Create
-const created = await db.getAllRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
+const created = await db.getAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.getAllRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.getAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.getAllRecord.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.getAllTreeNodesRecord.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.object`

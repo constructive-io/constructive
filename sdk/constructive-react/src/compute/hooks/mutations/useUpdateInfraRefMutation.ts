@@ -41,7 +41,7 @@ export function useUpdateInfraRefMutation<S extends InfraRefSelect>(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
         infraRefPatch: InfraRefPatch;
       }
     >,
@@ -56,7 +56,7 @@ export function useUpdateInfraRefMutation<S extends InfraRefSelect>(
   Error,
   {
     id: string;
-    scopeId: string;
+    databaseId: string;
     infraRefPatch: InfraRefPatch;
   }
 >;
@@ -69,7 +69,7 @@ export function useUpdateInfraRefMutation(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
         infraRefPatch: InfraRefPatch;
       }
     >,
@@ -84,18 +84,18 @@ export function useUpdateInfraRefMutation(
     mutationKey: infraRefMutationKeys.all,
     mutationFn: ({
       id,
-      scopeId,
+      databaseId,
       infraRefPatch,
     }: {
       id: string;
-      scopeId: string;
+      databaseId: string;
       infraRefPatch: InfraRefPatch;
     }) =>
       getClient()
         .infraRef.update({
           where: {
             id,
-            scopeId,
+            databaseId,
           },
           data: infraRefPatch,
           select: args.select,

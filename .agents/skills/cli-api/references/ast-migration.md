@@ -12,8 +12,8 @@ csdk ast-migration list --where.<field>.<op> <value> --orderBy <values>
 csdk ast-migration list --limit 10 --after <cursor>
 csdk ast-migration find-first --where.<field>.<op> <value>
 csdk ast-migration get --id <Int>
-csdk ast-migration create [--action <String>] [--actionId <UUID>] [--actorId <UUID>] [--databaseId <UUID>] [--deploy <JSON>] [--deploys <String>] [--name <String>] [--payload <JSON>] [--requires <String>] [--revert <JSON>] [--verify <JSON>]
-csdk ast-migration update --id <Int> [--action <String>] [--actionId <UUID>] [--actorId <UUID>] [--databaseId <UUID>] [--deploy <JSON>] [--deploys <String>] [--name <String>] [--payload <JSON>] [--requires <String>] [--revert <JSON>] [--verify <JSON>]
+csdk ast-migration create --actionId <UUID> --actionName <String> --actorId <UUID> --databaseId <UUID> --deploy <JSON> --deploys <String> --name <String> --payload <JSON> --requires <String> --revert <JSON> --verify <JSON>
+csdk ast-migration update --id <Int> [--actionId <UUID>] [--actionName <String>] [--actorId <UUID>] [--databaseId <UUID>] [--deploy <JSON>] [--deploys <String>] [--name <String>] [--payload <JSON>] [--requires <String>] [--revert <JSON>] [--verify <JSON>]
 csdk ast-migration delete --id <Int>
 ```
 
@@ -58,7 +58,7 @@ csdk ast-migration list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a astMigration
 
 ```bash
-csdk ast-migration create [--action <String>] [--actionId <UUID>] [--actorId <UUID>] [--databaseId <UUID>] [--deploy <JSON>] [--deploys <String>] [--name <String>] [--payload <JSON>] [--requires <String>] [--revert <JSON>] [--verify <JSON>]
+csdk ast-migration create --actionId <UUID> --actionName <String> --actorId <UUID> --databaseId <UUID> --deploy <JSON> --deploys <String> --name <String> --payload <JSON> --requires <String> --revert <JSON> --verify <JSON>
 ```
 
 ### Get a astMigration by id

@@ -18,11 +18,11 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   authorId: 'uuid',
   committerId: 'uuid',
+  databaseId: 'uuid',
   date: 'string',
   id: 'uuid',
   message: 'string',
   parentIds: 'uuid',
-  scopeId: 'uuid',
   storeId: 'uuid',
   treeId: 'uuid',
 };
@@ -79,11 +79,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       authorId: true,
       committerId: true,
+      databaseId: true,
       date: true,
       id: true,
       message: true,
       parentIds: true,
-      scopeId: true,
       storeId: true,
       treeId: true,
     };
@@ -108,11 +108,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       authorId: true,
       committerId: true,
+      databaseId: true,
       date: true,
       id: true,
       message: true,
       parentIds: true,
-      scopeId: true,
       storeId: true,
       treeId: true,
     };
@@ -149,11 +149,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           authorId: true,
           committerId: true,
+          databaseId: true,
           date: true,
           id: true,
           message: true,
           parentIds: true,
-          scopeId: true,
           storeId: true,
           treeId: true,
         },
@@ -187,6 +187,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'date',
         message: 'date',
         required: false,
@@ -205,12 +211,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'parentIds',
         required: false,
         skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'scopeId',
-        message: 'scopeId',
-        required: true,
       },
       {
         type: 'text',
@@ -237,21 +237,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           authorId: cleanedData.authorId,
           committerId: cleanedData.committerId,
+          databaseId: cleanedData.databaseId,
           date: cleanedData.date,
           message: cleanedData.message,
           parentIds: cleanedData.parentIds,
-          scopeId: cleanedData.scopeId,
           storeId: cleanedData.storeId,
           treeId: cleanedData.treeId,
         },
         select: {
           authorId: true,
           committerId: true,
+          databaseId: true,
           date: true,
           id: true,
           message: true,
           parentIds: true,
-          scopeId: true,
           storeId: true,
           treeId: true,
         },
@@ -277,8 +277,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'scopeId',
-        message: 'scopeId',
+        name: 'databaseId',
+        message: 'databaseId',
         required: true,
       },
       {
@@ -337,7 +337,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       .update({
         where: {
           id: answers.id as string,
-          scopeId: answers.scopeId as string,
+          databaseId: answers.databaseId as string,
         },
         data: {
           authorId: cleanedData.authorId,
@@ -351,11 +351,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           authorId: true,
           committerId: true,
+          databaseId: true,
           date: true,
           id: true,
           message: true,
           parentIds: true,
-          scopeId: true,
           storeId: true,
           treeId: true,
         },
@@ -381,8 +381,8 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'scopeId',
-        message: 'scopeId',
+        name: 'databaseId',
+        message: 'databaseId',
         required: true,
       },
     ]);
@@ -392,7 +392,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       .delete({
         where: {
           id: answers.id as string,
-          scopeId: answers.scopeId as string,
+          databaseId: answers.databaseId as string,
         },
         select: {
           id: true,

@@ -26,6 +26,15 @@ export const dbPresetMutationKeys = {
   /** Delete dbPreset mutation key */ delete: (id: string | number) =>
     ['mutation', 'dbpreset', 'delete', id] as const,
 } as const;
+export const declaredCapacityMutationKeys = {
+  /** All declaredCapacity mutation keys */ all: ['mutation', 'declaredcapacity'] as const,
+  /** Create declaredCapacity mutation key */ create: () =>
+    ['mutation', 'declaredcapacity', 'create'] as const,
+  /** Update declaredCapacity mutation key */ update: (id: string | number) =>
+    ['mutation', 'declaredcapacity', 'update', id] as const,
+  /** Delete declaredCapacity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'declaredcapacity', 'delete', id] as const,
+} as const;
 export const functionApiBindingMutationKeys = {
   /** All functionApiBinding mutation keys */ all: ['mutation', 'functionapibinding'] as const,
   /** Create functionApiBinding mutation key */ create: () =>
@@ -164,14 +173,17 @@ export const functionInvocationMutationKeys = {
   /** Delete functionInvocation mutation key */ delete: (id: string | number) =>
     ['mutation', 'functioninvocation', 'delete', id] as const,
 } as const;
-export const getAllRecordMutationKeys = {
-  /** All getAllRecord mutation keys */ all: ['mutation', 'getallrecord'] as const,
-  /** Create getAllRecord mutation key */ create: () =>
-    ['mutation', 'getallrecord', 'create'] as const,
-  /** Update getAllRecord mutation key */ update: (id: string | number) =>
-    ['mutation', 'getallrecord', 'update', id] as const,
-  /** Delete getAllRecord mutation key */ delete: (id: string | number) =>
-    ['mutation', 'getallrecord', 'delete', id] as const,
+export const getAllTreeNodesRecordMutationKeys = {
+  /** All getAllTreeNodesRecord mutation keys */ all: [
+    'mutation',
+    'getalltreenodesrecord',
+  ] as const,
+  /** Create getAllTreeNodesRecord mutation key */ create: () =>
+    ['mutation', 'getalltreenodesrecord', 'create'] as const,
+  /** Update getAllTreeNodesRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'getalltreenodesrecord', 'update', id] as const,
+  /** Delete getAllTreeNodesRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'getalltreenodesrecord', 'delete', id] as const,
 } as const;
 export const infraCommitMutationKeys = {
   /** All infraCommit mutation keys */ all: ['mutation', 'infracommit'] as const,
@@ -182,14 +194,17 @@ export const infraCommitMutationKeys = {
   /** Delete infraCommit mutation key */ delete: (id: string | number) =>
     ['mutation', 'infracommit', 'delete', id] as const,
 } as const;
-export const infraGetAllRecordMutationKeys = {
-  /** All infraGetAllRecord mutation keys */ all: ['mutation', 'infragetallrecord'] as const,
-  /** Create infraGetAllRecord mutation key */ create: () =>
-    ['mutation', 'infragetallrecord', 'create'] as const,
-  /** Update infraGetAllRecord mutation key */ update: (id: string | number) =>
-    ['mutation', 'infragetallrecord', 'update', id] as const,
-  /** Delete infraGetAllRecord mutation key */ delete: (id: string | number) =>
-    ['mutation', 'infragetallrecord', 'delete', id] as const,
+export const infraGetAllTreeNodesRecordMutationKeys = {
+  /** All infraGetAllTreeNodesRecord mutation keys */ all: [
+    'mutation',
+    'infragetalltreenodesrecord',
+  ] as const,
+  /** Create infraGetAllTreeNodesRecord mutation key */ create: () =>
+    ['mutation', 'infragetalltreenodesrecord', 'create'] as const,
+  /** Update infraGetAllTreeNodesRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'infragetalltreenodesrecord', 'update', id] as const,
+  /** Delete infraGetAllTreeNodesRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'infragetalltreenodesrecord', 'delete', id] as const,
 } as const;
 export const infraObjectMutationKeys = {
   /** All infraObject mutation keys */ all: ['mutation', 'infraobject'] as const,
@@ -241,6 +256,18 @@ export const namespaceEventMutationKeys = {
     ['mutation', 'namespaceevent', 'update', id] as const,
   /** Delete namespaceEvent mutation key */ delete: (id: string | number) =>
     ['mutation', 'namespaceevent', 'delete', id] as const,
+} as const;
+export const platformDeclaredCapacityMutationKeys = {
+  /** All platformDeclaredCapacity mutation keys */ all: [
+    'mutation',
+    'platformdeclaredcapacity',
+  ] as const,
+  /** Create platformDeclaredCapacity mutation key */ create: () =>
+    ['mutation', 'platformdeclaredcapacity', 'create'] as const,
+  /** Update platformDeclaredCapacity mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformdeclaredcapacity', 'update', id] as const,
+  /** Delete platformDeclaredCapacity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformdeclaredcapacity', 'delete', id] as const,
 } as const;
 export const platformFunctionApiBindingMutationKeys = {
   /** All platformFunctionApiBinding mutation keys */ all: [
@@ -314,6 +341,54 @@ export const platformFunctionInvocationMutationKeys = {
   /** Delete platformFunctionInvocation mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformfunctioninvocation', 'delete', id] as const,
 } as const;
+export const platformInfraCommitMutationKeys = {
+  /** All platformInfraCommit mutation keys */ all: ['mutation', 'platforminfracommit'] as const,
+  /** Create platformInfraCommit mutation key */ create: () =>
+    ['mutation', 'platforminfracommit', 'create'] as const,
+  /** Update platformInfraCommit mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfracommit', 'update', id] as const,
+  /** Delete platformInfraCommit mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfracommit', 'delete', id] as const,
+} as const;
+export const platformInfraGetAllTreeNodesRecordMutationKeys = {
+  /** All platformInfraGetAllTreeNodesRecord mutation keys */ all: [
+    'mutation',
+    'platforminfragetalltreenodesrecord',
+  ] as const,
+  /** Create platformInfraGetAllTreeNodesRecord mutation key */ create: () =>
+    ['mutation', 'platforminfragetalltreenodesrecord', 'create'] as const,
+  /** Update platformInfraGetAllTreeNodesRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfragetalltreenodesrecord', 'update', id] as const,
+  /** Delete platformInfraGetAllTreeNodesRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfragetalltreenodesrecord', 'delete', id] as const,
+} as const;
+export const platformInfraObjectMutationKeys = {
+  /** All platformInfraObject mutation keys */ all: ['mutation', 'platforminfraobject'] as const,
+  /** Create platformInfraObject mutation key */ create: () =>
+    ['mutation', 'platforminfraobject', 'create'] as const,
+  /** Update platformInfraObject mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfraobject', 'update', id] as const,
+  /** Delete platformInfraObject mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfraobject', 'delete', id] as const,
+} as const;
+export const platformInfraRefMutationKeys = {
+  /** All platformInfraRef mutation keys */ all: ['mutation', 'platforminfraref'] as const,
+  /** Create platformInfraRef mutation key */ create: () =>
+    ['mutation', 'platforminfraref', 'create'] as const,
+  /** Update platformInfraRef mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfraref', 'update', id] as const,
+  /** Delete platformInfraRef mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfraref', 'delete', id] as const,
+} as const;
+export const platformInfraStoreMutationKeys = {
+  /** All platformInfraStore mutation keys */ all: ['mutation', 'platforminfrastore'] as const,
+  /** Create platformInfraStore mutation key */ create: () =>
+    ['mutation', 'platforminfrastore', 'create'] as const,
+  /** Update platformInfraStore mutation key */ update: (id: string | number) =>
+    ['mutation', 'platforminfrastore', 'update', id] as const,
+  /** Delete platformInfraStore mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platforminfrastore', 'delete', id] as const,
+} as const;
 export const platformNamespaceMutationKeys = {
   /** All platformNamespace mutation keys */ all: ['mutation', 'platformnamespace'] as const,
   /** Create platformNamespace mutation key */ create: () =>
@@ -368,6 +443,18 @@ export const platformResourceEventMutationKeys = {
   /** Delete platformResourceEvent mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformresourceevent', 'delete', id] as const,
 } as const;
+export const platformResourceInstallationMutationKeys = {
+  /** All platformResourceInstallation mutation keys */ all: [
+    'mutation',
+    'platformresourceinstallation',
+  ] as const,
+  /** Create platformResourceInstallation mutation key */ create: () =>
+    ['mutation', 'platformresourceinstallation', 'create'] as const,
+  /** Update platformResourceInstallation mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformresourceinstallation', 'update', id] as const,
+  /** Delete platformResourceInstallation mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformresourceinstallation', 'delete', id] as const,
+} as const;
 export const platformResourceStatusCheckMutationKeys = {
   /** All platformResourceStatusCheck mutation keys */ all: [
     'mutation',
@@ -379,6 +466,54 @@ export const platformResourceStatusCheckMutationKeys = {
     ['mutation', 'platformresourcestatuscheck', 'update', id] as const,
   /** Delete platformResourceStatusCheck mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformresourcestatuscheck', 'delete', id] as const,
+} as const;
+export const platformResourceUsageLogMutationKeys = {
+  /** All platformResourceUsageLog mutation keys */ all: [
+    'mutation',
+    'platformresourceusagelog',
+  ] as const,
+  /** Create platformResourceUsageLog mutation key */ create: () =>
+    ['mutation', 'platformresourceusagelog', 'create'] as const,
+  /** Update platformResourceUsageLog mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformresourceusagelog', 'update', id] as const,
+  /** Delete platformResourceUsageLog mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformresourceusagelog', 'delete', id] as const,
+} as const;
+export const platformResourceUsageSummaryMutationKeys = {
+  /** All platformResourceUsageSummary mutation keys */ all: [
+    'mutation',
+    'platformresourceusagesummary',
+  ] as const,
+  /** Create platformResourceUsageSummary mutation key */ create: () =>
+    ['mutation', 'platformresourceusagesummary', 'create'] as const,
+  /** Update platformResourceUsageSummary mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformresourceusagesummary', 'update', id] as const,
+  /** Delete platformResourceUsageSummary mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformresourceusagesummary', 'delete', id] as const,
+} as const;
+export const platformResourceUtilizationDailyMutationKeys = {
+  /** All platformResourceUtilizationDaily mutation keys */ all: [
+    'mutation',
+    'platformresourceutilizationdaily',
+  ] as const,
+  /** Create platformResourceUtilizationDaily mutation key */ create: () =>
+    ['mutation', 'platformresourceutilizationdaily', 'create'] as const,
+  /** Update platformResourceUtilizationDaily mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformresourceutilizationdaily', 'update', id] as const,
+  /** Delete platformResourceUtilizationDaily mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformresourceutilizationdaily', 'delete', id] as const,
+} as const;
+export const platformResourcesHealthMutationKeys = {
+  /** All platformResourcesHealth mutation keys */ all: [
+    'mutation',
+    'platformresourceshealth',
+  ] as const,
+  /** Create platformResourcesHealth mutation key */ create: () =>
+    ['mutation', 'platformresourceshealth', 'create'] as const,
+  /** Update platformResourcesHealth mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformresourceshealth', 'update', id] as const,
+  /** Delete platformResourcesHealth mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformresourceshealth', 'delete', id] as const,
 } as const;
 export const platformResourcesRequirementsStateMutationKeys = {
   /** All platformResourcesRequirementsState mutation keys */ all: [
@@ -403,6 +538,27 @@ export const platformResourcesResolvedRequirementMutationKeys = {
     ['mutation', 'platformresourcesresolvedrequirement', 'update', id] as const,
   /** Delete platformResourcesResolvedRequirement mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformresourcesresolvedrequirement', 'delete', id] as const,
+} as const;
+export const platformWebhookEndpointMutationKeys = {
+  /** All platformWebhookEndpoint mutation keys */ all: [
+    'mutation',
+    'platformwebhookendpoint',
+  ] as const,
+  /** Create platformWebhookEndpoint mutation key */ create: () =>
+    ['mutation', 'platformwebhookendpoint', 'create'] as const,
+  /** Update platformWebhookEndpoint mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformwebhookendpoint', 'update', id] as const,
+  /** Delete platformWebhookEndpoint mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformwebhookendpoint', 'delete', id] as const,
+} as const;
+export const platformWebhookEventMutationKeys = {
+  /** All platformWebhookEvent mutation keys */ all: ['mutation', 'platformwebhookevent'] as const,
+  /** Create platformWebhookEvent mutation key */ create: () =>
+    ['mutation', 'platformwebhookevent', 'create'] as const,
+  /** Update platformWebhookEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformwebhookevent', 'update', id] as const,
+  /** Delete platformWebhookEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformwebhookevent', 'delete', id] as const,
 } as const;
 export const resourceMutationKeys = {
   /** All resource mutation keys */ all: ['mutation', 'resource'] as const,
@@ -430,6 +586,15 @@ export const resourceEventMutationKeys = {
   /** Delete resourceEvent mutation key */ delete: (id: string | number) =>
     ['mutation', 'resourceevent', 'delete', id] as const,
 } as const;
+export const resourceInstallationMutationKeys = {
+  /** All resourceInstallation mutation keys */ all: ['mutation', 'resourceinstallation'] as const,
+  /** Create resourceInstallation mutation key */ create: () =>
+    ['mutation', 'resourceinstallation', 'create'] as const,
+  /** Update resourceInstallation mutation key */ update: (id: string | number) =>
+    ['mutation', 'resourceinstallation', 'update', id] as const,
+  /** Delete resourceInstallation mutation key */ delete: (id: string | number) =>
+    ['mutation', 'resourceinstallation', 'delete', id] as const,
+} as const;
 export const resourceStatusCheckMutationKeys = {
   /** All resourceStatusCheck mutation keys */ all: ['mutation', 'resourcestatuscheck'] as const,
   /** Create resourceStatusCheck mutation key */ create: () =>
@@ -438,6 +603,45 @@ export const resourceStatusCheckMutationKeys = {
     ['mutation', 'resourcestatuscheck', 'update', id] as const,
   /** Delete resourceStatusCheck mutation key */ delete: (id: string | number) =>
     ['mutation', 'resourcestatuscheck', 'delete', id] as const,
+} as const;
+export const resourceUsageLogMutationKeys = {
+  /** All resourceUsageLog mutation keys */ all: ['mutation', 'resourceusagelog'] as const,
+  /** Create resourceUsageLog mutation key */ create: () =>
+    ['mutation', 'resourceusagelog', 'create'] as const,
+  /** Update resourceUsageLog mutation key */ update: (id: string | number) =>
+    ['mutation', 'resourceusagelog', 'update', id] as const,
+  /** Delete resourceUsageLog mutation key */ delete: (id: string | number) =>
+    ['mutation', 'resourceusagelog', 'delete', id] as const,
+} as const;
+export const resourceUsageSummaryMutationKeys = {
+  /** All resourceUsageSummary mutation keys */ all: ['mutation', 'resourceusagesummary'] as const,
+  /** Create resourceUsageSummary mutation key */ create: () =>
+    ['mutation', 'resourceusagesummary', 'create'] as const,
+  /** Update resourceUsageSummary mutation key */ update: (id: string | number) =>
+    ['mutation', 'resourceusagesummary', 'update', id] as const,
+  /** Delete resourceUsageSummary mutation key */ delete: (id: string | number) =>
+    ['mutation', 'resourceusagesummary', 'delete', id] as const,
+} as const;
+export const resourceUtilizationDailyMutationKeys = {
+  /** All resourceUtilizationDaily mutation keys */ all: [
+    'mutation',
+    'resourceutilizationdaily',
+  ] as const,
+  /** Create resourceUtilizationDaily mutation key */ create: () =>
+    ['mutation', 'resourceutilizationdaily', 'create'] as const,
+  /** Update resourceUtilizationDaily mutation key */ update: (id: string | number) =>
+    ['mutation', 'resourceutilizationdaily', 'update', id] as const,
+  /** Delete resourceUtilizationDaily mutation key */ delete: (id: string | number) =>
+    ['mutation', 'resourceutilizationdaily', 'delete', id] as const,
+} as const;
+export const resourcesHealthMutationKeys = {
+  /** All resourcesHealth mutation keys */ all: ['mutation', 'resourceshealth'] as const,
+  /** Create resourcesHealth mutation key */ create: () =>
+    ['mutation', 'resourceshealth', 'create'] as const,
+  /** Update resourcesHealth mutation key */ update: (id: string | number) =>
+    ['mutation', 'resourceshealth', 'update', id] as const,
+  /** Delete resourcesHealth mutation key */ delete: (id: string | number) =>
+    ['mutation', 'resourceshealth', 'delete', id] as const,
 } as const;
 export const resourcesRequirementsStateMutationKeys = {
   /** All resourcesRequirementsState mutation keys */ all: [
@@ -462,6 +666,24 @@ export const resourcesResolvedRequirementMutationKeys = {
     ['mutation', 'resourcesresolvedrequirement', 'update', id] as const,
   /** Delete resourcesResolvedRequirement mutation key */ delete: (id: string | number) =>
     ['mutation', 'resourcesresolvedrequirement', 'delete', id] as const,
+} as const;
+export const webhookEndpointMutationKeys = {
+  /** All webhookEndpoint mutation keys */ all: ['mutation', 'webhookendpoint'] as const,
+  /** Create webhookEndpoint mutation key */ create: () =>
+    ['mutation', 'webhookendpoint', 'create'] as const,
+  /** Update webhookEndpoint mutation key */ update: (id: string | number) =>
+    ['mutation', 'webhookendpoint', 'update', id] as const,
+  /** Delete webhookEndpoint mutation key */ delete: (id: string | number) =>
+    ['mutation', 'webhookendpoint', 'delete', id] as const,
+} as const;
+export const webhookEventMutationKeys = {
+  /** All webhookEvent mutation keys */ all: ['mutation', 'webhookevent'] as const,
+  /** Create webhookEvent mutation key */ create: () =>
+    ['mutation', 'webhookevent', 'create'] as const,
+  /** Update webhookEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'webhookevent', 'update', id] as const,
+  /** Delete webhookEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'webhookevent', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -517,10 +739,72 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'insertNodeAtPath', identifier] as const)
       : (['mutation', 'insertNodeAtPath'] as const),
+  /** Mutation key for platformInfraInitEmptyRepo */ platformInfraInitEmptyRepo: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraInitEmptyRepo', identifier] as const)
+      : (['mutation', 'platformInfraInitEmptyRepo'] as const),
+  /** Mutation key for platformInfraInsertNodeAtPath */ platformInfraInsertNodeAtPath: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraInsertNodeAtPath', identifier] as const)
+      : (['mutation', 'platformInfraInsertNodeAtPath'] as const),
+  /** Mutation key for platformInfraSetDataAtPath */ platformInfraSetDataAtPath: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'platformInfraSetDataAtPath', identifier] as const)
+      : (['mutation', 'platformInfraSetDataAtPath'] as const),
+  /** Mutation key for platformResourceInstallationsInstall */ platformResourceInstallationsInstall:
+    (identifier?: string) =>
+      identifier
+        ? (['mutation', 'platformResourceInstallationsInstall', identifier] as const)
+        : (['mutation', 'platformResourceInstallationsInstall'] as const),
+  /** Mutation key for platformResourceInstallationsRollback */ platformResourceInstallationsRollback:
+    (identifier?: string) =>
+      identifier
+        ? (['mutation', 'platformResourceInstallationsRollback', identifier] as const)
+        : (['mutation', 'platformResourceInstallationsRollback'] as const),
+  /** Mutation key for platformResourceInstallationsUninstall */ platformResourceInstallationsUninstall:
+    (identifier?: string) =>
+      identifier
+        ? (['mutation', 'platformResourceInstallationsUninstall', identifier] as const)
+        : (['mutation', 'platformResourceInstallationsUninstall'] as const),
+  /** Mutation key for platformResourceInstallationsUpgrade */ platformResourceInstallationsUpgrade:
+    (identifier?: string) =>
+      identifier
+        ? (['mutation', 'platformResourceInstallationsUpgrade', identifier] as const)
+        : (['mutation', 'platformResourceInstallationsUpgrade'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
       : (['mutation', 'provisionBucket'] as const),
+  /** Mutation key for resourceInstallationsInstall */ resourceInstallationsInstall: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'resourceInstallationsInstall', identifier] as const)
+      : (['mutation', 'resourceInstallationsInstall'] as const),
+  /** Mutation key for resourceInstallationsRollback */ resourceInstallationsRollback: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'resourceInstallationsRollback', identifier] as const)
+      : (['mutation', 'resourceInstallationsRollback'] as const),
+  /** Mutation key for resourceInstallationsUninstall */ resourceInstallationsUninstall: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'resourceInstallationsUninstall', identifier] as const)
+      : (['mutation', 'resourceInstallationsUninstall'] as const),
+  /** Mutation key for resourceInstallationsUpgrade */ resourceInstallationsUpgrade: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'resourceInstallationsUpgrade', identifier] as const)
+      : (['mutation', 'resourceInstallationsUpgrade'] as const),
   /** Mutation key for saveGraph */ saveGraph: (identifier?: string) =>
     identifier
       ? (['mutation', 'saveGraph', identifier] as const)
@@ -562,6 +846,7 @@ export const customMutationKeys = {
  */
 export const mutationKeys = {
   dbPreset: dbPresetMutationKeys,
+  declaredCapacity: declaredCapacityMutationKeys,
   functionApiBinding: functionApiBindingMutationKeys,
   functionDefinition: functionDefinitionMutationKeys,
   functionDeployment: functionDeploymentMutationKeys,
@@ -576,34 +861,54 @@ export const mutationKeys = {
   functionGraphRef: functionGraphRefMutationKeys,
   functionGraphStore: functionGraphStoreMutationKeys,
   functionInvocation: functionInvocationMutationKeys,
-  getAllRecord: getAllRecordMutationKeys,
+  getAllTreeNodesRecord: getAllTreeNodesRecordMutationKeys,
   infraCommit: infraCommitMutationKeys,
-  infraGetAllRecord: infraGetAllRecordMutationKeys,
+  infraGetAllTreeNodesRecord: infraGetAllTreeNodesRecordMutationKeys,
   infraObject: infraObjectMutationKeys,
   infraRef: infraRefMutationKeys,
   infraStore: infraStoreMutationKeys,
   integrationProvider: integrationProviderMutationKeys,
   namespace: namespaceMutationKeys,
   namespaceEvent: namespaceEventMutationKeys,
+  platformDeclaredCapacity: platformDeclaredCapacityMutationKeys,
   platformFunctionApiBinding: platformFunctionApiBindingMutationKeys,
   platformFunctionDefinition: platformFunctionDefinitionMutationKeys,
   platformFunctionDeployment: platformFunctionDeploymentMutationKeys,
   platformFunctionDeploymentEvent: platformFunctionDeploymentEventMutationKeys,
   platformFunctionExecutionLog: platformFunctionExecutionLogMutationKeys,
   platformFunctionInvocation: platformFunctionInvocationMutationKeys,
+  platformInfraCommit: platformInfraCommitMutationKeys,
+  platformInfraGetAllTreeNodesRecord: platformInfraGetAllTreeNodesRecordMutationKeys,
+  platformInfraObject: platformInfraObjectMutationKeys,
+  platformInfraRef: platformInfraRefMutationKeys,
+  platformInfraStore: platformInfraStoreMutationKeys,
   platformNamespace: platformNamespaceMutationKeys,
   platformNamespaceEvent: platformNamespaceEventMutationKeys,
   platformResource: platformResourceMutationKeys,
   platformResourceDefinition: platformResourceDefinitionMutationKeys,
   platformResourceEvent: platformResourceEventMutationKeys,
+  platformResourceInstallation: platformResourceInstallationMutationKeys,
   platformResourceStatusCheck: platformResourceStatusCheckMutationKeys,
+  platformResourceUsageLog: platformResourceUsageLogMutationKeys,
+  platformResourceUsageSummary: platformResourceUsageSummaryMutationKeys,
+  platformResourceUtilizationDaily: platformResourceUtilizationDailyMutationKeys,
+  platformResourcesHealth: platformResourcesHealthMutationKeys,
   platformResourcesRequirementsState: platformResourcesRequirementsStateMutationKeys,
   platformResourcesResolvedRequirement: platformResourcesResolvedRequirementMutationKeys,
+  platformWebhookEndpoint: platformWebhookEndpointMutationKeys,
+  platformWebhookEvent: platformWebhookEventMutationKeys,
   resource: resourceMutationKeys,
   resourceDefinition: resourceDefinitionMutationKeys,
   resourceEvent: resourceEventMutationKeys,
+  resourceInstallation: resourceInstallationMutationKeys,
   resourceStatusCheck: resourceStatusCheckMutationKeys,
+  resourceUsageLog: resourceUsageLogMutationKeys,
+  resourceUsageSummary: resourceUsageSummaryMutationKeys,
+  resourceUtilizationDaily: resourceUtilizationDailyMutationKeys,
+  resourcesHealth: resourcesHealthMutationKeys,
   resourcesRequirementsState: resourcesRequirementsStateMutationKeys,
   resourcesResolvedRequirement: resourcesResolvedRequirementMutationKeys,
+  webhookEndpoint: webhookEndpointMutationKeys,
+  webhookEvent: webhookEventMutationKeys,
   custom: customMutationKeys,
 } as const;

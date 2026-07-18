@@ -41,8 +41,9 @@ const db = createClient({
 | `foreignKeyConstraint` | findMany, findOne, create, update, delete |
 | `fullTextSearch` | findMany, findOne, create, update, delete |
 | `function` | findMany, findOne, create, update, delete |
+| `httpRoute` | findMany, findOne, create, update, delete |
 | `index` | findMany, findOne, create, update, delete |
-| `migrateFile` | findMany, findOne, create, update, delete |
+| `managedDomain` | findMany, findOne, create, update, delete |
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `partition` | findMany, findOne, create, update, delete |
 | `policy` | findMany, findOne, create, update, delete |
@@ -261,8 +262,8 @@ CRUD operations for AstMigration records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `action` | String | Yes |
 | `actionId` | UUID | Yes |
+| `actionName` | String | Yes |
 | `actorId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
@@ -279,16 +280,16 @@ CRUD operations for AstMigration records.
 
 ```typescript
 // List all astMigration records
-const items = await db.astMigration.findMany({ select: { action: true, actionId: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } }).execute();
+const items = await db.astMigration.findMany({ select: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } }).execute();
 
 // Get one by id
-const item = await db.astMigration.findOne({ id: '<Int>', select: { action: true, actionId: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } }).execute();
+const item = await db.astMigration.findOne({ id: '<Int>', select: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } }).execute();
 
 // Create
-const created = await db.astMigration.create({ data: { action: '<String>', actionId: '<UUID>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.astMigration.create({ data: { actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.astMigration.update({ where: { id: '<Int>' }, data: { action: '<String>' }, select: { id: true } }).execute();
+const updated = await db.astMigration.update({ where: { id: '<Int>' }, data: { actionId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.astMigration.delete({ where: { id: '<Int>' } }).execute();
@@ -852,6 +853,47 @@ const updated = await db.function.update({ where: { id: '<UUID>' }, data: { data
 const deleted = await db.function.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.httpRoute`
+
+CRUD operations for HttpRoute records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `domainId` | UUID | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `method` | String | Yes |
+| `path` | String | Yes |
+| `priority` | Int | Yes |
+| `targetId` | UUID | Yes |
+| `targetKind` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all httpRoute records
+const items = await db.httpRoute.findMany({ select: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } }).execute();
+
+// Get one by id
+const item = await db.httpRoute.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } }).execute();
+
+// Create
+const created = await db.httpRoute.create({ data: { createdBy: '<UUID>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetId: '<UUID>', targetKind: '<String>', updatedBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.httpRoute.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.httpRoute.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.index`
 
 CRUD operations for Index records.
@@ -897,35 +939,41 @@ const updated = await db.index.update({ where: { id: '<UUID>' }, data: { accessM
 const deleted = await db.index.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.migrateFile`
+### `db.managedDomain`
 
-CRUD operations for MigrateFile records.
+CRUD operations for ManagedDomain records.
 
 **Fields:**
 
 | Field | Type | Editable |
 |-------|------|----------|
+| `annotations` | JSON | Yes |
 | `databaseId` | UUID | Yes |
+| `domain` | ConstructiveInternalTypeHostname | Yes |
 | `id` | UUID | No |
-| `upload` | ConstructiveInternalTypeUpload | Yes |
+| `isWildcard` | Boolean | Yes |
+| `tlsReadyAt` | Datetime | Yes |
+| `tlsStatus` | String | Yes |
+| `verificationStatus` | String | Yes |
+| `verifiedAt` | Datetime | Yes |
 
 **Operations:**
 
 ```typescript
-// List all migrateFile records
-const items = await db.migrateFile.findMany({ select: { databaseId: true, id: true, upload: true } }).execute();
+// List all managedDomain records
+const items = await db.managedDomain.findMany({ select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Get one by id
-const item = await db.migrateFile.findOne({ id: '<UUID>', select: { databaseId: true, id: true, upload: true } }).execute();
+const item = await db.managedDomain.findOne({ id: '<UUID>', select: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } }).execute();
 
 // Create
-const created = await db.migrateFile.create({ data: { databaseId: '<UUID>', upload: '<Upload>' }, select: { id: true } }).execute();
+const created = await db.managedDomain.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.migrateFile.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.managedDomain.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.migrateFile.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.managedDomain.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.nodeTypeRegistry`
@@ -1424,8 +1472,8 @@ CRUD operations for SqlAction records.
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `action` | String | Yes |
 | `actionId` | UUID | Yes |
+| `actionName` | String | Yes |
 | `actorId` | UUID | Yes |
 | `content` | String | Yes |
 | `createdAt` | Datetime | No |
@@ -1442,16 +1490,16 @@ CRUD operations for SqlAction records.
 
 ```typescript
 // List all sqlAction records
-const items = await db.sqlAction.findMany({ select: { action: true, actionId: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
+const items = await db.sqlAction.findMany({ select: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
 
 // Get one by id
-const item = await db.sqlAction.findOne({ id: '<Int>', select: { action: true, actionId: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
+const item = await db.sqlAction.findOne({ id: '<Int>', select: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
 
 // Create
-const created = await db.sqlAction.create({ data: { action: '<String>', actionId: '<UUID>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' }, select: { id: true } }).execute();
+const created = await db.sqlAction.create({ data: { actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { action: '<String>' }, select: { id: true } }).execute();
+const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { actionId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.sqlAction.delete({ where: { id: '<Int>' } }).execute();
@@ -1863,6 +1911,23 @@ applyRegistryDefaults
 
 ```typescript
 const result = await db.query.applyRegistryDefaults({ data: '<JSON>', nodeType: '<String>' }).execute();
+```
+
+### `db.query.resolveHttpRoute`
+
+resolveHttpRoute
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `pHost` | String |
+  | `pMethod` | String |
+  | `pPath` | String |
+
+```typescript
+const result = await db.query.resolveHttpRoute({ pHost: '<String>', pMethod: '<String>', pPath: '<String>' }).execute();
 ```
 
 ### `db.mutation.acceptDatabaseTransfer`

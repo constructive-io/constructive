@@ -252,7 +252,7 @@ export interface Commit {
   /** Root object ID of the tree snapshot at this commit */
   treeId?: string | null;
 }
-export interface GetAllRecord {
+export interface GetAllTreeNodesRecord {
   data?: Record<string, unknown> | null;
   path?: string[] | null;
 }
@@ -311,13 +311,14 @@ export interface PageInfo {
 }
 // ============ Entity Relation Types ============
 export interface CommitRelations {}
-export interface GetAllRecordRelations {}
+export interface GetAllTreeNodesRecordRelations {}
 export interface ObjectRelations {}
 export interface RefRelations {}
 export interface StoreRelations {}
 // ============ Entity Types With Relations ============
 export type CommitWithRelations = Commit & CommitRelations;
-export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
+export type GetAllTreeNodesRecordWithRelations = GetAllTreeNodesRecord &
+  GetAllTreeNodesRecordRelations;
 export type ObjectWithRelations = Object & ObjectRelations;
 export type RefWithRelations = Ref & RefRelations;
 export type StoreWithRelations = Store & StoreRelations;
@@ -333,7 +334,7 @@ export type CommitSelect = {
   storeId?: boolean;
   treeId?: boolean;
 };
-export type GetAllRecordSelect = {
+export type GetAllTreeNodesRecordSelect = {
   data?: boolean;
   path?: boolean;
 };
@@ -386,12 +387,12 @@ export interface CommitFilter {
   /** Filter by the object’s `treeId` field. */
   treeId?: UUIDFilter;
 }
-export interface GetAllRecordFilter {
+export interface GetAllTreeNodesRecordFilter {
   data?: JSONFilter;
   path?: StringListFilter;
-  and?: GetAllRecordFilter[];
-  or?: GetAllRecordFilter[];
-  not?: GetAllRecordFilter;
+  and?: GetAllTreeNodesRecordFilter[];
+  or?: GetAllTreeNodesRecordFilter[];
+  not?: GetAllTreeNodesRecordFilter;
 }
 export interface ObjectFilter {
   /** Checks for all expressions in this list. */
@@ -472,7 +473,7 @@ export type CommitOrderBy =
   | 'STORE_ID_DESC'
   | 'TREE_ID_ASC'
   | 'TREE_ID_DESC';
-export type GetAllRecordsOrderBy =
+export type GetAllTreeNodesRecordsOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'NATURAL'
@@ -557,23 +558,23 @@ export interface DeleteCommitInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateGetAllRecordInput {
+export interface CreateGetAllTreeNodesRecordInput {
   clientMutationId?: string;
-  getAllRecord: {
+  getAllTreeNodesRecord: {
     data?: Record<string, unknown>;
     path?: string[];
   };
 }
-export interface GetAllRecordPatch {
+export interface GetAllTreeNodesRecordPatch {
   data?: Record<string, unknown> | null;
   path?: string[] | null;
 }
-export interface UpdateGetAllRecordInput {
+export interface UpdateGetAllTreeNodesRecordInput {
   clientMutationId?: string;
   id: string;
-  getAllRecordPatch: GetAllRecordPatch;
+  getAllTreeNodesRecordPatch: GetAllTreeNodesRecordPatch;
 }
-export interface DeleteGetAllRecordInput {
+export interface DeleteGetAllTreeNodesRecordInput {
   clientMutationId?: string;
   id: string;
 }
