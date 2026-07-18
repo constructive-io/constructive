@@ -1,8 +1,8 @@
 {
-  "name": "@constructive-io/query-builder",
-  "version": "2.24.0",
+  "name": "query-spec",
+  "version": "0.0.1",
   "author": "Constructive <developers@constructive.io>",
-  "description": "PostgreSQL Query Builder",
+  "description": "The Constructive query language specification — shared filter, ordering, and pagination types",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -30,17 +30,13 @@
   },
   "keywords": [
     "query",
-    "builder",
+    "filter",
+    "spec",
     "sql",
-    "constructive",
-    "database"
+    "graphql",
+    "constructive"
   ],
   "devDependencies": {
     "makage": "^0.3.0"
-  },
-  "dependencies": {
-    "pg-ast": "workspace:^",
-    "pgsql-deparser": "^17.18.3",
-    "query-spec": "workspace:^"
   }
 }
