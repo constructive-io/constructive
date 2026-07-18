@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.23.0...@constructive-io/query-builder@2.24.0) (2026-07-18)
+
+### Features
+
+- **query-builder:** insert exprs, join ON filters, fromFunction, orderBy/groupBy exprs, clone ([ab7a603](https://github.com/constructive-io/constructive/commit/ab7a603240db461ce01faa2dcfd6f7b8caa025d1))
+
 # [2.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.22.0...@constructive-io/query-builder@2.23.0) (2026-07-14)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.21.0](https://github.com/constructive-io/constructive/compare/pgsql-test@4.20.0...pgsql-test@4.21.0) (2026-07-18)
+
+### Features
+
+- **pgpm:** workspace-level install + ephemeral pgpm fixtures workspace ([b245b11](https://github.com/constructive-io/constructive/commit/b245b11ecc47710b832232189e1e6cfc9803f3cb))
+
 # [4.20.0](https://github.com/constructive-io/constructive/compare/pgsql-test@4.19.3...pgsql-test@4.20.0) (2026-07-18)
 
 **Note:** Version bump only for package pgsql-test

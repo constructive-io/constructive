@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@0.4.0...graphile-function-bindings@0.5.0) (2026-07-18)
+
+### Bug Fixes
+
+- **fixtures:** remove anonymous grants shim; scope anonymous grants to the storage test scenario ([0190a8c](https://github.com/constructive-io/constructive/commit/0190a8c2652e134f6296d4704638c1427beb3729))
+
+### Features
+
+- **pgpm:** workspace-level install + ephemeral pgpm fixtures workspace ([b245b11](https://github.com/constructive-io/constructive/commit/b245b11ecc47710b832232189e1e6cfc9803f3cb))
+
 # [0.4.0](https://github.com/constructive-io/constructive/compare/graphile-function-bindings@0.3.2...graphile-function-bindings@0.4.0) (2026-07-18)
 
 **Note:** Version bump only for package graphile-function-bindings

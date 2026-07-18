@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.35.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.34.0...@pgpmjs/types@2.35.0) (2026-07-18)
+
+### Features
+
+- **pgpm:** workspace-level install + ephemeral pgpm fixtures workspace ([b245b11](https://github.com/constructive-io/constructive/commit/b245b11ecc47710b832232189e1e6cfc9803f3cb))
+
 # [2.34.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.33.2...@pgpmjs/types@2.34.0) (2026-07-12)
 
 **Note:** Version bump only for package @pgpmjs/types

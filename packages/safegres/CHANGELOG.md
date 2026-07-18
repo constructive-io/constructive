@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.1](https://github.com/constructive-io/constructive/compare/safegres@0.14.0...safegres@0.14.1) (2026-07-18)
+
+**Note:** Version bump only for package safegres
+
 # [0.14.0](https://github.com/constructive-io/constructive/compare/safegres@0.13.3...safegres@0.14.0) (2026-07-18)
 
 **Note:** Version bump only for package safegres

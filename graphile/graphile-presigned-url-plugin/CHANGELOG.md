@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.22.0...graphile-presigned-url-plugin@0.22.1) (2026-07-18)
+
+### Bug Fixes
+
+- **presigned-url:** resolve storage module config without the request role ([3996de5](https://github.com/constructive-io/constructive/commit/3996de5b083374d8beea9915b50608200aa3c2d5))
+
 # [0.22.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.21.1...graphile-presigned-url-plugin@0.22.0) (2026-07-12)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.40.0](https://github.com/constructive-io/constructive/compare/pgpm@4.39.0...pgpm@4.40.0) (2026-07-18)
+
+### Features
+
+- **pgpm:** workspace-level install + ephemeral pgpm fixtures workspace ([b245b11](https://github.com/constructive-io/constructive/commit/b245b11ecc47710b832232189e1e6cfc9803f3cb))
+
 # [4.39.0](https://github.com/constructive-io/constructive/compare/pgpm@4.38.3...pgpm@4.39.0) (2026-07-18)
 
 **Note:** Version bump only for package pgpm
