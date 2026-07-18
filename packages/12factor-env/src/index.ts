@@ -13,8 +13,6 @@ import {
   str,
   testOnly,
   url} from 'envalid';
-import { readFileSync } from 'fs';
-import { join,resolve } from 'path';
 
 /**
  * NODE_ENV resolved with "house" semantics.
@@ -114,67 +112,6 @@ const cleanEnv = <S extends Record<string, ValidatorSpec<unknown>>>(
   });
 };
 
-/**
- * Get the secrets path lazily to allow ENV_SECRETS_PATH changes at runtime
- */
-const getSecretsPath = (): string =>
-  process.env.ENV_SECRETS_PATH ?? '/run/secrets/';
-
-/**
- * Resolve the full path to a secret file
- */
-const secretPath = (name: string): string =>
-  name.startsWith('/') ? name : resolve(join(getSecretsPath(), name));
-
-/**
- * Read a secret from a file
- * @param secret - The secret file name or path
- * @returns The secret value or undefined if not found
- */
-const getSecret = (secret: string | undefined): string | undefined => {
-  if (!secret) return undefined;
-  try {
-    const value = readFileSync(secretPath(secret), 'utf-8');
-    return value.trim();
-  } catch {
-    return undefined;
-  }
-};
-
-/**
- * Read secrets from files based on the secret props configuration
- * Supports both direct secret files and _FILE suffix pattern
- */
-const secretEnv = <T extends Record<string, ValidatorSpec<unknown>>>(
-  inputEnv: Record<string, string | undefined>,
-  secretProps: T
-): Record<string, string> => {
-  return Object.keys(secretProps).reduce<Record<string, string>>((m, k) => {
-    // Try to read secret directly from file
-    const secret = getSecret(k);
-    if (secret) {
-      m[k] = secret;
-    } else {
-      // Try _FILE suffix pattern (e.g., DATABASE_PASSWORD_FILE)
-      const secretFileKey = `${k}_FILE`;
-      if (Object.prototype.hasOwnProperty.call(inputEnv, secretFileKey)) {
-        const secretFileValue = getSecret(inputEnv[secretFileKey]);
-        if (secretFileValue) {
-          m[k] = secretFileValue;
-        }
-      }
-    }
-    return m;
-  }, {});
-};
-
-/**
- * Create a validator for a secret file
- * @param envFile - The environment variable name for the secret file
- */
-const secret = (envFile?: string): ValidatorSpec<string> =>
-  str({ default: getSecret(envFile) });
-
 // ── Fallback classes ─────────────────────────────────────────────────────────
 //
 // A var's real distinction is not "optional vs required" but "is there an honest
@@ -246,7 +183,7 @@ const boolish = makeValidator<boolean>((value: string) => {
 type Specs = Record<string, ValidatorSpec<unknown>>;
 
 /**
- * Validate environment variables with secret file support
+ * Validate environment variables
  *
  * @param inputEnv - The environment object (usually process.env)
  * @param secrets - Required environment variables (validated with envalid)
@@ -276,13 +213,7 @@ const env = <S extends Specs, V extends Specs>(
   // First pass: validate optional vars
   const varEnv = cleanEnv(inputEnv, vars);
 
-  // Read secrets from files
-  const _secrets = secretEnv(inputEnv, secrets);
-
-  // Second pass: validate secrets with file values merged in
-  // Include inputEnv first so env vars (e.g., Kubernetes secretKeyRef) are available,
-  // then varEnv overrides, then file-based secrets have highest priority
-  const mergedEnv = { ...inputEnv, ...varEnv, ..._secrets } as unknown as Record<string, string | undefined>;
+  const mergedEnv = { ...inputEnv, ...varEnv } as unknown as Record<string, string | undefined>;
   return cleanEnv(mergedEnv, { ...secrets, ...vars }) as unknown as CleanedEnv<S & V>;
 };
 
@@ -296,8 +227,6 @@ export {
   env,
   EnvError,
   EnvMissingError,
-  getSecret,
-  getSecretsPath,
   host,
   json,
   makeValidator,
@@ -307,9 +236,6 @@ export {
   parseEnvNumber,
   port,
   required,
-  secret,
-  secretEnv,
-  secretPath,
   str,
   testOnly,
   url,
