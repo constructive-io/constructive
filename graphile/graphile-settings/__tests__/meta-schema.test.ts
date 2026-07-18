@@ -849,7 +849,8 @@ describe('MetaSchemaPlugin', () => {
           isArray: false,
           isNotNull: true,
           hasDefault: true,
-          subtype: null
+          subtype: null,
+          encoding: { kind: 'datetime' }
         },
         isNotNull: true,
         hasDefault: true,
@@ -925,6 +926,120 @@ describe('MetaSchemaPlugin', () => {
       const attr = createMockAttribute('text');
       const result = _buildFieldMeta('name', attr);
       expect(result.type.subtype).toBeNull();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Unit tests — scalar encoding contracts (type.encoding)
+  // ---------------------------------------------------------------------------
+
+  describe('buildFieldMeta — scalar encoding', () => {
+    it.each([
+      ['int8', 'bigint'],
+      ['bigint', 'bigint'],
+      ['numeric', 'bigint'],
+      ['timestamptz', 'datetime'],
+      ['timestamp', 'datetime'],
+      ['date', 'date'],
+      ['time', 'time'],
+      ['timetz', 'time'],
+      ['interval', 'interval'],
+      ['uuid', 'uuid'],
+      ['point', 'point'],
+      ['inet', 'inet'],
+      ['cidr', 'inet'],
+      ['bytea', 'bytea']
+    ])('maps %s → encoding.kind %s', (pg, kind) => {
+      const result = _buildFieldMeta('col', createMockAttribute(pg));
+      expect(result.type.encoding).toEqual({ kind });
+    });
+
+    it.each([['text'], ['varchar'], ['bool'], ['int4'], ['float8'], ['json'], ['jsonb']])(
+      'returns null encoding for plain scalar %s',
+      (pg) => {
+        const result = _buildFieldMeta('col', createMockAttribute(pg));
+        expect(result.type.encoding).toBeNull();
+      }
+    );
+
+    it('returns null encoding when the attribute/codec is missing', () => {
+      expect(_buildFieldMeta('broken', null).type.encoding).toBeNull();
+    });
+
+    it('marks ltree with dotPath', () => {
+      const result = _buildFieldMeta('path', createMockAttribute('ltree'));
+      expect(result.type.encoding).toEqual({ kind: 'ltree', dotPath: true });
+    });
+
+    it('describes geometry with subtype and srid read verbatim from extensions', () => {
+      const attr = createMockAttribute('geometry', {
+        extensions: { geometrySubtype: 'Polygon', geometrySrid: 4326 }
+      });
+      const result = _buildFieldMeta('zoneBoundary', attr);
+      expect(result.type.encoding).toEqual({
+        kind: 'geojson',
+        geometrySubtype: 'Polygon',
+        srid: 4326
+      });
+    });
+
+    it('describes geometry with null subtype/srid when extensions absent', () => {
+      const result = _buildFieldMeta('location', createMockAttribute('geometry'));
+      expect(result.type.encoding).toEqual({
+        kind: 'geojson',
+        geometrySubtype: null,
+        srid: null
+      });
+    });
+
+    it('describes vector with elementType and dimensions', () => {
+      const attr = createMockAttribute('vector', {
+        extensions: { vectorDimensions: 1536 }
+      });
+      const result = _buildFieldMeta('embedding', attr);
+      expect(result.type.encoding).toEqual({
+        kind: 'vector',
+        elementType: 'float',
+        dimensions: 1536
+      });
+    });
+
+    it('describes vector with null dimensions when unspecified', () => {
+      const result = _buildFieldMeta('embedding', createMockAttribute('vector'));
+      expect(result.type.encoding).toEqual({
+        kind: 'vector',
+        elementType: 'float',
+        dimensions: null
+      });
+    });
+
+    it('resolves kind from the underlying element codec for arrays', () => {
+      const attr = createMockAttribute('_uuid', {
+        codec: { name: '_uuid', arrayOfCodec: { name: 'uuid' } }
+      });
+      const result = _buildFieldMeta('ids', attr);
+      expect(result.type.isArray).toBe(true);
+      expect(result.type.encoding).toEqual({ kind: 'uuid' });
+    });
+
+    it('unwraps a domain codec to its underlying type', () => {
+      const attr = createMockAttribute('citext_domain', {
+        codec: { name: 'citext_domain', arrayOfCodec: null, domainOfCodec: { name: 'int8' } }
+      });
+      const result = _buildFieldMeta('big', attr);
+      expect(result.type.encoding).toEqual({ kind: 'bigint' });
+    });
+
+    it('marks composite (record) codecs as composite', () => {
+      const attr = createMockAttribute('address', {
+        codec: {
+          name: 'address',
+          arrayOfCodec: null,
+          attributes: { street: { codec: { name: 'text' } } }
+        }
+      });
+      const result = _buildFieldMeta('addr', attr);
+      expect(result.type.encoding).toEqual({ kind: 'composite', fields: null });
     });
   });
 

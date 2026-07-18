@@ -113,6 +113,45 @@ export interface TypeMeta {
   isNotNull?: boolean;
   hasDefault?: boolean;
   subtype?: string | null;
+  /**
+   * How the client must serialize/parse this scalar. `null` for plain scalars
+   * (String/Int/Float/Boolean/JSON/enum) whose wire format is obvious from
+   * `gqlType` — populated only for scalars introspection can't fully describe.
+   */
+  encoding?: ScalarEncodingMeta | null;
+}
+
+/** The machine kind a scalar marshals as on the client. */
+export type ScalarEncodingKind =
+  | 'bigint'
+  | 'datetime'
+  | 'date'
+  | 'time'
+  | 'interval'
+  | 'uuid'
+  | 'geojson'
+  | 'point'
+  | 'inet'
+  | 'ltree'
+  | 'vector'
+  | 'bytea'
+  | 'composite';
+
+export interface ScalarEncodingMeta {
+  /** Deterministic kind derived from the underlying (unwrapped) codec. */
+  kind: ScalarEncodingKind;
+  /** For 'vector': element scalar (e.g. 'float'), else null. */
+  elementType?: string | null;
+  /** For 'vector': declared length from typmod, else null. */
+  dimensions?: number | null;
+  /** For 'geojson': geometry subtype (Point/LineString/Polygon/…), else null. */
+  geometrySubtype?: string | null;
+  /** For 'geojson': spatial reference id, else null. */
+  srid?: number | null;
+  /** For 'ltree': values are dot-separated path strings ('a.b.c'). */
+  dotPath?: boolean;
+  /** For 'composite': nested attribute encodings. */
+  fields?: { name: string; type: TypeMeta }[] | null;
 }
 
 export interface IndexMeta {
@@ -212,6 +251,7 @@ export interface PgCodec {
   name: string;
   attributes?: Record<string, PgAttribute>;
   arrayOfCodec?: PgCodec | null;
+  domainOfCodec?: PgCodec | null;
   isAnonymous?: boolean;
   extensions?: {
     pg?: {
@@ -222,6 +262,8 @@ export interface PgCodec {
 
 export interface PgAttributeExtensions extends Record<string, unknown> {
   geometrySubtype?: string | null;
+  geometrySrid?: number | null;
+  vectorDimensions?: number | null;
 }
 
 export interface PgAttribute {

@@ -1,3 +1,4 @@
+import { buildScalarEncoding } from './encoding-meta-builders';
 import type {
   EnumMeta,
   FieldMeta,
@@ -117,6 +118,7 @@ export function buildFieldMeta(
       isNotNull,
       hasDefault,
       subtype,
+      encoding: buildScalarEncoding(attr),
     },
     isNotNull,
     hasDefault,
