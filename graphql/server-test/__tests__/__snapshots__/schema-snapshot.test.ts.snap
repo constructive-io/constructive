@@ -835,6 +835,28 @@ type MetaSchema {
   tables: [MetaTable!]!
 }
 
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """How scope was determined: 'smartTag' (@scope) or 'inferred' (columns)"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
+}
+
 """Search metadata for a table"""
 type MetaSearch {
   """Active search algorithms on this table"""
@@ -901,6 +923,9 @@ type MetaTable {
   realtime: MetaRealtime
   relations: MetaRelations!
   schemaName: String!
+
+  """Provisioning scope metadata (null if no @scope tag and not inferrable)"""
+  scope: MetaScope
 
   """Search metadata (null if no search configured)"""
   search: MetaSearch
