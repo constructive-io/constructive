@@ -55,9 +55,9 @@ Pick only the layers you need:
 - **Custom app schema**: `seed.pgpm(repoRoot)` + `services/test-data.sql` + your own schema/data SQL
 
 The installed modules grant `administrator`/`authenticated` — there are no
-`anonymous` grants (matching production). Scenarios that deliberately exercise
-anonymous access add their own scenario-local grants (e.g.
-`graphql/server-test/__fixtures__/seed/simple-seed-storage/schema.sql`).
+`anonymous` grants anywhere (matching production). Server plugins resolve
+module registrations (metaschema config) without the request role, so
+anonymous request paths never need grants on the metaschema schemas.
 
 ## Consumers
 
@@ -67,7 +67,7 @@ These test files use the shared fixtures:
 |-----------|---------------------|
 | `graphql/server-test/__tests__/server.integration.test.ts` | `base/*` (simple-seed), `services/*` + `app-schemas/*` (services scenarios) |
 | `graphql/server-test/__tests__/express-context.integration.test.ts` | `services/*` + `app-schemas/*` |
-| `graphql/server-test/__tests__/upload.integration.test.ts` | `seed.pgpm` modules (storage schemas/data + anonymous grants are local) |
+| `graphql/server-test/__tests__/upload.integration.test.ts` | `seed.pgpm` modules (storage schemas/data are local) |
 | `graphql/server-test/__tests__/cli-e2e.test.ts` | `base/*` + `app-schemas/*` (animals), `base/*` (search) |
 | `graphql/server-test/__tests__/search.integration.test.ts` | `base/*` |
 | `graphql/server-test/__tests__/schema-snapshot.test.ts` | `base/*` |

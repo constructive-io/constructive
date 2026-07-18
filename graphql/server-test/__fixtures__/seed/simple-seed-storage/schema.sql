@@ -2,14 +2,6 @@
 -- Creates storage schemas (buckets + files) for three tenants:
 --   Alice  (no RLS), Bob (moderate RLS), Mallory (strictest RLS)
 
--- This scenario deliberately exercises anonymous file operations, and the
--- upload plugin resolves storage_module registrations under the request role.
-GRANT USAGE ON SCHEMA metaschema_public, metaschema_modules_public, services_public
-  TO anonymous;
-GRANT SELECT ON ALL TABLES IN SCHEMA metaschema_public TO anonymous;
-GRANT SELECT ON ALL TABLES IN SCHEMA metaschema_modules_public TO anonymous;
-GRANT SELECT ON ALL TABLES IN SCHEMA services_public TO anonymous;
-
 -- =====================================================
 -- Helper: create a storage schema with buckets + files tables
 -- =====================================================
