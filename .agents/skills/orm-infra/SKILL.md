@@ -15,7 +15,7 @@ ORM client for the infra API — provides typed CRUD operations for 10 tables an
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: dbPreset, infraCommit, infraGetAllRecord, infraObject, infraRef, infraStore, namespace, namespaceEvent, ...
+// Available models: dbPreset, namespace, namespaceEvent, platformInfraCommit, platformInfraGetAllTreeNodesRecord, platformInfraObject, platformInfraRef, platformInfraStore, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -38,16 +38,16 @@ const items = await db.dbPreset.findMany({
 See the `references/` directory for detailed per-entity API documentation:
 
 - [db-preset](references/db-preset.md)
-- [infra-commit](references/infra-commit.md)
-- [infra-get-all-record](references/infra-get-all-record.md)
-- [infra-object](references/infra-object.md)
-- [infra-ref](references/infra-ref.md)
-- [infra-store](references/infra-store.md)
 - [namespace](references/namespace.md)
 - [namespace-event](references/namespace-event.md)
+- [platform-infra-commit](references/platform-infra-commit.md)
+- [platform-infra-get-all-tree-nodes-record](references/platform-infra-get-all-tree-nodes-record.md)
+- [platform-infra-object](references/platform-infra-object.md)
+- [platform-infra-ref](references/platform-infra-ref.md)
+- [platform-infra-store](references/platform-infra-store.md)
 - [platform-namespace](references/platform-namespace.md)
 - [platform-namespace-event](references/platform-namespace-event.md)
-- [infra-init-empty-repo](references/infra-init-empty-repo.md)
-- [infra-insert-node-at-path](references/infra-insert-node-at-path.md)
-- [infra-set-data-at-path](references/infra-set-data-at-path.md)
+- [platform-infra-init-empty-repo](references/platform-infra-init-empty-repo.md)
+- [platform-infra-insert-node-at-path](references/platform-infra-insert-node-at-path.md)
+- [platform-infra-set-data-at-path](references/platform-infra-set-data-at-path.md)
 - [provision-bucket](references/provision-bucket.md)

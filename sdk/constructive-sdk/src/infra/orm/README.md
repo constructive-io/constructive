@@ -22,13 +22,13 @@ const db = createClient({
 | Model | Operations |
 |-------|------------|
 | `dbPreset` | findMany, findOne, create, update, delete |
-| `infraCommit` | findMany, findOne, create, update, delete |
-| `infraGetAllRecord` | findMany, findOne, create, update, delete |
-| `infraObject` | findMany, findOne, create, update, delete |
-| `infraRef` | findMany, findOne, create, update, delete |
-| `infraStore` | findMany, findOne, create, update, delete |
 | `namespace` | findMany, findOne, create, update, delete |
 | `namespaceEvent` | findMany, findOne, create, update, delete |
+| `platformInfraCommit` | findMany, findOne, create, update, delete |
+| `platformInfraGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `platformInfraObject` | findMany, findOne, create, update, delete |
+| `platformInfraRef` | findMany, findOne, create, update, delete |
+| `platformInfraStore` | findMany, findOne, create, update, delete |
 | `platformNamespace` | findMany, findOne, create, update, delete |
 | `platformNamespaceEvent` | findMany, findOne, create, update, delete |
 
@@ -71,173 +71,6 @@ const updated = await db.dbPreset.update({ where: { id: '<UUID>' }, data: { acti
 
 // Delete
 const deleted = await db.dbPreset.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.infraCommit`
-
-CRUD operations for InfraCommit records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `authorId` | UUID | Yes |
-| `committerId` | UUID | Yes |
-| `date` | Datetime | Yes |
-| `id` | UUID | No |
-| `message` | String | Yes |
-| `parentIds` | UUID | Yes |
-| `scopeId` | UUID | Yes |
-| `storeId` | UUID | Yes |
-| `treeId` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all infraCommit records
-const items = await db.infraCommit.findMany({ select: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } }).execute();
-
-// Get one by id
-const item = await db.infraCommit.findOne({ id: '<UUID>', select: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } }).execute();
-
-// Create
-const created = await db.infraCommit.create({ data: { authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.infraCommit.update({ where: { id: '<UUID>' }, data: { authorId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.infraCommit.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.infraGetAllRecord`
-
-CRUD operations for InfraGetAllRecord records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `data` | JSON | Yes |
-| `path` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all infraGetAllRecord records
-const items = await db.infraGetAllRecord.findMany({ select: { data: true, path: true } }).execute();
-
-// Get one by id
-const item = await db.infraGetAllRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
-
-// Create
-const created = await db.infraGetAllRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.infraGetAllRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.infraGetAllRecord.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.infraObject`
-
-CRUD operations for InfraObject records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `createdAt` | Datetime | No |
-| `data` | JSON | Yes |
-| `id` | UUID | No |
-| `kids` | UUID | Yes |
-| `ktree` | String | Yes |
-| `scopeId` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all infraObject records
-const items = await db.infraObject.findMany({ select: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } }).execute();
-
-// Get one by id
-const item = await db.infraObject.findOne({ id: '<UUID>', select: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } }).execute();
-
-// Create
-const created = await db.infraObject.create({ data: { data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.infraObject.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.infraObject.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.infraRef`
-
-CRUD operations for InfraRef records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `commitId` | UUID | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `scopeId` | UUID | Yes |
-| `storeId` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all infraRef records
-const items = await db.infraRef.findMany({ select: { commitId: true, id: true, name: true, scopeId: true, storeId: true } }).execute();
-
-// Get one by id
-const item = await db.infraRef.findOne({ id: '<UUID>', select: { commitId: true, id: true, name: true, scopeId: true, storeId: true } }).execute();
-
-// Create
-const created = await db.infraRef.create({ data: { commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.infraRef.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.infraRef.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.infraStore`
-
-CRUD operations for InfraStore records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `createdAt` | Datetime | No |
-| `hash` | UUID | Yes |
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `scopeId` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all infraStore records
-const items = await db.infraStore.findMany({ select: { createdAt: true, hash: true, id: true, name: true, scopeId: true } }).execute();
-
-// Get one by id
-const item = await db.infraStore.findOne({ id: '<UUID>', select: { createdAt: true, hash: true, id: true, name: true, scopeId: true } }).execute();
-
-// Create
-const created = await db.infraStore.create({ data: { hash: '<UUID>', name: '<String>', scopeId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.infraStore.update({ where: { id: '<UUID>' }, data: { hash: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.infraStore.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.namespace`
@@ -290,38 +123,198 @@ CRUD operations for NamespaceEvent records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `actorId` | UUID | Yes |
-| `cpuMillicores` | Int | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `eventType` | String | Yes |
 | `id` | UUID | No |
-| `memoryBytes` | BigInt | Yes |
 | `message` | String | Yes |
 | `metadata` | JSON | Yes |
-| `metrics` | JSON | Yes |
 | `namespaceId` | UUID | Yes |
-| `networkEgressBytes` | BigInt | Yes |
-| `networkIngressBytes` | BigInt | Yes |
-| `podCount` | Int | Yes |
-| `storageBytes` | BigInt | Yes |
 
 **Operations:**
 
 ```typescript
 // List all namespaceEvent records
-const items = await db.namespaceEvent.findMany({ select: { actorId: true, cpuMillicores: true, createdAt: true, databaseId: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } }).execute();
+const items = await db.namespaceEvent.findMany({ select: { actorId: true, createdAt: true, databaseId: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } }).execute();
 
 // Get one by id
-const item = await db.namespaceEvent.findOne({ id: '<UUID>', select: { actorId: true, cpuMillicores: true, createdAt: true, databaseId: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } }).execute();
+const item = await db.namespaceEvent.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, databaseId: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } }).execute();
 
 // Create
-const created = await db.namespaceEvent.create({ data: { actorId: '<UUID>', cpuMillicores: '<Int>', databaseId: '<UUID>', eventType: '<String>', memoryBytes: '<BigInt>', message: '<String>', metadata: '<JSON>', metrics: '<JSON>', namespaceId: '<UUID>', networkEgressBytes: '<BigInt>', networkIngressBytes: '<BigInt>', podCount: '<Int>', storageBytes: '<BigInt>' }, select: { id: true } }).execute();
+const created = await db.namespaceEvent.create({ data: { actorId: '<UUID>', databaseId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.namespaceEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.namespaceEvent.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformInfraCommit`
+
+CRUD operations for PlatformInfraCommit records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `authorId` | UUID | Yes |
+| `committerId` | UUID | Yes |
+| `date` | Datetime | Yes |
+| `id` | UUID | No |
+| `message` | String | Yes |
+| `parentIds` | UUID | Yes |
+| `scopeId` | UUID | Yes |
+| `storeId` | UUID | Yes |
+| `treeId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformInfraCommit records
+const items = await db.platformInfraCommit.findMany({ select: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } }).execute();
+
+// Get one by id
+const item = await db.platformInfraCommit.findOne({ id: '<UUID>', select: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } }).execute();
+
+// Create
+const created = await db.platformInfraCommit.create({ data: { authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformInfraCommit.update({ where: { id: '<UUID>' }, data: { authorId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformInfraCommit.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformInfraGetAllTreeNodesRecord`
+
+CRUD operations for PlatformInfraGetAllTreeNodesRecord records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `data` | JSON | Yes |
+| `path` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformInfraGetAllTreeNodesRecord records
+const items = await db.platformInfraGetAllTreeNodesRecord.findMany({ select: { data: true, path: true } }).execute();
+
+// Get one by id
+const item = await db.platformInfraGetAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
+
+// Create
+const created = await db.platformInfraGetAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformInfraGetAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformInfraGetAllTreeNodesRecord.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformInfraObject`
+
+CRUD operations for PlatformInfraObject records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `data` | JSON | Yes |
+| `id` | UUID | No |
+| `kids` | UUID | Yes |
+| `ktree` | String | Yes |
+| `scopeId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformInfraObject records
+const items = await db.platformInfraObject.findMany({ select: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } }).execute();
+
+// Get one by id
+const item = await db.platformInfraObject.findOne({ id: '<UUID>', select: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } }).execute();
+
+// Create
+const created = await db.platformInfraObject.create({ data: { data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformInfraObject.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformInfraObject.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformInfraRef`
+
+CRUD operations for PlatformInfraRef records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `commitId` | UUID | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `scopeId` | UUID | Yes |
+| `storeId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformInfraRef records
+const items = await db.platformInfraRef.findMany({ select: { commitId: true, id: true, name: true, scopeId: true, storeId: true } }).execute();
+
+// Get one by id
+const item = await db.platformInfraRef.findOne({ id: '<UUID>', select: { commitId: true, id: true, name: true, scopeId: true, storeId: true } }).execute();
+
+// Create
+const created = await db.platformInfraRef.create({ data: { commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformInfraRef.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformInfraRef.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformInfraStore`
+
+CRUD operations for PlatformInfraStore records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `hash` | UUID | Yes |
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `scopeId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformInfraStore records
+const items = await db.platformInfraStore.findMany({ select: { createdAt: true, hash: true, id: true, name: true, scopeId: true } }).execute();
+
+// Get one by id
+const item = await db.platformInfraStore.findOne({ id: '<UUID>', select: { createdAt: true, hash: true, id: true, name: true, scopeId: true } }).execute();
+
+// Create
+const created = await db.platformInfraStore.create({ data: { hash: '<UUID>', name: '<String>', scopeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformInfraStore.update({ where: { id: '<UUID>' }, data: { hash: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformInfraStore.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformNamespace`
@@ -373,31 +366,24 @@ CRUD operations for PlatformNamespaceEvent records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `actorId` | UUID | Yes |
-| `cpuMillicores` | Int | Yes |
 | `createdAt` | Datetime | No |
 | `eventType` | String | Yes |
 | `id` | UUID | No |
-| `memoryBytes` | BigInt | Yes |
 | `message` | String | Yes |
 | `metadata` | JSON | Yes |
-| `metrics` | JSON | Yes |
 | `namespaceId` | UUID | Yes |
-| `networkEgressBytes` | BigInt | Yes |
-| `networkIngressBytes` | BigInt | Yes |
-| `podCount` | Int | Yes |
-| `storageBytes` | BigInt | Yes |
 
 **Operations:**
 
 ```typescript
 // List all platformNamespaceEvent records
-const items = await db.platformNamespaceEvent.findMany({ select: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } }).execute();
+const items = await db.platformNamespaceEvent.findMany({ select: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } }).execute();
 
 // Get one by id
-const item = await db.platformNamespaceEvent.findOne({ id: '<UUID>', select: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } }).execute();
+const item = await db.platformNamespaceEvent.findOne({ id: '<UUID>', select: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } }).execute();
 
 // Create
-const created = await db.platformNamespaceEvent.create({ data: { actorId: '<UUID>', cpuMillicores: '<Int>', eventType: '<String>', memoryBytes: '<BigInt>', message: '<String>', metadata: '<JSON>', metrics: '<JSON>', namespaceId: '<UUID>', networkEgressBytes: '<BigInt>', networkIngressBytes: '<BigInt>', podCount: '<Int>', storageBytes: '<BigInt>' }, select: { id: true } }).execute();
+const created = await db.platformNamespaceEvent.create({ data: { actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformNamespaceEvent.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -408,49 +394,49 @@ const deleted = await db.platformNamespaceEvent.delete({ where: { id: '<UUID>' }
 
 ## Custom Operations
 
-### `db.mutation.infraInitEmptyRepo`
+### `db.mutation.platformInfraInitEmptyRepo`
 
-infraInitEmptyRepo
+platformInfraInitEmptyRepo
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | InfraInitEmptyRepoInput (required) |
+  | `input` | PlatformInfraInitEmptyRepoInput (required) |
 
 ```typescript
-const result = await db.mutation.infraInitEmptyRepo({ input: { sId: '<UUID>', storeId: '<UUID>' } }).execute();
+const result = await db.mutation.platformInfraInitEmptyRepo({ input: { sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```
 
-### `db.mutation.infraInsertNodeAtPath`
+### `db.mutation.platformInfraInsertNodeAtPath`
 
-infraInsertNodeAtPath
+platformInfraInsertNodeAtPath
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | InfraInsertNodeAtPathInput (required) |
+  | `input` | PlatformInfraInsertNodeAtPathInput (required) |
 
 ```typescript
-const result = await db.mutation.infraInsertNodeAtPath({ input: '<InfraInsertNodeAtPathInput>' }).execute();
+const result = await db.mutation.platformInfraInsertNodeAtPath({ input: '<PlatformInfraInsertNodeAtPathInput>' }).execute();
 ```
 
-### `db.mutation.infraSetDataAtPath`
+### `db.mutation.platformInfraSetDataAtPath`
 
-infraSetDataAtPath
+platformInfraSetDataAtPath
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | InfraSetDataAtPathInput (required) |
+  | `input` | PlatformInfraSetDataAtPathInput (required) |
 
 ```typescript
-const result = await db.mutation.infraSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
+const result = await db.mutation.platformInfraSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.provisionBucket`

@@ -7,8 +7,8 @@ Commit history — each commit snapshots a tree root for a store
 ## Usage
 
 ```typescript
-useInfraCommitsQuery({ selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } } })
-useInfraCommitQuery({ id: '<UUID>', selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } } })
+useInfraCommitsQuery({ selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } } })
+useInfraCommitQuery({ id: '<UUID>', selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } } })
 useCreateInfraCommitMutation({ selection: { fields: { id: true } } })
 useUpdateInfraCommitMutation({ selection: { fields: { id: true } } })
 useDeleteInfraCommitMutation({})
@@ -20,7 +20,7 @@ useDeleteInfraCommitMutation({})
 
 ```typescript
 const { data, isLoading } = useInfraCommitsQuery({
-  selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } },
+  selection: { fields: { authorId: true, committerId: true, databaseId: true, date: true, id: true, message: true, parentIds: true, storeId: true, treeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useInfraCommitsQuery({
 const { mutate } = useCreateInfraCommitMutation({
   selection: { fields: { id: true } },
 });
-mutate({ authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
+mutate({ authorId: '<UUID>', committerId: '<UUID>', databaseId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
 ```

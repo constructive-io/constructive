@@ -37,28 +37,6 @@ function App() {
 | `useCreateDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useUpdateDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
 | `useDeleteDbPresetMutation` | Mutation | Database provisioning preset catalog — merkle-versioned head over the infra store |
-| `useInfraCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
-| `useInfraCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
-| `useCreateInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
-| `useUpdateInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
-| `useDeleteInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
-| `useInfraGetAllQuery` | Query | List all infraGetAll |
-| `useCreateInfraGetAllRecordMutation` | Mutation | Create a infraGetAllRecord |
-| `useInfraObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useInfraObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useCreateInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useUpdateInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useDeleteInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
-| `useInfraRefsQuery` | Query | Branch heads — mutable pointers into the commit chain |
-| `useInfraRefQuery` | Query | Branch heads — mutable pointers into the commit chain |
-| `useCreateInfraRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
-| `useUpdateInfraRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
-| `useDeleteInfraRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
-| `useInfraStoresQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
-| `useInfraStoreQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
-| `useCreateInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
-| `useUpdateInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
-| `useDeleteInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `useNamespacesQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
 | `useNamespaceQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
 | `useCreateNamespaceMutation` | Mutation | Logical namespace containers for grouping secrets, config, functions, and other resources |
@@ -69,6 +47,28 @@ function App() {
 | `useCreateNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useUpdateNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useDeleteNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
+| `usePlatformInfraCommitsQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `usePlatformInfraCommitQuery` | Query | Commit history — each commit snapshots a tree root for a store |
+| `useCreatePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useUpdatePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `useDeletePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
+| `usePlatformInfraGetAllTreeNodesQuery` | Query | List all platformInfraGetAllTreeNodes |
+| `useCreatePlatformInfraGetAllTreeNodesRecordMutation` | Mutation | Create a platformInfraGetAllTreeNodesRecord |
+| `usePlatformInfraObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `usePlatformInfraObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useCreatePlatformInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useUpdatePlatformInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `useDeletePlatformInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
+| `usePlatformInfraRefsQuery` | Query | Branch heads — mutable pointers into the commit chain |
+| `usePlatformInfraRefQuery` | Query | Branch heads — mutable pointers into the commit chain |
+| `useCreatePlatformInfraRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useUpdatePlatformInfraRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `useDeletePlatformInfraRefMutation` | Mutation | Branch heads — mutable pointers into the commit chain |
+| `usePlatformInfraStoresQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `usePlatformInfraStoreQuery` | Query | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useCreatePlatformInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useUpdatePlatformInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
+| `useDeletePlatformInfraStoreMutation` | Mutation | Named stores — one per version-controlled tree (e.g. one graph, one definition set) |
 | `usePlatformNamespacesQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
 | `usePlatformNamespaceQuery` | Query | Logical namespace containers for grouping secrets, config, functions, and other resources |
 | `useCreatePlatformNamespaceMutation` | Mutation | Logical namespace containers for grouping secrets, config, functions, and other resources |
@@ -79,9 +79,9 @@ function App() {
 | `useCreatePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useUpdatePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
 | `useDeletePlatformNamespaceEventMutation` | Mutation | Namespace lifecycle events — audit log of creation, activation, deactivation, label changes |
-| `useInfraInitEmptyRepoMutation` | Mutation | infraInitEmptyRepo |
-| `useInfraInsertNodeAtPathMutation` | Mutation | infraInsertNodeAtPath |
-| `useInfraSetDataAtPathMutation` | Mutation | infraSetDataAtPath |
+| `usePlatformInfraInitEmptyRepoMutation` | Mutation | platformInfraInitEmptyRepo |
+| `usePlatformInfraInsertNodeAtPathMutation` | Mutation | platformInfraInsertNodeAtPath |
+| `usePlatformInfraSetDataAtPathMutation` | Mutation | platformInfraSetDataAtPath |
 | `useProvisionBucketMutation` | Mutation | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -110,105 +110,6 @@ const { mutate: create } = useCreateDbPresetMutation({
 create({ active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', label: '<String>', modulesHash: '<UUID>', slug: '<String>', storeId: '<UUID>' });
 ```
 
-### InfraCommit
-
-```typescript
-// List all infraCommits
-const { data, isLoading } = useInfraCommitsQuery({
-  selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } },
-});
-
-// Get one infraCommit
-const { data: item } = useInfraCommitQuery({
-  id: '<UUID>',
-  selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } },
-});
-
-// Create a infraCommit
-const { mutate: create } = useCreateInfraCommitMutation({
-  selection: { fields: { id: true } },
-});
-create({ authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
-```
-
-### InfraGetAllRecord
-
-```typescript
-// List all infraGetAll
-const { data, isLoading } = useInfraGetAllQuery({
-  selection: { fields: { data: true, path: true } },
-});
-
-// Create a infraGetAllRecord
-const { mutate: create } = useCreateInfraGetAllRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', path: '<String>' });
-```
-
-### InfraObject
-
-```typescript
-// List all infraObjects
-const { data, isLoading } = useInfraObjectsQuery({
-  selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } },
-});
-
-// Get one infraObject
-const { data: item } = useInfraObjectQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } },
-});
-
-// Create a infraObject
-const { mutate: create } = useCreateInfraObjectMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' });
-```
-
-### InfraRef
-
-```typescript
-// List all infraRefs
-const { data, isLoading } = useInfraRefsQuery({
-  selection: { fields: { commitId: true, id: true, name: true, scopeId: true, storeId: true } },
-});
-
-// Get one infraRef
-const { data: item } = useInfraRefQuery({
-  id: '<UUID>',
-  selection: { fields: { commitId: true, id: true, name: true, scopeId: true, storeId: true } },
-});
-
-// Create a infraRef
-const { mutate: create } = useCreateInfraRefMutation({
-  selection: { fields: { id: true } },
-});
-create({ commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' });
-```
-
-### InfraStore
-
-```typescript
-// List all infraStores
-const { data, isLoading } = useInfraStoresQuery({
-  selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } },
-});
-
-// Get one infraStore
-const { data: item } = useInfraStoreQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } },
-});
-
-// Create a infraStore
-const { mutate: create } = useCreateInfraStoreMutation({
-  selection: { fields: { id: true } },
-});
-create({ hash: '<UUID>', name: '<String>', scopeId: '<UUID>' });
-```
-
 ### Namespace
 
 ```typescript
@@ -235,20 +136,119 @@ create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', i
 ```typescript
 // List all namespaceEvents
 const { data, isLoading } = useNamespaceEventsQuery({
-  selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, databaseId: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } },
+  selection: { fields: { actorId: true, createdAt: true, databaseId: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } },
 });
 
 // Get one namespaceEvent
 const { data: item } = useNamespaceEventQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, databaseId: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } },
+  selection: { fields: { actorId: true, createdAt: true, databaseId: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } },
 });
 
 // Create a namespaceEvent
 const { mutate: create } = useCreateNamespaceEventMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', cpuMillicores: '<Int>', databaseId: '<UUID>', eventType: '<String>', memoryBytes: '<BigInt>', message: '<String>', metadata: '<JSON>', metrics: '<JSON>', namespaceId: '<UUID>', networkEgressBytes: '<BigInt>', networkIngressBytes: '<BigInt>', podCount: '<Int>', storageBytes: '<BigInt>' });
+create({ actorId: '<UUID>', databaseId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' });
+```
+
+### PlatformInfraCommit
+
+```typescript
+// List all platformInfraCommits
+const { data, isLoading } = usePlatformInfraCommitsQuery({
+  selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } },
+});
+
+// Get one platformInfraCommit
+const { data: item } = usePlatformInfraCommitQuery({
+  id: '<UUID>',
+  selection: { fields: { authorId: true, committerId: true, date: true, id: true, message: true, parentIds: true, scopeId: true, storeId: true, treeId: true } },
+});
+
+// Create a platformInfraCommit
+const { mutate: create } = useCreatePlatformInfraCommitMutation({
+  selection: { fields: { id: true } },
+});
+create({ authorId: '<UUID>', committerId: '<UUID>', date: '<Datetime>', message: '<String>', parentIds: '<UUID>', scopeId: '<UUID>', storeId: '<UUID>', treeId: '<UUID>' });
+```
+
+### PlatformInfraGetAllTreeNodesRecord
+
+```typescript
+// List all platformInfraGetAllTreeNodes
+const { data, isLoading } = usePlatformInfraGetAllTreeNodesQuery({
+  selection: { fields: { data: true, path: true } },
+});
+
+// Create a platformInfraGetAllTreeNodesRecord
+const { mutate: create } = useCreatePlatformInfraGetAllTreeNodesRecordMutation({
+  selection: { fields: { id: true } },
+});
+create({ data: '<JSON>', path: '<String>' });
+```
+
+### PlatformInfraObject
+
+```typescript
+// List all platformInfraObjects
+const { data, isLoading } = usePlatformInfraObjectsQuery({
+  selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } },
+});
+
+// Get one platformInfraObject
+const { data: item } = usePlatformInfraObjectQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, data: true, id: true, kids: true, ktree: true, scopeId: true } },
+});
+
+// Create a platformInfraObject
+const { mutate: create } = useCreatePlatformInfraObjectMutation({
+  selection: { fields: { id: true } },
+});
+create({ data: '<JSON>', kids: '<UUID>', ktree: '<String>', scopeId: '<UUID>' });
+```
+
+### PlatformInfraRef
+
+```typescript
+// List all platformInfraRefs
+const { data, isLoading } = usePlatformInfraRefsQuery({
+  selection: { fields: { commitId: true, id: true, name: true, scopeId: true, storeId: true } },
+});
+
+// Get one platformInfraRef
+const { data: item } = usePlatformInfraRefQuery({
+  id: '<UUID>',
+  selection: { fields: { commitId: true, id: true, name: true, scopeId: true, storeId: true } },
+});
+
+// Create a platformInfraRef
+const { mutate: create } = useCreatePlatformInfraRefMutation({
+  selection: { fields: { id: true } },
+});
+create({ commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' });
+```
+
+### PlatformInfraStore
+
+```typescript
+// List all platformInfraStores
+const { data, isLoading } = usePlatformInfraStoresQuery({
+  selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } },
+});
+
+// Get one platformInfraStore
+const { data: item } = usePlatformInfraStoreQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, hash: true, id: true, name: true, scopeId: true } },
+});
+
+// Create a platformInfraStore
+const { mutate: create } = useCreatePlatformInfraStoreMutation({
+  selection: { fields: { id: true } },
+});
+create({ hash: '<UUID>', name: '<String>', scopeId: '<UUID>' });
 ```
 
 ### PlatformNamespace
@@ -277,56 +277,56 @@ create({ annotations: '<JSON>', description: '<String>', isActive: '<Boolean>', 
 ```typescript
 // List all platformNamespaceEvents
 const { data, isLoading } = usePlatformNamespaceEventsQuery({
-  selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } },
+  selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } },
 });
 
 // Get one platformNamespaceEvent
 const { data: item } = usePlatformNamespaceEventQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, cpuMillicores: true, createdAt: true, eventType: true, id: true, memoryBytes: true, message: true, metadata: true, metrics: true, namespaceId: true, networkEgressBytes: true, networkIngressBytes: true, podCount: true, storageBytes: true } },
+  selection: { fields: { actorId: true, createdAt: true, eventType: true, id: true, message: true, metadata: true, namespaceId: true } },
 });
 
 // Create a platformNamespaceEvent
 const { mutate: create } = useCreatePlatformNamespaceEventMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<UUID>', cpuMillicores: '<Int>', eventType: '<String>', memoryBytes: '<BigInt>', message: '<String>', metadata: '<JSON>', metrics: '<JSON>', namespaceId: '<UUID>', networkEgressBytes: '<BigInt>', networkIngressBytes: '<BigInt>', podCount: '<Int>', storageBytes: '<BigInt>' });
+create({ actorId: '<UUID>', eventType: '<String>', message: '<String>', metadata: '<JSON>', namespaceId: '<UUID>' });
 ```
 
 ## Custom Operation Hooks
 
-### `useInfraInitEmptyRepoMutation`
+### `usePlatformInfraInitEmptyRepoMutation`
 
-infraInitEmptyRepo
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | InfraInitEmptyRepoInput (required) |
-
-### `useInfraInsertNodeAtPathMutation`
-
-infraInsertNodeAtPath
+platformInfraInitEmptyRepo
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | InfraInsertNodeAtPathInput (required) |
+  | `input` | PlatformInfraInitEmptyRepoInput (required) |
 
-### `useInfraSetDataAtPathMutation`
+### `usePlatformInfraInsertNodeAtPathMutation`
 
-infraSetDataAtPath
+platformInfraInsertNodeAtPath
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | InfraSetDataAtPathInput (required) |
+  | `input` | PlatformInfraInsertNodeAtPathInput (required) |
+
+### `usePlatformInfraSetDataAtPathMutation`
+
+platformInfraSetDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetDataAtPathInput (required) |
 
 ### `useProvisionBucketMutation`
 

@@ -176,7 +176,7 @@ export class InfraRefModel {
       S,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       },
       InfraRefPatch
     > & {
@@ -199,7 +199,7 @@ export class InfraRefModel {
       'infraRefPatch',
       connectionFieldsMap,
       {
-        scopeId: args.where.scopeId,
+        databaseId: args.where.databaseId,
       }
     );
     return new QueryBuilder({
@@ -215,7 +215,7 @@ export class InfraRefModel {
     args: DeleteArgs<
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       },
       S
     > & {
@@ -232,7 +232,7 @@ export class InfraRefModel {
       'infraRef',
       {
         id: args.where.id,
-        scopeId: args.where.scopeId,
+        databaseId: args.where.databaseId,
       },
       'DeleteInfraRefInput',
       args.select,

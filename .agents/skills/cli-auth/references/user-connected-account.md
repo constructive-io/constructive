@@ -12,7 +12,7 @@ csdk user-connected-account list --where.<field>.<op> <value> --orderBy <values>
 csdk user-connected-account list --limit 10 --after <cursor>
 csdk user-connected-account find-first --where.<field>.<op> <value>
 csdk user-connected-account get --id <UUID>
-csdk user-connected-account create [--details <JSON>] [--identifier <String>] [--isVerified <Boolean>] [--ownerId <UUID>] [--service <String>]
+csdk user-connected-account create --details <JSON> --identifier <String> --isVerified <Boolean> --ownerId <UUID> --service <String>
 csdk user-connected-account update --id <UUID> [--details <JSON>] [--identifier <String>] [--isVerified <Boolean>] [--ownerId <UUID>] [--service <String>]
 csdk user-connected-account delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk user-connected-account list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a userConnectedAccount
 
 ```bash
-csdk user-connected-account create [--details <JSON>] [--identifier <String>] [--isVerified <Boolean>] [--ownerId <UUID>] [--service <String>]
+csdk user-connected-account create --details <JSON> --identifier <String> --isVerified <Boolean> --ownerId <UUID> --service <String>
 ```
 
 ### Get a userConnectedAccount by id

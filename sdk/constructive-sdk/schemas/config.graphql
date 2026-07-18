@@ -290,93 +290,6 @@ type CreatePlatformConfigPayload {
   query: Query
 }
 
-"""All input for the create `PlatformInternalSecret` mutation."""
-input CreatePlatformInternalSecretInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `PlatformInternalSecret` to be created by this mutation."""
-  platformInternalSecret: PlatformInternalSecretInput!
-}
-
-"""The output of our create `PlatformInternalSecret` mutation."""
-type CreatePlatformInternalSecretPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformInternalSecret` that was created by this mutation."""
-  platformInternalSecret: PlatformInternalSecret
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `PlatformSecret` mutation."""
-input CreatePlatformSecretInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `PlatformSecret` to be created by this mutation."""
-  platformSecret: PlatformSecretInput!
-}
-
-"""The output of our create `PlatformSecret` mutation."""
-type CreatePlatformSecretPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformSecret` that was created by this mutation."""
-  platformSecret: PlatformSecret
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `Secret` mutation."""
-input CreateSecretInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Secret` to be created by this mutation."""
-  secret: SecretInput!
-}
-
-"""The output of our create `Secret` mutation."""
-type CreateSecretPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `Secret` that was created by this mutation."""
-  secret: Secret
-}
-
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
@@ -854,30 +767,6 @@ type Mutation {
     input: CreatePlatformConfigInput!
   ): CreatePlatformConfigPayload
 
-  """Creates a single `PlatformInternalSecret`."""
-  createPlatformInternalSecret(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformInternalSecretInput!
-  ): CreatePlatformInternalSecretPayload
-
-  """Creates a single `PlatformSecret`."""
-  createPlatformSecret(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformSecretInput!
-  ): CreatePlatformSecretPayload
-
-  """Creates a single `Secret`."""
-  createSecret(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateSecretInput!
-  ): CreateSecretPayload
-
   """Deletes a single `Config` using a unique key."""
   deleteConfig(
     """
@@ -1280,20 +1169,6 @@ input PlatformInternalSecretFilter {
   updatedAt: DatetimeFilter
 }
 
-"""An input for mutations affecting `PlatformInternalSecret`"""
-input PlatformInternalSecretInput {
-  annotations: JSON
-  createdAt: Datetime
-  description: String
-  id: UUID
-  labels: JSON
-  name: String
-  namespaceId: UUID
-  retiredAt: Datetime
-  rotatedAt: Datetime
-  updatedAt: Datetime
-}
-
 """Methods to use when ordering `PlatformInternalSecret`."""
 enum PlatformInternalSecretOrderBy {
   ANNOTATIONS_ASC
@@ -1512,21 +1387,6 @@ input PlatformSecretFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `PlatformSecret`"""
-input PlatformSecretInput {
-  annotations: JSON
-  createdAt: Datetime
-  description: String
-  id: UUID
-  labels: JSON
-  name: String
-  namespaceId: UUID
-  provider: String
-  retiredAt: Datetime
-  rotatedAt: Datetime
-  updatedAt: Datetime
 }
 
 """Methods to use when ordering `PlatformSecret`."""
@@ -1940,22 +1800,6 @@ input SecretFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
-}
-
-"""An input for mutations affecting `Secret`"""
-input SecretInput {
-  annotations: JSON
-  createdAt: Datetime
-  databaseId: UUID
-  description: String
-  id: UUID
-  labels: JSON
-  name: String
-  namespaceId: UUID
-  provider: String
-  retiredAt: Datetime
-  rotatedAt: Datetime
-  updatedAt: Datetime
 }
 
 """Methods to use when ordering `Secret`."""

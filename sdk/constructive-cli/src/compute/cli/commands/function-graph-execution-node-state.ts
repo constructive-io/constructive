@@ -16,6 +16,9 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
+  callbackInputs: 'json',
+  callbackMeta: 'json',
+  callbackTokenHash: 'string',
   completedAt: 'string',
   createdAt: 'string',
   errorCode: 'string',
@@ -80,6 +83,9 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      callbackInputs: true,
+      callbackMeta: true,
+      callbackTokenHash: true,
       completedAt: true,
       createdAt: true,
       errorCode: true,
@@ -116,6 +122,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      callbackInputs: true,
+      callbackMeta: true,
+      callbackTokenHash: true,
       completedAt: true,
       createdAt: true,
       errorCode: true,
@@ -164,6 +173,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          callbackInputs: true,
+          callbackMeta: true,
+          callbackTokenHash: true,
           completedAt: true,
           createdAt: true,
           errorCode: true,
@@ -191,6 +203,27 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
+      {
+        type: 'json',
+        name: 'callbackInputs',
+        message: 'callbackInputs',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'callbackMeta',
+        message: 'callbackMeta',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'callbackTokenHash',
+        message: 'callbackTokenHash',
+        required: false,
+        skipPrompt: true,
+      },
       {
         type: 'text',
         name: 'completedAt',
@@ -268,6 +301,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.functionGraphExecutionNodeState
       .create({
         data: {
+          callbackInputs: cleanedData.callbackInputs,
+          callbackMeta: cleanedData.callbackMeta,
+          callbackTokenHash: cleanedData.callbackTokenHash,
           completedAt: cleanedData.completedAt,
           errorCode: cleanedData.errorCode,
           errorMessage: cleanedData.errorMessage,
@@ -280,6 +316,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           status: cleanedData.status,
         },
         select: {
+          callbackInputs: true,
+          callbackMeta: true,
+          callbackTokenHash: true,
           completedAt: true,
           createdAt: true,
           errorCode: true,
@@ -318,6 +357,27 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'createdAt',
         message: 'createdAt',
         required: true,
+      },
+      {
+        type: 'json',
+        name: 'callbackInputs',
+        message: 'callbackInputs',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'callbackMeta',
+        message: 'callbackMeta',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'callbackTokenHash',
+        message: 'callbackTokenHash',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -400,6 +460,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           createdAt: answers.createdAt as string,
         },
         data: {
+          callbackInputs: cleanedData.callbackInputs,
+          callbackMeta: cleanedData.callbackMeta,
+          callbackTokenHash: cleanedData.callbackTokenHash,
           completedAt: cleanedData.completedAt,
           errorCode: cleanedData.errorCode,
           errorMessage: cleanedData.errorMessage,
@@ -412,6 +475,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           status: cleanedData.status,
         },
         select: {
+          callbackInputs: true,
+          callbackMeta: true,
+          callbackTokenHash: true,
           completedAt: true,
           createdAt: true,
           errorCode: true,

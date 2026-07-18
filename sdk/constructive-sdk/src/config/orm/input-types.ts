@@ -764,7 +764,7 @@ export interface CreatePlatformInternalSecretInput {
     description?: string;
     labels?: Record<string, unknown>;
     name?: string;
-    namespaceId?: string;
+    namespaceId: string;
     retiredAt?: string;
     rotatedAt?: string;
   };
@@ -794,7 +794,7 @@ export interface CreatePlatformSecretInput {
     description?: string;
     labels?: Record<string, unknown>;
     name?: string;
-    namespaceId?: string;
+    namespaceId: string;
     provider?: string;
     retiredAt?: string;
     rotatedAt?: string;
@@ -823,11 +823,11 @@ export interface CreateSecretInput {
   clientMutationId?: string;
   secret: {
     annotations?: Record<string, unknown>;
-    databaseId?: string;
+    databaseId: string;
     description?: string;
     labels?: Record<string, unknown>;
     name?: string;
-    namespaceId?: string;
+    namespaceId: string;
     provider?: string;
     retiredAt?: string;
     rotatedAt?: string;
@@ -990,48 +990,6 @@ export interface PlatformConfigInput {
   updatedAt?: string;
   /** Plaintext config value */
   value?: string;
-}
-/** An input for mutations affecting `PlatformInternalSecret` */
-export interface PlatformInternalSecretInput {
-  annotations?: Record<string, unknown>;
-  createdAt?: string;
-  description?: string;
-  id?: string;
-  labels?: Record<string, unknown>;
-  name?: string;
-  namespaceId?: string;
-  retiredAt?: string;
-  rotatedAt?: string;
-  updatedAt?: string;
-}
-/** An input for mutations affecting `PlatformSecret` */
-export interface PlatformSecretInput {
-  annotations?: Record<string, unknown>;
-  createdAt?: string;
-  description?: string;
-  id?: string;
-  labels?: Record<string, unknown>;
-  name?: string;
-  namespaceId?: string;
-  provider?: string;
-  retiredAt?: string;
-  rotatedAt?: string;
-  updatedAt?: string;
-}
-/** An input for mutations affecting `Secret` */
-export interface SecretInput {
-  annotations?: Record<string, unknown>;
-  createdAt?: string;
-  databaseId?: string;
-  description?: string;
-  id?: string;
-  labels?: Record<string, unknown>;
-  name?: string;
-  namespaceId?: string;
-  provider?: string;
-  retiredAt?: string;
-  rotatedAt?: string;
-  updatedAt?: string;
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface _SecretsDelPayload {
@@ -1228,39 +1186,6 @@ export type DeletePlatformConfigPayloadSelect = {
   };
   platformConfigEdge?: {
     select: PlatformConfigEdgeSelect;
-  };
-};
-export interface CreatePlatformInternalSecretPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformInternalSecret` that was created by this mutation. */
-  platformInternalSecret?: PlatformInternalSecret | null;
-}
-export type CreatePlatformInternalSecretPayloadSelect = {
-  clientMutationId?: boolean;
-  platformInternalSecret?: {
-    select: PlatformInternalSecretSelect;
-  };
-};
-export interface CreatePlatformSecretPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformSecret` that was created by this mutation. */
-  platformSecret?: PlatformSecret | null;
-}
-export type CreatePlatformSecretPayloadSelect = {
-  clientMutationId?: boolean;
-  platformSecret?: {
-    select: PlatformSecretSelect;
-  };
-};
-export interface CreateSecretPayload {
-  clientMutationId?: string | null;
-  /** The `Secret` that was created by this mutation. */
-  secret?: Secret | null;
-}
-export type CreateSecretPayloadSelect = {
-  clientMutationId?: boolean;
-  secret?: {
-    select: SecretSelect;
   };
 };
 /** A `Config` edge in the connection. */

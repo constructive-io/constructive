@@ -188,6 +188,14 @@ export const functionMutationKeys = {
   /** Delete function mutation key */ delete: (id: string | number) =>
     ['mutation', 'function', 'delete', id] as const,
 } as const;
+export const httpRouteMutationKeys = {
+  /** All httpRoute mutation keys */ all: ['mutation', 'httproute'] as const,
+  /** Create httpRoute mutation key */ create: () => ['mutation', 'httproute', 'create'] as const,
+  /** Update httpRoute mutation key */ update: (id: string | number) =>
+    ['mutation', 'httproute', 'update', id] as const,
+  /** Delete httpRoute mutation key */ delete: (id: string | number) =>
+    ['mutation', 'httproute', 'delete', id] as const,
+} as const;
 export const indexMutationKeys = {
   /** All index mutation keys */ all: ['mutation', 'index'] as const,
   /** Create index mutation key */ create: () => ['mutation', 'index', 'create'] as const,
@@ -196,14 +204,14 @@ export const indexMutationKeys = {
   /** Delete index mutation key */ delete: (id: string | number) =>
     ['mutation', 'index', 'delete', id] as const,
 } as const;
-export const migrateFileMutationKeys = {
-  /** All migrateFile mutation keys */ all: ['mutation', 'migratefile'] as const,
-  /** Create migrateFile mutation key */ create: () =>
-    ['mutation', 'migratefile', 'create'] as const,
-  /** Update migrateFile mutation key */ update: (id: string | number) =>
-    ['mutation', 'migratefile', 'update', id] as const,
-  /** Delete migrateFile mutation key */ delete: (id: string | number) =>
-    ['mutation', 'migratefile', 'delete', id] as const,
+export const managedDomainMutationKeys = {
+  /** All managedDomain mutation keys */ all: ['mutation', 'manageddomain'] as const,
+  /** Create managedDomain mutation key */ create: () =>
+    ['mutation', 'manageddomain', 'create'] as const,
+  /** Update managedDomain mutation key */ update: (id: string | number) =>
+    ['mutation', 'manageddomain', 'update', id] as const,
+  /** Delete managedDomain mutation key */ delete: (id: string | number) =>
+    ['mutation', 'manageddomain', 'delete', id] as const,
 } as const;
 export const nodeTypeRegistryMutationKeys = {
   /** All nodeTypeRegistry mutation keys */ all: ['mutation', 'nodetyperegistry'] as const,
@@ -484,8 +492,9 @@ export const mutationKeys = {
   foreignKeyConstraint: foreignKeyConstraintMutationKeys,
   fullTextSearch: fullTextSearchMutationKeys,
   function: functionMutationKeys,
+  httpRoute: httpRouteMutationKeys,
   index: indexMutationKeys,
-  migrateFile: migrateFileMutationKeys,
+  managedDomain: managedDomainMutationKeys,
   nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   partition: partitionMutationKeys,
   policy: policyMutationKeys,

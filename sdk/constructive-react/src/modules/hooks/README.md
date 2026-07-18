@@ -207,6 +207,11 @@ function App() {
 | `useCreateHierarchyModuleMutation` | Mutation | Create a hierarchyModule |
 | `useUpdateHierarchyModuleMutation` | Mutation | Update a hierarchyModule |
 | `useDeleteHierarchyModuleMutation` | Mutation | Delete a hierarchyModule |
+| `useHttpRouteModulesQuery` | Query | List all httpRouteModules |
+| `useHttpRouteModuleQuery` | Query | Get one httpRouteModule |
+| `useCreateHttpRouteModuleMutation` | Mutation | Create a httpRouteModule |
+| `useUpdateHttpRouteModuleMutation` | Mutation | Update a httpRouteModule |
+| `useDeleteHttpRouteModuleMutation` | Mutation | Delete a httpRouteModule |
 | `useI18nModulesQuery` | Query | List all i18nModules |
 | `useI18NModuleQuery` | Query | Get one i18NModule |
 | `useCreateI18NModuleMutation` | Mutation | Create a i18NModule |
@@ -502,6 +507,11 @@ function App() {
 | `useCreateWebauthnCredentialsModuleMutation` | Mutation | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
 | `useUpdateWebauthnCredentialsModuleMutation` | Mutation | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
 | `useDeleteWebauthnCredentialsModuleMutation` | Mutation | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
+| `useWebhookModulesQuery` | Query | List all webhookModules |
+| `useWebhookModuleQuery` | Query | Get one webhookModule |
+| `useCreateWebhookModuleMutation` | Mutation | Create a webhookModule |
+| `useUpdateWebhookModuleMutation` | Mutation | Update a webhookModule |
+| `useDeleteWebhookModuleMutation` | Mutation | Delete a webhookModule |
 | `useResolveBlueprintFieldQuery` | Query | Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this. |
 | `useResolveBlueprintTableQuery` | Query | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `useConstructBlueprintMutation` | Mutation | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
@@ -651,20 +661,20 @@ create({ categories: '<String>', complexity: '<String>', copyCount: '<Int>', def
 ```typescript
 // List all computeLogModules
 const { data, isLoading } = useComputeLogModulesQuery({
-  selection: { fields: { actorFkTableId: true, apiName: true, computeLogTableId: true, computeLogTableName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, computeLogTableId: true, computeLogTableName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Get one computeLogModule
 const { data: item } = useComputeLogModuleQuery({
   id: '<UUID>',
-  selection: { fields: { actorFkTableId: true, apiName: true, computeLogTableId: true, computeLogTableName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, computeLogTableId: true, computeLogTableName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Create a computeLogModule
 const { mutate: create } = useCreateComputeLogModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ actorFkTableId: '<UUID>', apiName: '<String>', computeLogTableId: '<UUID>', computeLogTableName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>' });
+create({ actorFkTableId: '<UUID>', apiName: '<String>', computeLogTableId: '<UUID>', computeLogTableName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', usageSummaryTableId: '<UUID>', usageSummaryTableName: '<String>' });
 ```
 
 ### ConfigSecretsUserModule
@@ -840,20 +850,20 @@ create({ apiName: '<String>', databaseId: '<UUID>', dbPresetsTableId: '<UUID>', 
 ```typescript
 // List all dbUsageModules
 const { data, isLoading } = useDbUsageModulesQuery({
-  selection: { fields: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultPermissions: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsDailyTableId: true, queryStatsDailyTableName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, retention: true, rollupDbQueryStatsDailyFunction: true, rollupDbTableStatsDailyFunction: true, schemaId: true, scope: true, tableStatsDailyTableId: true, tableStatsDailyTableName: true, tableStatsLogTableId: true, tableStatsLogTableName: true } },
+  selection: { fields: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultPermissions: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, queryStatsSummaryTableId: true, queryStatsSummaryTableName: true, retention: true, rollupDbQueryStatsUsageSummaryFunction: true, rollupDbTableStatsUsageSummaryFunction: true, schemaId: true, scope: true, tableStatsLogTableId: true, tableStatsLogTableName: true, tableStatsSummaryTableId: true, tableStatsSummaryTableName: true } },
 });
 
 // Get one dbUsageModule
 const { data: item } = useDbUsageModuleQuery({
   id: '<UUID>',
-  selection: { fields: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultPermissions: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsDailyTableId: true, queryStatsDailyTableName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, retention: true, rollupDbQueryStatsDailyFunction: true, rollupDbTableStatsDailyFunction: true, schemaId: true, scope: true, tableStatsDailyTableId: true, tableStatsDailyTableName: true, tableStatsLogTableId: true, tableStatsLogTableName: true } },
+  selection: { fields: { apiName: true, collectDbQueryStatsFunction: true, collectDbTableStatsFunction: true, databaseId: true, defaultPermissions: true, entityField: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, queryStatsLogTableId: true, queryStatsLogTableName: true, queryStatsSummaryTableId: true, queryStatsSummaryTableName: true, retention: true, rollupDbQueryStatsUsageSummaryFunction: true, rollupDbTableStatsUsageSummaryFunction: true, schemaId: true, scope: true, tableStatsLogTableId: true, tableStatsLogTableName: true, tableStatsSummaryTableId: true, tableStatsSummaryTableName: true } },
 });
 
 // Create a dbUsageModule
 const { mutate: create } = useCreateDbUsageModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ apiName: '<String>', collectDbQueryStatsFunction: '<String>', collectDbTableStatsFunction: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', queryStatsDailyTableId: '<UUID>', queryStatsDailyTableName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', retention: '<String>', rollupDbQueryStatsDailyFunction: '<String>', rollupDbTableStatsDailyFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableStatsDailyTableId: '<UUID>', tableStatsDailyTableName: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>' });
+create({ apiName: '<String>', collectDbQueryStatsFunction: '<String>', collectDbTableStatsFunction: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', queryStatsLogTableId: '<UUID>', queryStatsLogTableName: '<String>', queryStatsSummaryTableId: '<UUID>', queryStatsSummaryTableName: '<String>', retention: '<String>', rollupDbQueryStatsUsageSummaryFunction: '<String>', rollupDbTableStatsUsageSummaryFunction: '<String>', schemaId: '<UUID>', scope: '<String>', tableStatsLogTableId: '<UUID>', tableStatsLogTableName: '<String>', tableStatsSummaryTableId: '<UUID>', tableStatsSummaryTableName: '<String>' });
 ```
 
 ### DefaultIdsModule
@@ -903,20 +913,20 @@ create({ databaseId: '<UUID>', fieldId: '<UUID>', funcName: '<String>', funcOrde
 ```typescript
 // List all devicesModules
 const { data, isLoading } = useDevicesModulesQuery({
-  selection: { fields: { databaseId: true, deviceSettingsTable: true, deviceSettingsTableId: true, id: true, schemaId: true, userDevicesTable: true, userDevicesTableId: true } },
+  selection: { fields: { databaseId: true, deviceSettingsTableId: true, deviceSettingsTableName: true, id: true, schemaId: true, userDevicesTableId: true, userDevicesTableName: true } },
 });
 
 // Get one devicesModule
 const { data: item } = useDevicesModuleQuery({
   id: '<UUID>',
-  selection: { fields: { databaseId: true, deviceSettingsTable: true, deviceSettingsTableId: true, id: true, schemaId: true, userDevicesTable: true, userDevicesTableId: true } },
+  selection: { fields: { databaseId: true, deviceSettingsTableId: true, deviceSettingsTableName: true, id: true, schemaId: true, userDevicesTableId: true, userDevicesTableName: true } },
 });
 
 // Create a devicesModule
 const { mutate: create } = useCreateDevicesModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', deviceSettingsTable: '<String>', deviceSettingsTableId: '<UUID>', schemaId: '<UUID>', userDevicesTable: '<String>', userDevicesTableId: '<UUID>' });
+create({ databaseId: '<UUID>', deviceSettingsTableId: '<UUID>', deviceSettingsTableName: '<String>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', userDevicesTableName: '<String>' });
 ```
 
 ### EmailsModule
@@ -1029,20 +1039,20 @@ create({ apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String
 ```typescript
 // List all functionModules
 const { data, isLoading } = useFunctionModulesQuery({
-  selection: { fields: { apiName: true, bindingsTableId: true, bindingsTableName: true, databaseId: true, defaultPermissions: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
+  selection: { fields: { apiName: true, bindingsTableId: true, bindingsTableName: true, databaseId: true, defaultPermissions: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, hasCron: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schedulesTableId: true, schemaId: true, scope: true } },
 });
 
 // Get one functionModule
 const { data: item } = useFunctionModuleQuery({
   id: '<UUID>',
-  selection: { fields: { apiName: true, bindingsTableId: true, bindingsTableName: true, databaseId: true, defaultPermissions: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
+  selection: { fields: { apiName: true, bindingsTableId: true, bindingsTableName: true, databaseId: true, defaultPermissions: true, definitionsTableId: true, definitionsTableName: true, entityField: true, entityTableId: true, hasCron: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schedulesTableId: true, schemaId: true, scope: true } },
 });
 
 // Create a functionModule
 const { mutate: create } = useCreateFunctionModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ apiName: '<String>', bindingsTableId: '<UUID>', bindingsTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', definitionsTableId: '<UUID>', definitionsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' });
+create({ apiName: '<String>', bindingsTableId: '<UUID>', bindingsTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', definitionsTableId: '<UUID>', definitionsTableName: '<String>', entityField: '<String>', entityTableId: '<UUID>', hasCron: '<Boolean>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schedulesTableId: '<UUID>', schemaId: '<UUID>', scope: '<String>' });
 ```
 
 ### GraphExecutionModule
@@ -1108,6 +1118,27 @@ const { mutate: create } = useCreateHierarchyModuleMutation({
 create({ chartEdgeGrantsTableId: '<UUID>', chartEdgeGrantsTableName: '<String>', chartEdgesTableId: '<UUID>', chartEdgesTableName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', getManagersFunction: '<String>', getSubordinatesFunction: '<String>', hierarchySprtTableId: '<UUID>', hierarchySprtTableName: '<String>', isManagerOfFunction: '<String>', prefix: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', rebuildHierarchyFunction: '<String>', schemaId: '<UUID>', scope: '<String>', sprtTableName: '<String>', usersTableId: '<UUID>' });
 ```
 
+### HttpRouteModule
+
+```typescript
+// List all httpRouteModules
+const { data, isLoading } = useHttpRouteModulesQuery({
+  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionModuleId: true, httpRoutesTableId: true, httpRoutesTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, resourceModuleId: true, schemaId: true, scope: true, storageModuleId: true } },
+});
+
+// Get one httpRouteModule
+const { data: item } = useHttpRouteModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionModuleId: true, httpRoutesTableId: true, httpRoutesTableName: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, resolverFunctionName: true, resourceModuleId: true, schemaId: true, scope: true, storageModuleId: true } },
+});
+
+// Create a httpRouteModule
+const { mutate: create } = useCreateHttpRouteModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionModuleId: '<UUID>', httpRoutesTableId: '<UUID>', httpRoutesTableName: '<String>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', resolverFunctionName: '<String>', resourceModuleId: '<UUID>', schemaId: '<UUID>', scope: '<String>', storageModuleId: '<UUID>' });
+```
+
 ### I18NModule
 
 ```typescript
@@ -1155,20 +1186,20 @@ create({ apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', ent
 ```typescript
 // List all inferenceLogModules
 const { data, isLoading } = useInferenceLogModulesQuery({
-  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, inferenceLogTableId: true, inferenceLogTableName: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, inferenceLogTableId: true, inferenceLogTableName: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Get one inferenceLogModule
 const { data: item } = useInferenceLogModuleQuery({
   id: '<UUID>',
-  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, inferenceLogTableId: true, inferenceLogTableName: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, inferenceLogTableId: true, inferenceLogTableName: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Create a inferenceLogModule
 const { mutate: create } = useCreateInferenceLogModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ actorFkTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', inferenceLogTableId: '<UUID>', inferenceLogTableName: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>' });
+create({ actorFkTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', inferenceLogTableId: '<UUID>', inferenceLogTableName: '<String>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', usageSummaryTableId: '<UUID>', usageSummaryTableName: '<String>' });
 ```
 
 ### InfraConfigModule
@@ -1533,20 +1564,20 @@ create({ apiName: '<String>', checkRateLimitFunction: '<String>', databaseId: '<
 ```typescript
 // List all rateLimitsModules
 const { data, isLoading } = useRateLimitsModulesQuery({
-  selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } },
+  selection: { fields: { databaseId: true, id: true, ipRateLimitsTableId: true, ipRateLimitsTableName: true, rateLimitSettingsTableId: true, rateLimitSettingsTableName: true, rateLimitsTableId: true, rateLimitsTableName: true, schemaId: true } },
 });
 
 // Get one rateLimitsModule
 const { data: item } = useRateLimitsModuleQuery({
   id: '<UUID>',
-  selection: { fields: { databaseId: true, id: true, ipRateLimitsTable: true, ipRateLimitsTableId: true, rateLimitSettingsTable: true, rateLimitSettingsTableId: true, rateLimitsTable: true, rateLimitsTableId: true, schemaId: true } },
+  selection: { fields: { databaseId: true, id: true, ipRateLimitsTableId: true, ipRateLimitsTableName: true, rateLimitSettingsTableId: true, rateLimitSettingsTableName: true, rateLimitsTableId: true, rateLimitsTableName: true, schemaId: true } },
 });
 
 // Create a rateLimitsModule
 const { mutate: create } = useCreateRateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', ipRateLimitsTable: '<String>', ipRateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', rateLimitSettingsTableId: '<UUID>', rateLimitsTable: '<String>', rateLimitsTableId: '<UUID>', schemaId: '<UUID>' });
+create({ databaseId: '<UUID>', ipRateLimitsTableId: '<UUID>', ipRateLimitsTableName: '<String>', rateLimitSettingsTableId: '<UUID>', rateLimitSettingsTableName: '<String>', rateLimitsTableId: '<UUID>', rateLimitsTableName: '<String>', schemaId: '<UUID>' });
 ```
 
 ### RealtimeModule
@@ -1596,20 +1627,20 @@ create({ apiRequired: '<Boolean>', createIndex: '<Boolean>', databaseId: '<UUID>
 ```typescript
 // List all resourceModules
 const { data, isLoading } = useResourceModulesQuery({
-  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourcesTableId: true, resourcesTableName: true, schemaId: true, scope: true } },
+  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, installationStoreName: true, merkleStoreModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceBillingRollupFunction: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourceUsageLogTableId: true, resourceUsageLogTableName: true, resourceUsageSummaryTableId: true, resourceUsageSummaryTableName: true, resourcesTableId: true, resourcesTableName: true, rollupResourceUsageSummaryFunction: true, schemaId: true, scope: true } },
 });
 
 // Get one resourceModule
 const { data: item } = useResourceModuleQuery({
   id: '<UUID>',
-  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourcesTableId: true, resourcesTableName: true, schemaId: true, scope: true } },
+  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, id: true, installationStoreName: true, merkleStoreModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, requirementsStateViewName: true, resolvedRequirementsViewName: true, resourceBillingRollupFunction: true, resourceDefinitionsTableId: true, resourceDefinitionsTableName: true, resourceEventsTableId: true, resourceEventsTableName: true, resourceInstallationsTableId: true, resourceInstallationsTableName: true, resourceStatusChecksTableId: true, resourceStatusChecksTableName: true, resourceUsageLogTableId: true, resourceUsageLogTableName: true, resourceUsageSummaryTableId: true, resourceUsageSummaryTableName: true, resourcesTableId: true, resourcesTableName: true, rollupResourceUsageSummaryFunction: true, schemaId: true, scope: true } },
 });
 
 // Create a resourceModule
 const { mutate: create } = useCreateResourceModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', requirementsStateViewName: '<String>', resolvedRequirementsViewName: '<String>', resourceDefinitionsTableId: '<UUID>', resourceDefinitionsTableName: '<String>', resourceEventsTableId: '<UUID>', resourceEventsTableName: '<String>', resourceStatusChecksTableId: '<UUID>', resourceStatusChecksTableName: '<String>', resourcesTableId: '<UUID>', resourcesTableName: '<String>', schemaId: '<UUID>', scope: '<String>' });
+create({ apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', installationStoreName: '<String>', merkleStoreModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', requirementsStateViewName: '<String>', resolvedRequirementsViewName: '<String>', resourceBillingRollupFunction: '<String>', resourceDefinitionsTableId: '<UUID>', resourceDefinitionsTableName: '<String>', resourceEventsTableId: '<UUID>', resourceEventsTableName: '<String>', resourceInstallationsTableId: '<UUID>', resourceInstallationsTableName: '<String>', resourceStatusChecksTableId: '<UUID>', resourceStatusChecksTableName: '<String>', resourceUsageLogTableId: '<UUID>', resourceUsageLogTableName: '<String>', resourceUsageSummaryTableId: '<UUID>', resourceUsageSummaryTableName: '<String>', resourcesTableId: '<UUID>', resourcesTableName: '<String>', rollupResourceUsageSummaryFunction: '<String>', schemaId: '<UUID>', scope: '<String>' });
 ```
 
 ### RlsModule
@@ -1680,20 +1711,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', sessionsTableId: '<UUID>', ta
 ```typescript
 // List all sessionsModules
 const { data, isLoading } = useSessionsModulesQuery({
-  selection: { fields: { authSettingsTable: true, authSettingsTableId: true, databaseId: true, id: true, schemaId: true, sessionCredentialsTable: true, sessionCredentialsTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionsTableId: true, usersTableId: true } },
+  selection: { fields: { authSettingsTableId: true, authSettingsTableName: true, databaseId: true, id: true, schemaId: true, sessionCredentialsTableId: true, sessionCredentialsTableName: true, sessionsDefaultExpiration: true, sessionsTableId: true, sessionsTableName: true, usersTableId: true } },
 });
 
 // Get one sessionsModule
 const { data: item } = useSessionsModuleQuery({
   id: '<UUID>',
-  selection: { fields: { authSettingsTable: true, authSettingsTableId: true, databaseId: true, id: true, schemaId: true, sessionCredentialsTable: true, sessionCredentialsTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionsTableId: true, usersTableId: true } },
+  selection: { fields: { authSettingsTableId: true, authSettingsTableName: true, databaseId: true, id: true, schemaId: true, sessionCredentialsTableId: true, sessionCredentialsTableName: true, sessionsDefaultExpiration: true, sessionsTableId: true, sessionsTableName: true, usersTableId: true } },
 });
 
 // Create a sessionsModule
 const { mutate: create } = useCreateSessionsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ authSettingsTable: '<String>', authSettingsTableId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', sessionCredentialsTable: '<String>', sessionCredentialsTableId: '<UUID>', sessionsDefaultExpiration: '<Interval>', sessionsTable: '<String>', sessionsTableId: '<UUID>', usersTableId: '<UUID>' });
+create({ authSettingsTableId: '<UUID>', authSettingsTableName: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionCredentialsTableName: '<String>', sessionsDefaultExpiration: '<Interval>', sessionsTableId: '<UUID>', sessionsTableName: '<String>', usersTableId: '<UUID>' });
 ```
 
 ### StorageLogModule
@@ -1701,20 +1732,20 @@ create({ authSettingsTable: '<String>', authSettingsTableId: '<UUID>', databaseI
 ```typescript
 // List all storageLogModules
 const { data, isLoading } = useStorageLogModulesQuery({
-  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, storageLogTableId: true, storageLogTableName: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, storageLogTableId: true, storageLogTableName: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Get one storageLogModule
 const { data: item } = useStorageLogModuleQuery({
   id: '<UUID>',
-  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, storageLogTableId: true, storageLogTableName: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, storageLogTableId: true, storageLogTableName: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Create a storageLogModule
 const { mutate: create } = useCreateStorageLogModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ actorFkTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', storageLogTableId: '<UUID>', storageLogTableName: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>' });
+create({ actorFkTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', storageLogTableId: '<UUID>', storageLogTableName: '<String>', usageSummaryTableId: '<UUID>', usageSummaryTableName: '<String>' });
 ```
 
 ### StorageModule
@@ -1743,20 +1774,20 @@ create({ allowedOrigins: '<String>', apiName: '<String>', bucketsTableId: '<UUID
 ```typescript
 // List all transferLogModules
 const { data, isLoading } = useTransferLogModulesQuery({
-  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, transferLogTableId: true, transferLogTableName: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Get one transferLogModule
 const { data: item } = useTransferLogModuleQuery({
   id: '<UUID>',
-  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, transferLogTableId: true, transferLogTableName: true, usageDailyTableId: true, usageDailyTableName: true } },
+  selection: { fields: { actorFkTableId: true, apiName: true, databaseId: true, entityField: true, entityFkTableId: true, id: true, interval: true, prefix: true, premake: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, publicSchemaName: true, retention: true, schemaId: true, scope: true, transferLogTableId: true, transferLogTableName: true, usageSummaryTableId: true, usageSummaryTableName: true } },
 });
 
 // Create a transferLogModule
 const { mutate: create } = useCreateTransferLogModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ actorFkTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', transferLogTableId: '<UUID>', transferLogTableName: '<String>', usageDailyTableId: '<UUID>', usageDailyTableName: '<String>' });
+create({ actorFkTableId: '<UUID>', apiName: '<String>', databaseId: '<UUID>', entityField: '<String>', entityFkTableId: '<UUID>', interval: '<String>', prefix: '<String>', premake: '<Int>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', publicSchemaName: '<String>', retention: '<String>', schemaId: '<UUID>', scope: '<String>', transferLogTableId: '<UUID>', transferLogTableName: '<String>', usageSummaryTableId: '<UUID>', usageSummaryTableName: '<String>' });
 ```
 
 ### UserAuthModule
@@ -1904,6 +1935,27 @@ const { mutate: create } = useCreateWebauthnCredentialsModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ apiName: '<String>', databaseId: '<UUID>', ownerTableId: '<UUID>', privateApiName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
+```
+
+### WebhookModule
+
+```typescript
+// List all webhookModules
+const { data, isLoading } = useWebhookModulesQuery({
+  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionInvocationModuleId: true, functionModuleId: true, id: true, infraSecretsModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, webhookEndpointsTableId: true, webhookEndpointsTableName: true, webhookEventsTableId: true, webhookEventsTableName: true } },
+});
+
+// Get one webhookModule
+const { data: item } = useWebhookModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { apiName: true, databaseId: true, defaultPermissions: true, entityField: true, entityTableId: true, functionInvocationModuleId: true, functionModuleId: true, id: true, infraSecretsModuleId: true, namespaceModuleId: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true, webhookEndpointsTableId: true, webhookEndpointsTableName: true, webhookEventsTableId: true, webhookEventsTableName: true } },
+});
+
+// Create a webhookModule
+const { mutate: create } = useCreateWebhookModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ apiName: '<String>', databaseId: '<UUID>', defaultPermissions: '<String>', entityField: '<String>', entityTableId: '<UUID>', functionInvocationModuleId: '<UUID>', functionModuleId: '<UUID>', infraSecretsModuleId: '<UUID>', namespaceModuleId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>', webhookEndpointsTableId: '<UUID>', webhookEndpointsTableName: '<String>', webhookEventsTableId: '<UUID>', webhookEventsTableName: '<String>' });
 ```
 
 ## Custom Operation Hooks

@@ -6,13 +6,13 @@
 
 import type {
   DbPreset,
-  InfraCommit,
-  InfraGetAllRecord,
-  InfraObject,
-  InfraRef,
-  InfraStore,
   Namespace,
   NamespaceEvent,
+  PlatformInfraCommit,
+  PlatformInfraGetAllTreeNodesRecord,
+  PlatformInfraObject,
+  PlatformInfraRef,
+  PlatformInfraStore,
   PlatformNamespace,
   PlatformNamespaceEvent,
   BigFloatFilter,
@@ -60,82 +60,10 @@ export type DbPresetOrderBy =
   | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `InfraCommit`. */
-export type InfraCommitOrderBy =
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'NATURAL'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC';
-/** Methods to use when ordering `InfraObject`. */
-export type InfraObjectOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC';
-/** Methods to use when ordering `InfraRef`. */
-export type InfraRefOrderBy =
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
-/** Methods to use when ordering `InfraStore`. */
-export type InfraStoreOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'SCOPE_ID_ASC'
-  | 'SCOPE_ID_DESC';
 /** Methods to use when ordering `NamespaceEvent`. */
 export type NamespaceEventOrderBy =
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
-  | 'CPU_MILLICORES_ASC'
-  | 'CPU_MILLICORES_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
@@ -144,27 +72,15 @@ export type NamespaceEventOrderBy =
   | 'EVENT_TYPE_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'MEMORY_BYTES_ASC'
-  | 'MEMORY_BYTES_DESC'
   | 'MESSAGE_ASC'
   | 'MESSAGE_DESC'
   | 'METADATA_ASC'
   | 'METADATA_DESC'
-  | 'METRICS_ASC'
-  | 'METRICS_DESC'
   | 'NAMESPACE_ID_ASC'
   | 'NAMESPACE_ID_DESC'
   | 'NATURAL'
-  | 'NETWORK_EGRESS_BYTES_ASC'
-  | 'NETWORK_EGRESS_BYTES_DESC'
-  | 'NETWORK_INGRESS_BYTES_ASC'
-  | 'NETWORK_INGRESS_BYTES_DESC'
-  | 'POD_COUNT_ASC'
-  | 'POD_COUNT_DESC'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORAGE_BYTES_ASC'
-  | 'STORAGE_BYTES_DESC';
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `Namespace`. */
 export type NamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
@@ -196,39 +112,95 @@ export type NamespaceOrderBy =
   | 'STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformInfraCommit`. */
+export type PlatformInfraCommitOrderBy =
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
+  | 'NATURAL'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC';
+/** Methods to use when ordering `PlatformInfraObject`. */
+export type PlatformInfraObjectOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
+/** Methods to use when ordering `PlatformInfraRef`. */
+export type PlatformInfraRefOrderBy =
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+/** Methods to use when ordering `PlatformInfraStore`. */
+export type PlatformInfraStoreOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SCOPE_ID_ASC'
+  | 'SCOPE_ID_DESC';
 /** Methods to use when ordering `PlatformNamespaceEvent`. */
 export type PlatformNamespaceEventOrderBy =
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
-  | 'CPU_MILLICORES_ASC'
-  | 'CPU_MILLICORES_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'EVENT_TYPE_ASC'
   | 'EVENT_TYPE_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'MEMORY_BYTES_ASC'
-  | 'MEMORY_BYTES_DESC'
   | 'MESSAGE_ASC'
   | 'MESSAGE_DESC'
   | 'METADATA_ASC'
   | 'METADATA_DESC'
-  | 'METRICS_ASC'
-  | 'METRICS_DESC'
   | 'NAMESPACE_ID_ASC'
   | 'NAMESPACE_ID_DESC'
   | 'NATURAL'
-  | 'NETWORK_EGRESS_BYTES_ASC'
-  | 'NETWORK_EGRESS_BYTES_DESC'
-  | 'NETWORK_INGRESS_BYTES_ASC'
-  | 'NETWORK_INGRESS_BYTES_DESC'
-  | 'POD_COUNT_ASC'
-  | 'POD_COUNT_DESC'
   | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'STORAGE_BYTES_ASC'
-  | 'STORAGE_BYTES_DESC';
+  | 'PRIMARY_KEY_DESC';
 /** Methods to use when ordering `PlatformNamespace`. */
 export type PlatformNamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
@@ -263,26 +235,6 @@ export interface CreateDbPresetInput {
   /** The `DbPreset` to be created by this mutation. */
   dbPreset: DbPresetInput;
 }
-export interface CreateInfraCommitInput {
-  clientMutationId?: string;
-  /** The `InfraCommit` to be created by this mutation. */
-  infraCommit: InfraCommitInput;
-}
-export interface CreateInfraObjectInput {
-  clientMutationId?: string;
-  /** The `InfraObject` to be created by this mutation. */
-  infraObject: InfraObjectInput;
-}
-export interface CreateInfraRefInput {
-  clientMutationId?: string;
-  /** The `InfraRef` to be created by this mutation. */
-  infraRef: InfraRefInput;
-}
-export interface CreateInfraStoreInput {
-  clientMutationId?: string;
-  /** The `InfraStore` to be created by this mutation. */
-  infraStore: InfraStoreInput;
-}
 export interface CreateNamespaceEventInput {
   clientMutationId?: string;
   /** The `NamespaceEvent` to be created by this mutation. */
@@ -292,6 +244,26 @@ export interface CreateNamespaceInput {
   clientMutationId?: string;
   /** The `Namespace` to be created by this mutation. */
   namespace: NamespaceInput;
+}
+export interface CreatePlatformInfraCommitInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraCommit` to be created by this mutation. */
+  platformInfraCommit: PlatformInfraCommitInput;
+}
+export interface CreatePlatformInfraObjectInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraObject` to be created by this mutation. */
+  platformInfraObject: PlatformInfraObjectInput;
+}
+export interface CreatePlatformInfraRefInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraRef` to be created by this mutation. */
+  platformInfraRef: PlatformInfraRefInput;
+}
+export interface CreatePlatformInfraStoreInput {
+  clientMutationId?: string;
+  /** The `PlatformInfraStore` to be created by this mutation. */
+  platformInfraStore: PlatformInfraStoreInput;
 }
 export interface CreatePlatformNamespaceEventInput {
   clientMutationId?: string;
@@ -389,32 +361,6 @@ export interface DeleteDbPresetInput {
   /** Unique preset identifier */
   id: string;
 }
-export interface DeleteInfraCommitInput {
-  clientMutationId?: string;
-  /** Unique commit identifier */
-  id: string;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-export interface DeleteInfraObjectInput {
-  clientMutationId?: string;
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-export interface DeleteInfraRefInput {
-  clientMutationId?: string;
-  /** Unique ref identifier */
-  id: string;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-export interface DeleteInfraStoreInput {
-  clientMutationId?: string;
-  /** Unique store identifier */
-  id: string;
-}
 export interface DeleteNamespaceEventInput {
   clientMutationId?: string;
   /** Event timestamp (partition key) */
@@ -424,6 +370,32 @@ export interface DeleteNamespaceEventInput {
 }
 export interface DeleteNamespaceInput {
   clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformInfraCommitInput {
+  clientMutationId?: string;
+  /** Unique commit identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeletePlatformInfraObjectInput {
+  clientMutationId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeletePlatformInfraRefInput {
+  clientMutationId?: string;
+  /** Unique ref identifier */
+  id: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface DeletePlatformInfraStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
   id: string;
 }
 export interface DeletePlatformNamespaceEventInput {
@@ -437,245 +409,12 @@ export interface DeletePlatformNamespaceInput {
   clientMutationId?: string;
   id: string;
 }
-/** A filter to be used against `InfraCommit` object types. All fields are combined with a logical ‘and.’ */
-export interface InfraCommitFilter {
-  /** Checks for all expressions in this list. */
-  and?: InfraCommitFilter[];
-  /** Filter by the object’s `authorId` field. */
-  authorId?: UUIDFilter;
-  /** Filter by the object’s `committerId` field. */
-  committerId?: UUIDFilter;
-  /** Filter by the object’s `date` field. */
-  date?: DatetimeFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `message` field. */
-  message?: StringFilter;
-  /** Negates the expression. */
-  not?: InfraCommitFilter;
-  /** Checks for any expressions in this list. */
-  or?: InfraCommitFilter[];
-  /** Filter by the object’s `parentIds` field. */
-  parentIds?: UUIDListFilter;
-  /** Filter by the object’s `scopeId` field. */
-  scopeId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-  /** Filter by the object’s `treeId` field. */
-  treeId?: UUIDFilter;
-}
-/** An input for mutations affecting `InfraCommit` */
-export interface InfraCommitInput {
-  /** User who authored the changes */
-  authorId?: string;
-  /** User who committed (may differ from author) */
-  committerId?: string;
-  /** Commit timestamp */
-  date?: string;
-  /** Unique commit identifier */
-  id?: string;
-  /** Optional commit message */
-  message?: string;
-  /** Parent commit IDs (supports merge commits) */
-  parentIds?: string[];
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-  /** Store this commit belongs to */
-  storeId: string;
-  /** Root object ID of the tree snapshot at this commit */
-  treeId?: string;
-}
-/** Represents an update to a `InfraCommit`. Fields that are set will be updated. */
-export interface InfraCommitPatch {
-  /** User who authored the changes */
-  authorId?: string;
-  /** User who committed (may differ from author) */
-  committerId?: string;
-  /** Commit timestamp */
-  date?: string;
-  /** Unique commit identifier */
-  id?: string;
-  /** Optional commit message */
-  message?: string;
-  /** Parent commit IDs (supports merge commits) */
-  parentIds?: string[];
-  /** Opaque store partition key for the global tier */
-  scopeId?: string;
-  /** Store this commit belongs to */
-  storeId?: string;
-  /** Root object ID of the tree snapshot at this commit */
-  treeId?: string;
-}
-export interface InfraInitEmptyRepoInput {
-  clientMutationId?: string;
-  sId?: string;
-  storeId?: string;
-}
-export interface InfraInsertNodeAtPathInput {
-  clientMutationId?: string;
-  data?: unknown;
-  kids?: string[];
-  ktree?: string[];
-  path?: string[];
-  root?: string;
-  sId?: string;
-}
-/** A filter to be used against `InfraObject` object types. All fields are combined with a logical ‘and.’ */
-export interface InfraObjectFilter {
-  /** Checks for all expressions in this list. */
-  and?: InfraObjectFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `data` field. */
-  data?: JSONFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `kids` field. */
-  kids?: UUIDListFilter;
-  /** Filter by the object’s `ktree` field. */
-  ktree?: StringListFilter;
-  /** Negates the expression. */
-  not?: InfraObjectFilter;
-  /** Checks for any expressions in this list. */
-  or?: InfraObjectFilter[];
-  /** Filter by the object’s `scopeId` field. */
-  scopeId?: UUIDFilter;
-}
-/** An input for mutations affecting `InfraObject` */
-export interface InfraObjectInput {
-  /** Timestamp of object creation */
-  createdAt?: string;
-  /** Payload data for this object node */
-  data?: unknown;
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** Ordered array of child object IDs */
-  kids?: string[];
-  /** Ordered array of child path names (parallel to kids) */
-  ktree?: string[];
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-/** Represents an update to a `InfraObject`. Fields that are set will be updated. */
-export interface InfraObjectPatch {
-  /** Timestamp of object creation */
-  createdAt?: string;
-  /** Payload data for this object node */
-  data?: unknown;
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id?: string;
-  /** Ordered array of child object IDs */
-  kids?: string[];
-  /** Ordered array of child path names (parallel to kids) */
-  ktree?: string[];
-  /** Opaque store partition key for the global tier */
-  scopeId?: string;
-}
-/** A filter to be used against `InfraRef` object types. All fields are combined with a logical ‘and.’ */
-export interface InfraRefFilter {
-  /** Checks for all expressions in this list. */
-  and?: InfraRefFilter[];
-  /** Filter by the object’s `commitId` field. */
-  commitId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: InfraRefFilter;
-  /** Checks for any expressions in this list. */
-  or?: InfraRefFilter[];
-  /** Filter by the object’s `scopeId` field. */
-  scopeId?: UUIDFilter;
-  /** Filter by the object’s `storeId` field. */
-  storeId?: UUIDFilter;
-}
-/** An input for mutations affecting `InfraRef` */
-export interface InfraRefInput {
-  /** Commit this ref points to */
-  commitId?: string;
-  /** Unique ref identifier */
-  id?: string;
-  /** Ref name (e.g. HEAD, main) */
-  name: string;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-  /** Store this ref belongs to */
-  storeId: string;
-}
-/** Represents an update to a `InfraRef`. Fields that are set will be updated. */
-export interface InfraRefPatch {
-  /** Commit this ref points to */
-  commitId?: string;
-  /** Unique ref identifier */
-  id?: string;
-  /** Ref name (e.g. HEAD, main) */
-  name?: string;
-  /** Opaque store partition key for the global tier */
-  scopeId?: string;
-  /** Store this ref belongs to */
-  storeId?: string;
-}
-export interface InfraSetDataAtPathInput {
-  clientMutationId?: string;
-  data?: unknown;
-  path?: string[];
-  root?: string;
-  sId?: string;
-}
-/** A filter to be used against `InfraStore` object types. All fields are combined with a logical ‘and.’ */
-export interface InfraStoreFilter {
-  /** Checks for all expressions in this list. */
-  and?: InfraStoreFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `hash` field. */
-  hash?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Negates the expression. */
-  not?: InfraStoreFilter;
-  /** Checks for any expressions in this list. */
-  or?: InfraStoreFilter[];
-  /** Filter by the object’s `scopeId` field. */
-  scopeId?: UUIDFilter;
-}
-/** An input for mutations affecting `InfraStore` */
-export interface InfraStoreInput {
-  /** Timestamp of store creation */
-  createdAt?: string;
-  /** Current root object hash of this store */
-  hash?: string;
-  /** Unique store identifier */
-  id?: string;
-  /** Human-readable store name */
-  name: string;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-/** Represents an update to a `InfraStore`. Fields that are set will be updated. */
-export interface InfraStorePatch {
-  /** Timestamp of store creation */
-  createdAt?: string;
-  /** Current root object hash of this store */
-  hash?: string;
-  /** Unique store identifier */
-  id?: string;
-  /** Human-readable store name */
-  name?: string;
-  /** Opaque store partition key for the global tier */
-  scopeId?: string;
-}
 /** A filter to be used against `NamespaceEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceEventFilter {
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: NamespaceEventFilter[];
-  /** Filter by the object’s `cpuMillicores` field. */
-  cpuMillicores?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -684,35 +423,21 @@ export interface NamespaceEventFilter {
   eventType?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `memoryBytes` field. */
-  memoryBytes?: BigIntFilter;
   /** Filter by the object’s `message` field. */
   message?: StringFilter;
   /** Filter by the object’s `metadata` field. */
   metadata?: JSONFilter;
-  /** Filter by the object’s `metrics` field. */
-  metrics?: JSONFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
-  /** Filter by the object’s `networkEgressBytes` field. */
-  networkEgressBytes?: BigIntFilter;
-  /** Filter by the object’s `networkIngressBytes` field. */
-  networkIngressBytes?: BigIntFilter;
   /** Negates the expression. */
   not?: NamespaceEventFilter;
   /** Checks for any expressions in this list. */
   or?: NamespaceEventFilter[];
-  /** Filter by the object’s `podCount` field. */
-  podCount?: IntFilter;
-  /** Filter by the object’s `storageBytes` field. */
-  storageBytes?: BigIntFilter;
 }
 /** An input for mutations affecting `NamespaceEvent` */
 export interface NamespaceEventInput {
   /** User who triggered this event (NULL for system/automated) */
   actorId?: string;
-  /** CPU usage in millicores at time of event */
-  cpuMillicores?: number;
   /** Event timestamp (partition key) */
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
@@ -721,31 +446,17 @@ export interface NamespaceEventInput {
   eventType: string;
   /** Unique event identifier */
   id?: string;
-  /** Memory usage in bytes at time of event */
-  memoryBytes?: string;
   /** Human-readable description of the event */
   message?: string;
   /** Structured context (old/new values, labels diff, etc.) */
   metadata?: unknown;
-  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
-  metrics?: unknown;
   /** Namespace this event belongs to */
   namespaceId: string;
-  /** Network egress in bytes during event window */
-  networkEgressBytes?: string;
-  /** Network ingress in bytes during event window */
-  networkIngressBytes?: string;
-  /** Number of active pods in the namespace at time of event */
-  podCount?: number;
-  /** Storage usage in bytes at time of event */
-  storageBytes?: string;
 }
 /** Represents an update to a `NamespaceEvent`. Fields that are set will be updated. */
 export interface NamespaceEventPatch {
   /** User who triggered this event (NULL for system/automated) */
   actorId?: string;
-  /** CPU usage in millicores at time of event */
-  cpuMillicores?: number;
   /** Event timestamp (partition key) */
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
@@ -754,24 +465,12 @@ export interface NamespaceEventPatch {
   eventType?: string;
   /** Unique event identifier */
   id?: string;
-  /** Memory usage in bytes at time of event */
-  memoryBytes?: string;
   /** Human-readable description of the event */
   message?: string;
   /** Structured context (old/new values, labels diff, etc.) */
   metadata?: unknown;
-  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
-  metrics?: unknown;
   /** Namespace this event belongs to */
   namespaceId?: string;
-  /** Network egress in bytes during event window */
-  networkEgressBytes?: string;
-  /** Network ingress in bytes during event window */
-  networkIngressBytes?: string;
-  /** Number of active pods in the namespace at time of event */
-  podCount?: number;
-  /** Storage usage in bytes at time of event */
-  storageBytes?: string;
 }
 /** A filter to be used against `Namespace` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceFilter {
@@ -860,104 +559,293 @@ export interface NamespacePatch {
   status?: string;
   updatedAt?: string;
 }
+/** A filter to be used against `PlatformInfraCommit` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraCommitFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraCommitFilter[];
+  /** Filter by the object’s `authorId` field. */
+  authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
+  committerId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
+  date?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
+  message?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraCommitFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraCommitFilter[];
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
+  treeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraCommit` */
+export interface PlatformInfraCommitInput {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Store this commit belongs to */
+  storeId: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+/** Represents an update to a `PlatformInfraCommit`. Fields that are set will be updated. */
+export interface PlatformInfraCommitPatch {
+  /** User who authored the changes */
+  authorId?: string;
+  /** User who committed (may differ from author) */
+  committerId?: string;
+  /** Commit timestamp */
+  date?: string;
+  /** Unique commit identifier */
+  id?: string;
+  /** Optional commit message */
+  message?: string;
+  /** Parent commit IDs (supports merge commits) */
+  parentIds?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Store this commit belongs to */
+  storeId?: string;
+  /** Root object ID of the tree snapshot at this commit */
+  treeId?: string;
+}
+export interface PlatformInfraInitEmptyRepoInput {
+  clientMutationId?: string;
+  sId?: string;
+  storeId?: string;
+}
+export interface PlatformInfraInsertNodeAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `PlatformInfraObject` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraObjectFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraObjectFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraObjectFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraObjectFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraObject` */
+export interface PlatformInfraObjectInput {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+/** Represents an update to a `PlatformInfraObject`. Fields that are set will be updated. */
+export interface PlatformInfraObjectPatch {
+  /** Timestamp of object creation */
+  createdAt?: string;
+  /** Payload data for this object node */
+  data?: unknown;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id?: string;
+  /** Ordered array of child object IDs */
+  kids?: string[];
+  /** Ordered array of child path names (parallel to kids) */
+  ktree?: string[];
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+}
+/** A filter to be used against `PlatformInfraRef` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraRefFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraRefFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraRefFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraRefFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraRef` */
+export interface PlatformInfraRefInput {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+  /** Store this ref belongs to */
+  storeId: string;
+}
+/** Represents an update to a `PlatformInfraRef`. Fields that are set will be updated. */
+export interface PlatformInfraRefPatch {
+  /** Commit this ref points to */
+  commitId?: string;
+  /** Unique ref identifier */
+  id?: string;
+  /** Ref name (e.g. HEAD, main) */
+  name?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+  /** Store this ref belongs to */
+  storeId?: string;
+}
+export interface PlatformInfraSetDataAtPathInput {
+  clientMutationId?: string;
+  data?: unknown;
+  path?: string[];
+  root?: string;
+  sId?: string;
+}
+/** A filter to be used against `PlatformInfraStore` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformInfraStoreFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformInfraStoreFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformInfraStoreFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformInfraStoreFilter[];
+  /** Filter by the object’s `scopeId` field. */
+  scopeId?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformInfraStore` */
+export interface PlatformInfraStoreInput {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name: string;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+/** Represents an update to a `PlatformInfraStore`. Fields that are set will be updated. */
+export interface PlatformInfraStorePatch {
+  /** Timestamp of store creation */
+  createdAt?: string;
+  /** Current root object hash of this store */
+  hash?: string;
+  /** Unique store identifier */
+  id?: string;
+  /** Human-readable store name */
+  name?: string;
+  /** Opaque store partition key for the global tier */
+  scopeId?: string;
+}
 /** A filter to be used against `PlatformNamespaceEvent` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceEventFilter {
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: PlatformNamespaceEventFilter[];
-  /** Filter by the object’s `cpuMillicores` field. */
-  cpuMillicores?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `eventType` field. */
   eventType?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `memoryBytes` field. */
-  memoryBytes?: BigIntFilter;
   /** Filter by the object’s `message` field. */
   message?: StringFilter;
   /** Filter by the object’s `metadata` field. */
   metadata?: JSONFilter;
-  /** Filter by the object’s `metrics` field. */
-  metrics?: JSONFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
-  /** Filter by the object’s `networkEgressBytes` field. */
-  networkEgressBytes?: BigIntFilter;
-  /** Filter by the object’s `networkIngressBytes` field. */
-  networkIngressBytes?: BigIntFilter;
   /** Negates the expression. */
   not?: PlatformNamespaceEventFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformNamespaceEventFilter[];
-  /** Filter by the object’s `podCount` field. */
-  podCount?: IntFilter;
-  /** Filter by the object’s `storageBytes` field. */
-  storageBytes?: BigIntFilter;
 }
 /** An input for mutations affecting `PlatformNamespaceEvent` */
 export interface PlatformNamespaceEventInput {
   /** User who triggered this event (NULL for system/automated) */
   actorId?: string;
-  /** CPU usage in millicores at time of event */
-  cpuMillicores?: number;
   /** Event timestamp (partition key) */
   createdAt?: string;
   /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
   eventType: string;
   /** Unique event identifier */
   id?: string;
-  /** Memory usage in bytes at time of event */
-  memoryBytes?: string;
   /** Human-readable description of the event */
   message?: string;
   /** Structured context (old/new values, labels diff, etc.) */
   metadata?: unknown;
-  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
-  metrics?: unknown;
   /** Namespace this event belongs to */
   namespaceId: string;
-  /** Network egress in bytes during event window */
-  networkEgressBytes?: string;
-  /** Network ingress in bytes during event window */
-  networkIngressBytes?: string;
-  /** Number of active pods in the namespace at time of event */
-  podCount?: number;
-  /** Storage usage in bytes at time of event */
-  storageBytes?: string;
 }
 /** Represents an update to a `PlatformNamespaceEvent`. Fields that are set will be updated. */
 export interface PlatformNamespaceEventPatch {
   /** User who triggered this event (NULL for system/automated) */
   actorId?: string;
-  /** CPU usage in millicores at time of event */
-  cpuMillicores?: number;
   /** Event timestamp (partition key) */
   createdAt?: string;
   /** Event type: created, activated, deactivated, labels_updated, annotations_updated, renamed */
   eventType?: string;
   /** Unique event identifier */
   id?: string;
-  /** Memory usage in bytes at time of event */
-  memoryBytes?: string;
   /** Human-readable description of the event */
   message?: string;
   /** Structured context (old/new values, labels diff, etc.) */
   metadata?: unknown;
-  /** Additional resource metrics (gpu, replicas, quotas, etc.) */
-  metrics?: unknown;
   /** Namespace this event belongs to */
   namespaceId?: string;
-  /** Network egress in bytes during event window */
-  networkEgressBytes?: string;
-  /** Network ingress in bytes during event window */
-  networkIngressBytes?: string;
-  /** Number of active pods in the namespace at time of event */
-  podCount?: number;
-  /** Storage usage in bytes at time of event */
-  storageBytes?: string;
 }
 /** A filter to be used against `PlatformNamespace` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceFilter {
@@ -1056,40 +944,6 @@ export interface UpdateDbPresetInput {
   /** Unique preset identifier */
   id: string;
 }
-export interface UpdateInfraCommitInput {
-  clientMutationId?: string;
-  /** Unique commit identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `InfraCommit` being updated. */
-  infraCommitPatch: InfraCommitPatch;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-export interface UpdateInfraObjectInput {
-  clientMutationId?: string;
-  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
-  id: string;
-  /** An object where the defined keys will be set on the `InfraObject` being updated. */
-  infraObjectPatch: InfraObjectPatch;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-export interface UpdateInfraRefInput {
-  clientMutationId?: string;
-  /** Unique ref identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `InfraRef` being updated. */
-  infraRefPatch: InfraRefPatch;
-  /** Opaque store partition key for the global tier */
-  scopeId: string;
-}
-export interface UpdateInfraStoreInput {
-  clientMutationId?: string;
-  /** Unique store identifier */
-  id: string;
-  /** An object where the defined keys will be set on the `InfraStore` being updated. */
-  infraStorePatch: InfraStorePatch;
-}
 export interface UpdateNamespaceEventInput {
   clientMutationId?: string;
   /** Event timestamp (partition key) */
@@ -1104,6 +958,40 @@ export interface UpdateNamespaceInput {
   id: string;
   /** An object where the defined keys will be set on the `Namespace` being updated. */
   namespacePatch: NamespacePatch;
+}
+export interface UpdatePlatformInfraCommitInput {
+  clientMutationId?: string;
+  /** Unique commit identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraCommit` being updated. */
+  platformInfraCommitPatch: PlatformInfraCommitPatch;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdatePlatformInfraObjectInput {
+  clientMutationId?: string;
+  /** Content-addressed UUID v5 — deterministic hash of (data, kids, ktree) */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraObject` being updated. */
+  platformInfraObjectPatch: PlatformInfraObjectPatch;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdatePlatformInfraRefInput {
+  clientMutationId?: string;
+  /** Unique ref identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraRef` being updated. */
+  platformInfraRefPatch: PlatformInfraRefPatch;
+  /** Opaque store partition key for the global tier */
+  scopeId: string;
+}
+export interface UpdatePlatformInfraStoreInput {
+  clientMutationId?: string;
+  /** Unique store identifier */
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformInfraStore` being updated. */
+  platformInfraStorePatch: PlatformInfraStorePatch;
 }
 export interface UpdatePlatformNamespaceEventInput {
   clientMutationId?: string;
@@ -1131,41 +1019,6 @@ export interface DbPresetConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `InfraCommit` values. */
-export interface InfraCommitConnection {
-  edges: InfraCommitEdge[];
-  nodes: InfraCommit[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `InfraGetAllRecord` values. */
-export interface InfraGetAllConnection {
-  edges: InfraGetAllEdge[];
-  nodes: InfraGetAllRecord[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `InfraObject` values. */
-export interface InfraObjectConnection {
-  edges: InfraObjectEdge[];
-  nodes: InfraObject[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `InfraRef` values. */
-export interface InfraRefConnection {
-  edges: InfraRefEdge[];
-  nodes: InfraRef[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `InfraStore` values. */
-export interface InfraStoreConnection {
-  edges: InfraStoreEdge[];
-  nodes: InfraStore[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `NamespaceEvent` values. */
 export interface NamespaceEventConnection {
   edges: NamespaceEventEdge[];
@@ -1177,6 +1030,41 @@ export interface NamespaceEventConnection {
 export interface NamespaceConnection {
   edges: NamespaceEdge[];
   nodes: Namespace[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraCommit` values. */
+export interface PlatformInfraCommitConnection {
+  edges: PlatformInfraCommitEdge[];
+  nodes: PlatformInfraCommit[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraGetAllTreeNodesRecord` values. */
+export interface PlatformInfraGetAllTreeNodesConnection {
+  edges: PlatformInfraGetAllTreeNodesEdge[];
+  nodes: PlatformInfraGetAllTreeNodesRecord[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraObject` values. */
+export interface PlatformInfraObjectConnection {
+  edges: PlatformInfraObjectEdge[];
+  nodes: PlatformInfraObject[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraRef` values. */
+export interface PlatformInfraRefConnection {
+  edges: PlatformInfraRefEdge[];
+  nodes: PlatformInfraRef[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformInfraStore` values. */
+export interface PlatformInfraStoreConnection {
+  edges: PlatformInfraStoreEdge[];
+  nodes: PlatformInfraStore[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1200,30 +1088,6 @@ export interface CreateDbPresetPayload {
   dbPreset?: DbPreset | null;
   dbPresetEdge?: DbPresetEdge | null;
 }
-export interface CreateInfraCommitPayload {
-  clientMutationId?: string | null;
-  /** The `InfraCommit` that was created by this mutation. */
-  infraCommit?: InfraCommit | null;
-  infraCommitEdge?: InfraCommitEdge | null;
-}
-export interface CreateInfraObjectPayload {
-  clientMutationId?: string | null;
-  /** The `InfraObject` that was created by this mutation. */
-  infraObject?: InfraObject | null;
-  infraObjectEdge?: InfraObjectEdge | null;
-}
-export interface CreateInfraRefPayload {
-  clientMutationId?: string | null;
-  /** The `InfraRef` that was created by this mutation. */
-  infraRef?: InfraRef | null;
-  infraRefEdge?: InfraRefEdge | null;
-}
-export interface CreateInfraStorePayload {
-  clientMutationId?: string | null;
-  /** The `InfraStore` that was created by this mutation. */
-  infraStore?: InfraStore | null;
-  infraStoreEdge?: InfraStoreEdge | null;
-}
 export interface CreateNamespacePayload {
   clientMutationId?: string | null;
   /** The `Namespace` that was created by this mutation. */
@@ -1235,6 +1099,30 @@ export interface CreateNamespaceEventPayload {
   /** The `NamespaceEvent` that was created by this mutation. */
   namespaceEvent?: NamespaceEvent | null;
   namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface CreatePlatformInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraCommit` that was created by this mutation. */
+  platformInfraCommit?: PlatformInfraCommit | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+}
+export interface CreatePlatformInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraObject` that was created by this mutation. */
+  platformInfraObject?: PlatformInfraObject | null;
+  platformInfraObjectEdge?: PlatformInfraObjectEdge | null;
+}
+export interface CreatePlatformInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraRef` that was created by this mutation. */
+  platformInfraRef?: PlatformInfraRef | null;
+  platformInfraRefEdge?: PlatformInfraRefEdge | null;
+}
+export interface CreatePlatformInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraStore` that was created by this mutation. */
+  platformInfraStore?: PlatformInfraStore | null;
+  platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
 }
 export interface CreatePlatformNamespacePayload {
   clientMutationId?: string | null;
@@ -1254,30 +1142,6 @@ export interface DeleteDbPresetPayload {
   dbPreset?: DbPreset | null;
   dbPresetEdge?: DbPresetEdge | null;
 }
-export interface DeleteInfraCommitPayload {
-  clientMutationId?: string | null;
-  /** The `InfraCommit` that was deleted by this mutation. */
-  infraCommit?: InfraCommit | null;
-  infraCommitEdge?: InfraCommitEdge | null;
-}
-export interface DeleteInfraObjectPayload {
-  clientMutationId?: string | null;
-  /** The `InfraObject` that was deleted by this mutation. */
-  infraObject?: InfraObject | null;
-  infraObjectEdge?: InfraObjectEdge | null;
-}
-export interface DeleteInfraRefPayload {
-  clientMutationId?: string | null;
-  /** The `InfraRef` that was deleted by this mutation. */
-  infraRef?: InfraRef | null;
-  infraRefEdge?: InfraRefEdge | null;
-}
-export interface DeleteInfraStorePayload {
-  clientMutationId?: string | null;
-  /** The `InfraStore` that was deleted by this mutation. */
-  infraStore?: InfraStore | null;
-  infraStoreEdge?: InfraStoreEdge | null;
-}
 export interface DeleteNamespacePayload {
   clientMutationId?: string | null;
   /** The `Namespace` that was deleted by this mutation. */
@@ -1289,6 +1153,30 @@ export interface DeleteNamespaceEventPayload {
   /** The `NamespaceEvent` that was deleted by this mutation. */
   namespaceEvent?: NamespaceEvent | null;
   namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface DeletePlatformInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraCommit` that was deleted by this mutation. */
+  platformInfraCommit?: PlatformInfraCommit | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+}
+export interface DeletePlatformInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraObject` that was deleted by this mutation. */
+  platformInfraObject?: PlatformInfraObject | null;
+  platformInfraObjectEdge?: PlatformInfraObjectEdge | null;
+}
+export interface DeletePlatformInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraRef` that was deleted by this mutation. */
+  platformInfraRef?: PlatformInfraRef | null;
+  platformInfraRefEdge?: PlatformInfraRefEdge | null;
+}
+export interface DeletePlatformInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraStore` that was deleted by this mutation. */
+  platformInfraStore?: PlatformInfraStore | null;
+  platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
 }
 export interface DeletePlatformNamespacePayload {
   clientMutationId?: string | null;
@@ -1302,14 +1190,14 @@ export interface DeletePlatformNamespaceEventPayload {
   platformNamespaceEvent?: PlatformNamespaceEvent | null;
   platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
 }
-export interface InfraInitEmptyRepoPayload {
+export interface PlatformInfraInitEmptyRepoPayload {
   clientMutationId?: string | null;
 }
-export interface InfraInsertNodeAtPathPayload {
+export interface PlatformInfraInsertNodeAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export interface InfraSetDataAtPathPayload {
+export interface PlatformInfraSetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -1333,30 +1221,6 @@ export interface UpdateDbPresetPayload {
   dbPreset?: DbPreset | null;
   dbPresetEdge?: DbPresetEdge | null;
 }
-export interface UpdateInfraCommitPayload {
-  clientMutationId?: string | null;
-  /** The `InfraCommit` that was updated by this mutation. */
-  infraCommit?: InfraCommit | null;
-  infraCommitEdge?: InfraCommitEdge | null;
-}
-export interface UpdateInfraObjectPayload {
-  clientMutationId?: string | null;
-  /** The `InfraObject` that was updated by this mutation. */
-  infraObject?: InfraObject | null;
-  infraObjectEdge?: InfraObjectEdge | null;
-}
-export interface UpdateInfraRefPayload {
-  clientMutationId?: string | null;
-  /** The `InfraRef` that was updated by this mutation. */
-  infraRef?: InfraRef | null;
-  infraRefEdge?: InfraRefEdge | null;
-}
-export interface UpdateInfraStorePayload {
-  clientMutationId?: string | null;
-  /** The `InfraStore` that was updated by this mutation. */
-  infraStore?: InfraStore | null;
-  infraStoreEdge?: InfraStoreEdge | null;
-}
 export interface UpdateNamespacePayload {
   clientMutationId?: string | null;
   /** The `Namespace` that was updated by this mutation. */
@@ -1368,6 +1232,30 @@ export interface UpdateNamespaceEventPayload {
   /** The `NamespaceEvent` that was updated by this mutation. */
   namespaceEvent?: NamespaceEvent | null;
   namespaceEventEdge?: NamespaceEventEdge | null;
+}
+export interface UpdatePlatformInfraCommitPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraCommit` that was updated by this mutation. */
+  platformInfraCommit?: PlatformInfraCommit | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+}
+export interface UpdatePlatformInfraObjectPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraObject` that was updated by this mutation. */
+  platformInfraObject?: PlatformInfraObject | null;
+  platformInfraObjectEdge?: PlatformInfraObjectEdge | null;
+}
+export interface UpdatePlatformInfraRefPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraRef` that was updated by this mutation. */
+  platformInfraRef?: PlatformInfraRef | null;
+  platformInfraRefEdge?: PlatformInfraRefEdge | null;
+}
+export interface UpdatePlatformInfraStorePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformInfraStore` that was updated by this mutation. */
+  platformInfraStore?: PlatformInfraStore | null;
+  platformInfraStoreEdge?: PlatformInfraStoreEdge | null;
 }
 export interface UpdatePlatformNamespacePayload {
   clientMutationId?: string | null;
@@ -1420,36 +1308,6 @@ export interface PageInfo {
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
 }
-/** A `InfraCommit` edge in the connection. */
-export interface InfraCommitEdge {
-  cursor?: string | null;
-  /** The `InfraCommit` at the end of the edge. */
-  node?: InfraCommit | null;
-}
-/** A `InfraGetAllRecord` edge in the connection. */
-export interface InfraGetAllEdge {
-  cursor?: string | null;
-  /** The `InfraGetAllRecord` at the end of the edge. */
-  node?: InfraGetAllRecord | null;
-}
-/** A `InfraObject` edge in the connection. */
-export interface InfraObjectEdge {
-  cursor?: string | null;
-  /** The `InfraObject` at the end of the edge. */
-  node?: InfraObject | null;
-}
-/** A `InfraRef` edge in the connection. */
-export interface InfraRefEdge {
-  cursor?: string | null;
-  /** The `InfraRef` at the end of the edge. */
-  node?: InfraRef | null;
-}
-/** A `InfraStore` edge in the connection. */
-export interface InfraStoreEdge {
-  cursor?: string | null;
-  /** The `InfraStore` at the end of the edge. */
-  node?: InfraStore | null;
-}
 /** A `NamespaceEvent` edge in the connection. */
 export interface NamespaceEventEdge {
   cursor?: string | null;
@@ -1461,6 +1319,36 @@ export interface NamespaceEdge {
   cursor?: string | null;
   /** The `Namespace` at the end of the edge. */
   node?: Namespace | null;
+}
+/** A `PlatformInfraCommit` edge in the connection. */
+export interface PlatformInfraCommitEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraCommit` at the end of the edge. */
+  node?: PlatformInfraCommit | null;
+}
+/** A `PlatformInfraGetAllTreeNodesRecord` edge in the connection. */
+export interface PlatformInfraGetAllTreeNodesEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraGetAllTreeNodesRecord` at the end of the edge. */
+  node?: PlatformInfraGetAllTreeNodesRecord | null;
+}
+/** A `PlatformInfraObject` edge in the connection. */
+export interface PlatformInfraObjectEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraObject` at the end of the edge. */
+  node?: PlatformInfraObject | null;
+}
+/** A `PlatformInfraRef` edge in the connection. */
+export interface PlatformInfraRefEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraRef` at the end of the edge. */
+  node?: PlatformInfraRef | null;
+}
+/** A `PlatformInfraStore` edge in the connection. */
+export interface PlatformInfraStoreEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraStore` at the end of the edge. */
+  node?: PlatformInfraStore | null;
 }
 /** A `PlatformNamespaceEvent` edge in the connection. */
 export interface PlatformNamespaceEventEdge {

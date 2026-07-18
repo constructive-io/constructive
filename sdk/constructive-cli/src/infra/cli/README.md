@@ -27,18 +27,18 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `db-preset` | dbPreset CRUD operations |
-| `infra-commit` | infraCommit CRUD operations |
-| `infra-get-all-record` | infraGetAllRecord CRUD operations |
-| `infra-object` | infraObject CRUD operations |
-| `infra-ref` | infraRef CRUD operations |
-| `infra-store` | infraStore CRUD operations |
 | `namespace` | namespace CRUD operations |
 | `namespace-event` | namespaceEvent CRUD operations |
+| `platform-infra-commit` | platformInfraCommit CRUD operations |
+| `platform-infra-get-all-tree-nodes-record` | platformInfraGetAllTreeNodesRecord CRUD operations |
+| `platform-infra-object` | platformInfraObject CRUD operations |
+| `platform-infra-ref` | platformInfraRef CRUD operations |
+| `platform-infra-store` | platformInfraStore CRUD operations |
 | `platform-namespace` | platformNamespace CRUD operations |
 | `platform-namespace-event` | platformNamespaceEvent CRUD operations |
-| `infra-init-empty-repo` | infraInitEmptyRepo |
-| `infra-insert-node-at-path` | infraInsertNodeAtPath |
-| `infra-set-data-at-path` | infraSetDataAtPath |
+| `platform-infra-init-empty-repo` | platformInfraInitEmptyRepo |
+| `platform-infra-insert-node-at-path` | platformInfraInsertNodeAtPath |
+| `platform-infra-set-data-at-path` | platformInfraSetDataAtPath |
 | `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
@@ -117,137 +117,6 @@ CRUD operations for DbPreset records.
 **Required create fields:** `definition`, `slug`
 **Optional create fields (backend defaults):** `active`, `commitId`, `description`, `label`, `modulesHash`, `storeId`
 
-### `infra-commit`
-
-CRUD operations for InfraCommit records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all infraCommit records |
-| `find-first` | Find first matching infraCommit record |
-| `get` | Get a infraCommit by id |
-| `create` | Create a new infraCommit |
-| `update` | Update an existing infraCommit |
-| `delete` | Delete a infraCommit |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `authorId` | UUID |
-| `committerId` | UUID |
-| `date` | Datetime |
-| `id` | UUID |
-| `message` | String |
-| `parentIds` | UUID |
-| `scopeId` | UUID |
-| `storeId` | UUID |
-| `treeId` | UUID |
-
-**Required create fields:** `scopeId`, `storeId`
-**Optional create fields (backend defaults):** `authorId`, `committerId`, `date`, `message`, `parentIds`, `treeId`
-
-### `infra-get-all-record`
-
-CRUD operations for InfraGetAllRecord records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all infraGetAllRecord records |
-| `find-first` | Find first matching infraGetAllRecord record |
-| `get` | Get a infraGetAllRecord by id |
-| `create` | Create a new infraGetAllRecord |
-| `update` | Update an existing infraGetAllRecord |
-| `delete` | Delete a infraGetAllRecord |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `data` | JSON |
-| `path` | String |
-
-**Required create fields:** `data`, `path`
-
-### `infra-object`
-
-CRUD operations for InfraObject records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all infraObject records |
-| `find-first` | Find first matching infraObject record |
-| `get` | Get a infraObject by id |
-| `create` | Create a new infraObject |
-| `update` | Update an existing infraObject |
-| `delete` | Delete a infraObject |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `data` | JSON |
-| `id` | UUID |
-| `kids` | UUID |
-| `ktree` | String |
-| `scopeId` | UUID |
-
-**Required create fields:** `scopeId`
-**Optional create fields (backend defaults):** `data`, `kids`, `ktree`
-
-### `infra-ref`
-
-CRUD operations for InfraRef records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all infraRef records |
-| `find-first` | Find first matching infraRef record |
-| `get` | Get a infraRef by id |
-| `create` | Create a new infraRef |
-| `update` | Update an existing infraRef |
-| `delete` | Delete a infraRef |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `commitId` | UUID |
-| `id` | UUID |
-| `name` | String |
-| `scopeId` | UUID |
-| `storeId` | UUID |
-
-**Required create fields:** `name`, `scopeId`, `storeId`
-**Optional create fields (backend defaults):** `commitId`
-
-### `infra-store`
-
-CRUD operations for InfraStore records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all infraStore records |
-| `find-first` | Find first matching infraStore record |
-| `get` | Get a infraStore by id |
-| `create` | Create a new infraStore |
-| `update` | Update an existing infraStore |
-| `delete` | Delete a infraStore |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `hash` | UUID |
-| `id` | UUID |
-| `name` | String |
-| `scopeId` | UUID |
-
-**Required create fields:** `name`, `scopeId`
-**Optional create fields (backend defaults):** `hash`
-
 ### `namespace`
 
 CRUD operations for Namespace records.
@@ -300,23 +169,147 @@ CRUD operations for NamespaceEvent records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
-| `cpuMillicores` | Int |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
 | `eventType` | String |
 | `id` | UUID |
-| `memoryBytes` | BigInt |
 | `message` | String |
 | `metadata` | JSON |
-| `metrics` | JSON |
 | `namespaceId` | UUID |
-| `networkEgressBytes` | BigInt |
-| `networkIngressBytes` | BigInt |
-| `podCount` | Int |
-| `storageBytes` | BigInt |
 
 **Required create fields:** `databaseId`, `eventType`, `namespaceId`
-**Optional create fields (backend defaults):** `actorId`, `cpuMillicores`, `memoryBytes`, `message`, `metadata`, `metrics`, `networkEgressBytes`, `networkIngressBytes`, `podCount`, `storageBytes`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
+
+### `platform-infra-commit`
+
+CRUD operations for PlatformInfraCommit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraCommit records |
+| `find-first` | Find first matching platformInfraCommit record |
+| `get` | Get a platformInfraCommit by id |
+| `create` | Create a new platformInfraCommit |
+| `update` | Update an existing platformInfraCommit |
+| `delete` | Delete a platformInfraCommit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `authorId` | UUID |
+| `committerId` | UUID |
+| `date` | Datetime |
+| `id` | UUID |
+| `message` | String |
+| `parentIds` | UUID |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+| `treeId` | UUID |
+
+**Required create fields:** `scopeId`, `storeId`
+**Optional create fields (backend defaults):** `authorId`, `committerId`, `date`, `message`, `parentIds`, `treeId`
+
+### `platform-infra-get-all-tree-nodes-record`
+
+CRUD operations for PlatformInfraGetAllTreeNodesRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraGetAllTreeNodesRecord records |
+| `find-first` | Find first matching platformInfraGetAllTreeNodesRecord record |
+| `get` | Get a platformInfraGetAllTreeNodesRecord by id |
+| `create` | Create a new platformInfraGetAllTreeNodesRecord |
+| `update` | Update an existing platformInfraGetAllTreeNodesRecord |
+| `delete` | Delete a platformInfraGetAllTreeNodesRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `data` | JSON |
+| `path` | String |
+
+**Required create fields:** `data`, `path`
+
+### `platform-infra-object`
+
+CRUD operations for PlatformInfraObject records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraObject records |
+| `find-first` | Find first matching platformInfraObject record |
+| `get` | Get a platformInfraObject by id |
+| `create` | Create a new platformInfraObject |
+| `update` | Update an existing platformInfraObject |
+| `delete` | Delete a platformInfraObject |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `data` | JSON |
+| `id` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+| `scopeId` | UUID |
+
+**Required create fields:** `scopeId`
+**Optional create fields (backend defaults):** `data`, `kids`, `ktree`
+
+### `platform-infra-ref`
+
+CRUD operations for PlatformInfraRef records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraRef records |
+| `find-first` | Find first matching platformInfraRef record |
+| `get` | Get a platformInfraRef by id |
+| `create` | Create a new platformInfraRef |
+| `update` | Update an existing platformInfraRef |
+| `delete` | Delete a platformInfraRef |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `commitId` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+| `storeId` | UUID |
+
+**Required create fields:** `name`, `scopeId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`
+
+### `platform-infra-store`
+
+CRUD operations for PlatformInfraStore records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInfraStore records |
+| `find-first` | Find first matching platformInfraStore record |
+| `get` | Get a platformInfraStore by id |
+| `create` | Create a new platformInfraStore |
+| `update` | Update an existing platformInfraStore |
+| `delete` | Delete a platformInfraStore |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `hash` | UUID |
+| `id` | UUID |
+| `name` | String |
+| `scopeId` | UUID |
+
+**Required create fields:** `name`, `scopeId`
+**Optional create fields (backend defaults):** `hash`
 
 ### `platform-namespace`
 
@@ -369,28 +362,21 @@ CRUD operations for PlatformNamespaceEvent records.
 | Field | Type |
 |-------|------|
 | `actorId` | UUID |
-| `cpuMillicores` | Int |
 | `createdAt` | Datetime |
 | `eventType` | String |
 | `id` | UUID |
-| `memoryBytes` | BigInt |
 | `message` | String |
 | `metadata` | JSON |
-| `metrics` | JSON |
 | `namespaceId` | UUID |
-| `networkEgressBytes` | BigInt |
-| `networkIngressBytes` | BigInt |
-| `podCount` | Int |
-| `storageBytes` | BigInt |
 
 **Required create fields:** `eventType`, `namespaceId`
-**Optional create fields (backend defaults):** `actorId`, `cpuMillicores`, `memoryBytes`, `message`, `metadata`, `metrics`, `networkEgressBytes`, `networkIngressBytes`, `podCount`, `storageBytes`
+**Optional create fields (backend defaults):** `actorId`, `message`, `metadata`
 
 ## Custom Operations
 
-### `infra-init-empty-repo`
+### `platform-infra-init-empty-repo`
 
-infraInitEmptyRepo
+platformInfraInitEmptyRepo
 
 - **Type:** mutation
 - **Arguments:**
@@ -401,9 +387,9 @@ infraInitEmptyRepo
   | `--input.sId` | UUID |
   | `--input.storeId` | UUID |
 
-### `infra-insert-node-at-path`
+### `platform-infra-insert-node-at-path`
 
-infraInsertNodeAtPath
+platformInfraInsertNodeAtPath
 
 - **Type:** mutation
 - **Arguments:**
@@ -418,9 +404,9 @@ infraInsertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
-### `infra-set-data-at-path`
+### `platform-infra-set-data-at-path`
 
-infraSetDataAtPath
+platformInfraSetDataAtPath
 
 - **Type:** mutation
 - **Arguments:**

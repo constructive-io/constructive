@@ -525,33 +525,35 @@ type DeleteStorePayload {
   ): StoreEdge
 }
 
-"""A connection to a list of `GetAllRecord` values."""
-type GetAllConnection {
+"""A connection to a list of `GetAllTreeNodesRecord` values."""
+type GetAllTreeNodesConnection {
   """
-  A list of edges which contains the `GetAllRecord` and cursor to aid in pagination.
+  A list of edges which contains the `GetAllTreeNodesRecord` and cursor to aid in pagination.
   """
-  edges: [GetAllEdge]!
+  edges: [GetAllTreeNodesEdge]!
 
-  """A list of `GetAllRecord` objects."""
-  nodes: [GetAllRecord]!
+  """A list of `GetAllTreeNodesRecord` objects."""
+  nodes: [GetAllTreeNodesRecord]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `GetAllRecord` you could get from the connection."""
+  """
+  The count of *all* `GetAllTreeNodesRecord` you could get from the connection.
+  """
   totalCount: Int!
 }
 
-"""A `GetAllRecord` edge in the connection."""
-type GetAllEdge {
+"""A `GetAllTreeNodesRecord` edge in the connection."""
+type GetAllTreeNodesEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `GetAllRecord` at the end of the edge."""
-  node: GetAllRecord
+  """The `GetAllTreeNodesRecord` at the end of the edge."""
+  node: GetAllTreeNodesRecord
 }
 
-type GetAllRecord {
+type GetAllTreeNodesRecord {
   data: JSON
   path: [String]
 }
@@ -1277,8 +1279,8 @@ type Query {
     where: CommitFilter
   ): CommitConnection
 
-  """Reads and enables pagination through a set of `GetAllRecord`."""
-  getAll(
+  """Reads and enables pagination through a set of `GetAllTreeNodesRecord`."""
+  getAllTreeNodes(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
@@ -1292,7 +1294,7 @@ type Query {
     """
     offset: Int
     sId: UUID
-  ): GetAllConnection
+  ): GetAllTreeNodesConnection
   getNodeAtPath(id: UUID, path: [String], sId: UUID): Object
 
   """Reads and enables pagination through a set of `Object`."""

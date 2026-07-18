@@ -25,8 +25,9 @@ import { FieldModel } from './models/field';
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
 import { FunctionModel } from './models/function';
+import { HttpRouteModel } from './models/httpRoute';
 import { IndexModel } from './models/index';
-import { MigrateFileModel } from './models/migrateFile';
+import { ManagedDomainModel } from './models/managedDomain';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { PartitionModel } from './models/partition';
 import { PolicyModel } from './models/policy';
@@ -106,8 +107,9 @@ export function createClient(config: OrmClientConfig) {
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),
     function: new FunctionModel(client),
+    httpRoute: new HttpRouteModel(client),
     index: new IndexModel(client),
-    migrateFile: new MigrateFileModel(client),
+    managedDomain: new ManagedDomainModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     partition: new PartitionModel(client),
     policy: new PolicyModel(client),

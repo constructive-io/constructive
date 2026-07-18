@@ -6,7 +6,7 @@
 
 import type {
   Commit,
-  GetAllRecord,
+  GetAllTreeNodesRecord,
   Object,
   Ref,
   Store,
@@ -429,10 +429,10 @@ export interface CommitConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `GetAllRecord` values. */
-export interface GetAllConnection {
-  edges: GetAllEdge[];
-  nodes: GetAllRecord[];
+/** A connection to a list of `GetAllTreeNodesRecord` values. */
+export interface GetAllTreeNodesConnection {
+  edges: GetAllTreeNodesEdge[];
+  nodes: GetAllTreeNodesRecord[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -593,11 +593,11 @@ export interface PageInfo {
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
 }
-/** A `GetAllRecord` edge in the connection. */
-export interface GetAllEdge {
+/** A `GetAllTreeNodesRecord` edge in the connection. */
+export interface GetAllTreeNodesEdge {
   cursor?: string | null;
-  /** The `GetAllRecord` at the end of the edge. */
-  node?: GetAllRecord | null;
+  /** The `GetAllTreeNodesRecord` at the end of the edge. */
+  node?: GetAllTreeNodesRecord | null;
 }
 /** A `Object` edge in the connection. */
 export interface ObjectEdge {

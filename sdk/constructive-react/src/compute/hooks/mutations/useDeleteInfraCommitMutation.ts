@@ -41,7 +41,7 @@ export function useDeleteInfraCommitMutation<S extends InfraCommitSelect>(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -55,7 +55,7 @@ export function useDeleteInfraCommitMutation<S extends InfraCommitSelect>(
   Error,
   {
     id: string;
-    scopeId: string;
+    databaseId: string;
   }
 >;
 export function useDeleteInfraCommitMutation(
@@ -67,7 +67,7 @@ export function useDeleteInfraCommitMutation(
       Error,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       }
     >,
     'mutationFn'
@@ -79,12 +79,12 @@ export function useDeleteInfraCommitMutation(
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: infraCommitMutationKeys.all,
-    mutationFn: ({ id, scopeId }: { id: string; scopeId: string }) =>
+    mutationFn: ({ id, databaseId }: { id: string; databaseId: string }) =>
       getClient()
         .infraCommit.delete({
           where: {
             id,
-            scopeId,
+            databaseId,
           },
           select: args.select,
         })

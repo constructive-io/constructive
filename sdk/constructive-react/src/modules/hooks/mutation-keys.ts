@@ -295,6 +295,15 @@ export const hierarchyModuleMutationKeys = {
   /** Delete hierarchyModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'hierarchymodule', 'delete', id] as const,
 } as const;
+export const httpRouteModuleMutationKeys = {
+  /** All httpRouteModule mutation keys */ all: ['mutation', 'httproutemodule'] as const,
+  /** Create httpRouteModule mutation key */ create: () =>
+    ['mutation', 'httproutemodule', 'create'] as const,
+  /** Update httpRouteModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'httproutemodule', 'update', id] as const,
+  /** Delete httpRouteModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'httproutemodule', 'delete', id] as const,
+} as const;
 export const i18NModuleMutationKeys = {
   /** All i18NModule mutation keys */ all: ['mutation', 'i18nmodule'] as const,
   /** Create i18NModule mutation key */ create: () => ['mutation', 'i18nmodule', 'create'] as const,
@@ -656,6 +665,15 @@ export const webauthnCredentialsModuleMutationKeys = {
   /** Delete webauthnCredentialsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'webauthncredentialsmodule', 'delete', id] as const,
 } as const;
+export const webhookModuleMutationKeys = {
+  /** All webhookModule mutation keys */ all: ['mutation', 'webhookmodule'] as const,
+  /** Create webhookModule mutation key */ create: () =>
+    ['mutation', 'webhookmodule', 'create'] as const,
+  /** Update webhookModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'webhookmodule', 'update', id] as const,
+  /** Delete webhookModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'webhookmodule', 'delete', id] as const,
+} as const;
 
 // ============================================================================
 // Custom Mutation Keys
@@ -760,6 +778,7 @@ export const mutationKeys = {
   graphExecutionModule: graphExecutionModuleMutationKeys,
   graphModule: graphModuleMutationKeys,
   hierarchyModule: hierarchyModuleMutationKeys,
+  httpRouteModule: httpRouteModuleMutationKeys,
   i18NModule: i18NModuleMutationKeys,
   identityProvidersModule: identityProvidersModuleMutationKeys,
   inferenceLogModule: inferenceLogModuleMutationKeys,
@@ -798,5 +817,6 @@ export const mutationKeys = {
   usersModule: usersModuleMutationKeys,
   webauthnAuthModule: webauthnAuthModuleMutationKeys,
   webauthnCredentialsModule: webauthnCredentialsModuleMutationKeys,
+  webhookModule: webhookModuleMutationKeys,
   custom: customMutationKeys,
 } as const;

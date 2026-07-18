@@ -12,8 +12,8 @@ csdk infra-ref list --where.<field>.<op> <value> --orderBy <values>
 csdk infra-ref list --limit 10 --after <cursor>
 csdk infra-ref find-first --where.<field>.<op> <value>
 csdk infra-ref get --id <UUID>
-csdk infra-ref create --name <String> --scopeId <UUID> --storeId <UUID> [--commitId <UUID>]
-csdk infra-ref update --id <UUID> [--commitId <UUID>] [--name <String>] [--scopeId <UUID>] [--storeId <UUID>]
+csdk infra-ref create --databaseId <UUID> --name <String> --storeId <UUID> [--commitId <UUID>]
+csdk infra-ref update --id <UUID> [--commitId <UUID>] [--databaseId <UUID>] [--name <String>] [--storeId <UUID>]
 csdk infra-ref delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk infra-ref list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a infraRef
 
 ```bash
-csdk infra-ref create --name <String> --scopeId <UUID> --storeId <UUID> [--commitId <UUID>]
+csdk infra-ref create --databaseId <UUID> --name <String> --storeId <UUID> [--commitId <UUID>]
 ```
 
 ### Get a infraRef by id

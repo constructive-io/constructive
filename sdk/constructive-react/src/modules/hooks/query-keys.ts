@@ -271,6 +271,15 @@ export const hierarchyModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...hierarchyModuleKeys.details(), id] as const,
 } as const;
+export const httpRouteModuleKeys = {
+  /** All httpRouteModule queries */ all: ['httproutemodule'] as const,
+  /** List query keys */ lists: () => [...httpRouteModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...httpRouteModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...httpRouteModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...httpRouteModuleKeys.details(), id] as const,
+} as const;
 export const i18NModuleKeys = {
   /** All i18NModule queries */ all: ['i18nmodule'] as const,
   /** List query keys */ lists: () => [...i18NModuleKeys.all, 'list'] as const,
@@ -614,6 +623,15 @@ export const webauthnCredentialsModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...webauthnCredentialsModuleKeys.details(), id] as const,
 } as const;
+export const webhookModuleKeys = {
+  /** All webhookModule queries */ all: ['webhookmodule'] as const,
+  /** List query keys */ lists: () => [...webhookModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...webhookModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...webhookModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...webhookModuleKeys.details(), id] as const,
+} as const;
 
 // ============================================================================
 // Custom Query Keys
@@ -676,6 +694,7 @@ export const queryKeys = {
   graphExecutionModule: graphExecutionModuleKeys,
   graphModule: graphModuleKeys,
   hierarchyModule: hierarchyModuleKeys,
+  httpRouteModule: httpRouteModuleKeys,
   i18NModule: i18NModuleKeys,
   identityProvidersModule: identityProvidersModuleKeys,
   inferenceLogModule: inferenceLogModuleKeys,
@@ -714,6 +733,7 @@ export const queryKeys = {
   usersModule: usersModuleKeys,
   webauthnAuthModule: webauthnAuthModuleKeys,
   webauthnCredentialsModule: webauthnCredentialsModuleKeys,
+  webhookModule: webhookModuleKeys,
   custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */

@@ -7,8 +7,8 @@ Branch heads — mutable pointers into the commit chain
 ## Usage
 
 ```typescript
-useInfraRefsQuery({ selection: { fields: { commitId: true, id: true, name: true, scopeId: true, storeId: true } } })
-useInfraRefQuery({ id: '<UUID>', selection: { fields: { commitId: true, id: true, name: true, scopeId: true, storeId: true } } })
+useInfraRefsQuery({ selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } } })
+useInfraRefQuery({ id: '<UUID>', selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } } })
 useCreateInfraRefMutation({ selection: { fields: { id: true } } })
 useUpdateInfraRefMutation({ selection: { fields: { id: true } } })
 useDeleteInfraRefMutation({})
@@ -20,7 +20,7 @@ useDeleteInfraRefMutation({})
 
 ```typescript
 const { data, isLoading } = useInfraRefsQuery({
-  selection: { fields: { commitId: true, id: true, name: true, scopeId: true, storeId: true } },
+  selection: { fields: { commitId: true, databaseId: true, id: true, name: true, storeId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useInfraRefsQuery({
 const { mutate } = useCreateInfraRefMutation({
   selection: { fields: { id: true } },
 });
-mutate({ commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' });
+mutate({ commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' });
 ```

@@ -162,7 +162,7 @@ export class InfraObjectModel {
       S,
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       },
       InfraObjectPatch
     > & {
@@ -185,7 +185,7 @@ export class InfraObjectModel {
       'infraObjectPatch',
       connectionFieldsMap,
       {
-        scopeId: args.where.scopeId,
+        databaseId: args.where.databaseId,
       }
     );
     return new QueryBuilder({
@@ -201,7 +201,7 @@ export class InfraObjectModel {
     args: DeleteArgs<
       {
         id: string;
-        scopeId: string;
+        databaseId: string;
       },
       S
     > & {
@@ -218,7 +218,7 @@ export class InfraObjectModel {
       'infraObject',
       {
         id: args.where.id,
-        scopeId: args.where.scopeId,
+        databaseId: args.where.databaseId,
       },
       'DeleteInfraObjectInput',
       args.select,

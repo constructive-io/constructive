@@ -46,8 +46,9 @@ csdk auth set-token <your-token>
 | `foreign-key-constraint` | foreignKeyConstraint CRUD operations |
 | `full-text-search` | fullTextSearch CRUD operations |
 | `function` | function CRUD operations |
+| `http-route` | httpRoute CRUD operations |
 | `index` | index CRUD operations |
-| `migrate-file` | migrateFile CRUD operations |
+| `managed-domain` | managedDomain CRUD operations |
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `partition` | partition CRUD operations |
 | `policy` | policy CRUD operations |
@@ -73,6 +74,7 @@ csdk auth set-token <your-token>
 | `view-table` | viewTable CRUD operations |
 | `webauthn-setting` | webauthnSetting CRUD operations |
 | `apply-registry-defaults` | applyRegistryDefaults |
+| `resolve-http-route` | resolveHttpRoute |
 | `accept-database-transfer` | acceptDatabaseTransfer |
 | `apply-rls` | applyRls |
 | `cancel-database-transfer` | cancelDatabaseTransfer |
@@ -294,8 +296,8 @@ CRUD operations for AstMigration records.
 
 | Field | Type |
 |-------|------|
-| `action` | String |
 | `actionId` | UUID |
+| `actionName` | String |
 | `actorId` | UUID |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
@@ -308,7 +310,7 @@ CRUD operations for AstMigration records.
 | `revert` | JSON |
 | `verify` | JSON |
 
-**Optional create fields (backend defaults):** `action`, `actionId`, `actorId`, `databaseId`, `deploy`, `deploys`, `name`, `payload`, `requires`, `revert`, `verify`
+**Required create fields:** `actionId`, `actionName`, `actorId`, `databaseId`, `deploy`, `deploys`, `name`, `payload`, `requires`, `revert`, `verify`
 
 ### `check-constraint`
 
@@ -768,6 +770,40 @@ CRUD operations for Function records.
 
 **Required create fields:** `databaseId`, `name`, `schemaId`
 
+### `http-route`
+
+CRUD operations for HttpRoute records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all httpRoute records |
+| `find-first` | Find first matching httpRoute record |
+| `get` | Get a httpRoute by id |
+| `create` | Create a new httpRoute |
+| `update` | Update an existing httpRoute |
+| `delete` | Delete a httpRoute |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `databaseId` | UUID |
+| `domainId` | UUID |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `method` | String |
+| `path` | String |
+| `priority` | Int |
+| `targetId` | UUID |
+| `targetKind` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+
+**Required create fields:** `databaseId`, `domainId`, `targetId`, `targetKind`
+**Optional create fields (backend defaults):** `createdBy`, `isActive`, `method`, `path`, `priority`, `updatedBy`
+
 ### `index`
 
 CRUD operations for Index records.
@@ -806,28 +842,35 @@ CRUD operations for Index records.
 **Required create fields:** `databaseId`, `tableId`
 **Optional create fields (backend defaults):** `accessMethod`, `category`, `fieldIds`, `includeFieldIds`, `indexParams`, `isUnique`, `name`, `opClasses`, `options`, `smartTags`, `tags`, `whereClause`
 
-### `migrate-file`
+### `managed-domain`
 
-CRUD operations for MigrateFile records.
+CRUD operations for ManagedDomain records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all migrateFile records |
-| `find-first` | Find first matching migrateFile record |
-| `get` | Get a migrateFile by id |
-| `create` | Create a new migrateFile |
-| `update` | Update an existing migrateFile |
-| `delete` | Delete a migrateFile |
+| `list` | List all managedDomain records |
+| `find-first` | Find first matching managedDomain record |
+| `get` | Get a managedDomain by id |
+| `create` | Create a new managedDomain |
+| `update` | Update an existing managedDomain |
+| `delete` | Delete a managedDomain |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
+| `annotations` | JSON |
 | `databaseId` | UUID |
+| `domain` | Hostname |
 | `id` | UUID |
-| `upload` | Upload |
+| `isWildcard` | Boolean |
+| `tlsReadyAt` | Datetime |
+| `tlsStatus` | String |
+| `verificationStatus` | String |
+| `verifiedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `databaseId`, `upload`
+**Required create fields:** `databaseId`, `domain`
+**Optional create fields (backend defaults):** `annotations`, `isWildcard`, `tlsReadyAt`, `tlsStatus`, `verificationStatus`, `verifiedAt`
 
 ### `node-type-registry`
 
@@ -1241,8 +1284,8 @@ CRUD operations for SqlAction records.
 
 | Field | Type |
 |-------|------|
-| `action` | String |
 | `actionId` | UUID |
+| `actionName` | String |
 | `actorId` | UUID |
 | `content` | String |
 | `createdAt` | Datetime |
@@ -1255,7 +1298,7 @@ CRUD operations for SqlAction records.
 | `revert` | String |
 | `verify` | String |
 
-**Optional create fields (backend defaults):** `action`, `actionId`, `actorId`, `content`, `databaseId`, `deploy`, `deps`, `name`, `payload`, `revert`, `verify`
+**Required create fields:** `actionId`, `actionName`, `actorId`, `content`, `databaseId`, `deploy`, `deps`, `name`, `payload`, `revert`, `verify`
 
 ### `table`
 
@@ -1590,6 +1633,19 @@ applyRegistryDefaults
   |----------|------|
   | `--data` | JSON |
   | `--nodeType` | String |
+
+### `resolve-http-route`
+
+resolveHttpRoute
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--pHost` | String |
+  | `--pMethod` | String |
+  | `--pPath` | String |
 
 ### `accept-database-transfer`
 

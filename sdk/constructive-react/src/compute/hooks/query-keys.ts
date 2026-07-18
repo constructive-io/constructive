@@ -28,6 +28,15 @@ export const dbPresetKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...dbPresetKeys.details(), id] as const,
 } as const;
+export const declaredCapacityKeys = {
+  /** All declaredCapacity queries */ all: ['declaredcapacity'] as const,
+  /** List query keys */ lists: () => [...declaredCapacityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...declaredCapacityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...declaredCapacityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...declaredCapacityKeys.details(), id] as const,
+} as const;
 export const functionApiBindingKeys = {
   /** All functionApiBinding queries */ all: ['functionapibinding'] as const,
   /** List query keys */ lists: () => [...functionApiBindingKeys.all, 'list'] as const,
@@ -158,14 +167,14 @@ export const functionInvocationKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionInvocationKeys.details(), id] as const,
 } as const;
-export const getAllRecordKeys = {
-  /** All getAllRecord queries */ all: ['getallrecord'] as const,
-  /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
+export const getAllTreeNodesRecordKeys = {
+  /** All getAllTreeNodesRecord queries */ all: ['getalltreenodesrecord'] as const,
+  /** List query keys */ lists: () => [...getAllTreeNodesRecordKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...getAllRecordKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...getAllRecordKeys.all, 'detail'] as const,
+    [...getAllTreeNodesRecordKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...getAllTreeNodesRecordKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...getAllRecordKeys.details(), id] as const,
+    [...getAllTreeNodesRecordKeys.details(), id] as const,
 } as const;
 export const infraCommitKeys = {
   /** All infraCommit queries */ all: ['infracommit'] as const,
@@ -176,14 +185,15 @@ export const infraCommitKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...infraCommitKeys.details(), id] as const,
 } as const;
-export const infraGetAllRecordKeys = {
-  /** All infraGetAllRecord queries */ all: ['infragetallrecord'] as const,
-  /** List query keys */ lists: () => [...infraGetAllRecordKeys.all, 'list'] as const,
+export const infraGetAllTreeNodesRecordKeys = {
+  /** All infraGetAllTreeNodesRecord queries */ all: ['infragetalltreenodesrecord'] as const,
+  /** List query keys */ lists: () => [...infraGetAllTreeNodesRecordKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...infraGetAllRecordKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...infraGetAllRecordKeys.all, 'detail'] as const,
+    [...infraGetAllTreeNodesRecordKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...infraGetAllTreeNodesRecordKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...infraGetAllRecordKeys.details(), id] as const,
+    [...infraGetAllTreeNodesRecordKeys.details(), id] as const,
 } as const;
 export const infraObjectKeys = {
   /** All infraObject queries */ all: ['infraobject'] as const,
@@ -238,6 +248,15 @@ export const namespaceEventKeys = {
   /** Detail query keys */ details: () => [...namespaceEventKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...namespaceEventKeys.details(), id] as const,
+} as const;
+export const platformDeclaredCapacityKeys = {
+  /** All platformDeclaredCapacity queries */ all: ['platformdeclaredcapacity'] as const,
+  /** List query keys */ lists: () => [...platformDeclaredCapacityKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformDeclaredCapacityKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformDeclaredCapacityKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformDeclaredCapacityKeys.details(), id] as const,
 } as const;
 export const platformFunctionApiBindingKeys = {
   /** All platformFunctionApiBinding queries */ all: ['platformfunctionapibinding'] as const,
@@ -301,6 +320,55 @@ export const platformFunctionInvocationKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformFunctionInvocationKeys.details(), id] as const,
 } as const;
+export const platformInfraCommitKeys = {
+  /** All platformInfraCommit queries */ all: ['platforminfracommit'] as const,
+  /** List query keys */ lists: () => [...platformInfraCommitKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformInfraCommitKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformInfraCommitKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformInfraCommitKeys.details(), id] as const,
+} as const;
+export const platformInfraGetAllTreeNodesRecordKeys = {
+  /** All platformInfraGetAllTreeNodesRecord queries */ all: [
+    'platforminfragetalltreenodesrecord',
+  ] as const,
+  /** List query keys */ lists: () =>
+    [...platformInfraGetAllTreeNodesRecordKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformInfraGetAllTreeNodesRecordKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformInfraGetAllTreeNodesRecordKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformInfraGetAllTreeNodesRecordKeys.details(), id] as const,
+} as const;
+export const platformInfraObjectKeys = {
+  /** All platformInfraObject queries */ all: ['platforminfraobject'] as const,
+  /** List query keys */ lists: () => [...platformInfraObjectKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformInfraObjectKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformInfraObjectKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformInfraObjectKeys.details(), id] as const,
+} as const;
+export const platformInfraRefKeys = {
+  /** All platformInfraRef queries */ all: ['platforminfraref'] as const,
+  /** List query keys */ lists: () => [...platformInfraRefKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformInfraRefKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformInfraRefKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformInfraRefKeys.details(), id] as const,
+} as const;
+export const platformInfraStoreKeys = {
+  /** All platformInfraStore queries */ all: ['platforminfrastore'] as const,
+  /** List query keys */ lists: () => [...platformInfraStoreKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformInfraStoreKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformInfraStoreKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformInfraStoreKeys.details(), id] as const,
+} as const;
 export const platformNamespaceKeys = {
   /** All platformNamespace queries */ all: ['platformnamespace'] as const,
   /** List query keys */ lists: () => [...platformNamespaceKeys.all, 'list'] as const,
@@ -347,6 +415,16 @@ export const platformResourceEventKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformResourceEventKeys.details(), id] as const,
 } as const;
+export const platformResourceInstallationKeys = {
+  /** All platformResourceInstallation queries */ all: ['platformresourceinstallation'] as const,
+  /** List query keys */ lists: () => [...platformResourceInstallationKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceInstallationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourceInstallationKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceInstallationKeys.details(), id] as const,
+} as const;
 export const platformResourceStatusCheckKeys = {
   /** All platformResourceStatusCheck queries */ all: ['platformresourcestatuscheck'] as const,
   /** List query keys */ lists: () => [...platformResourceStatusCheckKeys.all, 'list'] as const,
@@ -356,6 +434,47 @@ export const platformResourceStatusCheckKeys = {
     [...platformResourceStatusCheckKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformResourceStatusCheckKeys.details(), id] as const,
+} as const;
+export const platformResourceUsageLogKeys = {
+  /** All platformResourceUsageLog queries */ all: ['platformresourceusagelog'] as const,
+  /** List query keys */ lists: () => [...platformResourceUsageLogKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceUsageLogKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformResourceUsageLogKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceUsageLogKeys.details(), id] as const,
+} as const;
+export const platformResourceUsageSummaryKeys = {
+  /** All platformResourceUsageSummary queries */ all: ['platformresourceusagesummary'] as const,
+  /** List query keys */ lists: () => [...platformResourceUsageSummaryKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceUsageSummaryKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourceUsageSummaryKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceUsageSummaryKeys.details(), id] as const,
+} as const;
+export const platformResourceUtilizationDailyKeys = {
+  /** All platformResourceUtilizationDaily queries */ all: [
+    'platformresourceutilizationdaily',
+  ] as const,
+  /** List query keys */ lists: () =>
+    [...platformResourceUtilizationDailyKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourceUtilizationDailyKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () =>
+    [...platformResourceUtilizationDailyKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourceUtilizationDailyKeys.details(), id] as const,
+} as const;
+export const platformResourcesHealthKeys = {
+  /** All platformResourcesHealth queries */ all: ['platformresourceshealth'] as const,
+  /** List query keys */ lists: () => [...platformResourcesHealthKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformResourcesHealthKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformResourcesHealthKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformResourcesHealthKeys.details(), id] as const,
 } as const;
 export const platformResourcesRequirementsStateKeys = {
   /** All platformResourcesRequirementsState queries */ all: [
@@ -382,6 +501,24 @@ export const platformResourcesResolvedRequirementKeys = {
     [...platformResourcesResolvedRequirementKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformResourcesResolvedRequirementKeys.details(), id] as const,
+} as const;
+export const platformWebhookEndpointKeys = {
+  /** All platformWebhookEndpoint queries */ all: ['platformwebhookendpoint'] as const,
+  /** List query keys */ lists: () => [...platformWebhookEndpointKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformWebhookEndpointKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformWebhookEndpointKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformWebhookEndpointKeys.details(), id] as const,
+} as const;
+export const platformWebhookEventKeys = {
+  /** All platformWebhookEvent queries */ all: ['platformwebhookevent'] as const,
+  /** List query keys */ lists: () => [...platformWebhookEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformWebhookEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformWebhookEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformWebhookEventKeys.details(), id] as const,
 } as const;
 export const resourceKeys = {
   /** All resource queries */ all: ['resource'] as const,
@@ -410,6 +547,15 @@ export const resourceEventKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...resourceEventKeys.details(), id] as const,
 } as const;
+export const resourceInstallationKeys = {
+  /** All resourceInstallation queries */ all: ['resourceinstallation'] as const,
+  /** List query keys */ lists: () => [...resourceInstallationKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceInstallationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceInstallationKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceInstallationKeys.details(), id] as const,
+} as const;
 export const resourceStatusCheckKeys = {
   /** All resourceStatusCheck queries */ all: ['resourcestatuscheck'] as const,
   /** List query keys */ lists: () => [...resourceStatusCheckKeys.all, 'list'] as const,
@@ -418,6 +564,42 @@ export const resourceStatusCheckKeys = {
   /** Detail query keys */ details: () => [...resourceStatusCheckKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...resourceStatusCheckKeys.details(), id] as const,
+} as const;
+export const resourceUsageLogKeys = {
+  /** All resourceUsageLog queries */ all: ['resourceusagelog'] as const,
+  /** List query keys */ lists: () => [...resourceUsageLogKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceUsageLogKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceUsageLogKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceUsageLogKeys.details(), id] as const,
+} as const;
+export const resourceUsageSummaryKeys = {
+  /** All resourceUsageSummary queries */ all: ['resourceusagesummary'] as const,
+  /** List query keys */ lists: () => [...resourceUsageSummaryKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceUsageSummaryKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceUsageSummaryKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceUsageSummaryKeys.details(), id] as const,
+} as const;
+export const resourceUtilizationDailyKeys = {
+  /** All resourceUtilizationDaily queries */ all: ['resourceutilizationdaily'] as const,
+  /** List query keys */ lists: () => [...resourceUtilizationDailyKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourceUtilizationDailyKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourceUtilizationDailyKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourceUtilizationDailyKeys.details(), id] as const,
+} as const;
+export const resourcesHealthKeys = {
+  /** All resourcesHealth queries */ all: ['resourceshealth'] as const,
+  /** List query keys */ lists: () => [...resourcesHealthKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...resourcesHealthKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...resourcesHealthKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...resourcesHealthKeys.details(), id] as const,
 } as const;
 export const resourcesRequirementsStateKeys = {
   /** All resourcesRequirementsState queries */ all: ['resourcesrequirementsstate'] as const,
@@ -438,6 +620,24 @@ export const resourcesResolvedRequirementKeys = {
     [...resourcesResolvedRequirementKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...resourcesResolvedRequirementKeys.details(), id] as const,
+} as const;
+export const webhookEndpointKeys = {
+  /** All webhookEndpoint queries */ all: ['webhookendpoint'] as const,
+  /** List query keys */ lists: () => [...webhookEndpointKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...webhookEndpointKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...webhookEndpointKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...webhookEndpointKeys.details(), id] as const,
+} as const;
+export const webhookEventKeys = {
+  /** All webhookEvent queries */ all: ['webhookevent'] as const,
+  /** List query keys */ lists: () => [...webhookEventKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...webhookEventKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...webhookEventKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...webhookEventKeys.details(), id] as const,
 } as const;
 
 // ============================================================================
@@ -472,6 +672,7 @@ export const customQueryKeys = {
  */
 export const queryKeys = {
   dbPreset: dbPresetKeys,
+  declaredCapacity: declaredCapacityKeys,
   functionApiBinding: functionApiBindingKeys,
   functionDefinition: functionDefinitionKeys,
   functionDeployment: functionDeploymentKeys,
@@ -486,35 +687,55 @@ export const queryKeys = {
   functionGraphRef: functionGraphRefKeys,
   functionGraphStore: functionGraphStoreKeys,
   functionInvocation: functionInvocationKeys,
-  getAllRecord: getAllRecordKeys,
+  getAllTreeNodesRecord: getAllTreeNodesRecordKeys,
   infraCommit: infraCommitKeys,
-  infraGetAllRecord: infraGetAllRecordKeys,
+  infraGetAllTreeNodesRecord: infraGetAllTreeNodesRecordKeys,
   infraObject: infraObjectKeys,
   infraRef: infraRefKeys,
   infraStore: infraStoreKeys,
   integrationProvider: integrationProviderKeys,
   namespace: namespaceKeys,
   namespaceEvent: namespaceEventKeys,
+  platformDeclaredCapacity: platformDeclaredCapacityKeys,
   platformFunctionApiBinding: platformFunctionApiBindingKeys,
   platformFunctionDefinition: platformFunctionDefinitionKeys,
   platformFunctionDeployment: platformFunctionDeploymentKeys,
   platformFunctionDeploymentEvent: platformFunctionDeploymentEventKeys,
   platformFunctionExecutionLog: platformFunctionExecutionLogKeys,
   platformFunctionInvocation: platformFunctionInvocationKeys,
+  platformInfraCommit: platformInfraCommitKeys,
+  platformInfraGetAllTreeNodesRecord: platformInfraGetAllTreeNodesRecordKeys,
+  platformInfraObject: platformInfraObjectKeys,
+  platformInfraRef: platformInfraRefKeys,
+  platformInfraStore: platformInfraStoreKeys,
   platformNamespace: platformNamespaceKeys,
   platformNamespaceEvent: platformNamespaceEventKeys,
   platformResource: platformResourceKeys,
   platformResourceDefinition: platformResourceDefinitionKeys,
   platformResourceEvent: platformResourceEventKeys,
+  platformResourceInstallation: platformResourceInstallationKeys,
   platformResourceStatusCheck: platformResourceStatusCheckKeys,
+  platformResourceUsageLog: platformResourceUsageLogKeys,
+  platformResourceUsageSummary: platformResourceUsageSummaryKeys,
+  platformResourceUtilizationDaily: platformResourceUtilizationDailyKeys,
+  platformResourcesHealth: platformResourcesHealthKeys,
   platformResourcesRequirementsState: platformResourcesRequirementsStateKeys,
   platformResourcesResolvedRequirement: platformResourcesResolvedRequirementKeys,
+  platformWebhookEndpoint: platformWebhookEndpointKeys,
+  platformWebhookEvent: platformWebhookEventKeys,
   resource: resourceKeys,
   resourceDefinition: resourceDefinitionKeys,
   resourceEvent: resourceEventKeys,
+  resourceInstallation: resourceInstallationKeys,
   resourceStatusCheck: resourceStatusCheckKeys,
+  resourceUsageLog: resourceUsageLogKeys,
+  resourceUsageSummary: resourceUsageSummaryKeys,
+  resourceUtilizationDaily: resourceUtilizationDailyKeys,
+  resourcesHealth: resourcesHealthKeys,
   resourcesRequirementsState: resourcesRequirementsStateKeys,
   resourcesResolvedRequirement: resourcesResolvedRequirementKeys,
+  webhookEndpoint: webhookEndpointKeys,
+  webhookEvent: webhookEventKeys,
   custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */

@@ -14,7 +14,13 @@
 // ============================================================================
 
 import type { QueryClient } from '@tanstack/react-query';
-import { commitKeys, getAllRecordKeys, objectKeys, refKeys, storeKeys } from './query-keys';
+import {
+  commitKeys,
+  getAllTreeNodesRecordKeys,
+  objectKeys,
+  refKeys,
+  storeKeys,
+} from './query-keys';
 /**
 // ============================================================================
 // Invalidation Helpers
@@ -49,21 +55,21 @@ export const invalidate = {
         queryKey: commitKeys.detail(id),
       }),
   },
-  /** Invalidate getAllRecord queries */ getAllRecord: {
-    /** Invalidate all getAllRecord queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate getAllTreeNodesRecord queries */ getAllTreeNodesRecord: {
+    /** Invalidate all getAllTreeNodesRecord queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.all,
+        queryKey: getAllTreeNodesRecordKeys.all,
       }),
-    /** Invalidate getAllRecord list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate getAllTreeNodesRecord list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.lists(),
+        queryKey: getAllTreeNodesRecordKeys.lists(),
       }),
-    /** Invalidate a specific getAllRecord */ detail: (
+    /** Invalidate a specific getAllTreeNodesRecord */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.detail(id),
+        queryKey: getAllTreeNodesRecordKeys.detail(id),
       }),
   },
   /** Invalidate object queries */ object: {
@@ -126,12 +132,12 @@ export const remove = {
       queryKey: commitKeys.detail(id),
     });
   },
-  /** Remove getAllRecord from cache */ getAllRecord: (
+  /** Remove getAllTreeNodesRecord from cache */ getAllTreeNodesRecord: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: getAllRecordKeys.detail(id),
+      queryKey: getAllTreeNodesRecordKeys.detail(id),
     });
   },
   /** Remove object from cache */ object: (queryClient: QueryClient, id: string | number) => {

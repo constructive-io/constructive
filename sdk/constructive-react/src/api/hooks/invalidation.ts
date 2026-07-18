@@ -35,8 +35,9 @@ import {
   foreignKeyConstraintKeys,
   fullTextSearchKeys,
   functionKeys,
+  httpRouteKeys,
   indexKeys,
-  migrateFileKeys,
+  managedDomainKeys,
   nodeTypeRegistryKeys,
   partitionKeys,
   policyKeys,
@@ -401,6 +402,23 @@ export const invalidate = {
         queryKey: functionKeys.detail(id),
       }),
   },
+  /** Invalidate httpRoute queries */ httpRoute: {
+    /** Invalidate all httpRoute queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: httpRouteKeys.all,
+      }),
+    /** Invalidate httpRoute list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: httpRouteKeys.lists(),
+      }),
+    /** Invalidate a specific httpRoute */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: httpRouteKeys.detail(id),
+      }),
+  },
   /** Invalidate index queries */ index: {
     /** Invalidate all index queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -415,21 +433,21 @@ export const invalidate = {
         queryKey: indexKeys.detail(id),
       }),
   },
-  /** Invalidate migrateFile queries */ migrateFile: {
-    /** Invalidate all migrateFile queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate managedDomain queries */ managedDomain: {
+    /** Invalidate all managedDomain queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: migrateFileKeys.all,
+        queryKey: managedDomainKeys.all,
       }),
-    /** Invalidate migrateFile list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate managedDomain list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: migrateFileKeys.lists(),
+        queryKey: managedDomainKeys.lists(),
       }),
-    /** Invalidate a specific migrateFile */ detail: (
+    /** Invalidate a specific managedDomain */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: migrateFileKeys.detail(id),
+        queryKey: managedDomainKeys.detail(id),
       }),
   },
   /** Invalidate nodeTypeRegistry queries */ nodeTypeRegistry: {
@@ -965,17 +983,22 @@ export const remove = {
       queryKey: functionKeys.detail(id),
     });
   },
+  /** Remove httpRoute from cache */ httpRoute: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: httpRouteKeys.detail(id),
+    });
+  },
   /** Remove index from cache */ index: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: indexKeys.detail(id),
     });
   },
-  /** Remove migrateFile from cache */ migrateFile: (
+  /** Remove managedDomain from cache */ managedDomain: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: migrateFileKeys.detail(id),
+      queryKey: managedDomainKeys.detail(id),
     });
   },
   /** Remove nodeTypeRegistry from cache */ nodeTypeRegistry: (

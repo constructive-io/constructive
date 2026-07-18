@@ -199,6 +199,15 @@ export const functionKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...functionKeys.details(), id] as const,
 } as const;
+export const httpRouteKeys = {
+  /** All httpRoute queries */ all: ['httproute'] as const,
+  /** List query keys */ lists: () => [...httpRouteKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...httpRouteKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...httpRouteKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...httpRouteKeys.details(), id] as const,
+} as const;
 export const indexKeys = {
   /** All index queries */ all: ['index'] as const,
   /** List query keys */ lists: () => [...indexKeys.all, 'list'] as const,
@@ -208,14 +217,14 @@ export const indexKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...indexKeys.details(), id] as const,
 } as const;
-export const migrateFileKeys = {
-  /** All migrateFile queries */ all: ['migratefile'] as const,
-  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
+export const managedDomainKeys = {
+  /** All managedDomain queries */ all: ['manageddomain'] as const,
+  /** List query keys */ lists: () => [...managedDomainKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...migrateFileKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
+    [...managedDomainKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...managedDomainKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...migrateFileKeys.details(), id] as const,
+    [...managedDomainKeys.details(), id] as const,
 } as const;
 export const nodeTypeRegistryKeys = {
   /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
@@ -441,6 +450,8 @@ export const webauthnSettingKeys = {
 export const customQueryKeys = {
   /** Query key for applyRegistryDefaults */ applyRegistryDefaults: (variables?: object) =>
     ['applyRegistryDefaults', variables] as const,
+  /** Query key for resolveHttpRoute */ resolveHttpRoute: (variables?: object) =>
+    ['resolveHttpRoute', variables] as const,
 } as const;
 /**
 
@@ -485,8 +496,9 @@ export const queryKeys = {
   foreignKeyConstraint: foreignKeyConstraintKeys,
   fullTextSearch: fullTextSearchKeys,
   function: functionKeys,
+  httpRoute: httpRouteKeys,
   index: indexKeys,
-  migrateFile: migrateFileKeys,
+  managedDomain: managedDomainKeys,
   nodeTypeRegistry: nodeTypeRegistryKeys,
   partition: partitionKeys,
   policy: policyKeys,

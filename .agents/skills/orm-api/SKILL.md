@@ -1,13 +1,13 @@
 ---
 name: orm-api
-description: ORM client for the api API — provides typed CRUD operations for 46 tables and 8 custom operations
+description: ORM client for the api API — provides typed CRUD operations for 47 tables and 9 custom operations
 ---
 
 # orm-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the api API — provides typed CRUD operations for 46 tables and 8 custom operations
+ORM client for the api API — provides typed CRUD operations for 47 tables and 9 custom operations
 
 ## Usage
 
@@ -57,8 +57,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)
 - [function](references/function.md)
+- [http-route](references/http-route.md)
 - [index](references/index.md)
-- [migrate-file](references/migrate-file.md)
+- [managed-domain](references/managed-domain.md)
 - [node-type-registry](references/node-type-registry.md)
 - [partition](references/partition.md)
 - [policy](references/policy.md)
@@ -84,6 +85,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [view-table](references/view-table.md)
 - [webauthn-setting](references/webauthn-setting.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
+- [resolve-http-route](references/resolve-http-route.md)
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [apply-rls](references/apply-rls.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)

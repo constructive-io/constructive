@@ -182,7 +182,7 @@ CRUD operations for PlatformInternalSecret records.
 | `rotatedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `annotations`, `description`, `labels`, `name`, `namespaceId`, `retiredAt`, `rotatedAt`
+**Required create fields:** `annotations`, `description`, `labels`, `name`, `namespaceId`, `retiredAt`, `rotatedAt`
 
 ### `platform-secret`
 
@@ -213,7 +213,7 @@ CRUD operations for PlatformSecret records.
 | `rotatedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `annotations`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
+**Required create fields:** `annotations`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
 
 ### `secret`
 
@@ -245,7 +245,7 @@ CRUD operations for Secret records.
 | `rotatedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Optional create fields (backend defaults):** `annotations`, `databaseId`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
+**Required create fields:** `annotations`, `databaseId`, `description`, `labels`, `name`, `namespaceId`, `provider`, `retiredAt`, `rotatedAt`
 
 ## Custom Operations
 

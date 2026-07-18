@@ -7,7 +7,6 @@ import type { ApiExposureLevel, ObjectCategory } from './schema-types';
 export type ConstructiveInternalTypeAttachment = unknown;
 export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
-export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 export interface Api {
   annotations: unknown | null;
@@ -63,8 +62,8 @@ export interface App {
   siteId: string | null;
 }
 export interface AstMigration {
-  action: string | null;
   actionId: string | null;
+  actionName: string | null;
   actorId: string | null;
   createdAt: string | null;
   databaseId: string | null;
@@ -271,6 +270,21 @@ export interface Function {
   name: string | null;
   schemaId: string | null;
 }
+export interface HttpRoute {
+  createdAt: string | null;
+  createdBy: string | null;
+  databaseId: string | null;
+  domainId: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  method: string | null;
+  path: string | null;
+  priority: number | null;
+  targetId: string | null;
+  targetKind: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
 export interface Index {
   accessMethod: string | null;
   category: ObjectCategory | null;
@@ -290,10 +304,16 @@ export interface Index {
   updatedAt: string | null;
   whereClause: unknown | null;
 }
-export interface MigrateFile {
+export interface ManagedDomain {
+  annotations: unknown | null;
   databaseId: string | null;
+  domain: ConstructiveInternalTypeHostname | null;
   id: string | null;
-  upload: ConstructiveInternalTypeUpload | null;
+  isWildcard: boolean | null;
+  tlsReadyAt: string | null;
+  tlsStatus: string | null;
+  verificationStatus: string | null;
+  verifiedAt: string | null;
 }
 export interface NodeTypeRegistry {
   category: string | null;
@@ -446,8 +466,8 @@ export interface SpatialRelation {
   updatedAt: string | null;
 }
 export interface SqlAction {
-  action: string | null;
   actionId: string | null;
+  actionName: string | null;
   actorId: string | null;
   content: string | null;
   createdAt: string | null;

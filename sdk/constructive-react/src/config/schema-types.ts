@@ -252,21 +252,6 @@ export interface CreatePlatformConfigInput {
   /** The `PlatformConfig` to be created by this mutation. */
   platformConfig: PlatformConfigInput;
 }
-export interface CreatePlatformInternalSecretInput {
-  clientMutationId?: string;
-  /** The `PlatformInternalSecret` to be created by this mutation. */
-  platformInternalSecret: PlatformInternalSecretInput;
-}
-export interface CreatePlatformSecretInput {
-  clientMutationId?: string;
-  /** The `PlatformSecret` to be created by this mutation. */
-  platformSecret: PlatformSecretInput;
-}
-export interface CreateSecretInput {
-  clientMutationId?: string;
-  /** The `Secret` to be created by this mutation. */
-  secret: SecretInput;
-}
 export interface DeleteConfigInput {
   clientMutationId?: string;
   /** Unique identifier for this config entry */
@@ -383,19 +368,6 @@ export interface PlatformInternalSecretFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
-/** An input for mutations affecting `PlatformInternalSecret` */
-export interface PlatformInternalSecretInput {
-  annotations?: unknown;
-  createdAt?: string;
-  description?: string;
-  id?: string;
-  labels?: unknown;
-  name?: string;
-  namespaceId?: string;
-  retiredAt?: string;
-  rotatedAt?: string;
-  updatedAt?: string;
-}
 export interface PlatformInternalSecretsDelInput {
   clientMutationId?: string;
   namespaceId?: string;
@@ -450,20 +422,6 @@ export interface PlatformSecretFilter {
   rotatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `PlatformSecret` */
-export interface PlatformSecretInput {
-  annotations?: unknown;
-  createdAt?: string;
-  description?: string;
-  id?: string;
-  labels?: unknown;
-  name?: string;
-  namespaceId?: string;
-  provider?: string;
-  retiredAt?: string;
-  rotatedAt?: string;
-  updatedAt?: string;
 }
 export interface PlatformSecretsDelInput {
   clientMutationId?: string;
@@ -531,21 +489,6 @@ export interface SecretFilter {
   rotatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-}
-/** An input for mutations affecting `Secret` */
-export interface SecretInput {
-  annotations?: unknown;
-  createdAt?: string;
-  databaseId?: string;
-  description?: string;
-  id?: string;
-  labels?: unknown;
-  name?: string;
-  namespaceId?: string;
-  provider?: string;
-  retiredAt?: string;
-  rotatedAt?: string;
-  updatedAt?: string;
 }
 export interface UpdateConfigInput {
   clientMutationId?: string;
@@ -654,21 +597,6 @@ export interface CreatePlatformConfigPayload {
   /** The `PlatformConfig` that was created by this mutation. */
   platformConfig?: PlatformConfig | null;
   platformConfigEdge?: PlatformConfigEdge | null;
-}
-export interface CreatePlatformInternalSecretPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformInternalSecret` that was created by this mutation. */
-  platformInternalSecret?: PlatformInternalSecret | null;
-}
-export interface CreatePlatformSecretPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformSecret` that was created by this mutation. */
-  platformSecret?: PlatformSecret | null;
-}
-export interface CreateSecretPayload {
-  clientMutationId?: string | null;
-  /** The `Secret` that was created by this mutation. */
-  secret?: Secret | null;
 }
 export interface DeleteConfigPayload {
   clientMutationId?: string | null;

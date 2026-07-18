@@ -16,8 +16,8 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  action: 'string',
   actionId: 'uuid',
+  actionName: 'string',
   actorId: 'uuid',
   createdAt: 'string',
   databaseId: 'uuid',
@@ -75,8 +75,8 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      action: true,
       actionId: true,
+      actionName: true,
       actorId: true,
       createdAt: true,
       databaseId: true,
@@ -108,8 +108,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      action: true,
       actionId: true,
+      actionName: true,
       actorId: true,
       createdAt: true,
       databaseId: true,
@@ -143,80 +143,69 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'action',
-        message: 'action',
-        required: false,
-        skipPrompt: true,
+        name: 'actionId',
+        message: 'actionId',
+        required: true,
       },
       {
         type: 'text',
-        name: 'actionId',
-        message: 'actionId',
-        required: false,
-        skipPrompt: true,
+        name: 'actionName',
+        message: 'actionName',
+        required: true,
       },
       {
         type: 'text',
         name: 'actorId',
         message: 'actorId',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'databaseId',
         message: 'databaseId',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'json',
         name: 'deploy',
         message: 'deploy',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'deploys',
         message: 'deploys',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'name',
         message: 'name',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'json',
         name: 'payload',
         message: 'payload',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'text',
         name: 'requires',
         message: 'requires',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'json',
         name: 'revert',
         message: 'revert',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
       {
         type: 'json',
         name: 'verify',
         message: 'verify',
-        required: false,
-        skipPrompt: true,
+        required: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -228,8 +217,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.astMigration
       .create({
         data: {
-          action: cleanedData.action,
           actionId: cleanedData.actionId,
+          actionName: cleanedData.actionName,
           actorId: cleanedData.actorId,
           databaseId: cleanedData.databaseId,
           deploy: cleanedData.deploy,
@@ -241,8 +230,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           verify: cleanedData.verify,
         },
         select: {
-          action: true,
           actionId: true,
+          actionName: true,
           actorId: true,
           createdAt: true,
           databaseId: true,

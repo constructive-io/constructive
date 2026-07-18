@@ -12,8 +12,8 @@ csdk platform-function-invocation list --where.<field>.<op> <value> --orderBy <v
 csdk platform-function-invocation list --limit 10 --after <cursor>
 csdk platform-function-invocation find-first --where.<field>.<op> <value>
 csdk platform-function-invocation get --id <UUID>
-csdk platform-function-invocation create --taskIdentifier <String> [--actorId <UUID>] [--apiBindingId <UUID>] [--completedAt <Datetime>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>]
-csdk platform-function-invocation update --id <UUID> [--actorId <UUID>] [--apiBindingId <UUID>] [--completedAt <Datetime>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>] [--taskIdentifier <String>]
+csdk platform-function-invocation create --taskIdentifier <String> [--actorId <UUID>] [--apiBindingId <UUID>] [--channel <String>] [--completedAt <Datetime>] [--definitionScope <String>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--provenance <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>]
+csdk platform-function-invocation update --id <UUID> [--actorId <UUID>] [--apiBindingId <UUID>] [--channel <String>] [--completedAt <Datetime>] [--definitionScope <String>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--provenance <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>] [--taskIdentifier <String>]
 csdk platform-function-invocation delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-function-invocation list --where.id.equalTo <value> --orderBy ID_A
 ### Create a platformFunctionInvocation
 
 ```bash
-csdk platform-function-invocation create --taskIdentifier <String> [--actorId <UUID>] [--apiBindingId <UUID>] [--completedAt <Datetime>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>]
+csdk platform-function-invocation create --taskIdentifier <String> [--actorId <UUID>] [--apiBindingId <UUID>] [--channel <String>] [--completedAt <Datetime>] [--definitionScope <String>] [--durationMs <Int>] [--error <String>] [--functionDefinitionId <UUID>] [--graphExecutionId <UUID>] [--jobId <BigInt>] [--parentInvocationId <UUID>] [--payload <JSON>] [--provenance <JSON>] [--result <JSON>] [--startedAt <Datetime>] [--status <String>]
 ```
 
 ### Get a platformFunctionInvocation by id

@@ -9,7 +9,7 @@ Branch heads — mutable pointers into the commit chain
 ```typescript
 db.infraRef.findMany({ select: { id: true } }).execute()
 db.infraRef.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.infraRef.create({ data: { commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' }, select: { id: true } }).execute()
+db.infraRef.create({ data: { commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute()
 db.infraRef.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute()
 db.infraRef.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.infraRef.findMany({
 
 ```typescript
 const item = await db.infraRef.create({
-  data: { commitId: '<UUID>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>' },
+  data: { commitId: '<UUID>', databaseId: '<UUID>', name: '<String>', storeId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

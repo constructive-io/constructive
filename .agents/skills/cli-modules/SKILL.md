@@ -1,13 +1,13 @@
 ---
 name: cli-modules
-description: CLI tool (csdk) for the modules API — provides CRUD commands for 66 tables and 12 custom operations
+description: CLI tool (csdk) for the modules API — provides CRUD commands for 68 tables and 12 custom operations
 ---
 
 # cli-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the modules API — provides CRUD commands for 66 tables and 12 custom operations
+CLI tool (csdk) for the modules API — provides CRUD commands for 68 tables and 12 custom operations
 
 ## Usage
 
@@ -84,6 +84,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [graph-execution-module](references/graph-execution-module.md)
 - [graph-module](references/graph-module.md)
 - [hierarchy-module](references/hierarchy-module.md)
+- [http-route-module](references/http-route-module.md)
 - [i-18-n-module](references/i-18-n-module.md)
 - [identity-providers-module](references/identity-providers-module.md)
 - [inference-log-module](references/inference-log-module.md)
@@ -122,6 +123,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [users-module](references/users-module.md)
 - [webauthn-auth-module](references/webauthn-auth-module.md)
 - [webauthn-credentials-module](references/webauthn-credentials-module.md)
+- [webhook-module](references/webhook-module.md)
 - [resolve-blueprint-field](references/resolve-blueprint-field.md)
 - [resolve-blueprint-table](references/resolve-blueprint-table.md)
 - [construct-blueprint](references/construct-blueprint.md)

@@ -15,7 +15,7 @@ ORM client for the objects API — provides typed CRUD operations for 5 tables a
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: commit, getAllRecord, object, ref, store
+// Available models: commit, getAllTreeNodesRecord, object, ref, store
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -38,7 +38,7 @@ const items = await db.commit.findMany({
 See the `references/` directory for detailed per-entity API documentation:
 
 - [commit](references/commit.md)
-- [get-all-record](references/get-all-record.md)
+- [get-all-tree-nodes-record](references/get-all-tree-nodes-record.md)
 - [object](references/object.md)
 - [ref](references/ref.md)
 - [store](references/store.md)

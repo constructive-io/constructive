@@ -33,6 +33,7 @@ import type {
   GraphExecutionModule,
   GraphModule,
   HierarchyModule,
+  HttpRouteModule,
   I18NModule,
   IdentityProvidersModule,
   InferenceLogModule,
@@ -71,6 +72,7 @@ import type {
   UsersModule,
   WebauthnAuthModule,
   WebauthnCredentialsModule,
+  WebhookModule,
   BigFloatFilter,
   BigIntFilter,
   BitStringFilter,
@@ -416,10 +418,10 @@ export type ComputeLogModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 /** Methods to use when ordering `ConfigSecretsUserModule`. */
 export type ConfigSecretsUserModuleOrderBy =
   | 'API_NAME_ASC'
@@ -691,32 +693,32 @@ export type DbUsageModuleOrderBy =
   | 'PRIVATE_SCHEMA_NAME_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
-  | 'QUERY_STATS_DAILY_TABLE_ID_ASC'
-  | 'QUERY_STATS_DAILY_TABLE_ID_DESC'
-  | 'QUERY_STATS_DAILY_TABLE_NAME_ASC'
-  | 'QUERY_STATS_DAILY_TABLE_NAME_DESC'
   | 'QUERY_STATS_LOG_TABLE_ID_ASC'
   | 'QUERY_STATS_LOG_TABLE_ID_DESC'
   | 'QUERY_STATS_LOG_TABLE_NAME_ASC'
   | 'QUERY_STATS_LOG_TABLE_NAME_DESC'
+  | 'QUERY_STATS_SUMMARY_TABLE_ID_ASC'
+  | 'QUERY_STATS_SUMMARY_TABLE_ID_DESC'
+  | 'QUERY_STATS_SUMMARY_TABLE_NAME_ASC'
+  | 'QUERY_STATS_SUMMARY_TABLE_NAME_DESC'
   | 'RETENTION_ASC'
   | 'RETENTION_DESC'
-  | 'ROLLUP_DB_QUERY_STATS_DAILY_FUNCTION_ASC'
-  | 'ROLLUP_DB_QUERY_STATS_DAILY_FUNCTION_DESC'
-  | 'ROLLUP_DB_TABLE_STATS_DAILY_FUNCTION_ASC'
-  | 'ROLLUP_DB_TABLE_STATS_DAILY_FUNCTION_DESC'
+  | 'ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_ASC'
+  | 'ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_DESC'
+  | 'ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_ASC'
+  | 'ROLLUP_DB_TABLE_STATS_USAGE_SUMMARY_FUNCTION_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
-  | 'TABLE_STATS_DAILY_TABLE_ID_ASC'
-  | 'TABLE_STATS_DAILY_TABLE_ID_DESC'
-  | 'TABLE_STATS_DAILY_TABLE_NAME_ASC'
-  | 'TABLE_STATS_DAILY_TABLE_NAME_DESC'
   | 'TABLE_STATS_LOG_TABLE_ID_ASC'
   | 'TABLE_STATS_LOG_TABLE_ID_DESC'
   | 'TABLE_STATS_LOG_TABLE_NAME_ASC'
-  | 'TABLE_STATS_LOG_TABLE_NAME_DESC';
+  | 'TABLE_STATS_LOG_TABLE_NAME_DESC'
+  | 'TABLE_STATS_SUMMARY_TABLE_ID_ASC'
+  | 'TABLE_STATS_SUMMARY_TABLE_ID_DESC'
+  | 'TABLE_STATS_SUMMARY_TABLE_NAME_ASC'
+  | 'TABLE_STATS_SUMMARY_TABLE_NAME_DESC';
 /** Methods to use when ordering `DefaultIdsModule`. */
 export type DefaultIdsModuleOrderBy =
   | 'DATABASE_ID_ASC'
@@ -759,10 +761,10 @@ export type DenormalizedTableFieldOrderBy =
 export type DevicesModuleOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DEVICE_SETTINGS_TABLE_ASC'
-  | 'DEVICE_SETTINGS_TABLE_DESC'
   | 'DEVICE_SETTINGS_TABLE_ID_ASC'
   | 'DEVICE_SETTINGS_TABLE_ID_DESC'
+  | 'DEVICE_SETTINGS_TABLE_NAME_ASC'
+  | 'DEVICE_SETTINGS_TABLE_NAME_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -770,10 +772,10 @@ export type DevicesModuleOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
-  | 'USER_DEVICES_TABLE_ASC'
-  | 'USER_DEVICES_TABLE_DESC'
   | 'USER_DEVICES_TABLE_ID_ASC'
-  | 'USER_DEVICES_TABLE_ID_DESC';
+  | 'USER_DEVICES_TABLE_ID_DESC'
+  | 'USER_DEVICES_TABLE_NAME_ASC'
+  | 'USER_DEVICES_TABLE_NAME_DESC';
 /** Methods to use when ordering `EmailsModule`. */
 export type EmailsModuleOrderBy =
   | 'API_NAME_ASC'
@@ -1083,6 +1085,8 @@ export type FunctionModuleOrderBy =
   | 'ENTITY_FIELD_DESC'
   | 'ENTITY_TABLE_ID_ASC'
   | 'ENTITY_TABLE_ID_DESC'
+  | 'HAS_CRON_ASC'
+  | 'HAS_CRON_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -1102,6 +1106,8 @@ export type FunctionModuleOrderBy =
   | 'PROVISIONS_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCHEDULES_TABLE_ID_ASC'
+  | 'SCHEDULES_TABLE_ID_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
@@ -1249,6 +1255,53 @@ export type HierarchyModuleOrderBy =
   | 'SPRT_TABLE_NAME_DESC'
   | 'USERS_TABLE_ID_ASC'
   | 'USERS_TABLE_ID_DESC';
+/** Methods to use when ordering `HttpRouteModule`. */
+export type HttpRouteModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'ENTITY_FIELD_ASC'
+  | 'ENTITY_FIELD_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'FUNCTION_MODULE_ID_ASC'
+  | 'FUNCTION_MODULE_ID_DESC'
+  | 'HTTP_ROUTES_TABLE_ID_ASC'
+  | 'HTTP_ROUTES_TABLE_ID_DESC'
+  | 'HTTP_ROUTES_TABLE_NAME_ASC'
+  | 'HTTP_ROUTES_TABLE_NAME_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'RESOLVER_FUNCTION_NAME_ASC'
+  | 'RESOLVER_FUNCTION_NAME_DESC'
+  | 'RESOURCE_MODULE_ID_ASC'
+  | 'RESOURCE_MODULE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'STORAGE_MODULE_ID_ASC'
+  | 'STORAGE_MODULE_ID_DESC';
 /** Methods to use when ordering `I18NModule`. */
 export type I18NModuleOrderBy =
   | 'API_NAME_ASC'
@@ -1342,10 +1395,10 @@ export type InferenceLogModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
   | 'SCOPE_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 /** Methods to use when ordering `InfraConfigModule`. */
 export type InfraConfigModuleOrderBy =
   | 'API_NAME_ASC'
@@ -2113,21 +2166,21 @@ export type RateLimitsModuleOrderBy =
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IP_RATE_LIMITS_TABLE_ASC'
-  | 'IP_RATE_LIMITS_TABLE_DESC'
   | 'IP_RATE_LIMITS_TABLE_ID_ASC'
   | 'IP_RATE_LIMITS_TABLE_ID_DESC'
+  | 'IP_RATE_LIMITS_TABLE_NAME_ASC'
+  | 'IP_RATE_LIMITS_TABLE_NAME_DESC'
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'RATE_LIMITS_TABLE_ASC'
-  | 'RATE_LIMITS_TABLE_DESC'
   | 'RATE_LIMITS_TABLE_ID_ASC'
   | 'RATE_LIMITS_TABLE_ID_DESC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_ASC'
-  | 'RATE_LIMIT_SETTINGS_TABLE_DESC'
+  | 'RATE_LIMITS_TABLE_NAME_ASC'
+  | 'RATE_LIMITS_TABLE_NAME_DESC'
   | 'RATE_LIMIT_SETTINGS_TABLE_ID_ASC'
   | 'RATE_LIMIT_SETTINGS_TABLE_ID_DESC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_NAME_ASC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_NAME_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC';
 /** Methods to use when ordering `RealtimeModule`. */
@@ -2230,6 +2283,10 @@ export type ResourceModuleOrderBy =
   | 'ENTITY_TABLE_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'INSTALLATION_STORE_NAME_ASC'
+  | 'INSTALLATION_STORE_NAME_DESC'
+  | 'MERKLE_STORE_MODULE_ID_ASC'
+  | 'MERKLE_STORE_MODULE_ID_DESC'
   | 'NAMESPACE_MODULE_ID_ASC'
   | 'NAMESPACE_MODULE_ID_DESC'
   | 'NATURAL'
@@ -2257,6 +2314,8 @@ export type ResourceModuleOrderBy =
   | 'RESOURCES_TABLE_ID_DESC'
   | 'RESOURCES_TABLE_NAME_ASC'
   | 'RESOURCES_TABLE_NAME_DESC'
+  | 'RESOURCE_BILLING_ROLLUP_FUNCTION_ASC'
+  | 'RESOURCE_BILLING_ROLLUP_FUNCTION_DESC'
   | 'RESOURCE_DEFINITIONS_TABLE_ID_ASC'
   | 'RESOURCE_DEFINITIONS_TABLE_ID_DESC'
   | 'RESOURCE_DEFINITIONS_TABLE_NAME_ASC'
@@ -2265,10 +2324,24 @@ export type ResourceModuleOrderBy =
   | 'RESOURCE_EVENTS_TABLE_ID_DESC'
   | 'RESOURCE_EVENTS_TABLE_NAME_ASC'
   | 'RESOURCE_EVENTS_TABLE_NAME_DESC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_ID_ASC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_ID_DESC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_NAME_ASC'
+  | 'RESOURCE_INSTALLATIONS_TABLE_NAME_DESC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_ID_ASC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_ID_DESC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_NAME_ASC'
   | 'RESOURCE_STATUS_CHECKS_TABLE_NAME_DESC'
+  | 'RESOURCE_USAGE_LOG_TABLE_ID_ASC'
+  | 'RESOURCE_USAGE_LOG_TABLE_ID_DESC'
+  | 'RESOURCE_USAGE_LOG_TABLE_NAME_ASC'
+  | 'RESOURCE_USAGE_LOG_TABLE_NAME_DESC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'RESOURCE_USAGE_SUMMARY_TABLE_NAME_DESC'
+  | 'ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_ASC'
+  | 'ROLLUP_RESOURCE_USAGE_SUMMARY_FUNCTION_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
@@ -2350,10 +2423,10 @@ export type SessionSecretsModuleOrderBy =
   | 'TABLE_NAME_DESC';
 /** Methods to use when ordering `SessionsModule`. */
 export type SessionsModuleOrderBy =
-  | 'AUTH_SETTINGS_TABLE_ASC'
-  | 'AUTH_SETTINGS_TABLE_DESC'
   | 'AUTH_SETTINGS_TABLE_ID_ASC'
   | 'AUTH_SETTINGS_TABLE_ID_DESC'
+  | 'AUTH_SETTINGS_TABLE_NAME_ASC'
+  | 'AUTH_SETTINGS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'ID_ASC'
@@ -2365,14 +2438,14 @@ export type SessionsModuleOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'SESSIONS_DEFAULT_EXPIRATION_ASC'
   | 'SESSIONS_DEFAULT_EXPIRATION_DESC'
-  | 'SESSIONS_TABLE_ASC'
-  | 'SESSIONS_TABLE_DESC'
   | 'SESSIONS_TABLE_ID_ASC'
   | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_DESC'
+  | 'SESSIONS_TABLE_NAME_ASC'
+  | 'SESSIONS_TABLE_NAME_DESC'
   | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
   | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
+  | 'SESSION_CREDENTIALS_TABLE_NAME_ASC'
+  | 'SESSION_CREDENTIALS_TABLE_NAME_DESC'
   | 'USERS_TABLE_ID_ASC'
   | 'USERS_TABLE_ID_DESC';
 /** Methods to use when ordering `StorageLogModule`. */
@@ -2416,10 +2489,10 @@ export type StorageLogModuleOrderBy =
   | 'STORAGE_LOG_TABLE_ID_DESC'
   | 'STORAGE_LOG_TABLE_NAME_ASC'
   | 'STORAGE_LOG_TABLE_NAME_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 /** Methods to use when ordering `StorageModule`. */
 export type StorageModuleOrderBy =
   | 'ALLOWED_ORIGINS_ASC'
@@ -2546,10 +2619,10 @@ export type TransferLogModuleOrderBy =
   | 'TRANSFER_LOG_TABLE_ID_DESC'
   | 'TRANSFER_LOG_TABLE_NAME_ASC'
   | 'TRANSFER_LOG_TABLE_NAME_DESC'
-  | 'USAGE_DAILY_TABLE_ID_ASC'
-  | 'USAGE_DAILY_TABLE_ID_DESC'
-  | 'USAGE_DAILY_TABLE_NAME_ASC'
-  | 'USAGE_DAILY_TABLE_NAME_DESC';
+  | 'USAGE_SUMMARY_TABLE_ID_ASC'
+  | 'USAGE_SUMMARY_TABLE_ID_DESC'
+  | 'USAGE_SUMMARY_TABLE_NAME_ASC'
+  | 'USAGE_SUMMARY_TABLE_NAME_DESC';
 /** Methods to use when ordering `UserAuthModule`. */
 export type UserAuthModuleOrderBy =
   | 'API_NAME_ASC'
@@ -2749,6 +2822,57 @@ export type WebauthnCredentialsModuleOrderBy =
   | 'TABLE_ID_DESC'
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC';
+/** Methods to use when ordering `WebhookModule`. */
+export type WebhookModuleOrderBy =
+  | 'API_NAME_ASC'
+  | 'API_NAME_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEFAULT_PERMISSIONS_ASC'
+  | 'DEFAULT_PERMISSIONS_DESC'
+  | 'ENTITY_FIELD_ASC'
+  | 'ENTITY_FIELD_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'FUNCTION_INVOCATION_MODULE_ID_ASC'
+  | 'FUNCTION_INVOCATION_MODULE_ID_DESC'
+  | 'FUNCTION_MODULE_ID_ASC'
+  | 'FUNCTION_MODULE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INFRA_SECRETS_MODULE_ID_ASC'
+  | 'INFRA_SECRETS_MODULE_ID_DESC'
+  | 'NAMESPACE_MODULE_ID_ASC'
+  | 'NAMESPACE_MODULE_ID_DESC'
+  | 'NATURAL'
+  | 'POLICIES_ASC'
+  | 'POLICIES_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRIVATE_API_NAME_ASC'
+  | 'PRIVATE_API_NAME_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_NAME_ASC'
+  | 'PRIVATE_SCHEMA_NAME_DESC'
+  | 'PROVISIONS_ASC'
+  | 'PROVISIONS_DESC'
+  | 'PUBLIC_SCHEMA_NAME_ASC'
+  | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'SCOPE_ASC'
+  | 'SCOPE_DESC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_ID_ASC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_ID_DESC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_NAME_ASC'
+  | 'WEBHOOK_ENDPOINTS_TABLE_NAME_DESC'
+  | 'WEBHOOK_EVENTS_TABLE_ID_ASC'
+  | 'WEBHOOK_EVENTS_TABLE_ID_DESC'
+  | 'WEBHOOK_EVENTS_TABLE_NAME_ASC'
+  | 'WEBHOOK_EVENTS_TABLE_NAME_DESC';
 /** A filter to be used against `AgentModule` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentModuleFilter {
   /** Filter by the object’s `agentTableId` field. */
@@ -3530,10 +3654,10 @@ export interface ComputeLogModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 /** An input for mutations affecting `ComputeLogModule` */
 export interface ComputeLogModuleInput {
@@ -3555,8 +3679,8 @@ export interface ComputeLogModuleInput {
   retention?: string;
   schemaId?: string;
   scope?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** Represents an update to a `ComputeLogModule`. Fields that are set will be updated. */
 export interface ComputeLogModulePatch {
@@ -3578,8 +3702,8 @@ export interface ComputeLogModulePatch {
   retention?: string;
   schemaId?: string;
   scope?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** A filter to be used against `ConfigSecretsUserModule` object types. All fields are combined with a logical ‘and.’ */
 export interface ConfigSecretsUserModuleFilter {
@@ -3832,6 +3956,11 @@ export interface CreateHierarchyModuleInput {
   /** The `HierarchyModule` to be created by this mutation. */
   hierarchyModule: HierarchyModuleInput;
 }
+export interface CreateHttpRouteModuleInput {
+  clientMutationId?: string;
+  /** The `HttpRouteModule` to be created by this mutation. */
+  httpRouteModule: HttpRouteModuleInput;
+}
 export interface CreateI18NModuleInput {
   clientMutationId?: string;
   /** The `I18NModule` to be created by this mutation. */
@@ -4021,6 +4150,11 @@ export interface CreateWebauthnCredentialsModuleInput {
   clientMutationId?: string;
   /** The `WebauthnCredentialsModule` to be created by this mutation. */
   webauthnCredentialsModule: WebauthnCredentialsModuleInput;
+}
+export interface CreateWebhookModuleInput {
+  clientMutationId?: string;
+  /** The `WebhookModule` to be created by this mutation. */
+  webhookModule: WebhookModuleInput;
 }
 /** A filter to be used against `CryptoAddressesModule` object types. All fields are combined with a logical ‘and.’ */
 export interface CryptoAddressesModuleFilter {
@@ -4530,32 +4664,32 @@ export interface DbUsageModuleFilter {
   privateSchemaName?: StringFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
-  /** Filter by the object’s `queryStatsDailyTableId` field. */
-  queryStatsDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `queryStatsDailyTableName` field. */
-  queryStatsDailyTableName?: StringFilter;
   /** Filter by the object’s `queryStatsLogTableId` field. */
   queryStatsLogTableId?: UUIDFilter;
   /** Filter by the object’s `queryStatsLogTableName` field. */
   queryStatsLogTableName?: StringFilter;
+  /** Filter by the object’s `queryStatsSummaryTableId` field. */
+  queryStatsSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `queryStatsSummaryTableName` field. */
+  queryStatsSummaryTableName?: StringFilter;
   /** Filter by the object’s `retention` field. */
   retention?: StringFilter;
-  /** Filter by the object’s `rollupDbQueryStatsDailyFunction` field. */
-  rollupDbQueryStatsDailyFunction?: StringFilter;
-  /** Filter by the object’s `rollupDbTableStatsDailyFunction` field. */
-  rollupDbTableStatsDailyFunction?: StringFilter;
+  /** Filter by the object’s `rollupDbQueryStatsUsageSummaryFunction` field. */
+  rollupDbQueryStatsUsageSummaryFunction?: StringFilter;
+  /** Filter by the object’s `rollupDbTableStatsUsageSummaryFunction` field. */
+  rollupDbTableStatsUsageSummaryFunction?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
-  /** Filter by the object’s `tableStatsDailyTableId` field. */
-  tableStatsDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `tableStatsDailyTableName` field. */
-  tableStatsDailyTableName?: StringFilter;
   /** Filter by the object’s `tableStatsLogTableId` field. */
   tableStatsLogTableId?: UUIDFilter;
   /** Filter by the object’s `tableStatsLogTableName` field. */
   tableStatsLogTableName?: StringFilter;
+  /** Filter by the object’s `tableStatsSummaryTableId` field. */
+  tableStatsSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `tableStatsSummaryTableName` field. */
+  tableStatsSummaryTableName?: StringFilter;
 }
 /** An input for mutations affecting `DbUsageModule` */
 export interface DbUsageModuleInput {
@@ -4573,19 +4707,19 @@ export interface DbUsageModuleInput {
   privateSchemaId?: string;
   privateSchemaName?: string;
   publicSchemaName?: string;
-  queryStatsDailyTableId?: string;
-  queryStatsDailyTableName?: string;
   queryStatsLogTableId?: string;
   queryStatsLogTableName?: string;
+  queryStatsSummaryTableId?: string;
+  queryStatsSummaryTableName?: string;
   retention?: string;
-  rollupDbQueryStatsDailyFunction?: string;
-  rollupDbTableStatsDailyFunction?: string;
+  rollupDbQueryStatsUsageSummaryFunction?: string;
+  rollupDbTableStatsUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
-  tableStatsDailyTableId?: string;
-  tableStatsDailyTableName?: string;
   tableStatsLogTableId?: string;
   tableStatsLogTableName?: string;
+  tableStatsSummaryTableId?: string;
+  tableStatsSummaryTableName?: string;
 }
 /** Represents an update to a `DbUsageModule`. Fields that are set will be updated. */
 export interface DbUsageModulePatch {
@@ -4603,19 +4737,19 @@ export interface DbUsageModulePatch {
   privateSchemaId?: string;
   privateSchemaName?: string;
   publicSchemaName?: string;
-  queryStatsDailyTableId?: string;
-  queryStatsDailyTableName?: string;
   queryStatsLogTableId?: string;
   queryStatsLogTableName?: string;
+  queryStatsSummaryTableId?: string;
+  queryStatsSummaryTableName?: string;
   retention?: string;
-  rollupDbQueryStatsDailyFunction?: string;
-  rollupDbTableStatsDailyFunction?: string;
+  rollupDbQueryStatsUsageSummaryFunction?: string;
+  rollupDbTableStatsUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
-  tableStatsDailyTableId?: string;
-  tableStatsDailyTableName?: string;
   tableStatsLogTableId?: string;
   tableStatsLogTableName?: string;
+  tableStatsSummaryTableId?: string;
+  tableStatsSummaryTableName?: string;
 }
 /** A filter to be used against `DefaultIdsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DefaultIdsModuleFilter {
@@ -4753,6 +4887,10 @@ export interface DeleteGraphModuleInput {
   id: string;
 }
 export interface DeleteHierarchyModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteHttpRouteModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -4910,6 +5048,10 @@ export interface DeleteWebauthnCredentialsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteWebhookModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 /** A filter to be used against `DenormalizedTableField` object types. All fields are combined with a logical ‘and.’ */
 export interface DenormalizedTableFieldFilter {
   /** Checks for all expressions in this list. */
@@ -4979,10 +5121,10 @@ export interface DevicesModuleFilter {
   and?: DevicesModuleFilter[];
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `deviceSettingsTable` field. */
-  deviceSettingsTable?: StringFilter;
   /** Filter by the object’s `deviceSettingsTableId` field. */
   deviceSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `deviceSettingsTableName` field. */
+  deviceSettingsTableName?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -4991,30 +5133,30 @@ export interface DevicesModuleFilter {
   or?: DevicesModuleFilter[];
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
-  /** Filter by the object’s `userDevicesTable` field. */
-  userDevicesTable?: StringFilter;
   /** Filter by the object’s `userDevicesTableId` field. */
   userDevicesTableId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTableName` field. */
+  userDevicesTableName?: StringFilter;
 }
 /** An input for mutations affecting `DevicesModule` */
 export interface DevicesModuleInput {
   databaseId: string;
-  deviceSettingsTable?: string;
   deviceSettingsTableId?: string;
+  deviceSettingsTableName?: string;
   id?: string;
   schemaId?: string;
-  userDevicesTable?: string;
   userDevicesTableId?: string;
+  userDevicesTableName?: string;
 }
 /** Represents an update to a `DevicesModule`. Fields that are set will be updated. */
 export interface DevicesModulePatch {
   databaseId?: string;
-  deviceSettingsTable?: string;
   deviceSettingsTableId?: string;
+  deviceSettingsTableName?: string;
   id?: string;
   schemaId?: string;
-  userDevicesTable?: string;
   userDevicesTableId?: string;
+  userDevicesTableName?: string;
 }
 /** A filter to be used against `EmailsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface EmailsModuleFilter {
@@ -6069,6 +6211,8 @@ export interface FunctionModuleFilter {
   entityField?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `hasCron` field. */
+  hasCron?: BooleanFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -6089,6 +6233,8 @@ export interface FunctionModuleFilter {
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schedulesTableId` field. */
+  schedulesTableId?: UUIDFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
@@ -6105,6 +6251,7 @@ export interface FunctionModuleInput {
   definitionsTableName?: string;
   entityField?: string;
   entityTableId?: string;
+  hasCron?: boolean;
   id?: string;
   policies?: unknown;
   prefix?: string;
@@ -6113,6 +6260,7 @@ export interface FunctionModuleInput {
   privateSchemaName?: string;
   provisions?: unknown;
   publicSchemaName?: string;
+  schedulesTableId?: string;
   schemaId?: string;
   scope?: string;
 }
@@ -6127,6 +6275,7 @@ export interface FunctionModulePatch {
   definitionsTableName?: string;
   entityField?: string;
   entityTableId?: string;
+  hasCron?: boolean;
   id?: string;
   policies?: unknown;
   prefix?: string;
@@ -6135,6 +6284,7 @@ export interface FunctionModulePatch {
   privateSchemaName?: string;
   provisions?: unknown;
   publicSchemaName?: string;
+  schedulesTableId?: string;
   schemaId?: string;
   scope?: string;
 }
@@ -6443,6 +6593,117 @@ export interface HierarchyModulePatch {
   sprtTableName?: string;
   usersTableId?: string;
 }
+/** A filter to be used against `HttpRouteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface HttpRouteModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: HttpRouteModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionModule` relation. */
+  functionModule?: FunctionModuleFilter;
+  /** A related `functionModule` exists. */
+  functionModuleExists?: boolean;
+  /** Filter by the object’s `functionModuleId` field. */
+  functionModuleId?: UUIDFilter;
+  /** Filter by the object’s `httpRoutesTableId` field. */
+  httpRoutesTableId?: UUIDFilter;
+  /** Filter by the object’s `httpRoutesTableName` field. */
+  httpRoutesTableName?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: HttpRouteModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: HttpRouteModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `resolverFunctionName` field. */
+  resolverFunctionName?: StringFilter;
+  /** Filter by the object’s `resourceModule` relation. */
+  resourceModule?: ResourceModuleFilter;
+  /** A related `resourceModule` exists. */
+  resourceModuleExists?: boolean;
+  /** Filter by the object’s `resourceModuleId` field. */
+  resourceModuleId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `storageModule` relation. */
+  storageModule?: StorageModuleFilter;
+  /** A related `storageModule` exists. */
+  storageModuleExists?: boolean;
+  /** Filter by the object’s `storageModuleId` field. */
+  storageModuleId?: UUIDFilter;
+}
+/** An input for mutations affecting `HttpRouteModule` */
+export interface HttpRouteModuleInput {
+  apiName?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  functionModuleId?: string;
+  httpRoutesTableId?: string;
+  httpRoutesTableName?: string;
+  id?: string;
+  policies?: unknown;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: unknown;
+  publicSchemaName?: string;
+  resolverFunctionName?: string;
+  resourceModuleId?: string;
+  schemaId?: string;
+  scope?: string;
+  storageModuleId?: string;
+}
+/** Represents an update to a `HttpRouteModule`. Fields that are set will be updated. */
+export interface HttpRouteModulePatch {
+  apiName?: string;
+  databaseId?: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  functionModuleId?: string;
+  httpRoutesTableId?: string;
+  httpRoutesTableName?: string;
+  id?: string;
+  policies?: unknown;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: unknown;
+  publicSchemaName?: string;
+  resolverFunctionName?: string;
+  resourceModuleId?: string;
+  schemaId?: string;
+  scope?: string;
+  storageModuleId?: string;
+}
 /** A filter to be used against `I18NModule` object types. All fields are combined with a logical ‘and.’ */
 export interface I18NModuleFilter {
   /** Checks for all expressions in this list. */
@@ -6603,10 +6864,10 @@ export interface InferenceLogModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 /** An input for mutations affecting `InferenceLogModule` */
 export interface InferenceLogModuleInput {
@@ -6628,8 +6889,8 @@ export interface InferenceLogModuleInput {
   retention?: string;
   schemaId?: string;
   scope?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** Represents an update to a `InferenceLogModule`. Fields that are set will be updated. */
 export interface InferenceLogModulePatch {
@@ -6651,8 +6912,8 @@ export interface InferenceLogModulePatch {
   retention?: string;
   schemaId?: string;
   scope?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** A filter to be used against `InfraConfigModule` object types. All fields are combined with a logical ‘and.’ */
 export interface InfraConfigModuleFilter {
@@ -8460,22 +8721,22 @@ export interface RateLimitsModuleFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `ipRateLimitsTable` field. */
-  ipRateLimitsTable?: StringFilter;
   /** Filter by the object’s `ipRateLimitsTableId` field. */
   ipRateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `ipRateLimitsTableName` field. */
+  ipRateLimitsTableName?: StringFilter;
   /** Negates the expression. */
   not?: RateLimitsModuleFilter;
   /** Checks for any expressions in this list. */
   or?: RateLimitsModuleFilter[];
-  /** Filter by the object’s `rateLimitSettingsTable` field. */
-  rateLimitSettingsTable?: StringFilter;
   /** Filter by the object’s `rateLimitSettingsTableId` field. */
   rateLimitSettingsTableId?: UUIDFilter;
-  /** Filter by the object’s `rateLimitsTable` field. */
-  rateLimitsTable?: StringFilter;
+  /** Filter by the object’s `rateLimitSettingsTableName` field. */
+  rateLimitSettingsTableName?: StringFilter;
   /** Filter by the object’s `rateLimitsTableId` field. */
   rateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitsTableName` field. */
+  rateLimitsTableName?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
 }
@@ -8483,24 +8744,24 @@ export interface RateLimitsModuleFilter {
 export interface RateLimitsModuleInput {
   databaseId: string;
   id?: string;
-  ipRateLimitsTable?: string;
   ipRateLimitsTableId?: string;
-  rateLimitSettingsTable?: string;
+  ipRateLimitsTableName?: string;
   rateLimitSettingsTableId?: string;
-  rateLimitsTable?: string;
+  rateLimitSettingsTableName?: string;
   rateLimitsTableId?: string;
+  rateLimitsTableName?: string;
   schemaId?: string;
 }
 /** Represents an update to a `RateLimitsModule`. Fields that are set will be updated. */
 export interface RateLimitsModulePatch {
   databaseId?: string;
   id?: string;
-  ipRateLimitsTable?: string;
   ipRateLimitsTableId?: string;
-  rateLimitSettingsTable?: string;
+  ipRateLimitsTableName?: string;
   rateLimitSettingsTableId?: string;
-  rateLimitsTable?: string;
+  rateLimitSettingsTableName?: string;
   rateLimitsTableId?: string;
+  rateLimitsTableName?: string;
   schemaId?: string;
 }
 /** A filter to be used against `RealtimeModule` object types. All fields are combined with a logical ‘and.’ */
@@ -8895,6 +9156,14 @@ export interface ResourceModuleFilter {
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `installationStoreName` field. */
+  installationStoreName?: StringFilter;
+  /** Filter by the object’s `merkleStoreModule` relation. */
+  merkleStoreModule?: MerkleStoreModuleFilter;
+  /** A related `merkleStoreModule` exists. */
+  merkleStoreModuleExists?: boolean;
+  /** Filter by the object’s `merkleStoreModuleId` field. */
+  merkleStoreModuleId?: UUIDFilter;
   /** Filter by the object’s `namespaceModule` relation. */
   namespaceModule?: NamespaceModuleFilter;
   /** A related `namespaceModule` exists. */
@@ -8923,6 +9192,8 @@ export interface ResourceModuleFilter {
   requirementsStateViewName?: StringFilter;
   /** Filter by the object’s `resolvedRequirementsViewName` field. */
   resolvedRequirementsViewName?: StringFilter;
+  /** Filter by the object’s `resourceBillingRollupFunction` field. */
+  resourceBillingRollupFunction?: StringFilter;
   /** Filter by the object’s `resourceDefinitionsTableId` field. */
   resourceDefinitionsTableId?: UUIDFilter;
   /** Filter by the object’s `resourceDefinitionsTableName` field. */
@@ -8931,14 +9202,28 @@ export interface ResourceModuleFilter {
   resourceEventsTableId?: UUIDFilter;
   /** Filter by the object’s `resourceEventsTableName` field. */
   resourceEventsTableName?: StringFilter;
+  /** Filter by the object’s `resourceInstallationsTableId` field. */
+  resourceInstallationsTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceInstallationsTableName` field. */
+  resourceInstallationsTableName?: StringFilter;
   /** Filter by the object’s `resourceStatusChecksTableId` field. */
   resourceStatusChecksTableId?: UUIDFilter;
   /** Filter by the object’s `resourceStatusChecksTableName` field. */
   resourceStatusChecksTableName?: StringFilter;
+  /** Filter by the object’s `resourceUsageLogTableId` field. */
+  resourceUsageLogTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceUsageLogTableName` field. */
+  resourceUsageLogTableName?: StringFilter;
+  /** Filter by the object’s `resourceUsageSummaryTableId` field. */
+  resourceUsageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `resourceUsageSummaryTableName` field. */
+  resourceUsageSummaryTableName?: StringFilter;
   /** Filter by the object’s `resourcesTableId` field. */
   resourcesTableId?: UUIDFilter;
   /** Filter by the object’s `resourcesTableName` field. */
   resourcesTableName?: StringFilter;
+  /** Filter by the object’s `rollupResourceUsageSummaryFunction` field. */
+  rollupResourceUsageSummaryFunction?: StringFilter;
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
@@ -8952,6 +9237,8 @@ export interface ResourceModuleInput {
   entityField?: string;
   entityTableId?: string;
   id?: string;
+  installationStoreName?: string;
+  merkleStoreModuleId?: string;
   namespaceModuleId?: string;
   policies?: unknown;
   prefix?: string;
@@ -8962,14 +9249,22 @@ export interface ResourceModuleInput {
   publicSchemaName?: string;
   requirementsStateViewName?: string;
   resolvedRequirementsViewName?: string;
+  resourceBillingRollupFunction?: string;
   resourceDefinitionsTableId?: string;
   resourceDefinitionsTableName?: string;
   resourceEventsTableId?: string;
   resourceEventsTableName?: string;
+  resourceInstallationsTableId?: string;
+  resourceInstallationsTableName?: string;
   resourceStatusChecksTableId?: string;
   resourceStatusChecksTableName?: string;
+  resourceUsageLogTableId?: string;
+  resourceUsageLogTableName?: string;
+  resourceUsageSummaryTableId?: string;
+  resourceUsageSummaryTableName?: string;
   resourcesTableId?: string;
   resourcesTableName?: string;
+  rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
 }
@@ -8981,6 +9276,8 @@ export interface ResourceModulePatch {
   entityField?: string;
   entityTableId?: string;
   id?: string;
+  installationStoreName?: string;
+  merkleStoreModuleId?: string;
   namespaceModuleId?: string;
   policies?: unknown;
   prefix?: string;
@@ -8991,14 +9288,22 @@ export interface ResourceModulePatch {
   publicSchemaName?: string;
   requirementsStateViewName?: string;
   resolvedRequirementsViewName?: string;
+  resourceBillingRollupFunction?: string;
   resourceDefinitionsTableId?: string;
   resourceDefinitionsTableName?: string;
   resourceEventsTableId?: string;
   resourceEventsTableName?: string;
+  resourceInstallationsTableId?: string;
+  resourceInstallationsTableName?: string;
   resourceStatusChecksTableId?: string;
   resourceStatusChecksTableName?: string;
+  resourceUsageLogTableId?: string;
+  resourceUsageLogTableName?: string;
+  resourceUsageSummaryTableId?: string;
+  resourceUsageSummaryTableName?: string;
   resourcesTableId?: string;
   resourcesTableName?: string;
+  rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
 }
@@ -9176,7 +9481,7 @@ export interface SessionSecretsModuleInput {
   databaseId: string;
   id?: string;
   schemaId?: string;
-  /** Resolved reference to sessions_module.sessions_table, used to FK session_secrets.session_id with ON DELETE CASCADE. */
+  /** Resolved reference to sessions_module.sessions_table_name, used to FK session_secrets.session_id with ON DELETE CASCADE. */
   sessionsTableId?: string;
   tableId?: string;
   tableName?: string;
@@ -9186,7 +9491,7 @@ export interface SessionSecretsModulePatch {
   databaseId?: string;
   id?: string;
   schemaId?: string;
-  /** Resolved reference to sessions_module.sessions_table, used to FK session_secrets.session_id with ON DELETE CASCADE. */
+  /** Resolved reference to sessions_module.sessions_table_name, used to FK session_secrets.session_id with ON DELETE CASCADE. */
   sessionsTableId?: string;
   tableId?: string;
   tableName?: string;
@@ -9195,10 +9500,10 @@ export interface SessionSecretsModulePatch {
 export interface SessionsModuleFilter {
   /** Checks for all expressions in this list. */
   and?: SessionsModuleFilter[];
-  /** Filter by the object’s `authSettingsTable` field. */
-  authSettingsTable?: StringFilter;
   /** Filter by the object’s `authSettingsTableId` field. */
   authSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `authSettingsTableName` field. */
+  authSettingsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
@@ -9209,45 +9514,45 @@ export interface SessionsModuleFilter {
   or?: SessionsModuleFilter[];
   /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
-  /** Filter by the object’s `sessionCredentialsTable` field. */
-  sessionCredentialsTable?: StringFilter;
   /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableName` field. */
+  sessionCredentialsTableName?: StringFilter;
   /** Filter by the object’s `sessionsDefaultExpiration` field. */
   sessionsDefaultExpiration?: IntervalFilter;
-  /** Filter by the object’s `sessionsTable` field. */
-  sessionsTable?: StringFilter;
   /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableName` field. */
+  sessionsTableName?: StringFilter;
   /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
 }
 /** An input for mutations affecting `SessionsModule` */
 export interface SessionsModuleInput {
-  authSettingsTable?: string;
   authSettingsTableId?: string;
+  authSettingsTableName?: string;
   databaseId: string;
   id?: string;
   schemaId?: string;
-  sessionCredentialsTable?: string;
   sessionCredentialsTableId?: string;
+  sessionCredentialsTableName?: string;
   sessionsDefaultExpiration?: IntervalInput;
-  sessionsTable?: string;
   sessionsTableId?: string;
+  sessionsTableName?: string;
   usersTableId?: string;
 }
 /** Represents an update to a `SessionsModule`. Fields that are set will be updated. */
 export interface SessionsModulePatch {
-  authSettingsTable?: string;
   authSettingsTableId?: string;
+  authSettingsTableName?: string;
   databaseId?: string;
   id?: string;
   schemaId?: string;
-  sessionCredentialsTable?: string;
   sessionCredentialsTableId?: string;
+  sessionCredentialsTableName?: string;
   sessionsDefaultExpiration?: IntervalInput;
-  sessionsTable?: string;
   sessionsTableId?: string;
+  sessionsTableName?: string;
   usersTableId?: string;
 }
 /** A filter to be used against `StorageLogModule` object types. All fields are combined with a logical ‘and.’ */
@@ -9294,10 +9599,10 @@ export interface StorageLogModuleFilter {
   storageLogTableId?: UUIDFilter;
   /** Filter by the object’s `storageLogTableName` field. */
   storageLogTableName?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 /** An input for mutations affecting `StorageLogModule` */
 export interface StorageLogModuleInput {
@@ -9319,8 +9624,8 @@ export interface StorageLogModuleInput {
   scope?: string;
   storageLogTableId?: string;
   storageLogTableName?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** Represents an update to a `StorageLogModule`. Fields that are set will be updated. */
 export interface StorageLogModulePatch {
@@ -9342,8 +9647,8 @@ export interface StorageLogModulePatch {
   scope?: string;
   storageLogTableId?: string;
   storageLogTableName?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** A filter to be used against `StorageModule` object types. All fields are combined with a logical ‘and.’ */
 export interface StorageModuleFilter {
@@ -9564,10 +9869,10 @@ export interface TransferLogModuleFilter {
   transferLogTableId?: UUIDFilter;
   /** Filter by the object’s `transferLogTableName` field. */
   transferLogTableName?: StringFilter;
-  /** Filter by the object’s `usageDailyTableId` field. */
-  usageDailyTableId?: UUIDFilter;
-  /** Filter by the object’s `usageDailyTableName` field. */
-  usageDailyTableName?: StringFilter;
+  /** Filter by the object’s `usageSummaryTableId` field. */
+  usageSummaryTableId?: UUIDFilter;
+  /** Filter by the object’s `usageSummaryTableName` field. */
+  usageSummaryTableName?: StringFilter;
 }
 /** An input for mutations affecting `TransferLogModule` */
 export interface TransferLogModuleInput {
@@ -9589,8 +9894,8 @@ export interface TransferLogModuleInput {
   scope?: string;
   transferLogTableId?: string;
   transferLogTableName?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 /** Represents an update to a `TransferLogModule`. Fields that are set will be updated. */
 export interface TransferLogModulePatch {
@@ -9612,8 +9917,8 @@ export interface TransferLogModulePatch {
   scope?: string;
   transferLogTableId?: string;
   transferLogTableName?: string;
-  usageDailyTableId?: string;
-  usageDailyTableName?: string;
+  usageSummaryTableId?: string;
+  usageSummaryTableName?: string;
 }
 export interface UpdateAgentModuleInput {
   /** An object where the defined keys will be set on the `AgentModule` being updated. */
@@ -9785,6 +10090,12 @@ export interface UpdateHierarchyModuleInput {
   clientMutationId?: string;
   /** An object where the defined keys will be set on the `HierarchyModule` being updated. */
   hierarchyModulePatch: HierarchyModulePatch;
+  id: string;
+}
+export interface UpdateHttpRouteModuleInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `HttpRouteModule` being updated. */
+  httpRouteModulePatch: HttpRouteModulePatch;
   id: string;
 }
 export interface UpdateI18NModuleInput {
@@ -10016,6 +10327,12 @@ export interface UpdateWebauthnCredentialsModuleInput {
   id: string;
   /** An object where the defined keys will be set on the `WebauthnCredentialsModule` being updated. */
   webauthnCredentialsModulePatch: WebauthnCredentialsModulePatch;
+}
+export interface UpdateWebhookModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `WebhookModule` being updated. */
+  webhookModulePatch: WebhookModulePatch;
 }
 /** A filter to be used against `UserAuthModule` object types. All fields are combined with a logical ‘and.’ */
 export interface UserAuthModuleFilter {
@@ -10452,6 +10769,129 @@ export interface WebauthnCredentialsModulePatch {
   tableId?: string;
   tableName?: string;
 }
+/** A filter to be used against `WebhookModule` object types. All fields are combined with a logical ‘and.’ */
+export interface WebhookModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: WebhookModuleFilter[];
+  /** Filter by the object’s `apiName` field. */
+  apiName?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissions` field. */
+  defaultPermissions?: StringListFilter;
+  /** Filter by the object’s `entityField` field. */
+  entityField?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `functionInvocationModule` relation. */
+  functionInvocationModule?: FunctionInvocationModuleFilter;
+  /** A related `functionInvocationModule` exists. */
+  functionInvocationModuleExists?: boolean;
+  /** Filter by the object’s `functionInvocationModuleId` field. */
+  functionInvocationModuleId?: UUIDFilter;
+  /** Filter by the object’s `functionModule` relation. */
+  functionModule?: FunctionModuleFilter;
+  /** A related `functionModule` exists. */
+  functionModuleExists?: boolean;
+  /** Filter by the object’s `functionModuleId` field. */
+  functionModuleId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `infraSecretsModule` relation. */
+  infraSecretsModule?: InfraSecretsModuleFilter;
+  /** A related `infraSecretsModule` exists. */
+  infraSecretsModuleExists?: boolean;
+  /** Filter by the object’s `infraSecretsModuleId` field. */
+  infraSecretsModuleId?: UUIDFilter;
+  /** Filter by the object’s `namespaceModule` relation. */
+  namespaceModule?: NamespaceModuleFilter;
+  /** A related `namespaceModule` exists. */
+  namespaceModuleExists?: boolean;
+  /** Filter by the object’s `namespaceModuleId` field. */
+  namespaceModuleId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: WebhookModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: WebhookModuleFilter[];
+  /** Filter by the object’s `policies` field. */
+  policies?: JSONFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateApiName` field. */
+  privateApiName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `provisions` field. */
+  provisions?: JSONFilter;
+  /** Filter by the object’s `publicSchemaName` field. */
+  publicSchemaName?: StringFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: StringFilter;
+  /** Filter by the object’s `webhookEndpointsTableId` field. */
+  webhookEndpointsTableId?: UUIDFilter;
+  /** Filter by the object’s `webhookEndpointsTableName` field. */
+  webhookEndpointsTableName?: StringFilter;
+  /** Filter by the object’s `webhookEventsTableId` field. */
+  webhookEventsTableId?: UUIDFilter;
+  /** Filter by the object’s `webhookEventsTableName` field. */
+  webhookEventsTableName?: StringFilter;
+}
+/** An input for mutations affecting `WebhookModule` */
+export interface WebhookModuleInput {
+  apiName?: string;
+  databaseId: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  functionInvocationModuleId?: string;
+  functionModuleId?: string;
+  id?: string;
+  infraSecretsModuleId?: string;
+  namespaceModuleId?: string;
+  policies?: unknown;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: unknown;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope?: string;
+  webhookEndpointsTableId?: string;
+  webhookEndpointsTableName?: string;
+  webhookEventsTableId?: string;
+  webhookEventsTableName?: string;
+}
+/** Represents an update to a `WebhookModule`. Fields that are set will be updated. */
+export interface WebhookModulePatch {
+  apiName?: string;
+  databaseId?: string;
+  defaultPermissions?: string[];
+  entityField?: string;
+  entityTableId?: string;
+  functionInvocationModuleId?: string;
+  functionModuleId?: string;
+  id?: string;
+  infraSecretsModuleId?: string;
+  namespaceModuleId?: string;
+  policies?: unknown;
+  prefix?: string;
+  privateApiName?: string;
+  privateSchemaId?: string;
+  privateSchemaName?: string;
+  provisions?: unknown;
+  publicSchemaName?: string;
+  schemaId?: string;
+  scope?: string;
+  webhookEndpointsTableId?: string;
+  webhookEndpointsTableName?: string;
+  webhookEventsTableId?: string;
+  webhookEventsTableName?: string;
+}
 /** Root meta schema type */
 export interface MetaSchema {
   tables: MetaTable[];
@@ -10649,6 +11089,13 @@ export interface GraphModuleConnection {
 export interface HierarchyModuleConnection {
   edges: HierarchyModuleEdge[];
   nodes: HierarchyModule[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `HttpRouteModule` values. */
+export interface HttpRouteModuleConnection {
+  edges: HttpRouteModuleEdge[];
+  nodes: HttpRouteModule[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -10918,6 +11365,13 @@ export interface WebauthnCredentialsModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `WebhookModule` values. */
+export interface WebhookModuleConnection {
+  edges: WebhookModuleEdge[];
+  nodes: WebhookModule[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 export interface ConstructBlueprintPayload {
   clientMutationId?: string | null;
   result?: string | null;
@@ -11093,6 +11547,12 @@ export interface CreateHierarchyModulePayload {
   /** The `HierarchyModule` that was created by this mutation. */
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
+}
+export interface CreateHttpRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRouteModule` that was created by this mutation. */
+  httpRouteModule?: HttpRouteModule | null;
+  httpRouteModuleEdge?: HttpRouteModuleEdge | null;
 }
 export interface CreateI18NModulePayload {
   clientMutationId?: string | null;
@@ -11322,6 +11782,12 @@ export interface CreateWebauthnCredentialsModulePayload {
   webauthnCredentialsModule?: WebauthnCredentialsModule | null;
   webauthnCredentialsModuleEdge?: WebauthnCredentialsModuleEdge | null;
 }
+export interface CreateWebhookModulePayload {
+  clientMutationId?: string | null;
+  /** The `WebhookModule` that was created by this mutation. */
+  webhookModule?: WebhookModule | null;
+  webhookModuleEdge?: WebhookModuleEdge | null;
+}
 export interface DeleteAgentModulePayload {
   /** The `AgentModule` that was deleted by this mutation. */
   agentModule?: AgentModule | null;
@@ -11489,6 +11955,12 @@ export interface DeleteHierarchyModulePayload {
   /** The `HierarchyModule` that was deleted by this mutation. */
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
+}
+export interface DeleteHttpRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRouteModule` that was deleted by this mutation. */
+  httpRouteModule?: HttpRouteModule | null;
+  httpRouteModuleEdge?: HttpRouteModuleEdge | null;
 }
 export interface DeleteI18NModulePayload {
   clientMutationId?: string | null;
@@ -11718,6 +12190,12 @@ export interface DeleteWebauthnCredentialsModulePayload {
   webauthnCredentialsModule?: WebauthnCredentialsModule | null;
   webauthnCredentialsModuleEdge?: WebauthnCredentialsModuleEdge | null;
 }
+export interface DeleteWebhookModulePayload {
+  clientMutationId?: string | null;
+  /** The `WebhookModule` that was deleted by this mutation. */
+  webhookModule?: WebhookModule | null;
+  webhookModuleEdge?: WebhookModuleEdge | null;
+}
 export interface ProvisionBucketPayload {
   /** The access type applied */
   accessType: string;
@@ -11925,6 +12403,12 @@ export interface UpdateHierarchyModulePayload {
   /** The `HierarchyModule` that was updated by this mutation. */
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
+}
+export interface UpdateHttpRouteModulePayload {
+  clientMutationId?: string | null;
+  /** The `HttpRouteModule` that was updated by this mutation. */
+  httpRouteModule?: HttpRouteModule | null;
+  httpRouteModuleEdge?: HttpRouteModuleEdge | null;
 }
 export interface UpdateI18NModulePayload {
   clientMutationId?: string | null;
@@ -12154,6 +12638,12 @@ export interface UpdateWebauthnCredentialsModulePayload {
   webauthnCredentialsModule?: WebauthnCredentialsModule | null;
   webauthnCredentialsModuleEdge?: WebauthnCredentialsModuleEdge | null;
 }
+export interface UpdateWebhookModulePayload {
+  clientMutationId?: string | null;
+  /** The `WebhookModule` that was updated by this mutation. */
+  webhookModule?: WebhookModule | null;
+  webhookModuleEdge?: WebhookModuleEdge | null;
+}
 /** Information about a database table */
 export interface MetaTable {
   constraints: MetaConstraints;
@@ -12354,6 +12844,12 @@ export interface HierarchyModuleEdge {
   cursor?: string | null;
   /** The `HierarchyModule` at the end of the edge. */
   node?: HierarchyModule | null;
+}
+/** A `HttpRouteModule` edge in the connection. */
+export interface HttpRouteModuleEdge {
+  cursor?: string | null;
+  /** The `HttpRouteModule` at the end of the edge. */
+  node?: HttpRouteModule | null;
 }
 /** A `I18NModule` edge in the connection. */
 export interface I18NModuleEdge {
@@ -12582,6 +13078,12 @@ export interface WebauthnCredentialsModuleEdge {
   cursor?: string | null;
   /** The `WebauthnCredentialsModule` at the end of the edge. */
   node?: WebauthnCredentialsModule | null;
+}
+/** A `WebhookModule` edge in the connection. */
+export interface WebhookModuleEdge {
+  cursor?: string | null;
+  /** The `WebhookModule` at the end of the edge. */
+  node?: WebhookModule | null;
 }
 export interface ProvisionRelationRecord {
   outFieldId?: string | null;

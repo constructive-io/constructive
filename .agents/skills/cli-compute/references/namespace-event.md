@@ -12,8 +12,8 @@ csdk namespace-event list --where.<field>.<op> <value> --orderBy <values>
 csdk namespace-event list --limit 10 --after <cursor>
 csdk namespace-event find-first --where.<field>.<op> <value>
 csdk namespace-event get --id <UUID>
-csdk namespace-event create --databaseId <UUID> --eventType <String> --namespaceId <UUID> [--actorId <UUID>] [--cpuMillicores <Int>] [--memoryBytes <BigInt>] [--message <String>] [--metadata <JSON>] [--metrics <JSON>] [--networkEgressBytes <BigInt>] [--networkIngressBytes <BigInt>] [--podCount <Int>] [--storageBytes <BigInt>]
-csdk namespace-event update --id <UUID> [--actorId <UUID>] [--cpuMillicores <Int>] [--databaseId <UUID>] [--eventType <String>] [--memoryBytes <BigInt>] [--message <String>] [--metadata <JSON>] [--metrics <JSON>] [--namespaceId <UUID>] [--networkEgressBytes <BigInt>] [--networkIngressBytes <BigInt>] [--podCount <Int>] [--storageBytes <BigInt>]
+csdk namespace-event create --databaseId <UUID> --eventType <String> --namespaceId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
+csdk namespace-event update --id <UUID> [--actorId <UUID>] [--databaseId <UUID>] [--eventType <String>] [--message <String>] [--metadata <JSON>] [--namespaceId <UUID>]
 csdk namespace-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk namespace-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a namespaceEvent
 
 ```bash
-csdk namespace-event create --databaseId <UUID> --eventType <String> --namespaceId <UUID> [--actorId <UUID>] [--cpuMillicores <Int>] [--memoryBytes <BigInt>] [--message <String>] [--metadata <JSON>] [--metrics <JSON>] [--networkEgressBytes <BigInt>] [--networkIngressBytes <BigInt>] [--podCount <Int>] [--storageBytes <BigInt>]
+csdk namespace-event create --databaseId <UUID> --eventType <String> --namespaceId <UUID> [--actorId <UUID>] [--message <String>] [--metadata <JSON>]
 ```
 
 ### Get a namespaceEvent by id

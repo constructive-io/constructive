@@ -14,7 +14,7 @@ export interface Commit {
   storeId: string | null;
   treeId: string | null;
 }
-export interface GetAllRecord {
+export interface GetAllTreeNodesRecord {
   data: unknown | null;
   path: string[] | null;
 }

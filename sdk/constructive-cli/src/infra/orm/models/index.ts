@@ -4,12 +4,12 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { DbPresetModel } from './dbPreset';
-export { InfraCommitModel } from './infraCommit';
-export { InfraGetAllRecordModel } from './infraGetAllRecord';
-export { InfraObjectModel } from './infraObject';
-export { InfraRefModel } from './infraRef';
-export { InfraStoreModel } from './infraStore';
 export { NamespaceModel } from './namespace';
 export { NamespaceEventModel } from './namespaceEvent';
+export { PlatformInfraCommitModel } from './platformInfraCommit';
+export { PlatformInfraGetAllTreeNodesRecordModel } from './platformInfraGetAllTreeNodesRecord';
+export { PlatformInfraObjectModel } from './platformInfraObject';
+export { PlatformInfraRefModel } from './platformInfraRef';
+export { PlatformInfraStoreModel } from './platformInfraStore';
 export { PlatformNamespaceModel } from './platformNamespace';
 export { PlatformNamespaceEventModel } from './platformNamespaceEvent';

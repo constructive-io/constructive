@@ -132,16 +132,21 @@ function App() {
 | `useCreateFunctionMutation` | Mutation | Create a function |
 | `useUpdateFunctionMutation` | Mutation | Update a function |
 | `useDeleteFunctionMutation` | Mutation | Delete a function |
+| `useHttpRoutesQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
+| `useHttpRouteQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
+| `useCreateHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
+| `useUpdateHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
+| `useDeleteHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
 | `useIndicesQuery` | Query | List all indices |
 | `useIndexQuery` | Query | Get one index |
 | `useCreateIndexMutation` | Mutation | Create a index |
 | `useUpdateIndexMutation` | Mutation | Update a index |
 | `useDeleteIndexMutation` | Mutation | Delete a index |
-| `useMigrateFilesQuery` | Query | List all migrateFiles |
-| `useMigrateFileQuery` | Query | Get one migrateFile |
-| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
-| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
-| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
+| `useManagedDomainsQuery` | Query | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
+| `useManagedDomainQuery` | Query | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
+| `useCreateManagedDomainMutation` | Mutation | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
+| `useUpdateManagedDomainMutation` | Mutation | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
+| `useDeleteManagedDomainMutation` | Mutation | One row per cert-bearing host or wildcard; tracks domain verification and TLS provisioning independently of services_public.domains. Reconcilers match a route's root domain to a row here by string (no FK/coupling in v1) |
 | `useNodeTypeRegistriesQuery` | Query | List all nodeTypeRegistries |
 | `useNodeTypeRegistryQuery` | Query | Get one nodeTypeRegistry |
 | `useCreateNodeTypeRegistryMutation` | Mutation | Create a nodeTypeRegistry |
@@ -263,6 +268,7 @@ function App() {
 | `useUpdateWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
 | `useDeleteWebauthnSettingMutation` | Mutation | Per-database WebAuthn/passkey runtime configuration; typed replacement for api_modules webauthn_challenge JSONB entries |
 | `useApplyRegistryDefaultsQuery` | Query | applyRegistryDefaults |
+| `useResolveHttpRouteQuery` | Query | resolveHttpRoute |
 | `useAcceptDatabaseTransferMutation` | Mutation | acceptDatabaseTransfer |
 | `useApplyRlsMutation` | Mutation | applyRls |
 | `useCancelDatabaseTransferMutation` | Mutation | cancelDatabaseTransfer |
@@ -392,20 +398,20 @@ create({ appIdPrefix: '<String>', appImage: '<Image>', appStoreId: '<String>', a
 ```typescript
 // List all astMigrations
 const { data, isLoading } = useAstMigrationsQuery({
-  selection: { fields: { action: true, actionId: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
+  selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 
 // Get one astMigration
 const { data: item } = useAstMigrationQuery({
   id: '<Int>',
-  selection: { fields: { action: true, actionId: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
+  selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 
 // Create a astMigration
 const { mutate: create } = useCreateAstMigrationMutation({
   selection: { fields: { id: true } },
 });
-create({ action: '<String>', actionId: '<UUID>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' });
+create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' });
 ```
 
 ### CheckConstraint
@@ -702,6 +708,27 @@ const { mutate: create } = useCreateFunctionMutation({
 create({ databaseId: '<UUID>', name: '<String>', schemaId: '<UUID>' });
 ```
 
+### HttpRoute
+
+```typescript
+// List all httpRoutes
+const { data, isLoading } = useHttpRoutesQuery({
+  selection: { fields: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } },
+});
+
+// Get one httpRoute
+const { data: item } = useHttpRouteQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } },
+});
+
+// Create a httpRoute
+const { mutate: create } = useCreateHttpRouteMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetId: '<UUID>', targetKind: '<String>', updatedBy: '<UUID>' });
+```
+
 ### Index
 
 ```typescript
@@ -723,25 +750,25 @@ const { mutate: create } = useCreateIndexMutation({
 create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<UUID>', fieldIds: '<UUID>', includeFieldIds: '<UUID>', indexParams: '<JSON>', isUnique: '<Boolean>', name: '<String>', opClasses: '<String>', options: '<JSON>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', whereClause: '<JSON>' });
 ```
 
-### MigrateFile
+### ManagedDomain
 
 ```typescript
-// List all migrateFiles
-const { data, isLoading } = useMigrateFilesQuery({
-  selection: { fields: { databaseId: true, id: true, upload: true } },
+// List all managedDomains
+const { data, isLoading } = useManagedDomainsQuery({
+  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
 });
 
-// Get one migrateFile
-const { data: item } = useMigrateFileQuery({
+// Get one managedDomain
+const { data: item } = useManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { databaseId: true, id: true, upload: true } },
+  selection: { fields: { annotations: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, verificationStatus: true, verifiedAt: true } },
 });
 
-// Create a migrateFile
-const { mutate: create } = useCreateMigrateFileMutation({
+// Create a managedDomain
+const { mutate: create } = useCreateManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', upload: '<Upload>' });
+create({ annotations: '<JSON>', databaseId: '<UUID>', domain: '<Hostname>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### NodeTypeRegistry
@@ -1022,20 +1049,20 @@ create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldId: '<UUID>', 
 ```typescript
 // List all sqlActions
 const { data, isLoading } = useSqlActionsQuery({
-  selection: { fields: { action: true, actionId: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
+  selection: { fields: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
 });
 
 // Get one sqlAction
 const { data: item } = useSqlActionQuery({
   id: '<Int>',
-  selection: { fields: { action: true, actionId: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
+  selection: { fields: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
 });
 
 // Create a sqlAction
 const { mutate: create } = useCreateSqlActionMutation({
   selection: { fields: { id: true } },
 });
-create({ action: '<String>', actionId: '<UUID>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' });
+create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' });
 ```
 
 ### Table
@@ -1261,6 +1288,19 @@ applyRegistryDefaults
   |----------|------|
   | `data` | JSON |
   | `nodeType` | String |
+
+### `useResolveHttpRouteQuery`
+
+resolveHttpRoute
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `pHost` | String |
+  | `pMethod` | String |
+  | `pPath` | String |
 
 ### `useAcceptDatabaseTransferMutation`
 

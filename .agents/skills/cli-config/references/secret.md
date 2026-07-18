@@ -12,7 +12,7 @@ csdk secret list --where.<field>.<op> <value> --orderBy <values>
 csdk secret list --limit 10 --after <cursor>
 csdk secret find-first --where.<field>.<op> <value>
 csdk secret get --id <UUID>
-csdk secret create [--annotations <JSON>] [--databaseId <UUID>] [--description <String>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--provider <String>] [--retiredAt <Datetime>] [--rotatedAt <Datetime>]
+csdk secret create --annotations <JSON> --databaseId <UUID> --description <String> --labels <JSON> --name <String> --namespaceId <UUID> --provider <String> --retiredAt <Datetime> --rotatedAt <Datetime>
 csdk secret update --id <UUID> [--annotations <JSON>] [--databaseId <UUID>] [--description <String>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--provider <String>] [--retiredAt <Datetime>] [--rotatedAt <Datetime>]
 csdk secret delete --id <UUID>
 ```
@@ -58,7 +58,7 @@ csdk secret list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a secret
 
 ```bash
-csdk secret create [--annotations <JSON>] [--databaseId <UUID>] [--description <String>] [--labels <JSON>] [--name <String>] [--namespaceId <UUID>] [--provider <String>] [--retiredAt <Datetime>] [--rotatedAt <Datetime>]
+csdk secret create --annotations <JSON> --databaseId <UUID> --description <String> --labels <JSON> --name <String> --namespaceId <UUID> --provider <String> --retiredAt <Datetime> --rotatedAt <Datetime>
 ```
 
 ### Get a secret by id

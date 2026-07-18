@@ -28,14 +28,14 @@ export const commitKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...commitKeys.details(), id] as const,
 } as const;
-export const getAllRecordKeys = {
-  /** All getAllRecord queries */ all: ['getallrecord'] as const,
-  /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
+export const getAllTreeNodesRecordKeys = {
+  /** All getAllTreeNodesRecord queries */ all: ['getalltreenodesrecord'] as const,
+  /** List query keys */ lists: () => [...getAllTreeNodesRecordKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...getAllRecordKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...getAllRecordKeys.all, 'detail'] as const,
+    [...getAllTreeNodesRecordKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...getAllTreeNodesRecordKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...getAllRecordKeys.details(), id] as const,
+    [...getAllTreeNodesRecordKeys.details(), id] as const,
 } as const;
 export const objectKeys = {
   /** All object queries */ all: ['object'] as const,
@@ -88,7 +88,7 @@ export const storeKeys = {
  */
 export const queryKeys = {
   commit: commitKeys,
-  getAllRecord: getAllRecordKeys,
+  getAllTreeNodesRecord: getAllTreeNodesRecordKeys,
   object: objectKeys,
   ref: refKeys,
   store: storeKeys,

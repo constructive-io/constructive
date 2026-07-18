@@ -1,13 +1,13 @@
 ---
 name: hooks-api
-description: React Query hooks for the api API — provides typed query and mutation hooks for 46 tables and 8 custom operations
+description: React Query hooks for the api API — provides typed query and mutation hooks for 47 tables and 9 custom operations
 ---
 
 # hooks-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the api API — provides typed query and mutation hooks for 46 tables and 8 custom operations
+React Query hooks for the api API — provides typed query and mutation hooks for 47 tables and 9 custom operations
 
 ## Usage
 
@@ -58,8 +58,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)
 - [function](references/function.md)
+- [http-route](references/http-route.md)
 - [index](references/index.md)
-- [migrate-file](references/migrate-file.md)
+- [managed-domain](references/managed-domain.md)
 - [node-type-registry](references/node-type-registry.md)
 - [partition](references/partition.md)
 - [policy](references/policy.md)
@@ -85,6 +86,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [view-table](references/view-table.md)
 - [webauthn-setting](references/webauthn-setting.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
+- [resolve-http-route](references/resolve-http-route.md)
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [apply-rls](references/apply-rls.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)
