@@ -6,12 +6,18 @@ on:
       - v1
     paths-ignore:
       - '**.md'
+      - '**/*.md'
+      - '.agents/skills/**'
+      - 'docs/**'
   pull_request:
     branches:
       - main
       - v1
     paths-ignore:
       - '**.md'
+      - '**/*.md'
+      - '.agents/skills/**'
+      - 'docs/**'
   workflow_dispatch:
   workflow_call:
 
