@@ -277,6 +277,17 @@ new QueryBuilder()
 // INSERT INTO users (name) VALUES ($1) RETURNING id, lower(name) AS name_lower
 ```
 
+INSERT values accept expressions too:
+
+```ts
+new QueryBuilder()
+  .table('jobs')
+  .insert({ name: 'job-1', created_at: fn('now') })
+  .returning(['id'])
+  .build();
+// INSERT INTO jobs (name, created_at) VALUES ($1, now()) RETURNING id
+```
+
 ### JOINs
 
 ```ts
@@ -295,6 +306,58 @@ const { text, values } = new QueryBuilder()
 ```
 
 Supported join types: `.innerJoin()`, `.leftJoin()`, `.rightJoin()`, `.fullJoin()`.
+
+ON conditions also accept a JSON filter or an expression, for multi-condition or value-comparing joins:
+
+```ts
+import { and, eq, col } from '@constructive-io/query-builder';
+
+new QueryBuilder()
+  .table('orders', 'o')
+  .select(['o.id'])
+  .innerJoin('customers', and(
+    eq(col('o.customer_id'), col('customers.id')),
+    eq(col('customers.region'), 'us')
+  ))
+  .build();
+// JOIN customers ON o.customer_id = customers.id AND customers.region = $1
+
+new QueryBuilder()
+  .table('orders', 'o')
+  .select(['o.id'])
+  .leftJoin('customers', { 'c.active': { equalTo: true } }, { schema: 'crm', alias: 'c' })
+  .build();
+// LEFT JOIN crm.customers AS c ON c.active = $1
+```
+
+### Set-returning functions (fromFunction)
+
+Use a function as the FROM source with a range alias:
+
+```ts
+new QueryBuilder()
+  .select(['r.id', 'r.name'])
+  .fromFunction('get_rows', [7], { as: 'r' })
+  .where({ 'r.status': { equalTo: 'ok' } })
+  .build();
+// SELECT r.id, r.name FROM get_rows($1) AS r WHERE r.status = $2
+```
+
+Joins, WHERE filters, ORDER BY, etc. compose over the function source like a table.
+
+### Cloning
+
+Builders are mutable; `.clone()` copies the configured state so variants never affect the base:
+
+```ts
+const base = new QueryBuilder()
+  .table('jobs')
+  .select(['id'])
+  .where({ status: { equalTo: 'queued' } });
+
+const urgent = base.clone().where({ priority: { greaterThan: 5 } }).limit(1);
+// base is unchanged
+```
 
 ### CTEs (WITH clauses)
 
@@ -424,6 +487,14 @@ new QueryBuilder()
   .orderBy('name', 'ASC', 'FIRST')
   .build();
 
+// ORDER BY / GROUP BY expressions
+new QueryBuilder()
+  .table('events')
+  .select([{ expr: fn('date_trunc', [lit('day'), col('created_at')]), as: 'day' }])
+  .groupBy([fn('date_trunc', [lit('day'), col('created_at')])])
+  .orderBy(fn('lower', [col('name')]), 'DESC')
+  .build();
+
 // DISTINCT
 new QueryBuilder()
   .table('events')
@@ -451,16 +522,16 @@ new QueryBuilder()
 | `.select(columns)` | Build a SELECT with given columns (use `['*']` for all) |
 | `.selectCall(as, fnName, args?, opts?)` | Append a computed function-call column |
 | `.selectExpr(as, expr)` | Append a computed expression column |
-| `.insert(data)` | Build an INSERT (single row object or array of rows) |
+| `.insert(data)` | Build an INSERT (single row object or array of rows; values may be `Expr`) |
 | `.update(data)` | Build an UPDATE with `{ column: value \| Expr }` SET pairs |
 | `.delete()` | Build a DELETE |
 | `.where(...predicates)` | JSON filters and/or expressions (AND-combined across calls) |
-| `.innerJoin(table, leftCol, op, rightCol)` | INNER JOIN |
-| `.leftJoin(table, leftCol, op, rightCol)` | LEFT JOIN |
-| `.rightJoin(table, leftCol, op, rightCol)` | RIGHT JOIN |
-| `.fullJoin(table, leftCol, op, rightCol)` | FULL JOIN |
-| `.orderBy(col, dir?, nulls?)` | ORDER BY clause |
-| `.groupBy(columns)` | GROUP BY clause |
+| `.innerJoin(table, on, opts?)` | INNER JOIN; `on` is `(leftCol, op, rightCol)` or a `Filter`/`Expr` |
+| `.leftJoin(table, on, opts?)` | LEFT JOIN |
+| `.rightJoin(table, on, opts?)` | RIGHT JOIN |
+| `.fullJoin(table, on, opts?)` | FULL JOIN |
+| `.orderBy(col \| expr, dir?, nulls?)` | ORDER BY clause |
+| `.groupBy(columns)` | GROUP BY clause (column names or `Expr`s) |
 | `.having(...predicates)` | HAVING clause (JSON filters and/or expressions) |
 | `.limit(n)` | LIMIT clause |
 | `.offset(n)` | OFFSET clause |
@@ -470,6 +541,8 @@ new QueryBuilder()
 | `.with(name, subquery)` | CTE (WITH clause) |
 | `.withRecursive(name, subquery)` | Recursive CTE |
 | `.call(fnName, args?, opts?)` | Function/procedure call; `opts: { schema?, as? }`; args positional array or named record |
+| `.fromFunction(fnName, args?, opts?)` | Set-returning function as FROM source; `opts: { schema?, as? }` |
+| `.clone()` | Copy the builder for safe composition |
 | `.build()` | Returns `{ text: string, values: SqlValue[] }` |
 | `.toSQL()` | Returns just the SQL string |
 

@@ -71,7 +71,7 @@ export interface SelectExpr {
 export type SelectItem = string | SelectExpr;
 
 interface OrderBySpec {
-  column: string;
+  column: string | Expr;
   direction: SortDir;
   nulls?: NullsOrder;
 }
@@ -81,7 +81,7 @@ interface JoinSpec {
   schema?: string;
   table: string;
   alias?: string;
-  on: JoinOn;
+  on: JoinOn | Filter | Expr;
 }
 
 interface JoinOn {
@@ -89,6 +89,8 @@ interface JoinOn {
   operator: string;
   value: string;
 }
+
+type JoinOpts = { schema?: string; alias?: string };
 
 interface CteSpec {
   name: string;
@@ -175,14 +177,14 @@ function constNode(val: SqlValue) {
   return nodes.aConst({ sval: ast.string({ sval: val }) });
 }
 
-function sortByNode(col: string, dir: SortDir, nullsOrd?: NullsOrder) {
+function sortByNode(target: unknown, dir: SortDir, nullsOrd?: NullsOrder) {
   const dirMap: Record<SortDir, string> = { ASC: 'SORTBY_ASC', DESC: 'SORTBY_DESC' };
   const nullsMap: Record<string, string> = {
     FIRST: 'SORTBY_NULLS_FIRST',
     LAST: 'SORTBY_NULLS_LAST',
   };
   return nodes.sortBy({
-    node: colRef(col),
+    node: target as any,
     sortby_dir: dirMap[dir] as any,
     sortby_nulls: (nullsOrd ? nullsMap[nullsOrd] : 'SORTBY_NULLS_DEFAULT') as any,
   });
@@ -359,14 +361,15 @@ export class QueryBuilder {
   private _tableAlias: string | undefined;
   private _selectItems: SelectItem[] = [];
   private _distinct: boolean = false;
-  private _insertData: Record<string, SqlValue>[] | undefined;
+  private _insertData: Record<string, Operand>[] | undefined;
   private _updateData: Record<string, Operand> | undefined;
   private _isDelete: boolean = false;
   private _wherePredicates: (Filter | Expr)[] = [];
   private _joins: JoinSpec[] = [];
-  private _groupByColumns: string[] = [];
+  private _groupByColumns: (string | Expr)[] = [];
   private _havingPredicates: (Filter | Expr)[] = [];
   private _orderBySpecs: OrderBySpec[] = [];
+  private _fromFunction: { name: string; args?: FnArgs; schema?: string; as?: string } | undefined;
   private _limitValue: number | undefined;
   private _offsetValue: number | undefined;
   private _returning: SelectItem[] | undefined;
@@ -420,7 +423,7 @@ export class QueryBuilder {
   // INSERT
   // -------------------------------------------------------------------------
 
-  insert(data: Record<string, SqlValue> | Record<string, SqlValue>[]): this {
+  insert(data: Record<string, Operand> | Record<string, Operand>[]): this {
     this._insertData = Array.isArray(data) ? data : [data];
     return this;
   }
@@ -465,46 +468,65 @@ export class QueryBuilder {
   // JOIN
   // -------------------------------------------------------------------------
 
+  // ON condition: either the classic 4-arg column form
+  //   .join('INNER', 't', 'a.id', '=', 't.a_id')
+  // or a Filter / expression
+  //   .join('INNER', 't', and(eq(col('a.id'), col('t.a_id')), eq(col('t.kind'), 'x')))
+  join(kind: 'INNER' | 'LEFT' | 'RIGHT' | 'FULL', table: string, on: Filter | Expr, opts?: JoinOpts): this;
+  join(kind: 'INNER' | 'LEFT' | 'RIGHT' | 'FULL', table: string, onColumn: string, operator: string, onValue: string, opts?: JoinOpts): this;
   join(
     kind: 'INNER' | 'LEFT' | 'RIGHT' | 'FULL',
     table: string,
-    onColumn: string,
-    operator: string,
-    onValue: string,
-    opts?: { schema?: string; alias?: string },
+    onOrColumn: Filter | Expr | string,
+    operatorOrOpts?: string | JoinOpts,
+    onValue?: string,
+    maybeOpts?: JoinOpts,
   ): this {
     const joinKind = `JOIN_${kind}` as JoinKind;
+    const isColumnForm = typeof onOrColumn === 'string';
+    const opts = (isColumnForm ? maybeOpts : operatorOrOpts as JoinOpts | undefined);
+    const on: JoinOn | Filter | Expr = isColumnForm
+      ? { column: onOrColumn, operator: operatorOrOpts as string, value: onValue! }
+      : onOrColumn;
     this._joins.push({
       kind: joinKind,
       schema: opts?.schema,
       table,
       alias: opts?.alias,
-      on: { column: onColumn, operator, value: onValue },
+      on,
     });
     return this;
   }
 
-  innerJoin(table: string, onCol: string, op: string, onVal: string, opts?: { schema?: string; alias?: string }): this {
-    return this.join('INNER', table, onCol, op, onVal, opts);
+  innerJoin(table: string, on: Filter | Expr, opts?: JoinOpts): this;
+  innerJoin(table: string, onCol: string, op: string, onVal: string, opts?: JoinOpts): this;
+  innerJoin(table: string, a: any, b?: any, c?: any, d?: any): this {
+    return this.join('INNER', table, a, b, c, d);
   }
 
-  leftJoin(table: string, onCol: string, op: string, onVal: string, opts?: { schema?: string; alias?: string }): this {
-    return this.join('LEFT', table, onCol, op, onVal, opts);
+  leftJoin(table: string, on: Filter | Expr, opts?: JoinOpts): this;
+  leftJoin(table: string, onCol: string, op: string, onVal: string, opts?: JoinOpts): this;
+  leftJoin(table: string, a: any, b?: any, c?: any, d?: any): this {
+    return this.join('LEFT', table, a, b, c, d);
   }
 
-  rightJoin(table: string, onCol: string, op: string, onVal: string, opts?: { schema?: string; alias?: string }): this {
-    return this.join('RIGHT', table, onCol, op, onVal, opts);
+  rightJoin(table: string, on: Filter | Expr, opts?: JoinOpts): this;
+  rightJoin(table: string, onCol: string, op: string, onVal: string, opts?: JoinOpts): this;
+  rightJoin(table: string, a: any, b?: any, c?: any, d?: any): this {
+    return this.join('RIGHT', table, a, b, c, d);
   }
 
-  fullJoin(table: string, onCol: string, op: string, onVal: string, opts?: { schema?: string; alias?: string }): this {
-    return this.join('FULL', table, onCol, op, onVal, opts);
+  fullJoin(table: string, on: Filter | Expr, opts?: JoinOpts): this;
+  fullJoin(table: string, onCol: string, op: string, onVal: string, opts?: JoinOpts): this;
+  fullJoin(table: string, a: any, b?: any, c?: any, d?: any): this {
+    return this.join('FULL', table, a, b, c, d);
   }
 
   // -------------------------------------------------------------------------
   // GROUP BY / HAVING
   // -------------------------------------------------------------------------
 
-  groupBy(columns: string[]): this {
+  groupBy(columns: (string | Expr)[]): this {
     this._groupByColumns.push(...columns);
     return this;
   }
@@ -518,7 +540,7 @@ export class QueryBuilder {
   // ORDER BY / LIMIT / OFFSET
   // -------------------------------------------------------------------------
 
-  orderBy(column: string, direction: SortDir = 'ASC', nulls?: NullsOrder): this {
+  orderBy(column: string | Expr, direction: SortDir = 'ASC', nulls?: NullsOrder): this {
     this._orderBySpecs.push({ column, direction, nulls });
     return this;
   }
@@ -565,6 +587,50 @@ export class QueryBuilder {
     return this;
   }
 
+  // Set-returning function as the FROM source, with an optional range alias:
+  //   .select(['r.id']).fromFunction('get_rows', [7], { as: 'r' })
+  //   -> SELECT r.id FROM get_rows($1) AS r
+  fromFunction(name: string, args?: FnArgs, opts?: { schema?: string; as?: string }): this {
+    this._fromFunction = { name, args, schema: opts?.schema ?? this._schema, as: opts?.as };
+    return this;
+  }
+
+  // Deep-enough copy for safe composition: cloning then chaining never
+  // mutates the original builder. Referenced sub-builders (CTEs, subquery
+  // operands) are shared — building never mutates their configured state.
+  clone(): QueryBuilder {
+    const c = new QueryBuilder();
+    c._schema = this._schema;
+    c._table = this._table;
+    c._tableAlias = this._tableAlias;
+    c._selectItems = this._selectItems.map((i) => (typeof i === 'string' ? i : { ...i }));
+    c._distinct = this._distinct;
+    c._insertData = this._insertData?.map((row) => ({ ...row }));
+    c._updateData = this._updateData ? { ...this._updateData } : undefined;
+    c._isDelete = this._isDelete;
+    c._wherePredicates = [...this._wherePredicates];
+    c._joins = this._joins.map((j) => ({ ...j }));
+    c._groupByColumns = [...this._groupByColumns];
+    c._havingPredicates = [...this._havingPredicates];
+    c._orderBySpecs = this._orderBySpecs.map((s) => ({ ...s }));
+    c._limitValue = this._limitValue;
+    c._offsetValue = this._offsetValue;
+    c._returning = this._returning
+      ? this._returning.map((i) => (typeof i === 'string' ? i : { ...i }))
+      : undefined;
+    c._ctes = this._ctes.map((cte) => ({ ...cte }));
+    c._onConflict = this._onConflict
+      ? {
+        ...this._onConflict,
+        columns: this._onConflict.columns ? [...this._onConflict.columns] : undefined,
+        updateColumns: this._onConflict.updateColumns ? { ...this._onConflict.updateColumns } : undefined,
+      }
+      : undefined;
+    c._funcCall = this._funcCall ? { ...this._funcCall } : undefined;
+    c._fromFunction = this._fromFunction ? { ...this._fromFunction } : undefined;
+    return c;
+  }
+
   // -------------------------------------------------------------------------
   // Build
   // -------------------------------------------------------------------------
@@ -572,6 +638,9 @@ export class QueryBuilder {
   build(): QueryOutput {
     if (this._funcCall) {
       return this._buildFuncCall();
+    }
+    if (!this._table && this._fromFunction) {
+      return this._buildSelect();
     }
     if (!this._table) {
       throw new Error('Table name is not specified.');
@@ -849,30 +918,49 @@ export class QueryBuilder {
   // Internal: FROM clause with JOINs (wrapped nodes for fromClause arrays)
   // -------------------------------------------------------------------------
 
+  private _joinQuals(on: JoinOn | Filter | Expr): unknown {
+    if (isExpr(on)) {
+      return on(this._alloc);
+    }
+    if (typeof (on as JoinOn).column === 'string' && typeof (on as JoinOn).operator === 'string') {
+      const j = on as JoinOn;
+      return operatorExpr(colRef(j.column), j.operator, colRef(j.value));
+    }
+    return this._filterToNode(on as Filter);
+  }
+
   private _buildFromClause(): unknown[] {
-    const baseTable = wrappedRangeVar(this._table!, this._schema, this._tableAlias);
+    const base = this._fromFunction
+      ? this._rangeFunctionNode(this._fromFunction)
+      : wrappedRangeVar(this._table!, this._schema, this._tableAlias);
 
     if (this._joins.length === 0) {
-      return [baseTable];
+      return [base];
     }
 
-    let result: unknown = baseTable;
+    let result: unknown = base;
     for (const j of this._joins) {
       const rightTable = wrappedRangeVar(j.table, j.schema, j.alias);
-
-      const onLeft = colRef(j.on.column);
-      const onRight = colRef(j.on.value as string);
-      const quals = operatorExpr(onLeft, j.on.operator, onRight);
-
       result = nodes.joinExpr({
         jointype: j.kind as any,
         larg: result as any,
         rarg: rightTable as any,
-        quals: quals as any,
+        quals: this._joinQuals(j.on) as any,
       });
     }
 
     return [result];
+  }
+
+  private _rangeFunctionNode(spec: { name: string; args?: FnArgs; schema?: string; as?: string }): unknown {
+    const funcNode = funcCallNode(spec.name, buildFnArgNodes(spec.args, this._alloc), spec.schema);
+    return nodes.rangeFunction({
+      functions: [nodes.list({ items: [funcNode] as any[] })] as any[],
+      lateral: false,
+      ordinality: false,
+      is_rowsfrom: false,
+      alias: spec.as ? ast.alias({ aliasname: spec.as }) : undefined,
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -882,17 +970,21 @@ export class QueryBuilder {
   private _buildSelectInternal(startParamIndex: number = 0): unknown {
     this._paramIndex = startParamIndex;
 
-    const targetList = this._buildTargetList(this._selectItems);
+    const targetList = this._buildTargetList(
+      this._selectItems.length > 0 ? this._selectItems : ['*']
+    );
 
     const whereClause = this._buildPredicates(this._wherePredicates);
     const havingClause = this._buildPredicates(this._havingPredicates);
 
     const groupClause = this._groupByColumns.length > 0
-      ? this._groupByColumns.map((col) => colRef(col))
+      ? this._groupByColumns.map((g) => (isExpr(g) ? g(this._alloc) : colRef(g)))
       : undefined;
 
     const sortClause = this._orderBySpecs.length > 0
-      ? this._orderBySpecs.map((s) => sortByNode(s.column, s.direction, s.nulls))
+      ? this._orderBySpecs.map((s) =>
+        sortByNode(isExpr(s.column) ? s.column(this._alloc) : colRef(s.column), s.direction, s.nulls)
+      )
       : undefined;
 
     const limitCount = this._limitValue !== undefined
@@ -946,7 +1038,7 @@ export class QueryBuilder {
     const cols = columns.map((c) => resTargetCol(c));
 
     const valuesLists = rows.map((row) => {
-      const items = columns.map((c) => this._addParam(row[c]));
+      const items = columns.map((c) => operandToNode(row[c], this._alloc));
       return nodes.list({ items: items as any[] });
     });
 

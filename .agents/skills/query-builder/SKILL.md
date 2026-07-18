@@ -3,7 +3,7 @@ name: query-builder
 description: "AST-backed PostgreSQL query builder — fluent API for SELECT/INSERT/UPDATE/DELETE with SDK-style JSON where filters, expression helpers, JOINs, CTEs, ON CONFLICT, RETURNING, parameterized values. Uses pg-ast + pgsql-deparser. Use when building parameterized SQL queries, writing test helpers, or working with TableClient in constructive-test."
 metadata:
   author: constructive-io
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 
 # @constructive-io/query-builder
@@ -132,6 +132,13 @@ new QueryBuilder()
     { name: 'Alice', email: 'alice@example.com' },
     { name: 'Bob', email: 'bob@example.com' },
   ])
+  .build();
+
+// Values may be expressions
+new QueryBuilder()
+  .table('jobs')
+  .insert({ name: 'job-1', created_at: fn('now') })
+  .returning(['id'])
   .build();
 
 // Upsert (ON CONFLICT)
@@ -267,6 +274,10 @@ new QueryBuilder()
 - **Auto-parameterization**: All values become `ParamRef` nodes (`$1`, `$2`, ...) — values are never inlined into SQL.
 - **Deparser output**: `deparseSync()` produces pretty-printed multiline SQL. Tests should use flexible regex patterns with `\s*` for whitespace matching.
 - **NULL handling**: `.where({ col: { isNull: true } })` produces `col IS NULL`; `{ isNull: false }` produces `col IS NOT NULL` (no parameterization for NULL).
+- **JOIN ON conditions**: besides the 4-arg column form, joins accept a `Filter` or `Expr`: `.innerJoin('customers', and(eq(col('o.customer_id'), col('customers.id')), eq(col('customers.region'), 'us')))` or `.leftJoin('customers', { 'c.active': { equalTo: true } }, { schema: 'crm', alias: 'c' })`.
+- **Set-returning functions**: `.fromFunction('get_rows', [7], { schema: 'app', as: 'r' })` → `SELECT ... FROM app.get_rows($1) AS r`; joins/where/order compose over it like a table.
+- **ORDER BY / GROUP BY expressions**: `.orderBy(fn('lower', [col('name')]), 'DESC')` and `.groupBy([fn('date_trunc', [lit('day'), col('created_at')])])`.
+- **Cloning**: builders are mutable; `.clone()` copies configured state so `base.clone().where(...)` never mutates `base`.
 
 ## TableClient Integration
 

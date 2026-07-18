@@ -1341,4 +1341,208 @@ describe('QueryBuilder', () => {
       expect(values).toEqual(['2026-01-01']);
     });
   });
+
+  // =========================================================================
+  // Expressions in INSERT values
+  // =========================================================================
+  describe('INSERT Expression Values', () => {
+    it('should accept expressions in insert values', () => {
+      const { text, values } = new QueryBuilder()
+        .table('jobs')
+        .insert({
+          name: 'job-1',
+          created_at: fn('now'),
+          priority: add(lit(1), 2)
+        })
+        .returning(['id'])
+        .build();
+
+      expect(text).toMatch(/INSERT INTO jobs/);
+      expect(text).toMatch(/now\(\)/);
+      expect(text).toMatch(/1\s*\+\s*\$2/);
+      expect(values).toEqual(['job-1', 2]);
+    });
+
+    it('should accept expressions in multi-row inserts', () => {
+      const { text, values } = new QueryBuilder()
+        .table('events')
+        .insert([
+          { kind: 'a', at: fn('now') },
+          { kind: 'b', at: fn('now') }
+        ])
+        .build();
+
+      expect(text).toMatch(/now\(\)/);
+      expect(values).toEqual(['a', 'b']);
+    });
+  });
+
+  // =========================================================================
+  // JOIN ON with filters and expressions
+  // =========================================================================
+  describe('JOIN ON Filters and Expressions', () => {
+    it('should keep the classic 4-arg column form working', () => {
+      const { text } = new QueryBuilder()
+        .table('orders', 'o')
+        .select(['o.id'])
+        .innerJoin('customers', 'o.customer_id', '=', 'customers.id')
+        .build();
+
+      expect(text).toMatch(/JOIN customers ON o\.customer_id = customers\.id/);
+    });
+
+    it('should accept an expression ON condition', () => {
+      const { text, values } = new QueryBuilder()
+        .table('orders', 'o')
+        .select(['o.id'])
+        .innerJoin('customers', and(
+          eq(col('o.customer_id'), col('customers.id')),
+          eq(col('customers.region'), 'us')
+        ))
+        .build();
+
+      expect(text).toMatch(/JOIN customers ON\s+o\.customer_id = customers\.id\s+AND customers\.region = \$1/s);
+      expect(values).toEqual(['us']);
+    });
+
+    it('should accept a JSON filter ON condition', () => {
+      const { text, values } = new QueryBuilder()
+        .table('orders', 'o')
+        .select(['o.id'])
+        .leftJoin('c_alias', {
+          'c.active': { equalTo: true },
+          'c.tier': { in: ['gold', 'silver'] }
+        }, { schema: 'crm', alias: 'c' })
+        .build();
+
+      expect(text).toMatch(/LEFT JOIN crm\.c_alias AS c ON/s);
+      expect(text).toMatch(/c\.active = \$1/);
+      expect(text).toMatch(/c\.tier IN \(\$2, \$3\)/);
+      expect(values).toEqual([true, 'gold', 'silver']);
+    });
+  });
+
+  // =========================================================================
+  // fromFunction (set-returning function source)
+  // =========================================================================
+  describe('fromFunction', () => {
+    it('should build SELECT ... FROM fn(...) with a range alias', () => {
+      const { text, values } = new QueryBuilder()
+        .select(['r.id', 'r.name'])
+        .fromFunction('get_rows', [7], { as: 'r' })
+        .build();
+
+      expect(text).toMatch(/SELECT/);
+      expect(text).toMatch(/FROM get_rows\(\$1\) AS r/);
+      expect(values).toEqual([7]);
+    });
+
+    it('should support schema qualification and named args', () => {
+      const { text, values } = new QueryBuilder()
+        .fromFunction('get_users', { active: true }, { schema: 'app', as: 'u' })
+        .build();
+
+      expect(text).toMatch(/FROM app\.get_users\(active => \$1\) AS u/);
+      expect(text).toMatch(/SELECT\s+\*/s);
+      expect(values).toEqual([true]);
+    });
+
+    it('should support joining against a function source', () => {
+      const { text } = new QueryBuilder()
+        .select(['r.id', 't.name'])
+        .fromFunction('get_rows', [], { as: 'r' })
+        .innerJoin('teams', 'r.team_id', '=', 't.id', { alias: 't' })
+        .build();
+
+      expect(text).toMatch(/FROM get_rows\(\) AS r/);
+      expect(text).toMatch(/JOIN teams AS t ON r\.team_id = t\.id/);
+    });
+
+    it('should support where filters over function sources', () => {
+      const { text, values } = new QueryBuilder()
+        .select(['r.id'])
+        .fromFunction('get_rows', [], { as: 'r' })
+        .where({ 'r.status': { equalTo: 'ok' } })
+        .build();
+
+      expect(text).toMatch(/WHERE\s+r\.status = \$1/s);
+      expect(values).toEqual(['ok']);
+    });
+  });
+
+  // =========================================================================
+  // Expressions in ORDER BY / GROUP BY
+  // =========================================================================
+  describe('ORDER BY / GROUP BY Expressions', () => {
+    it('should order by an expression', () => {
+      const { text } = new QueryBuilder()
+        .table('users')
+        .select(['id'])
+        .orderBy(fn('lower', [col('name')]), 'DESC')
+        .build();
+
+      expect(text).toMatch(/ORDER BY\s+lower\(\s*name\s*\) DESC/s);
+    });
+
+    it('should group by an expression', () => {
+      const { text } = new QueryBuilder()
+        .table('events')
+        .select([{ expr: fn('date_trunc', [lit('day'), col('created_at')]), as: 'day' }])
+        .groupBy([fn('date_trunc', [lit('day'), col('created_at')])])
+        .build();
+
+      expect(text).toMatch(/GROUP BY\s+date_trunc\(/s);
+    });
+
+    it('should still group and order by column names', () => {
+      const { text } = new QueryBuilder()
+        .table('orders')
+        .select(['customer_id'])
+        .groupBy(['customer_id'])
+        .orderBy('customer_id', 'ASC', 'LAST')
+        .build();
+
+      expect(text).toMatch(/GROUP BY\s+customer_id/s);
+      expect(text).toMatch(/ORDER BY\s+customer_id ASC NULLS LAST/s);
+    });
+  });
+
+  // =========================================================================
+  // clone()
+  // =========================================================================
+  describe('clone', () => {
+    it('should not mutate the original when chaining on a clone', () => {
+      const base = new QueryBuilder()
+        .table('jobs')
+        .select(['id'])
+        .where({ status: { equalTo: 'queued' } });
+
+      const escalated = base.clone().where({ priority: { greaterThan: 5 } }).limit(1);
+
+      const baseOut = base.build();
+      const escalatedOut = escalated.build();
+
+      expect(baseOut.text).not.toMatch(/priority/);
+      expect(baseOut.text).not.toMatch(/LIMIT/);
+      expect(baseOut.values).toEqual(['queued']);
+
+      expect(escalatedOut.text).toMatch(/priority > \$2/);
+      expect(escalatedOut.text).toMatch(/LIMIT 1/);
+      expect(escalatedOut.values).toEqual(['queued', 5]);
+    });
+
+    it('should clone inserts, updates, joins and order specs independently', () => {
+      const base = new QueryBuilder()
+        .table('users')
+        .update({ name: 'a' })
+        .where({ id: { equalTo: 1 } })
+        .returning(['id']);
+
+      const other = base.clone().update({ name: 'b', updated_at: fn('now') });
+
+      expect(base.build().values).toEqual(['a', 1]);
+      expect(other.build().values).toEqual(['b', 1]);
+      expect(other.build().text).toMatch(/now\(\)/);
+    });
+  });
 });
