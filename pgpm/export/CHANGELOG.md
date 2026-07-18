@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.32.1...@pgpmjs/export@0.32.2) (2026-07-18)
+
+### Bug Fixes
+
+- **export:** use renamed sql action field ([08fe9b0](https://github.com/constructive-io/constructive/commit/08fe9b09d2f621415c9c2304ed2cacdbb32b2c83))
+
 ## [0.32.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.32.0...@pgpmjs/export@0.32.1) (2026-07-18)
 
 **Note:** Version bump only for package @pgpmjs/export
