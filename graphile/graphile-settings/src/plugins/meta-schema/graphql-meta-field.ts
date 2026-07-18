@@ -2,6 +2,7 @@ import {
   GraphQLBoolean,
   type GraphQLFieldConfig,
   GraphQLFloat,
+  GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -24,6 +25,24 @@ function nnList<T extends GraphQLOutputType>(
 }
 
 function createMetaSchemaType(): GraphQLObjectType {
+  const MetaScalarEncodingType = new GraphQLObjectType({
+    name: 'MetaScalarEncoding',
+    description:
+      'How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.',
+    fields: () => ({
+      kind: {
+        type: nn(GraphQLString),
+        description:
+          "Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite."
+      },
+      elementType: { type: GraphQLString, description: "For 'vector': element scalar (e.g. 'float')." },
+      dimensions: { type: GraphQLInt, description: "For 'vector': declared length, else null." },
+      geometrySubtype: { type: GraphQLString, description: "For 'geojson': Point/LineString/Polygon/…, else null." },
+      srid: { type: GraphQLInt, description: "For 'geojson': spatial reference id, else null." },
+      dotPath: { type: GraphQLBoolean, description: "For 'ltree': values are dot-separated path strings." }
+    })
+  });
+
   const MetaTypeType = new GraphQLObjectType({
     name: 'MetaType',
     description: 'Information about a PostgreSQL type',
@@ -33,7 +52,11 @@ function createMetaSchemaType(): GraphQLObjectType {
       isArray: { type: nn(GraphQLBoolean) },
       isNotNull: { type: GraphQLBoolean },
       hasDefault: { type: GraphQLBoolean },
-      subtype: { type: GraphQLString }
+      subtype: { type: GraphQLString },
+      encoding: {
+        type: MetaScalarEncodingType,
+        description: 'Scalar serialization contract (null for plain scalars)'
+      }
     })
   });
 
