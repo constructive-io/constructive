@@ -1,19 +1,20 @@
 import {
-  MetaSchemaPlugin,
-  _pgTypeToGqlType,
-  _buildFieldMeta,
-  _cachedTablesMeta,
-} from '../src/plugins/meta-schema';
-import {
-  parse,
-  print,
-  Kind,
+  graphql,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
-  graphql,
-  type SelectionNode,
+  Kind,
+  parse,
+  print,
+  type SelectionNode
 } from 'graphql';
+
+import {
+  _buildFieldMeta,
+  _cachedTablesMeta,
+  _pgTypeToGqlType,
+  MetaSchemaPlugin
+} from '../src/plugins/meta-schema';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -24,20 +25,20 @@ function createMockAttribute(pgType: string, opts: Record<string, any> = {}) {
     codec: { name: pgType, arrayOfCodec: null, ...opts.codec },
     notNull: false,
     hasDefault: false,
-    ...opts,
+    ...opts
   };
 }
 
 function createMockCodec(
   name: string,
   attributes: Record<string, any>,
-  schemaName = 'app_public',
+  schemaName = 'app_public'
 ) {
   return {
     name,
     attributes,
     isAnonymous: false,
-    extensions: { pg: { schemaName } },
+    extensions: { pg: { schemaName } }
   };
 }
 
@@ -48,7 +49,7 @@ function createMockResource(opts: Record<string, any>) {
     relations,
     uniques: opts.uniques || [],
     getRelations: () => relations,
-    getRelation: (name: string) => relations[name],
+    getRelation: (name: string) => relations[name]
   };
 }
 
@@ -59,11 +60,11 @@ function createMockResource(opts: Record<string, any>) {
 function createMockBuild(
   resources: Record<string, any>,
   schemas: string[] = ['app_public'],
-  overrides: Record<string, any> = {},
+  overrides: Record<string, any> = {}
 ) {
   const baseBuild = {
     input: {
-      pgRegistry: { pgResources: resources },
+      pgRegistry: { pgResources: resources }
     },
     inflection: {
       tableType: (codec: any) =>
@@ -90,9 +91,9 @@ function createMockBuild(
       tableFieldName: (resource: any) => (resource.codec?.name || 'unknown').toLowerCase(),
       createField: (resource: any) => 'create' + (resource.codec?.name || ''),
       updateByKeys: (resource: any) => 'update' + (resource.codec?.name || ''),
-      deleteByKeys: (resource: any) => 'delete' + (resource.codec?.name || ''),
+      deleteByKeys: (resource: any) => 'delete' + (resource.codec?.name || '')
     },
-    options: { pgSchemas: schemas },
+    options: { pgSchemas: schemas }
   };
 
   return {
@@ -100,12 +101,12 @@ function createMockBuild(
     ...overrides,
     inflection: {
       ...baseBuild.inflection,
-      ...(overrides.inflection || {}),
+      ...(overrides.inflection || {})
     },
     options: {
       ...baseBuild.options,
-      ...(overrides.options || {}),
-    },
+      ...(overrides.options || {})
+    }
   };
 }
 
@@ -123,7 +124,7 @@ function callInitHook(build: any): any[] {
 function callGraphQLObjectTypeFieldsHook(
   fields: Record<string, any>,
   build: any,
-  selfName: string,
+  selfName: string
 ): Record<string, any> {
   const fieldsHook = MetaSchemaPlugin.schema!.hooks!.GraphQLObjectType_fields as (
     fields: Record<string, any>,
@@ -153,7 +154,7 @@ function normalizeTablesForSnapshot(input: any[]): any[] {
     table.indexes = sortByName(table.indexes).map((idx: any) => ({
       ...idx,
       columns: [...(idx.columns || [])].sort(),
-      fields: sortByName(idx.fields),
+      fields: sortByName(idx.fields)
     }));
 
     if (table.constraints?.primaryKey) {
@@ -163,48 +164,48 @@ function normalizeTablesForSnapshot(input: any[]): any[] {
       ...table.constraints,
       unique: sortByName(table.constraints?.unique).map((c: any) => ({
         ...c,
-        fields: sortByName(c.fields),
+        fields: sortByName(c.fields)
       })),
       foreignKey: sortByName(table.constraints?.foreignKey).map((c: any) => ({
         ...c,
         fields: sortByName(c.fields),
         referencedFields: [...(c.referencedFields || [])].sort(),
-        refFields: sortByName(c.refFields),
-      })),
+        refFields: sortByName(c.refFields)
+      }))
     };
 
     table.foreignKeyConstraints = sortByName(table.foreignKeyConstraints).map((c: any) => ({
       ...c,
       fields: sortByName(c.fields),
       referencedFields: [...(c.referencedFields || [])].sort(),
-      refFields: sortByName(c.refFields),
+      refFields: sortByName(c.refFields)
     }));
     table.primaryKeyConstraints = sortByName(table.primaryKeyConstraints).map((c: any) => ({
       ...c,
-      fields: sortByName(c.fields),
+      fields: sortByName(c.fields)
     }));
     table.uniqueConstraints = sortByName(table.uniqueConstraints).map((c: any) => ({
       ...c,
-      fields: sortByName(c.fields),
+      fields: sortByName(c.fields)
     }));
 
     table.relations = {
       ...table.relations,
       belongsTo: sortByFieldName(table.relations?.belongsTo).map((rel: any) => ({
         ...rel,
-        keys: sortByName(rel.keys),
+        keys: sortByName(rel.keys)
       })),
       has: sortByFieldName(table.relations?.has).map((rel: any) => ({
         ...rel,
-        keys: sortByName(rel.keys),
+        keys: sortByName(rel.keys)
       })),
       hasOne: sortByFieldName(table.relations?.hasOne).map((rel: any) => ({
         ...rel,
-        keys: sortByName(rel.keys),
+        keys: sortByName(rel.keys)
       })),
       hasMany: sortByFieldName(table.relations?.hasMany).map((rel: any) => ({
         ...rel,
-        keys: sortByName(rel.keys),
+        keys: sortByName(rel.keys)
       })),
       manyToMany: sortByFieldName(table.relations?.manyToMany).map((rel: any) => ({
         ...rel,
@@ -212,19 +213,19 @@ function normalizeTablesForSnapshot(input: any[]): any[] {
           ...rel.junctionLeftConstraint,
           fields: sortByName(rel.junctionLeftConstraint?.fields),
           referencedFields: [...(rel.junctionLeftConstraint?.referencedFields || [])].sort(),
-          refFields: sortByName(rel.junctionLeftConstraint?.refFields),
+          refFields: sortByName(rel.junctionLeftConstraint?.refFields)
         },
         junctionLeftKeyAttributes: sortByName(rel.junctionLeftKeyAttributes),
         junctionRightConstraint: {
           ...rel.junctionRightConstraint,
           fields: sortByName(rel.junctionRightConstraint?.fields),
           referencedFields: [...(rel.junctionRightConstraint?.referencedFields || [])].sort(),
-          refFields: sortByName(rel.junctionRightConstraint?.refFields),
+          refFields: sortByName(rel.junctionRightConstraint?.refFields)
         },
         junctionRightKeyAttributes: sortByName(rel.junctionRightKeyAttributes),
         leftKeyAttributes: sortByName(rel.leftKeyAttributes),
-        rightKeyAttributes: sortByName(rel.rightKeyAttributes),
-      })),
+        rightKeyAttributes: sortByName(rel.rightKeyAttributes)
+      }))
     };
   }
 
@@ -400,6 +401,13 @@ query MetaContract {
       realtime {
         subscriptionFieldName
       }
+      scope {
+        scope
+        tier
+        keyColumn
+        entityTable
+        source
+      }
     }
   }
 }
@@ -480,6 +488,11 @@ const REQUIRED_META_QUERY_PATHS = [
   'i18n.translatableFields.name',
   'i18n.translatableFields.type',
   'realtime.subscriptionFieldName',
+  'scope.scope',
+  'scope.tier',
+  'scope.keyColumn',
+  'scope.entityTable',
+  'scope.source'
 ];
 
 function collectSelectionPaths(selections: readonly SelectionNode[], prefix = ''): string[] {
@@ -501,11 +514,11 @@ function getMetaQueryTablePaths(query: string): string[] {
   for (const definition of document.definitions) {
     if (definition.kind !== Kind.OPERATION_DEFINITION) continue;
     const metaField = definition.selectionSet.selections.find(
-      (sel) => sel.kind === Kind.FIELD && sel.name.value === '_meta',
+      (sel) => sel.kind === Kind.FIELD && sel.name.value === '_meta'
     );
     if (!metaField || metaField.kind !== Kind.FIELD) continue;
     const tablesField = metaField.selectionSet?.selections.find(
-      (sel) => sel.kind === Kind.FIELD && sel.name.value === 'tables',
+      (sel) => sel.kind === Kind.FIELD && sel.name.value === 'tables'
     );
     if (!tablesField || tablesField.kind !== Kind.FIELD || !tablesField.selectionSet) continue;
     return collectSelectionPaths(tablesField.selectionSet.selections);
@@ -517,45 +530,45 @@ function buildComplexScenarioTables(): any[] {
   const userCodec = createMockCodec('user', {
     id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
     email_address: createMockAttribute('email', { notNull: true }),
-    display_name: createMockAttribute('text'),
+    display_name: createMockAttribute('text')
   });
   const postCodec = createMockCodec('post', {
     id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
     author_id: createMockAttribute('uuid', { notNull: true }),
     title: createMockAttribute('text', { notNull: true }),
-    metadata: createMockAttribute('jsonb'),
+    metadata: createMockAttribute('jsonb')
   });
   const commentCodec = createMockCodec('comment', {
     id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
     post_id: createMockAttribute('uuid', { notNull: true }),
     author_id: createMockAttribute('uuid', { notNull: true }),
-    body: createMockAttribute('text', { notNull: true }),
+    body: createMockAttribute('text', { notNull: true })
   });
   const tagCodec = createMockCodec('tag', {
     id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
-    slug: createMockAttribute('text', { notNull: true }),
+    slug: createMockAttribute('text', { notNull: true })
   });
   const postTagCodec = createMockCodec('post_tag', {
     post_id: createMockAttribute('uuid', { notNull: true }),
-    tag_id: createMockAttribute('uuid', { notNull: true }),
+    tag_id: createMockAttribute('uuid', { notNull: true })
   });
 
   const userUniques = [
     { attributes: ['id'], isPrimary: true, tags: { name: 'users_pkey' } },
-    { attributes: ['email_address'], isPrimary: false, tags: { name: 'users_email_key' } },
+    { attributes: ['email_address'], isPrimary: false, tags: { name: 'users_email_key' } }
   ];
   const postUniques = [
-    { attributes: ['id'], isPrimary: true, tags: { name: 'posts_pkey' } },
+    { attributes: ['id'], isPrimary: true, tags: { name: 'posts_pkey' } }
   ];
   const commentUniques = [
-    { attributes: ['id'], isPrimary: true, tags: { name: 'comments_pkey' } },
+    { attributes: ['id'], isPrimary: true, tags: { name: 'comments_pkey' } }
   ];
   const tagUniques = [
     { attributes: ['id'], isPrimary: true, tags: { name: 'tags_pkey' } },
-    { attributes: ['slug'], isPrimary: false, tags: { name: 'tags_slug_key' } },
+    { attributes: ['slug'], isPrimary: false, tags: { name: 'tags_slug_key' } }
   ];
   const postTagUniques = [
-    { attributes: ['post_id', 'tag_id'], isPrimary: true, tags: { name: 'post_tags_pkey' } },
+    { attributes: ['post_id', 'tag_id'], isPrimary: true, tags: { name: 'post_tags_pkey' } }
   ];
 
   const postTagResource = createMockResource({
@@ -566,15 +579,15 @@ function buildComplexScenarioTables(): any[] {
         isReferencee: false,
         localAttributes: ['post_id'],
         remoteAttributes: ['id'],
-        remoteResource: { codec: postCodec, uniques: postUniques },
+        remoteResource: { codec: postCodec, uniques: postUniques }
       },
       post_tag_tag_fkey: {
         isReferencee: false,
         localAttributes: ['tag_id'],
         remoteAttributes: ['id'],
-        remoteResource: { codec: tagCodec, uniques: tagUniques },
-      },
-    },
+        remoteResource: { codec: tagCodec, uniques: tagUniques }
+      }
+    }
   });
 
   const postResource = createMockResource({
@@ -585,21 +598,21 @@ function buildComplexScenarioTables(): any[] {
         isReferencee: false,
         localAttributes: ['author_id'],
         remoteAttributes: ['id'],
-        remoteResource: { codec: userCodec, uniques: userUniques },
+        remoteResource: { codec: userCodec, uniques: userUniques }
       },
       post_comments: {
         isReferencee: true,
         localAttributes: ['id'],
         remoteAttributes: ['post_id'],
-        remoteResource: { codec: commentCodec, uniques: commentUniques },
+        remoteResource: { codec: commentCodec, uniques: commentUniques }
       },
       post_post_tags: {
         isReferencee: true,
         localAttributes: ['id'],
         remoteAttributes: ['post_id'],
-        remoteResource: { codec: postTagCodec, uniques: postTagUniques },
-      },
-    },
+        remoteResource: { codec: postTagCodec, uniques: postTagUniques }
+      }
+    }
   });
 
   const tagResource = createMockResource({
@@ -610,9 +623,9 @@ function buildComplexScenarioTables(): any[] {
         isReferencee: true,
         localAttributes: ['id'],
         remoteAttributes: ['tag_id'],
-        remoteResource: { codec: postTagCodec, uniques: postTagUniques },
-      },
-    },
+        remoteResource: { codec: postTagCodec, uniques: postTagUniques }
+      }
+    }
   });
 
   const pgManyToManyRealtionshipsByResource = new Map<any, any[]>([
@@ -625,9 +638,9 @@ function buildComplexScenarioTables(): any[] {
           junctionTable: postTagResource,
           rightRelationName: 'post_tag_tag_fkey',
           rightTable: tagResource,
-          allowsMultipleEdgesToNode: false,
-        },
-      ],
+          allowsMultipleEdgesToNode: false
+        }
+      ]
     ],
     [
       tagResource,
@@ -638,10 +651,10 @@ function buildComplexScenarioTables(): any[] {
           junctionTable: postTagResource,
           rightRelationName: 'post_tag_post_fkey',
           rightTable: postResource,
-          allowsMultipleEdgesToNode: false,
-        },
-      ],
-    ],
+          allowsMultipleEdgesToNode: false
+        }
+      ]
+    ]
   ]);
 
   const build = createMockBuild(
@@ -654,34 +667,34 @@ function buildComplexScenarioTables(): any[] {
             isReferencee: true,
             localAttributes: ['id'],
             remoteAttributes: ['author_id'],
-            remoteResource: { codec: postCodec, uniques: postUniques },
+            remoteResource: { codec: postCodec, uniques: postUniques }
           },
           user_comments: {
             isReferencee: true,
             localAttributes: ['id'],
             remoteAttributes: ['author_id'],
-            remoteResource: { codec: commentCodec, uniques: commentUniques },
-          },
-        },
+            remoteResource: { codec: commentCodec, uniques: commentUniques }
+          }
+        }
       },
       user_duplicate_codec: { codec: userCodec, uniques: userUniques, relations: {} },
       user_unique_lookup: {
         codec: userCodec,
         uniques: userUniques,
         relations: {},
-        isUnique: true,
+        isUnique: true
       },
       user_virtual: {
         codec: userCodec,
         uniques: userUniques,
         relations: {},
-        isVirtual: true,
+        isVirtual: true
       },
       helper_fn_resource: {
         codec: createMockCodec('helper_function', { value: createMockAttribute('text') }),
         uniques: [],
         relations: {},
-        parameters: [{ name: 'input' }],
+        parameters: [{ name: 'input' }]
       },
       post: postResource,
       comment: {
@@ -692,18 +705,18 @@ function buildComplexScenarioTables(): any[] {
             isReferencee: false,
             localAttributes: ['post_id'],
             remoteAttributes: ['id'],
-            remoteResource: { codec: postCodec, uniques: postUniques },
+            remoteResource: { codec: postCodec, uniques: postUniques }
           },
           comment_author_fkey: {
             isReferencee: false,
             localAttributes: ['author_id'],
             remoteAttributes: ['id'],
-            remoteResource: { codec: userCodec, uniques: userUniques },
-          },
-        },
+            remoteResource: { codec: userCodec, uniques: userUniques }
+          }
+        }
       },
       tag: tagResource,
-      post_tag: postTagResource,
+      post_tag: postTagResource
     },
     ['app_public'],
     {
@@ -719,9 +732,9 @@ function buildComplexScenarioTables(): any[] {
           if (rightName === 'tag') return 'tags';
           if (rightName === 'post') return 'posts';
           return details?.rightRelationName || null;
-        },
-      },
-    },
+        }
+      }
+    }
   );
 
   return callInitHook(build);
@@ -738,7 +751,7 @@ describe('MetaSchemaPlugin', () => {
       ['varchar', 'String'],
       ['char', 'String'],
       ['name', 'String'],
-      ['bpchar', 'String'],
+      ['bpchar', 'String']
     ])('maps %s → %s', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
@@ -750,14 +763,14 @@ describe('MetaSchemaPlugin', () => {
     it.each([
       ['int2', 'Int'],
       ['int4', 'Int'],
-      ['integer', 'Int'],
+      ['integer', 'Int']
     ])('maps %s → %s (integer types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
 
     it.each([
       ['int8', 'BigInt'],
-      ['bigint', 'BigInt'],
+      ['bigint', 'BigInt']
     ])('maps %s → %s (bigint types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
@@ -765,21 +778,21 @@ describe('MetaSchemaPlugin', () => {
     it.each([
       ['float4', 'Float'],
       ['float8', 'Float'],
-      ['numeric', 'BigFloat'],
+      ['numeric', 'BigFloat']
     ])('maps %s → %s (float types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
 
     it.each([
       ['bool', 'Boolean'],
-      ['boolean', 'Boolean'],
+      ['boolean', 'Boolean']
     ])('maps %s → %s (boolean types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
 
     it.each([
       ['timestamptz', 'Datetime'],
-      ['timestamp', 'Datetime'],
+      ['timestamp', 'Datetime']
     ])('maps %s → %s (timestamp types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
@@ -794,21 +807,21 @@ describe('MetaSchemaPlugin', () => {
       ['cidr', 'InternetAddress'],
       ['xml', 'String'],
       ['bytea', 'String'],
-      ['macaddr', 'String'],
+      ['macaddr', 'String']
     ])('maps %s → %s (additional scalar types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
 
     it.each([
       ['json', 'JSON'],
-      ['jsonb', 'JSON'],
+      ['jsonb', 'JSON']
     ])('maps %s → %s (json types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
 
     it.each([
       ['geometry', 'GeoJSON'],
-      ['geography', 'GeoJSON'],
+      ['geography', 'GeoJSON']
     ])('maps %s → %s (geo types)', (pg, gql) => {
       expect(_pgTypeToGqlType(pg)).toBe(gql);
     });
@@ -836,14 +849,14 @@ describe('MetaSchemaPlugin', () => {
           isArray: false,
           isNotNull: true,
           hasDefault: true,
-          subtype: null,
+          subtype: null
         },
         isNotNull: true,
         hasDefault: true,
         isPrimaryKey: false,
         isForeignKey: false,
         description: null,
-        enumValues: null,
+        enumValues: null
       });
     });
 
@@ -857,7 +870,7 @@ describe('MetaSchemaPlugin', () => {
 
     it('detects array types via arrayOfCodec', () => {
       const attr = createMockAttribute('text', {
-        codec: { name: 'text', arrayOfCodec: { name: '_text' } },
+        codec: { name: 'text', arrayOfCodec: { name: '_text' } }
       });
       const result = _buildFieldMeta('tags', attr);
       expect(result.type.isArray).toBe(true);
@@ -875,7 +888,7 @@ describe('MetaSchemaPlugin', () => {
         hasGraphQLTypeForPgCodec: () => {
           throw new Error('runtime lookup failed');
         },
-        getGraphQLTypeNameByPgCodec: (): string | null => null,
+        getGraphQLTypeNameByPgCodec: (): string | null => null
       };
 
       const result = _buildFieldMeta('id', attr, build);
@@ -884,7 +897,7 @@ describe('MetaSchemaPlugin', () => {
 
     it('maps array codecs by nested element type when root codec is unknown', () => {
       const attr = createMockAttribute('_int4', {
-        codec: { name: '_int4', arrayOfCodec: { name: 'int4' } },
+        codec: { name: '_int4', arrayOfCodec: { name: 'int4' } }
       });
 
       const result = _buildFieldMeta('ids', attr, {});
@@ -894,7 +907,7 @@ describe('MetaSchemaPlugin', () => {
 
     it('reads geometrySubtype from attribute extensions', () => {
       const attr = createMockAttribute('geometry', {
-        extensions: { geometrySubtype: 'Polygon' },
+        extensions: { geometrySubtype: 'Polygon' }
       });
       const result = _buildFieldMeta('zoneBoundary', attr);
       expect(result.type.subtype).toBe('Polygon');
@@ -924,10 +937,10 @@ describe('MetaSchemaPlugin', () => {
       const codec = createMockCodec('user', {
         display_name: createMockAttribute('text'),
         created_at: createMockAttribute('timestamptz'),
-        is_active: createMockAttribute('bool'),
+        is_active: createMockAttribute('bool')
       });
       const build = createMockBuild({
-        user: { codec, uniques: [], relations: {} },
+        user: { codec, uniques: [], relations: {} }
       });
 
       const tables = callInitHook(build);
@@ -941,10 +954,10 @@ describe('MetaSchemaPlugin', () => {
 
     it('falls back to raw PG name if inflection fails', () => {
       const codec = createMockCodec('user', {
-        display_name: createMockAttribute('text'),
+        display_name: createMockAttribute('text')
       });
       const build = createMockBuild({
-        user: { codec, uniques: [], relations: {} },
+        user: { codec, uniques: [], relations: {} }
       });
       // Sabotage inflection so it throws
       build.inflection._attributeName = () => {
@@ -958,11 +971,11 @@ describe('MetaSchemaPlugin', () => {
 
     it('inflects FK constraint field names', () => {
       const userCodec = createMockCodec('user', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
       const postCodec = createMockCodec('post', {
         id: createMockAttribute('uuid'),
-        author_id: createMockAttribute('uuid'),
+        author_id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild({
@@ -975,10 +988,10 @@ describe('MetaSchemaPlugin', () => {
               isReferencee: false,
               localAttributes: ['author_id'],
               remoteAttributes: ['id'],
-              remoteResource: { codec: userCodec, uniques: [] },
-            },
-          },
-        },
+              remoteResource: { codec: userCodec, uniques: [] }
+            }
+          }
+        }
       });
 
       const tables = callInitHook(build);
@@ -992,11 +1005,11 @@ describe('MetaSchemaPlugin', () => {
 
     it('inflects relation key field names', () => {
       const userCodec = createMockCodec('user', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
       const postCodec = createMockCodec('post', {
         id: createMockAttribute('uuid'),
-        author_id: createMockAttribute('uuid'),
+        author_id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild({
@@ -1009,10 +1022,10 @@ describe('MetaSchemaPlugin', () => {
               isReferencee: false,
               localAttributes: ['author_id'],
               remoteAttributes: ['id'],
-              remoteResource: { codec: userCodec, uniques: [] },
-            },
-          },
-        },
+              remoteResource: { codec: userCodec, uniques: [] }
+            }
+          }
+        }
       });
 
       const tables = callInitHook(build);
@@ -1026,7 +1039,7 @@ describe('MetaSchemaPlugin', () => {
     it('inflects index and PK constraint field names', () => {
       const codec = createMockCodec('user', {
         id: createMockAttribute('uuid'),
-        email_address: createMockAttribute('text'),
+        email_address: createMockAttribute('text')
       });
 
       const build = createMockBuild({
@@ -1034,10 +1047,10 @@ describe('MetaSchemaPlugin', () => {
           codec,
           uniques: [
             { attributes: ['id'], isPrimary: true, tags: { name: 'user_pkey' } },
-            { attributes: ['email_address'], isPrimary: false, tags: { name: 'user_email_key' } },
+            { attributes: ['email_address'], isPrimary: false, tags: { name: 'user_email_key' } }
           ],
-          relations: {},
-        },
+          relations: {}
+        }
       });
 
       const tables = callInitHook(build);
@@ -1062,12 +1075,12 @@ describe('MetaSchemaPlugin', () => {
   describe('init hook — table deduplication', () => {
     it('deduplicates resources sharing the same codec', () => {
       const codec = createMockCodec('user', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild({
         user: { codec, uniques: [], relations: {} },
-        user_2: { codec, uniques: [], relations: {} }, // same codec object
+        user_2: { codec, uniques: [], relations: {} } // same codec object
       });
 
       const tables = callInitHook(build);
@@ -1077,15 +1090,15 @@ describe('MetaSchemaPlugin', () => {
 
     it('includes distinct tables with different codecs', () => {
       const userCodec = createMockCodec('user', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
       const postCodec = createMockCodec('post', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild({
         user: { codec: userCodec, uniques: [], relations: {} },
-        post: { codec: postCodec, uniques: [], relations: {} },
+        post: { codec: postCodec, uniques: [], relations: {} }
       });
 
       const tables = callInitHook(build);
@@ -1099,11 +1112,11 @@ describe('MetaSchemaPlugin', () => {
         name: 'anon',
         attributes: { id: createMockAttribute('uuid') },
         isAnonymous: true,
-        extensions: { pg: { schemaName: 'app_public' } },
+        extensions: { pg: { schemaName: 'app_public' } }
       };
 
       const build = createMockBuild({
-        anon: { codec: anonCodec, uniques: [], relations: {} },
+        anon: { codec: anonCodec, uniques: [], relations: {} }
       });
 
       const tables = callInitHook(build);
@@ -1115,11 +1128,11 @@ describe('MetaSchemaPlugin', () => {
         name: 'no_schema',
         attributes: { id: createMockAttribute('uuid') },
         isAnonymous: false,
-        extensions: { pg: {} }, // no schemaName
+        extensions: { pg: {} } // no schemaName
       };
 
       const build = createMockBuild({
-        no_schema: { codec, uniques: [], relations: {} },
+        no_schema: { codec, uniques: [], relations: {} }
       });
 
       const tables = callInitHook(build);
@@ -1128,14 +1141,14 @@ describe('MetaSchemaPlugin', () => {
 
     it('skips non-table resources (unique lookups, virtual resources, functions)', () => {
       const codec = createMockCodec('user', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild({
         user: { codec, uniques: [], relations: {} },
         user_lookup: { codec, uniques: [], relations: {}, isUnique: true },
         user_virtual: { codec, uniques: [], relations: {}, isVirtual: true },
-        user_function: { codec, uniques: [], relations: {}, parameters: [{ name: 'id' }] },
+        user_function: { codec, uniques: [], relations: {}, parameters: [{ name: 'id' }] }
       });
 
       const tables = callInitHook(build);
@@ -1147,12 +1160,12 @@ describe('MetaSchemaPlugin', () => {
       const codecWithoutAttributes = {
         name: 'broken',
         isAnonymous: false,
-        extensions: { pg: { schemaName: 'app_public' } },
+        extensions: { pg: { schemaName: 'app_public' } }
       };
 
       const build = createMockBuild({
         no_codec: {},
-        no_attributes: { codec: codecWithoutAttributes, uniques: [], relations: {} },
+        no_attributes: { codec: codecWithoutAttributes, uniques: [], relations: {} }
       });
 
       const tables = callInitHook(build);
@@ -1173,11 +1186,11 @@ describe('MetaSchemaPlugin', () => {
         balance: createMockAttribute('numeric'),
         is_active: createMockAttribute('bool'),
         created_at: createMockAttribute('timestamptz'),
-        metadata: createMockAttribute('jsonb'),
+        metadata: createMockAttribute('jsonb')
       });
 
       const build = createMockBuild({
-        user: { codec, uniques: [], relations: {} },
+        user: { codec, uniques: [], relations: {} }
       });
 
       const tables = callInitHook(build);
@@ -1196,11 +1209,11 @@ describe('MetaSchemaPlugin', () => {
 
     it('preserves pgType alongside gqlType', () => {
       const codec = createMockCodec('user', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild({
-        user: { codec, uniques: [], relations: {} },
+        user: { codec, uniques: [], relations: {} }
       });
 
       const tables = callInitHook(build);
@@ -1213,19 +1226,19 @@ describe('MetaSchemaPlugin', () => {
     it('uses runtime build codec mappings for custom scalar types', () => {
       const codec = createMockCodec('user', {
         id: createMockAttribute('uuid'),
-        email_address: createMockAttribute('email'),
+        email_address: createMockAttribute('email')
       });
 
       const build = createMockBuild(
         {
-          user: { codec, uniques: [], relations: {} },
+          user: { codec, uniques: [], relations: {} }
         },
         ['app_public'],
         {
           hasGraphQLTypeForPgCodec: (attrCodec: any) => attrCodec?.name === 'email',
           getGraphQLTypeNameByPgCodec: (attrCodec: any) =>
-            attrCodec?.name === 'email' ? 'ConstructiveInternalTypeEmail' : null,
-        },
+            attrCodec?.name === 'email' ? 'ConstructiveInternalTypeEmail' : null
+        }
       );
 
       const tables = callInitHook(build);
@@ -1241,15 +1254,15 @@ describe('MetaSchemaPlugin', () => {
   describe('init hook — schema filtering', () => {
     it('only includes tables from configured schemas', () => {
       const publicCodec = createMockCodec('user', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       }, 'app_public');
       const privateCodec = createMockCodec('secret', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       }, 'app_private');
 
       const build = createMockBuild({
         user: { codec: publicCodec, uniques: [], relations: {} },
-        secret: { codec: privateCodec, uniques: [], relations: {} },
+        secret: { codec: privateCodec, uniques: [], relations: {} }
       }, ['app_public']);
 
       const tables = callInitHook(build);
@@ -1261,24 +1274,24 @@ describe('MetaSchemaPlugin', () => {
       const publicCodec = createMockCodec(
         'user',
         {
-          id: createMockAttribute('uuid'),
+          id: createMockAttribute('uuid')
         },
-        'app_public',
+        'app_public'
       );
       const privateCodec = createMockCodec(
         'audit_log',
         {
-          id: createMockAttribute('uuid'),
+          id: createMockAttribute('uuid')
         },
-        'app_private',
+        'app_private'
       );
 
       const build = createMockBuild(
         {
           user: { codec: publicCodec, uniques: [], relations: {} },
-          audit_log: { codec: privateCodec, uniques: [], relations: {} },
+          audit_log: { codec: privateCodec, uniques: [], relations: {} }
         },
-        [],
+        []
       );
 
       const tables = callInitHook(build);
@@ -1290,7 +1303,7 @@ describe('MetaSchemaPlugin', () => {
   describe('init hook — inflection and query fallbacks', () => {
     it('falls back when tableType inflection throws', () => {
       const codec = createMockCodec('audit_log', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild(
@@ -1298,8 +1311,8 @@ describe('MetaSchemaPlugin', () => {
           audit_log: {
             codec,
             uniques: [{ attributes: ['id'], isPrimary: true }],
-            relations: {},
-          },
+            relations: {}
+          }
         },
         ['app_public'],
         {
@@ -1315,9 +1328,9 @@ describe('MetaSchemaPlugin', () => {
             },
             deleteByKeys: () => {
               throw new Error('deleteByKeys failed');
-            },
-          },
-        },
+            }
+          }
+        }
       );
 
       const table = callInitHook(build)[0];
@@ -1330,7 +1343,7 @@ describe('MetaSchemaPlugin', () => {
 
     it('uses deterministic fallback names when inflectors throw or return nullish', () => {
       const codec = createMockCodec('audit_log', {
-        id: createMockAttribute('uuid'),
+        id: createMockAttribute('uuid')
       });
 
       const build = createMockBuild(
@@ -1338,8 +1351,8 @@ describe('MetaSchemaPlugin', () => {
           audit_log: {
             codec,
             uniques: [{ attributes: ['id'], isPrimary: true }],
-            relations: {},
-          },
+            relations: {}
+          }
         },
         ['app_public'],
         {
@@ -1371,9 +1384,9 @@ describe('MetaSchemaPlugin', () => {
             updateByKeys: (): string | null => null,
             deleteByKeys: () => {
               throw new Error('deleteByKeys failed');
-            },
-          },
-        },
+            }
+          }
+        }
       );
 
       const table = callInitHook(build)[0];
@@ -1390,7 +1403,7 @@ describe('MetaSchemaPlugin', () => {
         createInputType: 'CreateAuditLogInput',
         createPayloadType: 'CreateAuditLogPayload',
         updatePayloadType: 'UpdateAuditLogPayload',
-        deletePayloadType: 'DeleteAuditLogPayload',
+        deletePayloadType: 'DeleteAuditLogPayload'
       });
 
       expect(table.query).toEqual({
@@ -1398,16 +1411,16 @@ describe('MetaSchemaPlugin', () => {
         one: 'auditlog',
         create: 'createAuditLog',
         update: 'updateAuditLog',
-        delete: 'deleteAuditLog',
+        delete: 'deleteAuditLog'
       });
     });
 
     it('omits one/update/delete when a table has no primary key', () => {
       const codec = createMockCodec('event_log', {
-        occurred_at: createMockAttribute('timestamptz'),
+        occurred_at: createMockAttribute('timestamptz')
       });
       const build = createMockBuild({
-        event_log: { codec, uniques: [], relations: {} },
+        event_log: { codec, uniques: [], relations: {} }
       });
 
       const table = callInitHook(build)[0];
@@ -1421,20 +1434,20 @@ describe('MetaSchemaPlugin', () => {
   describe('init hook — relation and naming behavior', () => {
     it('classifies reverse relations into hasOne vs hasMany using remote unique constraints', () => {
       const userCodec = createMockCodec('user', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const profileCodec = createMockCodec('profile', {
         id: createMockAttribute('uuid', { notNull: true }),
-        user_id: createMockAttribute('uuid', { notNull: true }),
+        user_id: createMockAttribute('uuid', { notNull: true })
       });
       const postCodec = createMockCodec('post', {
         id: createMockAttribute('uuid', { notNull: true }),
-        author_id: createMockAttribute('uuid', { notNull: true }),
+        author_id: createMockAttribute('uuid', { notNull: true })
       });
 
       const profileUniques = [
         { attributes: ['id'], isPrimary: true, tags: { name: 'profiles_pkey' } },
-        { attributes: ['user_id'], isPrimary: false, tags: { name: 'profiles_user_id_key' } },
+        { attributes: ['user_id'], isPrimary: false, tags: { name: 'profiles_user_id_key' } }
       ];
       const postUniques = [{ attributes: ['id'], isPrimary: true, tags: { name: 'posts_pkey' } }];
 
@@ -1447,16 +1460,16 @@ describe('MetaSchemaPlugin', () => {
               isReferencee: true,
               localAttributes: ['id'],
               remoteAttributes: ['user_id'],
-              remoteResource: { codec: profileCodec, uniques: profileUniques },
+              remoteResource: { codec: profileCodec, uniques: profileUniques }
             },
             user_posts: {
               isReferencee: true,
               localAttributes: ['id'],
               remoteAttributes: ['author_id'],
-              remoteResource: { codec: postCodec, uniques: postUniques },
-            },
-          },
-        },
+              remoteResource: { codec: postCodec, uniques: postUniques }
+            }
+          }
+        }
       });
 
       const user = callInitHook(build)[0];
@@ -1469,11 +1482,11 @@ describe('MetaSchemaPlugin', () => {
 
     it('marks belongsTo relation unique when local fk columns are uniquely constrained', () => {
       const userCodec = createMockCodec('user', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const profileCodec = createMockCodec('profile', {
         id: createMockAttribute('uuid', { notNull: true }),
-        user_id: createMockAttribute('uuid', { notNull: true }),
+        user_id: createMockAttribute('uuid', { notNull: true })
       });
 
       const build = createMockBuild({
@@ -1482,24 +1495,24 @@ describe('MetaSchemaPlugin', () => {
           codec: profileCodec,
           uniques: [
             { attributes: ['id'], isPrimary: true },
-            { attributes: ['user_id'], isPrimary: false },
+            { attributes: ['user_id'], isPrimary: false }
           ],
           relations: {
             profile_user_fkey: {
               isReferencee: false,
               localAttributes: ['user_id'],
               remoteAttributes: ['id'],
-              remoteResource: { codec: userCodec, uniques: [{ attributes: ['id'], isPrimary: true }] },
-            },
-          },
-        },
+              remoteResource: { codec: userCodec, uniques: [{ attributes: ['id'], isPrimary: true }] }
+            }
+          }
+        }
       });
 
       const profile = callInitHook(build).find((table: any) => table.name === 'Profile');
       expect(profile.relations.belongsTo).toHaveLength(1);
       expect(profile.relations.belongsTo[0]).toMatchObject({
         fieldName: 'profile_user_fkey',
-        isUnique: true,
+        isUnique: true
       });
     });
 
@@ -1507,7 +1520,7 @@ describe('MetaSchemaPlugin', () => {
       const codec = createMockCodec('invoice_line', {
         id: createMockAttribute('uuid', { notNull: true }),
         account_id: createMockAttribute('uuid', { notNull: true }),
-        order_id: createMockAttribute('uuid', { notNull: true }),
+        order_id: createMockAttribute('uuid', { notNull: true })
       });
 
       const build = createMockBuild({
@@ -1515,33 +1528,33 @@ describe('MetaSchemaPlugin', () => {
           codec,
           uniques: [
             { attributes: ['id'], isPrimary: true },
-            { attributes: ['account_id', 'order_id'], isPrimary: false },
+            { attributes: ['account_id', 'order_id'], isPrimary: false }
           ],
-          relations: {},
-        },
+          relations: {}
+        }
       });
 
       const table = callInitHook(build)[0];
       expect(table.constraints.primaryKey?.name).toBe('invoice_line_pkey');
       expect(table.constraints.unique.map((u: any) => u.name)).toEqual([
-        'invoice_line_account_id_order_id_key',
+        'invoice_line_account_id_order_id_key'
       ]);
       expect(table.indexes.map((idx: any) => idx.name)).toEqual([
         'invoice_line_id_idx',
-        'invoice_line_account_id_order_id_idx',
+        'invoice_line_account_id_order_id_idx'
       ]);
     });
 
     it('builds many-to-many metadata from pg-many-to-many relationship details', () => {
       const postCodec = createMockCodec('post', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const tagCodec = createMockCodec('tag', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const postTagCodec = createMockCodec('post_tag', {
         post_id: createMockAttribute('uuid', { notNull: true }),
-        tag_id: createMockAttribute('uuid', { notNull: true }),
+        tag_id: createMockAttribute('uuid', { notNull: true })
       });
 
       const postUniques = [{ attributes: ['id'], isPrimary: true }];
@@ -1556,15 +1569,15 @@ describe('MetaSchemaPlugin', () => {
             isReferencee: false,
             localAttributes: ['post_id'],
             remoteAttributes: ['id'],
-            remoteResource: { codec: postCodec, uniques: postUniques },
+            remoteResource: { codec: postCodec, uniques: postUniques }
           },
           post_tag_tag_fkey: {
             isReferencee: false,
             localAttributes: ['tag_id'],
             remoteAttributes: ['id'],
-            remoteResource: { codec: tagCodec, uniques: tagUniques },
-          },
-        },
+            remoteResource: { codec: tagCodec, uniques: tagUniques }
+          }
+        }
       });
       const postResource = createMockResource({
         codec: postCodec,
@@ -1574,14 +1587,14 @@ describe('MetaSchemaPlugin', () => {
             isReferencee: true,
             localAttributes: ['id'],
             remoteAttributes: ['post_id'],
-            remoteResource: { codec: postTagCodec, uniques: postTagUniques },
-          },
-        },
+            remoteResource: { codec: postTagCodec, uniques: postTagUniques }
+          }
+        }
       });
       const tagResource = createMockResource({
         codec: tagCodec,
         uniques: tagUniques,
-        relations: {},
+        relations: {}
       });
 
       const pgManyToManyRealtionshipsByResource = new Map<any, any[]>([
@@ -1594,25 +1607,25 @@ describe('MetaSchemaPlugin', () => {
               junctionTable: postTagResource,
               rightRelationName: 'post_tag_tag_fkey',
               rightTable: tagResource,
-              allowsMultipleEdgesToNode: false,
-            },
-          ],
-        ],
+              allowsMultipleEdgesToNode: false
+            }
+          ]
+        ]
       ]);
 
       const build = createMockBuild(
         {
           post: postResource,
           tag: tagResource,
-          post_tag: postTagResource,
+          post_tag: postTagResource
         },
         ['app_public'],
         {
           pgManyToManyRealtionshipsByResource,
           inflection: {
-            _manyToManyRelation: () => 'tags',
-          },
-        },
+            _manyToManyRelation: () => 'tags'
+          }
+        }
       );
 
       const post = callInitHook(build).find((table: any) => table.name === 'Post');
@@ -1624,20 +1637,20 @@ describe('MetaSchemaPlugin', () => {
         junctionLeftConstraint: {
           name: 'post_post_tags',
           referencedTable: 'post',
-          referencedFields: ['id'],
+          referencedFields: ['id']
         },
         junctionRightConstraint: {
           name: 'post_tag_tag_fkey',
           referencedTable: 'tag',
-          referencedFields: ['id'],
+          referencedFields: ['id']
         },
-        rightTable: { name: 'tag' },
+        rightTable: { name: 'tag' }
       });
       expect(post.relations.manyToMany[0].junctionLeftKeyAttributes.map((f: any) => f.name)).toEqual([
-        'postId',
+        'postId'
       ]);
       expect(post.relations.manyToMany[0].junctionRightKeyAttributes.map((f: any) => f.name)).toEqual([
-        'tagId',
+        'tagId'
       ]);
       expect(post.relations.manyToMany[0].leftKeyAttributes.map((f: any) => f.name)).toEqual(['id']);
       expect(post.relations.manyToMany[0].rightKeyAttributes.map((f: any) => f.name)).toEqual(['id']);
@@ -1645,14 +1658,14 @@ describe('MetaSchemaPlugin', () => {
 
     it('falls back to codec matching when many-to-many map key is a different resource object', () => {
       const postCodec = createMockCodec('post', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const tagCodec = createMockCodec('tag', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const postTagCodec = createMockCodec('post_tag', {
         post_id: createMockAttribute('uuid', { notNull: true }),
-        tag_id: createMockAttribute('uuid', { notNull: true }),
+        tag_id: createMockAttribute('uuid', { notNull: true })
       });
 
       const postUniques = [{ attributes: ['id'], isPrimary: true }];
@@ -1667,15 +1680,15 @@ describe('MetaSchemaPlugin', () => {
             isReferencee: false,
             localAttributes: ['post_id'],
             remoteAttributes: ['id'],
-            remoteResource: { codec: postCodec, uniques: postUniques },
+            remoteResource: { codec: postCodec, uniques: postUniques }
           },
           post_tag_tag_fkey: {
             isReferencee: false,
             localAttributes: ['tag_id'],
             remoteAttributes: ['id'],
-            remoteResource: { codec: tagCodec, uniques: tagUniques },
-          },
-        },
+            remoteResource: { codec: tagCodec, uniques: tagUniques }
+          }
+        }
       });
       const postResourceInBuild = createMockResource({
         codec: postCodec,
@@ -1685,9 +1698,9 @@ describe('MetaSchemaPlugin', () => {
             isReferencee: true,
             localAttributes: ['id'],
             remoteAttributes: ['post_id'],
-            remoteResource: { codec: postTagCodec, uniques: postTagUniques },
-          },
-        },
+            remoteResource: { codec: postTagCodec, uniques: postTagUniques }
+          }
+        }
       });
       const postResourceInMap = createMockResource({
         codec: postCodec,
@@ -1697,14 +1710,14 @@ describe('MetaSchemaPlugin', () => {
             isReferencee: true,
             localAttributes: ['id'],
             remoteAttributes: ['post_id'],
-            remoteResource: { codec: postTagCodec, uniques: postTagUniques },
-          },
-        },
+            remoteResource: { codec: postTagCodec, uniques: postTagUniques }
+          }
+        }
       });
       const tagResource = createMockResource({
         codec: tagCodec,
         uniques: tagUniques,
-        relations: {},
+        relations: {}
       });
 
       const pgManyToManyRealtionshipsByResource = new Map<any, any[]>([
@@ -1717,25 +1730,25 @@ describe('MetaSchemaPlugin', () => {
               junctionTable: postTagResource,
               rightRelationName: 'post_tag_tag_fkey',
               rightTable: tagResource,
-              allowsMultipleEdgesToNode: false,
-            },
-          ],
-        ],
+              allowsMultipleEdgesToNode: false
+            }
+          ]
+        ]
       ]);
 
       const build = createMockBuild(
         {
           post: postResourceInBuild,
           tag: tagResource,
-          post_tag: postTagResource,
+          post_tag: postTagResource
         },
         ['app_public'],
         {
           pgManyToManyRealtionshipsByResource,
           inflection: {
-            _manyToManyRelation: () => 'tags',
-          },
-        },
+            _manyToManyRelation: () => 'tags'
+          }
+        }
       );
 
       const post = callInitHook(build).find((table: any) => table.name === 'Post');
@@ -1745,14 +1758,14 @@ describe('MetaSchemaPlugin', () => {
 
     it('skips malformed many-to-many relation details', () => {
       const postCodec = createMockCodec('post', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const tagCodec = createMockCodec('tag', {
-        id: createMockAttribute('uuid', { notNull: true }),
+        id: createMockAttribute('uuid', { notNull: true })
       });
       const postTagCodec = createMockCodec('post_tag', {
         post_id: createMockAttribute('uuid', { notNull: true }),
-        tag_id: createMockAttribute('uuid', { notNull: true }),
+        tag_id: createMockAttribute('uuid', { notNull: true })
       });
 
       const postResource = createMockResource({
@@ -1763,26 +1776,26 @@ describe('MetaSchemaPlugin', () => {
             isReferencee: true,
             localAttributes: ['id'],
             remoteAttributes: ['post_id'],
-            remoteResource: { codec: postTagCodec, uniques: [{ attributes: ['post_id', 'tag_id'], isPrimary: true }] },
-          },
-        },
+            remoteResource: { codec: postTagCodec, uniques: [{ attributes: ['post_id', 'tag_id'], isPrimary: true }] }
+          }
+        }
       });
       const tagResource = createMockResource({
         codec: tagCodec,
         uniques: [{ attributes: ['id'], isPrimary: true }],
-        relations: {},
+        relations: {}
       });
       const postTagResource = createMockResource({
         codec: postTagCodec,
         uniques: [{ attributes: ['post_id', 'tag_id'], isPrimary: true }],
-        relations: {},
+        relations: {}
       });
 
       const build = createMockBuild(
         {
           post: postResource,
           tag: tagResource,
-          post_tag: postTagResource,
+          post_tag: postTagResource
         },
         ['app_public'],
         {
@@ -1796,12 +1809,12 @@ describe('MetaSchemaPlugin', () => {
                   junctionTable: postTagResource,
                   rightRelationName: 'missing_right_relation',
                   rightTable: tagResource,
-                  allowsMultipleEdgesToNode: false,
-                },
-              ],
-            ],
-          ]),
-        },
+                  allowsMultipleEdgesToNode: false
+                }
+              ]
+            ]
+          ])
+        }
       );
 
       let tables: any[] = [];
@@ -1824,14 +1837,14 @@ describe('MetaSchemaPlugin', () => {
     it('adds _meta to Query and resolves cached tables through an executable schema', async () => {
       const codec = createMockCodec('user', {
         id: createMockAttribute('uuid', { notNull: true }),
-        email_address: createMockAttribute('text'),
+        email_address: createMockAttribute('text')
       });
       const build = createMockBuild({
         user: {
           codec,
           uniques: [{ attributes: ['id'], isPrimary: true, tags: { name: 'users_pkey' } }],
-          relations: {},
-        },
+          relations: {}
+        }
       });
 
       const seededTables = callInitHook(build);
@@ -1839,18 +1852,18 @@ describe('MetaSchemaPlugin', () => {
         {
           ping: {
             type: GraphQLString,
-            resolve: () => 'pong',
-          },
+            resolve: () => 'pong'
+          }
         },
         build,
-        'Query',
+        'Query'
       );
 
       const schema = new GraphQLSchema({
         query: new GraphQLObjectType({
           name: 'Query',
-          fields: () => queryFields,
-        }),
+          fields: () => queryFields
+        })
       });
 
       const result = await graphql({
@@ -1867,7 +1880,7 @@ describe('MetaSchemaPlugin', () => {
               }
             }
           }
-        `,
+        `
       });
 
       expect(result.errors).toBeUndefined();
@@ -1876,17 +1889,17 @@ describe('MetaSchemaPlugin', () => {
       expect((result.data as any)?._meta?.tables?.[0]).toMatchObject({
         name: 'User',
         schemaName: 'app_public',
-        query: seededTables[0].query,
+        query: seededTables[0].query
       });
       expect((result.data as any)?._meta?.tables?.[0]?.fields).toEqual([
         {
           name: 'id',
-          type: { pgType: 'uuid', gqlType: 'UUID', isArray: false },
+          type: { pgType: 'uuid', gqlType: 'UUID', isArray: false }
         },
         {
           name: 'emailAddress',
-          type: { pgType: 'text', gqlType: 'String', isArray: false },
-        },
+          type: { pgType: 'text', gqlType: 'String', isArray: false }
+        }
       ]);
     });
   });
@@ -1897,15 +1910,15 @@ describe('MetaSchemaPlugin', () => {
         user: {
           codec: createMockCodec('user', { id: createMockAttribute('uuid') }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const secondBuild = createMockBuild({
         project: {
           codec: createMockCodec('project', { id: createMockAttribute('uuid') }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
 
       const first = callInitHook(firstBuild);
@@ -1935,8 +1948,8 @@ describe('MetaSchemaPlugin', () => {
         user: {
           codec: createMockCodec('user', { id: createMockAttribute('uuid') }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       expect(tables[0].storage).toBeNull();
@@ -1946,38 +1959,38 @@ describe('MetaSchemaPlugin', () => {
       const codec = createMockCodec('app_file', {
         id: createMockAttribute('uuid'),
         key: createMockAttribute('text'),
-        bucket_id: createMockAttribute('uuid'),
+        bucket_id: createMockAttribute('uuid')
       });
       (codec as any).extensions = {
         ...codec.extensions,
-        tags: { storageFiles: true },
+        tags: { storageFiles: true }
       };
       const build = createMockBuild({
-        app_file: { codec, uniques: [], relations: {} },
+        app_file: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].storage).toEqual({
         isFilesTable: true,
-        isBucketsTable: false,
+        isBucketsTable: false
       });
     });
 
     it('detects @storageBuckets tagged tables', () => {
       const codec = createMockCodec('app_bucket', {
         id: createMockAttribute('uuid'),
-        key: createMockAttribute('text'),
+        key: createMockAttribute('text')
       });
       (codec as any).extensions = {
         ...codec.extensions,
-        tags: { storageBuckets: true },
+        tags: { storageBuckets: true }
       };
       const build = createMockBuild({
-        app_bucket: { codec, uniques: [], relations: {} },
+        app_bucket: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].storage).toEqual({
         isFilesTable: false,
-        isBucketsTable: true,
+        isBucketsTable: true
       });
     });
   });
@@ -1988,8 +2001,8 @@ describe('MetaSchemaPlugin', () => {
         user: {
           codec: createMockCodec('user', { id: createMockAttribute('uuid') }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       expect(tables[0].search).toBeNull();
@@ -1999,34 +2012,34 @@ describe('MetaSchemaPlugin', () => {
       const codec = createMockCodec('article', {
         id: createMockAttribute('uuid'),
         title: createMockAttribute('text'),
-        tsv: createMockAttribute('tsvector'),
+        tsv: createMockAttribute('tsvector')
       });
       const build = createMockBuild({
-        article: { codec, uniques: [], relations: {} },
+        article: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].search).toEqual({
         algorithms: ['tsvector'],
         columns: [{ name: 'tsv', algorithm: 'tsvector' }],
         hasUnifiedSearch: true,
-        config: null,
+        config: null
       });
     });
 
     it('detects vector columns (pgvector)', () => {
       const codec = createMockCodec('document', {
         id: createMockAttribute('uuid'),
-        embedding: createMockAttribute('vector'),
+        embedding: createMockAttribute('vector')
       });
       const build = createMockBuild({
-        document: { codec, uniques: [], relations: {} },
+        document: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].search).toEqual({
         algorithms: ['vector'],
         columns: [{ name: 'embedding', algorithm: 'vector' }],
         hasUnifiedSearch: false,
-        config: null,
+        config: null
       });
     });
 
@@ -2035,24 +2048,24 @@ describe('MetaSchemaPlugin', () => {
       (bm25Attr as any).extensions = { tags: { bm25Index: true } };
       const codec = createMockCodec('article', {
         id: createMockAttribute('uuid'),
-        body: bm25Attr,
+        body: bm25Attr
       });
       const build = createMockBuild({
-        article: { codec, uniques: [], relations: {} },
+        article: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].search).toEqual({
         algorithms: ['bm25'],
         columns: [{ name: 'body', algorithm: 'bm25' }],
         hasUnifiedSearch: true,
-        config: null,
+        config: null
       });
     });
 
     it('parses @searchConfig smart tag', () => {
       const codec = createMockCodec('article', {
         id: createMockAttribute('uuid'),
-        tsv: createMockAttribute('tsvector'),
+        tsv: createMockAttribute('tsvector')
       });
       (codec as any).extensions = {
         ...codec.extensions,
@@ -2061,12 +2074,12 @@ describe('MetaSchemaPlugin', () => {
             weights: { bm25: 0.6, tsv: 0.4 },
             boost_recent: true,
             boost_recency_field: 'created_at',
-            boost_recency_decay: 0.95,
-          },
-        },
+            boost_recency_decay: 0.95
+          }
+        }
       };
       const build = createMockBuild({
-        article: { codec, uniques: [], relations: {} },
+        article: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].search).toEqual({
@@ -2077,8 +2090,8 @@ describe('MetaSchemaPlugin', () => {
           weights: { bm25: 0.6, tsv: 0.4 },
           boostRecent: true,
           boostRecencyField: 'created_at',
-          boostRecencyDecay: 0.95,
-        },
+          boostRecencyDecay: 0.95
+        }
       });
     });
 
@@ -2089,10 +2102,10 @@ describe('MetaSchemaPlugin', () => {
         id: createMockAttribute('uuid'),
         tsv: createMockAttribute('tsvector'),
         embedding: createMockAttribute('vector'),
-        body: bm25Attr,
+        body: bm25Attr
       });
       const build = createMockBuild({
-        article: { codec, uniques: [], relations: {} },
+        article: { codec, uniques: [], relations: {} }
       });
       const tables = callInitHook(build);
       expect(tables[0].search!.algorithms).toEqual(['bm25', 'tsvector', 'vector']);
@@ -2107,11 +2120,11 @@ describe('MetaSchemaPlugin', () => {
         user: {
           codec: createMockCodec('user', {
             id: createMockAttribute('uuid'),
-            name: createMockAttribute('text'),
+            name: createMockAttribute('text')
           }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       for (const field of tables[0].fields) {
@@ -2122,73 +2135,73 @@ describe('MetaSchemaPlugin', () => {
     it('detects enum type on a field', () => {
       const enumCodec = {
         name: 'status_enum',
-        values: [{ value: 'active' }, { value: 'inactive' }, { value: 'pending' }],
+        values: [{ value: 'active' }, { value: 'inactive' }, { value: 'pending' }]
       };
       const build = createMockBuild({
         task: {
           codec: createMockCodec('task', {
             id: createMockAttribute('uuid'),
-            status: createMockAttribute('status_enum', { codec: enumCodec }),
+            status: createMockAttribute('status_enum', { codec: enumCodec })
           }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       const statusField = tables[0].fields.find((f: any) => f.name === 'status');
       expect(statusField.enumValues).toEqual({
         name: 'status_enum',
-        values: ['active', 'inactive', 'pending'],
+        values: ['active', 'inactive', 'pending']
       });
     });
 
     it('detects enum values as plain strings', () => {
       const enumCodec = {
         name: 'priority_enum',
-        values: ['low', 'medium', 'high'],
+        values: ['low', 'medium', 'high']
       };
       const build = createMockBuild({
         task: {
           codec: createMockCodec('task', {
             id: createMockAttribute('uuid'),
-            priority: createMockAttribute('priority_enum', { codec: enumCodec }),
+            priority: createMockAttribute('priority_enum', { codec: enumCodec })
           }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       const priorityField = tables[0].fields.find((f: any) => f.name === 'priority');
       expect(priorityField.enumValues).toEqual({
         name: 'priority_enum',
-        values: ['low', 'medium', 'high'],
+        values: ['low', 'medium', 'high']
       });
     });
 
     it('detects enum through domain wrapper', () => {
       const innerEnumCodec = {
         name: 'color_enum',
-        values: [{ value: 'red' }, { value: 'green' }, { value: 'blue' }],
+        values: [{ value: 'red' }, { value: 'green' }, { value: 'blue' }]
       };
       const domainCodec = {
         name: 'color_domain',
-        domainOfCodec: innerEnumCodec,
+        domainOfCodec: innerEnumCodec
       };
       const build = createMockBuild({
         item: {
           codec: createMockCodec('item', {
             id: createMockAttribute('uuid'),
-            color: createMockAttribute('color_domain', { codec: domainCodec }),
+            color: createMockAttribute('color_domain', { codec: domainCodec })
           }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       const colorField = tables[0].fields.find((f: any) => f.name === 'color');
       expect(colorField.enumValues).toEqual({
         name: 'color_enum',
-        values: ['red', 'green', 'blue'],
+        values: ['red', 'green', 'blue']
       });
     });
 
@@ -2199,11 +2212,11 @@ describe('MetaSchemaPlugin', () => {
         item: {
           codec: createMockCodec('item', {
             id: createMockAttribute('uuid'),
-            tags: createMockAttribute('_text', { codec: arrayCodec }),
+            tags: createMockAttribute('_text', { codec: arrayCodec })
           }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       const tagsField = tables[0].fields.find((f: any) => f.name === 'tags');
@@ -2217,11 +2230,11 @@ describe('MetaSchemaPlugin', () => {
         user: {
           codec: createMockCodec('user', {
             id: createMockAttribute('uuid'),
-            name: createMockAttribute('text'),
+            name: createMockAttribute('text')
           }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       expect(tables[0].i18n).toBeNull();
@@ -2234,13 +2247,13 @@ describe('MetaSchemaPlugin', () => {
           id: createMockAttribute('uuid'),
           title: createMockAttribute('text'),
           body: createMockAttribute('text'),
-          views: createMockAttribute('int4'),
+          views: createMockAttribute('int4')
         },
         isAnonymous: false,
         extensions: {
           pg: { schemaName: 'app_public' },
-          tags: { i18n: 'post_translations' },
-        },
+          tags: { i18n: 'post_translations' }
+        }
       };
       const translationCodec = {
         name: 'postTranslations',
@@ -2248,24 +2261,24 @@ describe('MetaSchemaPlugin', () => {
           post_id: createMockAttribute('uuid'),
           lang_code: createMockAttribute('text'),
           title: createMockAttribute('text'),
-          body: createMockAttribute('text'),
+          body: createMockAttribute('text')
         },
         isAnonymous: false,
         extensions: {
-          pg: { schemaName: 'app_public', name: 'post_translations' },
-        },
+          pg: { schemaName: 'app_public', name: 'post_translations' }
+        }
       };
       const build = createMockBuild({
         post: {
           codec: baseCodec,
           uniques: [],
-          relations: {},
+          relations: {}
         },
         post_translations: {
           codec: translationCodec,
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       const postTable = tables.find((t: any) => t.name === 'Post');
@@ -2273,8 +2286,8 @@ describe('MetaSchemaPlugin', () => {
         translationTable: 'post_translations',
         translatableFields: [
           { name: 'title', type: 'text' },
-          { name: 'body', type: 'text' },
-        ],
+          { name: 'body', type: 'text' }
+        ]
       });
     });
 
@@ -2284,43 +2297,43 @@ describe('MetaSchemaPlugin', () => {
         attributes: {
           id: createMockAttribute('uuid'),
           label: createMockAttribute('text'),
-          count: createMockAttribute('int4'),
+          count: createMockAttribute('int4')
         },
         isAnonymous: false,
         extensions: {
           pg: { schemaName: 'app_public' },
-          tags: { i18n: 'item_translations' },
-        },
+          tags: { i18n: 'item_translations' }
+        }
       };
       const translationCodec = {
         name: 'itemTranslations',
         attributes: {
           item_id: createMockAttribute('uuid'),
           lang_code: createMockAttribute('text'),
-          label: createMockAttribute('text'),
+          label: createMockAttribute('text')
         },
         isAnonymous: false,
         extensions: {
-          pg: { schemaName: 'app_public', name: 'item_translations' },
-        },
+          pg: { schemaName: 'app_public', name: 'item_translations' }
+        }
       };
       const build = createMockBuild({
         item: {
           codec: baseCodec,
           uniques: [],
-          relations: {},
+          relations: {}
         },
         item_translations: {
           codec: translationCodec,
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       const itemTable = tables.find((t: any) => t.name === 'Item');
       expect(itemTable.i18n).toEqual({
         translationTable: 'item_translations',
-        translatableFields: [{ name: 'label', type: 'text' }],
+        translatableFields: [{ name: 'label', type: 'text' }]
       });
     });
   });
@@ -2331,11 +2344,11 @@ describe('MetaSchemaPlugin', () => {
         user: {
           codec: createMockCodec('user', {
             id: createMockAttribute('uuid'),
-            name: createMockAttribute('text'),
+            name: createMockAttribute('text')
           }),
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       expect(tables[0].realtime).toBeNull();
@@ -2346,24 +2359,24 @@ describe('MetaSchemaPlugin', () => {
         name: 'message',
         attributes: {
           id: createMockAttribute('uuid'),
-          content: createMockAttribute('text'),
+          content: createMockAttribute('text')
         },
         isAnonymous: false,
         extensions: {
           pg: { schemaName: 'app_public' },
-          tags: { realtime: true },
-        },
+          tags: { realtime: true }
+        }
       };
       const build = createMockBuild({
         message: {
           codec: realtimeCodec,
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       expect(tables[0].realtime).toEqual({
-        subscriptionFieldName: 'onMessageChanged',
+        subscriptionFieldName: 'onMessageChanged'
       });
     });
 
@@ -2371,25 +2384,161 @@ describe('MetaSchemaPlugin', () => {
       const realtimeCodec = {
         name: 'chat_room',
         attributes: {
-          id: createMockAttribute('uuid'),
+          id: createMockAttribute('uuid')
         },
         isAnonymous: false,
         extensions: {
           pg: { schemaName: 'app_public' },
-          tags: { realtime: true },
-        },
+          tags: { realtime: true }
+        }
       };
       const build = createMockBuild({
         chat_room: {
           codec: realtimeCodec,
           uniques: [],
-          relations: {},
-        },
+          relations: {}
+        }
       });
       const tables = callInitHook(build);
       expect(tables[0].realtime).toEqual({
-        subscriptionFieldName: 'onChatRoomChanged',
+        subscriptionFieldName: 'onChatRoomChanged'
       });
+    });
+  });
+
+  describe('scope metadata', () => {
+    it('returns null scope for tables without @scope tag or a scope key column', () => {
+      const build = createMockBuild({
+        widget: {
+          codec: createMockCodec('widget', {
+            id: createMockAttribute('uuid'),
+            name: createMockAttribute('text')
+          }),
+          uniques: [],
+          relations: {}
+        }
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].scope).toBeNull();
+    });
+
+    it('reads a database @scope smart tag', () => {
+      const codec = createMockCodec('app_setting', {
+        id: createMockAttribute('uuid'),
+        database_id: createMockAttribute('uuid')
+      });
+      (codec as any).extensions = {
+        ...codec.extensions,
+        tags: { scope: 'database' }
+      };
+      const build = createMockBuild({
+        app_setting: { codec, uniques: [], relations: {} }
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].scope).toEqual({
+        scope: 'database',
+        tier: 'database',
+        keyColumn: 'databaseId',
+        entityTable: null,
+        source: 'smartTag'
+      });
+    });
+
+    it('reads a global (platform/app) @scope smart tag with no key column', () => {
+      const codec = createMockCodec('feature_flag', {
+        id: createMockAttribute('uuid'),
+        key: createMockAttribute('text')
+      });
+      (codec as any).extensions = {
+        ...codec.extensions,
+        tags: { scope: 'platform' }
+      };
+      const build = createMockBuild({
+        feature_flag: { codec, uniques: [], relations: {} }
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].scope).toEqual({
+        scope: 'platform',
+        tier: 'global',
+        keyColumn: null,
+        entityTable: null,
+        source: 'smartTag'
+      });
+    });
+
+    it('reads an entity @scope smart tag with entity table and scope-named key', () => {
+      const codec = createMockCodec('project', {
+        id: createMockAttribute('uuid'),
+        org_id: createMockAttribute('uuid')
+      });
+      (codec as any).extensions = {
+        ...codec.extensions,
+        tags: { scope: 'org', scopeEntityTable: 'organizations' }
+      };
+      const build = createMockBuild({
+        project: { codec, uniques: [], relations: {} }
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].scope).toEqual({
+        scope: 'org',
+        tier: 'entity',
+        keyColumn: 'orgId',
+        entityTable: 'organizations',
+        source: 'smartTag'
+      });
+    });
+
+    it('honors an explicit scopeKey smart tag over inference', () => {
+      const codec = createMockCodec('membership', {
+        id: createMockAttribute('uuid'),
+        owner_id: createMockAttribute('uuid')
+      });
+      (codec as any).extensions = {
+        ...codec.extensions,
+        tags: { scope: 'team', scopeKey: 'owner_id' }
+      };
+      const build = createMockBuild({
+        membership: { codec, uniques: [], relations: {} }
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].scope).toEqual({
+        scope: 'team',
+        tier: 'entity',
+        keyColumn: 'ownerId',
+        entityTable: null,
+        source: 'smartTag'
+      });
+    });
+
+    it('infers a database scope from a database_id column when untagged', () => {
+      const codec = createMockCodec('audit_log', {
+        id: createMockAttribute('uuid'),
+        database_id: createMockAttribute('uuid'),
+        message: createMockAttribute('text')
+      });
+      const build = createMockBuild({
+        audit_log: { codec, uniques: [], relations: {} }
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].scope).toEqual({
+        scope: 'database',
+        tier: 'database',
+        keyColumn: 'databaseId',
+        entityTable: null,
+        source: 'inferred'
+      });
+    });
+
+    it('does not infer entity/global scope from arbitrary columns', () => {
+      const codec = createMockCodec('note', {
+        id: createMockAttribute('uuid'),
+        author_id: createMockAttribute('uuid')
+      });
+      const build = createMockBuild({
+        note: { codec, uniques: [], relations: {} }
+      });
+      const tables = callInitHook(build);
+      expect(tables[0].scope).toBeNull();
     });
   });
 

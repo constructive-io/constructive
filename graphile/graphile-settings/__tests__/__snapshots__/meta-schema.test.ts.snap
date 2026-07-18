@@ -105,6 +105,12 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "relations.manyToMany.rightTable.name",
   "relations.manyToMany.type",
   "schemaName",
+  "scope",
+  "scope.entityTable",
+  "scope.keyColumn",
+  "scope.scope",
+  "scope.source",
+  "scope.tier",
   "search",
   "search.algorithms",
   "search.columns",
@@ -292,6 +298,13 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
       }
       realtime {
         subscriptionFieldName
+      }
+      scope {
+        scope
+        tier
+        keyColumn
+        entityTable
+        source
       }
     }
   }
@@ -732,6 +745,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [],
@@ -1338,6 +1352,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       ],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [],
@@ -1792,6 +1807,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [],
@@ -2234,6 +2250,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       ],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [
@@ -2587,6 +2604,7 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "manyToMany": [],
     },
     "schemaName": "app_public",
+    "scope": null,
     "search": null,
     "storage": null,
     "uniqueConstraints": [

@@ -1,13 +1,14 @@
 import {
   GraphQLBoolean,
+  type GraphQLFieldConfig,
   GraphQLFloat,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLString,
-  type GraphQLFieldConfig,
   type GraphQLOutputType,
+  GraphQLString
 } from 'graphql';
+
 import type { TableMeta } from './types';
 
 type FieldMap = Record<string, unknown>;
@@ -17,7 +18,7 @@ function nn<T extends GraphQLOutputType>(type: T): GraphQLNonNull<T> {
 }
 
 function nnList<T extends GraphQLOutputType>(
-  type: T,
+  type: T
 ): GraphQLNonNull<GraphQLList<GraphQLNonNull<T>>> {
   return nn(new GraphQLList(nn(type)));
 }
@@ -32,8 +33,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       isArray: { type: nn(GraphQLBoolean) },
       isNotNull: { type: GraphQLBoolean },
       hasDefault: { type: GraphQLBoolean },
-      subtype: { type: GraphQLString },
-    }),
+      subtype: { type: GraphQLString }
+    })
   });
 
   const MetaEnumType = new GraphQLObjectType({
@@ -41,8 +42,8 @@ function createMetaSchemaType(): GraphQLObjectType {
     description: 'Information about a PostgreSQL enum type',
     fields: () => ({
       name: { type: nn(GraphQLString), description: 'The PostgreSQL enum type name' },
-      values: { type: nnList(GraphQLString), description: 'Allowed values for this enum' },
-    }),
+      values: { type: nnList(GraphQLString), description: 'Allowed values for this enum' }
+    })
   });
 
   const MetaFieldType = new GraphQLObjectType({
@@ -56,8 +57,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       isPrimaryKey: { type: nn(GraphQLBoolean) },
       isForeignKey: { type: nn(GraphQLBoolean) },
       description: { type: GraphQLString },
-      enumValues: { type: MetaEnumType, description: 'Enum metadata if this field has an enum type' },
-    }),
+      enumValues: { type: MetaEnumType, description: 'Enum metadata if this field has an enum type' }
+    })
   });
 
   const MetaIndexType = new GraphQLObjectType({
@@ -68,8 +69,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       isUnique: { type: nn(GraphQLBoolean) },
       isPrimary: { type: nn(GraphQLBoolean) },
       columns: { type: nnList(GraphQLString) },
-      fields: { type: new GraphQLList(nn(MetaFieldType)) },
-    }),
+      fields: { type: new GraphQLList(nn(MetaFieldType)) }
+    })
   });
 
   const MetaPrimaryKeyConstraintType = new GraphQLObjectType({
@@ -77,8 +78,8 @@ function createMetaSchemaType(): GraphQLObjectType {
     description: 'Information about a primary key constraint',
     fields: () => ({
       name: { type: nn(GraphQLString) },
-      fields: { type: nnList(MetaFieldType) },
-    }),
+      fields: { type: nnList(MetaFieldType) }
+    })
   });
 
   const MetaUniqueConstraintType = new GraphQLObjectType({
@@ -86,16 +87,16 @@ function createMetaSchemaType(): GraphQLObjectType {
     description: 'Information about a unique constraint',
     fields: () => ({
       name: { type: nn(GraphQLString) },
-      fields: { type: nnList(MetaFieldType) },
-    }),
+      fields: { type: nnList(MetaFieldType) }
+    })
   });
 
   const MetaRefTableType = new GraphQLObjectType({
     name: 'MetaRefTable',
     description: 'Reference to a related table',
     fields: () => ({
-      name: { type: nn(GraphQLString) },
-    }),
+      name: { type: nn(GraphQLString) }
+    })
   });
 
   const MetaForeignKeyConstraintType = new GraphQLObjectType({
@@ -107,8 +108,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       referencedTable: { type: nn(GraphQLString) },
       referencedFields: { type: nnList(GraphQLString) },
       refFields: { type: new GraphQLList(nn(MetaFieldType)) },
-      refTable: { type: MetaRefTableType },
-    }),
+      refTable: { type: MetaRefTableType }
+    })
   });
 
   const MetaConstraintsType = new GraphQLObjectType({
@@ -117,8 +118,8 @@ function createMetaSchemaType(): GraphQLObjectType {
     fields: () => ({
       primaryKey: { type: MetaPrimaryKeyConstraintType },
       unique: { type: nnList(MetaUniqueConstraintType) },
-      foreignKey: { type: nnList(MetaForeignKeyConstraintType) },
-    }),
+      foreignKey: { type: nnList(MetaForeignKeyConstraintType) }
+    })
   });
 
   const MetaInflectionType = new GraphQLObjectType({
@@ -136,8 +137,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       createInputType: { type: nn(GraphQLString) },
       createPayloadType: { type: nn(GraphQLString) },
       updatePayloadType: { type: GraphQLString },
-      deletePayloadType: { type: nn(GraphQLString) },
-    }),
+      deletePayloadType: { type: nn(GraphQLString) }
+    })
   });
 
   const MetaQueryType = new GraphQLObjectType({
@@ -148,8 +149,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       one: { type: GraphQLString },
       create: { type: GraphQLString },
       update: { type: GraphQLString },
-      delete: { type: GraphQLString },
-    }),
+      delete: { type: GraphQLString }
+    })
   });
 
   const MetaBelongsToRelationType = new GraphQLObjectType({
@@ -160,8 +161,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       isUnique: { type: nn(GraphQLBoolean) },
       type: { type: GraphQLString },
       keys: { type: nnList(MetaFieldType) },
-      references: { type: nn(MetaRefTableType) },
-    }),
+      references: { type: nn(MetaRefTableType) }
+    })
   });
 
   const MetaHasRelationType = new GraphQLObjectType({
@@ -172,8 +173,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       isUnique: { type: nn(GraphQLBoolean) },
       type: { type: GraphQLString },
       keys: { type: nnList(MetaFieldType) },
-      referencedBy: { type: nn(MetaRefTableType) },
-    }),
+      referencedBy: { type: nn(MetaRefTableType) }
+    })
   });
 
   const MetaManyToManyRelationType = new GraphQLObjectType({
@@ -189,8 +190,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       junctionRightKeyAttributes: { type: nnList(MetaFieldType) },
       leftKeyAttributes: { type: nnList(MetaFieldType) },
       rightKeyAttributes: { type: nnList(MetaFieldType) },
-      rightTable: { type: nn(MetaRefTableType) },
-    }),
+      rightTable: { type: nn(MetaRefTableType) }
+    })
   });
 
   const MetaRelationsType = new GraphQLObjectType({
@@ -201,8 +202,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       has: { type: nnList(MetaHasRelationType) },
       hasOne: { type: nnList(MetaHasRelationType) },
       hasMany: { type: nnList(MetaHasRelationType) },
-      manyToMany: { type: nnList(MetaManyToManyRelationType) },
-    }),
+      manyToMany: { type: nnList(MetaManyToManyRelationType) }
+    })
   });
 
   const MetaStorageType = new GraphQLObjectType({
@@ -210,8 +211,8 @@ function createMetaSchemaType(): GraphQLObjectType {
     description: 'Storage metadata for a table',
     fields: () => ({
       isFilesTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage files table' },
-      isBucketsTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage buckets table' },
-    }),
+      isBucketsTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage buckets table' }
+    })
   });
 
   const MetaSearchConfigType = new GraphQLObjectType({
@@ -223,12 +224,12 @@ function createMetaSchemaType(): GraphQLObjectType {
         description: 'JSON-encoded per-adapter score weights',
         resolve(source: any) {
           return source.weights ? JSON.stringify(source.weights) : null;
-        },
+        }
       },
       boostRecent: { type: nn(GraphQLBoolean), description: 'Whether recency boosting is enabled' },
       boostRecencyField: { type: GraphQLString, description: 'Field used for recency decay' },
-      boostRecencyDecay: { type: GraphQLFloat, description: 'Exponential decay factor per day' },
-    }),
+      boostRecencyDecay: { type: GraphQLFloat, description: 'Exponential decay factor per day' }
+    })
   });
 
   const MetaSearchColumnType = new GraphQLObjectType({
@@ -236,8 +237,8 @@ function createMetaSchemaType(): GraphQLObjectType {
     description: 'A searchable column with its algorithm',
     fields: () => ({
       name: { type: nn(GraphQLString), description: 'Column name (camelCase)' },
-      algorithm: { type: nn(GraphQLString), description: 'Search algorithm: tsvector, bm25, trgm, or vector' },
-    }),
+      algorithm: { type: nn(GraphQLString), description: 'Search algorithm: tsvector, bm25, trgm, or vector' }
+    })
   });
 
   const MetaSearchType = new GraphQLObjectType({
@@ -247,8 +248,8 @@ function createMetaSchemaType(): GraphQLObjectType {
       algorithms: { type: nnList(GraphQLString), description: 'Active search algorithms on this table' },
       columns: { type: nnList(MetaSearchColumnType), description: 'Searchable columns with their algorithm' },
       hasUnifiedSearch: { type: nn(GraphQLBoolean), description: 'Whether unifiedSearch composite filter is available' },
-      config: { type: MetaSearchConfigType, description: 'Per-table search configuration' },
-    }),
+      config: { type: MetaSearchConfigType, description: 'Per-table search configuration' }
+    })
   });
 
   const MetaI18nFieldType = new GraphQLObjectType({
@@ -256,8 +257,8 @@ function createMetaSchemaType(): GraphQLObjectType {
     description: 'A translatable field',
     fields: () => ({
       name: { type: nn(GraphQLString), description: 'GraphQL field name' },
-      type: { type: nn(GraphQLString), description: 'PostgreSQL column type (text, citext)' },
-    }),
+      type: { type: nn(GraphQLString), description: 'PostgreSQL column type (text, citext)' }
+    })
   });
 
   const MetaI18nType = new GraphQLObjectType({
@@ -265,16 +266,28 @@ function createMetaSchemaType(): GraphQLObjectType {
     description: 'i18n metadata for a table with @i18n tag',
     fields: () => ({
       translationTable: { type: nn(GraphQLString), description: 'Name of the translation table' },
-      translatableFields: { type: nnList(MetaI18nFieldType), description: 'Fields that are translatable' },
-    }),
+      translatableFields: { type: nnList(MetaI18nFieldType), description: 'Fields that are translatable' }
+    })
   });
 
   const MetaRealtimeType = new GraphQLObjectType({
     name: 'MetaRealtime',
     description: 'Realtime metadata for a table with @realtime tag',
     fields: () => ({
-      subscriptionFieldName: { type: nn(GraphQLString), description: 'The generated subscription field name (e.g. onPostChanged)' },
-    }),
+      subscriptionFieldName: { type: nn(GraphQLString), description: 'The generated subscription field name (e.g. onPostChanged)' }
+    })
+  });
+
+  const MetaScopeType = new GraphQLObjectType({
+    name: 'MetaScope',
+    description: 'Provisioning scope metadata for a table',
+    fields: () => ({
+      scope: { type: nn(GraphQLString), description: "Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')" },
+      tier: { type: nn(GraphQLString), description: "Coarse bucket: 'global', 'database', or 'entity'" },
+      keyColumn: { type: GraphQLString, description: 'Inflected scope key column (e.g. databaseId, orgId), null for global tiers' },
+      entityTable: { type: GraphQLString, description: 'SQL name of the entity table for entity scopes, else null' },
+      source: { type: nn(GraphQLString), description: "How scope was determined: 'smartTag' (@scope) or 'inferred' (columns)" }
+    })
   });
 
   const MetaTableType = new GraphQLObjectType({
@@ -296,21 +309,22 @@ function createMetaSchemaType(): GraphQLObjectType {
       search: { type: MetaSearchType, description: 'Search metadata (null if no search configured)' },
       i18n: { type: MetaI18nType, description: 'i18n metadata (null if no @i18n tag)' },
       realtime: { type: MetaRealtimeType, description: 'Realtime metadata (null if no @realtime tag)' },
-    }),
+      scope: { type: MetaScopeType, description: 'Provisioning scope metadata (null if no @scope tag and not inferrable)' }
+    })
   });
 
   return new GraphQLObjectType({
     name: 'MetaSchema',
     description: 'Root meta schema type',
     fields: () => ({
-      tables: { type: nnList(MetaTableType) },
-    }),
+      tables: { type: nnList(MetaTableType) }
+    })
   });
 }
 
 export function extendQueryWithMetaField(
   fields: FieldMap,
-  tablesMeta: TableMeta[],
+  tablesMeta: TableMeta[]
 ): FieldMap {
   const metaSchemaType = createMetaSchemaType();
   const metaField: GraphQLFieldConfig<unknown, unknown> = {
@@ -319,11 +333,11 @@ export function extendQueryWithMetaField(
       'Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.',
     resolve() {
       return { tables: tablesMeta };
-    },
+    }
   };
 
   return {
     ...fields,
-    _meta: metaField,
+    _meta: metaField
   };
 }

@@ -121,7 +121,7 @@ map it onto a `Meta*` GraphQL type.**
 
 ## Adding a new metadata block to `_meta`
 
-Worked pattern (this is exactly how a `scope` block is being added — mirror the
+Worked pattern (this is exactly how the `scope` block was added — mirror the
 `storage`/`search` precedent):
 
 1. **(DB, if the data isn't already a physical column)** Emit a smart tag from the
@@ -131,8 +131,8 @@ Worked pattern (this is exactly how a `scope` block is being added — mirror th
    `pgpm package` + `pnpm run generate:constructive`.
 2. **`types.ts`** — add the interface (e.g. `ScopeMeta`) and a nullable field on
    `TableMeta` (`scope: ScopeMeta | null`).
-3. **A builder** — add `buildScopeMeta(codec, build, inflectAttr): ScopeMeta | null`
-   in `storage-search-meta-builders.ts` (or a new `scope-meta-builders.ts`). Read
+3. **A builder** — add `buildScopeMeta(codec, inflectAttr): ScopeMeta | null`
+   in a builder file (`scope` lives in `scope-meta-builders.ts`). Read
    `codec.extensions.tags`, return `null` when the feature is absent (the
    convention across all builders). Optionally infer from physical columns as a
    fallback (e.g. `database_id` present → database scope) and record provenance.
@@ -171,7 +171,7 @@ file, or direct introspection). Beyond raw structure it gives codegen the
   algorithm and know when `unifiedSearch` exists.
 - **i18n / realtime** — generate translation helpers and subscription hooks only
   where applicable.
-- **Scope (planned)** — auto-inject `databaseId`/`orgId` scope keys from context,
+- **Scope** — auto-inject `databaseId`/`orgId` scope keys from context,
   mark them non-required in create inputs, group/emit CLI & docs by tier, and
   choose the correct RLS/JWT context for generated test seeds.
 
@@ -196,4 +196,4 @@ file, or direct introspection). Beyond raw structure it gives codegen the
 
 - `graphile-search` — the search plugin whose activation `_meta.search` reflects
 - `constructive-cli` / `constructive-graphql-codegen` — consumers of `_meta`
-- `authoring-scoped-modules` (constructive-db) — the scope model `_meta.scope` will surface
+- `authoring-scoped-modules` (constructive-db) — the scope model `_meta.scope` surfaces

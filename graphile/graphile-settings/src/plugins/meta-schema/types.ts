@@ -14,6 +14,23 @@ export interface TableMeta {
   search: SearchMeta | null;
   i18n: I18nMeta | null;
   realtime: RealtimeMeta | null;
+  scope: ScopeMeta | null;
+}
+
+/** Coarse provisioning tier a table's scope belongs to. */
+export type ScopeTier = 'global' | 'database' | 'entity';
+
+export interface ScopeMeta {
+  /** The provisioning scope, e.g. 'platform', 'app', 'database', 'org', 'user' */
+  scope: string;
+  /** Coarse bucket: global (platform/app), database, or entity */
+  tier: ScopeTier;
+  /** Inflected scope key column (e.g. 'databaseId', 'orgId'), or null for global tiers */
+  keyColumn: string | null;
+  /** SQL name of the entity table for entity scopes, else null */
+  entityTable: string | null;
+  /** Where the scope was determined: 'smartTag' (@scope) or 'inferred' (columns) */
+  source: 'smartTag' | 'inferred';
 }
 
 export interface StorageMeta {

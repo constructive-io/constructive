@@ -2,40 +2,41 @@ import {
   buildForeignKeyConstraints,
   buildIndexes,
   buildPrimaryKey,
-  buildUniqueConstraints,
+  buildUniqueConstraints
 } from './constraint-meta-builders';
 import { buildInflectionMeta, buildQueryMeta, resolveTableType } from './name-meta-builders';
 import {
   buildBelongsToRelations,
   buildManyToManyRelations,
-  buildReverseRelations,
+  buildReverseRelations
 } from './relation-meta-builders';
-import { buildStorageMeta, buildSearchMeta, buildI18nMeta, buildRealtimeMeta } from './storage-search-meta-builders';
-import { buildFieldMeta } from './type-mappings';
+import { buildScopeMeta } from './scope-meta-builders';
+import { buildI18nMeta, buildRealtimeMeta,buildSearchMeta, buildStorageMeta } from './storage-search-meta-builders';
 import {
-  createBuildContext,
   type BuildContext,
-  type TableResourceWithCodec,
+  createBuildContext,
+  type TableResourceWithCodec
 } from './table-meta-context';
 import {
   getConfiguredSchemas,
   getRelations,
   getSchemaName,
   getUniques,
-  isTableResource,
+  isTableResource
 } from './table-resource-utils';
+import { buildFieldMeta } from './type-mappings';
 import type {
   ConstraintsMeta,
   MetaBuild,
   PgCodec,
-  TableMeta,
   RelationsMeta,
+  TableMeta
 } from './types';
 
 function buildTableMeta(
   resource: TableResourceWithCodec,
   schemaName: string,
-  context: BuildContext,
+  context: BuildContext
 ): TableMeta {
   const codec = resource.codec;
   const attributes = codec.attributes;
@@ -58,8 +59,8 @@ function buildTableMeta(
   const fields = Object.entries(attributes).map(([attrName, attr]) =>
     buildFieldMeta(context.inflectAttr(attrName, codec), attr, context.build, {
       isPrimaryKey: pkAttrNames.has(attrName),
-      isForeignKey: fkAttrNames.has(attrName),
-    }),
+      isForeignKey: fkAttrNames.has(attrName)
+    })
   );
   const indexes = buildIndexes(codec, attributes, uniques, context);
   const primaryKey = buildPrimaryKey(codec, attributes, uniques, context);
@@ -68,13 +69,13 @@ function buildTableMeta(
     codec,
     attributes,
     relations,
-    context,
+    context
   );
 
   const constraints: ConstraintsMeta = {
     primaryKey,
     unique: uniqueConstraints,
-    foreignKey: foreignKeyConstraints,
+    foreignKey: foreignKeyConstraints
   };
 
   const belongsTo = buildBelongsToRelations(codec, attributes, uniques, relations, context);
@@ -86,7 +87,7 @@ function buildTableMeta(
     has: [...hasOne, ...hasMany],
     hasOne,
     hasMany,
-    manyToMany,
+    manyToMany
   };
 
   const tableType = resolveTableType(context.build, codec);
@@ -95,6 +96,7 @@ function buildTableMeta(
   const search = buildSearchMeta(codec, context.build, context.inflectAttr);
   const i18n = buildI18nMeta(codec, context.build, context.inflectAttr);
   const realtime = buildRealtimeMeta(codec, context.build);
+  const scope = buildScopeMeta(codec, context.inflectAttr);
 
   return {
     name: tableType,
@@ -112,6 +114,7 @@ function buildTableMeta(
     search,
     i18n,
     realtime,
+    scope
   };
 }
 
