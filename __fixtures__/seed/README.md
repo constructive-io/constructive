@@ -8,7 +8,6 @@ Composable SQL seed layers for integration testing. Each layer builds on the pre
 |-------|-------|-----------------|
 | **base** | `base/setup.sql` | `uuid-ossp` extension, `stamps` schema + `timestamps()` trigger |
 | **services (real modules)** | `seed.pgpm(repoRoot)` | Real `@pgpm/metaschema-modules` (+ deps: `@pgpm/services`, `@pgpm/metaschema-schema`, ...) installed into the gitignored root `extensions/` — see `.agents/skills/ephemeral-pgpm-fixtures/SKILL.md`; run `pnpm fixtures:install` first |
-| **services grants** | `services/grants.sql` | Grants the `anonymous` test role read access on the installed metaschema/services schemas (modules already grant to `administrator`/`authenticated`) |
 | **services data** | `services/test-data.sql` | Example database (`simple-pets`), 3 schemas, 5 APIs, 2 domains, API→schema linkage, animals metaschema entries |
 | **app-schemas** | `app-schemas/simple-pets/schema.sql` | `simple-pets-*` schemas, animals table with constraints/indexes/triggers |
 | **app data** | `app-schemas/simple-pets/test-data.sql` | 5 test animals (Buddy, Max, Whiskers, Mittens, Tweety) |
@@ -39,7 +38,6 @@ const REPO_ROOT = path.resolve(__dirname, '../../..');
 [
   seed.pgpm(REPO_ROOT),                               // all installed @pgpm/* modules
   seed.sqlfile([
-    `${SEED}/services/grants.sql`,                    // test-role grants
     `${SEED}/app-schemas/simple-pets/schema.sql`,     // app tables
     `${SEED}/services/test-data.sql`,                 // API + domain rows
     `${SEED}/app-schemas/simple-pets/test-data.sql`,  // test animals
@@ -52,9 +50,14 @@ const REPO_ROOT = path.resolve(__dirname, '../../..');
 Pick only the layers you need:
 
 - **Base only** (extensions + stamps, no metaschema): `base/setup.sql` + your own schema/data
-- **Metaschema + services only** (no app tables): `seed.pgpm(metaschema-modules)` + `services/grants.sql` + `services/test-data.sql`
-- **Full stack with app data**: `seed.pgpm(metaschema-modules)` + `seed.pgpm(stamps)` + `services/grants.sql` + `app-schemas/*` + `services/test-data.sql` + `app-schemas/*/test-data.sql`
-- **Custom app schema**: `seed.pgpm(metaschema-modules)` + `services/grants.sql` + `services/test-data.sql` + your own schema/data SQL
+- **Metaschema + services only** (no app tables): `seed.pgpm(repoRoot)` + `services/test-data.sql`
+- **Full stack with app data**: `seed.pgpm(repoRoot)` + `app-schemas/*` + `services/test-data.sql` + `app-schemas/*/test-data.sql`
+- **Custom app schema**: `seed.pgpm(repoRoot)` + `services/test-data.sql` + your own schema/data SQL
+
+The installed modules grant `administrator`/`authenticated` — there are no
+`anonymous` grants anywhere (matching production). Server plugins resolve
+module registrations (metaschema config) without the request role, so
+anonymous request paths never need grants on the metaschema schemas.
 
 ## Consumers
 
@@ -64,7 +67,7 @@ These test files use the shared fixtures:
 |-----------|---------------------|
 | `graphql/server-test/__tests__/server.integration.test.ts` | `base/*` (simple-seed), `services/*` + `app-schemas/*` (services scenarios) |
 | `graphql/server-test/__tests__/express-context.integration.test.ts` | `services/*` + `app-schemas/*` |
-| `graphql/server-test/__tests__/upload.integration.test.ts` | `seed.pgpm` modules + `services/grants.sql` (storage data is local) |
+| `graphql/server-test/__tests__/upload.integration.test.ts` | `seed.pgpm` modules (storage schemas/data are local) |
 | `graphql/server-test/__tests__/cli-e2e.test.ts` | `base/*` + `app-schemas/*` (animals), `base/*` (search) |
 | `graphql/server-test/__tests__/search.integration.test.ts` | `base/*` |
 | `graphql/server-test/__tests__/schema-snapshot.test.ts` | `base/*` |

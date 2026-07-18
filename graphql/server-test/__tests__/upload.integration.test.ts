@@ -73,7 +73,6 @@ const metaSchemas = [
 const seedAdapters = [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
-    shared('services', 'grants.sql'),
     sql('simple-seed-storage', 'schema.sql'),
     sql('simple-seed-storage', 'test-data.sql'),
   ]),

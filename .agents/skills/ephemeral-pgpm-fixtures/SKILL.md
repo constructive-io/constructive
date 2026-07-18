@@ -43,7 +43,6 @@ const repoRoot = path.resolve(__dirname, '../../..'); // the repo root is the pg
 await getConnections(options, [
   seed.pgpm(repoRoot),                // deploys ALL installed modules in dependency order
   seed.sqlfile([
-    shared('services', 'grants.sql'), // widens grants to test roles
     /* app schemas, test data ... */
   ])
 ]);
@@ -51,7 +50,7 @@ await getConnections(options, [
 
 Key facts:
 - `seed.pgpm(dir)` deploys a pgpm module (and its dependencies) into the isolated test database; pass a workspace root (e.g. the repo root) to deploy every installed module once, in dependency order. Workspace-wide deploys require an explicit `cwd` — `seed.pgpm()` with no args stays module-only. Don't chain multiple `seed.pgpm(module)` calls that share dependencies — fast deploys are not idempotent across calls.
-- The real modules already grant to `administrator`/`authenticated`; include `__fixtures__/seed/services/grants.sql` only for the `anonymous` test role (read access), which production modules never grant to.
+- The real modules grant to `administrator`/`authenticated` — there are no `anonymous` grants anywhere (matching production). Server plugins resolve module registrations (metaschema config) without the request role (`withPgClient(null, ...)`), so anonymous request paths never need grants on the metaschema schemas.
 - Per-app *generated* tables (compute `function_definitions`, storage tables) are NOT published modules — they stay as hand-written fixtures (`__fixtures__/seed/compute/setup.sql`, `simple-seed-storage/`).
 - The deterministic pgpm engine fixtures under `__fixtures__/sqitch/` are intentionally frozen — never replace them with installed modules.
 

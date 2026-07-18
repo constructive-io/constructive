@@ -269,15 +269,21 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
+                      const databaseId = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                        resolveDatabaseId(pgClient),
+                      );
+                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+
+                      // Module registration is server config, not user data:
+                      // resolve it without the request role's pgSettings.
+                      const allConfigs = await vals.withPgClient(null, (pgClient: any) =>
+                        loadAllStorageModules(pgClient, databaseId),
+                      );
+                      const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
+                      if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
+
                       return vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
                         return pgClient.withTransaction(async (txClient: any) => {
-                          const databaseId = await resolveDatabaseId(txClient);
-                          if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
-
-                          const allConfigs = await loadAllStorageModules(txClient, databaseId);
-                          const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
-                          if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
-
                           const bucket = await getBucketConfig(
                             txClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined,
                           );
@@ -370,15 +376,21 @@ export function createPresignedUrlPlugin(
                     });
 
                     return lambda($combined, async (vals: any) => {
+                      const databaseId = await vals.withPgClient(vals.pgSettings, (pgClient: any) =>
+                        resolveDatabaseId(pgClient),
+                      );
+                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+
+                      // Module registration is server config, not user data:
+                      // resolve it without the request role's pgSettings.
+                      const allConfigs = await vals.withPgClient(null, (pgClient: any) =>
+                        loadAllStorageModules(pgClient, databaseId),
+                      );
+                      const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
+                      if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
+
                       return vals.withPgClient(vals.pgSettings, async (pgClient: any) => {
                         return pgClient.withTransaction(async (txClient: any) => {
-                          const databaseId = await resolveDatabaseId(txClient);
-                          if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
-
-                          const allConfigs = await loadAllStorageModules(txClient, databaseId);
-                          const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
-                          if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
-
                           const bucket = await getBucketConfig(
                             txClient, storageConfig, databaseId, vals.bucketKey, vals.ownerId || undefined,
                           );
@@ -480,23 +492,26 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
-                    await withPgClient(pgSettings, async (pgClient: any) => {
-                      const databaseId = await resolveDatabaseId(pgClient);
-                      if (!databaseId) return;
+                    const databaseId = await withPgClient(pgSettings, (pgClient: any) => resolveDatabaseId(pgClient));
+                    // Module registration is server config, not user data:
+                    // resolve it without the request role's pgSettings.
+                    const allConfigs = databaseId
+                      ? await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId))
+                      : [];
+                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 
-                      const allConfigs = await loadAllStorageModules(pgClient, databaseId);
-                      const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-                      if (!storageConfig) return;
-
-                      // Read the file row (RLS enforced)
-                      const result = await pgClient.query({
-                        text: `SELECT key, bucket_id FROM ${storageConfig.filesQualifiedName} WHERE id = $1 LIMIT 1`,
-                        values: [fileInput],
+                    if (storageConfig) {
+                      await withPgClient(pgSettings, async (pgClient: any) => {
+                        // Read the file row (RLS enforced)
+                        const result = await pgClient.query({
+                          text: `SELECT key, bucket_id FROM ${storageConfig.filesQualifiedName} WHERE id = $1 LIMIT 1`,
+                          values: [fileInput],
+                        });
+                        if (result.rows.length > 0) {
+                          fileRow = result.rows[0] as { key: string; bucket_id: string };
+                        }
                       });
-                      if (result.rows.length > 0) {
-                        fileRow = result.rows[0] as { key: string; bucket_id: string };
-                      }
-                    });
+                    }
                   } catch (err: any) {
                     log.warn(`Pre-delete file lookup failed: ${err.message}`);
                   }
@@ -513,14 +528,15 @@ export function createPresignedUrlPlugin(
 
                 if (withPgClient) {
                   try {
-                    await withPgClient(pgSettings, async (pgClient: any) => {
-                      const databaseId = await resolveDatabaseId(pgClient);
-                      if (!databaseId) return;
+                    const databaseId = await withPgClient(pgSettings, (pgClient: any) => resolveDatabaseId(pgClient));
+                    // Module registration is server config, not user data:
+                    // resolve it without the request role's pgSettings.
+                    const allConfigs = databaseId
+                      ? await withPgClient(null, (pgClient: any) => loadAllStorageModules(pgClient, databaseId))
+                      : [];
+                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
 
-                      const allConfigs = await loadAllStorageModules(pgClient, databaseId);
-                      const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-                      if (!storageConfig) return;
-
+                    if (storageConfig) await withPgClient(pgSettings, async (pgClient: any) => {
                       // Check refcount: any other file with the same key in this bucket?
                       const refResult = await pgClient.query({
                         text: `SELECT COUNT(*)::int AS ref_count FROM ${storageConfig.filesQualifiedName} WHERE key = $1 AND bucket_id = $2`,
