@@ -1,5 +1,12 @@
 import { ast, nodes } from 'pg-ast';
 import { deparseSync } from 'pgsql-deparser';
+import type {
+  ComparisonFilterOperator,
+  DistinctFilterOperator,
+  LikeFilterOperator,
+  ListFilterOperator,
+  PatternFilterOperator
+} from 'query-spec';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -18,37 +25,17 @@ type JoinKind = 'JOIN_INNER' | 'JOIN_LEFT' | 'JOIN_RIGHT' | 'JOIN_FULL';
 // or an explicit expression such as col(), fn(), lit(), param().
 export type Operand = SqlValue | Expr;
 
-// Per-field filter, SDK style. Operator names match the generated SDK/ORM
-// filter grammar (PostGraphile connection filters).
-export interface FieldFilter {
-  isNull?: boolean;
-  equalTo?: Operand | QueryBuilder;
-  notEqualTo?: Operand | QueryBuilder;
-  distinctFrom?: Operand;
-  notDistinctFrom?: Operand;
-  in?: Operand[] | QueryBuilder;
-  notIn?: Operand[] | QueryBuilder;
-  lessThan?: Operand | QueryBuilder;
-  lessThanOrEqualTo?: Operand | QueryBuilder;
-  greaterThan?: Operand | QueryBuilder;
-  greaterThanOrEqualTo?: Operand | QueryBuilder;
-  like?: Operand;
-  notLike?: Operand;
-  likeInsensitive?: Operand;
-  notLikeInsensitive?: Operand;
-  includes?: string;
-  notIncludes?: string;
-  includesInsensitive?: string;
-  notIncludesInsensitive?: string;
-  startsWith?: string;
-  notStartsWith?: string;
-  startsWithInsensitive?: string;
-  notStartsWithInsensitive?: string;
-  endsWith?: string;
-  notEndsWith?: string;
-  endsWithInsensitive?: string;
-  notEndsWithInsensitive?: string;
-}
+// Per-field filter conforming to the shared `query-spec` grammar, with
+// SQL-layer operands: expressions and subquery QueryBuilders are allowed
+// where JSON layers only allow plain values. Operator names come from the
+// query-spec operator groups so the grammar can never drift.
+export type FieldFilter =
+  { isNull?: boolean } &
+  { [K in ComparisonFilterOperator]?: Operand | QueryBuilder } &
+  { [K in DistinctFilterOperator]?: Operand } &
+  { [K in ListFilterOperator]?: Operand[] | QueryBuilder } &
+  { [K in LikeFilterOperator]?: Operand } &
+  { [K in PatternFilterOperator]?: string };
 
 // Main filter type — nested objects keyed by column name (may be
 // schema/alias-qualified, e.g. 'u.status'), with and/or/not combinators.
