@@ -1,8 +1,9 @@
-import { getConnEnvOptions, getEnvOptions } from '../src/merge';
 import { pgpmDefaults, PgpmOptions } from '@pgpmjs/types';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+
+import { getConnEnvOptions, getEnvOptions } from '../src/merge';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
@@ -224,5 +225,55 @@ describe('getEnvOptions', () => {
     expect(result.jobs?.worker?.supported).toEqual(['delta', 'epsilon']);
     expect(result.jobs?.scheduler?.supported).toEqual(['gamma', 'zeta']);
     expect(result.packages).toEqual(['testing/*', 'extensions/*']);
+  });
+
+  describe('production safety enforcement', () => {
+    // Empty cwd so no pgpm.json overrides the dangerous built-in defaults.
+    const emptyCwd = (): string =>
+      (tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-prod-')));
+
+    it('does not throw for bare defaults outside production', () => {
+      expect(() =>
+        getEnvOptions({}, emptyCwd(), { NODE_ENV: 'development' })
+      ).not.toThrow();
+    });
+
+    it('throws in production when secrets/hosts are left at dev defaults (STRICT_ENV=throw)', () => {
+      expect(() =>
+        getEnvOptions({}, emptyCwd(), { NODE_ENV: 'production', STRICT_ENV: 'throw' })
+      ).toThrow(/Unsafe production environment/);
+    });
+
+    it('warns (does not throw) in production by default', () => {
+      const spy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      try {
+        expect(() =>
+          getEnvOptions({}, emptyCwd(), { NODE_ENV: 'production' })
+        ).not.toThrow();
+        expect(spy).toHaveBeenCalled();
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it('does not throw in production when sensitive values are provided via env', () => {
+      const safeEnv: NodeJS.ProcessEnv = {
+        NODE_ENV: 'production',
+        STRICT_ENV: 'throw',
+        PGHOST: 'db.internal',
+        PGDATABASE: 'appdb',
+        PGPASSWORD: 's3cret-pg',
+        PGROOTDATABASE: 'app_root',
+        SERVER_HOST: '0.0.0.0',
+        DB_CONNECTIONS_APP_PASSWORD: 's3cret-app',
+        DB_CONNECTIONS_ADMIN_PASSWORD: 's3cret-admin',
+        AWS_ACCESS_KEY: 'AKIAREAL',
+        AWS_SECRET_KEY: 'realsecret',
+        CDN_ENDPOINT: 'https://s3.example.com',
+        CDN_PUBLIC_URL_PREFIX: 'https://cdn.example.com',
+        BUCKET_NAME: 'prod-bucket'
+      };
+      expect(() => getEnvOptions({}, emptyCwd(), safeEnv)).not.toThrow();
+    });
   });
 });
