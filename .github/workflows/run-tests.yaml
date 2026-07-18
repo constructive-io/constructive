@@ -4,10 +4,18 @@ on:
     branches:
       - main
       - v1
+    paths-ignore:
+      - '**/*.md'
+      - '.agents/skills/**'
+      - 'docs/**'
   pull_request:
     branches:
       - main
       - v1
+    paths-ignore:
+      - '**/*.md'
+      - '.agents/skills/**'
+      - 'docs/**'
   workflow_dispatch:
   workflow_call:
 
